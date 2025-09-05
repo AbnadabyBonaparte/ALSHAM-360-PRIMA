@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALSHAM 360° PRIMA - CRM Inteligente</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Header -->
+      <header>
+        <div class="container flex items-center justify-between">
+          <div class="flex items-center">
+            <h1 class="logo">ALSHAM 360° PRIMA</h1>
+            <span class="beta-badge">BETA</span>
+          </div>
+          <nav class="flex">
+            <a href="#dashboard">Dashboard</a>
+            <a href="#leads">Leads</a>
+            <a href="#automacao">Automação</a>
+          </nav>
+          <div class="flex items-center" style="gap: 1rem;">
+            <button class="btn btn-secondary">Configurações</button>
+            <button class="btn btn-primary">+ Novo Lead</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main>
+        <div class="container">
+          <!-- Welcome Section -->
+          <div class="welcome-section">
+            <h2>Bem-vindo ao ALSHAM 360° PRIMA</h2>
+            <p>Seu sistema de CRM inteligente com automação, gamificação e IA.</p>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="grid grid-4" style="margin-bottom: 3rem;">
+            <div class="card">
+              <div class="stat-card">
+                <div class="stat-icon blue">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="stat-label">Total de Leads</p>
+                  <p class="stat-value">1,234</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="stat-card">
+                <div class="stat-icon green">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="stat-label">Qualificados</p>
+                  <p class="stat-value">456</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="stat-card">
+                <div class="stat-icon yellow">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="stat-label">Taxa de Conversão</p>
+                  <p class="stat-value">37%</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="stat-card">
+                <div class="stat-icon purple">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="stat-label">Receita Mensal</p>
+                  <p class="stat-value">R$ 89k</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Leads Table -->
+          <div class="card">
+            <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 1.125rem; font-weight: 600; color: #1f2937;">Leads Recentes</h3>
+              <button class="btn btn-primary">Ver Todos</button>
+            </div>
+            
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Score IA</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 500;">João Silva</td>
+                    <td style="color: #6b7280;">joao@exemplo.com</td>
+                    <td>
+                      <span class="status-badge status-qualified">Qualificado</span>
+                    </td>
+                    <td style="color: #6b7280;">85/100</td>
+                    <td>
+                      <a href="#" class="table-action">Editar</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500;">Maria Santos</td>
+                    <td style="color: #6b7280;">maria@exemplo.com</td>
+                    <td>
+                      <span class="status-badge status-analysis">Em Análise</span>
+                    </td>
+                    <td style="color: #6b7280;">72/100</td>
+                    <td>
+                      <a href="#" class="table-action">Editar</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500;">Carlos Oliveira</td>
+                    <td style="color: #6b7280;">carlos@exemplo.com</td>
+                    <td>
+                      <span class="status-badge status-qualified">Qualificado</span>
+                    </td>
+                    <td style="color: #6b7280;">91/100</td>
+                    <td>
+                      <a href="#" class="table-action">Editar</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer>
+        <div class="container flex justify-between items-center">
+          <p>© 2025 ALSHAM Global Commerce. Todos os direitos reservados.</p>
+          <p>Versão 1.0.0 - PRIMA BETA</p>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+
