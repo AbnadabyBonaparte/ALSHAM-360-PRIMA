@@ -1,12 +1,13 @@
 {
-  "name": "frontend",
+  "name": "alsham-360-prima",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite preview --port $PORT --host 0.0.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
@@ -17,5 +18,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

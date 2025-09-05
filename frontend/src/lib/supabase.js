@@ -4,8 +4,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 // Configurações do Supabase (baseado na auditoria final)
-const supabaseUrl = 'https://your-project.supabase.co' // Substituir pela URL real
-const supabaseAnonKey = 'your-anon-key' // Substituir pela chave real
+const supabaseUrl = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
 
 // Criar cliente Supabase
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -57,11 +57,11 @@ export async function signInWithEmail(email, password) {
 /**
  * Fazer registro com email e senha
  */
-export async function signUpWithEmail(email, password, userData = {}) {
+export async function signUpWithEmail(userData) {
   try {
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: userData.email,
+      password: userData.password,
       options: {
         data: {
           full_name: userData.fullName || '',
@@ -72,10 +72,9 @@ export async function signUpWithEmail(email, password, userData = {}) {
     
     if (error) throw error
     
-    // Criar perfil do usuário
+    // Criar perfil do usuário usando função bootstrap
     if (data.user) {
       await createUserProfile(data.user.id, {
-        email: data.user.email,
         full_name: userData.fullName || '',
         org_id: userData.orgId || DEFAULT_ORG_ID,
         role: 'user'
@@ -216,22 +215,28 @@ export async function getUserProfile(userId) {
 }
 
 /**
- * Criar perfil do usuário
+ * Criar perfil do usuário (usando função bootstrap do programador)
  */
 export async function createUserProfile(userId, profileData) {
   try {
+    // Usar função bootstrap criada pelo programador
+    const { error: bootstrapError } = await supabase.rpc('bootstrap_profile_and_membership', {
+      p_full_name: profileData.full_name || '',
+      p_org: profileData.org_id || DEFAULT_ORG_ID
+    })
+
+    if (bootstrapError) {
+      console.warn('Erro no bootstrap (pode ser normal se usuário já existe):', bootstrapError)
+    }
+
+    // Buscar perfil criado para retornar
     const { data, error } = await supabase
       .from('user_profiles')
-      .insert([{
-        id: userId,
-        ...profileData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }])
-      .select()
+      .select('*')
+      .eq('user_id', userId)
       .single()
     
-    if (error) throw error
+    if (error && error.code !== 'PGRST116') throw error
     return data
   } catch (error) {
     console.error('Erro ao criar perfil:', error.message)
