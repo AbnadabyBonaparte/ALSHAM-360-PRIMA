@@ -1,79 +1,127 @@
 import './style.css'
-
-// ALSHAM 360° PRIMA - Dashboard Obra-Prima (UI Premium Consolidado)
+import { getDashboardKPIs, getLeads } from '../lib/supabase.js'
 
 // Timers globais para controle e limpeza
 let kpiTimer = null
 let leadTimer = null
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 ALSHAM 360° PRIMA - Dashboard Obra-Prima Carregado!')
 
   initializeAnimations()
-  initializeChart()
   initializeMicroInteractions()
   initializeGamification()
   initializeCelebrations()
 
+  await renderKPIs()
+  await renderLeadsTable()
+  await renderChartWithRealData()
+
   startRealTimeUpdates()
-  // Limpeza de timers ao sair da página ou aba perder o foco
   window.addEventListener('beforeunload', stopRealTimeUpdates)
   document.addEventListener('visibilitychange', () => {
     document.hidden ? stopRealTimeUpdates() : startRealTimeUpdates()
   })
 })
 
-// ===== ANIMAÇÕES DE ENTRADA =====
-function initializeAnimations() {
-  // Animar cards com delay escalonado
-  const cards = document.querySelectorAll('.bg-white')
-  cards.forEach((card, index) => {
-    card.style.opacity = '0'
-    card.style.transform = 'translateY(20px)'
-
-    setTimeout(() => {
-      card.style.transition = 'all 0.6s ease-out'
-      card.style.opacity = '1'
-      card.style.transform = 'translateY(0)'
-    }, index * 100)
-  })
-
-  // Acessibilidade: respeitar prefers-reduced-motion
-  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  if (!reduceMotion) {
-    setTimeout(() => animateProgressBars(), 1000)
+// ===== KPIs DINÂMICOS =====
+async function renderKPIs() {
+  const kpiBox = document.getElementById('dashboard-kpis')
+  if (!kpiBox) return
+  kpiBox.innerHTML = `<div class="text-gray-400 text-sm p-6">Carregando KPIs...</div>`
+  const { data, error } = await getDashboardKPIs()
+  if (error || !data) {
+    kpiBox.innerHTML = `<div class="text-red-500 p-6">Erro ao buscar KPIs: ${error?.message || 'Sem dados'}</div>`
+    return
   }
+  kpiBox.innerHTML = `
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white rounded-lg shadow p-4 flex flex-col">
+        <span class="text-gray-500 text-xs mb-1">Leads Totais</span>
+        <span class="text-2xl font-bold">${data.totalLeads}</span>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4 flex flex-col">
+        <span class="text-gray-500 text-xs mb-1">Qualificados</span>
+        <span class="text-2xl font-bold">${data.qualifiedLeads}</span>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4 flex flex-col">
+        <span class="text-gray-500 text-xs mb-1">Conversão</span>
+        <span class="text-2xl font-bold">${data.conversionRate}%</span>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4 flex flex-col">
+        <span class="text-gray-500 text-xs mb-1">Receita</span>
+        <span class="text-2xl font-bold">R$ ${data.totalRevenue.toLocaleString()}</span>
+      </div>
+    </div>
+    <div class="text-xs text-gray-400 mt-2">Atualizado: ${new Date(data.lastUpdated).toLocaleTimeString()}</div>
+  `
 }
 
-function animateProgressBars() {
-  // Seleciona barras de progresso apenas com atributo dedicado
-  const progressBars = document.querySelectorAll('[data-progress]')
-  progressBars.forEach(bar => {
-    const finalWidth = bar.style.width || '0%'
-    bar.style.width = '0%'
-    bar.style.transition = 'width 1.5s ease-out'
-    setTimeout(() => {
-      bar.style.width = finalWidth
-    }, 100)
-  })
+// ===== LEADS DINÂMICOS =====
+async function renderLeadsTable() {
+  const leadsBox = document.getElementById('leads-table')
+  if (!leadsBox) return
+  leadsBox.innerHTML = `<div class="text-gray-400 text-sm p-6">Carregando leads...</div>`
+  const { data, error } = await getLeads()
+  if (error || !data) {
+    leadsBox.innerHTML = `<div class="text-red-500 p-6">Erro ao buscar leads: ${error?.message || 'Sem dados'}</div>`
+    return
+  }
+  leadsBox.innerHTML = `
+    <table class="w-full text-sm text-left">
+      <thead>
+        <tr>
+          <th class="p-2">Nome</th>
+          <th class="p-2">Empresa</th>
+          <th class="p-2">Status</th>
+          <th class="p-2">Score IA</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.slice(0, 10).map(lead => `
+          <tr>
+            <td class="p-2 font-medium">${lead.nome}</td>
+            <td class="p-2">${lead.empresa || '-'}</td>
+            <td class="p-2">${lead.status}</td>
+            <td class="p-2">${lead.score_ia ?? '-'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    <div class="text-xs text-gray-400 mt-2">${data.length} leads encontrados</div>
+  `
 }
 
-// ===== GRÁFICO INTERATIVO =====
-function initializeChart() {
+// ===== GRÁFICO DINÂMICO COM DADOS REAIS =====
+async function renderChartWithRealData() {
   const canvas = document.getElementById('performanceChart')
   if (!canvas) return
 
+  const { data, error } = await getLeads()
+  if (error || !data) return createAlternativeChart(canvas)
+
+  // Agrupa receita por dia da semana (seg a dom)
+  const receitaPorDia = [0, 0, 0, 0, 0, 0, 0]
+  data.forEach(l => {
+    if (l.status === 'converted' && l.created_at) {
+      const dia = new Date(l.created_at).getDay()
+      receitaPorDia[dia] += Number(l.value || 0)
+    }
+  })
+  // Reorganiza para começar na segunda
+  const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+  const serie = [1,2,3,4,5,6,0].map(idx => receitaPorDia[idx])
+
   if (typeof Chart === 'undefined') {
-    console.log('Chart.js não carregado, criando gráfico alternativo (SVG)')
-    createAlternativeChart(canvas)
+    createAlternativeChart(canvas, serie)
     return
   }
 
-  const data = {
-    labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+  const chartData = {
+    labels,
     datasets: [{
       label: 'Receita (R$)',
-      data: [2500, 3200, 2800, 4100, 3600, 2900, 3400],
+      data: serie,
       borderColor: '#8b5cf6',
       backgroundColor: 'rgba(139, 92, 246, 0.1)',
       borderWidth: 3,
@@ -89,7 +137,7 @@ function initializeChart() {
 
   const config = {
     type: 'line',
-    data,
+    data: chartData,
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -116,13 +164,11 @@ function initializeChart() {
   new Chart(canvas, config)
 }
 
-function createAlternativeChart(canvasEl) {
-  // Substitui o canvas por um SVG simples com a mesma área
+function createAlternativeChart(canvasEl, data = [0,0,0,0,0,0,0]) {
   const container = canvasEl.parentNode
   if (!container) return
 
-  const data = [2500, 3200, 2800, 4100, 3600, 2900, 3400]
-  const max = Math.max(...data)
+  const max = Math.max(...data, 1)
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   svg.setAttribute('width', '100%')
@@ -157,9 +203,34 @@ function createAlternativeChart(canvasEl) {
   container.replaceChild(svg, canvasEl)
 }
 
+// ===== ANIMAÇÕES DE ENTRADA =====
+function initializeAnimations() {
+  const cards = document.querySelectorAll('.bg-white')
+  cards.forEach((card, index) => {
+    card.style.opacity = '0'
+    card.style.transform = 'translateY(20px)'
+    setTimeout(() => {
+      card.style.transition = 'all 0.6s ease-out'
+      card.style.opacity = '1'
+      card.style.transform = 'translateY(0)'
+    }, index * 100)
+  })
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  if (!reduceMotion) setTimeout(() => animateProgressBars(), 1000)
+}
+
+function animateProgressBars() {
+  const progressBars = document.querySelectorAll('[data-progress]')
+  progressBars.forEach(bar => {
+    const finalWidth = bar.style.width || '0%'
+    bar.style.width = '0%'
+    bar.style.transition = 'width 1.5s ease-out'
+    setTimeout(() => { bar.style.width = finalWidth }, 100)
+  })
+}
+
 // ===== MICRO-INTERAÇÕES PREMIUM =====
 function initializeMicroInteractions() {
-  // Hover effects nos KPIs
   const kpiCards = document.querySelectorAll('.hover\\:shadow-md, .bg-white')
   kpiCards.forEach(card => {
     card.addEventListener('mouseenter', function () {
@@ -172,12 +243,8 @@ function initializeMicroInteractions() {
       this.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
     })
   })
-
-  // Efeito ripple nos botões
   const buttons = document.querySelectorAll('button, .btn-primary, .btn-secondary')
   buttons.forEach(button => button.addEventListener('click', createRippleEffect))
-
-  // Animação de loading nos botões de ação
   const actionButtons = document.querySelectorAll('[class*="btn-"]')
   actionButtons.forEach(button => {
     button.addEventListener('click', function () {
@@ -235,23 +302,12 @@ function simulateAction(button) {
 
 // ===== GAMIFICAÇÃO INTERATIVA =====
 function initializeGamification() {
-  // Progress bar interativa do level
   const levelProgress = document.querySelector('.bg-gradient-premium')
-  if (levelProgress) {
-    levelProgress.addEventListener('click', showLevelDetails)
-  }
-
-  // Streak counter animado
+  if (levelProgress) levelProgress.addEventListener('click', showLevelDetails)
   const streakElement = document.querySelector('.text-primary')
-  if (streakElement && streakElement.textContent.includes('12 dias')) {
-    animateStreakCounter(streakElement)
-  }
-
-  // Badges/Conquistas
+  if (streakElement && streakElement.textContent.includes('12 dias')) animateStreakCounter(streakElement)
   const badgeButton = document.querySelector('button[class*="btn-primary"]')
-  if (badgeButton && badgeButton.textContent.includes('Conquistas')) {
-    badgeButton.addEventListener('click', showAchievements)
-  }
+  if (badgeButton && badgeButton.textContent.includes('Conquistas')) badgeButton.addEventListener('click', showAchievements)
 }
 
 function animateStreakCounter(element) {
@@ -374,97 +430,26 @@ function showAchievementNotification(title, message) {
   `
   document.body.appendChild(notification)
 
-  // Listener seguro para fechar (em vez de onclick inline)
   const closeBtn = notification.querySelector('.close-btn')
   closeBtn?.addEventListener('click', () => notification.remove(), { once: true })
 
-  // Animar entrada
   setTimeout(() => { notification.style.transform = 'translateX(0)' }, 100)
-
-  // Auto-remover após 5s
   setTimeout(() => {
     notification.style.transform = 'translateX(100%)'
     setTimeout(() => notification.remove(), 500)
   }, 5000)
 }
 
-// ===== ATUALIZAÇÕES EM TEMPO REAL (simulação) =====
+// ===== ATUALIZAÇÕES EM TEMPO REAL =====
 function startRealTimeUpdates() {
   stopRealTimeUpdates()
-  kpiTimer = setInterval(updateKPIs, 30000)
-  leadTimer = setInterval(() => { if (Math.random() > 0.8) showLeadNotification() }, 45000)
+  kpiTimer = setInterval(renderKPIs, 30000)
+  leadTimer = setInterval(renderLeadsTable, 45000)
 }
 function stopRealTimeUpdates() {
   if (kpiTimer) clearInterval(kpiTimer)
   if (leadTimer) clearInterval(leadTimer)
   kpiTimer = leadTimer = null
-}
-
-function updateKPIs() {
-  const kpiValues = document.querySelectorAll('.text-2xl.font-bold')
-  kpiValues.forEach(value => {
-    if (value.textContent.includes('1,234')) {
-      const newValue = 1234 + Math.floor(Math.random() * 10)
-      animateNumberChange(value, newValue.toLocaleString())
-    }
-  })
-}
-
-function animateNumberChange(element, newValue) {
-  element.style.transform = 'scale(1.1)'
-  element.style.color = '#10b981'
-  setTimeout(() => {
-    element.textContent = newValue
-    element.style.transform = 'scale(1)'
-    element.style.color = ''
-  }, 200)
-}
-
-function showLeadNotification() {
-  const messages = [
-    'Ana Costa está visualizando sua proposta',
-    'Pedro Silva agendou uma reunião',
-    'Novo lead: Empresa TechCorp'
-  ]
-  const message = messages[Math.floor(Math.random() * messages.length)]
-  showAchievementNotification('🎯 Atividade de Lead', message)
-}
-
-// ===== UTILITÁRIO DE MODAL (do Claude, aprimorado) =====
-function createModal(title, content) {
-  const modal = document.createElement('div')
-  modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
-  modal.innerHTML = `
-    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 transform scale-95 transition-transform duration-300">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-bold text-gray-900">${title}</h3>
-        <button class="text-gray-400 hover:text-gray-600 close-btn" aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        </button>
-      </div>
-      <div>${content}</div>
-    </div>
-  `
-  document.body.appendChild(modal)
-
-  // Fechar ao clicar fora do conteúdo
-  modal.addEventListener('click', function (e) {
-    if (e.target === modal) modal.remove()
-  })
-
-  // Fechar no botão (listener seguro)
-  const closeBtn = modal.querySelector('.close-btn')
-  closeBtn?.addEventListener('click', () => modal.remove(), { once: true })
-
-  // Animar entrada
-  setTimeout(() => {
-    const contentDiv = modal.querySelector('.transform')
-    if (contentDiv) contentDiv.style.transform = 'scale(1)'
-  }, 10)
-
-  return modal
 }
 
 // ===== ESTILOS AUXILIARES (injetados) =====
