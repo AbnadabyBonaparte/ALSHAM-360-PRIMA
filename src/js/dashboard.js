@@ -1,96 +1,140 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// ALSHAM 360° PRIMA - O Rosto e Corpo do Dashboard
+// Este arquivo controla a interface, pedindo os dados ao "cérebro" (supabase.js)
 
-// Configurações do Supabase
-const supabaseUrl = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI';
-export const DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { 
+    getCurrentUser,
+    DEFAULT_ORG_ID,
+    getDashboardKPIs
+} from '../lib/supabase.js';
 
-// ===== AUTENTICAÇÃO E PERFIS =====
-
-export async function getUserProfile(userId) {
-    try {
-        const { data, error } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('user_id', userId)
-            .single();
-        if (error && error.code !== 'PGRST116') throw error;
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar perfil:', error.message);
-        return null;
+// Estado da aplicação (apenas o que a tela precisa saber)
+let appState = {
+    user: null,
+    profile: null,
+    orgId: DEFAULT_ORG_ID,
+    data: {
+        kpis: null,
     }
-}
+};
 
-export async function getCurrentUser() {
+document.addEventListener('DOMContentLoaded', initializeAdvancedApp);
+
+async function initializeAdvancedApp() {
     try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        if (user) {
-            const profile = await getUserProfile(user.id);
-            return { user, profile };
-        }
-        return { user: null, profile: null };
-    } catch (error) {
-        console.error('Erro ao obter usuário:', error.message);
-        return { user: null, profile: null };
-    }
-}
-
-
-// ===== NOVO: LÓGICA DO DASHBOARD =====
-
-/**
- * Busca os KPIs principais para o Dashboard.
- * Esta função é a chave para substituir os dados "mock".
- */
-export async function getDashboardKPIs(orgId) {
-    try {
-        // Usamos Promise.all para buscar dados em paralelo, muito mais rápido!
-        const [leadsResult, opportunitiesResult] = await Promise.all([
-            supabase
-                .from('leads_crm')
-                .select('id, estagio, status, score_ia', { count: 'exact' })
-                .eq('org_id', orgId),
-            
-            supabase
-                .from('sales_opportunities')
-                .select('valor, etapa')
-                .eq('org_id', orgId)
-        ]);
-
-        if (leadsResult.error) throw leadsResult.error;
-        if (opportunitiesResult.error) throw opportunitiesResult.error;
-
-        const leads = leadsResult.data || [];
-        const opportunities = opportunitiesResult.data || [];
-
-        // --- Cálculos ---
-        const total_leads = leadsResult.count;
-        const leads_convertidos = leads.filter(l => l.status === 'converted' || l.estagio === 'convertido').length;
-        const receita_total = opportunities.reduce((sum, op) => sum + (op.valor || 0), 0);
-        const leadsComScore = leads.filter(l => l.score_ia != null);
-        const score_media_ia = leadsComScore.length > 0
-            ? (leadsComScore.reduce((sum, l) => sum + l.score_ia, 0) / leadsComScore.length).toFixed(1)
-            : 0;
-
-        const kpis = {
-            total_leads,
-            leads_convertidos,
-            receita_total: parseFloat(receita_total),
-            score_media_ia: parseFloat(score_media_ia),
-            // Adicionamos alguns KPIs extras que seu dashboard "obra-prima" espera
-            leads_quentes: leads.filter(l => l.temperatura === 'QUENTE').length, // Supondo que a coluna 'temperatura' exista
-            receita_fechada: opportunities.filter(op => op.etapa === 'fechada_ganha').reduce((sum, op) => sum + (op.valor || 0), 0),
-            interacoes_semana: 0, // Placeholder, pois ainda não buscamos interações
-        };
+        console.log('🚀 Iniciando Dashboard...');
         
-        return { data: kpis, error: null };
-
+        const authResult = await getCurrentUser();
+        if (!authResult.user) {
+            console.log('❌ Usuário não autenticado. Redirecionando para login.');
+            window.location.href = '/src/pages/login.html';
+            return;
+        }
+        
+        appState.user = authResult.user;
+        appState.profile = authResult.profile;
+        appState.orgId = authResult.profile?.org_id || DEFAULT_ORG_ID;
+        
+        console.log(`✅ Usuário autenticado: ${appState.user.email}`);
+        
+        await loadAllDashboardData();
+        
+        console.log('✨ Dashboard carregado com dados reais!');
+        
     } catch (error) {
-        console.error("Erro ao calcular KPIs do Dashboard:", error);
-        return { data: null, error };
+        console.error('❌ Erro na inicialização do Dashboard:', error);
+        // Se a carga real falhar, mostramos dados de emergência (demo)
+        await loadDemoData();
     }
 }
+
+async function loadAllDashboardData() {
+    console.log('📊 Carregando dados REAIS do dashboard...');
+    const { data: kpisData, error } = await getDashboardKPIs(appState.orgId);
+    
+    if (error) {
+        console.error("Falha ao carregar KPIs reais, usando fallback.", error);
+        await loadDemoData();
+        return;
+    }
+
+    appState.data.kpis = kpisData;
+    
+    // Simples fallback para dados de gamificação
+    appState.data.gamificacao = {
+        perfil: { level: appState.profile?.level || 1 },
+        progressao: { streak_atual: appState.profile?.streak || 0 }
+    };
+    
+    renderAdvancedDashboard();
+}
+
+async function loadDemoData() {
+    console.log('📋 Usando dados de demonstração como fallback.');
+    appState.data = {
+        kpis: {
+            total_leads: 0,
+            leads_convertidos: 0,
+            receita_total: 0,
+            score_media_ia: 0,
+            receita_fechada: 0,
+        },
+        gamificacao: { perfil: { level: 1 }, progressao: { streak_atual: 0 } },
+    };
+    renderAdvancedDashboard();
+}
+
+function renderAdvancedDashboard() {
+    renderAdvancedHeroSection();
+    renderAdvancedKPIs();
+}
+
+function renderAdvancedHeroSection() {
+    const heroContainer = document.querySelector('.bg-gradient-hero')?.parentElement;
+    if (!heroContainer || !appState.data.kpis) return;
+    
+    const kpis = appState.data.kpis;
+    const userName = appState.profile?.full_name || 'Usuário';
+    const level = appState.data.gamificacao?.perfil?.level;
+    
+    heroContainer.querySelector('.bg-gradient-hero').innerHTML = `
+        <div class="relative z-10">
+            <h2 class="text-3xl font-bold mb-2 text-white">${getTimeBasedGreeting()}, ${userName}!</h2>
+            <p class="text-xl mb-4 text-white">Você gerou <span class="font-bold text-yellow-300">R$ ${formatCurrency(kpis.receita_fechada)}</span> este mês.</p>
+            <div class="flex items-center space-x-6 text-sm text-white">
+                <div class="flex items-center space-x-2"><span>🏆</span><span>Level ${level}: ${getLevelTitle(level)}</span></div>
+                <div class="flex items-center space-x-2"><span>🔥</span><span>Streak: ${appState.data.gamificacao?.progressao?.streak_atual || 0} dias</span></div>
+            </div>
+        </div>`;
+}
+
+function renderAdvancedKPIs() {
+    const kpisContainer = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+    if (!kpisContainer || !appState.data.kpis) return;
+    
+    const kpis = appState.data.kpis;
+    
+    kpisContainer.innerHTML = `
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h3 class="text-2xl font-bold text-gray-900">${formatNumber(kpis.total_leads)}</h3>
+            <p class="text-gray-600 font-medium">Leads Ativos</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h3 class="text-2xl font-bold text-gray-900">${formatNumber(kpis.leads_convertidos)}</h3>
+            <p class="text-gray-600 font-medium">Conversões</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h3 class="text-2xl font-bold text-gray-900">${formatCurrency(kpis.receita_total)}</h3>
+            <p class="text-gray-600 font-medium">Receita Total</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h3 class="text-2xl font-bold text-gray-900">${kpis.score_media_ia}/10</h3>
+            <p class="text-gray-600 font-medium">Score IA Médio</p>
+        </div>`;
+}
+
+// Funções Auxiliares
+function formatCurrency(value) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0); }
+function formatNumber(value) { return new Intl.NumberFormat('pt-BR').format(value || 0); }
+function getTimeBasedGreeting() { const h = new Date().getHours(); if (h < 12) return 'Bom dia'; if (h < 18) return 'Boa tarde'; return 'Boa noite'; }
+function getLevelTitle(level) { const t = { 1: 'Iniciante', 7: 'Legend' }; return t[level] || `Level ${level}`; }
 
