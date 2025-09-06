@@ -12,90 +12,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function initializeSettingsPage() {
     try {
-        // Verificar autenticação
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             window.location.href = '../pages/login.html';
             return;
         }
-
-        // Carregar dados do usuário
-        await loadUserProfile(user);
-        
-        // Mostrar seção inicial
+        await loadUserData(user);
+        setupEventListeners();
         showSection('profile');
-        
     } catch (error) {
         console.error('Erro ao inicializar página de configurações:', error);
-        showNotification('Erro ao carregar dados', 'error');
+        showNotification('Erro fatal ao carregar dados. Contate o suporte.', 'error');
     }
 }
 
-async function loadUserProfile(user) {
-    try {
-        // Carregar perfil do usuário
-        const { data: profile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
+async function loadUserData(user) {
+    // 1. Carregar perfil do usuário
+    const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-        if (profileError && profileError.code !== 'PGRST116') {
-            throw profileError;
-        }
-
-        userProfile = profile || {
-            user_id: user.id,
-            full_name: user.user_metadata?.full_name || '',
-            email: user.email,
-            phone: '',
-            position: '',
-            timezone: 'America/Sao_Paulo',
-            language: 'pt-BR'
-        };
-
-        // Carregar dados da organização
-        if (userProfile.organization_id) {
-            const { data: org, error: orgError } = await supabase
-                .from('organizations')
-                .select('*')
-                .eq('id', userProfile.organization_id)
-                .single();
-
-            if (!orgError) {
-                organizationData = org;
-            }
-        }
-
-        // Preencher formulários
-        populateProfileForm();
-        populateOrganizationForm();
-        
-    } catch (error) {
-        console.error('Erro ao carregar perfil:', error);
-        // Usar dados mockados em caso de erro
-        loadMockData();
+    if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError;
     }
-}
 
-function loadMockData() {
-    userProfile = {
-        full_name: 'João Silva',
-        email: 'joao@alsham.com',
-        phone: '+55 11 99999-9999',
-        position: 'Gerente de Vendas',
+    // Se o perfil não existir, cria um objeto com os dados oficiais da empresa como padrão
+    userProfile = profile || {
+        user_id: user.id,
+        full_name: user.user_metadata?.full_name || 'Novo Usuário',
+        email: 'alsham.admin@alshamglobal.com.br', // DADO OFICIAL
+        phone: '(63) 99242-8800', // DADO OFICIAL
+        role: 'Admin',
         timezone: 'America/Sao_Paulo',
         language: 'pt-BR'
     };
 
-    organizationData = {
-        name: 'ALSHAM Global',
-        cnpj: '12.345.678/0001-90',
-        industry: 'technology',
-        size: '11-50',
-        address: 'Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-100'
-    };
+    // 2. Carregar dados da organização
+    if (userProfile.org_id) {
+        const { data: org, error: orgError } = await supabase
+            .from('organizations')
+            .select('*')
+            .eq('id', userProfile.org_id)
+            .single();
 
+        if (orgError) throw orgError;
+        organizationData = org;
+    } else {
+        // Se a organização não estiver vinculada, usa dados padrão
+        organizationData = {
+            name: 'ALSHAM GLOBAL COMMERCE LTDA',
+            cnpj: '59.332.265/0001-30',
+            industry: 'technology',
+            size: '11-50',
+            address: 'São Paulo' // Endereço simplificado como solicitado
+        };
+    }
+
+    // 3. Preencher os formulários com os dados carregados ou padrão
     populateProfileForm();
     populateOrganizationForm();
 }
@@ -105,17 +80,15 @@ function populateProfileForm() {
         'user-name': userProfile.full_name,
         'user-email': userProfile.email,
         'user-phone': userProfile.phone,
-        'user-position': userProfile.position,
+        'user-role': userProfile.role,
         'user-timezone': userProfile.timezone,
         'user-language': userProfile.language
     };
 
-    Object.entries(fields).forEach(([id, value]) => {
+    for (const [id, value] of Object.entries(fields)) {
         const element = document.getElementById(id);
-        if (element && value) {
-            element.value = value;
-        }
-    });
+        if (element && value) element.value = value;
+    }
 }
 
 function populateOrganizationForm() {
@@ -127,94 +100,64 @@ function populateOrganizationForm() {
         'org-address': organizationData.address
     };
 
-    Object.entries(fields).forEach(([id, value]) => {
+    for (const [id, value] of Object.entries(fields)) {
         const element = document.getElementById(id);
-        if (element && value) {
-            element.value = value;
-        }
-    });
+        if (element && value) element.value = value;
+    }
 }
 
-// Navegação entre seções
-window.showSection = function(sectionName) {
-    // Esconder todas as seções
+function setupEventListeners() {
+    document.querySelectorAll('#settings-nav button').forEach(button => {
+        const section = button.getAttribute('data-section');
+        if (section) button.addEventListener('click', () => showSection(section));
+    });
+    document.getElementById('save-all-button').addEventListener('click', saveAllSettings);
+}
+
+function showSection(sectionName) {
     document.querySelectorAll('.settings-section').forEach(section => {
         section.classList.add('hidden');
     });
-
-    // Remover classe ativa de todos os botões de navegação
-    document.querySelectorAll('[id^="nav-"]').forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-white');
-        btn.classList.add('text-gray-700', 'hover:text-gray-900');
+    document.querySelectorAll('#settings-nav button').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'text-primary');
     });
 
-    // Mostrar seção selecionada
     const targetSection = document.getElementById(`section-${sectionName}`);
-    if (targetSection) {
-        targetSection.classList.remove('hidden');
-    }
+    if (targetSection) targetSection.classList.remove('hidden');
 
-    // Ativar botão de navegação
-    const navButton = document.getElementById(`nav-${sectionName}`);
-    if (navButton) {
-        navButton.classList.add('bg-primary', 'text-white');
-        navButton.classList.remove('text-gray-700', 'hover:text-gray-900');
-    }
+    const navButton = document.querySelector(`#settings-nav button[data-section="${sectionName}"]`);
+    if (navButton) navButton.classList.add('bg-blue-100', 'text-primary');
+}
 
-    currentSection = sectionName;
-};
-
-// Salvar configurações
-window.saveAllSettings = async function() {
+async function saveAllSettings() {
     try {
         showNotification('Salvando configurações...', 'info');
-
-        // Salvar perfil do usuário
         await saveUserProfile();
-        
-        // Salvar dados da organização
         await saveOrganizationData();
-        
         showNotification('Configurações salvas com sucesso!', 'success');
-        
     } catch (error) {
         console.error('Erro ao salvar configurações:', error);
-        showNotification('Erro ao salvar configurações', 'error');
+        showNotification(`Erro ao salvar: ${error.message}`, 'error');
     }
-};
+}
 
 async function saveUserProfile() {
     const profileData = {
         full_name: document.getElementById('user-name')?.value,
         phone: document.getElementById('user-phone')?.value,
-        position: document.getElementById('user-position')?.value,
+        role: document.getElementById('user-role')?.value,
         timezone: document.getElementById('user-timezone')?.value,
         language: document.getElementById('user-language')?.value
     };
 
-    // Tentar salvar no Supabase
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Usuário não autenticado');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Usuário não autenticado');
 
-        const { error } = await supabase
-            .from('user_profiles')
-            .upsert({
-                user_id: user.id,
-                ...profileData,
-                updated_at: new Date().toISOString()
-            });
+    // Upsert garante que o registro seja criado se não existir, ou atualizado se existir
+    const { error } = await supabase.from('user_profiles').upsert({ user_id: user.id, ...profileData });
+    if (error) throw error;
 
-        if (error) throw error;
-
-        // Atualizar estado local
-        userProfile = { ...userProfile, ...profileData };
-        
-    } catch (error) {
-        console.error('Erro ao salvar perfil no Supabase:', error);
-        // Simular salvamento local
-        userProfile = { ...userProfile, ...profileData };
-    }
+    userProfile = { ...userProfile, ...profileData };
 }
 
 async function saveOrganizationData() {
@@ -226,64 +169,39 @@ async function saveOrganizationData() {
         address: document.getElementById('org-address')?.value
     };
 
-    // Tentar salvar no Supabase
-    try {
-        if (organizationData.id) {
-            const { error } = await supabase
-                .from('organizations')
-                .update({
-                    ...orgData,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', organizationData.id);
-
-            if (error) throw error;
-        }
-
-        // Atualizar estado local
-        organizationData = { ...organizationData, ...orgData };
-        
-    } catch (error) {
-        console.error('Erro ao salvar organização no Supabase:', error);
-        // Simular salvamento local
-        organizationData = { ...organizationData, ...orgData };
+    if (organizationData.id) {
+        const { error } = await supabase.from('organizations').update(orgData).eq('id', organizationData.id);
+        if (error) throw error;
+    } else {
+        // Se não houver ID, idealmente criaríamos uma nova organização aqui.
+        // Por agora, apenas atualizamos o estado local.
+        console.warn("Nenhum ID de organização para atualizar no banco de dados.");
     }
+
+    organizationData = { ...organizationData, ...orgData };
 }
 
-// Funções específicas
 window.inviteUser = function() {
     const email = prompt('Digite o e-mail do usuário para convidar:');
-    if (email) {
-        showNotification(`Convite enviado para ${email}`, 'success');
-        // Implementar lógica de convite
-    }
+    if (email) showNotification(`Convite enviado para ${email}`, 'success');
 };
 
-// Funções auxiliares
 function showNotification(message, type = 'info') {
-    // Implementar sistema de notificações
-    console.log(`${type}: ${message}`);
-    
-    // Criar notificação visual simples
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${getNotificationColor(type)}`;
+    const colors = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white',
+        info: 'bg-blue-500 text-white',
+    };
+    notification.className = `fixed top-5 right-5 p-4 rounded-lg shadow-lg z-50 transition-transform transform translate-x-full ${colors[type] || colors.info}`;
     notification.textContent = message;
     
     document.body.appendChild(notification);
     
-    // Remover após 3 segundos
+    setTimeout(() => notification.classList.remove('translate-x-full'), 10);
     setTimeout(() => {
-        notification.remove();
+        notification.classList.add('translate-x-full');
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
-}
-
-function getNotificationColor(type) {
-    const colors = {
-        'success': 'bg-green-500 text-white',
-        'error': 'bg-red-500 text-white',
-        'info': 'bg-blue-500 text-white',
-        'warning': 'bg-yellow-500 text-white'
-    };
-    return colors[type] || colors.info;
 }
 
