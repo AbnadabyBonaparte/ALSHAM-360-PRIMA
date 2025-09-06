@@ -1,403 +1,96 @@
-// ALSHAM 360° PRIMA - Dashboard OBRA-PRIMA COMPLETO v2.0
-
-// Este arquivo foi movido para seu local correto: src/js/dashboard.js
-
-
-
-// NOTA: Este código é uma obra de arte, mas depende de funções que ainda não implementamos 100%
-
-// no supabase.js (getDashboardKPIs, etc). Ele servirá como nosso alvo final.
-
-// Por enquanto, ele usará dados de demonstração.
-
-
-
-import { 
-
-    getCurrentUser,
-
-    DEFAULT_ORG_ID 
-
-} from '../lib/supabase.js';
-
-
-
-// Estado global avançado
-
-let appState = {
-
-    user: null,
-
-    profile: null,
-
-    orgId: DEFAULT_ORG_ID,
-
-    data: {
-
-        kpis: null,
-
-    },
-
-    ui: {
-
-        loading: false,
-
-    }
-
-};
-
-
-
-document.addEventListener('DOMContentLoaded', async function() {
-
-    console.log('🚀 ALSHAM 360° PRIMA - Iniciando Dashboard OBRA-PRIMA v2.0...');
-
-    await initializeAdvancedApp();
-
-});
-
-
-
-// ===== INICIALIZAÇÃO AVANÇADA =====
-
-async function initializeAdvancedApp() {
-
-    try {
-
-        showLoadingScreen();
-
-        
-
-        const authResult = await getCurrentUser();
-
-        
-
-        if (!authResult.user) {
-
-            console.log('❌ Usuário não autenticado, carregando dados demo');
-
-            await loadDemoData();
-
-            hideLoadingScreen();
-
-            return;
-
-        }
-
-        
-
-        appState.user = authResult.user;
-
-        appState.profile = authResult.profile;
-
-        appState.orgId = authResult.profile?.org_id || DEFAULT_ORG_ID;
-
-        
-
-        console.log(`✅ Usuário autenticado: ${authResult.user.email}`);
-
-        console.log(`🏢 Organização: ${appState.orgId}`);
-
-        
-
-        await loadAllDashboardData();
-
-        
-
-        hideLoadingScreen();
-
-        
-
-        console.log('✨ Dashboard OBRA-PRIMA totalmente carregado!');
-
-        
-
-    } catch (error) {
-
-        console.error('❌ Erro na inicialização:', error);
-
-        showErrorScreen('Erro ao carregar dashboard', error.message);
-
-    }
-
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// Configurações do Supabase
+const supabaseUrl = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI';
+export const DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// ===== AUTENTICAÇÃO E PERFIS =====
+
+export async function getUserProfile(userId) {
+    try {
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+        if (error && error.code !== 'PGRST116') throw error;
+        return data;
+    } catch (error) {
+        console.error('Erro ao buscar perfil:', error.message);
+        return null;
+    }
+}
+
+export async function getCurrentUser() {
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        if (user) {
+            const profile = await getUserProfile(user.id);
+            return { user, profile };
+        }
+        return { user: null, profile: null };
+    } catch (error) {
+        console.error('Erro ao obter usuário:', error.message);
+        return { user: null, profile: null };
+    }
 }
 
 
+// ===== NOVO: LÓGICA DO DASHBOARD =====
 
-async function loadAllDashboardData() {
+/**
+ * Busca os KPIs principais para o Dashboard.
+ * Esta função é a chave para substituir os dados "mock".
+ */
+export async function getDashboardKPIs(orgId) {
+    try {
+        // Usamos Promise.all para buscar dados em paralelo, muito mais rápido!
+        const [leadsResult, opportunitiesResult] = await Promise.all([
+            supabase
+                .from('leads_crm')
+                .select('id, estagio, status, score_ia', { count: 'exact' })
+                .eq('org_id', orgId),
+            
+            supabase
+                .from('sales_opportunities')
+                .select('valor, etapa')
+                .eq('org_id', orgId)
+        ]);
 
-    appState.ui.loading = true;
+        if (leadsResult.error) throw leadsResult.error;
+        if (opportunitiesResult.error) throw opportunitiesResult.error;
 
-    try {
+        const leads = leadsResult.data || [];
+        const opportunities = opportunitiesResult.data || [];
 
-        console.log('📊 Carregando dados do dashboard (usando demo por enquanto)...');
+        // --- Cálculos ---
+        const total_leads = leadsResult.count;
+        const leads_convertidos = leads.filter(l => l.status === 'converted' || l.estagio === 'convertido').length;
+        const receita_total = opportunities.reduce((sum, op) => sum + (op.valor || 0), 0);
+        const leadsComScore = leads.filter(l => l.score_ia != null);
+        const score_media_ia = leadsComScore.length > 0
+            ? (leadsComScore.reduce((sum, l) => sum + l.score_ia, 0) / leadsComScore.length).toFixed(1)
+            : 0;
 
-        // Futuramente, chamaremos as funções reais aqui:
+        const kpis = {
+            total_leads,
+            leads_convertidos,
+            receita_total: parseFloat(receita_total),
+            score_media_ia: parseFloat(score_media_ia),
+            // Adicionamos alguns KPIs extras que seu dashboard "obra-prima" espera
+            leads_quentes: leads.filter(l => l.temperatura === 'QUENTE').length, // Supondo que a coluna 'temperatura' exista
+            receita_fechada: opportunities.filter(op => op.etapa === 'fechada_ganha').reduce((sum, op) => sum + (op.valor || 0), 0),
+            interacoes_semana: 0, // Placeholder, pois ainda não buscamos interações
+        };
+        
+        return { data: kpis, error: null };
 
-        // const kpisResult = await getDashboardKPIs(appState.orgId);
-
-        // appState.data.kpis = kpisResult.data;
-
-        await loadDemoData(); // Usando demo como fallback
-
-        
-
-        await renderAdvancedDashboard();
-
-
-
-    } catch (error) {
-
-        console.error('❌ Erro ao carregar dados:', error);
-
-        await loadDemoData();
-
-    } finally {
-
-        appState.ui.loading = false;
-
-    }
-
+    } catch (error) {
+        console.error("Erro ao calcular KPIs do Dashboard:", error);
+        return { data: null, error };
+    }
 }
 
-
-
-// ===== DADOS DEMO (FALLBACK) =====
-
-async function loadDemoData() {
-
-    console.log('📋 Carregando dados demo...');
-
-    
-
-    appState.data = {
-
-        kpis: {
-
-            total_leads: 1234,
-
-            leads_quentes: 45,
-
-            leads_mornos: 89,
-
-            leads_frios: 1100,
-
-            leads_convertidos: 67,
-
-            taxa_conversao: 5.4,
-
-            score_media_ia: 7.8,
-
-            receita_total: 89000,
-
-            receita_fechada: 67000,
-
-            interacoes_semana: 234
-
-        },
-
-        gamificacao: {
-
-            perfil: { level: 7, total_points: 2840 },
-
-            progressao: { streak_atual: 12 },
-
-        },
-
-    };
-
-    
-
-    await renderAdvancedDashboard();
-
-}
-
-
-
-// ===== RENDERIZAÇÃO AVANÇADA =====
-
-async function renderAdvancedDashboard() {
-
-    try {
-
-        await renderAdvancedHeroSection();
-
-        await renderAdvancedKPIs();
-
-    } catch (error) {
-
-        console.error('❌ Erro na renderização:', error);
-
-    }
-
-}
-
-
-
-// ===== HERO SECTION AVANÇADA =====
-
-async function renderAdvancedHeroSection() {
-
-    const heroContainer = document.querySelector('.bg-gradient-hero')?.parentElement;
-
-    if (!heroContainer || !appState.data.kpis) return;
-
-    
-
-    const kpis = appState.data.kpis;
-
-    const userName = appState.profile?.full_name || 'Usuário';
-
-    const level = appState.data.gamificacao?.perfil?.level || 1;
-
-    
-
-    heroContainer.querySelector('.bg-gradient-hero').innerHTML = `
-
-        <div class="relative z-10">
-
-            <h2 class="text-3xl font-bold mb-2 text-white">
-
-                ${getTimeBasedGreeting()}, ${userName}!
-
-            </h2>
-
-            <p class="text-xl mb-4 text-white">
-
-                Você gerou <span class="font-bold text-yellow-300 animate-pulse">R$ ${formatCurrency(kpis.receita_fechada)}</span> este mês.
-
-            </p>
-
-             <div class="flex items-center space-x-6 text-sm text-white">
-
-                <div class="flex items-center space-x-2">
-
-                    <span class="text-yellow-300">🏆</span>
-
-                    <span>Level ${level}: ${getLevelTitle(level)}</span>
-
-                </div>
-
-                <div class="flex items-center space-x-2">
-
-                    <span class="text-blue-300">🔥</span>
-
-                    <span>Streak: ${appState.data.gamificacao?.progressao?.streak_atual || 0} dias</span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-
-// ===== KPIS SUPER AVANÇADOS =====
-
-async function renderAdvancedKPIs() {
-
-    const kpisContainer = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
-
-    if (!kpisContainer || !appState.data.kpis) return;
-
-    
-
-    const kpis = appState.data.kpis;
-
-    
-
-    kpisContainer.innerHTML = `
-
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-
-            <h3 class="text-2xl font-bold text-gray-900">${formatNumber(kpis.total_leads || 0)}</h3>
-
-            <p class="text-gray-600 font-medium">Leads Ativos</p>
-
-        </div>
-
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-
-            <h3 class="text-2xl font-bold text-gray-900">${formatNumber(kpis.leads_convertidos || 0)}</h3>
-
-            <p class="text-gray-600 font-medium">Conversões</p>
-
-        </div>
-
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-
-            <h3 class="text-2xl font-bold text-gray-900">R$ ${formatCurrency(kpis.receita_total || 0)}</h3>
-
-            <p class="text-gray-600 font-medium">Receita Total</p>
-
-        </div>
-
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-
-             <h3 class="text-2xl font-bold text-gray-900">${kpis.score_media_ia || 0}/10</h3>
-
-            <p class="text-gray-600 font-medium">Score IA Médio</p>
-
-        </div>
-
-    `;
-
-}
-
-
-
-// ===== FUNÇÕES AUXILIARES =====
-
-function formatCurrency(value) {
-
-    return new Intl.NumberFormat('pt-BR').format(value || 0);
-
-}
-
-
-
-function formatNumber(value) {
-
-    return new Intl.NumberFormat('pt-BR').format(value || 0);
-
-}
-
-
-
-function getTimeBasedGreeting() {
-
-    const hour = new Date().getHours();
-
-    if (hour < 12) return 'Bom dia';
-
-    if (hour < 18) return 'Boa tarde';
-
-    return 'Boa noite';
-
-}
-
-
-
-function getLevelTitle(level) {
-
-    const titles = { 1: 'Iniciante', 2: 'Vendedor Jr', 3: 'Vendedor', 4: 'Vendedor Sr', 5: 'Expert', 6: 'Master', 7: 'Legend' };
-
-    return titles[level] || `Level ${level}`;
-
-}
-
-
-
-function showLoadingScreen() { console.log('🔄 Mostrando tela de carregamento...'); }
-
-function hideLoadingScreen() { console.log('✅ Ocultando tela de carregamento...'); }
-
-function showErrorScreen(title, message) { console.error(`❌ ${title}: ${message}`); }
-
-
-
-console.log('✨ Dashboard OBRA-PRIMA v2.0 COMPLETO carregado!');
