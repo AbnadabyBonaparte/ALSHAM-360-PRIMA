@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase.js';
+import { supabase, DEFAULT_ORG_ID } from '../lib/supabase.js';
 
 // Estado da aplicação
 let userGameData = {};
@@ -9,8 +9,10 @@ let challenges = [];
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     initializeGamificationPage();
+    setupRankingButtons();
 });
 
+// INICIALIZAÇÃO PRINCIPAL
 async function initializeGamificationPage() {
     try {
         // Verificar autenticação
@@ -22,13 +24,14 @@ async function initializeGamificationPage() {
 
         // Carregar dados de gamificação
         await loadGameData(user);
-        
+
     } catch (error) {
         console.error('Erro ao inicializar página de gamificação:', error);
         showNotification('Erro ao carregar dados', 'error');
     }
 }
 
+// CARREGAR DADOS DE GAMIFICAÇÃO
 async function loadGameData(user) {
     try {
         // Tentar carregar dados do Supabase
@@ -43,30 +46,31 @@ async function loadGameData(user) {
         }
 
         userGameData = gameData || {};
-        
+
         // Se não houver dados, usar dados mockados
         if (!gameData) {
             loadMockGameData();
         }
 
         // Carregar outros dados
-        loadTeamRanking();
+        await loadTeamRanking('week');
         loadBadges();
         loadChallenges();
-        
+
         // Atualizar interface
         updateGameInterface();
-        
+
     } catch (error) {
         console.error('Erro ao carregar dados de gamificação:', error);
         loadMockGameData();
-        loadTeamRanking();
+        loadTeamRanking('week');
         loadBadges();
         loadChallenges();
         updateGameInterface();
     }
 }
 
+// MOCKS DE DADOS (para desenvolvimento)
 function loadMockGameData() {
     userGameData = {
         user_id: 'mock-user',
@@ -81,14 +85,16 @@ function loadMockGameData() {
     };
 }
 
-function loadTeamRanking() {
+function loadTeamRanking(period = 'week') {
+    // Você pode trocar para buscar dados reais do Supabase por período depois
+    // Por enquanto, mock dinâmico para cityzen dev
     teamRanking = [
         {
             position: 1,
             name: 'Maria Santos',
             role: 'Vendedora Senior',
-            points: 2956,
-            weekly_points: 89,
+            points: period === 'week' ? 2956 : period === 'month' ? 8921 : 15822,
+            weekly_points: period === 'week' ? 89 : period === 'month' ? 388 : 1200,
             avatar: 'MS',
             badge: '👑'
         },
@@ -96,8 +102,8 @@ function loadTeamRanking() {
             position: 2,
             name: 'Pedro Costa',
             role: 'Vendedor Pleno',
-            points: 2891,
-            weekly_points: 76,
+            points: period === 'week' ? 2891 : period === 'month' ? 8677 : 14519,
+            weekly_points: period === 'week' ? 76 : period === 'month' ? 355 : 1102,
             avatar: 'PC',
             badge: '🥈'
         },
@@ -105,8 +111,8 @@ function loadTeamRanking() {
             position: 3,
             name: 'João Silva',
             role: 'Vendedor Expert',
-            points: 2847,
-            weekly_points: 156,
+            points: period === 'week' ? 2847 : period === 'month' ? 8327 : 13987,
+            weekly_points: period === 'week' ? 156 : period === 'month' ? 412 : 1300,
             avatar: 'JS',
             badge: '🥉',
             isCurrentUser: true
@@ -115,16 +121,16 @@ function loadTeamRanking() {
             position: 4,
             name: 'Ana Oliveira',
             role: 'Vendedora Junior',
-            points: 2234,
-            weekly_points: 45,
+            points: period === 'week' ? 2234 : period === 'month' ? 7500 : 9907,
+            weekly_points: period === 'week' ? 45 : period === 'month' ? 210 : 650,
             avatar: 'AO'
         },
         {
             position: 5,
             name: 'Carlos Mendes',
             role: 'Vendedor Junior',
-            points: 1987,
-            weekly_points: 32,
+            points: period === 'week' ? 1987 : period === 'month' ? 6340 : 7896,
+            weekly_points: period === 'week' ? 32 : period === 'month' ? 180 : 560,
             avatar: 'CM'
         }
     ];
@@ -185,28 +191,29 @@ function loadChallenges() {
     ];
 }
 
+// ATUALIZAR INTERFACE
 function updateGameInterface() {
     // Atualizar estatísticas do perfil
     document.getElementById('user-level').textContent = `Nível ${userGameData.level}`;
     document.getElementById('total-points').textContent = `${userGameData.total_points.toLocaleString()} pontos`;
     document.getElementById('total-badges').textContent = `${userGameData.badges_earned} badges`;
-    
+
     // Atualizar barra de progresso
     const progressPercent = ((userGameData.total_points % 1000) / 1000) * 100;
     document.getElementById('level-progress').style.width = `${progressPercent}%`;
-    
+
     // Atualizar estatísticas rápidas
     document.getElementById('weekly-score').textContent = userGameData.weekly_points;
     document.getElementById('streak-days').textContent = userGameData.streak_days;
     document.getElementById('rank-position').textContent = `#${userGameData.rank_position}`;
     document.getElementById('achievements-month').textContent = userGameData.achievements_month;
-    
+
     // Renderizar badges
     renderBadges();
-    
+
     // Renderizar ranking
     renderTeamRanking();
-    
+
     // Renderizar desafios
     renderChallenges();
 }
@@ -216,7 +223,7 @@ function renderBadges() {
     if (!earnedBadgesContainer) return;
 
     const earnedBadges = badges.filter(badge => badge.earned).slice(0, 6);
-    
+
     earnedBadgesContainer.innerHTML = earnedBadges.map(badge => `
         <div class="text-center p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
             <div class="text-3xl mb-2">${badge.icon}</div>
@@ -234,7 +241,7 @@ function renderTeamRanking() {
         const isCurrentUser = member.isCurrentUser;
         const positionColor = getPositionColor(member.position);
         const bgClass = isCurrentUser ? 'ring-2 ring-primary' : '';
-        
+
         return `
             <div class="flex items-center space-x-4 p-4 ${positionColor.bg} rounded-lg ${positionColor.border} ${bgClass}">
                 <div class="flex items-center space-x-3">
@@ -323,14 +330,14 @@ function getPositionColor(position) {
 function showNotification(message, type = 'info') {
     // Implementar sistema de notificações
     console.log(`${type}: ${message}`);
-    
+
     // Criar notificação visual simples
     const notification = document.createElement('div');
     notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${getNotificationColor(type)}`;
     notification.textContent = message;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remover após 3 segundos
     setTimeout(() => {
         notification.remove();
@@ -358,3 +365,20 @@ window.viewAllChallenges = function() {
     // Implementar modal com todos os desafios
 };
 
+// BOTÕES DE PERÍODO DO RANKING (SEM FALTAR NADA!)
+function setupRankingButtons() {
+    document.querySelectorAll('[data-range]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const range = btn.getAttribute('data-range');
+            // Atualiza ranking mockado por período (ou troque para fetch real do Supabase)
+            loadTeamRanking(range);
+            renderTeamRanking();
+
+            // Atualiza visual dos botões
+            document.querySelectorAll('[data-range]').forEach(b => b.classList.remove('bg-primary', 'text-white'));
+            btn.classList.add('bg-primary', 'text-white');
+
+            showNotification('Ranking atualizado para: ' + btn.textContent, 'info');
+        });
+    });
+}
