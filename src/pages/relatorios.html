@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - ALSHAM 360° PRIMA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    
+    <!-- Header Premium -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">A</span>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
+                            <p class="text-xs text-gray-500">Analytics & Relatórios</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="../../index.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Dashboard</a>
+                    <a href="leads-real.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Leads</a>
+                    <a href="automacoes.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Automações</a>
+                    <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">Relatórios</a>
+                </nav>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="exportAllReports()" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Exportar Relatórios">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </button>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
+                        </div>
+                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
+                        <button data-auth="logout-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cabeçalho da Página -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">📊 Analytics & Relatórios</h2>
+                <p class="text-gray-600 mt-2">Insights inteligentes para impulsionar suas vendas</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <select id="period-selector" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="30" selected>Últimos 30 dias</option>
+                    <option value="90">Últimos 90 dias</option>
+                    <option value="365">Último ano</option>
+                </select>
+                <button onclick="generateReport()" class="btn-primary">
+                    📈 Gerar Relatório
+                </button>
+            </div>
+        </div>
+
+        <!-- KPIs Executivos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">💰</span>
+                    </div>
+                    <span class="text-green-500 text-sm font-medium">+23%</span>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900" id="total-revenue">R$ 0</h3>
+                <p class="text-gray-600 text-sm">Receita Total</p>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">🎯</span>
+                    </div>
+                    <span class="text-green-500 text-sm font-medium">+15%</span>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900" id="conversion-rate">0%</h3>
+                <p class="text-gray-600 text-sm">Taxa de Conversão</p>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">⏱️</span>
+                    </div>
+                    <span class="text-red-500 text-sm font-medium">-8%</span>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900" id="avg-cycle">0 dias</h3>
+                <p class="text-gray-600 text-sm">Ciclo Médio de Vendas</p>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">📈</span>
+                    </div>
+                    <span class="text-green-500 text-sm font-medium">+31%</span>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900" id="avg-deal-size">R$ 0</h3>
+                <p class="text-gray-600 text-sm">Ticket Médio</p>
+            </div>
+        </div>
+
+        <!-- Gráficos Principais -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Receita ao Longo do Tempo -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">📈 Receita ao Longo do Tempo</h3>
+                    <div class="flex space-x-2">
+                        <button class="text-xs bg-primary text-white px-3 py-1 rounded-full">Receita</button>
+                        <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Leads</button>
+                    </div>
+                </div>
+                <div class="h-64">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Funil de Conversão -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">🎯 Funil de Conversão</h3>
+                    <button onclick="optimizeFunnel()" class="text-xs bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600 transition-colors">
+                        Otimizar
+                    </button>
+                </div>
+                <div class="h-64">
+                    <canvas id="funnelChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance por Vendedor -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">👥 Performance por Vendedor</h3>
+                <div class="flex space-x-2">
+                    <button class="text-xs bg-primary text-white px-3 py-1 rounded-full">Receita</button>
+                    <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Conversões</button>
+                    <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Atividade</button>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Vendedor</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Receita</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Conversões</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Taxa</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Atividade</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Ranking</th>
+                        </tr>
+                    </thead>
+                    <tbody id="performance-table">
+                        <!-- Dados serão carregados dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Insights de IA -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Insights Inteligentes -->
+            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 border border-purple-200">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
+                        <span class="text-white text-xl">🤖</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Insights de IA</h3>
+                </div>
+                
+                <div class="space-y-4" id="ai-insights">
+                    <div class="bg-white/70 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-xl">💡</span>
+                            <div>
+                                <p class="font-medium text-gray-900">Oportunidade de Crescimento</p>
+                                <p class="text-sm text-gray-600 mt-1">Leads do setor Tech têm 34% mais chance de conversão. Foque seus esforços neste segmento.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/70 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-xl">⚡</span>
+                            <div>
+                                <p class="font-medium text-gray-900">Timing Otimizado</p>
+                                <p class="text-sm text-gray-600 mt-1">Terças-feiras às 14h têm a maior taxa de resposta (89%). Agende suas ligações importantes neste horário.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/70 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-xl">🎯</span>
+                            <div>
+                                <p class="font-medium text-gray-900">Gargalo Identificado</p>
+                                <p class="text-sm text-gray-600 mt-1">40% dos leads ficam parados na etapa "Proposta". Considere automatizar o follow-up.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Previsão de Vendas -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">🔮 Previsão de Vendas</h3>
+                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">95% Confiança</span>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Este Mês</span>
+                            <span class="text-lg font-bold text-gray-900">R$ 127.500</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 73%"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">73% da meta (R$ 175.000)</p>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Próximo Mês</span>
+                            <span class="text-lg font-bold text-gray-900">R$ 156.200</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 89%"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Previsão baseada em pipeline atual</p>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Trimestre</span>
+                            <span class="text-lg font-bold text-gray-900">R$ 425.800</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 95%"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Tendência de crescimento sustentável</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análise de Origem de Leads -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Origem de Leads -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">📍 Origem de Leads</h3>
+                <div class="h-48">
+                    <canvas id="sourceChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Status dos Leads -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">📊 Status dos Leads</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm text-gray-700">Novos</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">234</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <span class="text-sm text-gray-700">Qualificados</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">156</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm text-gray-700">Proposta</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">89</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="text-sm text-gray-700">Convertidos</span>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-900">67</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações Recomendadas -->
+            <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">🎯 Ações Recomendadas</h3>
+                <div class="space-y-4">
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <p class="text-sm font-medium text-gray-900">Contatar 12 leads quentes</p>
+                        <p class="text-xs text-gray-600 mt-1">Alta probabilidade de conversão</p>
+                        <button class="mt-2 text-xs bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600 transition-colors">
+                            Executar
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <p class="text-sm font-medium text-gray-900">Revisar 8 propostas pendentes</p>
+                        <p class="text-xs text-gray-600 mt-1">Mais de 7 dias sem resposta</p>
+                        <button class="mt-2 text-xs bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600 transition-colors">
+                            Revisar
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <p class="text-sm font-medium text-gray-900">Agendar 5 demos</p>
+                        <p class="text-xs text-gray-600 mt-1">Leads qualificados aguardando</p>
+                        <button class="mt-2 text-xs bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600 transition-colors">
+                            Agendar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios Personalizados -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">📋 Relatórios Personalizados</h3>
+                <button onclick="createCustomReport()" class="btn-primary">
+                    ➕ Criar Relatório
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <span class="text-xl">📊</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Relatório Semanal</h4>
+                            <p class="text-xs text-gray-600">Performance da semana</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Última atualização: Hoje</span>
+                        <button class="text-xs bg-blue-500 text-white px-2 py-1 rounded">Gerar</button>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <span class="text-xl">💰</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">ROI por Canal</h4>
+                            <p class="text-xs text-gray-600">Retorno por origem</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Última atualização: Ontem</span>
+                        <button class="text-xs bg-green-500 text-white px-2 py-1 rounded">Gerar</button>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <span class="text-xl">🎯</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Análise de Funil</h4>
+                            <p class="text-xs text-gray-600">Gargalos e oportunidades</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Última atualização: 2 dias</span>
+                        <button class="text-xs bg-purple-500 text-white px-2 py-1 rounded">Gerar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="../js/relatorios.js"></script>
+</body>
+</html>
+
