@@ -547,4 +547,3 @@ window.deleteLead = async function(leadId) {
 }
 
 console.log('📋 Leads controller configurado - ALSHAM 360° PRIMA')
-
