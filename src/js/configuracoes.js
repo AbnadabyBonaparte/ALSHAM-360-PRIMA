@@ -82,17 +82,21 @@ async function loadProfile() {
 
   populateProfileForm();
 
-  // Avatar e nome visível (CORRIGIDO: assignment em parênteses)
-  $qs('[data-auth="user-avatar"]')?.textContent = (
-    (appState.profile.full_name || appState.user.email || 'U')
+  // Avatar e nome visível (CORRIGIDO)
+  const userAvatarElement = $qs('[data-auth="user-avatar"]');
+  if (userAvatarElement) {
+    userAvatarElement.textContent = (appState.profile.full_name || appState.user.email || 'U')
       .split(' ')
       .map(s => s[0])
       .join('')
       .toUpperCase()
-      .slice(0, 2)
-  );
+      .slice(0, 2);
+  }
 
-  $qs('[data-auth="user-name"]')?.textContent = appState.profile.full_name || 'Usuário';
+  const userNameElement = $qs('[data-auth="user-name"]');
+  if (userNameElement) {
+    userNameElement.textContent = appState.profile.full_name || 'Usuário';
+  }
 }
 
 function populateProfileForm() {
