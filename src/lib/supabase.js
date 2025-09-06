@@ -165,3 +165,58 @@ export async function signOut() {
         throw error;
     }
 }
+
+// ===== DASHBOARD KPIs =====
+export async function getDashboardKPIs(orgId) {
+    try {
+        const { data, error } = await supabase
+            .from('dashboard_kpis')
+            .select('*')
+            .eq('org_id', orgId)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error('Erro ao buscar KPIs:', error);
+            // Retorna dados padrão em caso de erro
+            return {
+                data: {
+                    total_leads: 0,
+                    leads_convertidos: 0,
+                    receita_total: 0,
+                    score_media_ia: 0,
+                    receita_fechada: 0
+                },
+                error: null
+            };
+        }
+        
+        // Se não há dados, retorna estrutura padrão
+        if (!data) {
+            return {
+                data: {
+                    total_leads: 0,
+                    leads_convertidos: 0,
+                    receita_total: 0,
+                    score_media_ia: 0,
+                    receita_fechada: 0
+                },
+                error: null
+            };
+        }
+        
+        return { data, error: null };
+        
+    } catch (error) {
+        console.error('Erro ao buscar KPIs do dashboard:', error);
+        return {
+            data: {
+                total_leads: 0,
+                leads_convertidos: 0,
+                receita_total: 0,
+                score_media_ia: 0,
+                receita_fechada: 0
+            },
+            error
+        };
+    }
+}
