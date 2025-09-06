@@ -26,24 +26,17 @@ const publicPages = [
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔐 Auth middleware loaded - ALSHAM 360° PRIMA');
-    
-    // Inicializar autenticação
     initializeAuth();
-    
-    // Configurar listeners globais
     setupGlobalListeners();
 });
 
 // ===== INICIALIZAÇÃO DE AUTENTICAÇÃO =====
 async function initializeAuth() {
     try {
-        // Verificar sessão atual
         const session = await getCurrentSession();
         
         if (session?.user) {
-            // Buscar dados do usuário
             const { user, profile } = await getCurrentUser();
-            
             if (user && profile) {
                 setAuthenticatedUser(user, profile);
                 console.log('Usuário autenticado:', user.email);
@@ -54,7 +47,6 @@ async function initializeAuth() {
             handleUnauthenticated();
         }
         
-        // Configurar listener de mudanças de auth
         onAuthStateChange(handleAuthStateChange);
         
     } catch (error) {
@@ -68,11 +60,7 @@ function setAuthenticatedUser(user, profile) {
     currentUser = user;
     currentProfile = profile;
     isAuthenticated = true;
-    
-    // Atualizar UI
     updateAuthUI();
-    
-    // Verificar se precisa redirecionar
     checkRouteAccess();
 }
 
@@ -80,8 +68,6 @@ function clearAuthenticatedUser() {
     currentUser = null;
     currentProfile = null;
     isAuthenticated = false;
-    
-    // Atualizar UI
     updateAuthUI();
 }
 
@@ -93,37 +79,21 @@ function handleAuthStateChange(event, session, profile) {
         case 'SIGNED_IN':
             if (session?.user && profile) {
                 setAuthenticatedUser(session.user, profile);
-                showAuthNotification('Login realizado com sucesso!', 'success');
-                redirectAfterLogin(); // Redireciona após o login
+                redirectAfterLogin();
             }
             break;
             
         case 'SIGNED_OUT':
             clearAuthenticatedUser();
             handleUnauthenticated();
-            showAuthNotification('Logout realizado com sucesso!', 'info');
-            break;
-            
-        case 'TOKEN_REFRESHED':
-            console.log('Token refreshed');
-            break;
-            
-        case 'USER_UPDATED':
-            if (session?.user && profile) {
-                setAuthenticatedUser(session.user, profile);
-            }
             break;
     }
 }
 
 function handleUnauthenticated() {
     clearAuthenticatedUser();
-    
-    // Verificar se está em página protegida
     const currentPath = window.location.pathname;
-    const isPublicPage = publicPages.some(page => 
-        currentPath.endsWith(page)
-    );
+    const isPublicPage = publicPages.some(page => currentPath.endsWith(page));
     
     if (!isPublicPage) {
         console.log('Página protegida, redirecionando para login');
@@ -134,8 +104,6 @@ function handleUnauthenticated() {
 // ===== PROTEÇÃO DE ROTAS =====
 function checkRouteAccess() {
     const currentPath = window.location.pathname;
-    
-    // Se está autenticado e em página de login/registro, redirecionar para dashboard
     if (isAuthenticated) {
         if (currentPath.endsWith('login.html') || currentPath.endsWith('register.html')) {
             console.log('Usuário autenticado em página pública, redirecionando...');
@@ -154,11 +122,6 @@ function redirectAfterLogin() {
 
 // ===== ATUALIZAÇÃO DE UI =====
 function updateAuthUI() {
-    updateUserInfo();
-    updateActionButtons();
-}
-
-function updateUserInfo() {
     const userNameElements = document.querySelectorAll('[data-auth="user-name"]');
     userNameElements.forEach(element => {
         element.textContent = currentProfile?.full_name || currentUser?.email || 'Visitante';
@@ -174,25 +137,25 @@ function updateUserInfo() {
             .substring(0, 2);
         element.textContent = initials;
     });
-}
 
-function updateActionButtons() {
     const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
     logoutButtons.forEach(button => {
-        button.onclick = handleLogout; // Usar onclick para evitar múltiplos listeners
+        button.onclick = (e) => {
+            e.preventDefault();
+            handleLogout();
+        };
     });
 }
 
+
 // ===== AÇÕES DE AUTENTICAÇÃO =====
-async function handleLogout(e) {
-    e.preventDefault();
+async function handleLogout() {
     try {
         console.log('Fazendo logout...');
         await signOut();
         window.location.href = '/src/pages/login.html';
     } catch (error) {
         console.error('Erro no logout:', error);
-        showAuthNotification('Erro ao fazer logout', 'error');
     }
 }
 
@@ -217,12 +180,4 @@ async function checkSessionValidity() {
         handleUnauthenticated();
     }
 }
-
-// ===== NOTIFICAÇÕES =====
-function showAuthNotification(message, type = 'info') {
-    // Implementação de notificação visual
-    console.log(`[${type.toUpperCase()}] ${message}`);
-}
-
-console.log('🔐 Auth middleware configurado - ALSHAM 360° PRIMA');
 
