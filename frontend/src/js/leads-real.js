@@ -4,6 +4,31 @@ import { supabase } from '../lib/supabase.js';
 let currentView = 'table';
 let allLeads = [];
 let filteredLeads = [];
+let editingLeadId = null;
+let userOrgId = null;
+
+// Toast visual
+function showNotification(message, type = 'info') {
+    let root = document.getElementById('toast-root');
+    if (!root) {
+        root = document.createElement('div');
+        root.id = 'toast-root';
+        root.className = 'fixed top-4 right-4 space-y-3 z-50 pointer-events-none';
+        document.body.appendChild(root);
+    }
+    const div = document.createElement('div');
+    div.role = "status";
+    div.className =
+        "pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-sm border transition-all duration-300 mb-1 " +
+        (type === "error"
+            ? "bg-red-50 border-red-200 text-red-800"
+            : type === "success"
+            ? "bg-green-50 border-green-200 text-green-800"
+            : "bg-white border-gray-200 text-gray-800");
+    div.textContent = message;
+    root.appendChild(div);
+    setTimeout(() => div.remove(), 3500);
+}
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
@@ -18,20 +43,31 @@ async function initializeLeadsPage() {
             window.location.href = '../pages/login.html';
             return;
         }
+        userOrgId = (await getUserOrgId(user)) || 'default-org';
 
         // Carregar leads
         await loadLeads();
-        
+
         // Configurar event listeners
         setupEventListeners();
-        
+
         // Atualizar estatísticas
         updateStatistics();
-        
+
     } catch (error) {
         console.error('Erro ao inicializar página de leads:', error);
         showNotification('Erro ao carregar dados', 'error');
     }
+}
+
+async function getUserOrgId(user) {
+    // Busca org_id real do perfil
+    const { data, error } = await supabase
+        .from('user_profiles')
+        .select('org_id')
+        .eq('user_id', user.id)
+        .single();
+    return data?.org_id;
 }
 
 function setupEventListeners() {
@@ -40,38 +76,38 @@ function setupEventListeners() {
     if (searchInput) {
         searchInput.addEventListener('input', debounce(applyFilters, 300));
     }
-    
+
     // Filtros
     const statusFilter = document.getElementById('status-filter');
     const periodFilter = document.getElementById('period-filter');
-    
     if (statusFilter) statusFilter.addEventListener('change', applyFilters);
     if (periodFilter) periodFilter.addEventListener('change', applyFilters);
-    
-    // Form de novo lead
+
+    // Form de novo lead / edição
     const newLeadForm = document.getElementById('new-lead-form');
     if (newLeadForm) {
-        newLeadForm.addEventListener('submit', handleNewLeadSubmit);
+        newLeadForm.addEventListener('submit', handleLeadSubmit);
     }
 }
 
 async function loadLeads() {
     try {
         showLoading(true);
-        
+
         const { data: leads, error } = await supabase
             .from('leads')
             .select('*')
+            .eq('org_id', userOrgId)
             .order('created_at', { ascending: false });
-            
+
         if (error) throw error;
-        
+
         allLeads = leads || [];
         filteredLeads = [...allLeads];
-        
+
         renderLeads();
         updateStatistics();
-        
+
     } catch (error) {
         console.error('Erro ao carregar leads:', error);
         showNotification('Erro ao carregar leads', 'error');
@@ -86,9 +122,9 @@ function renderLeads() {
         showEmptyState();
         return;
     }
-    
+
     hideEmptyState();
-    
+
     if (currentView === 'table') {
         renderTableView();
     } else {
@@ -99,7 +135,7 @@ function renderLeads() {
 function renderTableView() {
     const tableBody = document.getElementById('leads-table-body');
     if (!tableBody) return;
-    
+
     tableBody.innerHTML = filteredLeads.map(lead => `
         <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
             <td class="py-4 px-4">
@@ -157,7 +193,7 @@ function renderTableView() {
             </td>
         </tr>
     `).join('');
-    
+
     document.getElementById('table-view').classList.remove('hidden');
     document.getElementById('grid-view').classList.add('hidden');
 }
@@ -165,7 +201,7 @@ function renderTableView() {
 function renderGridView() {
     const gridContainer = document.getElementById('leads-grid');
     if (!gridContainer) return;
-    
+
     gridContainer.innerHTML = filteredLeads.map(lead => `
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between mb-4">
@@ -182,7 +218,7 @@ function renderGridView() {
                     ${getStatusText(lead.status)}
                 </span>
             </div>
-            
+
             <div class="space-y-2 mb-4">
                 <div class="flex items-center space-x-2 text-sm text-gray-600">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,7 +243,7 @@ function renderGridView() {
                 </div>
                 ` : ''}
             </div>
-            
+
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                 <span class="text-xs text-gray-500">${formatDate(lead.created_at)}</span>
                 <div class="flex items-center space-x-2">
@@ -232,7 +268,7 @@ function renderGridView() {
             </div>
         </div>
     `).join('');
-    
+
     document.getElementById('grid-view').classList.remove('hidden');
     document.getElementById('table-view').classList.add('hidden');
 }
@@ -242,7 +278,7 @@ function updateStatistics() {
     const qualifiedLeads = allLeads.filter(lead => lead.status === 'qualified').length;
     const convertedLeads = allLeads.filter(lead => lead.status === 'converted').length;
     const conversionRate = totalLeads > 0 ? ((convertedLeads / totalLeads) * 100).toFixed(1) : 0;
-    
+
     document.getElementById('total-leads').textContent = totalLeads;
     document.getElementById('qualified-leads').textContent = qualifiedLeads;
     document.getElementById('converted-leads').textContent = convertedLeads;
@@ -253,30 +289,30 @@ function applyFilters() {
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const statusFilter = document.getElementById('status-filter').value;
     const periodFilter = document.getElementById('period-filter').value;
-    
+
     filteredLeads = allLeads.filter(lead => {
         // Filtro de busca
-        const matchesSearch = !searchTerm || 
+        const matchesSearch = !searchTerm ||
             lead.name.toLowerCase().includes(searchTerm) ||
             lead.email.toLowerCase().includes(searchTerm) ||
             (lead.company && lead.company.toLowerCase().includes(searchTerm));
-        
+
         // Filtro de status
         const matchesStatus = !statusFilter || lead.status === statusFilter;
-        
+
         // Filtro de período
         const matchesPeriod = !periodFilter || checkPeriodFilter(lead.created_at, periodFilter);
-        
+
         return matchesSearch && matchesStatus && matchesPeriod;
     });
-    
+
     renderLeads();
 }
 
 function checkPeriodFilter(dateString, period) {
     const date = new Date(dateString);
     const now = new Date();
-    
+
     switch (period) {
         case 'today':
             return date.toDateString() === now.toDateString();
@@ -294,9 +330,9 @@ function checkPeriodFilter(dateString, period) {
     }
 }
 
-async function handleNewLeadSubmit(event) {
+async function handleLeadSubmit(event) {
     event.preventDefault();
-    
+
     const formData = new FormData(event.target);
     const leadData = {
         name: formData.get('name'),
@@ -308,24 +344,31 @@ async function handleNewLeadSubmit(event) {
         value: formData.get('value') ? parseFloat(formData.get('value')) : null,
         source: formData.get('source'),
         notes: formData.get('notes'),
-        org_id: 'default-org' // TODO: Pegar do usuário logado
+        org_id: userOrgId
     };
-    
+
     try {
-        const { data, error } = await supabase
-            .from('leads')
-            .insert([leadData])
-            .select();
-            
-        if (error) throw error;
-        
-        showNotification('Lead criado com sucesso!', 'success');
+        if (editingLeadId) {
+            // Update lead
+            const { error } = await supabase
+                .from('leads')
+                .update(leadData)
+                .eq('id', editingLeadId);
+            if (error) throw error;
+            showNotification('Lead editado com sucesso!', 'success');
+        } else {
+            // Create lead
+            const { error } = await supabase
+                .from('leads')
+                .insert([leadData]);
+            if (error) throw error;
+            showNotification('Lead criado com sucesso!', 'success');
+        }
         closeNewLeadModal();
         await loadLeads();
-        
     } catch (error) {
-        console.error('Erro ao criar lead:', error);
-        showNotification('Erro ao criar lead', 'error');
+        console.error('Erro ao salvar lead:', error);
+        showNotification('Erro ao salvar lead', 'error');
     }
 }
 
@@ -396,34 +439,34 @@ function hideEmptyState() {
     document.getElementById('empty-state').classList.add('hidden');
 }
 
-function showNotification(message, type = 'info') {
-    // Implementar sistema de notificações
-    alert(message);
-}
-
 // Funções globais
 window.toggleView = function(view) {
     currentView = view;
-    
+
     // Atualizar botões
     document.getElementById('table-view-btn').classList.toggle('bg-primary', view === 'table');
     document.getElementById('table-view-btn').classList.toggle('text-white', view === 'table');
     document.getElementById('table-view-btn').classList.toggle('bg-gray-200', view !== 'table');
     document.getElementById('table-view-btn').classList.toggle('text-gray-600', view !== 'table');
-    
+
     document.getElementById('grid-view-btn').classList.toggle('bg-primary', view === 'grid');
     document.getElementById('grid-view-btn').classList.toggle('text-white', view === 'grid');
     document.getElementById('grid-view-btn').classList.toggle('bg-gray-200', view !== 'grid');
     document.getElementById('grid-view-btn').classList.toggle('text-gray-600', view !== 'grid');
-    
+
     renderLeads();
 };
 
 window.openNewLeadModal = function() {
+    editingLeadId = null;
     document.getElementById('new-lead-modal').classList.remove('hidden');
+    document.getElementById('new-lead-form').reset();
+    document.querySelector('#new-lead-modal h3').textContent = '➕ Novo Lead';
+    document.querySelector('#new-lead-form button[type=submit]').textContent = 'Criar Lead';
 };
 
 window.closeNewLeadModal = function() {
+    editingLeadId = null;
     document.getElementById('new-lead-modal').classList.add('hidden');
     document.getElementById('new-lead-form').reset();
 };
@@ -443,24 +486,40 @@ window.openWhatsApp = function(phone, name) {
 };
 
 window.editLead = function(leadId) {
-    // TODO: Implementar modal de edição
-    showNotification('Funcionalidade de edição em desenvolvimento', 'info');
+    editingLeadId = leadId;
+    const lead = allLeads.find(l => l.id === leadId);
+    if (!lead) return showNotification('Lead não encontrado', 'error');
+
+    document.getElementById('new-lead-modal').classList.remove('hidden');
+    const form = document.getElementById('new-lead-form');
+    // Preenche campos
+    form.name.value = lead.name || '';
+    form.email.value = lead.email || '';
+    form.phone.value = lead.phone || '';
+    form.company.value = lead.company || '';
+    form.position.value = lead.position || '';
+    form.status.value = lead.status || 'new';
+    form.value.value = lead.value || '';
+    form.source.value = lead.source || 'website';
+    form.notes.value = lead.notes || '';
+    document.querySelector('#new-lead-modal h3').textContent = '✏️ Editar Lead';
+    document.querySelector('#new-lead-form button[type=submit]').textContent = 'Salvar Alterações';
 };
 
 window.deleteLead = async function(leadId) {
     if (!confirm('Tem certeza que deseja excluir este lead?')) return;
-    
+
     try {
         const { error } = await supabase
             .from('leads')
             .delete()
             .eq('id', leadId);
-            
+
         if (error) throw error;
-        
+
         showNotification('Lead excluído com sucesso!', 'success');
         await loadLeads();
-        
+
     } catch (error) {
         console.error('Erro ao excluir lead:', error);
         showNotification('Erro ao excluir lead', 'error');
@@ -468,7 +527,24 @@ window.deleteLead = async function(leadId) {
 };
 
 window.exportLeads = function() {
-    // TODO: Implementar exportação
-    showNotification('Funcionalidade de exportação em desenvolvimento', 'info');
-};
+    if (!allLeads.length) return showNotification('Sem leads para exportar!', 'info');
 
+    // Monta csv
+    const headers = ['Nome', 'E-mail', 'Telefone', 'Empresa', 'Cargo', 'Status', 'Valor', 'Origem', 'Observações', 'Data'];
+    const rows = allLeads.map(l => [
+        l.name, l.email, l.phone, l.company, l.position, getStatusText(l.status), l.value, l.source, l.notes, formatDate(l.created_at)
+    ]);
+    const csvContent = [headers, ...rows].map(row =>
+        row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(';')
+    ).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `leads-${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showNotification('Exportação concluída!', 'success');
+};
