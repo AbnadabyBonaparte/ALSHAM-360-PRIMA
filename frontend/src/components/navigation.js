@@ -1,15 +1,15 @@
 // Sistema de navegação global para ALSHAM 360° PRIMA
 
-// Configuração das rotas
+// Configuração das rotas para produção
 const routes = {
-    'dashboard': '../../index.html',
-    'leads': 'leads-real.html',
-    'automacoes': 'automacoes.html',
-    'relatorios': 'relatorios.html',
-    'configuracoes': 'configuracoes.html',
-    'gamificacao': 'gamificacao.html',
-    'login': 'login.html',
-    'register': 'register.html'
+    'dashboard': '/index.html',
+    'leads': '/leads.html',
+    'automacoes': '/automacoes.html',
+    'relatorios': '/relatorios.html',
+    'configuracoes': '/configuracoes.html',
+    'gamificacao': '/gamificacao.html',
+    'login': '/login.html',
+    'register': '/register.html'
 };
 
 // Função para navegar entre páginas
