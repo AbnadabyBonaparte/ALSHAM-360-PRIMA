@@ -220,3 +220,180 @@ export async function getDashboardKPIs(orgId) {
         };
     }
 }
+
+// ===== LEADS AVANÇADOS =====
+export async function getLeadsAvancados(orgId, options = {}) {
+    try {
+        const limit = options.limit || 50;
+        const { data, error } = await supabase
+            .from('leads')
+            .select('*')
+            .eq('org_id', orgId)
+            .limit(limit)
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Erro ao buscar leads:', error);
+            return { data: [], error };
+        }
+        
+        return { data: data || [], error: null };
+    } catch (error) {
+        console.error('Erro ao buscar leads avançados:', error);
+        return { data: [], error };
+    }
+}
+
+// ===== FUNIL ANALYTICS =====
+export async function getFunilAnalytics(orgId) {
+    try {
+        const { data, error } = await supabase
+            .from('funil_analytics')
+            .select('*')
+            .eq('org_id', orgId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error('Erro ao buscar funil:', error);
+            return { data: [], error };
+        }
+        
+        return { data: data || [], error: null };
+    } catch (error) {
+        console.error('Erro ao buscar analytics do funil:', error);
+        return { data: [], error };
+    }
+}
+
+// ===== PERFORMANCE TEMPORAL =====
+export async function getPerformanceTemporalBetterStuff(orgId) {
+    try {
+        const { data, error } = await supabase
+            .from('performance_temporal')
+            .select('*')
+            .eq('org_id', orgId)
+            .order('data_registro', { ascending: false })
+            .limit(30);
+        
+        if (error) {
+            console.error('Erro ao buscar performance temporal:', error);
+            return { data: { timeline: [] }, error };
+        }
+        
+        return { data: { timeline: data || [] }, error: null };
+    } catch (error) {
+        console.error('Erro ao buscar performance temporal:', error);
+        return { data: { timeline: [] }, error };
+    }
+}
+
+// ===== GAMIFICAÇÃO =====
+export async function getGamificationStatus(userId, orgId) {
+    try {
+        const { data, error } = await supabase
+            .from('gamification_status')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('org_id', orgId)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error('Erro ao buscar gamificação:', error);
+            return {
+                data: {
+                    perfil: { level: 1, total_points: 0 },
+                    progressao: { streak_atual: 0 },
+                    badges: []
+                },
+                error: null
+            };
+        }
+        
+        return { 
+            data: data || {
+                perfil: { level: 1, total_points: 0 },
+                progressao: { streak_atual: 0 },
+                badges: []
+            }, 
+            error: null 
+        };
+    } catch (error) {
+        console.error('Erro ao buscar status de gamificação:', error);
+        return {
+            data: {
+                perfil: { level: 1, total_points: 0 },
+                progressao: { streak_atual: 0 },
+                badges: []
+            },
+            error
+        };
+    }
+}
+
+export async function registrarPontosGamificacao(userId, acao, pontos) {
+    try {
+        const { data, error } = await supabase
+            .from('gamification_pontos')
+            .insert({
+                user_id: userId,
+                acao,
+                pontos,
+                created_at: new Date().toISOString()
+            });
+        
+        if (error) {
+            console.error('Erro ao registrar pontos:', error);
+            return { data: null, error };
+        }
+        
+        return { data, error: null };
+    } catch (error) {
+        console.error('Erro ao registrar pontos de gamificação:', error);
+        return { data: null, error };
+    }
+}
+
+// ===== INSIGHTS IA =====
+export async function getInsightsIA(orgId) {
+    try {
+        const { data, error } = await supabase
+            .from('insights_ia')
+            .select('*')
+            .eq('org_id', orgId)
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        if (error) {
+            console.error('Erro ao buscar insights IA:', error);
+            return {
+                data: {
+                    predicoes: [],
+                    proximasAcoes: [],
+                    insights: []
+                },
+                error
+            };
+        }
+        
+        return { 
+            data: {
+                predicoes: data || [],
+                proximasAcoes: data || [],
+                insights: data || []
+            }, 
+            error: null 
+        };
+    } catch (error) {
+        console.error('Erro ao buscar insights de IA:', error);
+        return {
+            data: {
+                predicoes: [],
+                proximasAcoes: [],
+                insights: []
+            },
+            error
+        };
+    }
+}
