@@ -1,207 +1,191 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - ALSHAM 360° PRIMA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="../style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — ALSHAM 360° PRIMA</title>
+
+  <!-- SEO / PWA -->
+  <meta name="description" content="Dashboard do ALSHAM 360° PRIMA: KPIs, analytics, leads recentes e ações rápidas." />
+  <link rel="manifest" href="../site.webmanifest" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <link rel="icon" href="../favicon.ico" />
+  <link rel="canonical" href="/app/pages/dashboard.html" />
+
+  <!-- Fontes e Estilos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+
+  <!-- Libs para gráficos e celebração -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 </head>
+
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-    
-    <!-- Header Premium -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">A</span>
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-                            <p class="text-xs text-gray-500">Dashboard Obra-Prima</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">Dashboard</a>
-                    <a href="leads.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Leads</a>
-                    <a href="#" class="text-gray-600 hover:text-primary transition-colors font-medium">Automações</a>
-                    <a href="#" class="text-gray-600 hover:text-primary transition-colors font-medium">Relatórios</a>
-                </nav>
-                
-                <div class="flex items-center space-x-4">
-                    <div class="relative">
-                        <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                            </svg>
-                        </button>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-pulse"></span>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
-                        </div>
-                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
-                        <button data-auth="logout-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
+  <noscript>
+    <div style="padding:12px;background:#fee2e2;color:#991b1b;text-align:center">
+      Este aplicativo precisa de JavaScript habilitado.
+    </div>
+  </noscript>
 
-    <!-- Hero Section - Demonstração Contínua de Valor -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden">
-            <div class="absolute inset-0 bg-black/10"></div>
-            <div class="relative z-10">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold mb-2">🎉 Bem-vindo de volta!</h2>
-                        <p class="text-xl mb-4">Você está fazendo um ótimo trabalho</p>
-                        <div class="flex items-center space-x-6 text-sm">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-green-300">↗️ +23%</span>
-                                <span>vs. semana passada</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-yellow-300">🔥</span>
-                                <span>Seu melhor mês até agora</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm opacity-90 mb-2">Meta Mensal</div>
-                        <div class="text-2xl font-bold" id="monthly-progress">73%</div>
-                        <div class="text-sm" id="monthly-remaining">Faltam R$ 8.250</div>
-                        <div class="w-32 bg-white/20 rounded-full h-2 mt-2">
-                            <div class="bg-yellow-300 h-2 rounded-full" style="width: 73%"></div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Header Premium -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm" role="banner">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a class="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg" href="./dashboard.html" aria-label="Página inicial">
+          <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
+            <span class="text-white font-bold text-lg">A</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
+            <p class="text-xs text-gray-500">Dashboard Obra-Prima</p>
+          </div>
+        </a>
+        <nav class="hidden md:flex items-center space-x-8" aria-label="Navegação principal">
+          <a href="./dashboard.html" class="text-primary font-medium border-b-2 border-primary pb-1">Dashboard</a>
+          <a href="./leads.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Leads</a>
+          <a href="./automacoes.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Automações</a>
+          <a href="./relatorios.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Relatórios</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <div class="relative" aria-live="polite">
+            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Notificações" aria-label="Notificações">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-pulse" aria-hidden="true"></span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center" aria-hidden="true">
+              <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
             </div>
+            <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
+            <button data-auth="logout-btn" class="text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            </button>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </header>
 
-    <!-- KPIs Dinâmicos -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="kpis-container">
-            <!-- KPIs serão carregados dinamicamente -->
-        </div>
-    </section>
-
-    <!-- Analytics e Ações Rápidas -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Analytics -->
-            <div class="lg:col-span-2" id="analytics-container">
-                <!-- Gráficos serão carregados dinamicamente -->
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden">
+      <div class="absolute inset-0 bg-black/10"></div>
+      <div class="relative z-10">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold mb-2">🎉 Bem-vindo de volta!</h2>
+            <p class="text-xl mb-4">Você está fazendo um ótimo trabalho</p>
+            <div class="flex items-center space-x-6 text-sm">
+              <span class="flex items-center space-x-2"><span class="text-green-300">↗️ +23%</span><span>vs. semana passada</span></span>
+              <span class="flex items-center space-x-2"><span class="text-yellow-300">🔥</span><span>Seu melhor mês até agora</span></span>
             </div>
-            
-            <!-- Ações Rápidas -->
-            <div class="space-y-6">
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">⚡ Ações Rápidas</h3>
-                    <div class="space-y-3" id="quick-actions">
-                        <!-- Ações serão carregadas dinamicamente -->
-                    </div>
-                </div>
-                
-                <!-- Insights Inteligentes -->
-                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🧠 Insights IA</h3>
-                    <div class="space-y-4">
-                        <div class="bg-white rounded-lg p-4 shadow-sm">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                                    <span class="text-white text-sm">🎯</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Oportunidade Detectada</p>
-                                    <p class="text-xs text-gray-600 mt-1">3 leads qualificados aguardam contato há mais de 2 dias</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white rounded-lg p-4 shadow-sm">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                                    <span class="text-white text-sm">📈</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Tendência Positiva</p>
-                                    <p class="text-xs text-gray-600 mt-1">Taxa de conversão 15% acima da média do setor</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white rounded-lg p-4 shadow-sm">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                                    <span class="text-white text-sm">⏰</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Melhor Horário</p>
-                                    <p class="text-xs text-gray-600 mt-1">Terças às 14h têm 40% mais conversões</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm opacity-90 mb-2">Meta Mensal</div>
+            <div class="text-2xl font-bold" id="monthly-progress">73%</div>
+            <div class="text-sm" id="monthly-remaining">Faltam R$ 8.250</div>
+            <div class="w-32 bg-white/20 rounded-full h-2 mt-2">
+              <div class="bg-yellow-300 h-2 rounded-full" style="width:73%"></div>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- Leads Recentes -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+  <!-- KPIs Dinâmicos -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div id="kpis-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" aria-live="polite">
+      <!-- KPIs dinâmicos via dashboard.js -->
+    </div>
+  </section>
+
+  <!-- Analytics e Ações rápidas -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div id="analytics-container" class="lg:col-span-2">
+        <!-- Gráficos injetados dinamicamente -->
+      </div>
+      <aside class="space-y-6" aria-label="Ações rápidas e insights">
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-gray-900">📋 Leads Recentes</h3>
-                <a href="leads.html" class="text-primary hover:text-primary-dark font-medium">Ver todos</a>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-gray-200">
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Nome</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Valor</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Data</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recent-leads">
-                        <!-- Leads serão carregados dinamicamente -->
-                    </tbody>
-                </table>
-            </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">⚡ Ações Rápidas</h3>
+          <div id="quick-actions" class="space-y-3"></div>
         </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="text-center text-gray-500 text-sm">
-            © 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.
+        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">🧠 Insights IA</h3>
+          <div class="space-y-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><span class="text-white text-sm">🎯</span></div>
+                <div><p class="text-sm font-medium text-gray-900">Oportunidade Detectada</p><p class="text-xs text-gray-600 mt-1">3 leads qualificados aguardam contato há mais de 2 dias</p></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center"><span class="text-white text-sm">📈</span></div>
+                <div><p class="text-sm font-medium text-gray-900">Tendência Positiva</p><p class="text-xs text-gray-600 mt-1">Taxa de conversão 15% acima da média do setor</p></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center"><span class="text-white text-sm">⏰</span></div>
+                <div><p class="text-sm font-medium text-gray-900">Melhor Horário</p><p class="text-xs text-gray-600 mt-1">Terças às 14h têm 40% mais conversões</p></div>
+              </div>
+            </div>
+          </div>
         </div>
-    </footer>
+      </aside>
+    </div>
+  </section>
 
-    <!-- Scripts -->
-    <script type="module" src="../js/auth.js"></script>
-    <script type="module" src="../js/dashboard.js"></script>
+  <!-- Leads Recentes -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-gray-900">📋 Leads Recentes</h3>
+        <a href="./leads.html" class="text-primary hover:text-primary-dark font-medium">Ver todos</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Nome</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Valor</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Data</th>
+            </tr>
+          </thead>
+          <tbody id="recent-leads">
+            <!-- Leads carregados dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
+    <p class="text-center text-gray-500 text-sm">© 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.</p>
+  </footer>
+
+  <!-- App scripts (importantes para dados reais) -->
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module" src="../js/dashboard.js"></script>
+
+  <!-- Guard-rail: loga erros não tratados para debug em produção -->
+  <script>
+    window.addEventListener('unhandledrejection', (e) => console.error('Unhandled promise rejection:', e.reason));
+    window.addEventListener('error', (e) => console.error('Unhandled error:', e.message || e));
+  </script>
 </body>
 </html>
-
