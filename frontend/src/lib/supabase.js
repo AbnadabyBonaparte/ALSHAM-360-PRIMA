@@ -345,3 +345,178 @@ export async function getCurrentToken() {
 
 console.log('🔐 Supabase configurado - ALSHAM 360° PRIMA')
 
+
+// ===== FUNÇÕES DE LEADS COM CACHE REDIS =====
+
+/**
+ * Buscar leads da organização (com cache Redis)
+ */
+export async function getLeads(orgId = DEFAULT_ORG_ID) {
+  try {
+    // Tentar buscar do cache primeiro
+    const { default: redisCache } = await import('./redis.js')
+    const cachedLeads = await redisCache.getLeads(orgId)
+    
+    if (cachedLeads) {
+      console.log('✅ Leads carregados do cache Redis')
+      return { data: cachedLeads, error: null, fromCache: true }
+    }
+
+    // Se não estiver no cache, buscar do Supabase
+    const { data, error } = await supabase
+      .from('leads_crm')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    // Cachear resultado para próximas consultas
+    if (data) {
+      await redisCache.cacheLeads(orgId, data)
+      console.log('✅ Leads cacheados no Redis')
+    }
+
+    return { data, error: null, fromCache: false }
+  } catch (error) {
+    console.error('Erro ao buscar leads:', error)
+    return { data: null, error }
+  }
+}
+
+/**
+ * Criar novo lead (e invalidar cache)
+ */
+export async function createLead(leadData, orgId = DEFAULT_ORG_ID) {
+  try {
+    const { data, error } = await supabase
+      .from('leads_crm')
+      .insert([{
+        ...leadData,
+        org_id: orgId,
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    // Invalidar cache de leads para forçar atualização
+    const { default: redisCache } = await import('./redis.js')
+    await redisCache.invalidateCache(`leads:${orgId}`)
+    await redisCache.invalidateCache(`kpis:${orgId}`)
+    
+    console.log('✅ Lead criado e cache invalidado')
+    return { data, error: null }
+  } catch (error) {
+    console.error('Erro ao criar lead:', error)
+    return { data: null, error }
+  }
+}
+
+/**
+ * Atualizar lead (e invalidar cache)
+ */
+export async function updateLead(leadId, updates, orgId = DEFAULT_ORG_ID) {
+  try {
+    const { data, error } = await supabase
+      .from('leads_crm')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', leadId)
+      .eq('org_id', orgId)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    // Invalidar cache
+    const { default: redisCache } = await import('./redis.js')
+    await redisCache.invalidateCache(`leads:${orgId}`)
+    await redisCache.invalidateCache(`kpis:${orgId}`)
+    
+    console.log('✅ Lead atualizado e cache invalidado')
+    return { data, error: null }
+  } catch (error) {
+    console.error('Erro ao atualizar lead:', error)
+    return { data: null, error }
+  }
+}
+
+/**
+ * Deletar lead (e invalidar cache)
+ */
+export async function deleteLead(leadId, orgId = DEFAULT_ORG_ID) {
+  try {
+    const { error } = await supabase
+      .from('leads_crm')
+      .delete()
+      .eq('id', leadId)
+      .eq('org_id', orgId)
+
+    if (error) throw error
+
+    // Invalidar cache
+    const { default: redisCache } = await import('./redis.js')
+    await redisCache.invalidateCache(`leads:${orgId}`)
+    await redisCache.invalidateCache(`kpis:${orgId}`)
+    
+    console.log('✅ Lead deletado e cache invalidado')
+    return { error: null }
+  } catch (error) {
+    console.error('Erro ao deletar lead:', error)
+    return { error }
+  }
+}
+
+/**
+ * Buscar KPIs do dashboard (com cache Redis)
+ */
+export async function getDashboardKPIs(orgId = DEFAULT_ORG_ID) {
+  try {
+    // Tentar buscar do cache primeiro
+    const { default: redisCache } = await import('./redis.js')
+    const cachedKPIs = await redisCache.getKPIs(orgId)
+    
+    if (cachedKPIs) {
+      console.log('✅ KPIs carregados do cache Redis')
+      return { data: cachedKPIs, error: null, fromCache: true }
+    }
+
+    // Buscar leads para calcular KPIs
+    const { data: leads, error } = await supabase
+      .from('leads_crm')
+      .select('*')
+      .eq('org_id', orgId)
+
+    if (error) throw error
+
+    // Calcular KPIs
+    const totalLeads = leads?.length || 0
+    const qualifiedLeads = leads?.filter(lead => lead.status === 'qualified')?.length || 0
+    const convertedLeads = leads?.filter(lead => lead.status === 'converted')?.length || 0
+    const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads * 100).toFixed(1) : 0
+    const totalRevenue = leads?.filter(lead => lead.status === 'converted')
+      ?.reduce((sum, lead) => sum + (lead.value || 0), 0) || 0
+
+    const kpis = {
+      totalLeads,
+      qualifiedLeads,
+      conversionRate: parseFloat(conversionRate),
+      totalRevenue,
+      lastUpdated: new Date().toISOString()
+    }
+
+    // Cachear KPIs
+    await redisCache.cacheKPIs(orgId, kpis)
+    console.log('✅ KPIs calculados e cacheados no Redis')
+
+    return { data: kpis, error: null, fromCache: false }
+  } catch (error) {
+    console.error('Erro ao buscar KPIs:', error)
+    return { data: null, error }
+  }
+}
+
