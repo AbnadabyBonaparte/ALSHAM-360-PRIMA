@@ -299,10 +299,23 @@
                             <span>💰 Valor: R$ 12.500</span>
                         </div>
                     </div>
-                    <div class="flex space-x-2">
-                        <button class="btn-primary text-xs px-3 py-2 flex-1">📞 Ligar Agora</button>
-                        <button class="btn-secondary text-xs px-3 py-2 flex-1">📧 Enviar Email</button>
-                        <button class="btn-outline text-xs px-3 py-2">📅 Agendar</button>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                        <button class="btn-primary text-xs px-3 py-2 flex items-center justify-center space-x-1">
+                            <span>📞</span>
+                            <span>Ligar</span>
+                        </button>
+                        <button onclick="openWhatsApp('5511999999999', 'Maria Santos')" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-1">
+                            <span>💬</span>
+                            <span>WhatsApp</span>
+                        </button>
+                        <button class="btn-secondary text-xs px-3 py-2 flex items-center justify-center space-x-1">
+                            <span>📧</span>
+                            <span>Email</span>
+                        </button>
+                        <button class="btn-outline text-xs px-3 py-2 flex items-center justify-center space-x-1">
+                            <span>📅</span>
+                            <span>Agendar</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -407,6 +420,43 @@
         </div>
     </footer>
 
+    <script>
+        // Função para abrir WhatsApp
+        function openWhatsApp(phone, name) {
+            // Remove caracteres especiais do telefone
+            const cleanPhone = phone.replace(/\D/g, '');
+            
+            // Mensagem personalizada
+            const message = `Olá ${name}! Sou da ALSHAM e gostaria de conversar sobre nossa proposta. Quando seria um bom momento para você?`;
+            
+            // Codifica a mensagem para URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // URL do WhatsApp
+            const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+            
+            // Abre em nova aba
+            window.open(whatsappUrl, '_blank');
+            
+            // Feedback visual
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ Enviado!';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+        
+        // Função para demonstrar valor
+        function showValueDemo() {
+            alert('🎯 Valor Demonstrado:\n\n• 23% aumento nas conversões\n• 2.5h economizadas por dia\n• R$ 15.750 gerados esta semana\n• 89% de satisfação da equipe');
+        }
+    </script>
+
+    <script type="module" src="./src/components/navigation.js"></script>
     <script type="module" src="./src/js/auth.js"></script>
     <script src="./src/main.js"></script>
 </body>
