@@ -1,52 +1,50 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="h-full bg-gray-50 scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personalize suas preferências e configurações do ALSHAM 360° PRIMA.">
+    <meta name="robots" content="index, follow">
     <title>Configurações - ALSHAM 360° PRIMA</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-    
+
+    <noscript>
+        <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; padding: 1em; background-color: #f8d7da; color: #721c24; text-align: center; border-bottom: 1px solid #f5c6cb;">
+            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente. Por favor, habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
+
     <!-- Header Premium -->
     <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-3" aria-label="Voltar ao Dashboard">
                         <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">A</span>
+                            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
                         </div>
                         <div>
                             <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-                            <p class="text-xs text-gray-500">Configurações do Sistema</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
-                
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="../../index.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Dashboard</a>
-                    <a href="leads-real.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Leads</a>
-                    <a href="automacoes.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Automações</a>
-                    <a href="relatorios.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Relatórios</a>
+                <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
+                    <!-- Menu dinâmico será injetado aqui pelo navigation.js -->
                 </nav>
-                
                 <div class="flex items-center space-x-4">
-                    <button onclick="saveAllSettings()" class="btn-primary text-sm">
-                        💾 Salvar Tudo
-                    </button>
                     <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
-                        </div>
-                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
-                        <button data-auth="logout-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
+                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
+                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
+                        <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         </button>
                     </div>
                 </div>
@@ -54,494 +52,58 @@
         </div>
     </header>
 
-    <!-- Layout Principal -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="breadcrumb" class="mb-8"></div>
+
+        <section>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">⚙️ Configurações</h2>
+            <p class="text-gray-600 mb-8">Personalize suas preferências e defina parâmetros da sua conta e organização.</p>
             
-            <!-- Menu Lateral -->
-            <div class="lg:w-64 flex-shrink-0">
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 sticky top-24">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">⚙️ Configurações</h3>
-                    <nav class="space-y-2">
-                        <button onclick="showSection('profile')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-profile">
-                            👤 Perfil
-                        </button>
-                        <button onclick="showSection('organization')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-organization">
-                            🏢 Organização
-                        </button>
-                        <button onclick="showSection('team')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-team">
-                            👥 Equipe
-                        </button>
-                        <button onclick="showSection('integrations')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-integrations">
-                            🔗 Integrações
-                        </button>
-                        <button onclick="showSection('notifications')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-notifications">
-                            🔔 Notificações
-                        </button>
-                        <button onclick="showSection('security')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-security">
-                            🔒 Segurança
-                        </button>
-                        <button onclick="showSection('billing')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900 font-medium" id="nav-billing">
-                            💳 Faturamento
-                        </button>
-                    </nav>
+            <!-- Exemplo de cards de configuração -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Preferências do usuário -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Preferências do Usuário</h3>
+                    <form id="user-preferences-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="theme">Tema</label>
+                            <select id="theme" name="theme" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                                <option value="light">Claro</option>
+                                <option value="dark">Escuro</option>
+                                <option value="system">Sistema</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="notificacoes">Notificações</label>
+                            <select id="notificacoes" name="notificacoes" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                                <option value="todas">Todas</option>
+                                <option value="importantes">Apenas importantes</option>
+                                <option value="nenhuma">Nenhuma</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary mt-2">Salvar Preferências</button>
+                    </form>
+                </div>
+
+                <!-- Configurações da organização -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Configurações da Organização</h3>
+                    <form id="org-settings-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="org-nome">Nome da organização</label>
+                            <input type="text" id="org-nome" name="org-nome" value="Minha Empresa" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="org-email">E-mail de contato</label>
+                            <input type="email" id="org-email" name="org-email" value="contato@empresa.com" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                        </div>
+                        <button type="submit" class="btn-primary mt-2">Salvar Configurações</button>
+                    </form>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <!-- Conteúdo Principal -->
-            <div class="flex-1">
-                
-                <!-- Seção Perfil -->
-                <div id="section-profile" class="settings-section">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">👤 Perfil do Usuário</h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
-                                <input type="text" id="user-name" value="João Silva" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
-                                <input type="email" id="user-email" value="joao@alsham.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
-                                <input type="tel" id="user-phone" value="+55 11 99999-9999" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
-                                <input type="text" id="user-position" value="Gerente de Vendas" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Fuso Horário</label>
-                                <select id="user-timezone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="America/Sao_Paulo" selected>São Paulo (GMT-3)</option>
-                                    <option value="America/New_York">Nova York (GMT-5)</option>
-                                    <option value="Europe/London">Londres (GMT+0)</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
-                                <select id="user-language" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="pt-BR" selected>Português (Brasil)</option>
-                                    <option value="en-US">English (US)</option>
-                                    <option value="es-ES">Español</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Foto do Perfil</label>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 bg-gradient-premium rounded-full flex items-center justify-center">
-                                    <span class="text-white text-xl font-semibold">JS</span>
-                                </div>
-                                <div>
-                                    <button class="btn-outline text-sm">Alterar Foto</button>
-                                    <p class="text-xs text-gray-500 mt-1">JPG, PNG ou GIF. Máximo 2MB.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Organização -->
-                <div id="section-organization" class="settings-section hidden">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">🏢 Configurações da Organização</h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Nome da Empresa</label>
-                                <input type="text" id="org-name" value="ALSHAM Global" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">CNPJ</label>
-                                <input type="text" id="org-cnpj" value="12.345.678/0001-90" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Setor</label>
-                                <select id="org-industry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="technology" selected>Tecnologia</option>
-                                    <option value="finance">Financeiro</option>
-                                    <option value="healthcare">Saúde</option>
-                                    <option value="education">Educação</option>
-                                    <option value="retail">Varejo</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Tamanho da Empresa</label>
-                                <select id="org-size" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="1-10">1-10 funcionários</option>
-                                    <option value="11-50" selected>11-50 funcionários</option>
-                                    <option value="51-200">51-200 funcionários</option>
-                                    <option value="201-1000">201-1000 funcionários</option>
-                                    <option value="1000+">1000+ funcionários</option>
-                                </select>
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Endereço</label>
-                                <textarea id="org-address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-100</textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Logo da Empresa</label>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 bg-gradient-premium rounded-xl flex items-center justify-center">
-                                    <span class="text-white text-xl font-semibold">A</span>
-                                </div>
-                                <div>
-                                    <button class="btn-outline text-sm">Alterar Logo</button>
-                                    <p class="text-xs text-gray-500 mt-1">PNG ou SVG. Máximo 5MB.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Equipe -->
-                <div id="section-team" class="settings-section hidden">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900">👥 Gerenciamento de Equipe</h2>
-                            <button onclick="inviteUser()" class="btn-primary">
-                                ➕ Convidar Usuário
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Usuário</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Cargo</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Permissão</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="team-members">
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-4 px-4">
-                                            <div class="flex items-center space-x-3">
-                                                <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center">
-                                                    <span class="text-white text-sm font-semibold">JS</span>
-                                                </div>
-                                                <div>
-                                                    <p class="font-medium text-gray-900">João Silva</p>
-                                                    <p class="text-sm text-gray-600">joao@alsham.com</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4">Gerente de Vendas</td>
-                                        <td class="py-4 px-4">
-                                            <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">Admin</span>
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Ativo</span>
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <button class="text-blue-600 hover:text-blue-800 text-sm">Editar</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-4 px-4">
-                                            <div class="flex items-center space-x-3">
-                                                <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                                                    <span class="text-white text-sm font-semibold">MS</span>
-                                                </div>
-                                                <div>
-                                                    <p class="font-medium text-gray-900">Maria Santos</p>
-                                                    <p class="text-sm text-gray-600">maria@alsham.com</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="py-4 px-4">Vendedora</td>
-                                        <td class="py-4 px-4">
-                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Usuário</span>
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Ativo</span>
-                                        </td>
-                                        <td class="py-4 px-4">
-                                            <button class="text-blue-600 hover:text-blue-800 text-sm">Editar</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Integrações -->
-                <div id="section-integrations" class="settings-section hidden">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">🔗 Integrações</h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- WhatsApp Business -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                            <span class="text-2xl">💬</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold text-gray-900">WhatsApp Business</h3>
-                                            <p class="text-sm text-gray-600">Integração com WhatsApp</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn-primary text-sm">Conectar</button>
-                                </div>
-                                <p class="text-xs text-gray-500">Envie mensagens automáticas via WhatsApp</p>
-                            </div>
-                            
-                            <!-- Google Workspace -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                            <span class="text-2xl">📧</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold text-gray-900">Google Workspace</h3>
-                                            <p class="text-sm text-gray-600">Gmail e Calendar</p>
-                                        </div>
-                                    </div>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Conectado</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Sincronização de e-mails e calendário</p>
-                            </div>
-                            
-                            <!-- Zapier -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                                            <span class="text-2xl">⚡</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold text-gray-900">Zapier</h3>
-                                            <p class="text-sm text-gray-600">Automações avançadas</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn-outline text-sm">Configurar</button>
-                                </div>
-                                <p class="text-xs text-gray-500">Conecte com 5000+ aplicativos</p>
-                            </div>
-                            
-                            <!-- Slack -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                            <span class="text-2xl">💬</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold text-gray-900">Slack</h3>
-                                            <p class="text-sm text-gray-600">Notificações em equipe</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn-outline text-sm">Conectar</button>
-                                </div>
-                                <p class="text-xs text-gray-500">Receba notificações no Slack</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Notificações -->
-                <div id="section-notifications" class="settings-section hidden">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">🔔 Configurações de Notificação</h2>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">E-mail</h3>
-                                <div class="space-y-3">
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Novos leads</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Leads convertidos</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Relatórios semanais</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Atualizações do sistema</span>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Push (Navegador)</h3>
-                                <div class="space-y-3">
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Novos leads</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Lembretes de follow-up</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3">
-                                        <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="text-gray-700">Metas atingidas</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Segurança -->
-                <div id="section-security" class="settings-section hidden">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">🔒 Segurança</h2>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Alterar Senha</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Senha Atual</label>
-                                        <input type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Nova Senha</label>
-                                        <input type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    </div>
-                                </div>
-                                <button class="mt-4 btn-primary text-sm">Alterar Senha</button>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Autenticação de Dois Fatores</h3>
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                    <div>
-                                        <p class="font-medium text-gray-900">2FA via SMS</p>
-                                        <p class="text-sm text-gray-600">Adicione uma camada extra de segurança</p>
-                                    </div>
-                                    <button class="btn-outline text-sm">Ativar</button>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Sessões Ativas</h3>
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                                        <div>
-                                            <p class="font-medium text-gray-900">Chrome - Windows</p>
-                                            <p class="text-sm text-gray-600">São Paulo, Brasil • Agora</p>
-                                        </div>
-                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Atual</span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                                        <div>
-                                            <p class="font-medium text-gray-900">Safari - iPhone</p>
-                                            <p class="text-sm text-gray-600">São Paulo, Brasil • 2 horas atrás</p>
-                                        </div>
-                                        <button class="text-red-600 hover:text-red-800 text-sm">Encerrar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Faturamento -->
-                <div id="section-billing" class="settings-section hidden">
-                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">💳 Faturamento</h2>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Plano Atual</h3>
-                                <div class="border border-gray-200 rounded-lg p-6">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div>
-                                            <h4 class="text-xl font-bold text-gray-900">Plano Professional</h4>
-                                            <p class="text-gray-600">Até 50 usuários • Recursos avançados</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-2xl font-bold text-gray-900">R$ 299</p>
-                                            <p class="text-sm text-gray-600">/mês</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-sm text-gray-600">Próxima cobrança: 15 de outubro de 2025</p>
-                                        <button class="btn-outline text-sm">Alterar Plano</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Histórico de Faturas</h3>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Data</th>
-                                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Descrição</th>
-                                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Valor</th>
-                                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="border-b border-gray-100">
-                                                <td class="py-4 px-4">15/09/2025</td>
-                                                <td class="py-4 px-4">Plano Professional - Setembro</td>
-                                                <td class="py-4 px-4">R$ 299,00</td>
-                                                <td class="py-4 px-4">
-                                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Pago</span>
-                                                </td>
-                                                <td class="py-4 px-4">
-                                                    <button class="text-blue-600 hover:text-blue-800 text-sm">Download</button>
-                                                </td>
-                                            </tr>
-                                            <tr class="border-b border-gray-100">
-                                                <td class="py-4 px-4">15/08/2025</td>
-                                                <td class="py-4 px-4">Plano Professional - Agosto</td>
-                                                <td class="py-4 px-4">R$ 299,00</td>
-                                                <td class="py-4 px-4">
-                                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Pago</span>
-                                                </td>
-                                                <td class="py-4 px-4">
-                                                    <button class="text-blue-600 hover:text-blue-800 text-sm">Download</button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script type="module" src="../js/auth.js"></script>
-    <script type="module" src="../js/configuracoes.js"></script>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
-
