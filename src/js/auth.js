@@ -1,139 +1,229 @@
-// ALSHAM 360° PRIMA - Authentication Middleware (Revisão Gemini)
-// Proteção de rotas, gestão de sessões e correção de race conditions.
+// ALSHAM 360° PRIMA - Navigation System
+// Sistema de navegação dinâmica e controle de menu ativo
 
-import { supabase, onAuthStateChange, signOut } from '../lib/supabase.js';
-
-// ===== ESTADO GLOBAL =====
-// Usamos um objeto para encapsular o estado e evitar variáveis soltas.
-const authState = {
-    user: null,
-    profile: null,
-    session: null,
-    isAuthenticated: false,
-    isInitialized: false, // Flag para controlar a inicialização
+// ===== CONFIGURAÇÃO DE ROTAS =====
+const routes = {
+    '/': { title: 'Dashboard', icon: '📊' },
+    '/index.html': { title: 'Dashboard', icon: '📊' },
+    '/leads.html': { title: 'Leads', icon: '👥' },
+    '/leads-real.html': { title: 'Leads Real', icon: '🎯' },
+    '/automacoes.html': { title: 'Automações', icon: '🤖' },
+    '/relacionamentos.html': { title: 'Relacionamentos', icon: '🔗' },
+    '/gamificacao.html': { title: 'Gamificação', icon: '🎮' },
+    '/relatorios.html': { title: 'Relatórios', icon: '📈' },
+    '/configuracoes.html': { title: 'Configurações', icon: '⚙️' }
 };
 
-// ===== CONFIGURAÇÃO =====
-// Páginas que NÃO precisam de autenticação.
-// CORREÇÃO: Caminhos simplificados para o Vite.
-const publicPages = ['/', '/index.html', '/login.html', '/register.html'];
+// ===== ESTADO DA NAVEGAÇÃO =====
+const navState = {
+    currentPath: window.location.pathname,
+    isMenuOpen: false,
+    isMobile: window.innerWidth < 768
+};
 
 // ===== INICIALIZAÇÃO =====
-// A inicialização agora retorna uma Promise, garantindo que o fluxo espere por ela.
-async function initializeAuth() {
-    // Previne re-inicialização
-    if (authState.isInitialized) return;
+document.addEventListener('DOMContentLoaded', initializeNavigation);
+window.addEventListener('resize', handleResize);
 
-    // Ouve as mudanças de estado de autenticação (login, logout)
-    onAuthStateChange((_event, session) => {
-        updateAuthState(session);
+function initializeNavigation() {
+    updateActiveMenuItem();
+    updatePageTitle();
+    setupMobileMenu();
+    setupNavigationEvents();
+    createBreadcrumb();
+    console.log('🧭 Navigation system initialized');
+}
+
+// ===== CONTROLE DE MENU ATIVO =====
+function updateActiveMenuItem() {
+    // Remove classes ativas de todos os itens
+    document.querySelectorAll('[data-nav-item]').forEach(item => {
+        item.classList.remove('active', 'bg-primary', 'text-white');
+        item.classList.add('text-gray-600', 'hover:bg-gray-100');
     });
 
-    // Pega a sessão inicial para verificar se o usuário já está logado
-    const { data: { session } } = await supabase.auth.getSession();
-    await updateAuthState(session);
-
-    authState.isInitialized = true;
-    console.log('🔐 Auth middleware inicializado. Autenticado:', authState.isAuthenticated);
-}
-
-// ===== FUNÇÃO PRINCIPAL DE CONTROLE DE ACESSO =====
-// Esta função será chamada em todas as páginas.
-async function protectPage() {
-    // Garante que a verificação só ocorra após a inicialização do auth.
-    if (!authState.isInitialized) {
-        await initializeAuth();
-    }
-
-    const currentPath = window.location.pathname;
-    const isPublicPage = publicPages.includes(currentPath);
-
-    // 1. Se o usuário ESTÁ autenticado, mas está na página de login/registro, redireciona para o dashboard.
-    if (authState.isAuthenticated && (currentPath === '/login.html' || currentPath === '/register.html')) {
-        console.log('Usuário autenticado em página pública. Redirecionando para o dashboard...');
-        window.location.replace('/index.html'); // Usar replace para não poluir o histórico
-        return;
-    }
-
-    // 2. Se o usuário NÃO ESTÁ autenticado e a página NÃO é pública, redireciona para o login.
-    if (!authState.isAuthenticated && !isPublicPage) {
-        console.warn(`Acesso negado a '${currentPath}'. Redirecionando para o login.`);
-        window.location.replace('/login.html'); // Usar replace
-        return;
-    }
-
-    // 3. Se o usuário está autenticado, atualiza a UI com seus dados.
-    if (authState.isAuthenticated) {
-        updateAuthUI();
+    // Adiciona classe ativa ao item atual
+    const currentItem = document.querySelector(`[data-nav-item="${navState.currentPath}"]`) ||
+                       document.querySelector(`[data-nav-item="/"]`);
+    
+    if (currentItem) {
+        currentItem.classList.remove('text-gray-600', 'hover:bg-gray-100');
+        currentItem.classList.add('active', 'bg-primary', 'text-white');
     }
 }
 
-// ===== GESTÃO DE ESTADO =====
-// Função central para atualizar o estado de autenticação.
-async function updateAuthState(session) {
-    if (session?.user) {
-        const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('full_name, avatar_url') // Pegue os dados que precisar
-            .eq('user_id', session.user.id)
-            .single();
-
-        authState.user = session.user;
-        authState.profile = profile;
-        authState.session = session;
-        authState.isAuthenticated = true;
-    } else {
-        authState.user = null;
-        authState.profile = null;
-        authState.session = null;
-        authState.isAuthenticated = false;
+// ===== TÍTULO DA PÁGINA =====
+function updatePageTitle() {
+    const route = routes[navState.currentPath] || routes['/'];
+    document.title = `${route.title} - ALSHAM 360° PRIMA`;
+    
+    // Atualiza h1 se existir
+    const pageTitle = document.querySelector('[data-page-title]');
+    if (pageTitle) {
+        pageTitle.textContent = route.title;
     }
 }
 
-// ===== ATUALIZAÇÃO DE UI =====
-// Atualiza os elementos da página com as informações do usuário.
-function updateAuthUI() {
-    // Garante que a UI só seja atualizada quando o DOM estiver pronto.
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', updateAuthUI);
-        return;
+// ===== BREADCRUMB =====
+function createBreadcrumb() {
+    const breadcrumbContainer = document.querySelector('[data-breadcrumb]');
+    if (!breadcrumbContainer) return;
+
+    const route = routes[navState.currentPath] || routes['/'];
+    const breadcrumbHTML = `
+        <nav class="flex items-center space-x-2 text-sm text-gray-600">
+            <a href="/" class="hover:text-primary transition-colors">
+                <span class="mr-1">🏠</span>Dashboard
+            </a>
+            ${navState.currentPath !== '/' && navState.currentPath !== '/index.html' ? `
+                <span class="text-gray-400">></span>
+                <span class="text-gray-900 font-medium">
+                    <span class="mr-1">${route.icon}</span>${route.title}
+                </span>
+            ` : ''}
+        </nav>
+    `;
+    breadcrumbContainer.innerHTML = breadcrumbHTML;
+}
+
+// ===== MENU MOBILE =====
+function setupMobileMenu() {
+    const menuButton = document.querySelector('[data-mobile-menu-button]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    const menuOverlay = document.querySelector('[data-menu-overlay]');
+
+    if (!menuButton || !mobileMenu) return;
+
+    menuButton.addEventListener('click', toggleMobileMenu);
+    
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', closeMobileMenu);
     }
 
-    const userNameElements = document.querySelectorAll('[data-auth="user-name"]');
-    userNameElements.forEach(el => {
-        el.textContent = authState.profile?.full_name || authState.user?.email || 'Visitante';
+    // Fecha menu ao clicar em link
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
     });
+}
 
-    const userAvatarElements = document.querySelectorAll('[data-auth="user-avatar"]');
-    userAvatarElements.forEach(el => {
-        // Lógica para avatar: imagem, ou iniciais se não houver imagem.
-        if (authState.profile?.avatar_url) {
-            el.innerHTML = `<img src="${authState.profile.avatar_url}" alt="Avatar" class="w-full h-full rounded-full object-cover">`;
-        } else {
-            const initials = (authState.profile?.full_name || 'U')
-                .split(' ')
-                .map(n => n[0])
-                .join('')
-                .substring(0, 2)
-                .toUpperCase();
-            el.textContent = initials;
+function toggleMobileMenu() {
+    navState.isMenuOpen = !navState.isMenuOpen;
+    updateMobileMenuVisibility();
+}
+
+function closeMobileMenu() {
+    navState.isMenuOpen = false;
+    updateMobileMenuVisibility();
+}
+
+function updateMobileMenuVisibility() {
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    const menuOverlay = document.querySelector('[data-menu-overlay]');
+    const menuButton = document.querySelector('[data-mobile-menu-button]');
+
+    if (mobileMenu) {
+        mobileMenu.classList.toggle('hidden', !navState.isMenuOpen);
+        mobileMenu.classList.toggle('translate-x-0', navState.isMenuOpen);
+        mobileMenu.classList.toggle('-translate-x-full', !navState.isMenuOpen);
+    }
+
+    if (menuOverlay) {
+        menuOverlay.classList.toggle('hidden', !navState.isMenuOpen);
+    }
+
+    if (menuButton) {
+        const icon = menuButton.querySelector('span');
+        if (icon) {
+            icon.textContent = navState.isMenuOpen ? '✕' : '☰';
+        }
+    }
+}
+
+// ===== EVENTOS DE NAVEGAÇÃO =====
+function setupNavigationEvents() {
+    // Intercepta cliques em links de navegação
+    document.addEventListener('click', (e) => {
+        const navLink = e.target.closest('[data-nav-item]');
+        if (navLink) {
+            e.preventDefault();
+            const href = navLink.getAttribute('data-nav-item') || navLink.getAttribute('href');
+            if (href && href !== navState.currentPath) {
+                navigateTo(href);
+            }
         }
     });
 
-    const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
-    logoutButtons.forEach(button => {
-        // Remove listener antigo para evitar duplicação
-        button.replaceWith(button.cloneNode(true));
-        // Adiciona o novo listener
-        document.querySelector('[data-auth="logout-btn"]').addEventListener('click', async (e) => {
-            e.preventDefault();
-            console.log('Fazendo logout...');
-            await signOut();
-            window.location.replace('/login.html');
-        });
+    // Escuta mudanças na URL (botão voltar/avançar)
+    window.addEventListener('popstate', () => {
+        navState.currentPath = window.location.pathname;
+        updateActiveMenuItem();
+        updatePageTitle();
+        createBreadcrumb();
     });
 }
 
-// ===== EXECUÇÃO IMEDIATA =====
-// Inicia a proteção da página assim que o script é carregado.
-protectPage();
+// ===== NAVEGAÇÃO PROGRAMÁTICA =====
+function navigateTo(path) {
+    if (path === navState.currentPath) return;
+    
+    // Mostra loading
+    showNavigationLoading();
+    
+    setTimeout(() => {
+        window.location.href = path;
+    }, 150); // Pequeno delay para mostrar o loading
+}
+
+function showNavigationLoading() {
+    const loader = document.createElement('div');
+    loader.id = 'nav-loader';
+    loader.className = 'fixed top-0 left-0 w-full h-1 bg-primary z-50';
+    loader.innerHTML = '<div class="h-full bg-blue-600 animate-pulse"></div>';
+    document.body.appendChild(loader);
+    
+    setTimeout(() => {
+        loader?.remove();
+    }, 300);
+}
+
+// ===== RESPONSIVE =====
+function handleResize() {
+    const wasMobile = navState.isMobile;
+    navState.isMobile = window.innerWidth < 768;
+    
+    // Se mudou de mobile para desktop, fecha o menu
+    if (wasMobile && !navState.isMobile && navState.isMenuOpen) {
+        closeMobileMenu();
+    }
+}
+
+// ===== NOTIFICAÇÕES DE NAVEGAÇÃO =====
+function showNavigationToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// ===== API PÚBLICA =====
+window.navigation = {
+    navigateTo,
+    updateActiveMenuItem,
+    toggleMobileMenu,
+    closeMobileMenu,
+    getCurrentPath: () => navState.currentPath,
+    isMenuOpen: () => navState.isMenuOpen
+};
+
+// ===== EXPORTS =====
+export {
+    navigateTo,
+    updateActiveMenuItem,
+    toggleMobileMenu,
+    closeMobileMenu
+};
