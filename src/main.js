@@ -1,6 +1,8 @@
 // ALSHAM 360° PRIMA - Dashboard OBRA-PRIMA COMPLETO v2.0
 // Sistema COMPLETO com dados reais e recursos avançados
 
+import './js/auth.js'; 
+
 import { 
     getDashboardKPIs, 
     getLeadsAvancados, 
