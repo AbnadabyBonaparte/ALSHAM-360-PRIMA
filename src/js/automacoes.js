@@ -1,245 +1,139 @@
-import { supabase } from '../lib/supabase.js';
+// ALSHAM 360° PRIMA - Authentication Middleware (Revisão Gemini)
+// Proteção de rotas, gestão de sessões e correção de race conditions.
 
-// Estado da aplicação
-let automations = [];
-let executionHistory = [];
+import { supabase, onAuthStateChange, signOut } from '../lib/supabase.js';
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAutomationsPage();
-});
+// ===== ESTADO GLOBAL =====
+// Usamos um objeto para encapsular o estado e evitar variáveis soltas.
+const authState = {
+    user: null,
+    profile: null,
+    session: null,
+    isAuthenticated: false,
+    isInitialized: false, // Flag para controlar a inicialização
+};
 
-async function initializeAutomationsPage() {
-    try {
-        // Verificar autenticação
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            window.location.href = '../pages/login.html';
-            return;
-        }
+// ===== CONFIGURAÇÃO =====
+// Páginas que NÃO precisam de autenticação.
+// CORREÇÃO: Caminhos simplificados para o Vite.
+const publicPages = ['/', '/index.html', '/login.html', '/register.html'];
 
-        // Carregar dados
-        await loadAutomations();
-        loadExecutionHistory();
-        
-    } catch (error) {
-        console.error('Erro ao inicializar página de automações:', error);
-        showNotification('Erro ao carregar dados', 'error');
+// ===== INICIALIZAÇÃO =====
+// A inicialização agora retorna uma Promise, garantindo que o fluxo espere por ela.
+async function initializeAuth() {
+    // Previne re-inicialização
+    if (authState.isInitialized) return;
+
+    // Ouve as mudanças de estado de autenticação (login, logout)
+    onAuthStateChange((_event, session) => {
+        updateAuthState(session);
+    });
+
+    // Pega a sessão inicial para verificar se o usuário já está logado
+    const { data: { session } } = await supabase.auth.getSession();
+    await updateAuthState(session);
+
+    authState.isInitialized = true;
+    console.log('🔐 Auth middleware inicializado. Autenticado:', authState.isAuthenticated);
+}
+
+// ===== FUNÇÃO PRINCIPAL DE CONTROLE DE ACESSO =====
+// Esta função será chamada em todas as páginas.
+async function protectPage() {
+    // Garante que a verificação só ocorra após a inicialização do auth.
+    if (!authState.isInitialized) {
+        await initializeAuth();
+    }
+
+    const currentPath = window.location.pathname;
+    const isPublicPage = publicPages.includes(currentPath);
+
+    // 1. Se o usuário ESTÁ autenticado, mas está na página de login/registro, redireciona para o dashboard.
+    if (authState.isAuthenticated && (currentPath === '/login.html' || currentPath === '/register.html')) {
+        console.log('Usuário autenticado em página pública. Redirecionando para o dashboard...');
+        window.location.replace('/index.html'); // Usar replace para não poluir o histórico
+        return;
+    }
+
+    // 2. Se o usuário NÃO ESTÁ autenticado e a página NÃO é pública, redireciona para o login.
+    if (!authState.isAuthenticated && !isPublicPage) {
+        console.warn(`Acesso negado a '${currentPath}'. Redirecionando para o login.`);
+        window.location.replace('/login.html'); // Usar replace
+        return;
+    }
+
+    // 3. Se o usuário está autenticado, atualiza a UI com seus dados.
+    if (authState.isAuthenticated) {
+        updateAuthUI();
     }
 }
 
-async function loadAutomations() {
-    try {
-        // Tentar carregar do Supabase
-        const { data: automationRules, error } = await supabase
-            .from('automation_rules')
-            .select('*')
-            .eq('is_active', true);
+// ===== GESTÃO DE ESTADO =====
+// Função central para atualizar o estado de autenticação.
+async function updateAuthState(session) {
+    if (session?.user) {
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, avatar_url') // Pegue os dados que precisar
+            .eq('user_id', session.user.id)
+            .single();
 
-        if (error) throw error;
-
-        automations = automationRules || [];
-        
-        // Se não houver dados, usar dados mockados
-        if (automations.length === 0) {
-            loadMockAutomations();
-        }
-        
-    } catch (error) {
-        console.error('Erro ao carregar automações:', error);
-        loadMockAutomations();
+        authState.user = session.user;
+        authState.profile = profile;
+        authState.session = session;
+        authState.isAuthenticated = true;
+    } else {
+        authState.user = null;
+        authState.profile = null;
+        authState.session = null;
+        authState.isAuthenticated = false;
     }
 }
 
-function loadMockAutomations() {
-    automations = [
-        {
-            id: 'welcome-sequence',
-            name: 'Sequência de Boas-vindas',
-            description: 'Envia e-mails automáticos para novos leads',
-            trigger_event: 'lead_created',
-            is_active: true,
-            executions_today: 247,
-            last_execution: new Date(Date.now() - 2 * 60 * 1000), // 2 min atrás
-            success_rate: 98.5
-        },
-        {
-            id: 'auto-qualification',
-            name: 'Qualificação Automática',
-            description: 'Qualifica leads baseado em critérios pré-definidos',
-            trigger_event: 'lead_updated',
-            is_active: true,
-            executions_today: 89,
-            last_execution: new Date(Date.now() - 5 * 60 * 1000), // 5 min atrás
-            success_rate: 94.2
-        },
-        {
-            id: 'weekly-report',
-            name: 'Relatório Semanal',
-            description: 'Gera e envia relatórios semanais automaticamente',
-            trigger_event: 'scheduled',
-            is_active: true,
-            executions_today: 0,
-            last_execution: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 dias atrás
-            success_rate: 100
+// ===== ATUALIZAÇÃO DE UI =====
+// Atualiza os elementos da página com as informações do usuário.
+function updateAuthUI() {
+    // Garante que a UI só seja atualizada quando o DOM estiver pronto.
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateAuthUI);
+        return;
+    }
+
+    const userNameElements = document.querySelectorAll('[data-auth="user-name"]');
+    userNameElements.forEach(el => {
+        el.textContent = authState.profile?.full_name || authState.user?.email || 'Visitante';
+    });
+
+    const userAvatarElements = document.querySelectorAll('[data-auth="user-avatar"]');
+    userAvatarElements.forEach(el => {
+        // Lógica para avatar: imagem, ou iniciais se não houver imagem.
+        if (authState.profile?.avatar_url) {
+            el.innerHTML = `<img src="${authState.profile.avatar_url}" alt="Avatar" class="w-full h-full rounded-full object-cover">`;
+        } else {
+            const initials = (authState.profile?.full_name || 'U')
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .substring(0, 2)
+                .toUpperCase();
+            el.textContent = initials;
         }
-    ];
-}
+    });
 
-function loadExecutionHistory() {
-    // Dados mockados para histórico de execuções
-    const mockHistory = [
-        {
-            automation: 'Sequência de Boas-vindas',
-            trigger: 'Novo lead: Maria Silva',
-            status: 'success',
-            execution_time: new Date(Date.now() - 2 * 60 * 1000),
-            result: 'E-mail enviado com sucesso'
-        },
-        {
-            automation: 'Qualificação Automática',
-            trigger: 'Lead atualizado: João Santos',
-            status: 'success',
-            execution_time: new Date(Date.now() - 5 * 60 * 1000),
-            result: 'Lead qualificado automaticamente'
-        },
-        {
-            automation: 'Sequência de Boas-vindas',
-            trigger: 'Novo lead: Pedro Costa',
-            status: 'success',
-            execution_time: new Date(Date.now() - 8 * 60 * 1000),
-            result: 'E-mail enviado com sucesso'
-        },
-        {
-            automation: 'Follow-up Automático',
-            trigger: 'Proposta enviada: Ana Oliveira',
-            status: 'failed',
-            execution_time: new Date(Date.now() - 15 * 60 * 1000),
-            result: 'Erro: E-mail inválido'
-        },
-        {
-            automation: 'Qualificação Automática',
-            trigger: 'Lead atualizado: Carlos Mendes',
-            status: 'success',
-            execution_time: new Date(Date.now() - 20 * 60 * 1000),
-            result: 'Lead qualificado automaticamente'
-        }
-    ];
-
-    renderExecutionHistory(mockHistory);
-}
-
-function renderExecutionHistory(history) {
-    const tableBody = document.getElementById('execution-history');
-    if (!tableBody) return;
-
-    tableBody.innerHTML = history.map(execution => `
-        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-            <td class="py-4 px-4">
-                <span class="font-medium text-gray-900">${execution.automation}</span>
-            </td>
-            <td class="py-4 px-4">
-                <span class="text-gray-700">${execution.trigger}</span>
-            </td>
-            <td class="py-4 px-4">
-                <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(execution.status)}">
-                    ${getStatusText(execution.status)}
-                </span>
-            </td>
-            <td class="py-4 px-4">
-                <span class="text-gray-600 text-sm">${formatDateTime(execution.execution_time)}</span>
-            </td>
-            <td class="py-4 px-4">
-                <span class="text-gray-700 text-sm">${execution.result}</span>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// Funções auxiliares
-function getStatusColor(status) {
-    const colors = {
-        'success': 'bg-green-100 text-green-800',
-        'failed': 'bg-red-100 text-red-800',
-        'running': 'bg-blue-100 text-blue-800',
-        'pending': 'bg-yellow-100 text-yellow-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-}
-
-function getStatusText(status) {
-    const texts = {
-        'success': 'Sucesso',
-        'failed': 'Falhou',
-        'running': 'Executando',
-        'pending': 'Pendente'
-    };
-    return texts[status] || status;
-}
-
-function formatDateTime(date) {
-    return new Date(date).toLocaleString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+    const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
+    logoutButtons.forEach(button => {
+        // Remove listener antigo para evitar duplicação
+        button.replaceWith(button.cloneNode(true));
+        // Adiciona o novo listener
+        document.querySelector('[data-auth="logout-btn"]').addEventListener('click', async (e) => {
+            e.preventDefault();
+            console.log('Fazendo logout...');
+            await signOut();
+            window.location.replace('/login.html');
+        });
     });
 }
 
-function showNotification(message, type = 'info') {
-    // Implementar sistema de notificações
-    console.log(`${type}: ${message}`);
-}
-
-// Funções globais
-window.createNewAutomation = function() {
-    showNotification('Abrindo criador de automação...', 'info');
-    // Implementar criador de automação
-};
-
-window.openTemplateLibrary = function() {
-    showNotification('Abrindo biblioteca de templates...', 'info');
-    // Implementar biblioteca de templates
-};
-
-window.syncAutomations = function() {
-    showNotification('Sincronizando automações...', 'info');
-    loadAutomations();
-    loadExecutionHistory();
-};
-
-window.viewAutomationStats = function(automationId) {
-    showNotification(`Visualizando estatísticas da automação: ${automationId}`, 'info');
-    // Implementar visualização de estatísticas
-};
-
-window.editAutomation = function(automationId) {
-    showNotification(`Editando automação: ${automationId}`, 'info');
-    // Implementar edição de automação
-};
-
-window.toggleAutomation = function(automationId) {
-    const automation = automations.find(a => a.id === automationId);
-    if (automation) {
-        automation.is_active = !automation.is_active;
-        const status = automation.is_active ? 'ativada' : 'pausada';
-        showNotification(`Automação ${status} com sucesso!`, 'success');
-    }
-};
-
-window.useTemplate = function(templateId) {
-    showNotification(`Usando template: ${templateId}`, 'info');
-    // Implementar uso de template
-};
-
-window.createAutomation = function() {
-    showNotification('Criando nova automação...', 'info');
-    // Implementar criação de automação personalizada
-};
-
-window.viewAllTemplates = function() {
-    showNotification('Visualizando todos os templates...', 'info');
-    // Implementar visualização de todos os templates
-};
-
+// ===== EXECUÇÃO IMEDIATA =====
+// Inicia a proteção da página assim que o script é carregado.
+protectPage();
