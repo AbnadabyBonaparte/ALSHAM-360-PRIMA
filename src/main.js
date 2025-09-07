@@ -1,8 +1,8 @@
-// src/main.js - Ponto de Entrada Principal (Versão com Caminhos Simplificados)
+// src/main.js - Ponto de Entrada Principal (Padrão Obra-Prima 10/10)
 
 // Módulos Globais
 import './js/auth.js';
-import './js/navigation.js'; // Agora assume que navigation.js está em /js/
+import './js/navigation.js'; // Agora ele existe em /js/
 
 // Mapeamento de Módulos de Página
 const pageModules = {
@@ -23,13 +23,12 @@ const currentPath = window.location.pathname;
 
 // Carregador de Módulo
 const loadModule = () => {
-    if (pageModules[currentPath]) {
-        pageModules[currentPath]();
-    } else if (currentPath === '/' || currentPath === '') {
-        pageModules['/']();
+    const path = (currentPath === '/' || currentPath === '') ? '/' : currentPath;
+    if (pageModules[path]) {
+        pageModules[path]().catch(err => console.error(`Falha ao carregar o módulo para ${path}:`, err));
     }
 };
 
 loadModule();
 
-console.log(`🚀 ALSHAM 360° PRIMA - Módulo para "${currentPath}" carregado.`);
+console.log(`🚀 ALSHAM 360° PRIMA - Tentando carregar módulo para "${currentPath}".`);
