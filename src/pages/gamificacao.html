@@ -1,197 +1,123 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="h-full bg-gray-50 scroll-smooth">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gamificação — ALSHAM 360° PRIMA</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Acompanhe seu progresso, conquiste badges, suba no ranking e complete desafios no Centro de Gamificação do ALSHAM 360° PRIMA.">
+    <meta name="robots" content="noindex, nofollow"> <!-- Conteúdo privado do usuário -->
+    
+    <title>Gamificação - ALSHAM 360° PRIMA</title>
+    
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-  <!-- SEO / PWA -->
-  <meta name="description" content="Centro de Gamificação do ALSHAM 360° PRIMA: badges, rankings, desafios e pontos." />
-  <link rel="manifest" href="../site.webmanifest" />
-  <meta name="theme-color" content="#8b5cf6" />
-  <link rel="icon" href="../favicon.ico" />
-  <link rel="canonical" href="/app/pages/gamificacao.html" />
-
-  <!-- Fontes -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-  <!-- Estilos -->
-  <link rel="stylesheet" href="../style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CORREÇÃO: Caminho absoluto para o CSS principal -->
+    <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  <noscript>
-    <div style="padding:12px;background:#fee2e2;color:#991b1b;text-align:center">
-      Este aplicativo precisa de JavaScript habilitado.
-    </div>
-  </noscript>
+    
+    <noscript>
+        <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; padding: 1em; background-color: #f8d7da; color: #721c24; text-align: center; border-bottom: 1px solid #f5c6cb;">
+            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente. Por favor, habilite o JavaScript no seu navegador.
+        </div>
+    </noscript>
 
-  <!-- Header Premium -->
-  <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm" role="banner">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <a class="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg" href="./dashboard.html" aria-label="Página inicial">
-          <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
-            <span class="text-white font-bold text-lg">A</span>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-            <p class="text-xs text-gray-500">Gamificação &amp; Conquistas</p>
-          </div>
-        </a>
-        <nav class="hidden md:flex items-center space-x-8" aria-label="Navegação principal">
-          <a href="./dashboard.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Dashboard</a>
-          <a href="./leads.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Leads</a>
-          <a href="./automacoes.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Automações</a>
-          <a href="./relatorios.html" class="text-gray-600 hover:text-primary transition-colors font-medium">Relatórios</a>
-          <a href="./gamificacao.html" class="text-primary font-medium border-b-2 border-primary pb-1" aria-current="page">Gamificação</a>
-        </nav>
-        <div class="flex items-center space-x-4">
-          <div class="flex items-center space-x-2" aria-live="polite">
-            <span class="text-2xl">🏆</span>
-            <span class="text-sm font-semibold text-gray-700" id="user-level">Nível 7</span>
-          </div>
-          <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center" aria-hidden="true">
-              <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
+    <!-- Header Premium Padronizado -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-3" aria-label="Voltar ao Dashboard">
+                        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- OTIMIZAÇÃO: Container para navegação dinâmica -->
+                <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
+                    <!-- Menu dinâmico será injetado aqui -->
+                </nav>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
+                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
+                        <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
-            <button data-auth="logout-btn" class="text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-              </svg>
-            </button>
-          </div>
         </div>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Conteúdo Principal -->
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-gray-900 mb-2">🎮 Centro de Gamificação</h2>
-      <p class="text-gray-600">Conquiste badges, suba de nível e compita com sua equipe!</p>
-    </div>
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb será injetado aqui -->
+        <div id="breadcrumb" class="mb-8"></div>
 
-    <!-- Perfil do Jogador -->
-    <div class="bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl p-8 text-white mb-8">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-6">
-          <div class="relative">
-            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <span class="text-3xl font-bold" id="profile-avatar">JS</span>
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">🎮 Centro de Gamificação</h2>
+            <p class="text-gray-600">Conquiste badges, suba de nível e compita com sua equipe!</p>
+        </div>
+
+        <!-- Perfil do Jogador (Container para dados dinâmicos ) -->
+        <section id="player-profile-card" class="bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl p-8 text-white mb-8">
+            <!-- O card do perfil do jogador será injetado aqui pelo gamificacao.js -->
+        </section>
+
+        <!-- Estatísticas Rápidas (Container para dados dinâmicos) -->
+        <section id="quick-stats-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Os cards de estatísticas serão injetados aqui -->
+        </section>
+
+        <!-- Badges & Próximas Conquistas -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">🏆 Badges Conquistados</h3>
+                    <span id="earned-badges-count" class="text-sm text-gray-500">-- de --</span>
+                </div>
+                <div id="earned-badges-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                    <!-- Badges serão injetados aqui -->
+                </div>
             </div>
-            <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-              <span class="text-lg" id="profile-level">7</span>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">🎯 Próximas Conquistas</h3>
+                <div id="upcoming-achievements-list" class="space-y-4">
+                    <!-- Próximas conquistas serão injetadas aqui -->
+                </div>
             </div>
-          </div>
-          <div>
-            <h3 class="text-2xl font-bold" id="profile-name">João Silva</h3>
-            <p class="text-white/80" id="profile-rank">Vendedor Expert • Nível 7</p>
-            <div class="flex items-center space-x-4 mt-2">
-              <span class="flex items-center space-x-2"><span class="text-yellow-300">⭐</span><span class="font-semibold" id="total-points">2.847 pontos</span></span>
-              <span class="flex items-center space-x-2"><span class="text-orange-300">🏆</span><span class="font-semibold" id="total-badges">12 badges</span></span>
+        </div>
+
+        <!-- Ranking da Equipe -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">🏆 Ranking da Equipe</h3>
+                <div id="ranking-controls" class="flex space-x-2" role="tablist" aria-label="Período do ranking">
+                    <!-- Botões de controle (Semana, Mês, etc.) serão injetados aqui -->
+                </div>
             </div>
-          </div>
+            <div id="team-ranking-list" class="space-y-4">
+                <!-- A lista do ranking será injetada aqui -->
+            </div>
         </div>
-        <div class="text-right">
-          <p class="text-white/80 text-sm">Progresso para Nível <span id="next-level-label">8</span></p>
-          <div class="w-48 bg-white/20 rounded-full h-3 mt-2" aria-hidden="true">
-            <div class="bg-yellow-400 h-3 rounded-full" style="width:73%" id="level-progress"></div>
-          </div>
-          <p class="text-xs text-white/60 mt-1"><span id="profile-progress-points">847</span> / <span id="profile-next-level-points">1.200</span> pontos</p>
-        </div>
-      </div>
-    </div>
+    </main>
 
-    <!-- Estatísticas rápidas -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
-        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4"><span class="text-2xl">🎯</span></div>
-        <h3 class="text-2xl font-bold text-gray-900" id="weekly-score">156</h3>
-        <p class="text-gray-600 text-sm">Pontos esta semana</p>
-      </div>
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
-        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4"><span class="text-2xl">🔥</span></div>
-        <h3 class="text-2xl font-bold text-gray-900" id="streak-days">12</h3>
-        <p class="text-gray-600 text-sm">Dias consecutivos</p>
-      </div>
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
-        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4"><span class="text-2xl">📈</span></div>
-        <h3 class="text-2xl font-bold text-gray-900" id="rank-position">#3</h3>
-        <p class="text-gray-600 text-sm">Posição no ranking</p>
-      </div>
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
-        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4"><span class="text-2xl">🎖️</span></div>
-        <h3 class="text-2xl font-bold text-gray-900" id="achievements-month">3</h3>
-        <p class="text-gray-600 text-sm">Conquistas este mês</p>
-      </div>
-    </div>
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
+        <p class="text-center text-gray-500 text-sm">© 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.</p>
+    </footer>
 
-    <!-- Badges & Próximas conquistas -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <!-- Badges conquistados -->
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-semibold text-gray-900">🏆 Badges Conquistados</h3>
-          <span class="text-sm text-gray-500" id="earned-badges-count">12 de 25</span>
-        </div>
-        <div class="grid grid-cols-3 gap-4" id="earned-badges">
-          <!-- Badges renderizados dinamicamente -->
-        </div>
-        <button onclick="window.dispatchEvent(new CustomEvent('view-all-badges'))" class="w-full mt-4 text-center text-primary hover:text-primary-dark transition-colors font-medium">
-          Ver Todos os Badges
-        </button>
-      </div>
-      <!-- Próximas conquistas -->
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h3 class="text-lg font-semibold text-gray-900 mb-6">🎯 Próximas Conquistas</h3>
-        <div class="space-y-4" id="upcoming-achievements">
-          <!-- Próximas conquistas dinâmicas -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Ranking -->
-    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900">🏆 Ranking da Equipe</h3>
-        <div class="flex space-x-2" role="tablist" aria-label="Período do ranking">
-          <button class="text-xs bg-primary text-white px-3 py-1 rounded-full" data-range="week" aria-selected="true">Esta Semana</button>
-          <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors" data-range="month">Este Mês</button>
-          <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors" data-range="all">Todos os Tempos</button>
-        </div>
-      </div>
-      <div class="space-y-4" id="team-ranking">
-        <!-- Ranking renderizado dinamicamente -->
-      </div>
-    </div>
-
-    <!-- Desafios ativos -->
-    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900">🎮 Desafios Ativos</h3>
-        <button class="btn-outline text-sm" onclick="window.dispatchEvent(new CustomEvent('view-all-challenges'))">Ver Todos</button>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="active-challenges">
-        <!-- Desafios renderizados dinamicamente -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Toast/notifications container -->
-  <div id="toast-root" class="fixed top-4 right-4 space-y-3 z-50 pointer-events-none"></div>
-
-  <!-- Scripts do app (dados reais via gamificacao.js) -->
-  <script type="module" src="../js/auth.js"></script>
-  <script type="module" src="../js/gamificacao.js"></script>
-
-  <!-- Guard-rail de erros -->
-  <script>
-    window.addEventListener('unhandledrejection', e => console.error('Unhandled promise rejection:', e.reason));
-    window.addEventListener('error', e => console.error('Unhandled error:', e.message || e));
-  </script>
+    <!-- CORREÇÃO: Ponto de entrada único para todos os scripts -->
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
