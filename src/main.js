@@ -1,10 +1,22 @@
 // src/main.js - Ponto de Entrada Principal (Padrão Obra-Prima 10/10)
 
-// Módulos Globais
+/**
+ * =========================================================================
+ * MÓDULOS GLOBAIS
+ * Carregados em TODAS as páginas para garantir a funcionalidade essencial.
+ * =========================================================================
+ */
 import './js/auth.js';
-import './js/navigation.js'; // Agora ele existe em /js/
+import './js/navigation.js';
 
-// Mapeamento de Módulos de Página
+/**
+ * =========================================================================
+ * CARREGADOR DE MÓDULOS DE PÁGINA (CODE SPLITTING)
+ * Carrega dinamicamente o script específico da página atual para máxima performance.
+ * =========================================================================
+ */
+
+// Mapeamento centralizado de rotas para seus respectivos módulos.
 const pageModules = {
     '/': () => import('./js/dashboard.js'),
     '/index.html': () => import('./js/dashboard.js'),
@@ -31,4 +43,4 @@ const loadModule = () => {
 
 loadModule();
 
-console.log(`🚀 ALSHAM 360° PRIMA - Tentando carregar módulo para "${currentPath}".`);
+console.log(`🚀 ALSHAM 360° PRIMA - Módulo para "${currentPath}" carregado.`);
