@@ -31,8 +31,6 @@ let isLoading = false
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔐 Login page loaded - ALSHAM 360° PRIMA')
-    
     // Verificar se já está logado
     checkAuthStatus()
     
@@ -52,7 +50,6 @@ async function checkAuthStatus() {
         const { user, profile } = await getCurrentUser()
         
         if (user && profile) {
-            console.log('Usuário já logado, redirecionando...')
             showSuccess('Você já está logado! Redirecionando...')
             
             setTimeout(() => {
@@ -60,7 +57,7 @@ async function checkAuthStatus() {
             }, 1500)
         }
     } catch (error) {
-        console.log('Usuário não logado')
+        // Usuário não logado - não faz nada
     }
 }
 
@@ -117,8 +114,6 @@ async function handleLogin(e) {
         setLoading(true)
         clearMessages()
         
-        console.log('Tentando login com:', email)
-        
         const result = await signInWithEmail(email, password)
         
         if (result.user) {
@@ -136,15 +131,13 @@ async function handleLogin(e) {
         }
         
     } catch (error) {
-        console.error('Erro no login:', error)
-        
         let errorMsg = 'Erro no login. Tente novamente.'
         
-        if (error.message.includes('Invalid login credentials')) {
+        if (error.message && error.message.includes('Invalid login credentials')) {
             errorMsg = 'E-mail ou senha incorretos'
-        } else if (error.message.includes('Email not confirmed')) {
+        } else if (error.message && error.message.includes('Email not confirmed')) {
             errorMsg = 'Por favor, confirme seu e-mail antes de fazer login'
-        } else if (error.message.includes('Too many requests')) {
+        } else if (error.message && error.message.includes('Too many requests')) {
             errorMsg = 'Muitas tentativas. Tente novamente em alguns minutos'
         }
         
@@ -165,15 +158,9 @@ async function handleGoogleLogin() {
     try {
         setLoading(true)
         clearMessages()
-        
-        console.log('Iniciando login com Google...')
         await signInWithGoogle()
-        
-        // O redirecionamento será feito pelo OAuth
         showSuccess('Redirecionando para Google...')
-        
     } catch (error) {
-        console.error('Erro no login com Google:', error)
         showError('Erro ao conectar com Google. Tente novamente.')
         setLoading(false)
     }
@@ -185,15 +172,9 @@ async function handleMicrosoftLogin() {
     try {
         setLoading(true)
         clearMessages()
-        
-        console.log('Iniciando login com Microsoft...')
         await signInWithMicrosoft()
-        
-        // O redirecionamento será feito pelo OAuth
         showSuccess('Redirecionando para Microsoft...')
-        
     } catch (error) {
-        console.error('Erro no login com Microsoft:', error)
         showError('Erro ao conectar com Microsoft. Tente novamente.')
         setLoading(false)
     }
@@ -206,12 +187,8 @@ function handleEnterKey(e) {
 }
 
 function handleAuthStateChange(event, session, profile) {
-    console.log('Auth state changed:', event)
-    
     if (event === 'SIGNED_IN' && session?.user) {
-        console.log('Usuário logado:', session.user.email)
         showSuccess('Login realizado com sucesso!')
-        
         setTimeout(() => {
             window.location.href = '/index.html'
         }, 1000)
@@ -225,9 +202,7 @@ function handleOAuthCallback() {
     const errorDescription = urlParams.get('error_description')
     
     if (error) {
-        console.error('OAuth error:', error, errorDescription)
         showError('Erro na autenticação. Tente novamente.')
-        
         // Limpar URL
         window.history.replaceState({}, document.title, window.location.pathname)
     }
@@ -236,7 +211,6 @@ function handleOAuthCallback() {
 // ===== UTILITÁRIOS =====
 function togglePasswordVisibility() {
     const isPassword = passwordInput.type === 'password'
-    
     passwordInput.type = isPassword ? 'text' : 'password'
     eyeOpen.classList.toggle('hidden', !isPassword)
     eyeClosed.classList.toggle('hidden', isPassword)
@@ -291,11 +265,9 @@ function isValidEmail(email) {
 function setupAnimations() {
     // Animar entrada dos elementos
     const elements = document.querySelectorAll('.bg-white, .bg-gradient-premium')
-    
     elements.forEach((element, index) => {
         element.style.opacity = '0'
         element.style.transform = 'translateY(20px)'
-        
         setTimeout(() => {
             element.style.transition = 'all 0.6s ease-out'
             element.style.opacity = '1'
@@ -317,33 +289,25 @@ style.textContent = `
     .shake {
         animation: shake 0.5s ease-in-out;
     }
-    
     @keyframes shake {
         0%, 100% { transform: translateX(0); }
         25% { transform: translateX(-5px); }
         75% { transform: translateX(5px); }
     }
-    
     .bg-grid-pattern {
         background-image: 
             linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
             linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
         background-size: 20px 20px;
     }
-    
     input:focus {
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-    
     button:hover {
         transform: translateY(-1px);
     }
-    
     button:active {
         transform: translateY(0);
     }
 `
 document.head.appendChild(style)
-
-console.log('✨ Login JavaScript carregado - ALSHAM 360° PRIMA')
-
