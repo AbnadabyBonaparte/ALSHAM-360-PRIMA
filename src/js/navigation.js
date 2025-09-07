@@ -1,234 +1,229 @@
-// Sistema de navegação global para ALSHAM 360° PRIMA (Versão Final Otimizada)
-// Combina a robustez da versão do Copilot com a correção de caminhos do Gemini para o Vite.
+// ALSHAM 360° PRIMA - Navigation System
+// Sistema de navegação dinâmica e controle de menu ativo
 
-/**
- * Mapeamento centralizado das rotas.
- * CORREÇÃO CRÍTICA: Caminhos ajustados para o servidor do Vite.
- * O Vite serve os HTMLs como se estivessem na raiz.
- */
+// ===== CONFIGURAÇÃO DE ROTAS =====
 const routes = {
-    'dashboard': '/', // Aponta para o index.html na raiz
-    'leads': '/leads-real.html',
-    'automacoes': '/automacoes.html',
-    'configuracoes': '/configuracoes.html',
-    'gamificacao': '/gamificacao.html',
-    'relacionamentos': '/relacionamentos.html',
-    'login': '/login.html',
-    'register': '/register.html'
-    // 'relatorios': '/relatorios.html', // Descomente quando a página for criada
+    '/': { title: 'Dashboard', icon: '📊' },
+    '/index.html': { title: 'Dashboard', icon: '📊' },
+    '/leads.html': { title: 'Leads', icon: '👥' },
+    '/leads-real.html': { title: 'Leads Real', icon: '🎯' },
+    '/automacoes.html': { title: 'Automações', icon: '🤖' },
+    '/relacionamentos.html': { title: 'Relacionamentos', icon: '🔗' },
+    '/gamificacao.html': { title: 'Gamificação', icon: '🎮' },
+    '/relatorios.html': { title: 'Relatórios', icon: '📈' },
+    '/configuracoes.html': { title: 'Configurações', icon: '⚙️' }
 };
 
-/**
- * Verifica se um link está ativo baseado no pathname.
- * Lógica robusta que funciona para a raiz e outras páginas.
- */
-function isLinkActive(linkHref, currentPath) {
-    if (!linkHref) return false;
-    // Trata o caso da dashboard (index.html) que pode ser '/' ou '/index.html'
-    if (linkHref === '/' || linkHref.endsWith('index.html')) {
-        return currentPath === '/' || currentPath.endsWith('/index.html');
-    }
-    // Para outras páginas, uma verificação exata é mais segura
-    return currentPath.endsWith(linkHref);
+// ===== ESTADO DA NAVEGAÇÃO =====
+const navState = {
+    currentPath: window.location.pathname,
+    isMenuOpen: false,
+    isMobile: window.innerWidth < 768
+};
+
+// ===== INICIALIZAÇÃO =====
+document.addEventListener('DOMContentLoaded', initializeNavigation);
+window.addEventListener('resize', handleResize);
+
+function initializeNavigation() {
+    updateActiveMenuItem();
+    updatePageTitle();
+    setupMobileMenu();
+    setupNavigationEvents();
+    createBreadcrumb();
+    console.log('🧭 Navigation system initialized');
 }
 
-/**
- * Navegação para uma página.
- */
-window.navigateTo = function(pageKey) {
-    const url = routes[pageKey];
-    if (url !== undefined) {
-        window.location.href = url;
-    } else {
-        console.error(`[Navegação] Rota não encontrada para a chave: ${pageKey}`);
-    }
-};
-
-/**
- * Atualiza os estilos dos links de navegação para destacar o ativo.
- */
-function updateActiveNavigation() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('nav a, #mobile-menu a');
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (isLinkActive(href, currentPath)) {
-            link.classList.add('text-primary', 'font-medium', 'border-b-2', 'border-primary', 'pb-1');
-            link.classList.remove('text-gray-600', 'hover:text-primary', 'text-gray-700');
-        } else {
-            link.classList.remove('text-primary', 'font-medium', 'border-b-2', 'border-primary', 'pb-1');
-            link.classList.add('text-gray-600', 'hover:text-primary');
-        }
+// ===== CONTROLE DE MENU ATIVO =====
+function updateActiveMenuItem() {
+    // Remove classes ativas de todos os itens
+    document.querySelectorAll('[data-nav-item]').forEach(item => {
+        item.classList.remove('active', 'bg-primary', 'text-white');
+        item.classList.add('text-gray-600', 'hover:bg-gray-100');
     });
+
+    // Adiciona classe ativa ao item atual
+    const currentItem = document.querySelector(`[data-nav-item="${navState.currentPath}"]`) ||
+                       document.querySelector(`[data-nav-item="/"]`);
+    
+    if (currentItem) {
+        currentItem.classList.remove('text-gray-600', 'hover:bg-gray-100');
+        currentItem.classList.add('active', 'bg-primary', 'text-white');
+    }
 }
 
-/**
- * Gera e insere o menu de navegação principal dinamicamente.
- * O nav principal deve ter a classe 'main-nav'
- */
-function createNavigationMenu() {
-    const nav = document.querySelector('nav.main-nav');
-    if (!nav) return;
-
-    const menuItems = [
-        { key: 'dashboard', label: 'Dashboard', icon: '📊' },
-        { key: 'leads', label: 'Leads', icon: '👥' },
-        { key: 'automacoes', label: 'Automações', icon: '🤖' },
-        { key: 'relacionamentos', label: 'Relacionamentos', icon: '🔗' },
-        { key: 'gamificacao', label: 'Gamificação', icon: '🎮' },
-        { key: 'configuracoes', label: 'Configurações', icon: '⚙️' },
-        // { key: 'relatorios', label: 'Relatórios', icon: '📈' }, // Aparecerá quando a rota for adicionada
-    ].filter(item => routes[item.key]); // Só mostra se existir rota
-
-    const currentPath = window.location.pathname;
-
-    nav.innerHTML = menuItems.map(item => {
-        const href = routes[item.key];
-        const activeClass = isLinkActive(href, currentPath)
-            ? 'text-primary font-medium border-b-2 border-primary pb-1'
-            : 'text-gray-600 hover:text-primary transition-colors font-medium';
-
-        return `
-            <a href="${href}" class="${activeClass}">
-                <span class="hidden sm:inline">${item.icon}</span> ${item.label}
-            </a>
-        `;
-    }).join('');
+// ===== TÍTULO DA PÁGINA =====
+function updatePageTitle() {
+    const route = routes[navState.currentPath] || routes['/'];
+    document.title = `${route.title} - ALSHAM 360° PRIMA`;
+    
+    // Atualiza h1 se existir
+    const pageTitle = document.querySelector('[data-page-title]');
+    if (pageTitle) {
+        pageTitle.textContent = route.title;
+    }
 }
 
-/**
- * Gera e insere o breadcrumb na página.
- */
+// ===== BREADCRUMB =====
 function createBreadcrumb() {
-    const breadcrumbContainer = document.getElementById('breadcrumb');
+    const breadcrumbContainer = document.querySelector('[data-breadcrumb]');
     if (!breadcrumbContainer) return;
 
-    const currentPath = window.location.pathname;
-    // Lógica elegante do Copilot para encontrar a chave e o rótulo
-    const key = Object.keys(routes).find(k => isLinkActive(routes[k], currentPath));
-    const label = key
-        ? {
-            'dashboard': '🏠 Dashboard',
-            'leads': '👥 Leads',
-            'automacoes': '🤖 Automações',
-            'configuracoes': '⚙️ Configurações',
-            'gamificacao': '🎮 Gamificação',
-            'relacionamentos': '🔗 Relacionamentos',
-            // 'relatorios': '📈 Relatórios',
-        }[key] || 'Página Atual'
-        : 'Página Atual';
-
-    let breadcrumbHTML = `
-        <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
-            <a href="${routes.dashboard}" class="hover:text-primary transition-colors">🏠 Dashboard</a>
+    const route = routes[navState.currentPath] || routes['/'];
+    const breadcrumbHTML = `
+        <nav class="flex items-center space-x-2 text-sm text-gray-600">
+            <a href="/" class="hover:text-primary transition-colors">
+                <span class="mr-1">🏠</span>Dashboard
+            </a>
+            ${navState.currentPath !== '/' && navState.currentPath !== '/index.html' ? `
+                <span class="text-gray-400">></span>
+                <span class="text-gray-900 font-medium">
+                    <span class="mr-1">${route.icon}</span>${route.title}
+                </span>
+            ` : ''}
+        </nav>
     `;
-
-    if (key && key !== 'dashboard') {
-        breadcrumbHTML += `<span>›</span><span class="text-gray-900 font-medium">${label}</span>`;
-    }
-
-    breadcrumbHTML += `</nav>`;
     breadcrumbContainer.innerHTML = breadcrumbHTML;
 }
 
-/**
- * Gera o menu mobile.
- */
-function createMobileMenu() {
-    const header = document.querySelector('header');
-    if (!header) return;
+// ===== MENU MOBILE =====
+function setupMobileMenu() {
+    const menuButton = document.querySelector('[data-mobile-menu-button]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    const menuOverlay = document.querySelector('[data-menu-overlay]');
 
-    // Botão mobile
-    const mobileMenuButton = document.createElement('button');
-    mobileMenuButton.className = 'md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors';
-    mobileMenuButton.setAttribute('data-mobile-menu-button', 'true');
-    mobileMenuButton.innerHTML = `
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-    `;
+    if (!menuButton || !mobileMenu) return;
 
-    // Menu mobile
-    const mobileMenu = document.createElement('div');
-    mobileMenu.className = 'hidden md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-40';
-    mobileMenu.id = 'mobile-menu';
+    menuButton.addEventListener('click', toggleMobileMenu);
+    
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', closeMobileMenu);
+    }
 
-    const menuItems = [
-        { key: 'dashboard', label: 'Dashboard', icon: '📊' },
-        { key: 'leads', label: 'Leads', icon: '👥' },
-        { key: 'automacoes', label: 'Automações', icon: '🤖' },
-        { key: 'relacionamentos', label: 'Relacionamentos', icon: '🔗' },
-        { key: 'gamificacao', label: 'Gamificação', icon: '🎮' },
-        { key: 'configuracoes', label: 'Configurações', icon: '⚙️' },
-        // { key: 'relatorios', label: 'Relatórios', icon: '📈' }, // Aparecerá quando a rota for adicionada
-    ].filter(item => routes[item.key]);
-
-    mobileMenu.innerHTML = `
-        <div class="px-4 py-2 space-y-1">
-            ${menuItems.map(item => `
-                <a href="${routes[item.key]}" class="block px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">
-                    ${item.icon} ${item.label}
-                </a>
-            `).join('')}
-        </div>
-    `;
-
-    // Toggle
-    mobileMenuButton.addEventListener('click', function () {
-        mobileMenu.classList.toggle('hidden');
+    // Fecha menu ao clicar em link
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
     });
+}
 
-    // Inserção
-    const headerContainer = header.querySelector('.max-w-7xl') || header;
-    headerContainer.appendChild(mobileMenu);
+function toggleMobileMenu() {
+    navState.isMenuOpen = !navState.isMenuOpen;
+    updateMobileMenuVisibility();
+}
 
-    const nav = headerContainer.querySelector('nav');
-    if (nav) {
-        nav.parentNode.insertBefore(mobileMenuButton, nav);
+function closeMobileMenu() {
+    navState.isMenuOpen = false;
+    updateMobileMenuVisibility();
+}
+
+function updateMobileMenuVisibility() {
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    const menuOverlay = document.querySelector('[data-menu-overlay]');
+    const menuButton = document.querySelector('[data-mobile-menu-button]');
+
+    if (mobileMenu) {
+        mobileMenu.classList.toggle('hidden', !navState.isMenuOpen);
+        mobileMenu.classList.toggle('translate-x-0', navState.isMenuOpen);
+        mobileMenu.classList.toggle('-translate-x-full', !navState.isMenuOpen);
+    }
+
+    if (menuOverlay) {
+        menuOverlay.classList.toggle('hidden', !navState.isMenuOpen);
+    }
+
+    if (menuButton) {
+        const icon = menuButton.querySelector('span');
+        if (icon) {
+            icon.textContent = navState.isMenuOpen ? '✕' : '☰';
+        }
     }
 }
 
-/**
- * Atalhos de teclado para navegação rápida.
- */
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', function (e) {
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key) {
-                case '1': e.preventDefault(); navigateTo('dashboard'); break;
-                case '2': e.preventDefault(); navigateTo('leads'); break;
-                case '3': e.preventDefault(); navigateTo('automacoes'); break;
-                case '4': e.preventDefault(); navigateTo('relacionamentos'); break;
-                case '5': e.preventDefault(); navigateTo('gamificacao'); break;
-                case '6': e.preventDefault(); navigateTo('configuracoes'); break;
-                // case '7': e.preventDefault(); navigateTo('relatorios'); break; // Quando existir
+// ===== EVENTOS DE NAVEGAÇÃO =====
+function setupNavigationEvents() {
+    // Intercepta cliques em links de navegação
+    document.addEventListener('click', (e) => {
+        const navLink = e.target.closest('[data-nav-item]');
+        if (navLink) {
+            e.preventDefault();
+            const href = navLink.getAttribute('data-nav-item') || navLink.getAttribute('href');
+            if (href && href !== navState.currentPath) {
+                navigateTo(href);
             }
         }
     });
+
+    // Escuta mudanças na URL (botão voltar/avançar)
+    window.addEventListener('popstate', () => {
+        navState.currentPath = window.location.pathname;
+        updateActiveMenuItem();
+        updatePageTitle();
+        createBreadcrumb();
+    });
 }
 
-// Event listener principal que inicializa tudo
-document.addEventListener('DOMContentLoaded', function () {
-    createNavigationMenu();
-    createBreadcrumb();
-    createMobileMenu();
-    updateActiveNavigation();
-    setupKeyboardShortcuts();
+// ===== NAVEGAÇÃO PROGRAMÁTICA =====
+function navigateTo(path) {
+    if (path === navState.currentPath) return;
+    
+    // Mostra loading
+    showNavigationLoading();
+    
+    setTimeout(() => {
+        window.location.href = path;
+    }, 150); // Pequeno delay para mostrar o loading
+}
 
-    // Fechar menu mobile ao clicar fora
-    document.addEventListener('click', function (e) {
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuButton = document.querySelector('[data-mobile-menu-button]');
-        if (mobileMenu && !mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target) && !mobileMenuButton?.contains(e.target)) {
-            mobileMenu.classList.add('hidden');
-        }
-    });
-});
+function showNavigationLoading() {
+    const loader = document.createElement('div');
+    loader.id = 'nav-loader';
+    loader.className = 'fixed top-0 left-0 w-full h-1 bg-primary z-50';
+    loader.innerHTML = '<div class="h-full bg-blue-600 animate-pulse"></div>';
+    document.body.appendChild(loader);
+    
+    setTimeout(() => {
+        loader?.remove();
+    }, 300);
+}
 
-// Exporta utilitários para uso global (opcional)
-window.navigationUtils = {
+// ===== RESPONSIVE =====
+function handleResize() {
+    const wasMobile = navState.isMobile;
+    navState.isMobile = window.innerWidth < 768;
+    
+    // Se mudou de mobile para desktop, fecha o menu
+    if (wasMobile && !navState.isMobile && navState.isMenuOpen) {
+        closeMobileMenu();
+    }
+}
+
+// ===== NOTIFICAÇÕES DE NAVEGAÇÃO =====
+function showNavigationToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// ===== API PÚBLICA =====
+window.navigation = {
     navigateTo,
-    updateActiveNavigation,
-    createNavigationMenu,
-    createBreadcrumb
+    updateActiveMenuItem,
+    toggleMobileMenu,
+    closeMobileMenu,
+    getCurrentPath: () => navState.currentPath,
+    isMenuOpen: () => navState.isMenuOpen
+};
+
+// ===== EXPORTS =====
+export {
+    navigateTo,
+    updateActiveMenuItem,
+    toggleMobileMenu,
+    closeMobileMenu
 };
