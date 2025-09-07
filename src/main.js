@@ -1,27 +1,10 @@
-// src/main.js - Ponto de Entrada Principal (Padrão Obra-Prima 10/10 - Versão Refinada)
+// src/main.js - Ponto de Entrada Principal (Versão com Caminhos Simplificados)
 
-/**
- * =========================================================================
- * MÓDULOS GLOBAIS
- * Carregados em TODAS as páginas para garantir a funcionalidade essencial.
- * =========================================================================
- */
-
-// CORREÇÃO CRÍTICA: Aponta para o local correto do navigation.js
-import './components/navigation.js';
-
-// O auth.js já está no local correto.
+// Módulos Globais
 import './js/auth.js';
+import './js/navigation.js'; // Agora assume que navigation.js está em /js/
 
-
-/**
- * =========================================================================
- * CARREGADOR DE MÓDULOS DE PÁGINA (CODE SPLITTING)
- * Carrega dinamicamente o script específico da página atual para máxima performance.
- * =========================================================================
- */
-
-// Mapeamento centralizado de rotas para seus respectivos módulos.
+// Mapeamento de Módulos de Página
 const pageModules = {
     '/': () => import('./js/dashboard.js'),
     '/index.html': () => import('./js/dashboard.js'),
@@ -36,15 +19,17 @@ const pageModules = {
     '/leads.html': () => import('./js/leads.js')
 };
 
-// Obtém o caminho da página atual.
 const currentPath = window.location.pathname;
 
-// Procura e executa o carregador do módulo correspondente à página atual.
-if (pageModules[currentPath]) {
-    pageModules[currentPath]();
-} else if (currentPath === '/' || currentPath === '') {
-    // Fallback para o dashboard se o caminho for a raiz do domínio
-    pageModules['/']();
-}
+// Carregador de Módulo
+const loadModule = () => {
+    if (pageModules[currentPath]) {
+        pageModules[currentPath]();
+    } else if (currentPath === '/' || currentPath === '') {
+        pageModules['/']();
+    }
+};
 
-console.log(`🚀 ALSHAM 360° PRIMA - Módulo para a página "${currentPath}" carregado.`);
+loadModule();
+
+console.log(`🚀 ALSHAM 360° PRIMA - Módulo para "${currentPath}" carregado.`);
