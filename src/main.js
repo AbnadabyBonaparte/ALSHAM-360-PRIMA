@@ -1,4 +1,4 @@
-// src/main.js - Ponto de Entrada Principal (Com Caminhos Corrigidos)
+// src/main.js - Ponto de Entrada Principal (Padrão Obra-Prima 10/10 - Versão Refinada)
 
 /**
  * =========================================================================
@@ -7,19 +7,21 @@
  * =========================================================================
  */
 
-// CORREÇÃO: O caminho para navigation.js foi ajustado para apontar para a pasta 'components'.
+// CORREÇÃO CRÍTICA: Aponta para o local correto do navigation.js
 import './components/navigation.js';
 
-// O auth.js já estava no local correto.
+// O auth.js já está no local correto.
 import './js/auth.js';
 
 
 /**
  * =========================================================================
  * CARREGADOR DE MÓDULOS DE PÁGINA (CODE SPLITTING)
+ * Carrega dinamicamente o script específico da página atual para máxima performance.
  * =========================================================================
  */
 
+// Mapeamento centralizado de rotas para seus respectivos módulos.
 const pageModules = {
     '/': () => import('./js/dashboard.js'),
     '/index.html': () => import('./js/dashboard.js'),
@@ -34,11 +36,14 @@ const pageModules = {
     '/leads.html': () => import('./js/leads.js')
 };
 
+// Obtém o caminho da página atual.
 const currentPath = window.location.pathname;
 
+// Procura e executa o carregador do módulo correspondente à página atual.
 if (pageModules[currentPath]) {
     pageModules[currentPath]();
 } else if (currentPath === '/' || currentPath === '') {
+    // Fallback para o dashboard se o caminho for a raiz do domínio
     pageModules['/']();
 }
 
