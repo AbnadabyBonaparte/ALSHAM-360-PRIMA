@@ -1,183 +1,139 @@
-// ALSHAM 360° PRIMA - Authentication Middleware
-// Proteção de rotas e gestão de sessões
+// ALSHAM 360° PRIMA - Authentication Middleware (Revisão Gemini)
+// Proteção de rotas, gestão de sessões e correção de race conditions.
 
-import { 
-    getCurrentUser, 
-    getCurrentSession, 
-    onAuthStateChange,
-    signOut
-} from '../lib/supabase.js';
+import { supabase, onAuthStateChange, signOut } from '../lib/supabase.js';
 
-// Estado global de autenticação
-let currentUser = null;
-let currentProfile = null;
-let isAuthenticated = false;
+// ===== ESTADO GLOBAL =====
+// Usamos um objeto para encapsular o estado e evitar variáveis soltas.
+const authState = {
+    user: null,
+    profile: null,
+    session: null,
+    isAuthenticated: false,
+    isInitialized: false, // Flag para controlar a inicialização
+};
 
-// Páginas que não precisam de autenticação
-const publicPages = [
-    '/src/pages/login.html',
-    '/src/pages/register.html',
-    '/login.html',
-    '/register.html',
-    '/',
-    '/index.html'
-];
+// ===== CONFIGURAÇÃO =====
+// Páginas que NÃO precisam de autenticação.
+// CORREÇÃO: Caminhos simplificados para o Vite.
+const publicPages = ['/', '/index.html', '/login.html', '/register.html'];
 
 // ===== INICIALIZAÇÃO =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔐 Auth middleware loaded - ALSHAM 360° PRIMA');
-    initializeAuth();
-    setupGlobalListeners();
-});
-
-// ===== INICIALIZAÇÃO DE AUTENTICAÇÃO =====
+// A inicialização agora retorna uma Promise, garantindo que o fluxo espere por ela.
 async function initializeAuth() {
-    try {
-        const session = await getCurrentSession();
-        
-        if (session?.user) {
-            const { user, profile } = await getCurrentUser();
-            if (user && profile) {
-                setAuthenticatedUser(user, profile);
-                console.log('Usuário autenticado:', user.email);
-            } else {
-                handleUnauthenticated();
-            }
-        } else {
-            handleUnauthenticated();
-        }
-        
-        onAuthStateChange(handleAuthStateChange);
-        
-    } catch (error) {
-        console.error('Erro na inicialização de auth:', error);
-        handleUnauthenticated();
+    // Previne re-inicialização
+    if (authState.isInitialized) return;
+
+    // Ouve as mudanças de estado de autenticação (login, logout)
+    onAuthStateChange((_event, session) => {
+        updateAuthState(session);
+    });
+
+    // Pega a sessão inicial para verificar se o usuário já está logado
+    const { data: { session } } = await supabase.auth.getSession();
+    await updateAuthState(session);
+
+    authState.isInitialized = true;
+    console.log('🔐 Auth middleware inicializado. Autenticado:', authState.isAuthenticated);
+}
+
+// ===== FUNÇÃO PRINCIPAL DE CONTROLE DE ACESSO =====
+// Esta função será chamada em todas as páginas.
+async function protectPage() {
+    // Garante que a verificação só ocorra após a inicialização do auth.
+    if (!authState.isInitialized) {
+        await initializeAuth();
+    }
+
+    const currentPath = window.location.pathname;
+    const isPublicPage = publicPages.includes(currentPath);
+
+    // 1. Se o usuário ESTÁ autenticado, mas está na página de login/registro, redireciona para o dashboard.
+    if (authState.isAuthenticated && (currentPath === '/login.html' || currentPath === '/register.html')) {
+        console.log('Usuário autenticado em página pública. Redirecionando para o dashboard...');
+        window.location.replace('/index.html'); // Usar replace para não poluir o histórico
+        return;
+    }
+
+    // 2. Se o usuário NÃO ESTÁ autenticado e a página NÃO é pública, redireciona para o login.
+    if (!authState.isAuthenticated && !isPublicPage) {
+        console.warn(`Acesso negado a '${currentPath}'. Redirecionando para o login.`);
+        window.location.replace('/login.html'); // Usar replace
+        return;
+    }
+
+    // 3. Se o usuário está autenticado, atualiza a UI com seus dados.
+    if (authState.isAuthenticated) {
+        updateAuthUI();
     }
 }
 
 // ===== GESTÃO DE ESTADO =====
-function setAuthenticatedUser(user, profile) {
-    currentUser = user;
-    currentProfile = profile;
-    isAuthenticated = true;
-    updateAuthUI();
-    checkRouteAccess();
-}
+// Função central para atualizar o estado de autenticação.
+async function updateAuthState(session) {
+    if (session?.user) {
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, avatar_url') // Pegue os dados que precisar
+            .eq('user_id', session.user.id)
+            .single();
 
-function clearAuthenticatedUser() {
-    currentUser = null;
-    currentProfile = null;
-    isAuthenticated = false;
-    updateAuthUI();
-}
-
-// ===== HANDLERS =====
-function handleAuthStateChange(event, session, profile) {
-    console.log('Auth state changed:', event);
-    
-    switch (event) {
-        case 'SIGNED_IN':
-            if (session?.user && profile) {
-                setAuthenticatedUser(session.user, profile);
-                redirectAfterLogin();
-            }
-            break;
-            
-        case 'SIGNED_OUT':
-            clearAuthenticatedUser();
-            handleUnauthenticated();
-            break;
+        authState.user = session.user;
+        authState.profile = profile;
+        authState.session = session;
+        authState.isAuthenticated = true;
+    } else {
+        authState.user = null;
+        authState.profile = null;
+        authState.session = null;
+        authState.isAuthenticated = false;
     }
-}
-
-function handleUnauthenticated() {
-    clearAuthenticatedUser();
-    const currentPath = window.location.pathname;
-    const isPublicPage = publicPages.some(page => currentPath.endsWith(page));
-    
-    if (!isPublicPage) {
-        console.log('Página protegida, redirecionando para login');
-        redirectToLogin();
-    }
-}
-
-// ===== PROTEÇÃO DE ROTAS =====
-function checkRouteAccess() {
-    const currentPath = window.location.pathname;
-    if (isAuthenticated) {
-        if (currentPath.endsWith('login.html') || currentPath.endsWith('register.html')) {
-            console.log('Usuário autenticado em página pública, redirecionando...');
-            window.location.href = '/index.html';
-        }
-    }
-}
-
-function redirectToLogin() {
-    window.location.href = '/src/pages/login.html';
-}
-
-function redirectAfterLogin() {
-    window.location.href = '/index.html';
 }
 
 // ===== ATUALIZAÇÃO DE UI =====
+// Atualiza os elementos da página com as informações do usuário.
 function updateAuthUI() {
+    // Garante que a UI só seja atualizada quando o DOM estiver pronto.
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateAuthUI);
+        return;
+    }
+
     const userNameElements = document.querySelectorAll('[data-auth="user-name"]');
-    userNameElements.forEach(element => {
-        element.textContent = currentProfile?.full_name || currentUser?.email || 'Visitante';
+    userNameElements.forEach(el => {
+        el.textContent = authState.profile?.full_name || authState.user?.email || 'Visitante';
     });
-    
+
     const userAvatarElements = document.querySelectorAll('[data-auth="user-avatar"]');
-    userAvatarElements.forEach(element => {
-        const initials = (currentProfile?.full_name || 'U')
-            .split(' ')
-            .map(name => name[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-        element.textContent = initials;
+    userAvatarElements.forEach(el => {
+        // Lógica para avatar: imagem, ou iniciais se não houver imagem.
+        if (authState.profile?.avatar_url) {
+            el.innerHTML = `<img src="${authState.profile.avatar_url}" alt="Avatar" class="w-full h-full rounded-full object-cover">`;
+        } else {
+            const initials = (authState.profile?.full_name || 'U')
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .substring(0, 2)
+                .toUpperCase();
+            el.textContent = initials;
+        }
     });
 
     const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
     logoutButtons.forEach(button => {
-        button.onclick = (e) => {
+        // Remove listener antigo para evitar duplicação
+        button.replaceWith(button.cloneNode(true));
+        // Adiciona o novo listener
+        document.querySelector('[data-auth="logout-btn"]').addEventListener('click', async (e) => {
             e.preventDefault();
-            handleLogout();
-        };
+            console.log('Fazendo logout...');
+            await signOut();
+            window.location.replace('/login.html');
+        });
     });
 }
 
-
-// ===== AÇÕES DE AUTENTICAÇÃO =====
-async function handleLogout() {
-    try {
-        console.log('Fazendo logout...');
-        await signOut();
-        window.location.href = '/src/pages/login.html';
-    } catch (error) {
-        console.error('Erro no logout:', error);
-    }
-}
-
-// ===== LISTENERS GLOBAIS =====
-function setupGlobalListeners() {
-    window.addEventListener('popstate', checkRouteAccess);
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) checkSessionValidity();
-    });
-}
-
-// ===== VERIFICAÇÃO DE SESSÃO =====
-async function checkSessionValidity() {
-    try {
-        const session = await getCurrentSession();
-        if (!session || !session.user) {
-            console.log('Sessão inválida, fazendo logout');
-            handleUnauthenticated();
-        }
-    } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
-        handleUnauthenticated();
-    }
-}
-
+// ===== EXECUÇÃO IMEDIATA =====
+// Inicia a proteção da página assim que o script é carregado.
+protectPage();
