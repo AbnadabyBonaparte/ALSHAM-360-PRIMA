@@ -1,4 +1,4 @@
-// src/main.js - Ponto de Entrada Principal (Padrão Obra-Prima 10/10 - Versão Refinada)
+// src/main.js - Ponto de Entrada Principal (Com Caminhos Corrigidos)
 
 /**
  * =========================================================================
@@ -7,22 +7,19 @@
  * =========================================================================
  */
 
-// 1. Autenticação e Proteção de Rotas: O guarda de segurança do sistema.
-import './js/auth.js';
+// CORREÇÃO: O caminho para navigation.js foi ajustado para apontar para a pasta 'components'.
+import './components/navigation.js';
 
-// 2. Navegação Dinâmica: Garante um menu e breadcrumbs consistentes.
-import './js/navigation.js';
+// O auth.js já estava no local correto.
+import './js/auth.js';
 
 
 /**
  * =========================================================================
  * CARREGADOR DE MÓDULOS DE PÁGINA (CODE SPLITTING)
- * Carrega dinamicamente o script específico da página atual para máxima performance.
  * =========================================================================
  */
 
-// Mapeamento centralizado de rotas para seus respectivos módulos.
-// Esta abordagem é mais limpa e fácil de expandir do que múltiplos `if`s.
 const pageModules = {
     '/': () => import('./js/dashboard.js'),
     '/index.html': () => import('./js/dashboard.js'),
@@ -33,23 +30,16 @@ const pageModules = {
     '/relacionamentos.html': () => import('./js/relacionamentos.js'),
     '/login.html': () => import('./js/login.js'),
     '/register.html': () => import('./js/register.js'),
-    '/relatorios.html': () => import('./js/relatorios.js'), // Adicionado para completar
-    '/leads.html': () => import('./js/leads.js') // Adicionado para completar
+    '/relatorios.html': () => import('./js/relatorios.js'),
+    '/leads.html': () => import('./js/leads.js')
 };
 
-// Obtém o caminho da página atual.
 const currentPath = window.location.pathname;
 
-// Procura e executa o carregador do módulo correspondente à página atual.
 if (pageModules[currentPath]) {
     pageModules[currentPath]();
-} else {
-    // Fallback para o dashboard se o caminho for a raiz do domínio sem `index.html`
-    // (alguns servidores podem servir a raiz como '/' apenas)
-    if (currentPath === '/' || currentPath === '') {
-        pageModules['/']();
-    }
+} else if (currentPath === '/' || currentPath === '') {
+    pageModules['/']();
 }
 
 console.log(`🚀 ALSHAM 360° PRIMA - Módulo para a página "${currentPath}" carregado.`);
-
