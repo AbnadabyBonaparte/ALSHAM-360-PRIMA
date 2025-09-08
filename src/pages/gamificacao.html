@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Acompanhe seu progresso, conquiste badges, suba no ranking e complete desafios no Centro de Gamificação do ALSHAM 360° PRIMA.">
-    <meta name="robots" content="noindex, nofollow"> <!-- Conteúdo privado do usuário -->
+    <meta name="robots" content="noindex, nofollow">
     
     <title>Gamificação - ALSHAM 360° PRIMA</title>
     
@@ -16,18 +16,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- CORREÇÃO: Caminho absoluto para o CSS principal -->
     <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
     
     <noscript>
         <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; padding: 1em; background-color: #f8d7da; color: #721c24; text-align: center; border-bottom: 1px solid #f5c6cb;">
-            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente. Por favor, habilite o JavaScript no seu navegador.
+            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente.
         </div>
     </noscript>
 
-    <!-- Header Premium Padronizado -->
+    <!-- Header Premium -->
     <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -42,17 +41,23 @@
                     </a>
                 </div>
                 
-                <!-- OTIMIZAÇÃO: Container para navegação dinâmica -->
                 <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
-                    <!-- Menu dinâmico será injetado aqui -->
+                    <!-- Menu dinâmico será injetado aqui pelo navigation.js -->
                 </nav>
                 
                 <div class="flex items-center space-x-4">
+                    <button id="refresh-gamification-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Atualizar Gamificação" aria-label="Atualizar Gamificação">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
                         <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
                         <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -60,64 +65,129 @@
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Breadcrumb será injetado aqui -->
+        <!-- Breadcrumb -->
         <div id="breadcrumb" class="mb-8"></div>
 
+        <!-- Page Header -->
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">🎮 Centro de Gamificação</h2>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">🎮 Centro de Gamificação</h1>
             <p class="text-gray-600">Conquiste badges, suba de nível e compita com sua equipe!</p>
         </div>
 
-        <!-- Perfil do Jogador (Container para dados dinâmicos ) -->
-        <section id="player-profile-card" class="bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl p-8 text-white mb-8">
-            <!-- O card do perfil do jogador será injetado aqui pelo gamificacao.js -->
+        <!-- Player Profile Card -->
+        <section id="player-profile-card" class="bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl p-8 text-white mb-8 relative overflow-hidden">
+            <!-- Conteúdo será injetado pelo gamificacao.js -->
         </section>
 
-        <!-- Estatísticas Rápidas (Container para dados dinâmicos) -->
+        <!-- Quick Stats -->
         <section id="quick-stats-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <!-- Os cards de estatísticas serão injetados aqui -->
+            <!-- Cards de estatísticas serão injetados aqui -->
         </section>
 
-        <!-- Badges & Próximas Conquistas -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900">🏆 Badges Conquistados</h3>
-                    <span id="earned-badges-count" class="text-sm text-gray-500">-- de --</span>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Badges Section -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Earned Badges -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">🏆 Badges Conquistados</h2>
+                        <span id="earned-badges-count" class="text-sm text-gray-500">-- de --</span>
+                    </div>
+                    <div id="earned-badges-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                        <!-- Badges serão injetados aqui -->
+                    </div>
                 </div>
-                <div id="earned-badges-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                    <!-- Badges serão injetados aqui -->
+
+                <!-- Available Badges -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">🎯 Próximas Conquistas</h2>
+                        <button id="view-all-badges-btn" class="text-blue-600 hover:text-blue-700 font-medium text-sm">Ver todos</button>
+                    </div>
+                    <div id="upcoming-achievements-list" class="space-y-4">
+                        <!-- Próximas conquistas serão injetadas aqui -->
+                    </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">🎯 Próximas Conquistas</h3>
-                <div id="upcoming-achievements-list" class="space-y-4">
-                    <!-- Próximas conquistas serão injetadas aqui -->
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Level Progress -->
+                <div id="level-progress-container" class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">⭐ Progresso de Nível</h2>
+                    <div id="level-progress-content">
+                        <!-- Progresso será injetado aqui -->
+                    </div>
+                </div>
+
+                <!-- Daily Challenges -->
+                <div id="challenges-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">🎯 Desafios</h2>
+                        <div id="challenges-tabs" class="flex space-x-2">
+                            <button class="challenge-tab active text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700" data-period="daily">Diário</button>
+                            <button class="challenge-tab text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600" data-period="weekly">Semanal</button>
+                            <button class="challenge-tab text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600" data-period="monthly">Mensal</button>
+                        </div>
+                    </div>
+                    <div id="challenges-content">
+                        <!-- Desafios serão injetados aqui -->
+                    </div>
+                </div>
+
+                <!-- Rewards -->
+                <div id="rewards-container" class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">🎁 Recompensas</h2>
+                    <div id="rewards-content">
+                        <!-- Recompensas serão injetadas aqui -->
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Ranking da Equipe -->
+        <!-- Team Leaderboard -->
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-900">🏆 Ranking da Equipe</h3>
+                <h2 class="text-xl font-semibold text-gray-900">🏆 Ranking da Equipe</h2>
                 <div id="ranking-controls" class="flex space-x-2" role="tablist" aria-label="Período do ranking">
-                    <!-- Botões de controle (Semana, Mês, etc.) serão injetados aqui -->
+                    <button class="ranking-period active px-4 py-2 text-sm font-medium bg-blue-100 text-blue-700 rounded-lg" data-period="week">Semana</button>
+                    <button class="ranking-period px-4 py-2 text-sm font-medium bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200" data-period="month">Mês</button>
+                    <button class="ranking-period px-4 py-2 text-sm font-medium bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200" data-period="quarter">Trimestre</button>
+                    <button class="ranking-period px-4 py-2 text-sm font-medium bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200" data-period="year">Ano</button>
                 </div>
             </div>
             <div id="team-ranking-list" class="space-y-4">
-                <!-- A lista do ranking será injetada aqui -->
+                <!-- Lista do ranking será injetada aqui -->
+            </div>
+        </div>
+
+        <!-- Achievement History -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-900">📜 Histórico de Conquistas</h2>
+                <button id="clear-history-btn" class="text-gray-400 hover:text-gray-600 text-sm">Limpar histórico</button>
+            </div>
+            <div id="achievement-history-list" class="space-y-3">
+                <!-- Histórico será injetado aqui -->
             </div>
         </div>
     </main>
 
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
-        <p class="text-center text-gray-500 text-sm">© 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.</p>
-    </footer>
+    <!-- Badge Detail Modal -->
+    <div id="badge-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-xl max-w-md w-full p-6">
+            <div id="badge-modal-content">
+                <!-- Conteúdo do modal será injetado aqui -->
+            </div>
+        </div>
+    </div>
 
-    <!-- CORREÇÃO: Ponto de entrada único para todos os scripts -->
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+
