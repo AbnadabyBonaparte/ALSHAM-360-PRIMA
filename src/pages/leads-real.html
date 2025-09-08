@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Gestão avançada de leads do ALSHAM 360° PRIMA: visualize, filtre, crie e acompanhe oportunidades em tempo real.">
-    <meta name="robots" content="noindex, nofollow"> <!-- Conteúdo privado do usuário -->
+    <meta name="robots" content="noindex, nofollow">
     
     <title>Leads - ALSHAM 360° PRIMA</title>
     
@@ -16,18 +16,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- CORREÇÃO: Caminho absoluto para o CSS principal -->
     <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
     
     <noscript>
         <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; padding: 1em; background-color: #f8d7da; color: #721c24; text-align: center; border-bottom: 1px solid #f5c6cb;">
-            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente. Por favor, habilite o JavaScript no seu navegador.
+            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente.
         </div>
     </noscript>
 
-    <!-- Header Premium Padronizado -->
+    <!-- Header Premium -->
     <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -43,15 +42,22 @@
                 </div>
                 
                 <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
-                    <!-- Menu dinâmico será injetado aqui -->
+                    <!-- Menu dinâmico será injetado aqui pelo navigation.js -->
                 </nav>
                 
                 <div class="flex items-center space-x-4">
+                    <button id="sync-leads-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sincronizar Leads" aria-label="Sincronizar Leads">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
                         <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
                         <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -59,46 +65,251 @@
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
         <div id="breadcrumb" class="mb-8"></div>
 
+        <!-- Page Header -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-gray-900">📋 Gestão de Leads</h2>
-                <p class="text-gray-600 mt-2">Gerencie seus prospects e oportunidades de vendas.</p>
+                <h1 class="text-3xl font-bold text-gray-900">👥 Gestão de Leads</h1>
+                <p class="text-gray-600 mt-2">Gerencie seus prospects e oportunidades de vendas</p>
             </div>
             <div class="flex items-center space-x-4">
-                <button id="export-btn" class="btn-outline">📊 Exportar</button>
+                <button id="import-leads-btn" class="btn-outline">📥 Importar</button>
+                <button id="export-leads-btn" class="btn-outline">📊 Exportar</button>
                 <button id="new-lead-btn" class="btn-primary">➕ Novo Lead</button>
             </div>
         </div>
 
-        <!-- KPIs (Container para dados dinâmicos ) -->
-        <section id="kpis-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- KPIs Container -->
+        <section id="kpis-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
             <!-- Cards de KPI serão injetados aqui pelo leads-real.js -->
         </section>
 
-        <!-- Filtros e Busca -->
-        <section id="filters-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
-            <!-- Filtros serão gerenciados pelo leads-real.js -->
+        <!-- Filters and Search -->
+        <section class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="leads-search-input"
+                            placeholder="Buscar leads por nome, email, empresa..."
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            aria-label="Buscar leads"
+                        >
+                        <svg class="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <select id="view-mode-select" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="table">📋 Tabela</option>
+                        <option value="grid">🔲 Cards</option>
+                        <option value="kanban">📊 Kanban</option>
+                    </select>
+                    <button id="clear-filters-btn" class="text-gray-500 hover:text-gray-700 text-sm">Limpar filtros</button>
+                </div>
+            </div>
+
+            <!-- Filter Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div>
+                    <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="status-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="">Todos os status</option>
+                        <option value="novo">🆕 Novo</option>
+                        <option value="contatado">📞 Contatado</option>
+                        <option value="qualificado">✅ Qualificado</option>
+                        <option value="proposta">📋 Proposta</option>
+                        <option value="negociacao">🤝 Negociação</option>
+                        <option value="fechado">💰 Fechado</option>
+                        <option value="perdido">❌ Perdido</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="priority-filter" class="block text-sm font-medium text-gray-700 mb-1">Prioridade</label>
+                    <select id="priority-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="">Todas as prioridades</option>
+                        <option value="baixa">🟢 Baixa</option>
+                        <option value="media">🟡 Média</option>
+                        <option value="alta">🟠 Alta</option>
+                        <option value="urgente">🔴 Urgente</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="source-filter" class="block text-sm font-medium text-gray-700 mb-1">Fonte</label>
+                    <select id="source-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="">Todas as fontes</option>
+                        <!-- Opções serão carregadas dinamicamente -->
+                    </select>
+                </div>
+
+                <div>
+                    <label for="assignee-filter" class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
+                    <select id="assignee-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="">Todos os responsáveis</option>
+                        <!-- Opções serão carregadas dinamicamente -->
+                    </select>
+                </div>
+
+                <div>
+                    <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-1">Período</label>
+                    <select id="date-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="">Todos os períodos</option>
+                        <option value="today">Hoje</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mês</option>
+                        <option value="quarter">Este trimestre</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+            </div>
         </section>
 
-        <!-- Tabela de Leads (Container principal) -->
+        <!-- Leads Display Container -->
         <section id="leads-display-container" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <!-- O estado (loading, empty, table, grid) será gerenciado aqui pelo leads-real.js -->
+            <!-- Loading State -->
+            <div id="loading-state" class="flex items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span class="ml-3 text-gray-600">Carregando leads...</span>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-12">
+                <div class="text-6xl mb-4">👥</div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum lead encontrado</h3>
+                <p class="text-gray-500 mb-4">Comece criando seu primeiro lead ou ajuste os filtros</p>
+                <button id="create-first-lead-btn" class="btn-primary">Criar primeiro lead</button>
+            </div>
+
+            <!-- Table View -->
+            <div id="table-view" class="hidden">
+                <div class="overflow-x-auto">
+                    <table id="leads-table" class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left">
+                                    <input type="checkbox" id="select-all-leads" class="rounded border-gray-300">
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="name">
+                                    Nome
+                                    <svg class="inline w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="email">
+                                    Email
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="company">
+                                    Empresa
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="status">
+                                    Status
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="priority">
+                                    Prioridade
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="value">
+                                    Valor
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="assignee">
+                                    Responsável
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" data-sort="created_at">
+                                    Criado em
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-tbody" class="bg-white divide-y divide-gray-200">
+                            <!-- Linhas da tabela serão injetadas aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Grid View -->
+            <div id="grid-view" class="hidden p-6">
+                <div id="leads-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards serão injetados aqui -->
+                </div>
+            </div>
+
+            <!-- Kanban View -->
+            <div id="kanban-view" class="hidden p-6">
+                <div id="kanban-board" class="flex space-x-6 overflow-x-auto">
+                    <!-- Colunas do kanban serão injetadas aqui -->
+                </div>
+            </div>
         </section>
+
+        <!-- Pagination -->
+        <div id="pagination-container" class="flex items-center justify-between mt-6 px-4 py-3 bg-white border border-gray-200 rounded-lg">
+            <div class="flex items-center">
+                <span class="text-sm text-gray-700">
+                    Mostrando <span id="pagination-start">0</span> a <span id="pagination-end">0</span> de <span id="pagination-total">0</span> leads
+                </span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <select id="pagination-limit" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                    <option value="10">10 por página</option>
+                    <option value="25">25 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                </select>
+                <div id="pagination-buttons" class="flex space-x-1">
+                    <!-- Botões de paginação serão injetados aqui -->
+                </div>
+            </div>
+        </div>
     </main>
 
-    <!-- Modal para Novo/Editar Lead (será gerenciado pelo JS) -->
-    <div id="lead-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
-        <!-- O conteúdo do modal será injetado e controlado pelo leads-real.js -->
+    <!-- Lead Modal -->
+    <div id="lead-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div id="lead-modal-content">
+                <!-- Conteúdo do modal será injetado aqui -->
+            </div>
+        </div>
     </div>
 
-    <!-- Container para Notificações/Toasts -->
-    <div id="toast-container" class="fixed top-4 right-4 space-y-3 z-[100] pointer-events-none"></div>
+    <!-- Import Modal -->
+    <div id="import-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-6">
+            <div id="import-modal-content">
+                <!-- Conteúdo do modal de importação será injetado aqui -->
+            </div>
+        </div>
+    </div>
 
-    <!-- CORREÇÃO: Ponto de entrada único para todos os scripts -->
+    <!-- Bulk Actions Bar -->
+    <div id="bulk-actions-bar" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg border border-gray-200 px-6 py-3 hidden">
+        <div class="flex items-center space-x-4">
+            <span id="selected-count" class="text-sm font-medium text-gray-700">0 selecionados</span>
+            <div class="flex space-x-2">
+                <button id="bulk-assign-btn" class="btn-outline-sm">Atribuir</button>
+                <button id="bulk-status-btn" class="btn-outline-sm">Alterar Status</button>
+                <button id="bulk-delete-btn" class="btn-outline-sm text-red-600 hover:text-red-700">Excluir</button>
+            </div>
+            <button id="close-bulk-actions" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+
