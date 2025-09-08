@@ -33,7 +33,25 @@
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         .gradient-premium { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .bg-primary { background-color: #3B82F6; }
+        
+        /* ############# ERRO CRÍTICO ############# */
+        /* As regras @apply abaixo NÃO funcionarão em HTML. */
+        /* Elas devem ser movidas para seu arquivo CSS de origem para serem compiladas pelo Tailwind. */
+        /*
         .btn-primary { @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none; }
+        .form-group { @apply mb-6; }
+        .form-label { @apply block text-sm font-medium text-gray-700 mb-2; }
+        .form-input { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors; }
+        .form-textarea { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical; }
+        .form-select { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white; }
+        .form-checkbox { @apply w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2; }
+        .nav-item { @apply w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 focus:ring-2 focus:ring-blue-500 focus:outline-none; }
+        .nav-item:hover { @apply bg-gray-50; }
+        .nav-item.active { @apply bg-blue-600 text-white; }
+        .nav-item.active:hover { @apply bg-blue-700; }
+        */
+        /* ########################################## */
+
         .loading-skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
@@ -41,19 +59,6 @@
         .slide-in { animation: slideIn 0.2s ease-out; }
         @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Form Styles */
-        .form-group { @apply mb-6; }
-        .form-label { @apply block text-sm font-medium text-gray-700 mb-2; }
-        .form-input { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors; }
-        .form-textarea { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical; }
-        .form-select { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white; }
-        .form-checkbox { @apply w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2; }
-        
-        /* Navigation Styles */
-        .nav-item { @apply w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 focus:ring-2 focus:ring-blue-500 focus:outline-none; }
-        .nav-item:hover { @apply bg-gray-50; }
-        .nav-item.active { @apply bg-blue-600 text-white; }
-        .nav-item.active:hover { @apply bg-blue-700; }
     </style>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -125,7 +130,7 @@
                     </nav>
                 </div>
                 
-                <nav class="hidden md:flex items-center space-x-6" aria-label="Navegação Principal" role="navigation">
+                <nav class="hidden md:flex items-center space-x-6" aria-label="Navegação Principal">
                     <div class="main-nav flex items-center space-x-6">
                     </div>
                 </nav>
@@ -136,7 +141,7 @@
                         <span>Auto-salvando...</span>
                     </div>
                     
-                    <button 
+                    <button
                         data-save-all
                         class="hidden sm:flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
                         title="Salvar todas as configurações"
@@ -148,9 +153,9 @@
                     </button>
                     
                     <div class="flex items-center space-x-3 pl-3 border-l border-gray-200">
-                        <div 
-                            class="w-8 h-8 gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm" 
-                            data-auth="user-avatar" 
+                        <div
+                            class="w-8 h-8 gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm"
+                            data-auth="user-avatar"
                             aria-label="Avatar do usuário"
                         >
                             <span data-auth="user-initials">U</span>
@@ -159,10 +164,10 @@
                             <p class="text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</p>
                             <p class="text-xs text-gray-500" data-auth="user-role">Configurações</p>
                         </div>
-                        <button 
-                            data-auth="logout-btn" 
-                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:outline-none" 
-                            title="Sair do Sistema" 
+                        <button
+                            data-auth="logout-btn"
+                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                            title="Sair do Sistema"
                             aria-label="Fazer logout"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -220,11 +225,11 @@
                         <p class="text-sm text-gray-600 mt-1">Navegue pelas opções</p>
                     </div>
                     
-                    <nav class="p-4" aria-label="Menu de configurações" role="navigation">
+                    <nav class="p-4" aria-label="Menu de configurações">
                         <ul class="space-y-2" id="settings-nav">
                             <li>
-                                <button 
-                                    class="nav-item active" 
+                                <button
+                                    class="nav-item active"
                                     data-section="profile"
                                     role="tab"
                                     aria-selected="true"
@@ -239,8 +244,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="organization"
                                     role="tab"
                                     aria-selected="false"
@@ -255,8 +260,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="team"
                                     role="tab"
                                     aria-selected="false"
@@ -271,8 +276,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="notifications"
                                     role="tab"
                                     aria-selected="false"
@@ -287,8 +292,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="integrations"
                                     role="tab"
                                     aria-selected="false"
@@ -303,8 +308,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="security"
                                     role="tab"
                                     aria-selected="false"
@@ -319,8 +324,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="billing"
                                     role="tab"
                                     aria-selected="false"
@@ -335,8 +340,8 @@
                             </li>
                             
                             <li>
-                                <button 
-                                    class="nav-item" 
+                                <button
+                                    class="nav-item"
                                     data-section="analytics"
                                     role="tab"
                                     aria-selected="false"
@@ -366,7 +371,7 @@
                                 </h2>
                                 <p class="text-sm text-gray-600 mt-1">Gerencie suas informações pessoais e preferências</p>
                             </div>
-                            <button 
+                            <button
                                 data-save="profile"
                                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             >
@@ -400,11 +405,11 @@
                                     <label for="full_name" class="form-label">
                                         Nome Completo <span class="text-red-500">*</span>
                                     </label>
-                                    <input 
-                                        type="text" 
-                                        id="full_name" 
-                                        name="full_name" 
-                                        class="form-input" 
+                                    <input
+                                        type="text"
+                                        id="full_name"
+                                        name="full_name"
+                                        class="form-input"
                                         placeholder="Seu nome completo"
                                         required
                                         autocomplete="name"
@@ -415,11 +420,11 @@
                                     <label for="email" class="form-label">
                                         Email <span class="text-red-500">*</span>
                                     </label>
-                                    <input 
-                                        type="email" 
-                                        id="email" 
-                                        name="email" 
-                                        class="form-input" 
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        class="form-input"
                                         placeholder="seu@email.com"
                                         required
                                         autocomplete="email"
@@ -430,11 +435,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="form-group">
                                     <label for="phone" class="form-label">Telefone</label>
-                                    <input 
-                                        type="tel" 
-                                        id="phone" 
-                                        name="phone" 
-                                        class="form-input" 
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        name="phone"
+                                        class="form-input"
                                         placeholder="+55 (11) 99999-9999"
                                         autocomplete="tel"
                                     >
@@ -442,11 +447,11 @@
                                 
                                 <div class="form-group">
                                     <label for="position" class="form-label">Cargo</label>
-                                    <input 
-                                        type="text" 
-                                        id="position" 
-                                        name="position" 
-                                        class="form-input" 
+                                    <input
+                                        type="text"
+                                        id="position"
+                                        name="position"
+                                        class="form-input"
                                         placeholder="Seu cargo na empresa"
                                         autocomplete="organization-title"
                                     >
@@ -469,11 +474,11 @@
                             
                             <div class="form-group">
                                 <label for="bio" class="form-label">Biografia</label>
-                                <textarea 
-                                    id="bio" 
-                                    name="bio" 
-                                    rows="4" 
-                                    class="form-textarea" 
+                                <textarea
+                                    id="bio"
+                                    name="bio"
+                                    rows="4"
+                                    class="form-textarea"
                                     placeholder="Conte um pouco sobre você e sua experiência..."
                                 ></textarea>
                             </div>
@@ -500,11 +505,11 @@
                             
                             <div class="form-group">
                                 <label for="linkedin_url" class="form-label">LinkedIn URL</label>
-                                <input 
-                                    type="url" 
-                                    id="linkedin_url" 
-                                    name="linkedin_url" 
-                                    class="form-input" 
+                                <input
+                                    type="url"
+                                    id="linkedin_url"
+                                    name="linkedin_url"
+                                    class="form-input"
                                     placeholder="https://linkedin.com/in/seuperfil"
                                 >
                             </div>
@@ -522,7 +527,7 @@
                                 </h2>
                                 <p class="text-sm text-gray-600 mt-1">Configure os dados da sua empresa e preferências organizacionais</p>
                             </div>
-                            <button 
+                            <button
                                 data-save="organization"
                                 class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors focus:ring-2 focus:ring-purple-500 focus:outline-none"
                             >
@@ -538,11 +543,11 @@
                                     <label for="org_name" class="form-label">
                                         Nome da Empresa <span class="text-red-500">*</span>
                                     </label>
-                                    <input 
-                                        type="text" 
-                                        id="org_name" 
-                                        name="name" 
-                                        class="form-input" 
+                                    <input
+                                        type="text"
+                                        id="org_name"
+                                        name="name"
+                                        class="form-input"
                                         placeholder="Nome da sua empresa"
                                         required
                                     >
@@ -550,11 +555,11 @@
                                 
                                 <div class="form-group">
                                     <label for="cnpj" class="form-label">CNPJ</label>
-                                    <input 
-                                        type="text" 
-                                        id="cnpj" 
-                                        name="cnpj" 
-                                        class="form-input" 
+                                    <input
+                                        type="text"
+                                        id="cnpj"
+                                        name="cnpj"
+                                        class="form-input"
                                         placeholder="00.000.000/0000-00"
                                         pattern="[0-9]{2}.[0-9]{3}.[0-9]{3}/[0-9]{4}-[0-9]{2}"
                                     >
@@ -592,11 +597,11 @@
                             
                             <div class="form-group">
                                 <label for="address" class="form-label">Endereço</label>
-                                <textarea 
-                                    id="address" 
-                                    name="address" 
-                                    rows="3" 
-                                    class="form-textarea" 
+                                <textarea
+                                    id="address"
+                                    name="address"
+                                    rows="3"
+                                    class="form-textarea"
                                     placeholder="Endereço completo da empresa"
                                 ></textarea>
                             </div>
@@ -604,11 +609,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="form-group">
                                     <label for="website" class="form-label">Website</label>
-                                    <input 
-                                        type="url" 
-                                        id="website" 
-                                        name="website" 
-                                        class="form-input" 
+                                    <input
+                                        type="url"
+                                        id="website"
+                                        name="website"
+                                        class="form-input"
                                         placeholder="https://suaempresa.com.br"
                                     >
                                 </div>
@@ -625,11 +630,11 @@
                             
                             <div class="form-group">
                                 <label for="description" class="form-label">Descrição da Empresa</label>
-                                <textarea 
-                                    id="description" 
-                                    name="description" 
-                                    rows="4" 
-                                    class="form-textarea" 
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    rows="4"
+                                    class="form-textarea"
                                     placeholder="Descreva sua empresa, missão e valores..."
                                 ></textarea>
                             </div>
@@ -660,10 +665,10 @@
                                 
                                 <div class="space-y-4">
                                     <div class="flex items-center space-x-3">
-                                        <input 
-                                            type="checkbox" 
-                                            id="auto_assign_leads" 
-                                            name="auto_assign_leads" 
+                                        <input
+                                            type="checkbox"
+                                            id="auto_assign_leads"
+                                            name="auto_assign_leads"
                                             class="form-checkbox"
                                         >
                                         <label for="auto_assign_leads" class="text-sm font-medium text-gray-700">
@@ -672,10 +677,10 @@
                                     </div>
                                     
                                     <div class="flex items-center space-x-3">
-                                        <input 
-                                            type="checkbox" 
-                                            id="lead_scoring_enabled" 
-                                            name="lead_scoring_enabled" 
+                                        <input
+                                            type="checkbox"
+                                            id="lead_scoring_enabled"
+                                            name="lead_scoring_enabled"
                                             class="form-checkbox"
                                         >
                                         <label for="lead_scoring_enabled" class="text-sm font-medium text-gray-700">
@@ -698,7 +703,7 @@
                                 </h2>
                                 <p class="text-sm text-gray-600 mt-1">Gerencie membros da equipe, permissões e acessos</p>
                             </div>
-                            <button 
+                            <button
                                 onclick="inviteTeamMember()"
                                 class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                             >
@@ -741,7 +746,7 @@
                                 </h2>
                                 <p class="text-sm text-gray-600 mt-1">Configure como e quando receber notificações</p>
                             </div>
-                            <button 
+                            <button
                                 data-save="notifications"
                                 class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors focus:ring-2 focus:ring-orange-500 focus:outline-none"
                             >
@@ -839,19 +844,19 @@
                                 <div class="grid grid-cols-2 gap-4 ml-7">
                                     <div class="form-group">
                                         <label for="quiet_hours_start" class="form-label">Início</label>
-                                        <input 
-                                            type="time" 
-                                            id="quiet_hours_start" 
-                                            data-notification="quiet_hours_start" 
+                                        <input
+                                            type="time"
+                                            id="quiet_hours_start"
+                                            data-notification="quiet_hours_start"
                                             class="form-input"
                                         >
                                     </div>
                                     <div class="form-group">
                                         <label for="quiet_hours_end" class="form-label">Fim</label>
-                                        <input 
-                                            type="time" 
-                                            id="quiet_hours_end" 
-                                            data-notification="quiet_hours_end" 
+                                        <input
+                                            type="time"
+                                            id="quiet_hours_end"
+                                            data-notification="quiet_hours_end"
                                             class="form-input"
                                         >
                                     </div>
@@ -936,7 +941,7 @@
                                         <div class="font-medium text-gray-700">Alterar senha</div>
                                         <p class="text-sm text-gray-600">Última alteração: <span id="password-last-changed">-</span></p>
                                     </div>
-                                    <button 
+                                    <button
                                         onclick="changePassword()"
                                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                     >
@@ -949,7 +954,7 @@
                                         <div class="font-medium text-gray-700">Autenticação de dois fatores (2FA)</div>
                                         <p class="text-sm text-gray-600">Adicione uma camada extra de segurança</p>
                                     </div>
-                                    <button 
+                                    <button
                                         onclick="enable2FA()"
                                         class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                                     >
@@ -1059,7 +1064,7 @@
                             </div>
                             
                             <div class="flex space-x-3">
-                                <button 
+                                <button
                                     onclick="upgradePlan()"
                                     class="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-medium"
                                 >
@@ -1072,3 +1077,244 @@
                         </div>
                         
                         <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">💳</span>
+                                Forma de Pagamento
+                            </h3>
+                            
+                            <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <span class="text-blue-600 font-bold">💳</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-700">Cartão de Crédito</div>
+                                        <p class="text-sm text-gray-600" id="billing-payment-method">•••• •••• •••• 4532</p>
+                                    </div>
+                                </div>
+                                <button class="text-blue-600 hover:text-blue-700 font-medium">
+                                    Alterar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                    <span class="text-xl mr-2" aria-hidden="true">📄</span>
+                                    Histórico de Faturas
+                                </h3>
+                                <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                    Ver todas
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-700">Janeiro 2025</div>
+                                        <p class="text-sm text-gray-600">Pago em 05/01/2025</p>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="font-medium text-gray-900">R$ 297,00</span>
+                                        <button
+                                            onclick="downloadInvoice()"
+                                            class="text-blue-600 hover:text-blue-700 text-sm"
+                                        >
+                                            Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-analytics" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="analytics-tab">
+                    <div class="bg-gradient-to-r from-cyan-50 to-blue-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">📊</span>
+                                    Analytics e Relatórios
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Configure métricas, relatórios e dashboards personalizados</p>
+                            </div>
+                            <button
+                                data-save="analytics"
+                                class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+                            >
+                                Salvar Analytics
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 space-y-8">
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">📈</span>
+                                Configurações de Dashboard
+                            </h3>
+                            
+                            <form id="analytics-form" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="form-group">
+                                        <label for="default_date_range" class="form-label">Período padrão</label>
+                                        <select id="default_date_range" name="default_date_range" class="form-select">
+                                            <option value="7d">Últimos 7 dias</option>
+                                            <option value="30d">Últimos 30 dias</option>
+                                            <option value="90d">Últimos 90 dias</option>
+                                            <option value="1y">Último ano</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="refresh_interval" class="form-label">Auto-atualização</label>
+                                        <select id="refresh_interval" name="refresh_interval" class="form-select">
+                                            <option value="manual">Manual</option>
+                                            <option value="1m">1 minuto</option>
+                                            <option value="5m">5 minutos</option>
+                                            <option value="15m">15 minutos</option>
+                                            <option value="30m">30 minutos</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-3">
+                                        <input
+                                            type="checkbox"
+                                            id="show_revenue_charts"
+                                            name="show_revenue_charts"
+                                            class="form-checkbox"
+                                        >
+                                        <label for="show_revenue_charts" class="text-sm font-medium text-gray-700">
+                                            Exibir gráficos de receita
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-3">
+                                        <input
+                                            type="checkbox"
+                                            id="show_lead_conversion"
+                                            name="show_lead_conversion"
+                                            class="form-checkbox"
+                                        >
+                                        <label for="show_lead_conversion" class="text-sm font-medium text-gray-700">
+                                            Mostrar taxa de conversão de leads
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-3">
+                                        <input
+                                            type="checkbox"
+                                            id="show_team_performance"
+                                            name="show_team_performance"
+                                            class="form-checkbox"
+                                        >
+                                        <label for="show_team_performance" class="text-sm font-medium text-gray-700">
+                                            Performance da equipe
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">📧</span>
+                                Relatórios Automáticos
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="weekly_report" class="font-medium text-gray-700">Relatório semanal</label>
+                                        <p class="text-sm text-gray-600">Resumo de vendas e métricas toda segunda-feira</p>
+                                    </div>
+                                    <input type="checkbox" id="weekly_report" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="monthly_report" class="font-medium text-gray-700">Relatório mensal</label>
+                                        <p class="text-sm text-gray-600">Análise completa enviada no primeiro dia do mês</p>
+                                    </div>
+                                    <input type="checkbox" id="monthly_report" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="custom_alerts" class="font-medium text-gray-700">Alertas personalizados</label>
+                                        <p class="text-sm text-gray-600">Notificações baseadas em metas e thresholds</p>
+                                    </div>
+                                    <input type="checkbox" id="custom_alerts" class="form-checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">🎯</span>
+                                Metas e KPIs
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="monthly_revenue_goal" class="form-label">Meta de receita mensal (R$)</label>
+                                    <input
+                                        type="number"
+                                        id="monthly_revenue_goal"
+                                        name="monthly_revenue_goal"
+                                        class="form-input"
+                                        placeholder="50000"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="monthly_leads_goal" class="form-label">Meta de leads mensais</label>
+                                    <input
+                                        type="number"
+                                        id="monthly_leads_goal"
+                                        name="monthly_leads_goal"
+                                        class="form-input"
+                                        placeholder="500"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="conversion_rate_goal" class="form-label">Meta de conversão (%)</label>
+                                    <input
+                                        type="number"
+                                        id="conversion_rate_goal"
+                                        name="conversion_rate_goal"
+                                        class="form-input"
+                                        placeholder="15"
+                                        min="0"
+                                        max="100"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="average_deal_size_goal" class="form-label">Ticket médio (R$)</label>
+                                    <input
+                                        type="number"
+                                        id="average_deal_size_goal"
+                                        name="average_deal_size_goal"
+                                        class="form-input"
+                                        placeholder="2500"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script src="/src/config.js"></script>
+</body>
+</html>
