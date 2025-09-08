@@ -5,13 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Personalize suas preferências e configurações do ALSHAM 360° PRIMA.">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="noindex, nofollow">
+    
     <title>Configurações - ALSHAM 360° PRIMA</title>
+    
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -36,15 +40,19 @@
                         </div>
                     </a>
                 </div>
+                
                 <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
                     <!-- Menu dinâmico será injetado aqui pelo navigation.js -->
                 </nav>
+                
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
                         <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
                         <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -53,57 +61,172 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
         <div id="breadcrumb" class="mb-8"></div>
 
-        <section>
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">⚙️ Configurações</h2>
-            <p class="text-gray-600 mb-8">Personalize suas preferências e defina parâmetros da sua conta e organização.</p>
-            
-            <!-- Exemplo de cards de configuração -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Preferências do usuário -->
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Preferências do Usuário</h3>
-                    <form id="user-preferences-form" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="theme">Tema</label>
-                            <select id="theme" name="theme" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                                <option value="light">Claro</option>
-                                <option value="dark">Escuro</option>
-                                <option value="system">Sistema</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="notificacoes">Notificações</label>
-                            <select id="notificacoes" name="notificacoes" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                                <option value="todas">Todas</option>
-                                <option value="importantes">Apenas importantes</option>
-                                <option value="nenhuma">Nenhuma</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-primary mt-2">Salvar Preferências</button>
-                    </form>
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">⚙️ Configurações</h1>
+            <p class="text-gray-600">Personalize suas preferências e defina parâmetros da sua conta e organização</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="lg:w-64 flex-shrink-0">
+                <nav class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sticky top-24">
+                    <ul class="space-y-2" id="settings-nav">
+                        <li>
+                            <button class="settings-nav-item active w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="profile">
+                                <span class="text-lg">👤</span>
+                                <span class="font-medium">Perfil do Usuário</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="organization">
+                                <span class="text-lg">🏢</span>
+                                <span class="font-medium">Organização</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="team">
+                                <span class="text-lg">👥</span>
+                                <span class="font-medium">Equipe</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="notifications">
+                                <span class="text-lg">🔔</span>
+                                <span class="font-medium">Notificações</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="integrations">
+                                <span class="text-lg">🔗</span>
+                                <span class="font-medium">Integrações</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="security">
+                                <span class="text-lg">🔒</span>
+                                <span class="font-medium">Segurança</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="billing">
+                                <span class="text-lg">💳</span>
+                                <span class="font-medium">Faturamento</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="analytics">
+                                <span class="text-lg">📊</span>
+                                <span class="font-medium">Analytics</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1">
+                <!-- Profile Section -->
+                <div id="profile-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">👤 Perfil do Usuário</h2>
+                        <p class="text-gray-600">Gerencie suas informações pessoais e preferências</p>
+                    </div>
+                    <div id="profile-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
                 </div>
 
-                <!-- Configurações da organização -->
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Configurações da Organização</h3>
-                    <form id="org-settings-form" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="org-nome">Nome da organização</label>
-                            <input type="text" id="org-nome" name="org-nome" value="Minha Empresa" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="org-email">E-mail de contato</label>
-                            <input type="email" id="org-email" name="org-email" value="contato@empresa.com" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
-                        </div>
-                        <button type="submit" class="btn-primary mt-2">Salvar Configurações</button>
-                    </form>
+                <!-- Organization Section -->
+                <div id="organization-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🏢 Organização</h2>
+                        <p class="text-gray-600">Configure os dados da sua empresa</p>
+                    </div>
+                    <div id="organization-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Team Section -->
+                <div id="team-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">👥 Equipe</h2>
+                        <p class="text-gray-600">Gerencie membros da equipe e permissões</p>
+                    </div>
+                    <div id="team-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div id="notifications-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🔔 Notificações</h2>
+                        <p class="text-gray-600">Configure como e quando receber notificações</p>
+                    </div>
+                    <div id="notifications-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Integrations Section -->
+                <div id="integrations-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🔗 Integrações</h2>
+                        <p class="text-gray-600">Conecte com ferramentas externas</p>
+                    </div>
+                    <div id="integrations-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div id="security-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🔒 Segurança</h2>
+                        <p class="text-gray-600">Proteja sua conta e dados</p>
+                    </div>
+                    <div id="security-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Billing Section -->
+                <div id="billing-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">💳 Faturamento</h2>
+                        <p class="text-gray-600">Gerencie planos e pagamentos</p>
+                    </div>
+                    <div id="billing-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div id="analytics-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">📊 Analytics</h2>
+                        <p class="text-gray-600">Configure ferramentas de análise</p>
+                    </div>
+                    <div id="analytics-content">
+                        <!-- Conteúdo será injetado pelo JavaScript -->
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
 
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+
