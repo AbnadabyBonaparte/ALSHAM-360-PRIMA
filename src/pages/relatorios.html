@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Analytics e Relatórios do ALSHAM 360° PRIMA. Visualize KPIs, funil de conversão, performance da equipe e insights de IA.">
-    <meta name="robots" content="noindex, nofollow"> <!-- Conteúdo privado do usuário -->
+    <meta name="robots" content="noindex, nofollow">
     
     <title>Relatórios - ALSHAM 360° PRIMA</title>
     
@@ -16,18 +16,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- CORREÇÃO: Caminho absoluto para o CSS principal -->
     <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
     
     <noscript>
         <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; padding: 1em; background-color: #f8d7da; color: #721c24; text-align: center; border-bottom: 1px solid #f5c6cb;">
-            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente. Por favor, habilite o JavaScript no seu navegador.
+            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente.
         </div>
     </noscript>
 
-    <!-- Header Premium Padronizado -->
+    <!-- Header Premium -->
     <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -43,15 +42,22 @@
                 </div>
                 
                 <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
-                    <!-- Menu dinâmico será injetado aqui -->
+                    <!-- Menu dinâmico será injetado aqui pelo navigation.js -->
                 </nav>
                 
                 <div class="flex items-center space-x-4">
+                    <button id="refresh-reports-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Atualizar Relatórios" aria-label="Atualizar Relatórios">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
                         <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
                         <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -59,56 +65,297 @@
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
         <div id="breadcrumb" class="mb-8"></div>
 
+        <!-- Page Header -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-gray-900">📊 Analytics & Relatórios</h2>
-                <p class="text-gray-600 mt-2">Insights inteligentes para impulsionar suas vendas.</p>
+                <h1 class="text-3xl font-bold text-gray-900">📊 Analytics & Relatórios</h1>
+                <p class="text-gray-600 mt-2">Insights inteligentes para impulsionar suas vendas</p>
             </div>
-            <div id="report-controls" class="flex items-center space-x-4">
-                <!-- Controles como seletor de período e botão de gerar serão injetados aqui -->
+            <div class="flex items-center space-x-4">
+                <button id="export-pdf-btn" class="btn-outline">📄 PDF</button>
+                <button id="export-excel-btn" class="btn-outline">📊 Excel</button>
+                <button id="export-csv-btn" class="btn-outline">📋 CSV</button>
+                <button id="generate-report-btn" class="btn-primary">📈 Gerar Relatório</button>
             </div>
         </div>
 
-        <!-- KPIs (Container para dados dinâmicos ) -->
+        <!-- Filters Section -->
+        <section class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+                    <div>
+                        <label for="period-filter" class="block text-sm font-medium text-gray-700 mb-1">Período</label>
+                        <select id="period-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="7d">Últimos 7 dias</option>
+                            <option value="30d" selected>Últimos 30 dias</option>
+                            <option value="90d">Últimos 90 dias</option>
+                            <option value="6m">Últimos 6 meses</option>
+                            <option value="1y">Último ano</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="salesperson-filter" class="block text-sm font-medium text-gray-700 mb-1">Vendedor</label>
+                        <select id="salesperson-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="">Todos os vendedores</option>
+                            <!-- Opções serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="metric-filter" class="block text-sm font-medium text-gray-700 mb-1">Métrica Principal</label>
+                        <select id="metric-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="revenue">Receita</option>
+                            <option value="leads">Leads</option>
+                            <option value="conversion">Conversão</option>
+                            <option value="activities">Atividades</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="source-filter" class="block text-sm font-medium text-gray-700 mb-1">Fonte</label>
+                        <select id="source-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="">Todas as fontes</option>
+                            <!-- Opções serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <button id="apply-filters-btn" class="btn-primary">Aplicar</button>
+                    <button id="clear-filters-btn" class="btn-outline">Limpar</button>
+                </div>
+            </div>
+
+            <!-- Custom Date Range -->
+            <div id="custom-date-range" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                <div>
+                    <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Data Inicial</label>
+                    <input type="date" id="start-date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">Data Final</label>
+                    <input type="date" id="end-date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+            </div>
+        </section>
+
+        <!-- KPIs Container -->
         <section id="kpis-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Cards de KPI serão injetados aqui pelo relatorios.js -->
         </section>
 
-        <!-- Gráficos -->
+        <!-- Charts Section -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Revenue Chart -->
             <div id="revenue-chart-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <!-- Gráfico de Receita será injetado aqui -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">📈 Receita ao Longo do Tempo</h3>
+                    <div class="flex items-center space-x-2">
+                        <button id="revenue-chart-type" class="text-sm text-gray-500 hover:text-gray-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="revenue-chart" class="h-64">
+                    <!-- Gráfico será renderizado aqui -->
+                </div>
             </div>
+
+            <!-- Funnel Chart -->
             <div id="funnel-chart-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <!-- Gráfico de Funil será injetado aqui -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">🔄 Funil de Conversão</h3>
+                    <div class="flex items-center space-x-2">
+                        <span id="funnel-period" class="text-sm text-gray-500">Últimos 30 dias</span>
+                    </div>
+                </div>
+                <div id="funnel-chart" class="h-64">
+                    <!-- Gráfico será renderizado aqui -->
+                </div>
             </div>
         </section>
 
-        <!-- Performance por Vendedor -->
-        <section id="performance-table-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
-            <!-- Tabela de performance será injetada aqui -->
-        </section>
-
-        <!-- Insights & Previsão -->
+        <!-- Additional Charts -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div id="ai-insights-container" class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 border border-purple-200">
-                <!-- Insights de IA serão injetados aqui -->
+            <!-- Leads Sources Chart -->
+            <div id="sources-chart-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">🎯 Fontes de Leads</h3>
+                </div>
+                <div id="sources-chart" class="h-64">
+                    <!-- Gráfico será renderizado aqui -->
+                </div>
             </div>
+
+            <!-- Activities Chart -->
+            <div id="activities-chart-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">📞 Atividades por Tipo</h3>
+                </div>
+                <div id="activities-chart" class="h-64">
+                    <!-- Gráfico será renderizado aqui -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Table -->
+        <section id="performance-table-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">🏆 Performance da Equipe</h3>
+                <div class="flex items-center space-x-2">
+                    <select id="performance-metric" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                        <option value="revenue">Por Receita</option>
+                        <option value="leads">Por Leads</option>
+                        <option value="conversion">Por Conversão</option>
+                        <option value="activities">Por Atividades</option>
+                    </select>
+                </div>
+            </div>
+            <div id="performance-table" class="overflow-x-auto">
+                <!-- Tabela será renderizada aqui -->
+            </div>
+        </section>
+
+        <!-- Insights & Forecast Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- AI Insights -->
+            <div id="ai-insights-container" class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 border border-purple-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">🤖 Insights de IA</h3>
+                    <div class="flex items-center space-x-1">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-xs text-gray-500">Atualizado agora</span>
+                    </div>
+                </div>
+                <div id="ai-insights-content" class="space-y-4">
+                    <!-- Insights serão injetados aqui -->
+                </div>
+            </div>
+
+            <!-- Sales Forecast -->
             <div id="sales-forecast-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <!-- Previsão de vendas será injetada aqui -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">🔮 Previsão de Vendas</h3>
+                    <select id="forecast-period" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                        <option value="30d">Próximos 30 dias</option>
+                        <option value="60d">Próximos 60 dias</option>
+                        <option value="90d">Próximos 90 dias</option>
+                    </select>
+                </div>
+                <div id="forecast-chart" class="h-64">
+                    <!-- Gráfico de previsão será renderizado aqui -->
+                </div>
+                <div id="forecast-summary" class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <!-- Resumo da previsão será injetado aqui -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Goals & Targets -->
+        <section id="goals-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">🎯 Metas e Objetivos</h3>
+                <button id="edit-goals-btn" class="btn-outline-sm">✏️ Editar Metas</button>
+            </div>
+            <div id="goals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards de metas serão injetados aqui -->
+            </div>
+        </section>
+
+        <!-- Recent Activities -->
+        <section id="recent-activities-container" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">📋 Atividades Recentes</h3>
+                <a href="/leads-real.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Ver todas</a>
+            </div>
+            <div id="activities-feed" class="space-y-4">
+                <!-- Feed de atividades será injetado aqui -->
             </div>
         </section>
     </main>
 
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
-        <p class="text-center text-gray-500 text-sm">© 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.</p>
-    </footer>
+    <!-- Export Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-xl max-w-md w-full p-6">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Exportar Relatório</h2>
+                <p class="text-gray-600">Escolha o formato e configurações de exportação</p>
+            </div>
+            
+            <form id="export-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Formato</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="export-format" value="pdf" class="mr-2" checked>
+                            <span class="text-sm">PDF - Relatório visual completo</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="export-format" value="excel" class="mr-2">
+                            <span class="text-sm">Excel - Dados para análise</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="export-format" value="csv" class="mr-2">
+                            <span class="text-sm">CSV - Dados brutos</span>
+                        </label>
+                    </div>
+                </div>
 
-    <!-- CORREÇÃO: Ponto de entrada único para todos os scripts -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Incluir</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="include-kpis" class="mr-2" checked>
+                            <span class="text-sm">KPIs e métricas</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="include-charts" class="mr-2" checked>
+                            <span class="text-sm">Gráficos e visualizações</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="include-table" class="mr-2" checked>
+                            <span class="text-sm">Tabela de performance</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="include-insights" class="mr-2">
+                            <span class="text-sm">Insights de IA</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" id="cancel-export" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="confirm-export" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Exportar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goals Modal -->
+    <div id="goals-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-6">
+            <div id="goals-modal-content">
+                <!-- Conteúdo do modal de metas será injetado aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+
