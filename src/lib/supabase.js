@@ -659,7 +659,7 @@ export async function getSentimentAnalysisLogs(orgId = getCurrentOrgId()) {
 }
 
 // =========================================================================
-// 3. AUTOMAÇÕES (3 TABELAS)
+// 3. AUTOMAÇÕES (3 TABELAS) - CORRIGIDO PARA BUILD
 // =========================================================================
 
 // 3.1 AUTOMATION RULES - Regras de automação
@@ -697,6 +697,48 @@ export async function createAutomationRule(rule, orgId = getCurrentOrgId()) {
       .single()
 
     return handleSupabaseResponse(data, error, 'criação de regra de automação')
+  } catch (error) {
+    return { data: null, error: createError(`Erro inesperado: ${error.message}`) }
+  }
+}
+
+export async function updateAutomationRule(ruleId, rule, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ ruleId, rule, orgId })
+  if (validation) return { data: null, error: validation }
+
+  try {
+    const payload = { 
+      ...rule
+    }
+
+    const { data, error } = await supabase
+      .from('automation_rules')
+      .update(payload)
+      .eq('id', ruleId)
+      .eq('org_id', orgId)
+      .select()
+      .single()
+
+    return handleSupabaseResponse(data, error, 'atualização de regra de automação')
+  } catch (error) {
+    return { data: null, error: createError(`Erro inesperado: ${error.message}`) }
+  }
+}
+
+export async function deleteAutomationRule(ruleId, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ ruleId, orgId })
+  if (validation) return { data: null, error: validation }
+
+  try {
+    const { data, error } = await supabase
+      .from('automation_rules')
+      .delete()
+      .eq('id', ruleId)
+      .eq('org_id', orgId)
+      .select()
+      .single()
+
+    return handleSupabaseResponse(data, error, 'exclusão de regra de automação')
   } catch (error) {
     return { data: null, error: createError(`Erro inesperado: ${error.message}`) }
   }
