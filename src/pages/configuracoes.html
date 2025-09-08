@@ -1,232 +1,1134 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-gray-50 scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Personalize suas preferências e configurações do ALSHAM 360° PRIMA.">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <title>Configurações - ALSHAM 360° PRIMA</title>
-    
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/src/style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema Enterprise de Configurações - ALSHAM 360° PRIMA. Gerencie perfil, organização, equipe, segurança e integrações.">
+    <meta name="keywords" content="configurações, perfil, organização, equipe, segurança, integrações, crm">
+    <meta name="author" content="ALSHAM 360° PRIMA">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#3B82F6">
+    
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <title>Configurações Enterprise - ALSHAM 360° PRIMA</title>
+    
+        <link rel="icon" type="image/svg+xml" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+        <style>
+        /* Critical CSS for immediate render */
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .gradient-premium { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .bg-primary { background-color: #3B82F6; }
+        .btn-primary { @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none; }
+        .loading-skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Form Styles */
+        .form-group { @apply mb-6; }
+        .form-label { @apply block text-sm font-medium text-gray-700 mb-2; }
+        .form-input { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors; }
+        .form-textarea { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical; }
+        .form-select { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white; }
+        .form-checkbox { @apply w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2; }
+        
+        /* Navigation Styles */
+        .nav-item { @apply w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 focus:ring-2 focus:ring-blue-500 focus:outline-none; }
+        .nav-item:hover { @apply bg-gray-50; }
+        .nav-item.active { @apply bg-blue-600 text-white; }
+        .nav-item.active:hover { @apply bg-blue-700; }
+    </style>
+    
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+        <link rel="stylesheet" href="/src/style.css">
+    
+        <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ALSHAM 360° PRIMA - Configurações",
+        "description": "Sistema Enterprise de Configurações e Administração",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web Browser"
+    }
+    </script>
 </head>
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
 
-    <noscript>
-        <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999; padding: 1em; background-color: #f8d7da; color: #721c24; text-align: center; border-bottom: 1px solid #f5c6cb;">
-            <strong>Atenção:</strong> Este site requer JavaScript para funcionar corretamente. Por favor, habilite o JavaScript no seu navegador.
-        </div>
-    </noscript>
+<body class="font-inter bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 min-h-screen antialiased">
 
-    <!-- Header Premium -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <a href="/" class="flex items-center space-x-3" aria-label="Voltar ao Dashboard">
-                        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-                        </div>
-                    </a>
-                </div>
-                
-                <nav class="hidden md:flex items-center space-x-8 main-nav" aria-label="Navegação Principal">
-                    <!-- Menu dinâmico será injetado aqui pelo navigation.js -->
-                </nav>
-                
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-label="Avatar do usuário"></div>
-                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</span>
-                        <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair" aria-label="Sair">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
+        <noscript>
+        <div role="alert" class="fixed inset-0 z-50 flex items-center justify-center bg-red-50 p-4">
+            <div class="bg-white border border-red-200 rounded-lg p-6 max-w-md text-center shadow-lg">
+                <div class="text-red-600 text-4xl mb-4" aria-hidden="true">⚠️</div>
+                <h1 class="text-lg font-bold text-red-800 mb-2">JavaScript Necessário</h1>
+                <p class="text-red-700 mb-4">Este sistema requer JavaScript para funcionar. Por favor, habilite o JavaScript no seu navegador.</p>
+                <button onclick="location.reload()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Tentar Novamente
+                </button>
+            </div>
+        </div>
+    </noscript>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Breadcrumb -->
-        <div id="breadcrumb" class="mb-8"></div>
+        <div id="config-loader" class="fixed inset-0 z-40 bg-white/90 backdrop-blur-sm hidden" aria-live="polite">
+        <div class="flex items-center justify-center h-full">
+            <div class="text-center">
+                <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                <p id="loader-message" class="text-gray-700 font-medium">Carregando configurações...</p>
+                <p class="text-gray-500 text-sm mt-2">Sincronizando dados enterprise</p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">⚙️ Configurações</h1>
-            <p class="text-gray-600">Personalize suas preferências e defina parâmetros da sua conta e organização</p>
-        </div>
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+        Pular para o conteúdo principal
+    </a>
 
-        <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar Navigation -->
-            <div class="lg:w-64 flex-shrink-0">
-                <nav class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sticky top-24">
-                    <ul class="space-y-2" id="settings-nav">
-                        <li>
-                            <button class="settings-nav-item active w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="profile">
-                                <span class="text-lg">👤</span>
-                                <span class="font-medium">Perfil do Usuário</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="organization">
-                                <span class="text-lg">🏢</span>
-                                <span class="font-medium">Organização</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="team">
-                                <span class="text-lg">👥</span>
-                                <span class="font-medium">Equipe</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="notifications">
-                                <span class="text-lg">🔔</span>
-                                <span class="font-medium">Notificações</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="integrations">
-                                <span class="text-lg">🔗</span>
-                                <span class="font-medium">Integrações</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="security">
-                                <span class="text-lg">🔒</span>
-                                <span class="font-medium">Segurança</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="billing">
-                                <span class="text-lg">💳</span>
-                                <span class="font-medium">Faturamento</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="settings-nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3" data-section="analytics">
-                                <span class="text-lg">📊</span>
-                                <span class="font-medium">Analytics</span>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+        <header class="bg-white/90 backdrop-blur-xl border-b border-gray-200/60 sticky top-0 z-30 shadow-sm" role="banner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                                <div class="flex items-center space-x-4">
+                    <a href="/" class="flex items-center space-x-3 group" aria-label="Voltar ao Dashboard Principal">
+                        <div class="w-10 h-10 gradient-premium rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
+                        </div>
+                        <div class="hidden sm:block">
+                            <h1 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">ALSHAM 360°</h1>
+                            <p class="text-xs text-gray-500 font-medium">PRIMA Enterprise</p>
+                        </div>
+                    </a>
+                    
+                                        <nav aria-label="Breadcrumb" class="hidden lg:flex">
+                        <ol class="flex items-center space-x-2 text-sm">
+                            <li><a href="/" class="text-gray-500 hover:text-gray-700 transition-colors">Dashboard</a></li>
+                            <li class="text-gray-400" aria-hidden="true">/</li>
+                            <li class="text-gray-900 font-medium" aria-current="page">Configurações</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                                <nav class="hidden md:flex items-center space-x-6" aria-label="Navegação Principal" role="navigation">
+                    <div class="main-nav flex items-center space-x-6">
+                                            </div>
+                </nav>
+                
+                                <div class="flex items-center space-x-3">
+                                        <div id="autosave-indicator" class="hidden items-center space-x-2 text-sm text-gray-600">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>Auto-salvando...</span>
+                    </div>
+                    
+                                        <button 
+                        data-save-all
+                        class="hidden sm:flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
+                        title="Salvar todas as configurações"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        <span class="font-medium">Salvar Tudo</span>
+                    </button>
+                    
+                                        <div class="flex items-center space-x-3 pl-3 border-l border-gray-200">
+                        <div 
+                            class="w-8 h-8 gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm" 
+                            data-auth="user-avatar" 
+                            aria-label="Avatar do usuário"
+                        >
+                            <span data-auth="user-initials">U</span>
+                        </div>
+                        <div class="hidden sm:block">
+                            <p class="text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</p>
+                            <p class="text-xs text-gray-500" data-auth="user-role">Configurações</p>
+                        </div>
+                        <button 
+                            data-auth="logout-btn" 
+                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:outline-none" 
+                            title="Sair do Sistema" 
+                            aria-label="Fazer logout"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-            <!-- Main Content -->
-            <div class="flex-1">
-                <!-- Profile Section -->
-                <div id="profile-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">👤 Perfil do Usuário</h2>
-                        <p class="text-gray-600">Gerencie suas informações pessoais e preferências</p>
-                    </div>
-                    <div id="profile-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+        <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
+        
+                <section class="mb-8" aria-labelledby="page-title">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex-1">
+                    <h1 id="page-title" class="text-4xl font-bold text-gray-900 mb-3 flex items-center">
+                        <span class="text-3xl mr-3" aria-hidden="true">⚙️</span>
+                        Configurações Enterprise
+                        <span id="unsaved-indicator" class="hidden ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-1 animate-pulse"></span>
+                            Alterações não salvas
+                        </span>
+                    </h1>
+                    <p class="text-lg text-gray-600 max-w-3xl">
+                        Central de controle completa para personalizar sua experiência no 
+                        <span class="font-medium text-blue-600">Sistema ALSHAM 360° PRIMA</span>
+                    </p>
+                    
+                                        <div class="mt-3 flex flex-wrap items-center gap-4 text-sm">
+                        <div class="flex items-center text-green-600">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                            <span>Sistema Conectado</span>
+                        </div>
+                        <div class="flex items-center text-blue-600">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                            <span>Auto-save Ativo</span>
+                        </div>
+                        <div class="flex items-center text-purple-600">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                            <span>Dados Sincronizados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                <!-- Organization Section -->
-                <div id="organization-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🏢 Organização</h2>
-                        <p class="text-gray-600">Configure os dados da sua empresa</p>
-                    </div>
-                    <div id="organization-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+                        <aside class="lg:col-span-1" role="complementary">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-bold text-gray-900">Menu de Configurações</h2>
+                        <p class="text-sm text-gray-600 mt-1">Navegue pelas opções</p>
+                    </div>
+                    
+                    <nav class="p-4" aria-label="Menu de configurações" role="navigation">
+                        <ul class="space-y-2" id="settings-nav">
+                            <li>
+                                <button 
+                                    class="nav-item active" 
+                                    data-section="profile"
+                                    role="tab"
+                                    aria-selected="true"
+                                    aria-controls="section-profile"
+                                >
+                                    <span class="text-xl" aria-hidden="true">👤</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Perfil do Usuário</div>
+                                        <div class="text-xs opacity-75">Dados pessoais</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="organization"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="section-organization"
+                                >
+                                    <span class="text-xl" aria-hidden="true">🏢</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Organização</div>
+                                        <div class="text-xs opacity-75">Dados da empresa</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="team"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="section-team"
+                                >
+                                    <span class="text-xl" aria-hidden="true">👥</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Equipe</div>
+                                        <div class="text-xs opacity-75">Membros e permissões</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="notifications"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="section-notifications"
+                      _B_R_         >
+                                    <span class="text-xl" aria-hidden="true">🔔</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Notificações</div>
+                                        <div class="text-xs opacity-75">Alertas e avisos</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="integrations"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="section-integrations"
+                                >
+                                    <span class="text-xl" aria-hidden="true">🔗</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Integrações</div>
+                                        <div class="text-xs opacity-75">Apps externos</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="security"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="section-security"
+                                >
+                                    <span class="text-xl" aria-hidden="true">🔒</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Segurança</div>
+                                        <div class="text-xs opacity-75">Proteção de dados</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="billing"
+                                    role="tab"
+                  *                         aria-selected="false"
+                                    aria-controls="section-billing"
+                                >
+                                    <span class="text-xl" aria-hidden="true">💳</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Faturamento</div>
+                                        <div class="text-xs opacity-75">Planos e pagamentos</div>
+                                    </div>
+                                </button>
+                            </li>
+                            
+                            <li>
+                                <button 
+                                    class="nav-item" 
+                                    data-section="analytics"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="section-analytics"
+                                >
+                                    <span class="text-xl" aria-hidden="true">📊</span>
+                                    <div class="text-left">
+                                        <div class="font-medium">Analytics</div>
+                                        <div class="text-xs opacity-75">Métricas e relatórios</div>
+                                    </div>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </aside>
 
-                <!-- Team Section -->
-                <div id="team-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">👥 Equipe</h2>
-                        <p class="text-gray-600">Gerencie membros da equipe e permissões</p>
-                    </div>
-                    <div id="team-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+                        <div class="lg:col-span-3">
+                
+                                <section id="section-profile" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">👤</span>
+                                    Perfil do Usuário
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Gerencie suas informações pessoais e preferências</p>
+                            </div>
+                            <button 
+                                data-save="profile"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            >
+                                Salvar Perfil
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                                                <div class="flex items-center space-x-6 mb-8 p-6 bg-gray-50 rounded-xl">
+                            <div id="profile-avatar" class="flex-shrink-0">
+                                                                <div class="w-20 h-20 bg-gray-200 rounded-full animate-pulse"></div>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Foto do Perfil</h3>
+                                <p class="text-sm text-gray-600 mb-4">Adicione uma foto para personalizar seu perfil</p>
+                                <div class="flex space-x-3">
+                                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                                        Escolher Arquivo
+                                    </button>
+                                    <button class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                                        Remover
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                                                <form id="profile-form" class="space-y-6" novalidate>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="full_name" class="form-label">
+                                        Nome Completo <span class="text-red-500">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="full_name" 
+                                        name="full_name" 
+                                        class="form-input" 
+                                        placeholder="Seu nome completo"
+                                        required
+                                        autocomplete="name"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email" class="form-label">
+                                        Email <span class="text-red-500">*</span>
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        name="email" 
+                          _B_R_           class="form-input" 
+                                        placeholder="seu@email.com"
+                                        required
+                                        autocomplete="email"
+                                    >
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">Telefone</label>
+                                    <input 
+                                        type="tel" 
+                                        id="phone" 
+                                        name="phone" 
+                                        class="form-input" 
+                                        placeholder="+55 (11) 99999-9999"
+                                        autocomplete="tel"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="position" class="form-label">Cargo</label>
+                                    <input 
+                                        type="text" 
+                                        id="position" 
+                                        name="position" 
+                                        class="form-input" 
+                                        placeholder="Seu cargo na empresa"
+                                        autocomplete="organization-title"
+                                    >
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="department" class="form-label">Departamento</label>
+                                <select id="department" name="department" class="form-select">
+                                    <option value="">Selecione um departamento</option>
+                                    <option value="vendas">Vendas</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="suporte">Suporte</option>
+                                    <option value="financeiro">Financeiro</option>
+                                    <option value="rh">Recursos Humanos</option>
+                                    <option value="ti">Tecnologia</option>
+                                    <option value="diretoria">Diretoria</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bio" class="form-label">Biografia</label>
+                                <textarea 
+                                    id="bio" 
+                                    name="bio" 
+                                    rows="4" 
+                                    class="form-textarea" 
+                                    placeholder="Conte um pouco sobre você e sua experiência..."
+                                ></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="timezone" class="form-label">Fuso Horário</label>
+                                    <select id="timezone" name="timezone" class="form-select">
+                                        <option value="America/Sao_Paulo">São Paulo (GMT-3)</option>
+                                        <option value="America/Manaus">Manaus (GMT-4)</option>
+                                        <option value="America/Rio_Branco">Rio Branco (GMT-5)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="locale" class="form-label">Idioma</label>
+                                    <select id="locale" name="locale" class="form-select">
+                                        <option value="pt-BR">Português (Brasil)</option>
+                                        <option value="en-US">English (US)</option>
+                                        <option value="es-ES">Español</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="linkedin_url" class="form-label">LinkedIn URL</label>
+                                <input 
+                                    type="url" 
+                                    id="linkedin_url" 
+                                    name="linkedin_url" 
+                                    class="form-input" 
+                                    placeholder="https://linkedin.com/in/seuperfil"
+                                >
+                            </div>
+                        </form>
+                    </div>
+                </section>
 
-                <!-- Notifications Section -->
-                <div id="notifications-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🔔 Notificações</h2>
-                        <p class="text-gray-600">Configure como e quando receber notificações</p>
-                    </div>
-                    <div id="notifications-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+                                <section id="section-organization" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="organization-tab">
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">🏢</span>
+                                    Organização
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Configure os dados da sua empresa e preferências organizacionais</p>
+                            </div>
+                            <button 
+                                data-save="organization"
+                                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            >
+                                Salvar Organização
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <form id="organization-form" class="space-y-6" novalidate>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="org_name" class="form-label">
+                                        Nome da Empresa <span class="text-red-500">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="org_name" 
+                                        name="name" 
+                                        class="form-input" 
+                                        placeholder="Nome da sua empresa"
+                                        required
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="cnpj" class="form-label">CNPJ</label>
+                                    <input 
+                                        type="text" 
+                                        id="cnpj" 
+                                        name="cnpj" 
+                                        class="form-input" 
+                                        placeholder="00.000.000/0000-00"
+                                        pattern="[0-9]{2}.[0-9]{3}.[0-9]{3}/[0-9]{4}-[0-9]{2}"
+                    _B_R_                 >
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="industry" class="form-label">Setor</label>
+                                    <select id="industry" name="industry" class="form-select">
+                                        <option value="">Selecione o setor</option>
+                                        <option value="technology">Tecnologia</option>
+                                        <option value="retail">Varejo</option>
+                                        <option value="services">Serviços</option>
+                                        <option value="manufacturing">Manufatura</option>
+                                        <option value="healthcare">Saúde</option>
+                                        <option value="education">Educação</option>
+e                                     <option value="finance">Financeiro</option>
+                                        <option value="real_estate">Imobiliário</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="company_size" class="form-label">Tamanho da Empresa</label>
+                                    <select id="company_size" name="size" class="form-select">
+                                        <option value="">Selecione o tamanho</option>
+                                        <option value="1-10">1-10 funcionários</option>
+                                        <option value="11-50">11-50 funcionários</option>
+                                        <option value="51-200">51-200 funcionários</option>
+                                        <option value="201-500">201-500 funcionários</option>
+                                        <option value="500+">500+ funcionários</option>
+                                    </select>
+                              _B_R_   </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="address" class="form-label">Endereço</label>
+                                <textarea 
+                                    id="address" 
+                                    name="address" 
+                                    rows="3" 
+                                    class="form-textarea" 
+                                    placeholder="Endereço completo da empresa"
+                                ></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="website" class="form-label">Website</label>
+                                    <input 
+                                        type="url" 
+                                        id="website" 
+                                        name="website" 
+                                        class="form-input" 
+                                        placeholder="https://suaempresa.com.br"
+                                    >
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="currency" class="form-label">Moeda</label>
+                                    <select id="currency" name="currency" class="form-select">
+                                        <option value="BRL">Real Brasileiro (R$)</option>
+                                        <option value="USD">Dólar Americano ($)</option>
+                                        <option value="EUR">Euro (€)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="description" class="form-label">Descrição da Empresa</label>
+                                <textarea 
+                                    id="description" 
+                                    name="description" 
+                                    rows="4" 
+                                    class="form-textarea" 
+                                    placeholder="Descreva sua empresa, missão e valores..."
+                                ></textarea>
+                            </div>
+                        </form>
+                        
+                                                <div class="mt-8 pt-8 border-t border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Configurações Organizacionais</h3>
+                            
+                            <form id="org-settings-form" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="form-group">
+                                        <label for="date_format" class="form-label">Formato de Data</label>
+                                        <select id="date_format" name="date_format" class="form-select">
+                                            <option value="dd/mm/yyyy">DD/MM/AAAA</option>
+                                            <option value="mm/dd/yyyy">MM/DD/AAAA</option>
+                                            <option value="yyyy-mm-dd">AAAA-MM-DD</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="time_format" class="form-label">Formato de Hora</label>
+                                        <select id="time_format" name="time_format" class="form-select">
+                                            <option value="24h">24 horas</option>
+                                            <option value="12h">12 horas (AM/PM)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-3">
+                                        <input 
+                                            type="checkbox" 
+                                            id="auto_assign_leads" 
+                                            name="auto_assign_leads" 
+                                            class="form-checkbox"
+                                        >
+                                        <label for="auto_assign_leads" class="text-sm font-medium text-gray-700">
+                                            Atribuição automática de leads
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-3">
+                                        <input 
+                                            type="checkbox" 
+                                            id="lead_scoring_enabled" 
+                                            name="lead_scoring_enabled" 
+                                            class="form-checkbox"
+                                        >
+                                        <label for="lead_scoring_enabled" class="text-sm font-medium text-gray-700">
+                                            Pontuação automática de leads
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Integrations Section -->
-                <div id="integrations-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🔗 Integrações</h2>
-                        <p class="text-gray-600">Conecte com ferramentas externas</p>
-                    </div>
-                    <div id="integrations-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+                                <section id="section-team" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="team-tab">
+                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">👥</span>
+                                    Gerenciamento de Equipe
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Gerencie membros da equipe, permissões e acessos</p>
+                            </div>
+                            <button 
+                                onclick="inviteTeamMember()"
+                                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                            >
+                                Convidar Membro
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                            <div class="bg-blue-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-blue-600" id="team-total-count">-</div>
+                                <div class="text-sm text-blue-700">Total de Membros</div>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-green-600" id="team-active-count">-</div>
+                                <div class="text-sm text-green-700">Membros Ativos</div>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-purple-600" id="team-online-count">-</div>
+                                <div class="text-sm text-purple-700">Online Agora</div>
+                            </div>
+                        </div>
+                        
+                                                <div id="team-members-list" class="space-y-4">
+                                                        
+                                                        <div class="loading-skeleton rounded-xl h-20"></div>
+                            <div class="loading-skeleton rounded-xl h-20"></div>
+                            <div class="loading-skeleton rounded-xl h-20"></div>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Security Section -->
-                <div id="security-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">🔒 Segurança</h2>
-                        <p class="text-gray-600">Proteja sua conta e dados</p>
-                    </div>
-                    <div id="security-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+                                <section id="section-notifications" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="notifications-tab">
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">🔔</span>
+                                    Configurações de Notificações
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Configure como e quando receber notificações</p>
+                            </div>
+                            <button 
+                                data-save="notifications"
+                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            >
+                                Salvar Notificações
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 space-y-8">
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">📧</span>
+                                Notificações por Email
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="email_new_leads" class="font-medium text-gray-700">Novos leads</label>
+                                        <p class="text-sm text-gray-600">Receba um email quando um novo lead for criado</p>
+                                    </div>
+                                    <input type="checkbox" id="email_new_leads" data-notification="email_new_leads" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="email_lead_assigned" class="font-medium text-gray-700">Lead atribuído</label>
+                                        <p class="text-sm text-gray-600">Quando um lead for atribuído a você</p>
+                                    </div>
+                                    <input type="checkbox" id="email_lead_assigned" data-notification="email_lead_assigned" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="email_deal_closed" class="font-medium text-gray-700">Negócio fechado</label>
+                                        <p class="text-sm text-gray-600">Quando um negócio for fechado na sua equipe</p>
+                                    </div>
+                                    <input type="checkbox" id="email_deal_closed" data-notification="email_deal_closed" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="email_weekly_report" class="font-medium text-gray-700">Relatório semanal</label>
+                                        <p class="text-sm text-gray-600">Resumo semanal de performance</p>
+                                    </div>
+                                    <input type="checkbox" id="email_weekly_report" data-notification="email_weekly_report" class="form-checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">📱</span>
+                          _B_R_       Notificações Push
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="push_new_leads" class="font-medium text-gray-700">Novos leads</label>
+                                        <p class="text-sm text-gray-600">Notificação instantânea para novos leads</p>
+                                    </div>
+                                    <input type="checkbox" id="push_new_leads" data-notification="push_new_leads" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="push_reminders" class="font-medium text-gray-700">Lembretes</label>
+                                        <p class="text-sm text-gray-600">Lembretes de tarefas e follow-ups</p>
+                                    </div>
+                                    <input type="checkbox" id="push_reminders" data-notification="push_reminders" class="form-checkbox">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="push_goals_achieved" class="font-medium text-gray-700">Metas alcançadas</label>
+                                        <p class="text-sm text-gray-600">Quando suas metas forem atingidas</p>
+                                    </div>
+                                    <input type="checkbox" id="push_goals_achieved" data-notification="push_goals_achieved" class="form-checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">🌙</span>
+                                Horário Silencioso
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="quiet_hours_enabled" data-notification="quiet_hours_enabled" class="form-checkbox">
+                                    <label for="quiet_hours_enabled" class="font-medium text-gray-700">
+                                        Ativar horário silencioso
+                                    </label>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 ml-7">
+                                    <div class="form-group">
+                                        <label for="quiet_hours_start" class="form-label">Início</label>
+                                        <input 
+                                            type="time" 
+                                            id="quiet_hours_start" 
+                                            data-notification="quiet_hours_start" 
+                                            class="form-input"
+                                        >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quiet_hours_end" class="form-label">Fim</label>
+                                        <input 
+                                            type="time" 
+                                            id="quiet_hours_end" 
+                                            data-notification="quiet_hours_end" 
+                                            class="form-input"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Billing Section -->
-                <div id="billing-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">💳 Faturamento</h2>
-                        <p class="text-gray-600">Gerencie planos e pagamentos</p>
-                    </div>
-                    <div id="billing-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
+                                <section id="section-integrations" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="integrations-tab">
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">🔗</span>
+                                    Integrações de Sistema
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Conecte com ferramentas externas e automatize workflows</p>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <span id="integrations-connected-count">-</span> de <span id="integrations-total-count">-</span> conectadas
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                                                <div class="mb-6">
+                            <div class="flex flex-wrap gap-2">
+                                <button class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
+                                    Todas
+                                </button>
+                                <button class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors">
+                                    Mensagens
+                                </button>
+                                <button class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors">
+                                    Email
+                                </button>
+                                <button class="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors">
+                                    Social
+                                </button>
+                                <button class="px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors">
+                                    Automação
+                                </button>
+                            </div>
+            _B_R_             </div>
+                        
+                                                <div id="integrations-list">
+                                                        
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="loading-skeleton rounded-xl h-32"></div>
+                                <div class="loading-skeleton rounded-xl h-32"></div>
+                                <div class="loading-skeleton rounded-xl h-32"></div>
+                                <div class="loading-skeleton rounded-xl h-32"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Analytics Section -->
-                <div id="analytics-section" class="settings-section bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hidden">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">📊 Analytics</h2>
-                        <p class="text-gray-600">Configure ferramentas de análise</p>
-                    </div>
-                    <div id="analytics-content">
-                        <!-- Conteúdo será injetado pelo JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+                                <section id="section-security" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="security-tab">
+                    <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">🔒</span>
+                                    Configurações de Segurança
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Proteja sua conta e dados com configurações avançadas</p>
+                            </div>
+                            <div id="security-status" class="text-sm">
+                                                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 space-y-8">
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">🔑</span>
+                                Senha e Autenticação
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-700">Alterar senha</div>
+                                        <p class="text-sm text-gray-600">Última alteração: <span id="password-last-changed">-</span></p>
+                                    </div>
+                                    <button 
+                                        onclick="changePassword()"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        Alterar
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-700">Autenticação de dois fatores (2FA)</div>
+                                        <p class="text-sm text-gray-600">Adicione uma camada extra de segurança</p>
+                                    </div>
+                                    <button 
+                                        onclick="enable2FA()"
+                                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                                    >
+                                        Configurar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">🛡️</span>
+                                Segurança de Login
+              _B_R_           </h3>
+                            
+                            <form id="security-form" class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="login_notifications" class="font-medium text-gray-700">Notificações de login</label>
+                                        <p class="text-sm text-gray-600">Receba alertas sobre novos logins</p>
+                                    </div>
+                                    <input type="checkbox" id="login_notifications" name="login_notifications" class="form-checkbox">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="session_timeout" class="form-label">Timeout de sessão (minutos)</label>
+                                    <select id="session_timeout" name="session_timeout" class="form-select">
+                                        <option value="60">1 hora</option>
+                                        <option value="240">4 horas</option>
+                                        <option value="480">8 horas</option>
+                                        <option value="1440">24 horas</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">📱</span>
+                                Dispositivos Confiáveis
+                            </h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <span class="text-blue-600 text-sm">💻</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-gray-700">Chrome no Windows</div>
+                                            <p class="text-sm text-gray-600">Último acesso: Agora</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">Atual</span>
+                                </div>
+                                
+                                <div class="text-center py-4">
+    _B_R_                         <p class="text-sm text-gray-600">Nenhum outro dispositivo confiável registrado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
-    <!-- Modal Container -->
-    <div id="modal-container"></div>
-
-    <script type="module" src="/src/main.js"></script>
-</body>
-</html>
-
+                                <section id="section-billing" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="billing-tab">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-5 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                    <span class="text-2xl mr-3" aria-hidden="true">💳</span>
+                                    Faturamento e Assinatura
+                                </h2>
+                                <p class="text-sm text-gray-600 mt-1">Gerencie planos, pagamentos e histórico de cobrança</p>
+                            </div>
+                            <span id="billing-status" class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                                Ativo
+                            </span>
+                        </div>
+                    </div>
+        _B_R_             
+                    <div class="p-6 space-y-8">
+                                                <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold">Plano Atual</h3>
+                                    <p class="text-blue-100">ALSHAM 360° PRIMA Premium</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold" id="billing-amount">R$ 297,00</div>
+                                    <p class="text-blue-100">por mês</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="text-center">
+                                    <div class="text-lg font-semibold">5.000</div>
+                                    <p class="text-blue-100 text-sm">Leads por mês</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-lg font-semibold">10</div>
+                                    <p class="text-blue-100 text-sm">Usuários</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-lg font-semibold">50</div>
+                                    <p class="text-blue-100 text-sm">Automações</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-3">
+                                <button 
+                                    onclick="upgradePlan()"
+                                    class="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                                >
+                                    Fazer Upgrade
+                                </button>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    Alterar Plano
+                                </button>
+                            </div>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">📊</span>
+                                Uso Atual
+                            </h3>
+                            
+                            <div id="usage-stats" class="space-y-4">
+                                                                
+                                                                <div class="loading-skeleton rounded-lg h-16"></div>
+                                <div class="loading-skeleton rounded-lg h-16"></div>
+                                <div class="loading-skeleton rounded-lg h-16"></div>
+                            </div>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="text-xl mr-2" aria-hidden="true">💳</span>
+                                Forma de Pagamento
+                            </h3>
+                            
+                            <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <span class="text-blue-600 font-bold">💳</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-700">Cartão de Crédito</div>
+                                        <p class="text-sm text-gray-600" id="billing-payment-method">•••• •••• •••• 4532</p>
+                                    </div>
+                                </div>
+                                <button class="text-blue-600 hover:text-blue-700 font-medium">
+                                    Alterar
+            _B_R_               </button>
+                            </div>
+                        </div>
+                        
+                                                <div class="bg-gray-50 rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                    <span class="text-xl mr-2" aria-hidden="true">📄</span>
+                                    Histórico de Faturas
+                                </h3>
+                                <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                    Ver todas
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-700">Janeiro 2025</div>
+                                        <p class="text-sm text-gray-600">Pago em 05/01/2025</p>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="font-medium text-gray-900">R$ 297,00</span>
+                                        <button 
+                                            onclick="downloadInvoice()"
+                                            class="text-blue-600 hover:text-blue-700 text-sm"
+                                        >
