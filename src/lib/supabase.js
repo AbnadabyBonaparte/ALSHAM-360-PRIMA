@@ -21,7 +21,7 @@ import { createClient } from '@supabase/supabase-js'
 // 4. [NOVO V8] Adicionadas todas as funções de autenticação que estavam faltando:
 //    - signInWithEmail, signInWithGoogle, signInWithMicrosoft
 //    - signUpWithEmail, signOut, getCurrentUser
-//    - resetPassword, updatePassword
+//    - resetPassword, updatePassword, onAuthStateChange
 // =========================================================================
 
 // =========================================================================
@@ -231,6 +231,32 @@ export async function updatePassword(newPassword) {
     return { data, error: null }
   } catch (error) {
     return { data: null, error: createError(`Erro inesperado na atualização: ${error.message}`) }
+  }
+}
+
+// NOVA FUNÇÃO: Monitorar mudanças no estado de autenticação
+export function onAuthStateChange(callback) {
+  if (typeof callback !== 'function') {
+    console.error('onAuthStateChange requer uma função callback')
+    return null
+  }
+
+  try {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      try {
+        callback(event, session)
+      } catch (error) {
+        console.error('Erro no callback de auth state change:', error)
+      }
+    })
+
+    // Retornar função para cancelar a inscrição
+    return () => {
+      subscription?.unsubscribe()
+    }
+  } catch (error) {
+    console.error('Erro ao configurar onAuthStateChange:', error)
+    return null
   }
 }
 
@@ -1612,4 +1638,4 @@ console.log('✅ ALSHAM 360° PRIMA - Supabase Library V8 carregada com sucesso!
 console.log('📊 55 tabelas/views conectadas e prontas para uso')
 console.log('🔐 Sistema de autenticação completo implementado')
 console.log('🛡️ Segurança multi-tenant ativada')
-
+console.log('🆕 Função onAuthStateChange adicionada e exportada')
