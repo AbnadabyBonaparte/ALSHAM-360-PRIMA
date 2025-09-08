@@ -1,28 +1,35 @@
-// ALSHAM 360° PRIMA - Sistema de Leads Ultimate Fusion 10/10
-// Combina a estrutura limpa do código atual com interface premium e recursos avançados
+// ALSHAM 360° PRIMA - Leads Real System CORRIGIDO
+// Interface premium para gestão completa de leads com CRM avançado
 
-import {
+import { 
     getCurrentUser,
     getLeads,
     createLead,
     updateLead,
-    deleteLead
+    deleteLead,
+    getLeadById,
+    getLeadInteractions,
+    createLeadInteraction,
+    getLeadSources,
+    getLeadTags,
+    getUserProfiles
 } from '../lib/supabase.js';
 
 // ===== ESTADO GLOBAL =====
 const leadsState = {
-    currentOrgId: null,
-    userProfile: null,
-    allLeads: [],
+    user: null,
+    currentUserProfile: null,
+    orgId: null,
+    leads: [],
     filteredLeads: [],
     selectedLeads: [],
     currentView: 'table', // table, grid, kanban
-    editingLead: null,
     filters: {
         search: '',
         status: '',
         period: '',
         priority: '',
+        source: '',
         assignee: ''
     },
     sorting: {
@@ -40,29 +47,54 @@ const leadsState = {
         qualified: 0,
         converted: 0,
         conversionRate: 0,
-        avgValue: 0,
-        totalValue: 0
+        avgValue: 0
     },
     isLoading: false,
-    bulkActionMode: false
+    isRefreshing: false,
+    error: null,
+    bulkActionMode: false,
+    editingLead: null,
+    leadSources: [],
+    leadTags: [],
+    teamMembers: [],
+    searchTimeout: null
 };
 
 // ===== CONFIGURAÇÕES =====
-const config = {
+const leadsConfig = {
     statusOptions: [
-        { value: 'new', label: 'Novo', color: 'blue', icon: '🆕' },
-        { value: 'contacted', label: 'Contatado', color: 'yellow', icon: '📞' },
-        { value: 'qualified', label: 'Qualificado', color: 'purple', icon: '✅' },
-        { value: 'proposal', label: 'Proposta', color: 'orange', icon: '📋' },
-        { value: 'converted', label: 'Convertido', color: 'green', icon: '💰' },
-        { value: 'lost', label: 'Perdido', color: 'red', icon: '❌' }
+        { value: 'novo', label: 'Novo', color: 'blue', icon: '🆕' },
+        { value: 'contatado', label: 'Contatado', color: 'yellow', icon: '📞' },
+        { value: 'qualificado', label: 'Qualificado', color: 'purple', icon: '✅' },
+        { value: 'proposta', label: 'Proposta', color: 'orange', icon: '📋' },
+        { value: 'convertido', label: 'Convertido', color: 'green', icon: '💰' },
+        { value: 'perdido', label: 'Perdido', color: 'red', icon: '❌' }
     ],
     priorityOptions: [
-        { value: 'low', label: 'Baixa', color: 'gray' },
-        { value: 'medium', label: 'Média', color: 'yellow' },
-        { value: 'high', label: 'Alta', color: 'orange' },
-        { value: 'urgent', label: 'Urgente', color: 'red' }
-    ]
+        { value: 'baixa', label: 'Baixa', color: 'gray' },
+        { value: 'media', label: 'Média', color: 'yellow' },
+        { value: 'alta', label: 'Alta', color: 'orange' },
+        { value: 'urgente', label: 'Urgente', color: 'red' }
+    ],
+    sourceOptions: [
+        { value: 'website', label: 'Website', icon: '🌐' },
+        { value: 'social_media', label: 'Redes Sociais', icon: '📱' },
+        { value: 'email_marketing', label: 'Email Marketing', icon: '📧' },
+        { value: 'referral', label: 'Indicação', icon: '👥' },
+        { value: 'cold_call', label: 'Cold Call', icon: '☎️' },
+        { value: 'event', label: 'Evento', icon: '🎯' },
+        { value: 'other', label: 'Outro', icon: '📌' }
+    ],
+    // CORRIGIDO: Classes CSS estáticas
+    statusStyles: {
+        novo: { bg: 'bg-blue-100', text: 'text-blue-800' },
+        contatado: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+        qualificado: { bg: 'bg-purple-100', text: 'text-purple-800' },
+        proposta: { bg: 'bg-orange-100', text: 'text-orange-800' },
+        convertido: { bg: 'bg-green-100', text: 'text-green-800' },
+        perdido: { bg: 'bg-red-100', text: 'text-red-800' },
+        default: { bg: 'bg-gray-100', text: 'text-gray-800' }
+    }
 };
 
 // ===== INICIALIZAÇÃO =====
@@ -70,931 +102,937 @@ document.addEventListener('DOMContentLoaded', initializeLeadsPage);
 
 async function initializeLeadsPage() {
     try {
-        showLoading(true, 'Inicializando sistema de leads...');
+        showLoading(true, 'Carregando sistema de leads...');
         
-        // Verifica usuário e perfil
-        const { user, profile } = await getCurrentUser();
-        if (!user || !profile) {
+        // CORRIGIDO: Melhor tratamento de autenticação
+        try {
+            const { user, profile, error } = await getCurrentUser();
+            if (error) {
+                console.error('Erro de autenticação:', error);
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            if (!user) {
+                console.log('Usuário não autenticado, redirecionando...');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            leadsState.user = user;
+            leadsState.currentUserProfile = profile;
+            leadsState.orgId = profile?.org_id || 'default-org-id';
+            
+        } catch (authError) {
+            console.error('Erro ao verificar autenticação:', authError);
             window.location.href = '/login.html';
             return;
         }
         
-        leadsState.currentOrgId = profile.org_id;
-        leadsState.userProfile = profile;
+        // Carregar dados auxiliares
+        await loadAuxiliaryData();
         
-        updateUserInfo(profile);
-        setupEventListeners();
+        // Carregar leads
         await loadLeads();
         
-        showLoading(false);
-        showSuccess('Sistema de leads carregado com sucesso!');
-        console.log('👥 Sistema de leads Ultimate Fusion inicializado');
+        // Configurar interface
+        setupEventListeners();
+        renderInterface();
         
-    } catch (err) {
-        showError('Erro ao carregar usuário ou leads: ' + err.message);
-        console.error(err);
+        leadsState.isLoading = false;
         showLoading(false);
+        
+        console.log('🎯 Sistema de Leads Real inicializado');
+        showSuccess('Sistema de leads carregado com sucesso!');
+        
+    } catch (error) {
+        console.error('❌ Erro ao inicializar leads:', error);
+        leadsState.error = error.message;
+        leadsState.isLoading = false;
+        showLoading(false);
+        showError(`Erro ao carregar leads: ${error.message}`);
         loadDemoData();
     }
-}
-
-// ===== CONFIGURAÇÃO DE EVENTOS =====
-function setupEventListeners() {
-    // Botões principais
-    document.getElementById('new-lead-btn')?.addEventListener('click', openNewLeadModal);
-    document.getElementById('empty-new-lead-btn')?.addEventListener('click', openNewLeadModal);
-    
-    // Modal
-    document.getElementById('close-modal')?.addEventListener('click', closeModal);
-    document.getElementById('cancel-lead')?.addEventListener('click', closeModal);
-    document.getElementById('lead-form')?.addEventListener('submit', handleLeadSubmit);
-    document.getElementById('lead-modal')?.addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-    });
-    
-    // Filtros e busca
-    document.getElementById('search-input')?.addEventListener('input', debounce(applyFilters, 200));
-    document.getElementById('status-filter')?.addEventListener('change', applyFilters);
-    document.getElementById('period-filter')?.addEventListener('change', applyFilters);
-    document.getElementById('priority-filter')?.addEventListener('change', applyFilters);
-    document.getElementById('clear-filters')?.addEventListener('click', clearFilters);
-    
-    // Visualizações
-    document.getElementById('view-table')?.addEventListener('click', () => switchView('table'));
-    document.getElementById('view-grid')?.addEventListener('click', () => switchView('grid'));
-    document.getElementById('view-kanban')?.addEventListener('click', () => switchView('kanban'));
-    
-    // Ações em massa
-    document.getElementById('select-all')?.addEventListener('change', handleSelectAll);
-    document.getElementById('bulk-delete')?.addEventListener('click', handleBulkDelete);
-    document.getElementById('bulk-update-status')?.addEventListener('click', handleBulkUpdateStatus);
-    
-    // Export/Import
-    document.getElementById('export-leads')?.addEventListener('click', exportLeads);
-    document.getElementById('import-leads')?.addEventListener('click', importLeads);
 }
 
 // ===== CARREGAMENTO DE DADOS =====
 async function loadLeads() {
-    try {
-        leadsState.isLoading = true;
-        showLoading(true, 'Carregando leads...');
-        
-        const { data, error } = await getLeads(leadsState.currentOrgId);
-        if (error) throw error;
-        
-        leadsState.allLeads = data || [];
-        leadsState.filteredLeads = [...leadsState.allLeads];
-        
-        calculateKPIs();
-        renderCurrentView();
-        updateLeadsCount();
-        updateKPICards();
-        
-    } catch (err) {
-        showError('Erro ao carregar leads: ' + err.message);
-        console.error(err);
-        loadDemoData();
-    } finally {
-        leadsState.isLoading = false;
-        showLoading(false);
-    }
-}
-
-function loadDemoData() {
-    leadsState.allLeads = [
-        {
-            id: '1',
-            name: 'Maria Silva Entrepreneurs',
-            email: 'maria.silva@techcorp.com.br',
-            phone: '+55 11 99999-1111',
-            company: 'Tech Corporation Brasil',
-            position: 'Diretora de TI',
-            status: 'qualified',
-            priority: 'high',
-            value: 45000,
-            notes: 'Interessada em migração para cloud. Orçamento pré-aprovado de R$ 50k.',
-            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            assignee: 'João Santos',
-            source: 'website',
-            score: 8.5
-        },
-        {
-            id: '2',
-            name: 'Pedro Costa Innovation',
-            email: 'pedro@inovastartup.com',
-            phone: '+55 11 88888-2222',
-            company: 'Inova Startup Ltda',
-            position: 'CEO & Founder',
-            status: 'new',
-            priority: 'medium',
-            value: 25000,
-            notes: 'Startup em crescimento rápido. Precisa escalar operações.',
-            created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-            assignee: 'Ana Oliveira',
-            source: 'referral',
-            score: 7.2
-        },
-        {
-            id: '3',
-            name: 'Ana Rodrigues Excellence',
-            email: 'ana.rodrigues@megacorp.com.br',
-            phone: '+55 11 77777-3333',
-            company: 'Mega Corporation',
-            position: 'VP of Operations',
-            status: 'proposal',
-            priority: 'urgent',
-            value: 120000,
-            notes: 'Proposta enviada. Decisão esperada até sexta-feira.',
-            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            assignee: 'Carlos Silva',
-            source: 'cold_call',
-            score: 9.1
-        },
-        {
-            id: '4',
-            name: 'Roberto Oliveira Scale',
-            email: 'roberto@scaletech.io',
-            phone: '+55 21 66666-4444',
-            company: 'Scale Technologies',
-            position: 'CTO',
-            status: 'converted',
-            priority: 'high',
-            value: 85000,
-            notes: 'Projeto concluído com sucesso. Cliente satisfeito.',
-            created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-            assignee: 'Marina Santos',
-            source: 'social_media',
-            score: 9.8
-        },
-        {
-            id: '5',
-            name: 'Juliana Mendes Future',
-            email: 'juliana@futuredev.com.br',
-            phone: '+55 11 55555-5555',
-            company: 'Future Development',
-            position: 'Project Manager',
-            status: 'contacted',
-            priority: 'low',
-            value: 15000,
-            notes: 'Primeira reunião marcada para próxima semana.',
-            created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            assignee: 'Pedro Lima',
-            source: 'email_marketing',
-            score: 6.4
-        }
-    ];
-    
-    leadsState.filteredLeads = [...leadsState.allLeads];
-    calculateKPIs();
-    renderCurrentView();
-    updateLeadsCount();
-    updateKPICards();
-}
-
-// ===== CÁLCULOS E KPIs =====
-function calculateKPIs() {
-    const leads = leadsState.allLeads;
-    const today = new Date().toDateString();
-    
-    leadsState.kpis = {
-        total: leads.length,
-        newToday: leads.filter(l => new Date(l.created_at).toDateString() === today).length,
-        qualified: leads.filter(l => ['qualified', 'proposal'].includes(l.status)).length,
-        converted: leads.filter(l => l.status === 'converted').length,
-        conversionRate: leads.length > 0 ? (leads.filter(l => l.status === 'converted').length / leads.length * 100).toFixed(1) : 0,
-        avgValue: leads.length > 0 ? Math.round(leads.reduce((sum, l) => sum + (l.value || 0), 0) / leads.length) : 0,
-        totalValue: leads.reduce((sum, l) => sum + (l.value || 0), 0)
-    };
-}
-
-function updateKPICards() {
-    const kpis = leadsState.kpis;
-    
-    const kpiData = [
-        { id: 'total-leads', label: 'Total de Leads', value: kpis.total, icon: '👥', color: 'blue', trend: '+5%' },
-        { id: 'new-today', label: 'Novos Hoje', value: kpis.newToday, icon: '🆕', color: 'green', trend: '+12%' },
-        { id: 'qualified', label: 'Qualificados', value: kpis.qualified, icon: '✅', color: 'purple', trend: '+8%' },
-        { id: 'converted', label: 'Convertidos', value: kpis.converted, icon: '💰', color: 'orange', trend: '+15%' },
-        { id: 'conversion-rate', label: 'Taxa Conversão', value: `${kpis.conversionRate}%`, icon: '📈', color: 'red', trend: '+3%' },
-        { id: 'avg-value', label: 'Valor Médio', value: formatCurrency(kpis.avgValue), icon: '💎', color: 'pink', trend: '+7%' }
-    ];
-    
-    const container = document.getElementById('kpi-cards');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            ${kpiData.map(kpi => `
-                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-${kpi.color}-100 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">${kpi.icon}</span>
-                        </div>
-                        <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">${kpi.trend}</span>
-                    </div>
-                    <p class="text-2xl font-bold text-gray-900 mb-1">${kpi.value}</p>
-                    <p class="text-sm text-gray-600">${kpi.label}</p>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-// ===== RENDERIZAÇÃO =====
-function renderCurrentView() {
-    if (!leadsState.filteredLeads.length) {
-        showEmptyState();
+    if (leadsState.isRefreshing) {
+        console.log('⏳ Carregamento já em andamento...');
         return;
     }
     
-    hideEmptyState();
-    
-    switch (leadsState.currentView) {
-        case 'table':
-            renderTableView();
-            break;
-        case 'grid':
-            renderGridView();
-            break;
-        case 'kanban':
-            renderKanbanView();
-            break;
-        default:
-            renderTableView();
+    try {
+        leadsState.isRefreshing = true;
+        
+        const result = await getLeads(leadsState.orgId, {
+            limit: 1000 // Carregar todos os leads para filtros locais
+        }).catch(err => ({ error: err }));
+        
+        if (result.error) {
+            throw new Error(result.error.message || 'Erro ao carregar leads');
+        }
+        
+        leadsState.leads = Array.isArray(result.data) ? result.data : [];
+        leadsState.filteredLeads = [...leadsState.leads];
+        
+        calculateKPIs();
+        applyFiltersAndSorting();
+        
+        console.log(`✅ ${leadsState.leads.length} leads carregados`);
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar leads:', error);
+        throw error;
+    } finally {
+        leadsState.isRefreshing = false;
+    }
+}
+
+async function loadAuxiliaryData() {
+    try {
+        // CORRIGIDO: Melhor tratamento de Promise.allSettled
+        const promises = [
+            getLeadSources(leadsState.orgId).catch(err => ({ error: err })),
+            getLeadTags(leadsState.orgId).catch(err => ({ error: err })),
+            getUserProfiles(leadsState.orgId).catch(err => ({ error: err }))
+        ];
+        
+        const [sourcesResult, tagsResult, teamResult] = await Promise.all(promises);
+        
+        if (sourcesResult && sourcesResult.data && !sourcesResult.error) {
+            leadsState.leadSources = Array.isArray(sourcesResult.data) ? sourcesResult.data : [];
+        } else if (sourcesResult?.error) {
+            console.warn('Erro ao carregar fontes de leads:', sourcesResult.error);
+        }
+        
+        if (tagsResult && tagsResult.data && !tagsResult.error) {
+            leadsState.leadTags = Array.isArray(tagsResult.data) ? tagsResult.data : [];
+        } else if (tagsResult?.error) {
+            console.warn('Erro ao carregar tags de leads:', tagsResult.error);
+        }
+        
+        if (teamResult && teamResult.data && !teamResult.error) {
+            leadsState.teamMembers = Array.isArray(teamResult.data) ? teamResult.data : [];
+        } else if (teamResult?.error) {
+            console.warn('Erro ao carregar membros da equipe:', teamResult.error);
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Erro ao carregar dados auxiliares:', error);
+        // Continua sem dados auxiliares
+    }
+}
+
+// ===== CÁLCULO DE KPIs =====
+function calculateKPIs() {
+    const leads = leadsState.leads;
+    if (!Array.isArray(leads)) {
+        console.warn('Dados de leads inválidos para cálculo de KPIs');
+        return;
     }
     
-    updateViewButtons();
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    leadsState.kpis.total = leads.length;
+    
+    // Leads de hoje
+    leadsState.kpis.newToday = leads.filter(lead => {
+        try {
+            return new Date(lead.created_at) >= startOfToday;
+        } catch (e) {
+            return false;
+        }
+    }).length;
+    
+    // Leads qualificados
+    leadsState.kpis.qualified = leads.filter(lead => 
+        lead.status === 'qualificado' || lead.status === 'qualified'
+    ).length;
+    
+    // Leads convertidos
+    leadsState.kpis.converted = leads.filter(lead => 
+        lead.status === 'convertido' || lead.status === 'converted'
+    ).length;
+    
+    // Taxa de conversão
+    leadsState.kpis.conversionRate = leadsState.kpis.total > 0 
+        ? ((leadsState.kpis.converted / leadsState.kpis.total) * 100).toFixed(1)
+        : 0;
+    
+    // Valor médio
+    const leadsWithValue = leads.filter(lead => {
+        const value = parseFloat(lead.value);
+        return !isNaN(value) && value > 0;
+    });
+    
+    leadsState.kpis.avgValue = leadsWithValue.length > 0
+        ? Math.round(leadsWithValue.reduce((sum, lead) => sum + parseFloat(lead.value), 0) / leadsWithValue.length)
+        : 0;
 }
 
-function renderTableView() {
-    const tbody = document.getElementById('leads-table-body');
-    if (!tbody) return;
+// ===== FILTROS E ORDENAÇÃO =====
+function applyFiltersAndSorting() {
+    let filtered = [...leadsState.leads];
     
-    tbody.innerHTML = leadsState.filteredLeads.map(lead => `
-        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-            <td class="py-4 px-4">
-                <input type="checkbox" class="lead-checkbox rounded border-gray-300" value="${lead.id}">
-            </td>
-            <td class="py-4 px-6">
-                <div class="flex items-center space-x-3">
-                    <div class="relative">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm font-semibold">${getInitials(lead.name)}</span>
-                        </div>
-                        ${lead.score ? `<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 text-white text-xs rounded-full flex items-center justify-center">${lead.score}</div>` : ''}
-                    </div>
+    // Aplicar filtros
+    if (leadsState.filters.search) {
+        const search = leadsState.filters.search.toLowerCase().trim();
+        filtered = filtered.filter(lead => {
+            const name = (lead.name || '').toLowerCase();
+            const email = (lead.email || '').toLowerCase();
+            const company = (lead.company || '').toLowerCase();
+            
+            return name.includes(search) || 
+                   email.includes(search) || 
+                   company.includes(search);
+        });
+    }
+    
+    if (leadsState.filters.status) {
+        filtered = filtered.filter(lead => lead.status === leadsState.filters.status);
+    }
+    
+    if (leadsState.filters.priority) {
+        filtered = filtered.filter(lead => lead.priority === leadsState.filters.priority);
+    }
+    
+    if (leadsState.filters.source) {
+        filtered = filtered.filter(lead => lead.source === leadsState.filters.source);
+    }
+    
+    if (leadsState.filters.assignee) {
+        filtered = filtered.filter(lead => lead.assigned_to === leadsState.filters.assignee);
+    }
+    
+    // Aplicar ordenação
+    filtered.sort((a, b) => {
+        const field = leadsState.sorting.field;
+        const direction = leadsState.sorting.direction === 'asc' ? 1 : -1;
+        
+        let aValue = a[field];
+        let bValue = b[field];
+        
+        // Tratar valores nulos/undefined
+        if (aValue == null) aValue = '';
+        if (bValue == null) bValue = '';
+        
+        // Tratar datas
+        if (field.includes('_at') || field === 'created_at') {
+            try {
+                aValue = new Date(aValue);
+                bValue = new Date(bValue);
+            } catch (e) {
+                aValue = new Date(0);
+                bValue = new Date(0);
+            }
+        }
+        
+        // Tratar números
+        if (field === 'value') {
+            aValue = parseFloat(aValue) || 0;
+            bValue = parseFloat(bValue) || 0;
+        }
+        
+        // Tratar strings
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+            return aValue.localeCompare(bValue) * direction;
+        }
+        
+        if (aValue < bValue) return -1 * direction;
+        if (aValue > bValue) return 1 * direction;
+        return 0;
+    });
+    
+    leadsState.filteredLeads = filtered;
+    leadsState.pagination.totalItems = filtered.length;
+    
+    // Resetar para primeira página se necessário
+    const maxPage = Math.ceil(leadsState.pagination.totalItems / leadsState.pagination.itemsPerPage) || 1;
+    if (leadsState.pagination.currentPage > maxPage) {
+        leadsState.pagination.currentPage = 1;
+    }
+}
+
+// ===== CRUD OPERATIONS =====
+async function createNewLead(leadData) {
+    try {
+        showLoading(true, 'Criando lead...');
+        
+        const result = await createLead(leadData, leadsState.orgId);
+        
+        if (result.error) {
+            throw new Error(result.error.message || 'Erro ao criar lead');
+        }
+        
+        // Adicionar à lista local
+        if (result.data) {
+            leadsState.leads.unshift(result.data);
+            calculateKPIs();
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+        
+        showSuccess('Lead criado com sucesso!');
+        console.log('✅ Lead criado:', result.data);
+        
+        return result.data;
+        
+    } catch (error) {
+        console.error('❌ Erro ao criar lead:', error);
+        showError(`Erro ao criar lead: ${error.message}`);
+        throw error;
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function updateExistingLead(leadId, leadData) {
+    try {
+        showLoading(true, 'Atualizando lead...');
+        
+        const result = await updateLead(leadId, leadData, leadsState.orgId);
+        
+        if (result.error) {
+            throw new Error(result.error.message || 'Erro ao atualizar lead');
+        }
+        
+        // Atualizar na lista local
+        if (result.data) {
+            const index = leadsState.leads.findIndex(lead => lead.id === leadId);
+            if (index !== -1) {
+                leadsState.leads[index] = result.data;
+            }
+            
+            calculateKPIs();
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+        
+        showSuccess('Lead atualizado com sucesso!');
+        console.log('✅ Lead atualizado:', result.data);
+        
+        return result.data;
+        
+    } catch (error) {
+        console.error('❌ Erro ao atualizar lead:', error);
+        showError(`Erro ao atualizar lead: ${error.message}`);
+        throw error;
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function deleteExistingLead(leadId) {
+    try {
+        if (!showConfirmDialog('Tem certeza que deseja excluir este lead?')) {
+            return;
+        }
+        
+        showLoading(true, 'Excluindo lead...');
+        
+        const result = await deleteLead(leadId, leadsState.orgId);
+        
+        if (result.error) {
+            throw new Error(result.error.message || 'Erro ao excluir lead');
+        }
+        
+        // Remover da lista local
+        leadsState.leads = leadsState.leads.filter(lead => lead.id !== leadId);
+        leadsState.selectedLeads = leadsState.selectedLeads.filter(id => id !== leadId);
+        
+        calculateKPIs();
+        applyFiltersAndSorting();
+        renderInterface();
+        
+        showSuccess('Lead excluído com sucesso!');
+        console.log('✅ Lead excluído:', leadId);
+        
+    } catch (error) {
+        console.error('❌ Erro ao excluir lead:', error);
+        showError(`Erro ao excluir lead: ${error.message}`);
+        throw error;
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ===== RENDERIZAÇÃO =====
+function renderInterface() {
+    try {
+        renderKPIs();
+        renderFilters();
+        renderLeadsTable();
+        renderPagination();
+    } catch (error) {
+        console.error('Erro ao renderizar interface:', error);
+    }
+}
+
+function renderKPIs() {
+    const kpisContainer = document.getElementById('kpis-section');
+    if (!kpisContainer) return;
+    
+    kpisContainer.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+            <div class="bg-white rounded-lg p-4 shadow-sm border">
+                <div class="flex items-center justify-between">
                     <div>
-                        <div class="font-medium text-gray-900">${lead.name || 'N/A'}</div>
-                        <div class="text-sm text-gray-500">${lead.company || ''}</div>
-                        <div class="text-xs text-gray-400">${lead.position || ''}</div>
+                        <p class="text-sm text-gray-600">Total</p>
+                        <p class="text-2xl font-bold text-gray-900">${leadsState.kpis.total.toLocaleString('pt-BR')}</p>
                     </div>
+                    <div class="text-blue-600">👥</div>
                 </div>
-            </td>
-            <td class="py-4 px-6">
-                <div class="text-gray-900">${lead.email || 'N/A'}</div>
-                <div class="text-sm text-gray-500">${lead.phone || ''}</div>
-            </td>
-            <td class="py-4 px-6">
-                <div class="flex items-center space-x-2">
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(lead.status)}">
-                        ${getStatusIcon(lead.status)} ${getStatusLabel(lead.status)}
-                    </span>
-                    ${lead.priority ? `<span class="w-2 h-2 rounded-full bg-${getPriorityColor(lead.priority)}-500"></span>` : ''}
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 shadow-sm border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Hoje</p>
+                        <p class="text-2xl font-bold text-green-600">${leadsState.kpis.newToday.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div class="text-green-600">🆕</div>
                 </div>
-            </td>
-            <td class="py-4 px-6">
-                <div class="font-medium text-gray-900">${formatCurrency(lead.value || 0)}</div>
-                <div class="text-sm text-gray-500">${lead.assignee || 'Não atribuído'}</div>
-            </td>
-            <td class="py-4 px-6">
-                <div class="text-gray-600">${formatDate(lead.created_at)}</div>
-                <div class="text-xs text-gray-500">${formatTimeAgo(lead.created_at)}</div>
-            </td>
-            <td class="py-4 px-6">
-                <div class="flex items-center space-x-2">
-                    <button type="button" class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all" onclick="editLead('${lead.id}')" title="Editar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                    </button>
-                    <button type="button" class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all" onclick="contactLead('${lead.id}', 'phone')" title="Ligar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                    </button>
-                    <button type="button" class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all" onclick="contactLead('${lead.id}', 'email')" title="Email">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                    </button>
-                    <button type="button" class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all" onclick="deleteLeadHandler('${lead.id}')" title="Excluir">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                    </button>
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 shadow-sm border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Qualificados</p>
+                        <p class="text-2xl font-bold text-purple-600">${leadsState.kpis.qualified.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div class="text-purple-600">✅</div>
                 </div>
-            </td>
-        </tr>
-    `).join('');
-    
-    setupTableCheckboxes();
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 shadow-sm border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Convertidos</p>
+                        <p class="text-2xl font-bold text-green-600">${leadsState.kpis.converted.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div class="text-green-600">💰</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 shadow-sm border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Taxa Conversão</p>
+                        <p class="text-2xl font-bold text-blue-600">${leadsState.kpis.conversionRate}%</p>
+                    </div>
+                    <div class="text-blue-600">📈</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 shadow-sm border">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Valor Médio</p>
+                        <p class="text-2xl font-bold text-orange-600">R$ ${leadsState.kpis.avgValue.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div class="text-orange-600">💎</div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
-function renderGridView() {
-    const grid = document.getElementById('leads-grid');
-    if (!grid) return;
+function renderFilters() {
+    const filtersContainer = document.getElementById('filters-section');
+    if (!filtersContainer) return;
     
-    grid.innerHTML = leadsState.filteredLeads.map(lead => `
-        <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
-            <div class="absolute top-4 right-4">
-                <input type="checkbox" class="lead-checkbox rounded border-gray-300" value="${lead.id}">
+    filtersContainer.innerHTML = `
+        <div class="bg-white rounded-lg p-4 shadow-sm border mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                <div>
+                    <input type="text" 
+                           id="search-input"
+                           placeholder="Buscar leads..." 
+                           value="${escapeHtml(leadsState.filters.search)}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <select id="status-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos os Status</option>
+                        ${leadsConfig.statusOptions.map(option => `
+                            <option value="${escapeHtml(option.value)}" ${leadsState.filters.status === option.value ? 'selected' : ''}>
+                                ${escapeHtml(option.label)}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div>
+                    <select id="priority-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todas as Prioridades</option>
+                        ${leadsConfig.priorityOptions.map(option => `
+                            <option value="${escapeHtml(option.value)}" ${leadsState.filters.priority === option.value ? 'selected' : ''}>
+                                ${escapeHtml(option.label)}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div>
+                    <select id="source-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todas as Fontes</option>
+                        ${leadsConfig.sourceOptions.map(option => `
+                            <option value="${escapeHtml(option.value)}" ${leadsState.filters.source === option.value ? 'selected' : ''}>
+                                ${escapeHtml(option.label)}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div>
+                    <button id="clear-filters" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                        Limpar Filtros
+                    </button>
+                </div>
+                
+                <div>
+                    <button id="new-lead-btn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        + Novo Lead
+                    </button>
+                </div>
             </div>
-            
-            <div class="flex items-center justify-between mb-4">
-                <div class="relative">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <span class="text-white font-semibold">${getInitials(lead.name)}</span>
-                    </div>
-                    ${lead.score ? `<div class="absolute -bottom-1 -right-1 w-6 h-6 bg-purple-500 text-white text-xs rounded-full flex items-center justify-center">${lead.score}</div>` : ''}
-                </div>
-                <div class="flex items-center space-x-2">
-                    ${lead.priority ? `<span class="w-3 h-3 rounded-full bg-${getPriorityColor(lead.priority)}-500"></span>` : ''}
-                    <span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(lead.status)}">
-                        ${getStatusIcon(lead.status)} ${getStatusLabel(lead.status)}
-                    </span>
-                </div>
+        </div>
+    `;
+}
+
+function renderLeadsTable() {
+    const tableContainer = document.getElementById('leads-table-container');
+    if (!tableContainer) return;
+    
+    const startIndex = (leadsState.pagination.currentPage - 1) * leadsState.pagination.itemsPerPage;
+    const endIndex = startIndex + leadsState.pagination.itemsPerPage;
+    const paginatedLeads = leadsState.filteredLeads.slice(startIndex, endIndex);
+    
+    if (paginatedLeads.length === 0) {
+        tableContainer.innerHTML = `
+            <div class="bg-white rounded-lg shadow-sm border p-8 text-center">
+                <div class="text-gray-400 text-6xl mb-4">🎯</div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum lead encontrado</h3>
+                <p class="text-gray-600 mb-4">Não há leads que correspondam aos filtros aplicados.</p>
+                <button id="clear-filters-empty" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Limpar Filtros
+                </button>
             </div>
-            
-            <div class="mb-4">
-                <h3 class="font-semibold text-gray-900 mb-1">${lead.name || 'N/A'}</h3>
-                <p class="text-sm text-gray-600">${lead.company || 'Empresa não informada'}</p>
-                <p class="text-xs text-gray-500">${lead.position || ''}</p>
-                <p class="text-sm text-gray-600 mt-1">${lead.email || ''}</p>
+        `;
+        return;
+    }
+    
+    tableContainer.innerHTML = `
+        <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <input type="checkbox" id="select-all" class="rounded">
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="name">
+                                Nome ${getSortIcon('name')}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="email">
+                                Email ${getSortIcon('email')}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="status">
+                                Status ${getSortIcon('status')}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="source">
+                                Fonte ${getSortIcon('source')}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="value">
+                                Valor ${getSortIcon('value')}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="created_at">
+                                Criado ${getSortIcon('created_at')}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${paginatedLeads.map(lead => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="checkbox" class="lead-checkbox rounded" value="${escapeHtml(lead.id)}">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="text-sm font-medium text-gray-900">${escapeHtml(lead.name || 'N/A')}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">${escapeHtml(lead.email || 'N/A')}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    ${renderStatusBadge(lead.status)}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">${escapeHtml(getSourceLabel(lead.source))}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        ${lead.value ? `R$ ${parseFloat(lead.value).toLocaleString('pt-BR')}` : '-'}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        ${formatDate(lead.created_at)}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button class="text-blue-600 hover:text-blue-900" data-action="edit" data-id="${escapeHtml(lead.id)}">
+                                            Editar
+                                        </button>
+                                        <button class="text-red-600 hover:text-red-900" data-action="delete" data-id="${escapeHtml(lead.id)}">
+                                            Excluir
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
-            
-            <div class="space-y-2 mb-4">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">Valor:</span>
-                    <span class="font-semibold text-gray-900">${formatCurrency(lead.value || 0)}</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">Responsável:</span>
-                    <span class="text-gray-900">${lead.assignee || 'Não atribuído'}</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">Criado:</span>
-                    <span class="text-gray-900">${formatDate(lead.created_at)}</span>
-                </div>
+        </div>
+    `;
+}
+
+function renderPagination() {
+    const paginationContainer = document.getElementById('pagination-section');
+    if (!paginationContainer) return;
+    
+    const totalPages = Math.ceil(leadsState.pagination.totalItems / leadsState.pagination.itemsPerPage);
+    const currentPage = leadsState.pagination.currentPage;
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    const startItem = ((currentPage - 1) * leadsState.pagination.itemsPerPage) + 1;
+    const endItem = Math.min(currentPage * leadsState.pagination.itemsPerPage, leadsState.pagination.totalItems);
+    
+    paginationContainer.innerHTML = `
+        <div class="flex items-center justify-between mt-6">
+            <div class="text-sm text-gray-700">
+                Mostrando ${startItem.toLocaleString('pt-BR')} a 
+                ${endItem.toLocaleString('pt-BR')} 
+                de ${leadsState.pagination.totalItems.toLocaleString('pt-BR')} leads
             </div>
-            
-            ${lead.notes ? `
-                <div class="mb-4">
-                    <p class="text-xs text-gray-600 bg-gray-50 p-2 rounded">${lead.notes.substring(0, 100)}${lead.notes.length > 100 ? '...' : ''}</p>
-                </div>
-            ` : ''}
             
             <div class="flex space-x-2">
-                <button type="button" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors" onclick="editLead('${lead.id}')">
-                    ✏️ Editar
+                <button ${currentPage === 1 ? 'disabled' : ''} 
+                        class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-page="${currentPage - 1}">
+                    Anterior
                 </button>
-                <button type="button" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors" onclick="contactLead('${lead.id}', 'phone')">
-                    📞
-                </button>
-                <button type="button" class="px-3 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors" onclick="contactLead('${lead.id}', 'email')">
-                    📧
+                
+                ${generatePageButtons(currentPage, totalPages)}
+                
+                <button ${currentPage === totalPages ? 'disabled' : ''} 
+                        class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-page="${currentPage + 1}">
+                    Próximo
                 </button>
             </div>
-        </div>
-    `).join('');
-    
-    setupGridCheckboxes();
-}
-
-function renderKanbanView() {
-    const container = document.getElementById('leads-kanban');
-    if (!container) return;
-    
-    const statusGroups = groupLeadsByStatus();
-    
-    container.innerHTML = `
-        <div class="flex space-x-6 overflow-x-auto pb-6">
-            ${config.statusOptions.map(status => `
-                <div class="flex-shrink-0 w-80">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                        <div class="p-4 border-b border-gray-200 bg-${status.color}-50">
-                            <div class="flex items-center justify-between">
-                                <h3 class="font-semibold text-gray-900 flex items-center">
-                                    <span class="mr-2">${status.icon}</span>
-                                    ${status.label}
-                                </h3>
-                                <span class="bg-${status.color}-100 text-${status.color}-800 text-xs font-medium px-2 py-1 rounded-full">
-                                    ${statusGroups[status.value]?.length || 0}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="p-4 space-y-3 max-h-96 overflow-y-auto">
-                            ${(statusGroups[status.value] || []).map(lead => renderKanbanCard(lead)).join('')}
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
         </div>
     `;
 }
 
-function renderKanbanCard(lead) {
+// ===== UTILITÁRIOS =====
+// CORRIGIDO: Status badge com classes estáticas
+function renderStatusBadge(status) {
+    const statusConfig = leadsConfig.statusOptions.find(s => s.value === status) || 
+                        { label: status || 'N/A', color: 'gray', icon: '❓' };
+    
+    const styles = leadsConfig.statusStyles[status] || leadsConfig.statusStyles.default;
+    
     return `
-        <div class="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:shadow-sm transition-all cursor-pointer" onclick="viewLead('${lead.id}')">
-            <div class="flex items-start justify-between mb-2">
-                <h4 class="font-medium text-gray-900 text-sm">${lead.name}</h4>
-                ${lead.priority ? `<span class="w-2 h-2 rounded-full bg-${getPriorityColor(lead.priority)}-500"></span>` : ''}
-            </div>
-            <p class="text-xs text-gray-600 mb-2">${lead.company || 'Empresa não informada'}</p>
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-medium text-gray-900">${formatCurrency(lead.value || 0)}</span>
-                ${lead.score ? `<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${lead.score}</span>` : ''}
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-xs text-gray-500">${lead.assignee || 'Não atribuído'}</span>
-                <span class="text-xs text-gray-500">${formatTimeAgo(lead.created_at)}</span>
-            </div>
-        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles.bg} ${styles.text}">
+            <span class="mr-1">${statusConfig.icon}</span>
+            ${escapeHtml(statusConfig.label)}
+        </span>
     `;
 }
 
-function groupLeadsByStatus() {
-    const groups = {};
-    config.statusOptions.forEach(status => {
-        groups[status.value] = [];
-    });
-    
-    leadsState.filteredLeads.forEach(lead => {
-        if (groups[lead.status]) {
-            groups[lead.status].push(lead);
-        }
-    });
-    
-    return groups;
+function getSourceLabel(source) {
+    const sourceConfig = leadsConfig.sourceOptions.find(s => s.value === source);
+    return sourceConfig ? `${sourceConfig.icon} ${sourceConfig.label}` : (source || 'N/A');
 }
 
-// ===== MODAL E FORMULÁRIO =====
-function openNewLeadModal() {
-    leadsState.editingLead = null;
-    document.getElementById('modal-title').textContent = 'Novo Lead';
-    document.getElementById('lead-form').reset();
-    document.getElementById('lead-modal').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
+function getSortIcon(field) {
+    if (leadsState.sorting.field !== field) return '';
+    return leadsState.sorting.direction === 'asc' ? '▲' : '▼';
 }
 
-function openEditLeadModal(lead) {
-    leadsState.editingLead = lead;
-    document.getElementById('modal-title').textContent = 'Editar Lead';
+function generatePageButtons(currentPage, totalPages) {
+    const buttons = [];
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
     
-    // Preencher formulário
-    document.getElementById('lead-name').value = lead.name || '';
-    document.getElementById('lead-email').value = lead.email || '';
-    document.getElementById('lead-phone').value = lead.phone || '';
-    document.getElementById('lead-company').value = lead.company || '';
-    document.getElementById('lead-position').value = lead.position || '';
-    document.getElementById('lead-status').value = lead.status || 'new';
-    document.getElementById('lead-priority').value = lead.priority || 'medium';
-    document.getElementById('lead-value').value = lead.value || '';
-    document.getElementById('lead-assignee').value = lead.assignee || '';
-    document.getElementById('lead-notes').value = lead.notes || '';
-    
-    document.getElementById('lead-modal').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeModal() {
-    document.getElementById('lead-modal').classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-    leadsState.editingLead = null;
-}
-
-async function handleLeadSubmit(e) {
-    e.preventDefault();
-    
-    const formData = {
-        name: document.getElementById('lead-name').value,
-        email: document.getElementById('lead-email').value,
-        phone: document.getElementById('lead-phone').value,
-        company: document.getElementById('lead-company').value,
-        position: document.getElementById('lead-position').value,
-        status: document.getElementById('lead-status').value,
-        priority: document.getElementById('lead-priority').value,
-        value: parseFloat(document.getElementById('lead-value').value) || 0,
-        assignee: document.getElementById('lead-assignee').value,
-        notes: document.getElementById('lead-notes').value
-    };
-    
-    try {
-        showLoading(true, leadsState.editingLead ? 'Atualizando lead...' : 'Criando lead...');
-        
-        if (leadsState.editingLead) {
-            const { error } = await updateLead(leadsState.editingLead.id, formData, leadsState.currentOrgId);
-            if (error) throw error;
-            showSuccess('Lead atualizado com sucesso!');
-        } else {
-            const { error } = await createLead(formData, leadsState.currentOrgId);
-            if (error) throw error;
-            showSuccess('Lead criado com sucesso!');
-        }
-        
-        closeModal();
-        await loadLeads();
-        
-    } catch (err) {
-        showError('Erro ao salvar lead: ' + err.message);
-        console.error(err);
-    } finally {
-        showLoading(false);
+    for (let page = startPage; page <= endPage; page++) {
+        const isActive = page === currentPage;
+        buttons.push(`
+            <button class="px-3 py-2 text-sm ${isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'} border border-gray-300 rounded-md hover:bg-gray-50"
+                    data-page="${page}">
+                ${page}
+            </button>
+        `);
     }
-}
-
-// ===== AÇÕES DOS LEADS =====
-window.editLead = function(leadId) {
-    const lead = leadsState.allLeads.find(l => l.id === leadId);
-    if (lead) openEditLeadModal(lead);
-};
-
-window.viewLead = function(leadId) {
-    const lead = leadsState.allLeads.find(l => l.id === leadId);
-    if (lead) {
-        showSuccess(`Visualizando ${lead.name}`);
-        // Implementar modal de visualização detalhada
-    }
-};
-
-window.deleteLeadHandler = async function(leadId) {
-    if (!confirm('Tem certeza que deseja excluir este lead?')) return;
     
-    try {
-        showLoading(true, 'Excluindo lead...');
-        const { error } = await deleteLead(leadId, leadsState.currentOrgId);
-        if (error) throw error;
-        showSuccess('Lead excluído com sucesso!');
-        await loadLeads();
-    } catch (err) {
-        showError('Erro ao excluir lead: ' + err.message);
-        console.error(err);
-    } finally {
-        showLoading(false);
-    }
-};
-
-window.contactLead = function(leadId, method) {
-    const lead = leadsState.allLeads.find(l => l.id === leadId);
-    if (!lead) return;
-    
-    if (method === 'phone') {
-        if (lead.phone) {
-            window.open(`tel:${lead.phone.replace(/\D/g, '')}`);
-            showSuccess(`Ligando para ${lead.name}`);
-        } else {
-            showError('Telefone não cadastrado');
-        }
-    } else if (method === 'email') {
-        if (lead.email) {
-            window.open(`mailto:${lead.email}?subject=Contato - ALSHAM 360°&body=Olá ${lead.name}, gostaria de conversar sobre nossa proposta.`);
-            showSuccess(`Abrindo email para ${lead.name}`);
-        } else {
-            showError('Email não cadastrado');
-        }
-    }
-};
-
-// ===== FILTROS E BUSCA =====
-function applyFilters() {
-    const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
-    const statusFilter = document.getElementById('status-filter')?.value || '';
-    const periodFilter = document.getElementById('period-filter')?.value || '';
-    const priorityFilter = document.getElementById('priority-filter')?.value || '';
-    
-    leadsState.filteredLeads = leadsState.allLeads.filter(lead => {
-        const matchesSearch = !searchTerm ||
-            (lead.name && lead.name.toLowerCase().includes(searchTerm)) ||
-            (lead.email && lead.email.toLowerCase().includes(searchTerm)) ||
-            (lead.company && lead.company.toLowerCase().includes(searchTerm));
-            
-        const matchesStatus = !statusFilter || lead.status === statusFilter;
-        const matchesPriority = !priorityFilter || lead.priority === priorityFilter;
-        const matchesPeriod = !periodFilter || matchesPeriodFilter(lead.created_at, periodFilter);
-        
-        return matchesSearch && matchesStatus && matchesPriority && matchesPeriod;
-    });
-    
-    renderCurrentView();
-    updateLeadsCount();
-}
-
-function matchesPeriodFilter(dateString, period) {
-    if (!dateString) return false;
-    const date = new Date(dateString);
-    const now = new Date();
-    
-    switch (period) {
-        case 'today':
-            return date.toDateString() === now.toDateString();
-        case 'week':
-            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            return date >= weekAgo;
-        case 'month':
-            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-        case 'quarter':
-            const quarter = Math.floor(now.getMonth() / 3);
-            const leadQuarter = Math.floor(date.getMonth() / 3);
-            return leadQuarter === quarter && date.getFullYear() === now.getFullYear();
-        default:
-            return true;
-    }
-}
-
-function clearFilters() {
-    document.getElementById('search-input').value = '';
-    document.getElementById('status-filter').value = '';
-    document.getElementById('period-filter').value = '';
-    document.getElementById('priority-filter').value = '';
-    applyFilters();
-}
-
-// ===== VISUALIZAÇÕES =====
-function switchView(view) {
-    leadsState.currentView = view;
-    
-    // Esconder todas as views
-    document.getElementById('leads-table-view')?.classList.add('hidden');
-    document.getElementById('leads-grid-view')?.classList.add('hidden');
-    document.getElementById('leads-kanban-view')?.classList.add('hidden');
-    
-    // Mostrar view ativa
-    document.getElementById(`leads-${view}-view`)?.classList.remove('hidden');
-    
-    renderCurrentView();
-}
-
-function updateViewButtons() {
-    const buttons = ['view-table', 'view-grid', 'view-kanban'];
-    buttons.forEach(btnId => {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
-        
-        const view = btnId.split('-')[1];
-        const isActive = view === leadsState.currentView;
-        
-        btn.classList.toggle('text-primary', isActive);
-        btn.classList.toggle('bg-primary', isActive);
-        btn.classList.toggle('text-white', isActive);
-        btn.classList.toggle('text-gray-400', !isActive);
-        btn.classList.toggle('bg-gray-100', !isActive);
-    });
-}
-
-// ===== AÇÕES EM MASSA =====
-function handleSelectAll(e) {
-    const checkboxes = document.querySelectorAll('.lead-checkbox');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = e.target.checked;
-    });
-    updateBulkActionBar();
-}
-
-function updateBulkActionBar() {
-    const selectedCheckboxes = document.querySelectorAll('.lead-checkbox:checked');
-    const bulkBar = document.getElementById('bulk-action-bar');
-    
-    if (selectedCheckboxes.length > 0) {
-        bulkBar?.classList.remove('hidden');
-        const countEl = bulkBar?.querySelector('#selected-count');
-        if (countEl) countEl.textContent = selectedCheckboxes.length;
-    } else {
-        bulkBar?.classList.add('hidden');
-    }
-}
-
-function setupTableCheckboxes() {
-    const checkboxes = document.querySelectorAll('.lead-checkbox');
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateBulkActionBar);
-    });
-}
-
-function setupGridCheckboxes() {
-    setupTableCheckboxes(); // Mesma lógica
-}
-
-function handleBulkDelete() {
-    const selected = Array.from(document.querySelectorAll('.lead-checkbox:checked')).map(cb => cb.value);
-    if (selected.length === 0) return;
-    
-    if (confirm(`Tem certeza que deseja excluir ${selected.length} leads?`)) {
-        showSuccess('Função de exclusão em massa em desenvolvimento');
-    }
-}
-
-function handleBulkUpdateStatus() {
-    const selected = Array.from(document.querySelectorAll('.lead-checkbox:checked')).map(cb => cb.value);
-    if (selected.length === 0) return;
-    
-    showSuccess('Função de atualização em massa em desenvolvimento');
-}
-
-// ===== IMPORT/EXPORT =====
-function exportLeads() {
-    const data = leadsState.filteredLeads.map(lead => ({
-        Nome: lead.name,
-        Email: lead.email,
-        Telefone: lead.phone,
-        Empresa: lead.company,
-        Cargo: lead.position,
-        Status: getStatusLabel(lead.status),
-        Prioridade: lead.priority,
-        Valor: lead.value,
-        Responsável: lead.assignee,
-        Criado: formatDate(lead.created_at),
-        Observações: lead.notes
-    }));
-    
-    const csv = convertToCSV(data);
-    downloadCSV(csv, 'leads-alsham.csv');
-    showSuccess('Leads exportados com sucesso!');
-}
-
-function importLeads() {
-    showSuccess('Função de importação em desenvolvimento');
-}
-
-function convertToCSV(data) {
-    const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(row => Object.values(row).map(val => `"${val || ''}"`).join(','));
-    return [headers, ...rows].join('\n');
-}
-
-function downloadCSV(csv, filename) {
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-}
-
-// ===== FUNÇÕES AUXILIARES =====
-function getInitials(name) {
-    if (!name) return 'N';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function getStatusColor(status) {
-    const statusConfig = config.statusOptions.find(s => s.value === status);
-    return statusConfig ? `bg-${statusConfig.color}-100 text-${statusConfig.color}-800` : 'bg-gray-100 text-gray-800';
-}
-
-function getStatusLabel(status) {
-    const statusConfig = config.statusOptions.find(s => s.value === status);
-    return statusConfig ? statusConfig.label : 'Novo';
-}
-
-function getStatusIcon(status) {
-    const statusConfig = config.statusOptions.find(s => s.value === status);
-    return statusConfig ? statusConfig.icon : '🆕';
-}
-
-function getPriorityColor(priority) {
-    const priorityConfig = config.priorityOptions.find(p => p.value === priority);
-    return priorityConfig ? priorityConfig.color : 'gray';
-}
-
-function formatCurrency(value) {
-    return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(value);
+    return buttons.join('');
 }
 
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(date);
-}
-
-function formatTimeAgo(dateString) {
-    if (!dateString) return 'N/A';
     
-    const now = new Date();
-    const date = new Date(dateString);
-    const diff = now - date;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
-    if (days === 0) return 'Hoje';
-    if (days === 1) return 'Ontem';
-    if (days < 7) return `${days}d atrás`;
-    if (days < 30) return `${Math.floor(days / 7)}sem atrás`;
-    return `${Math.floor(days / 30)}mês atrás`;
-}
-
-function updateLeadsCount() {
-    const count = leadsState.filteredLeads.length;
-    const countEl = document.getElementById('leads-count');
-    if (countEl) {
-        countEl.textContent = `${count} lead${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+    try {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }).format(date);
+    } catch (error) {
+        console.warn('Erro ao formatar data:', error);
+        return 'Erro';
     }
 }
 
-function updateUserInfo(profile) {
-    if (profile?.full_name) {
-        document.querySelectorAll('[data-auth="user-name"]').forEach(el => {
-            el.textContent = profile.full_name;
-        });
-        document.querySelectorAll('[data-auth="user-avatar"]').forEach(el => {
-            el.textContent = getInitials(profile.full_name);
-        });
-    }
+// NOVO: Função para escape HTML
+function escapeHtml(text) {
+    if (text == null) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
 }
 
-function showEmptyState() {
-    document.getElementById('leads-table-view')?.classList.add('hidden');
-    document.getElementById('leads-grid-view')?.classList.add('hidden');
-    document.getElementById('leads-kanban-view')?.classList.add('hidden');
-    document.getElementById('empty-state')?.classList.remove('hidden');
-}
-
-function hideEmptyState() {
-    document.getElementById('empty-state')?.classList.add('hidden');
-    
-    // Mostrar view ativa
-    if (leadsState.currentView === 'table') {
-        document.getElementById('leads-table-view')?.classList.remove('hidden');
-    } else if (leadsState.currentView === 'grid') {
-        document.getElementById('leads-grid-view')?.classList.remove('hidden');
-    } else if (leadsState.currentView === 'kanban') {
-        document.getElementById('leads-kanban-view')?.classList.remove('hidden');
-    }
-}
-
-function showLoading(show = true, message = 'Carregando...') {
-    let loader = document.getElementById('leads-loader');
-    if (!loader && show) {
-        loader = document.createElement('div');
-        loader.id = 'leads-loader';
-        loader.className = 'fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm';
-        loader.innerHTML = `
-            <div class="text-center">
-                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-primary border-b-4 border-gray-100 mx-auto mb-4"></div>
-                <p class="text-gray-600 font-medium">${message}</p>
-            </div>
-        `;
-        document.body.appendChild(loader);
-    }
-    
-    if (loader) {
-        loader.style.display = show ? 'flex' : 'none';
+// CORRIGIDO: Melhor sistema de notificações
+function showLoading(show, message = 'Carregando...') {
+    const loadingElement = document.getElementById('loading-indicator');
+    if (loadingElement) {
         if (show) {
-            const messageEl = loader.querySelector('p');
-            if (messageEl) messageEl.textContent = message;
+            loadingElement.textContent = message;
+            loadingElement.classList.remove('hidden');
+        } else {
+            loadingElement.classList.add('hidden');
         }
     }
+    console.log(show ? `🔄 ${message}` : '✅ Loading complete');
 }
 
-function showSuccess(message) { showNotification(message, 'success'); }
-function showError(message) { showNotification(message, 'error'); }
-
-function showNotification(message, type = 'info') {
-    const toast = document.createElement('div');
-    const colors = {
-        success: 'bg-green-500 text-white',
-        error: 'bg-red-500 text-white',
-        info: 'bg-blue-500 text-white',
-        warning: 'bg-yellow-500 text-white'
-    };
+function showError(message) {
+    console.error('❌', message);
     
-    toast.className = `fixed bottom-4 right-4 ${colors[type]} px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-0`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    // Tentar usar notificação personalizada primeiro
+    const errorElement = document.getElementById('error-notification');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+        setTimeout(() => {
+            errorElement.classList.add('hidden');
+        }, 5000);
+    } else {
+        // Fallback para alert apenas se não houver elemento de notificação
+        alert(`Erro: ${message}`);
+    }
 }
 
-function debounce(fn, ms = 300) {
+function showSuccess(message) {
+    console.log('✅', message);
+    
+    // Tentar usar notificação personalizada primeiro
+    const successElement = document.getElementById('success-notification');
+    if (successElement) {
+        successElement.textContent = message;
+        successElement.classList.remove('hidden');
+        setTimeout(() => {
+            successElement.classList.add('hidden');
+        }, 3000);
+    }
+}
+
+function showConfirmDialog(message) {
+    // Melhor seria implementar um modal customizado
+    return confirm(message);
+}
+
+// NOVO: Debounce para busca
+function debounce(func, wait) {
     let timeout;
-    return function(...args) {
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
         clearTimeout(timeout);
-        timeout = setTimeout(() => fn.apply(this, args), ms);
+        timeout = setTimeout(later, wait);
     };
 }
 
-// ===== EXPORTS =====
-export {
-    leadsState,
-    loadLeads,
-    renderCurrentView
+// ===== EVENT LISTENERS =====
+function setupEventListeners() {
+    // CORRIGIDO: Busca com debounce
+    document.addEventListener('input', (e) => {
+        if (e.target.id === 'search-input') {
+            if (leadsState.searchTimeout) {
+                clearTimeout(leadsState.searchTimeout);
+            }
+            
+            leadsState.searchTimeout = setTimeout(() => {
+                leadsState.filters.search = e.target.value;
+                leadsState.pagination.currentPage = 1; // Reset para primeira página
+                applyFiltersAndSorting();
+                renderInterface();
+            }, 300);
+        }
+    });
+    
+    document.addEventListener('change', (e) => {
+        if (e.target.id === 'status-filter') {
+            leadsState.filters.status = e.target.value;
+            leadsState.pagination.currentPage = 1;
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+        
+        if (e.target.id === 'priority-filter') {
+            leadsState.filters.priority = e.target.value;
+            leadsState.pagination.currentPage = 1;
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+        
+        if (e.target.id === 'source-filter') {
+            leadsState.filters.source = e.target.value;
+            leadsState.pagination.currentPage = 1;
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+    });
+    
+    // Botões
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'clear-filters' || e.target.id === 'clear-filters-empty') {
+            leadsState.filters = { search: '', status: '', period: '', priority: '', source: '', assignee: '' };
+            leadsState.pagination.currentPage = 1;
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+        
+        if (e.target.id === 'new-lead-btn') {
+            openLeadModal();
+        }
+        
+        if (e.target.dataset.action === 'edit') {
+            editLead(e.target.dataset.id);
+        }
+        
+        if (e.target.dataset.action === 'delete') {
+            deleteExistingLead(e.target.dataset.id);
+        }
+        
+        if (e.target.dataset.page) {
+            const page = parseInt(e.target.dataset.page);
+            if (page > 0) {
+                leadsState.pagination.currentPage = page;
+                renderInterface();
+            }
+        }
+    });
+    
+    // Ordenação
+    document.addEventListener('click', (e) => {
+        if (e.target.dataset.sort) {
+            const field = e.target.dataset.sort;
+            if (leadsState.sorting.field === field) {
+                leadsState.sorting.direction = leadsState.sorting.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                leadsState.sorting.field = field;
+                leadsState.sorting.direction = 'asc';
+            }
+            applyFiltersAndSorting();
+            renderInterface();
+        }
+    });
+    
+    // Cleanup
+    window.addEventListener('beforeunload', () => {
+        if (leadsState.searchTimeout) {
+            clearTimeout(leadsState.searchTimeout);
+        }
+    });
+}
+
+// ===== MODAL DE LEAD =====
+function openLeadModal(leadId = null) {
+    // Implementar modal de criação/edição de lead
+    console.log('📝 Abrindo modal de lead:', leadId);
+    showSuccess('Modal de lead em desenvolvimento');
+}
+
+function editLead(leadId) {
+    // Implementar edição de lead
+    console.log('✏️ Editando lead:', leadId);
+    openLeadModal(leadId);
+}
+
+// ===== DADOS DEMO =====
+function loadDemoData() {
+    console.log('🎯 Carregando dados demo de leads...');
+    
+    leadsState.leads = [
+        {
+            id: '1',
+            name: 'João Silva',
+            email: 'joao@exemplo.com',
+            status: 'novo',
+            source: 'website',
+            value: 5000,
+            created_at: new Date().toISOString()
+        },
+        {
+            id: '2',
+            name: 'Maria Santos',
+            email: 'maria@exemplo.com',
+            status: 'qualificado',
+            source: 'social_media',
+            value: 7500,
+            created_at: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+            id: '3',
+            name: 'Carlos Oliveira',
+            email: 'carlos@exemplo.com',
+            status: 'convertido',
+            source: 'referral',
+            value: 12000,
+            created_at: new Date(Date.now() - 172800000).toISOString()
+        }
+    ];
+    
+    leadsState.filteredLeads = [...leadsState.leads];
+    calculateKPIs();
+    renderInterface();
+    showSuccess('Dados demo carregados');
+}
+
+// ===== API PÚBLICA =====
+window.leadsReal = {
+    refresh: loadLeads,
+    getState: () => ({ ...leadsState }),
+    createLead: createNewLead,
+    updateLead: updateExistingLead,
+    deleteLead: deleteExistingLead
 };
+
+console.log('🎯 Leads Real module loaded');
