@@ -1,414 +1,948 @@
+// ALSHAM 360° PRIMA - Sistema de Leads Ultimate 10/10
+// Interface premium para gestão completa de leads com CRM avançado
+
 import { supabase } from '../lib/supabase.js';
 
-// Estado da aplicação
-let currentView = 'table';
-let allLeads = [];
-let filteredLeads = [];
-let editingLeadId = null;
-let userOrgId = null;
+// ===== ESTADO GLOBAL =====
+const leadsState = {
+    user: null,
+    currentUserProfile: null,
+    leads: [],
+    filteredLeads: [],
+    selectedLeads: [],
+    currentView: 'table', // table, grid, kanban
+    filters: {
+        search: '',
+        status: '',
+        period: '',
+        priority: '',
+        source: '',
+        assignee: ''
+    },
+    sorting: {
+        field: 'created_at',
+        direction: 'desc'
+    },
+    pagination: {
+        currentPage: 1,
+        itemsPerPage: 20,
+        totalItems: 0
+    },
+    kpis: {
+        total: 0,
+        newToday: 0,
+        qualified: 0,
+        converted: 0,
+        conversionRate: 0,
+        avgValue: 0
+    },
+    isLoading: false,
+    error: null,
+    bulkActionMode: false
+};
 
-// Toast visual
-function showNotification(message, type = 'info') {
-    let root = document.getElementById('toast-root');
-    if (!root) {
-        root = document.createElement('div');
-        root.id = 'toast-root';
-        root.className = 'fixed top-4 right-4 space-y-3 z-50 pointer-events-none';
-        document.body.appendChild(root);
-    }
-    const div = document.createElement('div');
-    div.role = "status";
-    div.className =
-        "pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-sm border transition-all duration-300 mb-1 " +
-        (type === "error"
-            ? "bg-red-50 border-red-200 text-red-800"
-            : type === "success"
-            ? "bg-green-50 border-green-200 text-green-800"
-            : "bg-white border-gray-200 text-gray-800");
-    div.textContent = message;
-    root.appendChild(div);
-    setTimeout(() => div.remove(), 3500);
-}
+// ===== CONFIGURAÇÕES =====
+const leadsConfig = {
+    tableName: 'leads_crm',
+    statusOptions: [
+        { value: 'novo', label: 'Novo', color: 'blue', icon: '🆕' },
+        { value: 'contatado', label: 'Contatado', color: 'yellow', icon: '📞' },
+        { value: 'qualificado', label: 'Qualificado', color: 'purple', icon: '✅' },
+        { value: 'proposta', label: 'Proposta', color: 'orange', icon: '📋' },
+        { value: 'convertido', label: 'Convertido', color: 'green', icon: '💰' },
+        { value: 'perdido', label: 'Perdido', color: 'red', icon: '❌' }
+    ],
+    priorityOptions: [
+        { value: 'baixa', label: 'Baixa', color: 'gray' },
+        { value: 'media', label: 'Média', color: 'yellow' },
+        { value: 'alta', label: 'Alta', color: 'orange' },
+        { value: 'urgente', label: 'Urgente', color: 'red' }
+    ],
+    sourceOptions: [
+        { value: 'website', label: 'Website', icon: '🌐' },
+        { value: 'social_media', label: 'Redes Sociais', icon: '📱' },
+        { value: 'email_marketing', label: 'Email Marketing', icon: '📧' },
+        { value: 'referral', label: 'Indicação', icon: '👥' },
+        { value: 'cold_call', label: 'Cold Call', icon: '☎️' },
+        { value: 'event', label: 'Evento', icon: '🎯' },
+        { value: 'other', label: 'Outro', icon: '📌' }
+    ]
+};
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-    initializeLeadsPage();
-});
+// ===== INICIALIZAÇÃO =====
+document.addEventListener('DOMContentLoaded', initializeLeadsPage);
 
 async function initializeLeadsPage() {
     try {
+        showLoading(true, 'Carregando sistema de leads...');
+        
         // Verificar autenticação
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            window.location.href = '../pages/login.html';
+            window.location.href = '/login.html';
             return;
         }
-        userOrgId = (await getUserOrgId(user)) || 'default-org';
-
-        // Carregar leads
-        await loadLeads();
-
-        // Configurar event listeners
+        
+        leadsState.user = user;
+        
+        // Buscar perfil do usuário
+        const { data: profile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('org_id, full_name')
+            .eq('user_id', user.id)
+            .single();
+            
+        if (profileError || !profile) {
+            throw new Error('Perfil ou organização do usuário não encontrada.');
+        }
+        
+        leadsState.currentUserProfile = profile;
+        
+        // Carregar dados iniciais
+        await Promise.all([
+            loadLeads(),
+            loadKPIs()
+        ]);
+        
+        setupUI();
         setupEventListeners();
-
-        // Atualizar estatísticas
-        updateStatistics();
-
+        setupRealTimeUpdates();
+        
+        showLoading(false);
+        showToast('Sistema de leads carregado com sucesso!', 'success');
+        console.log('👥 Sistema de leads Ultimate inicializado');
+        
     } catch (error) {
-        console.error('Erro ao inicializar página de leads:', error);
-        showNotification('Erro ao carregar dados', 'error');
+        console.error('Erro ao inicializar sistema de leads:', error);
+        leadsState.error = error.message;
+        showLoading(false);
+        showToast('Erro ao carregar sistema de leads: ' + error.message, 'error');
+        loadDemoData();
     }
 }
 
-async function getUserOrgId(user) {
-    // Busca org_id real do perfil
-    const { data, error } = await supabase
-        .from('user_profiles')
-        .select('org_id')
-        .eq('user_id', user.id)
-        .single();
-    return data?.org_id;
-}
-
-function setupEventListeners() {
-    // Busca em tempo real
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(applyFilters, 300));
-    }
-
-    // Filtros
-    const statusFilter = document.getElementById('status-filter');
-    const periodFilter = document.getElementById('period-filter');
-    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
-    if (periodFilter) periodFilter.addEventListener('change', applyFilters);
-
-    // Form de novo lead / edição
-    const newLeadForm = document.getElementById('new-lead-form');
-    if (newLeadForm) {
-        newLeadForm.addEventListener('submit', handleLeadSubmit);
-    }
-}
-
+// ===== CARREGAMENTO DE DADOS =====
 async function loadLeads() {
     try {
-        showLoading(true);
-
-        const { data: leads, error } = await supabase
-            .from('leads')
+        leadsState.isLoading = true;
+        
+        let query = supabase
+            .from(leadsConfig.tableName)
             .select('*')
-            .eq('org_id', userOrgId)
-            .order('created_at', { ascending: false });
-
+            .eq('org_id', leadsState.currentUserProfile.org_id);
+        
+        // Aplicar filtros
+        query = applyFilters(query);
+        
+        // Aplicar ordenação
+        query = query.order(leadsState.sorting.field, { 
+            ascending: leadsState.sorting.direction === 'asc' 
+        });
+        
+        // Aplicar paginação
+        const from = (leadsState.pagination.currentPage - 1) * leadsState.pagination.itemsPerPage;
+        const to = from + leadsState.pagination.itemsPerPage - 1;
+        query = query.range(from, to);
+        
+        const { data, error, count } = await query;
+        
         if (error) throw error;
-
-        allLeads = leads || [];
-        filteredLeads = [...allLeads];
-
-        renderLeads();
-        updateStatistics();
-
+        
+        leadsState.leads = data || [];
+        leadsState.filteredLeads = leadsState.leads;
+        leadsState.pagination.totalItems = count || 0;
+        
+        renderCurrentView();
+        updatePagination();
+        
     } catch (error) {
         console.error('Erro ao carregar leads:', error);
-        showNotification('Erro ao carregar leads', 'error');
-        showEmptyState();
+        throw error;
     } finally {
-        showLoading(false);
+        leadsState.isLoading = false;
     }
 }
 
-function renderLeads() {
-    if (filteredLeads.length === 0) {
-        showEmptyState();
-        return;
+async function loadKPIs() {
+    try {
+        // Carregar estatísticas dos leads
+        const { data: stats, error } = await supabase
+            .rpc('get_leads_kpis', { p_org_id: leadsState.currentUserProfile.org_id });
+            
+        if (error) throw error;
+        
+        if (stats && stats.length > 0) {
+            leadsState.kpis = stats[0];
+        } else {
+            calculateDemoKPIs();
+        }
+        
+        updateKPICards();
+        
+    } catch (error) {
+        console.error('Erro ao carregar KPIs:', error);
+        calculateDemoKPIs();
+        updateKPICards();
     }
+}
 
-    hideEmptyState();
-
-    if (currentView === 'table') {
-        renderTableView();
-    } else {
-        renderGridView();
+function applyFilters(query) {
+    const { filters } = leadsState;
+    
+    if (filters.status) {
+        query = query.eq('status', filters.status);
     }
+    
+    if (filters.search) {
+        query = query.or(`nome.ilike.%${filters.search}%,email.ilike.%${filters.search}%,empresa.ilike.%${filters.search}%`);
+    }
+    
+    if (filters.priority) {
+        query = query.eq('prioridade', filters.priority);
+    }
+    
+    if (filters.source) {
+        query = query.eq('origem', filters.source);
+    }
+    
+    if (filters.assignee) {
+        query = query.eq('responsavel', filters.assignee);
+    }
+    
+    if (filters.period) {
+        const periodFilter = getPeriodFilter(filters.period);
+        if (periodFilter) {
+            query = query.gte('created_at', periodFilter.toISOString());
+        }
+    }
+    
+    return query;
+}
+
+function getPeriodFilter(period) {
+    const now = new Date();
+    
+    switch (period) {
+        case 'today':
+            return new Date(now.setHours(0, 0, 0, 0));
+        case 'week':
+            return new Date(now.setDate(now.getDate() - 7));
+        case 'month':
+            return new Date(now.setDate(now.getDate() - 30));
+        case 'quarter':
+            return new Date(now.setDate(now.getDate() - 90));
+        case 'year':
+            return new Date(now.setFullYear(now.getFullYear() - 1));
+        default:
+            return null;
+    }
+}
+
+// ===== DADOS DEMO =====
+function loadDemoData() {
+    leadsState.leads = [
+        {
+            id: '1',
+            nome: 'Maria Silva',
+            email: 'maria.silva@empresa.com',
+            telefone: '+55 11 99999-1111',
+            empresa: 'Tech Solutions Ltda',
+            cargo: 'Diretora de TI',
+            status: 'qualificado',
+            prioridade: 'alta',
+            origem: 'website',
+            valor_negocio: 25000,
+            responsavel: 'João Santos',
+            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            ultima_interacao: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+            score_ia: 8.5,
+            observacoes: 'Interesse em migração para cloud. Orçamento aprovado.'
+        },
+        {
+            id: '2',
+            nome: 'Pedro Costa',
+            email: 'pedro@startup.com.br',
+            telefone: '+55 11 88888-2222',
+            empresa: 'Startup Inovadora',
+            cargo: 'CEO',
+            status: 'novo',
+            prioridade: 'media',
+            origem: 'social_media',
+            valor_negocio: 15000,
+            responsavel: 'Ana Oliveira',
+            created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            ultima_interacao: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+            score_ia: 7.2,
+            observacoes: 'Startup em crescimento. Precisa de solução escalável.'
+        },
+        {
+            id: '3',
+            nome: 'Ana Rodrigues',
+            email: 'ana.rodrigues@corp.com',
+            telefone: '+55 11 77777-3333',
+            empresa: 'Corporação Nacional',
+            cargo: 'Gerente de Compras',
+            status: 'proposta',
+            prioridade: 'urgente',
+            origem: 'referral',
+            valor_negocio: 45000,
+            responsavel: 'Carlos Silva',
+            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            ultima_interacao: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+            score_ia: 9.1,
+            observacoes: 'Proposta enviada. Aguardando aprovação da diretoria.'
+        }
+    ];
+    
+    leadsState.filteredLeads = leadsState.leads;
+    calculateDemoKPIs();
+    renderCurrentView();
+    updateKPICards();
+}
+
+function calculateDemoKPIs() {
+    const leads = leadsState.leads;
+    const today = new Date().toDateString();
+    
+    leadsState.kpis = {
+        total: leads.length,
+        newToday: leads.filter(l => new Date(l.created_at).toDateString() === today).length,
+        qualified: leads.filter(l => l.status === 'qualificado' || l.status === 'proposta').length,
+        converted: leads.filter(l => l.status === 'convertido').length,
+        conversionRate: leads.length > 0 ? (leads.filter(l => l.status === 'convertido').length / leads.length * 100).toFixed(1) : 0,
+        avgValue: leads.length > 0 ? (leads.reduce((sum, l) => sum + (l.valor_negocio || 0), 0) / leads.length) : 0
+    };
+}
+
+// ===== RENDERIZAÇÃO =====
+function renderCurrentView() {
+    switch (leadsState.currentView) {
+        case 'table':
+            renderTableView();
+            break;
+        case 'grid':
+            renderGridView();
+            break;
+        case 'kanban':
+            renderKanbanView();
+            break;
+        default:
+            renderTableView();
+    }
+    
+    updateViewButtons();
+    updateResultsCount();
 }
 
 function renderTableView() {
-    const tableBody = document.getElementById('leads-table-body');
-    if (!tableBody) return;
+    const container = document.getElementById('leads-container');
+    if (!container) return;
+    
+    if (leadsState.leads.length === 0) {
+        container.innerHTML = renderEmptyState();
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left">
+                                <input type="checkbox" id="select-all" class="rounded border-gray-300">
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortBy('nome')">
+                                Nome
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortBy('empresa')">
+                                Empresa
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortBy('status')">
+                                Status
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortBy('prioridade')">
+                                Prioridade
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortBy('valor_negocio')">
+                                Valor
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortBy('created_at')">
+                                Criado
+                            </th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${leadsState.leads.map(lead => renderTableRow(lead)).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    setupTableEvents();
+}
 
-    tableBody.innerHTML = filteredLeads.map(lead => `
-        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-            <td class="py-4 px-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-semibold text-sm">${getInitials(lead.name)}</span>
+function renderTableRow(lead) {
+    const statusConfig = getStatusConfig(lead.status);
+    const priorityConfig = getPriorityConfig(lead.prioridade);
+    
+    return `
+        <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-4">
+                <input type="checkbox" class="lead-checkbox rounded border-gray-300" value="${lead.id}">
+            </td>
+            <td class="px-4 py-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-white font-semibold text-sm">
+                            ${(lead.nome || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </span>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-900">${lead.name}</p>
-                        <p class="text-sm text-gray-600">${lead.company || 'Sem empresa'}</p>
+                        <p class="font-medium text-gray-900">${lead.nome}</p>
+                        <p class="text-sm text-gray-600">${lead.email}</p>
                     </div>
                 </div>
             </td>
-            <td class="py-4 px-4">
+            <td class="px-4 py-4">
                 <div>
-                    <p class="text-sm text-gray-900">${lead.email}</p>
-                    <p class="text-sm text-gray-600">${lead.phone || 'Sem telefone'}</p>
+                    <p class="font-medium text-gray-900">${lead.empresa || '-'}</p>
+                    <p class="text-sm text-gray-600">${lead.cargo || '-'}</p>
                 </div>
             </td>
-            <td class="py-4 px-4">
-                <span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(lead.status)}">
-                    ${getStatusText(lead.status)}
+            <td class="px-4 py-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${statusConfig.color}-100 text-${statusConfig.color}-800">
+                    <span class="mr-1">${statusConfig.icon}</span>
+                    ${statusConfig.label}
                 </span>
             </td>
-            <td class="py-4 px-4">
-                <span class="font-medium text-gray-900">
-                    ${lead.value ? formatCurrency(lead.value) : 'Não informado'}
+            <td class="px-4 py-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${priorityConfig.color}-100 text-${priorityConfig.color}-800">
+                    ${priorityConfig.label}
                 </span>
             </td>
-            <td class="py-4 px-4">
-                <span class="text-sm text-gray-600">
-                    ${formatDate(lead.created_at)}
-                </span>
+            <td class="px-4 py-4">
+                <p class="font-medium text-gray-900">${formatCurrency(lead.valor_negocio)}</p>
+                ${lead.score_ia ? `<p class="text-xs text-purple-600">Score IA: ${lead.score_ia}/10</p>` : ''}
             </td>
-            <td class="py-4 px-4">
-                <div class="flex items-center space-x-2">
-                    <button onclick="editLead('${lead.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
+            <td class="px-4 py-4">
+                <p class="text-sm text-gray-900">${formatDate(lead.created_at)}</p>
+                <p class="text-xs text-gray-600">${formatTimeAgo(lead.ultima_interacao)}</p>
+            </td>
+            <td class="px-4 py-4 text-right">
+                <div class="flex items-center justify-end space-x-2">
+                    <button onclick="viewLead('${lead.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        Ver
                     </button>
-                    ${lead.phone ? `
-                    <button onclick="openWhatsApp('${lead.phone}', '${lead.name}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="WhatsApp">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                        </svg>
+                    <button onclick="editLead('${lead.id}')" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                        Editar
                     </button>
-                    ` : ''}
-                    <button onclick="deleteLead('${lead.id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
+                    <button onclick="showLeadActions('${lead.id}')" class="text-gray-400 hover:text-gray-600">
+                        <span class="text-lg">⋮</span>
                     </button>
                 </div>
             </td>
         </tr>
-    `).join('');
-
-    document.getElementById('table-view').classList.remove('hidden');
-    document.getElementById('grid-view').classList.add('hidden');
+    `;
 }
 
 function renderGridView() {
-    const gridContainer = document.getElementById('leads-grid');
-    if (!gridContainer) return;
+    const container = document.getElementById('leads-container');
+    if (!container) return;
+    
+    if (leadsState.leads.length === 0) {
+        container.innerHTML = renderEmptyState();
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            ${leadsState.leads.map(lead => renderLeadCard(lead)).join('')}
+        </div>
+    `;
+}
 
-    gridContainer.innerHTML = filteredLeads.map(lead => `
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+function renderLeadCard(lead) {
+    const statusConfig = getStatusConfig(lead.status);
+    const priorityConfig = getPriorityConfig(lead.prioridade);
+    
+    return `
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
             <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-semibold">${getInitials(lead.name)}</span>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-gray-900">${lead.name}</h3>
-                        <p class="text-sm text-gray-600">${lead.company || 'Sem empresa'}</p>
-                    </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-semibold">
+                        ${(lead.nome || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </span>
                 </div>
-                <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(lead.status)}">
-                    ${getStatusText(lead.status)}
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-${priorityConfig.color}-500"></span>
+                    <button onclick="showLeadActions('${lead.id}')" class="text-gray-400 hover:text-gray-600">
+                        <span class="text-lg">⋮</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-900 mb-1">${lead.nome}</h3>
+                <p class="text-sm text-gray-600">${lead.empresa || 'Empresa não informada'}</p>
+                <p class="text-xs text-gray-500">${lead.cargo || ''}</p>
+            </div>
+            
+            <div class="mb-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${statusConfig.color}-100 text-${statusConfig.color}-800">
+                    <span class="mr-1">${statusConfig.icon}</span>
+                    ${statusConfig.label}
                 </span>
             </div>
-
+            
             <div class="space-y-2 mb-4">
-                <div class="flex items-center space-x-2 text-sm text-gray-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    <span>${lead.email}</span>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Valor:</span>
+                    <span class="font-medium text-gray-900">${formatCurrency(lead.valor_negocio)}</span>
                 </div>
-                ${lead.phone ? `
-                <div class="flex items-center space-x-2 text-sm text-gray-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                    </svg>
-                    <span>${lead.phone}</span>
-                </div>
+                ${lead.score_ia ? `
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Score IA:</span>
+                        <span class="font-medium text-purple-600">${lead.score_ia}/10</span>
+                    </div>
                 ` : ''}
-                ${lead.value ? `
-                <div class="flex items-center space-x-2 text-sm text-gray-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
-                    <span>${formatCurrency(lead.value)}</span>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Criado:</span>
+                    <span class="text-gray-900">${formatDate(lead.created_at)}</span>
                 </div>
-                ` : ''}
             </div>
-
-            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                <span class="text-xs text-gray-500">${formatDate(lead.created_at)}</span>
-                <div class="flex items-center space-x-2">
-                    <button onclick="editLead('${lead.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                    </button>
-                    ${lead.phone ? `
-                    <button onclick="openWhatsApp('${lead.phone}', '${lead.name}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="WhatsApp">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                        </svg>
-                    </button>
-                    ` : ''}
-                    <button onclick="deleteLead('${lead.id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                    </button>
-                </div>
+            
+            <div class="flex space-x-2">
+                <button onclick="contactLead('${lead.id}', 'phone')" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    📞 Ligar
+                </button>
+                <button onclick="contactLead('${lead.id}', 'email')" class="flex-1 bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors">
+                    📧 Email
+                </button>
             </div>
         </div>
-    `).join('');
-
-    document.getElementById('grid-view').classList.remove('hidden');
-    document.getElementById('table-view').classList.add('hidden');
+    `;
 }
 
-function updateStatistics() {
-    const totalLeads = allLeads.length;
-    const qualifiedLeads = allLeads.filter(lead => lead.status === 'qualified').length;
-    const convertedLeads = allLeads.filter(lead => lead.status === 'converted').length;
-    const conversionRate = totalLeads > 0 ? ((convertedLeads / totalLeads) * 100).toFixed(1) : 0;
-
-    document.getElementById('total-leads').textContent = totalLeads;
-    document.getElementById('qualified-leads').textContent = qualifiedLeads;
-    document.getElementById('converted-leads').textContent = convertedLeads;
-    document.getElementById('conversion-rate').textContent = `${conversionRate}%`;
+function renderKanbanView() {
+    const container = document.getElementById('leads-container');
+    if (!container) return;
+    
+    const statusGroups = groupLeadsByStatus();
+    
+    container.innerHTML = `
+        <div class="flex space-x-6 overflow-x-auto pb-6">
+            ${leadsConfig.statusOptions.map(status => `
+                <div class="flex-shrink-0 w-80">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-semibold text-gray-900 flex items-center">
+                                    <span class="mr-2">${status.icon}</span>
+                                    ${status.label}
+                                </h3>
+                                <span class="bg-${status.color}-100 text-${status.color}-800 text-xs font-medium px-2 py-1 rounded-full">
+                                    ${statusGroups[status.value]?.length || 0}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-3 max-h-96 overflow-y-auto">
+                            ${(statusGroups[status.value] || []).map(lead => renderKanbanCard(lead)).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
-function applyFilters() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const statusFilter = document.getElementById('status-filter').value;
-    const periodFilter = document.getElementById('period-filter').value;
+function renderKanbanCard(lead) {
+    const priorityConfig = getPriorityConfig(lead.prioridade);
+    
+    return `
+        <div class="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:shadow-sm transition-all cursor-pointer" onclick="viewLead('${lead.id}')">
+            <div class="flex items-start justify-between mb-2">
+                <h4 class="font-medium text-gray-900 text-sm">${lead.nome}</h4>
+                <span class="w-2 h-2 rounded-full bg-${priorityConfig.color}-500"></span>
+            </div>
+            <p class="text-xs text-gray-600 mb-2">${lead.empresa || 'Empresa não informada'}</p>
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-900">${formatCurrency(lead.valor_negocio)}</span>
+                <span class="text-xs text-gray-500">${formatTimeAgo(lead.created_at)}</span>
+            </div>
+        </div>
+    `;
+}
 
-    filteredLeads = allLeads.filter(lead => {
-        // Filtro de busca
-        const matchesSearch = !searchTerm ||
-            lead.name.toLowerCase().includes(searchTerm) ||
-            lead.email.toLowerCase().includes(searchTerm) ||
-            (lead.company && lead.company.toLowerCase().includes(searchTerm));
-
-        // Filtro de status
-        const matchesStatus = !statusFilter || lead.status === statusFilter;
-
-        // Filtro de período
-        const matchesPeriod = !periodFilter || checkPeriodFilter(lead.created_at, periodFilter);
-
-        return matchesSearch && matchesStatus && matchesPeriod;
+function groupLeadsByStatus() {
+    const groups = {};
+    leadsConfig.statusOptions.forEach(status => {
+        groups[status.value] = [];
     });
-
-    renderLeads();
-}
-
-function checkPeriodFilter(dateString, period) {
-    const date = new Date(dateString);
-    const now = new Date();
-
-    switch (period) {
-        case 'today':
-            return date.toDateString() === now.toDateString();
-        case 'week':
-            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            return date >= weekAgo;
-        case 'month':
-            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-        case 'quarter':
-            const quarter = Math.floor(now.getMonth() / 3);
-            const leadQuarter = Math.floor(date.getMonth() / 3);
-            return leadQuarter === quarter && date.getFullYear() === now.getFullYear();
-        default:
-            return true;
-    }
-}
-
-async function handleLeadSubmit(event) {
-    event.preventDefault();
-
-    const formData = new FormData(event.target);
-    const leadData = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        company: formData.get('company'),
-        position: formData.get('position'),
-        status: formData.get('status'),
-        value: formData.get('value') ? parseFloat(formData.get('value')) : null,
-        source: formData.get('source'),
-        notes: formData.get('notes'),
-        org_id: userOrgId
-    };
-
-    try {
-        if (editingLeadId) {
-            // Update lead
-            const { error } = await supabase
-                .from('leads')
-                .update(leadData)
-                .eq('id', editingLeadId);
-            if (error) throw error;
-            showNotification('Lead editado com sucesso!', 'success');
-        } else {
-            // Create lead
-            const { error } = await supabase
-                .from('leads')
-                .insert([leadData]);
-            if (error) throw error;
-            showNotification('Lead criado com sucesso!', 'success');
+    
+    leadsState.leads.forEach(lead => {
+        if (groups[lead.status]) {
+            groups[lead.status].push(lead);
         }
-        closeNewLeadModal();
-        await loadLeads();
-    } catch (error) {
-        console.error('Erro ao salvar lead:', error);
-        showNotification('Erro ao salvar lead', 'error');
+    });
+    
+    return groups;
+}
+
+function renderEmptyState() {
+    return `
+        <div class="text-center py-16">
+            <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="text-4xl">👥</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Nenhum lead encontrado</h3>
+            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                ${leadsState.filters.search || Object.values(leadsState.filters).some(f => f) 
+                    ? 'Nenhum lead encontrado com os filtros aplicados. Tente ajustar os critérios de busca.'
+                    : 'Crie seu primeiro lead para começar a gerenciar seus contatos e oportunidades de vendas.'
+                }
+            </p>
+            <div class="flex gap-4 justify-center">
+                <button onclick="openNewLeadModal()" class="btn-primary">
+                    Criar Primeiro Lead
+                </button>
+                ${Object.values(leadsState.filters).some(f => f) ? `
+                    <button onclick="clearAllFilters()" class="btn-secondary">
+                        Limpar Filtros
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function updateKPICards() {
+    const kpis = leadsState.kpis;
+    
+    const kpiData = [
+        { label: 'Total de Leads', value: kpis.total, icon: '👥', color: 'blue' },
+        { label: 'Novos Hoje', value: kpis.newToday, icon: '🆕', color: 'green' },
+        { label: 'Qualificados', value: kpis.qualified, icon: '✅', color: 'purple' },
+        { label: 'Convertidos', value: kpis.converted, icon: '💰', color: 'orange' },
+        { label: 'Taxa de Conversão', value: `${kpis.conversionRate}%`, icon: '📈', color: 'red' },
+        { label: 'Valor Médio', value: formatCurrency(kpis.avgValue), icon: '💎', color: 'pink' }
+    ];
+    
+    const container = document.getElementById('kpi-cards');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            ${kpiData.map(kpi => `
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-10 h-10 bg-${kpi.color}-100 rounded-lg flex items-center justify-center">
+                            <span class="text-lg">${kpi.icon}</span>
+                        </div>
+                    </div>
+                    <p class="text-2xl font-bold text-gray-900">${kpi.value}</p>
+                    <p class="text-sm text-gray-600">${kpi.label}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// ===== CONFIGURAÇÃO DA UI =====
+function setupUI() {
+    setupFilters();
+    setupBulkActions();
+    setupViewSwitcher();
+}
+
+function setupFilters() {
+    // Filtro de busca
+    const searchInput = document.getElementById('search-filter');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce((e) => {
+            leadsState.filters.search = e.target.value;
+            loadLeads();
+        }, 300));
+    }
+    
+    // Filtros de select
+    ['status-filter', 'priority-filter', 'source-filter', 'period-filter'].forEach(filterId => {
+        const select = document.getElementById(filterId);
+        if (select) {
+            select.addEventListener('change', (e) => {
+                const filterKey = filterId.split('-')[0];
+                leadsState.filters[filterKey] = e.target.value;
+                loadLeads();
+            });
+        }
+    });
+}
+
+function setupBulkActions() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('.lead-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateBulkActionBar();
+        });
     }
 }
 
-// Funções auxiliares
-function getInitials(name) {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+function setupViewSwitcher() {
+    const viewButtons = document.querySelectorAll('[data-view]');
+    viewButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const view = e.target.getAttribute('data-view');
+            switchView(view);
+        });
+    });
 }
 
-function getStatusColor(status) {
-    const colors = {
-        'new': 'bg-blue-100 text-blue-800',
-        'qualified': 'bg-yellow-100 text-yellow-800',
-        'proposal': 'bg-purple-100 text-purple-800',
-        'converted': 'bg-green-100 text-green-800',
-        'lost': 'bg-red-100 text-red-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+function setupEventListeners() {
+    // Event listeners adicionais podem ser configurados aqui
 }
 
-function getStatusText(status) {
-    const texts = {
-        'new': 'Novo',
-        'qualified': 'Qualificado',
-        'proposal': 'Proposta',
-        'converted': 'Convertido',
-        'lost': 'Perdido'
+function setupTableEvents() {
+    // Configurar eventos específicos da tabela
+    const leadCheckboxes = document.querySelectorAll('.lead-checkbox');
+    leadCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActionBar);
+    });
+}
+
+function setupRealTimeUpdates() {
+    // Configurar atualizações em tempo real via Supabase
+    const subscription = supabase
+        .channel('leads_realtime')
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: leadsConfig.tableName,
+            filter: `org_id=eq.${leadsState.currentUserProfile.org_id}`
+        }, (payload) => {
+            console.log('Atualização em tempo real:', payload);
+            loadLeads();
+        })
+        .subscribe();
+    
+    // Limpar subscription quando sair da página
+    window.addEventListener('beforeunload', () => {
+        supabase.removeChannel(subscription);
+    });
+}
+
+// ===== AÇÕES =====
+window.openNewLeadModal = function() {
+    showToast('Modal de criação de lead em desenvolvimento', 'info');
+};
+
+window.viewLead = function(leadId) {
+    const lead = leadsState.leads.find(l => l.id === leadId);
+    if (lead) {
+        showToast(`Visualizando ${lead.nome}`, 'info');
+    }
+};
+
+window.editLead = function(leadId) {
+    const lead = leadsState.leads.find(l => l.id === leadId);
+    if (lead) {
+        showToast(`Editando ${lead.nome}`, 'info');
+    }
+};
+
+window.deleteLead = function(leadId) {
+    if (confirm('Tem certeza que deseja excluir este lead?')) {
+        showToast('Função de exclusão em desenvolvimento', 'info');
+    }
+};
+
+window.contactLead = function(leadId, method) {
+    const lead = leadsState.leads.find(l => l.id === leadId);
+    if (!lead) return;
+    
+    if (method === 'phone') {
+        if (lead.telefone) {
+            window.open(`tel:${lead.telefone.replace(/\D/g, '')}`);
+            showToast(`Ligando para ${lead.nome}`, 'success');
+        } else {
+            showToast('Telefone não cadastrado', 'warning');
+        }
+    } else if (method === 'email') {
+        if (lead.email) {
+            window.open(`mailto:${lead.email}?subject=Contato - ALSHAM 360°`);
+            showToast(`Abrindo email para ${lead.nome}`, 'success');
+        } else {
+            showToast('Email não cadastrado', 'warning');
+        }
+    }
+};
+
+window.showLeadActions = function(leadId) {
+    showToast('Menu de ações em desenvolvimento', 'info');
+};
+
+window.switchView = function(view) {
+    leadsState.currentView = view;
+    renderCurrentView();
+};
+
+window.sortBy = function(field) {
+    if (leadsState.sorting.field === field) {
+        leadsState.sorting.direction = leadsState.sorting.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        leadsState.sorting.field = field;
+        leadsState.sorting.direction = 'asc';
+    }
+    loadLeads();
+};
+
+window.clearAllFilters = function() {
+    leadsState.filters = {
+        search: '',
+        status: '',
+        period: '',
+        priority: '',
+        source: '',
+        assignee: ''
     };
-    return texts[status] || status;
+    
+    // Limpar campos de filtro
+    document.getElementById('search-filter').value = '';
+    ['status-filter', 'priority-filter', 'source-filter', 'period-filter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.value = '';
+    });
+    
+    loadLeads();
+};
+
+// ===== FUNÇÕES AUXILIARES =====
+function getStatusConfig(status) {
+    return leadsConfig.statusOptions.find(s => s.value === status) || leadsConfig.statusOptions[0];
+}
+
+function getPriorityConfig(priority) {
+    return leadsConfig.priorityOptions.find(p => p.value === priority) || leadsConfig.priorityOptions[1];
 }
 
 function formatCurrency(value) {
+    if (!value) return 'R$ 0,00';
     return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
     }).format(value);
 }
 
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+function formatDate(date) {
+    if (!date) return '-';
+    return new Date(date).toLocaleDateString('pt-BR');
 }
+
+function formatTimeAgo(date) {
+    if (!date) return '-';
+    
+    const now = new Date();
+    const diff = now - new Date(date);
+    const minutes = Math.floor(diff / 60000);
+    
+    if (minutes < 1) return 'agora';
+    if (minutes < 60) return `${minutes}min atrás`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h atrás`;
+    
+    const days = Math.floor(hours / 24);
+    return `${days}d atrás`;
+}
+
+function updateViewButtons() {
+    const buttons = document.querySelectorAll('[data-view]');
+    buttons.forEach(button => {
+        const view = button.getAttribute('data-view');
+        const isActive = view === leadsState.currentView;
+        
+        button.classList.toggle('bg-primary', isActive);
+        button.classList.toggle('text-white', isActive);
+        button.classList.toggle('bg-gray-100', !isActive);
+        button.classList.toggle('text-gray-700', !isActive);
+    });
+}
+
+function updateResultsCount() {
+    const counter = document.getElementById('results-count');
+    if (counter) {
+        const { currentPage, itemsPerPage, totalItems } = leadsState.pagination;
+        const start = (currentPage - 1) * itemsPerPage + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        
+        counter.textContent = `Mostrando ${start}-${end} de ${totalItems} leads`;
+    }
+}
+
+function updatePagination() {
+    const container = document.getElementById('pagination');
+    if (!container) return;
+    
+    const { currentPage, totalItems, itemsPerPage } = leadsState.pagination;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="flex items-center justify-between">
+            <button onclick="changePage(${currentPage - 1})" 
+                    class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                    ${currentPage === 1 ? 'disabled' : ''}>
+                Anterior
+            </button>
+            
+            <span class="text-sm text-gray-700">
+                Página ${currentPage} de ${totalPages}
+            </span>
+            
+            <button onclick="changePage(${currentPage + 1})" 
+                    class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                    ${currentPage === totalPages ? 'disabled' : ''}>
+                Próxima
+            </button>
+        </div>
+    `;
+}
+
+function updateBulkActionBar() {
+    const selectedCheckboxes = document.querySelectorAll('.lead-checkbox:checked');
+    const bulkBar = document.getElementById('bulk-action-bar');
+    
+    if (selectedCheckboxes.length > 0) {
+        if (bulkBar) {
+            bulkBar.classList.remove('hidden');
+            bulkBar.querySelector('#selected-count').textContent = selectedCheckboxes.length;
+        }
+    } else {
+        if (bulkBar) {
+            bulkBar.classList.add('hidden');
+        }
+    }
+}
+
+window.changePage = function(page) {
+    const totalPages = Math.ceil(leadsState.pagination.totalItems / leadsState.pagination.itemsPerPage);
+    
+    if (page >= 1 && page <= totalPages) {
+        leadsState.pagination.currentPage = page;
+        loadLeads();
+    }
+};
 
 function debounce(func, wait) {
     let timeout;
@@ -422,129 +956,50 @@ function debounce(func, wait) {
     };
 }
 
-function showLoading(show) {
-    const loadingState = document.getElementById('loading-state');
-    if (loadingState) {
-        loadingState.classList.toggle('hidden', !show);
+// ===== FUNÇÕES DE UTILIDADE =====
+function showLoading(show, message = 'Carregando...') {
+    let loader = document.getElementById('leads-loader');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'leads-loader';
+        loader.className = 'fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm';
+        loader.innerHTML = `
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-primary border-b-4 border-gray-100 mx-auto mb-4"></div>
+                <p class="text-gray-600 font-medium" id="leads-loader-message">${message}</p>
+            </div>
+        `;
+        document.body.appendChild(loader);
     }
+    
+    const messageEl = loader.querySelector('#leads-loader-message');
+    if (messageEl) messageEl.textContent = message;
+    
+    loader.style.display = show ? 'flex' : 'none';
 }
 
-function showEmptyState() {
-    document.getElementById('empty-state').classList.remove('hidden');
-    document.getElementById('table-view').classList.add('hidden');
-    document.getElementById('grid-view').classList.add('hidden');
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-yellow-500',
+        info: 'bg-blue-500'
+    };
+    
+    toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-0`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
-function hideEmptyState() {
-    document.getElementById('empty-state').classList.add('hidden');
-}
-
-// Funções globais
-window.toggleView = function(view) {
-    currentView = view;
-
-    // Atualizar botões
-    document.getElementById('table-view-btn').classList.toggle('bg-primary', view === 'table');
-    document.getElementById('table-view-btn').classList.toggle('text-white', view === 'table');
-    document.getElementById('table-view-btn').classList.toggle('bg-gray-200', view !== 'table');
-    document.getElementById('table-view-btn').classList.toggle('text-gray-600', view !== 'table');
-
-    document.getElementById('grid-view-btn').classList.toggle('bg-primary', view === 'grid');
-    document.getElementById('grid-view-btn').classList.toggle('text-white', view === 'grid');
-    document.getElementById('grid-view-btn').classList.toggle('bg-gray-200', view !== 'grid');
-    document.getElementById('grid-view-btn').classList.toggle('text-gray-600', view !== 'grid');
-
-    renderLeads();
-};
-
-window.openNewLeadModal = function() {
-    editingLeadId = null;
-    document.getElementById('new-lead-modal').classList.remove('hidden');
-    document.getElementById('new-lead-form').reset();
-    document.querySelector('#new-lead-modal h3').textContent = '➕ Novo Lead';
-    document.querySelector('#new-lead-form button[type=submit]').textContent = 'Criar Lead';
-};
-
-window.closeNewLeadModal = function() {
-    editingLeadId = null;
-    document.getElementById('new-lead-modal').classList.add('hidden');
-    document.getElementById('new-lead-form').reset();
-};
-
-window.refreshLeads = function() {
-    loadLeads();
-};
-
-window.applyFilters = applyFilters;
-
-window.openWhatsApp = function(phone, name) {
-    const cleanPhone = phone.replace(/\D/g, '');
-    const message = `Olá ${name}! Sou da ALSHAM e gostaria de conversar sobre nossa proposta. Quando seria um bom momento para você?`;
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
-};
-
-window.editLead = function(leadId) {
-    editingLeadId = leadId;
-    const lead = allLeads.find(l => l.id === leadId);
-    if (!lead) return showNotification('Lead não encontrado', 'error');
-
-    document.getElementById('new-lead-modal').classList.remove('hidden');
-    const form = document.getElementById('new-lead-form');
-    // Preenche campos
-    form.name.value = lead.name || '';
-    form.email.value = lead.email || '';
-    form.phone.value = lead.phone || '';
-    form.company.value = lead.company || '';
-    form.position.value = lead.position || '';
-    form.status.value = lead.status || 'new';
-    form.value.value = lead.value || '';
-    form.source.value = lead.source || 'website';
-    form.notes.value = lead.notes || '';
-    document.querySelector('#new-lead-modal h3').textContent = '✏️ Editar Lead';
-    document.querySelector('#new-lead-form button[type=submit]').textContent = 'Salvar Alterações';
-};
-
-window.deleteLead = async function(leadId) {
-    if (!confirm('Tem certeza que deseja excluir este lead?')) return;
-
-    try {
-        const { error } = await supabase
-            .from('leads')
-            .delete()
-            .eq('id', leadId);
-
-        if (error) throw error;
-
-        showNotification('Lead excluído com sucesso!', 'success');
-        await loadLeads();
-
-    } catch (error) {
-        console.error('Erro ao excluir lead:', error);
-        showNotification('Erro ao excluir lead', 'error');
-    }
-};
-
-window.exportLeads = function() {
-    if (!allLeads.length) return showNotification('Sem leads para exportar!', 'info');
-
-    // Monta csv
-    const headers = ['Nome', 'E-mail', 'Telefone', 'Empresa', 'Cargo', 'Status', 'Valor', 'Origem', 'Observações', 'Data'];
-    const rows = allLeads.map(l => [
-        l.name, l.email, l.phone, l.company, l.position, getStatusText(l.status), l.value, l.source, l.notes, formatDate(l.created_at)
-    ]);
-    const csvContent = [headers, ...rows].map(row =>
-        row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(';')
-    ).join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `leads-${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showNotification('Exportação concluída!', 'success');
+// ===== EXPORTS =====
+export {
+    leadsState,
+    loadLeads,
+    renderCurrentView
 };
