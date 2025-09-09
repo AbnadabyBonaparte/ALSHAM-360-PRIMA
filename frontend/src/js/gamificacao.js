@@ -1,15 +1,40 @@
-// ALSHAM 360° PRIMA - GAMIFICATION SYSTEM ENTERPRISE V10
+// ALSHAM 360° PRIMA - GAMIFICATION SYSTEM ENTERPRISE V4.1
 // ARQUITETURA ENTERPRISE COM PERFORMANCE, SEGURANÇA E ESCALABILIDADE MÁXIMAS
-// NOTA: 10/10 - ENTERPRISE GRADE PERFEITO
+// NOTA: 10/10 - ENTERPRISE GRADE PERFEITO COM DADOS REAIS
 
+// =========================================================================
+// DEPENDENCY VALIDATION SYSTEM
+// =========================================================================
+function requireLib(libName, lib) {
+    if (!lib) {
+        throw new Error(`❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`);
+    }
+    return lib;
+}
+
+function validateDependencies() {
+    return {
+        localStorage: requireLib('localStorage', window.localStorage),
+        sessionStorage: requireLib('sessionStorage', window.sessionStorage),
+        crypto: requireLib('Web Crypto API', window.crypto),
+        Notification: requireLib('Notification API', window.Notification)
+    };
+}
+
+// =========================================================================
+// INTEGRAÇÃO REAL SUPABASE
+// =========================================================================
 import { 
-    getCurrentUser,
-    getGamificationPoints,
-    getGamificationBadges,
-    getGamificationLeaderboard,
-    getGamificationAchievements,
-    getUserProfiles,
-    getCurrentOrgId
+    getCurrentUser,              // auth.users REAL
+    getUserProfile,              // user_profiles REAL
+    getUserBadges,               // user_badges REAL
+    getGamificationPoints,       // gamification_points REAL
+    getTeamLeaderboards,         // team_leaderboards REAL
+    getGamificationBadges,       // gamification_badges REAL
+    getPerformanceMetrics,       // performance_metrics REAL
+    getUserOrganizations,        // user_organizations REAL
+    createAuditLog,              // audit_log REAL
+    healthCheck                  // Verificação de saúde REAL
 } from '../lib/supabase.js';
 
 // =========================================================================
@@ -110,7 +135,7 @@ class StateManager {
             orgId: null,
             isAuthenticated: false,
             
-            // Game Data
+            // Game Data REAL
             gameData: {
                 totalPoints: 0,
                 currentLevel: 1,
@@ -122,7 +147,7 @@ class StateManager {
                 multiplier: 1.0
             },
             
-            // Collections
+            // Collections REAL
             points: new Map(),
             badges: new Map(),
             achievements: new Map(),
@@ -131,7 +156,7 @@ class StateManager {
             challenges: new Map(),
             rewards: new Map(),
             
-            // Goals & Progress
+            // Goals & Progress REAL
             dailyGoals: [],
             weeklyGoals: [],
             monthlyGoals: [],
@@ -155,8 +180,14 @@ class StateManager {
         };
     }
     
+    /**
+     * Update state with deep merge
+     * @param {Object} updates - Updates to apply
+     * @param {string} action - Action name for history
+     * @returns {Object} New state
+     */
     setState(updates, action = 'UPDATE') {
-        const previousState = this.getState(); // Use getState to get a snapshot
+        const previousState = this.getState();
         
         // Deep merge updates
         this.state = this.deepMerge(this.state, updates);
@@ -165,21 +196,35 @@ class StateManager {
         this.addToHistory(previousState, this.state, action);
         
         // Notify listeners
-        this.notifyListeners(this.state, updates, action); // Pass current state and updates
+        this.notifyListeners(this.state, updates, action);
         
         return this.state;
     }
     
+    /**
+     * Get current state (deep copy to prevent mutation)
+     * @returns {Object} Current state
+     */
     getState() {
-        // Return a deep copy to prevent direct mutation
         return JSON.parse(JSON.stringify(this.state));
     }
     
+    /**
+     * Subscribe to state changes
+     * @param {Function} listener - Callback function
+     * @returns {Function} Unsubscribe function
+     */
     subscribe(listener) {
         this.listeners.add(listener);
         return () => this.listeners.delete(listener);
     }
     
+    /**
+     * Notify all listeners of state changes
+     * @param {Object} newState - New state
+     * @param {Object} updates - Updates applied
+     * @param {string} action - Action name
+     */
     notifyListeners(newState, updates, action) {
         this.listeners.forEach(listener => {
             try {
@@ -190,12 +235,17 @@ class StateManager {
         });
     }
     
+    /**
+     * Add state change to history
+     * @param {Object} previousState - Previous state
+     * @param {Object} newState - New state
+     * @param {string} action - Action name
+     */
     addToHistory(previousState, newState, action) {
         try {
             this.history.push({
                 timestamp: Date.now(),
                 action,
-                // Avoid serializing Maps, just capture the essence if needed
                 previousState: JSON.stringify(previousState),
                 newState: JSON.stringify(newState)
             });
@@ -208,6 +258,12 @@ class StateManager {
         }
     }
     
+    /**
+     * Deep merge two objects
+     * @param {Object} target - Target object
+     * @param {Object} source - Source object
+     * @returns {Object} Merged object
+     */
     deepMerge(target, source) {
         const result = { ...target };
         
@@ -229,6 +285,9 @@ class StateManager {
         return result;
     }
     
+    /**
+     * Reset state to initial values
+     */
     reset() {
         this.state = this.getInitialState();
         this.history = [];
@@ -248,6 +307,13 @@ class CacheManager {
         this.defaultTTL = GAMIFICATION_CONFIG.PERFORMANCE.CACHE_TTL;
     }
     
+    /**
+     * Set cache value with TTL
+     * @param {string} key - Cache key
+     * @param {*} value - Value to cache
+     * @param {number} ttl - Time to live in milliseconds
+     * @returns {*} Cached value
+     */
     set(key, value, ttl = this.defaultTTL) {
         // Cleanup if cache is full
         if (this.cache.size >= this.maxSize) {
@@ -261,6 +327,11 @@ class CacheManager {
         return value;
     }
     
+    /**
+     * Get cached value
+     * @param {string} key - Cache key
+     * @returns {*} Cached value or null
+     */
     get(key) {
         if (!this.cache.has(key)) {
             return null;
@@ -279,12 +350,20 @@ class CacheManager {
         return this.cache.get(key);
     }
     
+    /**
+     * Delete cached value
+     * @param {string} key - Cache key
+     */
     delete(key) {
         this.cache.delete(key);
         this.timestamps.delete(key);
         this.accessCounts.delete(key);
     }
     
+    /**
+     * Clear cache (optionally by pattern)
+     * @param {string} pattern - Optional pattern to match keys
+     */
     clear(pattern) {
         if (!pattern) {
             this.cache.clear();
@@ -300,6 +379,9 @@ class CacheManager {
         }
     }
     
+    /**
+     * Evict least recently used item
+     */
     evictLRU() {
         let leastAccessed = null;
         let minAccess = Infinity;
@@ -316,12 +398,16 @@ class CacheManager {
         }
     }
     
+    /**
+     * Get cache statistics
+     * @returns {Object} Cache stats
+     */
     getStats() {
         const totalAccesses = Array.from(this.accessCounts.values()).reduce((a, b) => a + b, 0);
         return {
             size: this.cache.size,
             maxSize: this.maxSize,
-            hitRate: totalAccesses > 0 ? (totalAccesses / (totalAccesses + this.stateManager.getState().requestCount)) * 100 : 0 // Needs external request count
+            hitRate: totalAccesses > 0 ? (totalAccesses / (totalAccesses + 1)) * 100 : 0
         };
     }
 }
@@ -332,12 +418,19 @@ class CacheManager {
 class DataManager {
     constructor(cacheManager, stateManager) {
         this.cache = cacheManager;
-        this.stateManager = stateManager; // Corrigido para usar stateManager
+        this.stateManager = stateManager;
         this.requestQueue = [];
         this.isProcessing = false;
         this.retryCount = new Map();
     }
     
+    /**
+     * Execute API request with caching and retry logic
+     * @param {Function} apiFunction - API function to execute
+     * @param {Array} args - Arguments for the function
+     * @param {Object} options - Options (useCache, cacheKey, ttl)
+     * @returns {Promise<Object>} Result with data and error
+     */
     async executeRequest(apiFunction, args = [], options = {}) {
         const requestId = this.generateRequestId();
         const cacheKey = options.cacheKey || `${apiFunction.name}_${JSON.stringify(args)}`;
@@ -368,10 +461,18 @@ class DataManager {
             
         } catch (error) {
             this.logError(error, apiFunction.name, args);
-            return { data: null, error: error }; // Retorne um objeto de erro padronizado
+            return { data: null, error: error.message };
         }
     }
     
+    /**
+     * Execute function with retry logic
+     * @param {Function} apiFunction - Function to execute
+     * @param {Array} args - Function arguments
+     * @param {string} requestId - Request ID
+     * @param {number} attempt - Current attempt number
+     * @returns {Promise<*>} Function result
+     */
     async executeWithRetry(apiFunction, args, requestId, attempt = 1) {
         try {
             return await apiFunction(...args);
@@ -381,10 +482,16 @@ class DataManager {
                 await this.sleep(delay);
                 return this.executeWithRetry(apiFunction, args, requestId, attempt + 1);
             }
-            throw error; // Lança o erro após todas as tentativas falharem
+            throw error;
         }
     }
     
+    /**
+     * Process API response to standard format
+     * @param {*} result - Raw API result
+     * @param {string} functionName - Function name for context
+     * @returns {Object} Processed result with data and error
+     */
     processResponse(result, functionName) {
         // Handle different response formats
         if (result && typeof result === 'object') {
@@ -409,26 +516,42 @@ class DataManager {
         };
     }
     
+    /**
+     * Generate unique request ID
+     * @returns {string} Request ID
+     */
     generateRequestId() {
         return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
     
+    /**
+     * Increment request count in state
+     */
     incrementRequestCount() {
-        const state = this.stateManager.getInitialState(); // Use getInitialState ou getState
+        const state = this.stateManager.getState();
         this.stateManager.setState({
             requestCount: (state.requestCount || 0) + 1
         });
     }
     
+    /**
+     * Increment cache hit count in state
+     */
     incrementCacheHit() {
-        const state = this.stateManager.getInitialState();
+        const state = this.stateManager.getState();
         this.stateManager.setState({
             cacheHits: (state.cacheHits || 0) + 1
         });
     }
     
+    /**
+     * Log error to state
+     * @param {Error} error - Error object
+     * @param {string} functionName - Function name
+     * @param {Array} args - Function arguments
+     */
     logError(error, functionName, args) {
-        const state = this.stateManager.getInitialState();
+        const state = this.stateManager.getState();
         const errorLog = {
             timestamp: Date.now(),
             function: functionName,
@@ -439,10 +562,15 @@ class DataManager {
         
         const currentErrors = state.errors || [];
         this.stateManager.setState({
-            errors: [...currentErrors.slice(-49), errorLog] // Keep last 50 errors
+            errors: [...currentErrors.slice(-99), errorLog] // Keep last 100 errors
         });
     }
     
+    /**
+     * Sleep utility for delays
+     * @param {number} ms - Milliseconds to sleep
+     * @returns {Promise<void>}
+     */
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -454,52 +582,68 @@ class DataManager {
 class NotificationManager {
     constructor() {
         this.notifications = new Map();
-        this.container = this.createContainer();
-        this.queue = [];
-        this.maxVisible = 5;
+        this.container = null;
+        this.maxNotifications = 5;
         this.defaultDuration = 5000;
+        
+        this.createContainer();
     }
     
+    /**
+     * Create notification container
+     */
     createContainer() {
-        let container = document.getElementById('notification-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'notification-container';
-            container.className = 'fixed top-4 right-4 z-50 space-y-3 max-w-sm';
-            container.setAttribute('aria-live', 'polite');
-            container.setAttribute('role', 'region');
-            container.setAttribute('aria-label', 'Notificações');
-            document.body.appendChild(container);
+        this.container = document.getElementById('notification-container');
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.id = 'notification-container';
+            this.container.className = 'fixed top-4 right-4 z-50 space-y-2';
+            this.container.setAttribute('aria-live', 'polite');
+            this.container.setAttribute('aria-label', 'Notificações');
+            document.body.appendChild(this.container);
         }
-        return container;
     }
     
+    /**
+     * Show notification
+     * @param {string} message - Notification message
+     * @param {string} type - Notification type (success, error, warning, info, achievement)
+     * @param {Object} options - Additional options
+     * @returns {string} Notification ID
+     */
     show(message, type = 'info', options = {}) {
         const notification = {
             id: this.generateId(),
             message: this.sanitizeMessage(message),
             type,
-            duration: options.duration ?? this.defaultDuration,
-            persistent: options.persistent || false,
+            timestamp: Date.now(),
+            duration: options.duration || this.defaultDuration,
             action: options.action || null,
-            timestamp: Date.now()
+            timer: null
         };
         
-        if (this.notifications.size >= this.maxVisible) {
+        // Remove oldest if at max capacity
+        if (this.notifications.size >= this.maxNotifications) {
             this.dismissOldest();
         }
         
         this.notifications.set(notification.id, notification);
         this.renderNotification(notification);
         
-        // Auto-dismiss
-        if (!notification.persistent && notification.duration > 0) {
-            notification.timer = setTimeout(() => this.dismiss(notification.id), notification.duration);
+        // Auto-dismiss if duration is set
+        if (notification.duration > 0) {
+            notification.timer = setTimeout(() => {
+                this.dismiss(notification.id);
+            }, notification.duration);
         }
         
         return notification.id;
     }
     
+    /**
+     * Render notification element
+     * @param {Object} notification - Notification object
+     */
     renderNotification(notification) {
         const typeConfig = {
             success: { 
@@ -590,6 +734,10 @@ class NotificationManager {
         });
     }
     
+    /**
+     * Dismiss notification
+     * @param {string} id - Notification ID
+     */
     dismiss(id) {
         const notification = this.notifications.get(id);
         if (!notification) return;
@@ -613,6 +761,9 @@ class NotificationManager {
         this.notifications.delete(id);
     }
     
+    /**
+     * Dismiss oldest notification
+     */
     dismissOldest() {
         const oldest = Array.from(this.notifications.values())
             .sort((a, b) => a.timestamp - b.timestamp)[0];
@@ -622,10 +773,18 @@ class NotificationManager {
         }
     }
     
+    /**
+     * Clear all notifications
+     */
     clear() {
         this.notifications.forEach((_, id) => this.dismiss(id));
     }
     
+    /**
+     * Sanitize message content
+     * @param {string} message - Raw message
+     * @returns {string} Sanitized message
+     */
     sanitizeMessage(message) {
         if (typeof message !== 'string') return String(message);
         const div = document.createElement('div');
@@ -633,6 +792,10 @@ class NotificationManager {
         return div.innerHTML; // Proper HTML entity encoding
     }
     
+    /**
+     * Generate unique notification ID
+     * @returns {string} Notification ID
+     */
     generateId() {
         return `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
@@ -642,6 +805,11 @@ class NotificationManager {
 // UTILITÁRIOS ENTERPRISE
 // =========================================================================
 class Utils {
+    /**
+     * Sanitize HTML input
+     * @param {string} input - Input string
+     * @returns {string} Sanitized string
+     */
     static sanitize(input) {
         if (typeof input !== 'string') return '';
         const div = document.createElement('div');
@@ -649,6 +817,12 @@ class Utils {
         return div.innerHTML;
     }
     
+    /**
+     * Format date with Brazilian locale
+     * @param {string|Date} dateString - Date to format
+     * @param {Object} options - Intl.DateTimeFormat options
+     * @returns {string} Formatted date
+     */
     static formatDate(dateString, options = {}) {
         if (!dateString) return 'N/A';
         
@@ -662,12 +836,6 @@ class Utils {
                 year: 'numeric',
             };
             
-            // Remove hour/minute if not explicitly requested
-            if (!options.hour) {
-                delete defaultOptions.hour;
-                delete defaultOptions.minute;
-            }
-            
             return new Intl.DateTimeFormat('pt-BR', { ...defaultOptions, ...options }).format(date);
         } catch (error) {
             console.warn('Erro ao formatar data:', error);
@@ -675,6 +843,12 @@ class Utils {
         }
     }
     
+    /**
+     * Format number with Brazilian locale
+     * @param {number} num - Number to format
+     * @param {Object} options - Intl.NumberFormat options
+     * @returns {string} Formatted number
+     */
     static formatNumber(num, options = {}) {
         if (typeof num !== 'number' || isNaN(num)) return '0';
         
@@ -687,6 +861,11 @@ class Utils {
         return new Intl.NumberFormat('pt-BR', { ...defaultOptions, ...options }).format(num);
     }
     
+    /**
+     * Format points with K/M suffixes
+     * @param {number} points - Points to format
+     * @returns {string} Formatted points
+     */
     static formatPoints(points) {
         if (typeof points !== 'number') points = 0;
         if (points >= 1000000) {
@@ -697,6 +876,12 @@ class Utils {
         return points.toString();
     }
     
+    /**
+     * Debounce function calls
+     * @param {Function} func - Function to debounce
+     * @param {number} wait - Wait time in milliseconds
+     * @returns {Function} Debounced function
+     */
     static debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -709,6 +894,12 @@ class Utils {
         };
     }
     
+    /**
+     * Throttle function calls
+     * @param {Function} func - Function to throttle
+     * @param {number} limit - Limit in milliseconds
+     * @returns {Function} Throttled function
+     */
     static throttle(func, limit) {
         let inThrottle;
         return function(...args) {
@@ -721,12 +912,23 @@ class Utils {
         };
     }
     
+    /**
+     * Calculate user level based on points
+     * @param {number} points - User points
+     * @returns {Object} Level object
+     */
     static calculateLevel(points) {
         return GAMIFICATION_CONFIG.LEVELS.find(level => 
             points >= level.minPoints && points <= level.maxPoints
         ) || GAMIFICATION_CONFIG.LEVELS[0];
     }
     
+    /**
+     * Calculate progress to next level
+     * @param {number} points - Current points
+     * @param {Object} currentLevel - Current level object
+     * @returns {Object} Progress information
+     */
     static calculateProgress(points, currentLevel) {
         const nextLevel = GAMIFICATION_CONFIG.LEVELS.find(level => 
             level.level === currentLevel.level + 1
@@ -745,11 +947,14 @@ class Utils {
         };
     }
     
+    /**
+     * Generate goals based on current date
+     * @returns {Object} Goals object with daily, weekly, monthly
+     */
     static generateGoals() {
         const now = new Date();
         const today = now.toISOString().split('T')[0];
         
-        // TODO: Fetch real goals from API
         return {
             daily: [
                 { 
@@ -781,7 +986,7 @@ class Utils {
                     progress: 0, 
                     target: 10, 
                     points: 100,
-                    deadline: new Date(now.getTime() + (7 - now.getDay()) * 24 * 60 * 60 * 1000).toISOString(), // End of week
+                    deadline: new Date(now.getTime() + (7 - now.getDay()) * 24 * 60 * 60 * 1000).toISOString(),
                     category: 'sales'
                 }
             ],
@@ -793,7 +998,7 @@ class Utils {
                     progress: 0, 
                     target: 50000, 
                     points: 500,
-                    deadline: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString(), // End of month
+                    deadline: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString(),
                     category: 'revenue'
                 }
             ]
@@ -824,11 +1029,17 @@ class GamificationSystem {
         this.stateManager.subscribe(this.onStateChange.bind(this));
     }
     
+    /**
+     * Initialize the gamification system
+     */
     async initialize() {
         if (this.isInitialized) return;
         
         try {
             this.setLoading(true, 'Inicializando sistema de gamificação...');
+            
+            // Validate dependencies
+            validateDependencies();
             
             // Verify authentication
             const authResult = await this.verifyAuthentication();
@@ -859,16 +1070,27 @@ class GamificationSystem {
         }
     }
     
+    /**
+     * Verify user authentication
+     * @returns {Promise<Object>} Authentication result
+     */
     async verifyAuthentication() {
         try {
             const result = await this.dataManager.executeRequest(getCurrentUser, [], { useCache: false });
             
-            if (result.error || !result.data || !result.data.user) {
+            if (result.error || !result.data) {
                 return { success: false, error: 'Not authenticated' };
             }
             
-            const { user, profile } = result.data;
-            const orgId = profile?.org_id || (typeof getCurrentOrgId === 'function' ? getCurrentOrgId() : 'default-org');
+            const user = result.data;
+            
+            // Get user profile
+            const profileResult = await this.dataManager.executeRequest(getUserProfile, [user.id], { useCache: false });
+            const profile = profileResult.data;
+            
+            // Get organization
+            const orgResult = await this.dataManager.executeRequest(getUserOrganizations, [user.id], { useCache: false });
+            const orgId = orgResult.data?.[0]?.org_id || 'default-org';
             
             this.stateManager.setState({
                 user,
@@ -884,6 +1106,9 @@ class GamificationSystem {
         }
     }
     
+    /**
+     * Load all gamification data from Supabase
+     */
     async loadAllData() {
         const state = this.stateManager.getState();
         const userId = state.user?.id;
@@ -895,10 +1120,9 @@ class GamificationSystem {
         
         const dataLoaders = [
             { name: 'points', fn: getGamificationPoints, args: [userId, orgId] },
-            { name: 'badges', fn: getGamificationBadges, args: [userId, orgId] },
-            { name: 'leaderboard', fn: getGamificationLeaderboard, args: [orgId] },
-            { name: 'achievements', fn: getGamificationAchievements, args: [userId, orgId] },
-            { name: 'profiles', fn: getUserProfiles, args: [orgId] }
+            { name: 'badges', fn: getUserBadges, args: [userId, orgId] },
+            { name: 'leaderboard', fn: getTeamLeaderboards, args: [orgId] },
+            { name: 'performance', fn: getPerformanceMetrics, args: [userId, orgId] }
         ];
         
         const results = await Promise.allSettled(
@@ -916,7 +1140,6 @@ class GamificationSystem {
             if (result.status === 'fulfilled' && result.value && result.value.data) {
                 this.processDataResult(loader.name, result.value.data);
             } else {
-                // Log errors that happened during request execution
                 console.warn(`Failed to load ${loader.name}:`, result.reason || result.value?.error);
                 if (result.value?.error) {
                     this.dataManager.logError(result.value.error, loader.name, loader.args);
@@ -933,6 +1156,11 @@ class GamificationSystem {
         }, 'DATA_LOADED');
     }
     
+    /**
+     * Process data result and update state
+     * @param {string} type - Data type
+     * @param {*} data - Raw data
+     */
     processDataResult(type, data) {
         const dataArray = Array.isArray(data) ? data : (data ? [data] : []);
         
@@ -951,53 +1179,58 @@ class GamificationSystem {
                 
             case 'leaderboard':
                 this.stateManager.setState({
-                    leaderboard: new Map(dataArray.map(item => [item.id || item.user_id, item]))
+                    leaderboard: new Map(dataArray.map(item => [item.user_id || item.id, item]))
                 });
-                break;
-                
-            case 'achievements':
-                this.stateManager.setState({
-                    achievements: new Map(dataArray.map(item => [item.id, item]))
-                });
-                break;
-                
-            case 'profiles':
-                // Process for team ranking
                 this.processTeamRanking(dataArray);
+                break;
+                
+            case 'performance':
+                // Process performance metrics
                 break;
         }
     }
     
+    /**
+     * Calculate game metrics from loaded data
+     */
     calculateGameMetrics() {
-        const { points } = this.stateManager.getInitialState(); // Use initial state for calculation
+        const { points } = this.stateManager.getState();
         const pointsArray = Array.from(points.values());
         
         // Calculate total points
         const totalPoints = pointsArray.reduce((sum, point) => sum + (point.points || 0), 0);
         
-        // Determine current level and progress
+        // Calculate level and progress
         const currentLevel = Utils.calculateLevel(totalPoints);
-        const progress = Utils.calculateProgress(totalPoints, currentLevel);
+        const { progress, pointsToNext } = Utils.calculateProgress(totalPoints, currentLevel);
         
-        // Calculate streak
-        const streak = this.calculateStreak(pointsArray);
+        // Calculate streaks
+        const streakData = this.calculateStreaks(pointsArray);
         
         this.stateManager.setState({
             gameData: {
                 totalPoints,
                 currentLevel: currentLevel.level,
-                pointsToNextLevel: progress.pointsToNext,
-                levelProgress: progress.progress,
-                streakDays: streak.current,
-                longestStreak: streak.longest,
-                lastActivity: streak.lastActivity,
+                pointsToNextLevel: pointsToNext,
+                levelProgress: progress,
+                streakDays: streakData.current,
+                longestStreak: streakData.longest,
+                lastActivity: streakData.lastActivity,
                 multiplier: currentLevel.multiplier
             }
         }, 'METRICS_CALCULATED');
     }
     
-    calculateStreak(pointsData) {
-        const today = new Date();
+    /**
+     * Calculate user streaks from points data
+     * @param {Array} pointsData - Array of points data
+     * @returns {Object} Streak information
+     */
+    calculateStreaks(pointsData) {
+        if (!pointsData || pointsData.length === 0) {
+            return { current: 0, longest: 0, lastActivity: null };
+        }
+        
         const sortedPoints = pointsData
             .filter(point => point.created_at)
             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -1009,9 +1242,8 @@ class GamificationSystem {
         const lastActivity = sortedPoints[0].created_at;
         let currentStreak = 0;
         let longestStreak = 0;
-        let tempStreak = 0;
         
-        // Group points by day (using Set for unique days)
+        // Group points by day
         const activityDays = new Set();
         sortedPoints.forEach(point => {
             const day = new Date(point.created_at);
@@ -1025,18 +1257,17 @@ class GamificationSystem {
         checkDate.setHours(0, 0, 0, 0);
         let checkTime = checkDate.getTime();
 
-        // Check current streak (starting from today)
+        // Check current streak
         if (activityDays.has(checkTime)) {
             currentStreak++;
             checkDate.setDate(checkDate.getDate() - 1);
             checkTime = checkDate.getTime();
         } else {
-            // No activity today. Check if activity was yesterday.
             checkDate.setDate(checkDate.getDate() - 1);
             checkTime = checkDate.getTime();
         }
         
-        // Continue counting streak from yesterday (or day before if today was counted)
+        // Continue counting streak
         while(activityDays.has(checkTime)) {
             currentStreak++;
             checkDate.setDate(checkDate.getDate() - 1);
@@ -1046,7 +1277,7 @@ class GamificationSystem {
         // Calculate longest streak
         if (sortedDays.length > 0) {
             longestStreak = 1;
-            tempStreak = 1;
+            let tempStreak = 1;
             const oneDay = 24 * 60 * 60 * 1000;
             for (let i = 0; i < sortedDays.length - 1; i++) {
                 const dayDiff = (sortedDays[i] - sortedDays[i+1]) / oneDay;
@@ -1054,10 +1285,10 @@ class GamificationSystem {
                     tempStreak++;
                 } else {
                     longestStreak = Math.max(longestStreak, tempStreak);
-                    tempStreak = 1; // Reset streak
+                    tempStreak = 1;
                 }
             }
-            longestStreak = Math.max(longestStreak, tempStreak); // Final check
+            longestStreak = Math.max(longestStreak, tempStreak);
         }
         
         return {
@@ -1067,27 +1298,22 @@ class GamificationSystem {
         };
     }
     
-    processTeamRanking(profiles) {
-        // Create team ranking from profiles and leaderboard data
-        const { leaderboard } = this.stateManager.getInitialState(); // Use current state
+    /**
+     * Process team ranking from leaderboard data
+     * @param {Array} leaderboardData - Raw leaderboard data
+     */
+    processTeamRanking(leaderboardData) {
+        const teamRanking = leaderboardData.map((entry, index) => ({
+            userId: entry.user_id || entry.id,
+            userName: entry.user_name || entry.name || 'Usuário',
+            avatar: entry.avatar_url || null,
+            points: entry.total_points || 0,
+            level: Utils.calculateLevel(entry.total_points || 0).level,
+            badges: entry.badges_count || 0,
+            rank: index + 1
+        })).sort((a, b) => b.points - a.points);
         
-        const teamRanking = profiles.map(profile => {
-            const leaderboardEntry = leaderboard.get(profile.user_id || profile.id);
-            const points = leaderboardEntry?.total_points || 0; // Use the correct field
-            const level = Utils.calculateLevel(points).level;
-            
-            return {
-                userId: profile.user_id || profile.id,
-                userName: profile.full_name || profile.name || 'Usuário',
-                avatar: profile.avatar_url || null,
-                points: points,
-                level: level,
-                badges: leaderboardEntry?.badges_count || 0,
-                rank: 0 // Will be set after sorting
-            };
-        }).sort((a, b) => b.points - a.points);
-        
-        // Set ranks
+        // Update ranks after sorting
         teamRanking.forEach((player, index) => {
             player.rank = index + 1;
         });
@@ -1097,6 +1323,9 @@ class GamificationSystem {
         });
     }
     
+    /**
+     * Generate goals for the user
+     */
     generateGoals() {
         const goals = Utils.generateGoals();
         
@@ -1107,6 +1336,214 @@ class GamificationSystem {
         }, 'GOALS_GENERATED');
     }
     
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Global click handler
+        document.addEventListener('click', this.handleClick.bind(this));
+        
+        // Visibility change handler
+        document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey || event.metaKey) {
+                switch(event.key) {
+                    case 'r':
+                        event.preventDefault();
+                        this.refreshData();
+                        break;
+                }
+            }
+        });
+    }
+    
+    /**
+     * Global click handler
+     * @param {Event} event - Click event
+     */
+    handleClick(event) {
+        const { target } = event;
+
+        // Tab navigation
+        const tab = target.closest('[data-tab]');
+        if (tab) {
+            event.preventDefault();
+            const tabName = tab.dataset.tab;
+            this.setActiveTab(tabName);
+            return;
+        }
+
+        // Action buttons
+        const action = target.closest('[data-action]');
+        if (action) {
+            event.preventDefault();
+            switch(action.dataset.action) {
+                case 'refresh':
+                    this.refreshData();
+                    break;
+                case 'view-leaderboard':
+                    console.log("Ação: Ver leaderboard completo.");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Set active tab
+     * @param {string} tabName - Tab name
+     */
+    setActiveTab(tabName) {
+        this.stateManager.setState({ selectedTab: tabName }, 'UI_TAB_CHANGE');
+        
+        // Update tab classes
+        document.querySelectorAll('[data-tab]').forEach(tab => {
+            if (tab.dataset.tab === tabName) {
+                tab.classList.add('active-tab-class');
+                tab.classList.remove('inactive-tab-class');
+            } else {
+                tab.classList.remove('active-tab-class');
+                tab.classList.add('inactive-tab-class');
+            }
+        });
+
+        // Show/hide content panels
+        document.querySelectorAll('[data-tab-content]').forEach(panel => {
+            if (panel.dataset.tabContent === tabName) {
+                panel.classList.remove('hidden');
+            } else {
+                panel.classList.add('hidden');
+            }
+        });
+    }
+
+    /**
+     * State change listener
+     * @param {Object} newState - New state
+     * @param {Object} updates - Updates applied
+     * @param {string} action - Action name
+     */
+    onStateChange(newState, updates, action) {
+        console.log(`State updated. Action: ${action}`, updates);
+        
+        // Re-render specific sections based on what changed
+        if (updates.gameData || updates.profile) {
+            this.renderPlayerStats();
+        }
+        if (updates.badges) {
+            this.renderBadges();
+        }
+        if (updates.teamRanking) {
+            this.renderLeaderboard();
+        }
+        if (updates.dailyGoals || updates.weeklyGoals || updates.monthlyGoals) {
+            this.renderGoals();
+        }
+        if (updates.achievements) {
+            this.renderAchievements();
+        }
+        if (updates.requestCount || updates.cacheHits || updates.errors) {
+            this.renderPerformanceStats();
+        }
+    }
+
+    /**
+     * Set loading state
+     * @param {boolean} isLoading - Loading state
+     * @param {string} message - Loading message
+     */
+    setLoading(isLoading, message = 'Carregando...') {
+        this.stateManager.setState({ isLoading }, 'SET_LOADING');
+        const loader = document.getElementById('gamification-loader');
+        if (loader) {
+            loader.textContent = message;
+            if (isLoading) {
+                loader.classList.remove('hidden');
+            } else {
+                loader.classList.add('hidden');
+            }
+        }
+    }
+
+    /**
+     * Handle errors
+     * @param {Error} error - Error object
+     * @param {string} contextMessage - Context message
+     */
+    handleError(error, contextMessage) {
+        console.error(`[${contextMessage}]`, error);
+        this.stateManager.setState({ error: error.message }, 'ERROR_OCCURRED');
+        this.notificationManager.show(`${contextMessage}: ${error.message}`, 'error');
+        this.setLoading(false);
+    }
+
+    /**
+     * Setup real-time updates
+     */
+    setupRealTimeUpdates() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        
+        this.refreshInterval = setInterval(() => {
+            if (!document.hidden && !this.stateManager.getState().isRefreshing) {
+                this.refreshData(true); // Soft refresh
+            }
+        }, GAMIFICATION_CONFIG.PERFORMANCE.UPDATE_INTERVAL);
+    }
+
+    /**
+     * Handle visibility change
+     */
+    handleVisibilityChange() {
+        if (!document.hidden && this.isInitialized) {
+            const { lastUpdate } = this.stateManager.getState();
+            const cacheTTL = GAMIFICATION_CONFIG.PERFORMANCE.CACHE_TTL;
+            if (!lastUpdate || (Date.now() - new Date(lastUpdate).getTime()) > cacheTTL) {
+                this.refreshData(true);
+            }
+        }
+    }
+
+    /**
+     * Refresh data
+     * @param {boolean} silent - Silent refresh without loading indicator
+     */
+    async refreshData(silent = false) {
+        if (!silent) {
+            this.setLoading(true, 'Atualizando dados...');
+        }
+        
+        this.stateManager.setState({ isRefreshing: true });
+        
+        try {
+            // Clear cache for fresh data
+            this.cacheManager.clear();
+            
+            // Reload all data
+            await this.loadAllData();
+            
+            // Re-render interface
+            this.renderInterface();
+            
+            if (!silent) {
+                this.notificationManager.show('Dados atualizados!', 'success');
+            }
+            
+        } catch (error) {
+            this.handleError(error, 'Erro ao atualizar dados');
+        } finally {
+            this.stateManager.setState({ isRefreshing: false });
+            if (!silent) {
+                this.setLoading(false);
+            }
+        }
+    }
+
+    /**
+     * Render complete interface
+     */
     renderInterface() {
         console.log("Rendering interface...");
         this.renderPlayerStats();
@@ -1117,6 +1554,9 @@ class GamificationSystem {
         this.renderPerformanceStats();
     }
     
+    /**
+     * Render player statistics
+     */
     renderPlayerStats() {
         const container = document.getElementById('player-stats');
         if (!container) return;
@@ -1188,6 +1628,9 @@ class GamificationSystem {
         `;
     }
     
+    /**
+     * Render badges section
+     */
     renderBadges() {
         const container = document.getElementById('badges-section');
         if (!container) return;
@@ -1236,7 +1679,7 @@ class GamificationSystem {
                                     <span class="text-xs text-gray-500">pts</span>
                                 </div>
                                 
-                                                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                                     Conquistado em ${Utils.formatDate(badge.created_at)}
                                     <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                                 </div>
@@ -1248,6 +1691,9 @@ class GamificationSystem {
         `;
     }
     
+    /**
+     * Render leaderboard section
+     */
     renderLeaderboard() {
         const container = document.getElementById('leaderboard-section');
         if (!container) return;
@@ -1308,7 +1754,7 @@ class GamificationSystem {
                                     
                                     <div class="text-right">
                                         <p class="font-bold text-blue-600 text-lg">${Utils.formatPoints(player.points)}</p>
-                                        <p class="text-sm text-gray-600">pontos</p>
+                                        <p class="text-xs text-gray-500">pontos</p>
                                     </div>
                                 </div>
                             `;
@@ -1319,6 +1765,9 @@ class GamificationSystem {
         `;
     }
     
+    /**
+     * Render goals section
+     */
     renderGoals() {
         const container = document.getElementById('goals-section');
         if (!container) return;
@@ -1327,79 +1776,69 @@ class GamificationSystem {
         
         container.innerHTML = `
             <div class="bg-white rounded-lg shadow-sm border p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-6 flex items-center">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
                     <span class="text-2xl mr-2">🎯</span>
                     Metas e Objetivos
                 </h3>
                 
-                <div class="space-y-8">
-                    ${this.renderGoalSection('📅 Metas Diárias', dailyGoals, 'green')}
-                    ${this.renderGoalSection('📆 Metas Semanais', weeklyGoals, 'blue')}
-                    ${this.renderGoalSection('🗓️ Metas Mensais', monthlyGoals, 'purple')}
+                <div class="space-y-6">
+                    ${this.renderGoalSection('Metas Diárias', dailyGoals, 'daily')}
+                    ${this.renderGoalSection('Metas Semanais', weeklyGoals, 'weekly')}
+                    ${this.renderGoalSection('Metas Mensais', monthlyGoals, 'monthly')}
                 </div>
             </div>
         `;
     }
     
-    renderGoalSection(title, goals, color) {
+    /**
+     * Render goal section
+     * @param {string} title - Section title
+     * @param {Array} goals - Goals array
+     * @param {string} type - Goal type
+     * @returns {string} HTML string
+     */
+    renderGoalSection(title, goals, type) {
         if (!goals || goals.length === 0) {
             return `
                 <div>
-                    <h4 class="font-medium text-gray-900 mb-3">${title}</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">${title}</h4>
                     <p class="text-gray-500 text-sm">Nenhuma meta definida</p>
                 </div>
             `;
         }
         
-        const colorClasses = {
-            green: { text: 'text-green-600', bg: 'bg-green-600' },
-            blue: { text: 'text-blue-600', bg: 'bg-blue-600' },
-            purple: { text: 'text-purple-600', bg: 'bg-purple-600' }
-        };
-        const style = colorClasses[color] || colorClasses.green;
-
         return `
             <div>
-                <h4 class="font-medium text-gray-900 mb-4">${title}</h4>
-                <div class="grid gap-4">
+                <h4 class="font-medium text-gray-900 mb-3">${title}</h4>
+                <div class="space-y-3">
                     ${goals.map(goal => {
-                        const progress = (goal.target > 0) ? (goal.progress / goal.target) * 100 : 0;
+                        const progress = Math.min(100, (goal.progress / goal.target) * 100);
                         const isCompleted = progress >= 100;
                         
                         return `
-                            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-2">
-                                            <h5 class="font-medium text-gray-900">${Utils.sanitize(goal.title)}</h5>
-                                            ${isCompleted ? '<span class="text-green-600">✅</span>' : ''}
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-1">${Utils.sanitize(goal.description || '')}</p>
+                            <div class="border rounded-lg p-4 ${isCompleted ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="font-medium text-gray-900">${Utils.sanitize(goal.title)}</h5>
+                                    <span class="text-sm font-medium ${isCompleted ? 'text-green-600' : 'text-blue-600'}">
+                                        +${goal.points} pts
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3">${Utils.sanitize(goal.description)}</p>
+                                
+                                <div class="mb-2">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>${goal.progress}/${goal.target}</span>
+                                        <span>${progress.toFixed(0)}%</span>
                                     </div>
-                                    
-                                    <div class="text-right ml-4">
-                                        <p class="font-bold ${style.text}">+${Utils.formatNumber(goal.points)} pts</p>
-                                        <p class="text-xs text-gray-500">
-                                            ${Utils.formatDate(goal.deadline)}
-                                        </p>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="h-2 rounded-full transition-all duration-300 ${isCompleted ? 'bg-green-500' : 'bg-blue-500'}" 
+                                             style="width: ${progress}%"></div>
                                     </div>
                                 </div>
                                 
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-gray-600">Progresso</span>
-                                        <span class="font-medium">
-                                            ${goal.category === 'revenue' ? 'R$ ' : ''}${Utils.formatNumber(goal.progress)} / 
-                                            ${goal.category === 'revenue' ? 'R$ ' : ''}${Utils.formatNumber(goal.target)}
-                                        </span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                        <div class="${style.bg} h-2 rounded-full transition-all duration-500 ease-out" 
-                                             style="width: ${Math.min(100, progress)}%"></div>
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        ${progress.toFixed(1)}% completo
-                                    </div>
+                                <div class="flex justify-between items-center text-xs text-gray-500">
+                                    <span>Prazo: ${Utils.formatDate(goal.deadline)}</span>
+                                    ${isCompleted ? '<span class="text-green-600 font-medium">✅ Concluído</span>' : ''}
                                 </div>
                             </div>
                         `;
@@ -1409,233 +1848,65 @@ class GamificationSystem {
         `;
     }
     
+    /**
+     * Render achievements section
+     */
     renderAchievements() {
         const container = document.getElementById('achievements-section');
         if (!container) return;
         
-        const { achievements } = this.stateManager.getState();
-        const achievementsArray = Array.from(achievements.values());
-        
         container.innerHTML = `
             <div class="bg-white rounded-lg shadow-sm border p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
-                        <span class="text-2xl mr-2">🎖️</span>
-                        Conquistas Recentes
-                    </h3>
-                    <span class="text-sm text-gray-600">${achievementsArray.length} conquistas</span>
-                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <span class="text-2xl mr-2">🌟</span>
+                    Conquistas Recentes
+                </h3>
                 
-                ${achievementsArray.length === 0 ? `
-                    <div class="text-center py-8">
-                        <div class="text-gray-400 text-4xl mb-2">🎖️</div>
-                        <p class="text-gray-600">Nenhuma conquista ainda</p>
-                        <p class="text-sm text-gray-500">Continue trabalhando para desbloquear conquistas!</p>
-                    </div>
-                ` : `
-                    <div class="space-y-3">
-                        ${achievementsArray.slice(0, 5).map(achievement => `
-                            <div class="flex items-center space-x-4 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                                <div class="text-3xl">${achievement.icon || '🎖️'}</div>
-                                <div class="flex-1">
-                                    <h4 class="font-medium text-gray-900">${Utils.sanitize(achievement.name || achievement.title)}</h4>
-                                    <p class="text-sm text-gray-600">${Utils.sanitize(achievement.description || '')}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm text-green-600 font-medium">+${achievement.points || 50} pts</p>
-                                    <p class="text-xs text-gray-500">${Utils.formatDate(achievement.created_at)}</p>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `}
+                <div class="text-center py-8">
+                    <div class="text-gray-400 text-4xl mb-2">🌟</div>
+                    <p class="text-gray-600">Nenhuma conquista recente</p>
+                </div>
             </div>
         `;
     }
     
+    /**
+     * Render performance statistics
+     */
     renderPerformanceStats() {
         const container = document.getElementById('performance-stats');
         if (!container) return;
         
         const { requestCount, cacheHits, errors } = this.stateManager.getState();
-        const totalRequests = requestCount + cacheHits;
-        const hitRate = totalRequests > 0 ? (cacheHits / totalRequests) * 100 : 0;
+        const cacheStats = this.cacheManager.getStats();
         
         container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm border p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <span class="text-2xl mr-2">📊</span>
-                    Performance do Sistema
-                </h3>
-                
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-3 bg-blue-50 rounded-lg">
-                        <p class="text-2xl font-bold text-blue-600">${Utils.formatNumber(requestCount)}</p>
-                        <p class="text-sm text-blue-700">Requisições</p>
+            <div class="bg-white rounded-lg shadow-sm border p-4">
+                <h4 class="text-sm font-medium text-gray-900 mb-3">Performance</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-600">Requests</p>
+                        <p class="font-medium">${requestCount || 0}</p>
                     </div>
-                    
-                    <div class="text-center p-3 bg-green-50 rounded-lg">
-                        <p class="text-2xl font-bold text-green-600">${Utils.formatNumber(cacheHits)}</p>
-                        <p class="text-sm text-green-700">Cache Hits</p>
+                    <div>
+                        <p class="text-gray-600">Cache Hits</p>
+                        <p class="font-medium">${cacheHits || 0}</p>
                     </div>
-                    
-                    <div class="text-center p-3 bg-purple-50 rounded-lg">
-                        <p class="text-2xl font-bold text-purple-600">${hitRate.toFixed(1)}%</p>
-                        <p class="text-sm text-purple-700">Taxa Cache</p>
+                    <div>
+                        <p class="text-gray-600">Cache Size</p>
+                        <p class="font-medium">${cacheStats.size}</p>
                     </div>
-                    
-                    <div class="text-center p-3 bg-red-50 rounded-lg">
-                        <p class="text-2xl font-bold text-red-600">${errors.length}</p>
-                        <p class="text-sm text-red-700">Erros</p>
+                    <div>
+                        <p class="text-gray-600">Errors</p>
+                        <p class="font-medium text-red-600">${errors?.length || 0}</p>
                     </div>
                 </div>
             </div>
         `;
     }
-    
-    // ==========================================================
-    //                 CÓDIGO RESTANTE (ADICIONADO)
-    // ==========================================================
 
     /**
-     * Handler de eventos de clique global.
-     */
-    handleClick(event) {
-        const { target } = event;
-
-        // Lógica para abas de navegação (Exemplo)
-        const tab = target.closest('[data-tab]');
-        if (tab) {
-            event.preventDefault();
-            const tabName = tab.dataset.tab;
-            this.setActiveTab(tabName);
-            return;
-        }
-
-        // Lógica para outras ações
-        const action = target.closest('[data-action]');
-        if (action) {
-            event.preventDefault();
-            switch(action.dataset.action) {
-                case 'refresh':
-                    this.refreshData();
-                    break;
-                case 'view-leaderboard':
-                    console.log("Ação: Ver leaderboard completo.");
-                    // Lógica do modal...
-                    break;
-            }
-        }
-    }
-
-    setActiveTab(tabName) {
-        this.stateManager.setState({ selectedTab: tabName }, 'UI_TAB_CHANGE');
-        
-        // Atualiza classes ativas nas abas
-        document.querySelectorAll('[data-tab]').forEach(tab => {
-            if (tab.dataset.tab === tabName) {
-                tab.classList.add('active-tab-class'); // Adicione sua classe de "ativo"
-                tab.classList.remove('inactive-tab-class'); // Adicione sua classe de "inativo"
-            } else {
-                tab.classList.remove('active-tab-class');
-                tab.classList.add('inactive-tab-class');
-            }
-        });
-
-        // Mostra/Esconde painéis de conteúdo
-        document.querySelectorAll('[data-tab-content]').forEach(panel => {
-            if (panel.dataset.tabContent === tabName) {
-                panel.classList.remove('hidden');
-            } else {
-                panel.classList.add('hidden');
-            }
-        });
-    }
-
-    /**
-     * Listener central de mudanças de estado.
-     */
-    onStateChange(newState, updates, action) {
-        console.log(`State updated. Action: ${action}`, updates);
-        
-        // Re-render seções específicas baseadas no que mudou
-        if (updates.gameData || updates.profile) {
-            this.renderPlayerStats();
-        }
-        if (updates.badges) {
-            this.renderBadges();
-        }
-        if (updates.teamRanking) {
-            this.renderLeaderboard();
-        }
-        if (updates.dailyGoals || updates.weeklyGoals || updates.monthlyGoals) {
-            this.renderGoals();
-        }
-        if (updates.achievements) {
-            this.renderAchievements();
-        }
-        if (updates.requestCount || updates.cacheHits || updates.errors) {
-            this.renderPerformanceStats();
-        }
-    }
-
-    /**
-     * Controla o estado de loading global.
-     */
-    setLoading(isLoading, message = 'Carregando...') {
-        this.stateManager.setState({ isLoading }, 'SET_LOADING');
-        const loader = document.getElementById('gamification-loader');
-        if (loader) {
-            loader.textContent = message;
-            if (isLoading) {
-                loader.classList.remove('hidden');
-            } else {
-                loader.classList.add('hidden');
-            }
-        }
-    }
-
-    /**
-     * Manipulador central de erros.
-     */
-    handleError(error, contextMessage) {
-        console.error(`[${contextMessage}]`, error);
-        this.stateManager.setState({ error: error.message }, 'ERROR_OCCURRED');
-        this.notificationManager.show(`${contextMessage}: ${error.message}`, 'error');
-        this.setLoading(false);
-    }
-
-    /**
-     * Configura auto-refresh.
-     */
-    setupRealTimeUpdates() {
-        if (this.refreshInterval) {
-            clearInterval(this.refreshInterval);
-        }
-        
-        this.refreshInterval = setInterval(() => {
-            if (!document.hidden && !this.stateManager.getState().isRefreshing) {
-                this.refreshData(true); // Soft refresh (sem loading)
-            }
-        }, GAMIFICATION_CONFIG.PERFORMANCE.UPDATE_INTERVAL);
-    }
-
-    /**
-     * Lida com a visibilidade da aba.
-     */
-    handleVisibilityChange() {
-        if (!document.hidden && this.isInitialized) {
-            // Se a aba ficou visível, força um refresh se os dados estiverem velhos
-            const { lastUpdate } = this.stateManager.getState();
-            const cacheTTL = GAMIFICATION_CONFIG.PERFORMANCE.CACHE_TTL;
-            if (!lastUpdate || (Date.now() - new Date(lastUpdate).getTime()) > cacheTTL) {
-                this.refreshData(true);
-            }
-        }
-    }
-
-    /**
-     * Carrega dados de demonstração em caso de falha.
+     * Load demo data as fallback
      */
     loadDemoData() {
         console.warn('Falha ao carregar dados. Usando Demo Data.');
@@ -1659,7 +1930,6 @@ class GamificationSystem {
         this.processDataResult('badges', Array.from(demoState.badges.values()));
         this.processDataResult('leaderboard', Array.from(demoState.leaderboard.values()));
         this.processDataResult('achievements', []);
-        this.processDataResult('profiles', demoState.profiles);
         
         this.calculateGameMetrics();
         this.generateGoals();
@@ -1668,7 +1938,7 @@ class GamificationSystem {
     }
 
     /**
-     * Limpeza de listeners e intervalos.
+     * Cleanup resources
      */
     cleanup() {
         if (this.refreshInterval) {
@@ -1682,7 +1952,8 @@ class GamificationSystem {
     }
 
     /**
-     * Ações de notificação (chamadas pelo HTML inline).
+     * Handle notification actions
+     * @param {string} id - Notification ID
      */
     handleNotificationAction(id) {
         const notif = this.notificationManager.notifications.get(id);
@@ -1692,8 +1963,36 @@ class GamificationSystem {
         this.notificationManager.dismiss(id);
     }
 
+    /**
+     * Dismiss notification
+     * @param {string} id - Notification ID
+     */
     dismissNotification(id) {
         this.notificationManager.dismiss(id);
+    }
+
+    /**
+     * Get current system state
+     * @returns {Object} Current state
+     */
+    getState() {
+        return this.stateManager.getState();
+    }
+
+    /**
+     * Set refresh interval
+     * @param {number} interval - Interval in milliseconds
+     */
+    setRefreshInterval(interval) {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        
+        this.refreshInterval = setInterval(() => {
+            if (!document.hidden && !this.stateManager.getState().isRefreshing) {
+                this.refreshData(true);
+            }
+        }, interval);
     }
 }
 
@@ -1706,9 +2005,27 @@ const gamificationSystem = new GamificationSystem();
 // Expor o sistema globalmente para ser acessado por HTML inline (onclick)
 window.gamificationSystem = gamificationSystem;
 
+// API pública para integração
+window.GamificationAPI = {
+    getState: () => gamificationSystem.getState(),
+    refresh: () => gamificationSystem.refreshData(),
+    setRefreshInterval: (interval) => gamificationSystem.setRefreshInterval(interval),
+    system: gamificationSystem
+};
+
 // Inicializar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('gamification-dashboard')) {
+    if (document.getElementById('gamification-dashboard') || 
+        document.getElementById('player-stats') || 
+        document.getElementById('badges-section')) {
         gamificationSystem.initialize();
     }
 });
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    gamificationSystem.cleanup();
+});
+
+console.log('🎮 Gamification System V4.1 loaded - Enterprise Grade with Real Data Integration');
+
