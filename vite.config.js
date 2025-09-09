@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import { resolve } from 'path'
 
 export default defineConfig({
+  // A seção 'root' diz ao Vite onde encontrar o index.html e os outros arquivos.
+  // Como o Railway agora vai operar dentro de /frontend, não precisamos mais disso aqui,
+  // mas é uma boa prática manter a configuração de build explícita.
+  
   preview: {
     port: process.env.PORT || 4173,
     host: '0.0.0.0',
@@ -21,18 +25,17 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       input: {
+        // 'main' agora aponta para o index.html DENTRO da pasta frontend
         main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'src/pages/login.html'),
         register: resolve(__dirname, 'src/pages/register.html'),
         dashboard: resolve(__dirname, 'src/pages/dashboard.html'),
         leads: resolve(__dirname, 'src/pages/leads-real.html'),
-        // 'leads' original também estava na sua lista, adicionei por segurança
-        leads_original: resolve(__dirname, 'src/pages/leads.html'), 
-        relatorios: resolve(__dirname, 'src/pages/relatorios.html'), // Assumindo que este arquivo exista em src/pages
+        leads_original: resolve(__dirname, 'src/pages/leads.html'),
         automacoes: resolve(__dirname, 'src/pages/automacoes.html'),
         configuracoes: resolve(__dirname, 'src/pages/configuracoes.html'),
-        gamificacao: resolve(__dirname, 'src/pages/gamificacao.html'),
-        relacionamentos: resolve(__dirname, 'src/pages/relacionamentos.html')
+        gamificacao: resolve(__dirname, 'src/pages/gamificacao.html')
+        // REMOVIDO: 'relatorios.html' e 'relacionamentos.html' que não existem em src/pages
       }
     }
   }
