@@ -4,51 +4,180 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Faça login com segurança no ALSHAM 360° PRIMA CRM. Acesso rápido via e-mail, Google ou Microsoft com recursos avançados de segurança.">
+    <meta name="description" content="Faça login com segurança no ALSHAM 360° PRIMA CRM. Acesso rápido via e-mail, Google ou Microsoft com recursos avançados de segurança e autenticação biométrica.">
+    <meta name="keywords" content="login, CRM, ALSHAM, segurança, autenticação, biometria">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="ALSHAM Development Team">
+    <meta name="theme-color" content="#3B82F6">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Login - ALSHAM 360° PRIMA">
+    <meta property="og:description" content="Acesso seguro ao CRM mais avançado do mercado">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Login - ALSHAM 360° PRIMA">
+    <meta property="twitter:description" content="Acesso seguro ao CRM mais avançado do mercado">
+    <meta property="twitter:image" content="/og-image.png">
     
     <title>Login - ALSHAM 360° PRIMA</title>
     
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.0/tailwind.min.js"></script>
+    <!-- Stylesheets - Local build only, no CDN -->
     <link rel="stylesheet" href="/src/style.css">
 
     <style>
+        /* Enterprise CSS Variables */
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --error-color: #ef4444;
             --info-color: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --border-radius-xl: 0.75rem;
+            --border-radius-2xl: 1rem;
+            --transition-all: all 0.3s ease-in-out;
         }
         
+        /* Base styles */
         body { 
             font-family: 'Inter', sans-serif; 
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
             overflow-x: hidden;
         }
         
+        /* Premium gradient background */
         .bg-gradient-premium {
             background: var(--primary-gradient);
         }
         
+        /* Enterprise button styles - No @apply rules */
         .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
             background: var(--primary-gradient);
-            @apply text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300;
+            color: white;
+            font-weight: 600;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(0);
+            transition: var(--transition-all);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
         }
         
+        .btn-primary:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-0.125rem);
+        }
+        
+        .btn-primary:focus {
+            outline: none;
+            box-shadow: var(--shadow-xl), 0 0 0 4px rgb(59 130 246 / 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Premium input styles */
         .input-premium {
-            @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 bg-white;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius-xl);
+            background: white;
+            transition: var(--transition-all);
+            font-size: 0.875rem;
+            line-height: 1.25rem;
         }
         
+        .input-premium:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 4px rgb(59 130 246 / 0.1);
+        }
+        
+        .input-premium.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgb(239 68 68 / 0.1);
+        }
+        
+        /* Premium card styles */
         .card-premium {
-            @apply bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden;
+            background: white;
+            border-radius: var(--border-radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid #f3f4f6;
+            overflow: hidden;
         }
         
+        /* Glass effect */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* OAuth button styles */
+        .oauth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-sm);
+            background: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-all);
+            transform: translateY(0);
+        }
+        
+        .oauth-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-0.125rem);
+        }
+        
+        .oauth-btn:focus {
+            outline: none;
+            box-shadow: var(--shadow-md), 0 0 0 4px rgb(156 163 175 / 0.3);
+        }
+        
+        /* Floating background patterns */
         .floating-pattern {
             position: absolute;
             width: 300px;
@@ -81,6 +210,7 @@
             50% { transform: translateY(-20px) rotate(180deg); }
         }
         
+        /* Animation styles */
         .animate-on-load {
             opacity: 0;
             transform: translateY(30px);
@@ -111,10 +241,6 @@
             transition: all 0.3s ease;
         }
         
-        .oauth-btn {
-            @apply w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300;
-        }
-        
         .shake {
             animation: shake 0.6s cubic-bezier(.36,.07,.19,.97);
         }
@@ -130,18 +256,32 @@
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Notification styles */
         .security-notice {
-            @apply bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            max-width: 24rem;
+            margin: 0 auto;
         }
         
         .offline-notice {
-            @apply bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm;
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            max-width: 24rem;
+            margin: 0 auto;
         }
         
         .success-checkmark {
@@ -162,25 +302,102 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
             50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
         }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Field error styles */
+        .field-error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .field-error.hidden {
+            display: none;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .floating-pattern {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .card-premium {
+                margin: 1rem;
+            }
+        }
+        
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .card-premium {
+                border: 2px solid #000;
+            }
+            
+            .btn-primary {
+                border: 2px solid #000;
+            }
+            
+            .oauth-btn {
+                border: 2px solid #000;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1f2937;
+                --text-color: #f9fafb;
+                --card-bg: #374151;
+            }
+        }
+        
+        /* Focus visible for better accessibility */
+        .focus-visible:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen relative overflow-hidden">
     
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+        Pular para o conteúdo principal
+    </a>
+    
     <!-- Floating Background Elements -->
-    <div class="floating-pattern"></div>
-    <div class="floating-pattern"></div>
-    <div class="floating-pattern"></div>
+    <div class="floating-pattern" aria-hidden="true"></div>
+    <div class="floating-pattern" aria-hidden="true"></div>
+    <div class="floating-pattern" aria-hidden="true"></div>
     
     <!-- Grid Pattern Background -->
-    <div class="absolute inset-0 opacity-5 pointer-events-none">
+    <div class="absolute inset-0 opacity-5 pointer-events-none" aria-hidden="true">
         <div class="absolute inset-0" style="background-image: linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
     </div>
     
     <!-- Security & Offline Notices -->
-    <div id="security-notice" class="fixed top-4 left-4 right-4 z-50 hidden">
-        <div class="security-notice max-w-md mx-auto">
+    <div id="security-notice" class="fixed top-4 left-4 right-4 z-50 hidden" role="alert" aria-live="assertive">
+        <div class="security-notice">
             <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                 </svg>
                 <span>Aviso de Segurança</span>
@@ -188,10 +405,10 @@
         </div>
     </div>
     
-    <div id="offline-notice" class="fixed top-4 left-4 right-4 z-50 hidden">
-        <div class="offline-notice max-w-md mx-auto">
+    <div id="offline-notice" class="fixed top-4 left-4 right-4 z-50 hidden" role="alert" aria-live="assertive">
+        <div class="offline-notice">
             <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                 </svg>
                 <span>Sem conexão com a internet</span>
@@ -200,7 +417,7 @@
     </div>
     
     <!-- Main Container -->
-    <main class="relative min-h-screen flex items-center justify-center p-4" aria-label="Login ao sistema ALSHAM 360° PRIMA">
+    <main id="main-content" class="relative min-h-screen flex items-center justify-center p-4" role="main">
         <div class="w-full max-w-md">
             
             <!-- Login Card -->
@@ -208,9 +425,9 @@
                 
                 <!-- Header with Logo -->
                 <div class="bg-gradient-premium p-8 text-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-black opacity-10"></div>
+                    <div class="absolute inset-0 bg-black opacity-10" aria-hidden="true"></div>
                     <div class="relative z-10">
-                        <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 logo-glow transform hover:scale-105 transition-transform duration-300">
+                        <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 logo-glow transform hover:scale-105 transition-transform duration-300" aria-hidden="true">
                             <span class="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent">A</span>
                         </div>
                         <h1 class="text-2xl font-bold text-white mb-2">ALSHAM 360° PRIMA</h1>
@@ -221,10 +438,10 @@
                 <div class="p-8">
                     
                     <!-- Error Messages -->
-                    <div id="error-message" class="hidden mb-4">
+                    <div id="error-message" class="hidden mb-4" role="alert" aria-live="assertive">
                         <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
                             <div class="flex">
-                                <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                                 </svg>
                                 <span id="error-text" class="text-red-700 text-sm font-medium"></span>
@@ -233,10 +450,10 @@
                     </div>
 
                     <!-- Success Messages -->
-                    <div id="success-message" class="hidden mb-4">
+                    <div id="success-message" class="hidden mb-4" role="alert" aria-live="polite">
                         <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
                             <div class="flex items-center">
-                                <svg class="w-5 h-5 text-green-400 mr-3 success-checkmark" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-5 h-5 text-green-400 mr-3 success-checkmark" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
                                 <span id="success-text" class="text-green-700 text-sm font-medium"></span>
@@ -245,12 +462,12 @@
                     </div>
                     
                     <!-- Login Form -->
-                    <form id="login-form" class="space-y-6" novalidate>
+                    <form id="login-form" class="space-y-6" novalidate aria-label="Formulário de login">
                         
                         <!-- Email Field -->
                         <div class="form-field">
                             <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                                E-mail
+                                E-mail *
                             </label>
                             <div class="relative">
                                 <input
@@ -259,23 +476,24 @@
                                     name="email"
                                     required
                                     autocomplete="email"
-                                    class="input-premium pl-12"
+                                    class="input-premium pl-12 focus-visible"
                                     placeholder="seu@email.com"
                                     aria-describedby="email-error"
+                                    aria-invalid="false"
                                 >
-                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 field-icon">
+                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 field-icon" aria-hidden="true">
                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                                     </svg>
                                 </div>
                             </div>
-                            <div class="field-error hidden mt-2 text-sm text-red-600" role="alert"></div>
+                            <div id="email-error" class="field-error hidden" role="alert"></div>
                         </div>
 
                         <!-- Password Field -->
                         <div class="form-field">
                             <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Senha
+                                Senha *
                             </label>
                             <div class="relative">
                                 <input
@@ -284,11 +502,12 @@
                                     name="password"
                                     required
                                     autocomplete="current-password"
-                                    class="input-premium pl-12 pr-12"
+                                    class="input-premium pl-12 pr-12 focus-visible"
                                     placeholder="••••••••"
                                     aria-describedby="password-error"
+                                    aria-invalid="false"
                                 >
-                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 field-icon">
+                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 field-icon" aria-hidden="true">
                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                     </svg>
@@ -296,19 +515,20 @@
                                 <button
                                     type="button"
                                     id="toggle-password"
-                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus-visible"
                                     aria-label="Mostrar/ocultar senha"
+                                    aria-pressed="false"
                                 >
-                                    <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
-                                    <svg id="eye-closed" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg id="eye-closed" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L12 12m-3.122-3.122L12 12m0 0l3.878 3.878M12 12l6.878-6.878M3 3l18 18"></path>
                                     </svg>
                                 </button>
                             </div>
-                            <div class="field-error hidden mt-2 text-sm text-red-600" role="alert"></div>
+                            <div id="password-error" class="field-error hidden" role="alert"></div>
                         </div>
 
                         <!-- Remember Me & Forgot Password -->
@@ -318,159 +538,130 @@
                                     id="remember"
                                     name="remember"
                                     type="checkbox"
-                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors focus-visible"
                                 >
                                 <label for="remember" class="ml-2 block text-sm text-gray-700">
                                     Lembrar de mim
                                 </label>
                             </div>
 
-                            <a href="#" id="forgot-password" class="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors">
+                            <a href="#" id="forgot-password" class="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors focus-visible">
                                 Esqueceu a senha?
                             </a>
                         </div>
 
-                        <!-- Login Attempts Warning -->
-                        <div id="login-attempts" class="hidden text-center"></div>
-
-                        <!-- Submit Button -->
+                        <!-- Login Button -->
                         <button
                             type="submit"
                             id="login-btn"
-                            class="btn-primary w-full relative overflow-hidden"
+                            class="btn-primary focus-visible"
+                            aria-describedby="login-status"
                         >
-                            <span id="login-btn-text">Entrar na Plataforma</span>
-                            <svg id="login-spinner" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                            <span id="login-btn-text">Entrar</span>
+                            <div id="login-spinner" class="loading-spinner w-5 h-5 border-2 border-white border-t-transparent rounded-full ml-2 hidden" aria-hidden="true"></div>
                         </button>
+                        
+                        <div id="login-status" class="sr-only" aria-live="polite"></div>
                     </form>
-                    
-                    <!-- Biometric Login -->
-                    <div id="biometric-login" class="hidden mt-4">
-                        <button type="button" class="w-full flex items-center justify-center py-3 px-4 border-2 border-blue-200 rounded-xl text-blue-600 hover:bg-blue-50 transition-all duration-300 biometric-pulse">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 2C5.03 2 1 6.03 1 11s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-                                <path d="M10 6c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
-                            </svg>
-                            Login Biométrico
-                        </button>
-                    </div>
-                    
+
                     <!-- Divider -->
-                    <div class="mt-8">
+                    <div class="mt-8 mb-6">
                         <div class="relative">
-                            <div class="absolute inset-0 flex items-center">
+                            <div class="absolute inset-0 flex items-center" aria-hidden="true">
                                 <div class="w-full border-t border-gray-300"></div>
                             </div>
                             <div class="relative flex justify-center text-sm">
-                                <span class="px-4 bg-white text-gray-500 font-medium">Ou continue com</span>
+                                <span class="px-2 bg-white text-gray-500">Ou continue com</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- OAuth Buttons -->
-                    <div class="mt-6 space-y-3">
-                        <button type="button" id="google-login" class="oauth-btn">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                    <div class="space-y-3">
+                        <button id="google-login" class="oauth-btn focus-visible" aria-label="Entrar com Google">
+                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                             </svg>
-                            Continuar com Google
+                            Entrar com Google
                         </button>
 
-                        <button type="button" id="microsoft-login" class="oauth-btn">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                                <path fill="#f25022" d="M1 1h10v10H1z"/>
-                                <path fill="#00a4ef" d="M13 1h10v10H13z"/>
-                                <path fill="#7fba00" d="M1 13h10v10H1z"/>
-                                <path fill="#ffb900" d="M13 13h10v10H13z"/>
+                        <button id="microsoft-login" class="oauth-btn focus-visible" aria-label="Entrar com Microsoft">
+                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill="#F25022" d="M1 1h10v10H1z"/>
+                                <path fill="#00A4EF" d="M13 1h10v10H13z"/>
+                                <path fill="#7FBA00" d="M1 13h10v10H1z"/>
+                                <path fill="#FFB900" d="M13 13h10v10H13z"/>
                             </svg>
-                            Continuar com Microsoft
+                            Entrar com Microsoft
                         </button>
 
-                        <button type="button" id="apple-login" class="oauth-btn">
-                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                        <!-- Biometric Login (if supported) -->
+                        <button id="biometric-login" class="oauth-btn biometric-pulse hidden focus-visible" aria-label="Entrar com biometria">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                             </svg>
-                            Continuar com Apple
+                            Entrar com Biometria
                         </button>
                     </div>
-                    
+
                     <!-- Register Link -->
                     <div class="mt-8 text-center">
                         <p class="text-sm text-gray-600">
                             Não tem uma conta? 
-                            <a href="/register.html" class="text-blue-600 hover:text-blue-500 font-semibold transition-colors">
-                                Criar conta gratuita
+                            <a href="/src/pages/register.html" class="font-medium text-blue-600 hover:text-blue-500 transition-colors focus-visible">
+                                Cadastre-se gratuitamente
                             </a>
                         </p>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Demo Credentials Card -->
-            <div class="mt-6 card-premium glass-effect animate-on-load" style="animation-delay: 0.4s;">
-                <div class="p-4">
-                    <div class="text-center">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2">🚀 Credenciais Demo</h3>
-                        <p class="text-xs text-gray-600 mb-3">Teste a plataforma sem cadastro</p>
-                        <button type="button" id="demo-login" class="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:-translate-y-0.5">
-                            Usar Credenciais Demo
-                        </button>
+
+                    <!-- Security Notice -->
+                    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="text-sm text-blue-700">
+                                <p class="font-medium mb-1">Sua segurança é nossa prioridade</p>
+                                <p>Utilizamos criptografia de ponta e autenticação multifator para proteger seus dados.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center animate-on-load" style="animation-delay: 0.6s;">
-            <p class="text-xs text-gray-500">
-                © 2025 ALSHAM 360° PRIMA • Desenvolvido com 💜 para revolucionar seu CRM
-            </p>
+
+            <!-- Footer -->
+            <div class="mt-8 text-center text-sm text-gray-500">
+                <p>&copy; 2024 ALSHAM 360° PRIMA. Todos os direitos reservados.</p>
+                <div class="mt-2 space-x-4">
+                    <a href="#" class="hover:text-gray-700 transition-colors focus-visible">Termos de Uso</a>
+                    <a href="#" class="hover:text-gray-700 transition-colors focus-visible">Política de Privacidade</a>
+                    <a href="#" class="hover:text-gray-700 transition-colors focus-visible">Suporte</a>
+                </div>
+            </div>
         </div>
     </main>
 
+    <!-- Fallback para usuários sem JavaScript -->
+    <noscript>
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
+                <p class="text-gray-600 mb-6">
+                    Esta aplicação requer JavaScript para funcionar corretamente. 
+                    Por favor, habilite o JavaScript em seu navegador e recarregue a página.
+                </p>
+                <button onclick="location.reload()" class="btn-primary">
+                    Recarregar Página
+                </button>
+            </div>
+        </div>
+    </noscript>
+
     <!-- Scripts -->
-    <script type="module">
-        // Configuração inicial do formulário de login
-        document.addEventListener('DOMContentLoaded', () => {
-            // Adicionar efeitos visuais aos campos
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('focus', (e) => {
-                    e.target.parentElement.classList.add('scale-105');
-                });
-                
-                input.addEventListener('blur', (e) => {
-                    e.target.parentElement.classList.remove('scale-105');
-                });
-            });
-            
-            // Botão demo
-            const demoBtn = document.getElementById('demo-login');
-            if (demoBtn) {
-                demoBtn.addEventListener('click', () => {
-                    document.getElementById('email').value = 'demo@alsham360.com';
-                    document.getElementById('password').value = 'demo123456';
-                    
-                    // Trigger events para validação
-                    document.getElementById('email').dispatchEvent(new Event('input'));
-                    document.getElementById('password').dispatchEvent(new Event('input'));
-                });
-            }
-            
-            // Remover elementos de loading inicial
-            setTimeout(() => {
-                document.body.classList.add('loaded');
-            }, 1000);
-        });
-    </script>
-    
-    <script type="module" src="/src/js/login.js"></script>
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+
