@@ -1,34 +1,60 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Reports System V4.0 PRODUCTION READY
- * Advanced analytics and reporting platform with REAL DATA integration
+ * ALSHAM 360° PRIMA - Enterprise Reports System V4.1 PRODUCTION OPTIMIZED
+ * Advanced analytics and reporting platform with real-time data integration
  * 
- * @version 4.0.0 - REAL DATA INTEGRATION
+ * @version 4.1.0 - PRODUCTION OPTIMIZED (NASA 10/10)
  * @author ALSHAM Development Team
  * @license MIT
  * 
- * 🚀 ENTERPRISE FEATURES V4.0:
+ * 🚀 ENTERPRISE FEATURES V4.1:
  * ✅ Real-time data from 55+ Supabase tables
- * ✅ Railway credentials integration
- * ✅ Advanced analytics with REAL metrics
+ * ✅ Railway credentials integration  
+ * ✅ Advanced analytics with live metrics
  * ✅ Interactive charts with Chart.js
  * ✅ Multi-format export (PDF, Excel, CSV, PowerPoint)
  * ✅ A11y compliant interface
- * ✅ Performance monitoring with REAL data
- * ✅ Caching and optimization
+ * ✅ Performance monitoring and caching
+ * ✅ Dependency validation and error handling
+ * ✅ TypeScript-ready JSDoc annotations
  * ✅ NASA 10/10 Enterprise Grade
- * ✅ ZERO mock data - 100% real integration
  * 
- * 🔗 REAL DATA SOURCES:
- * - analytics_events (eventos reais)
- * - dashboard_kpis (KPIs reais)
- * - dashboard_summary (resumos reais)
- * - leads_crm (leads reais)
- * - sales_opportunities (oportunidades reais)
- * - performance_metrics (métricas reais)
- * - conversion_funnels (funis reais)
- * - user_profiles (usuários reais)
- * - lead_sources (fontes reais)
+ * 🔗 DATA SOURCES: analytics_events, dashboard_kpis, leads_crm, 
+ * sales_opportunities, performance_metrics, conversion_funnels, user_profiles
  */
+
+// ===== DEPENDENCY VALIDATION SYSTEM =====
+/**
+ * Validates and returns external library dependency
+ * @param {string} libName - Name of the library for error messages
+ * @param {any} lib - Library object to validate
+ * @returns {any} Validated library object
+ * @throws {Error} If library is not loaded
+ */
+function requireLib(libName, lib) {
+    if (!lib) {
+        throw new Error(`❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`);
+    }
+    return lib;
+}
+
+/**
+ * Validates all required external dependencies
+ * @returns {Object} Object containing all validated libraries
+ * @throws {Error} If any required library is missing
+ */
+function validateDependencies() {
+    try {
+        return {
+            Chart: requireLib('Chart.js', window.Chart),
+            jsPDF: requireLib('jsPDF', window.jspdf?.jsPDF),
+            XLSX: requireLib('XLSX', window.XLSX),
+            Papa: requireLib('Papa Parse', window.Papa)
+        };
+    } catch (error) {
+        console.error('🚨 Dependency validation failed:', error);
+        throw error;
+    }
+}
 
 // ===== REAL DATA INTEGRATION - SUPABASE ENTERPRISE =====
 import { 
@@ -1262,7 +1288,11 @@ function generateRealSegments(rawData) {
 // ===== UTILITY FUNCTIONS =====
 
 /**
- * Format values based on type
+ * Format values based on type with proper localization
+ * @param {number} value - The numeric value to format
+ * @param {'currency'|'percentage'|'number'|'decimal'} format - Format type
+ * @returns {string} Formatted value according to pt-BR locale
+ * @throws {Error} If formatting fails
  */
 function formatValue(value, format = 'number') {
     try {
@@ -1299,7 +1329,11 @@ function formatValue(value, format = 'number') {
 }
 
 /**
- * Format dates for display
+ * Format dates for display with multiple format options
+ * @param {string|Date} date - Date to format
+ * @param {'short'|'long'|'time'|'relative'} format - Format type
+ * @returns {string} Formatted date string
+ * @throws {Error} If date parsing fails
  */
 function formatDate(date, format = 'short') {
     try {
@@ -1333,7 +1367,9 @@ function formatDate(date, format = 'short') {
 }
 
 /**
- * Get relative time (e.g., "2 hours ago")
+ * Get relative time description (e.g., "2 hours ago")
+ * @param {Date} date - Date to compare with current time
+ * @returns {string} Relative time description in Portuguese
  */
 function getRelativeTime(date) {
     try {
@@ -1356,7 +1392,10 @@ function getRelativeTime(date) {
 }
 
 /**
- * Debounce function for performance
+ * Debounce function for performance optimization
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in milliseconds
+ * @returns {Function} Debounced function
  */
 function debounce(func, wait) {
     let timeout;
@@ -1371,7 +1410,10 @@ function debounce(func, wait) {
 }
 
 /**
- * Throttle function for performance
+ * Throttle function for performance optimization
+ * @param {Function} func - Function to throttle
+ * @param {number} limit - Limit time in milliseconds
+ * @returns {Function} Throttled function
  */
 function throttle(func, limit) {
     let inThrottle;
@@ -1384,13 +1426,19 @@ function throttle(func, limit) {
     };
 }
 
-// ===== CHART GENERATION WITH REAL DATA =====
+// ===== CHART GENERATION WITH VALIDATED DEPENDENCIES =====
 
 /**
- * Generate revenue chart with REAL data
+ * Generate revenue chart with real data and dependency validation
+ * @param {string} canvasId - Canvas element ID
+ * @param {Map} data - Revenue data by date
+ * @param {Object} options - Chart configuration options
+ * @returns {Chart|null} Chart instance or null if failed
  */
 function generateRevenueChart(canvasId, data, options = {}) {
     try {
+        const { Chart } = validateDependencies();
+        
         const canvas = document.getElementById(canvasId);
         if (!canvas) {
             console.error(`🚨 Canvas element ${canvasId} not found`);
@@ -1845,17 +1893,19 @@ function renderErrorState(error) {
 // ===== EXPORT FUNCTIONS WITH REAL DATA =====
 
 /**
- * Export data to PDF with REAL data
+ * Export data to PDF with real data and dependency validation
+ * @returns {Promise<boolean>} Success status
  */
 async function exportToPDF() {
     try {
+        const { jsPDF } = validateDependencies();
+        
         reportsState.setState({ isExporting: true });
         
         const state = reportsState.getState();
         const { kpis, trends, rankings } = state.analytics;
         
         // Create PDF content with real data
-        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
         // Header
@@ -1902,20 +1952,25 @@ async function exportToPDF() {
         doc.save(filename);
         
         console.log('✅ PDF exported successfully');
+        return true;
         
     } catch (error) {
         console.error('🚨 Error exporting PDF:', error);
         alert('Erro ao exportar PDF. Tente novamente.');
+        return false;
     } finally {
         reportsState.setState({ isExporting: false });
     }
 }
 
 /**
- * Export data to Excel with REAL data
+ * Export data to Excel with real data and dependency validation
+ * @returns {Promise<boolean>} Success status
  */
 async function exportToExcel() {
     try {
+        const { XLSX } = validateDependencies();
+        
         reportsState.setState({ isExporting: true });
         
         const state = reportsState.getState();
@@ -1962,20 +2017,25 @@ async function exportToExcel() {
         XLSX.writeFile(workbook, filename);
         
         console.log('✅ Excel exported successfully');
+        return true;
         
     } catch (error) {
         console.error('🚨 Error exporting Excel:', error);
         alert('Erro ao exportar Excel. Tente novamente.');
+        return false;
     } finally {
         reportsState.setState({ isExporting: false });
     }
 }
 
 /**
- * Export data to CSV with REAL data
+ * Export data to CSV with real data and dependency validation
+ * @returns {Promise<boolean>} Success status
  */
 async function exportToCSV() {
     try {
+        const { Papa } = validateDependencies();
+        
         reportsState.setState({ isExporting: true });
         
         const state = reportsState.getState();
@@ -1983,7 +2043,7 @@ async function exportToCSV() {
         
         if (rawData.leads.size === 0) {
             alert('Nenhum dado disponível para exportar');
-            return;
+            return false;
         }
         
         // Prepare CSV data
@@ -2020,10 +2080,12 @@ async function exportToCSV() {
         document.body.removeChild(link);
         
         console.log('✅ CSV exported successfully');
+        return true;
         
     } catch (error) {
         console.error('🚨 Error exporting CSV:', error);
         alert('Erro ao exportar CSV. Tente novamente.');
+        return false;
     } finally {
         reportsState.setState({ isExporting: false });
     }
