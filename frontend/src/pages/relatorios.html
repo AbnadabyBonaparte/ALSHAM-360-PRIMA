@@ -4,21 +4,43 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Analytics e Relatórios Enterprise do ALSHAM 360° PRIMA. Dashboards avançados, KPIs em tempo real, previsões de IA e exportação multi-formato.">
+    <meta name="description" content="Analytics e Relatórios Enterprise do ALSHAM 360° PRIMA. Dashboards avançados, KPIs em tempo real, previsões de IA e exportação multi-formato com conformidade LGPD.">
+    <meta name="keywords" content="analytics, relatórios, dashboard, KPI, BI, business intelligence, CRM, ALSHAM">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="ALSHAM Development Team">
+    <meta name="theme-color" content="#3B82F6">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
+    <meta property="og:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
+    <meta property="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
+    <meta property="twitter:image" content="/og-image.png">
     
     <title>Relatórios Enterprise - ALSHAM 360° PRIMA</title>
     
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.0/tailwind.min.js"></script>
+    <!-- Stylesheets - Local build only, no CDN -->
     <link rel="stylesheet" href="/src/style.css">
 
     <style>
+        /* Enterprise CSS Variables */
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --success-color: #10b981;
@@ -26,42 +48,139 @@
             --error-color: #ef4444;
             --info-color: #3b82f6;
             --chart-grid: rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --border-radius-xl: 0.75rem;
+            --border-radius-2xl: 1rem;
+            --transition-all: all 0.3s ease-in-out;
         }
         
+        /* Base styles */
         body { 
             font-family: 'Inter', sans-serif; 
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
             overflow-x: hidden;
         }
         
+        /* Premium gradient background */
         .bg-gradient-premium {
             background: var(--primary-gradient);
         }
         
+        /* Enterprise button styles - No @apply rules */
         .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
             background: var(--primary-gradient);
-            @apply text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300;
+            color: white;
+            font-weight: 600;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(0);
+            transition: var(--transition-all);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-0.125rem);
+        }
+        
+        .btn-primary:focus {
+            outline: none;
+            box-shadow: var(--shadow-xl), 0 0 0 4px rgb(59 130 246 / 0.3);
         }
         
         .btn-outline {
-            @apply px-4 py-2 border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border: 2px solid #d1d5db;
+            color: #374151;
+            font-weight: 500;
+            border-radius: var(--border-radius-xl);
+            background: white;
+            transition: var(--transition-all);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .btn-outline:hover {
+            border-color: #9ca3af;
+            background: #f9fafb;
+        }
+        
+        .btn-outline:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgb(156 163 175 / 0.3);
         }
         
         .btn-outline-sm {
-            @apply px-3 py-1 text-sm border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            border-radius: 0.5rem;
+            background: white;
+            transition: all 0.2s ease-in-out;
         }
         
+        .btn-outline-sm:hover {
+            background: #f9fafb;
+        }
+        
+        /* Premium card styles */
         .card-premium {
-            @apply bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300;
+            background: white;
+            border-radius: var(--border-radius-2xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #f3f4f6;
+            transition: var(--transition-all);
         }
         
+        .card-premium:hover {
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* KPI Card styles */
         .kpi-card {
-            @apply bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer;
+            background: white;
+            border-radius: var(--border-radius-2xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #f3f4f6;
+            transition: var(--transition-all);
+            cursor: pointer;
+            transform: translateY(0);
         }
         
+        .kpi-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-0.25rem);
+        }
+        
+        /* Chart container styles */
         .chart-container {
-            @apply bg-white rounded-2xl p-6 shadow-lg border border-gray-100 min-h-[400px];
+            background: white;
+            border-radius: var(--border-radius-2xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #f3f4f6;
+            min-height: 400px;
         }
         
+        /* Loading spinner */
         .loading-spinner {
             animation: spin 1s linear infinite;
         }
@@ -71,6 +190,7 @@
             to { transform: rotate(360deg); }
         }
         
+        /* Animation styles */
         .fade-in {
             animation: fadeIn 0.6s ease-out;
         }
@@ -98,6 +218,7 @@
             50% { opacity: 0.5; }
         }
         
+        /* Gradient text */
         .gradient-text {
             background: var(--primary-gradient);
             -webkit-background-clip: text;
@@ -105,38 +226,64 @@
             background-clip: text;
         }
         
+        /* Glass effect */
         .glass-effect {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
+        /* Chart skeleton loading */
         .chart-skeleton {
-            @apply bg-gray-200 rounded animate-pulse;
+            background: #e5e7eb;
+            border-radius: 0.5rem;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
+        /* Performance bar */
         .performance-bar {
             height: 4px;
             border-radius: 2px;
             transition: width 0.5s ease-in-out;
         }
         
+        /* Insight card */
         .insight-card {
-            @apply bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4 mb-3;
+            background: linear-gradient(to bottom right, #faf5ff, #eff6ff);
+            border: 1px solid #e9d5ff;
+            border-radius: var(--border-radius-xl);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
         }
         
+        /* Forecast card */
         .forecast-card {
-            @apply bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4;
+            background: linear-gradient(to bottom right, #f0fdf4, #ecfdf5);
+            border: 1px solid #bbf7d0;
+            border-radius: var(--border-radius-xl);
+            padding: 1rem;
         }
         
+        /* Activity item */
         .activity-item {
-            @apply flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
         }
         
+        .activity-item:hover {
+            background: #f9fafb;
+        }
+        
+        /* Goal progress ring */
         .goal-progress-ring {
             transform: rotate(-90deg);
         }
         
+        /* Notification animations */
         .notification-enter {
             animation: slideInRight 0.3s ease-out;
         }
@@ -157,7 +304,12 @@
         
         /* Chart.js custom styles */
         .chartjs-tooltip {
-            @apply bg-gray-900 text-white text-sm rounded-lg px-3 py-2 shadow-lg;
+            background: #1f2937;
+            color: white;
+            font-size: 0.875rem;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: var(--shadow-lg);
         }
         
         /* Responsive grid for KPIs */
@@ -169,54 +321,217 @@
         
         /* Performance table styles */
         .performance-table {
-            @apply w-full border-collapse;
+            width: 100%;
+            border-collapse: collapse;
         }
         
         .performance-table th {
-            @apply bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3 border-b border-gray-200;
+            background: #f9fafb;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
         }
         
         .performance-table td {
-            @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-100;
+            padding: 1rem 1.5rem;
+            white-space: nowrap;
+            font-size: 0.875rem;
+            color: #1f2937;
+            border-bottom: 1px solid #f3f4f6;
         }
         
         .performance-table tbody tr:hover {
-            @apply bg-blue-50;
+            background: #eff6ff;
         }
         
         /* Filter pills */
         .filter-pill {
-            @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
         }
         
         .filter-pill.active {
-            @apply bg-blue-100 text-blue-800;
+            background: #dbeafe;
+            color: #1e40af;
         }
         
         .filter-pill.inactive {
-            @apply bg-gray-100 text-gray-600 hover:bg-gray-200;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .filter-pill.inactive:hover {
+            background: #e5e7eb;
+        }
+        
+        /* Header styles */
+        .header-premium {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Navigation styles */
+        .nav-link {
+            color: #6b7280;
+            font-weight: 500;
+            transition: color 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover {
+            color: #1f2937;
+        }
+        
+        .nav-link.active {
+            color: #2563eb;
+            font-weight: 600;
+        }
+        
+        /* Breadcrumb styles */
+        .breadcrumb-link {
+            color: #6b7280;
+            transition: color 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-link:hover {
+            color: #374151;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .kpis-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .chart-container {
+                padding: 1rem;
+                min-height: 300px;
+            }
+            
+            .kpi-card {
+                padding: 1rem;
+            }
+            
+            .btn-primary,
+            .btn-outline {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.8125rem;
+            }
+        }
+        
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .card-premium,
+            .kpi-card,
+            .chart-container {
+                border: 2px solid #000;
+            }
+            
+            .btn-primary {
+                border: 2px solid #000;
+            }
+            
+            .btn-outline {
+                border: 2px solid #000;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1f2937;
+                --text-color: #f9fafb;
+                --card-bg: #374151;
+            }
+        }
+        
+        /* Focus visible for better accessibility */
+        .focus-visible:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        
+        /* Loading states */
+        .skeleton-loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Status indicators */
+        .status-online {
+            background: #10b981;
+        }
+        
+        .status-offline {
+            background: #6b7280;
+        }
+        
+        .status-warning {
+            background: #f59e0b;
+        }
+        
+        .status-error {
+            background: #ef4444;
         }
     </style>
 </head>
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
     
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+        Pular para o conteúdo principal
+    </a>
+    
     <!-- Loading Indicator -->
-    <div id="reports-loader" class="fixed top-0 left-0 right-0 z-50 hidden">
+    <div id="reports-loader" class="fixed top-0 left-0 right-0 z-50 hidden" role="status" aria-live="polite">
         <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium">
             <div class="flex items-center justify-center space-x-2">
-                <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full" aria-hidden="true"></div>
                 <span>Carregando analytics...</span>
             </div>
         </div>
     </div>
     
     <!-- Header Premium -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
+    <header class="header-premium" role="banner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
-                    <a href="/" class="flex items-center space-x-3 group" aria-label="Voltar ao Dashboard">
-                        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <a href="/" class="flex items-center space-x-3 group focus-visible" aria-label="Voltar ao Dashboard">
+                        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform" aria-hidden="true">
                             <span class="text-white font-bold text-lg">A</span>
                         </div>
                         <div>
@@ -226,32 +541,32 @@
                     </a>
                 </div>
                 
-                <nav class="hidden md:flex items-center space-x-8" aria-label="Navegação Principal">
-                    <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Dashboard</a>
-                    <a href="/leads.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Leads</a>
-                    <a href="/relatorios.html" class="text-blue-600 font-semibold">Relatórios</a>
-                    <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Pipeline</a>
+                <nav class="hidden md:flex items-center space-x-8" role="navigation" aria-label="Navegação Principal">
+                    <a href="/dashboard.html" class="nav-link focus-visible">Dashboard</a>
+                    <a href="/leads.html" class="nav-link focus-visible">Leads</a>
+                    <a href="/relatorios.html" class="nav-link active focus-visible" aria-current="page">Relatórios</a>
+                    <a href="/pipeline.html" class="nav-link focus-visible">Pipeline</a>
                 </nav>
                 
                 <div class="flex items-center space-x-4">
-                    <button id="refresh-reports" class="p-2 text-gray-400 hover:text-gray-600 transition-colors relative" title="Atualizar dados">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button id="refresh-reports" class="p-2 text-gray-400 hover:text-gray-600 transition-colors relative focus-visible" title="Atualizar dados" aria-label="Atualizar dados dos relatórios">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full pulse-dot"></span>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full pulse-dot status-online" aria-hidden="true"></span>
                     </button>
                     
-                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Notificações">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus-visible" title="Notificações" aria-label="Abrir notificações">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.97 4.97a.75.75 0 0 0-1.08 1.08L15.44 11.6a.75.75 0 0 0 1.08-1.08L10.97 4.97z"></path>
                         </svg>
                     </button>
                     
                     <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar">A</div>
+                        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-hidden="true">A</div>
                         <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Analista</span>
-                        <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Sair">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus-visible" title="Sair" aria-label="Fazer logout">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                             </svg>
                         </button>
@@ -263,37 +578,37 @@
 
     <!-- Breadcrumb -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <nav class="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
-            <a href="/" class="text-gray-500 hover:text-gray-700 transition-colors">Home</a>
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+        <nav class="flex items-center space-x-2 text-sm" role="navigation" aria-label="Breadcrumb">
+            <a href="/" class="breadcrumb-link focus-visible">Home</a>
+            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
             </svg>
-            <span class="text-gray-900 font-medium">Analytics & Relatórios</span>
+            <span class="text-gray-900 font-medium" aria-current="page">Analytics & Relatórios</span>
         </nav>
     </div>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
         
         <!-- Header da Página -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-3xl font-bold text-gray-900 flex items-center space-x-3">
-                    <span class="text-4xl">📊</span>
+                    <span class="text-4xl" role="img" aria-label="Gráfico">📊</span>
                     <span class="gradient-text">Analytics Enterprise</span>
                 </h1>
                 <p class="text-gray-600 mt-2">Insights inteligentes e previsões em tempo real para maximizar resultados</p>
             </div>
             
             <div class="flex items-center space-x-3">
-                <button class="btn-outline">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button class="btn-outline focus-visible" aria-label="Exportar relatórios">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Exportar
                 </button>
-                <button id="export-menu-toggle" class="btn-primary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="export-menu-toggle" class="btn-primary focus-visible" aria-label="Gerar novo relatório">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                     Gerar Relatório
@@ -301,327 +616,229 @@
             </div>
         </div>
 
-        <!-- Filtros Avançados -->
-        <section id="reports-filters" class="mb-8">
-            <!-- Filtros serão injetados aqui pelo JavaScript -->
-            <div class="card-premium p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <div class="chart-skeleton h-12 rounded-xl"></div>
-                    <div class="chart-skeleton h-12 rounded-xl"></div>
-                    <div class="chart-skeleton h-12 rounded-xl"></div>
-                    <div class="chart-skeleton h-12 rounded-xl"></div>
-                    <div class="chart-skeleton h-12 rounded-xl"></div>
-                    <div class="chart-skeleton h-12 rounded-xl"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- KPIs Dashboard -->
-        <section id="reports-kpis" class="mb-8">
-            <!-- KPIs serão injetados aqui pelo JavaScript -->
+        <!-- KPIs Grid -->
+        <section class="mb-8" aria-labelledby="kpis-heading">
+            <h2 id="kpis-heading" class="sr-only">Indicadores-chave de performance</h2>
             <div class="kpis-grid">
-                <div class="kpi-card">
-                    <div class="chart-skeleton h-24 rounded-lg"></div>
+                
+                <!-- KPI 1: Receita Total -->
+                <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Receita total: R$ 847.250">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-green-600 font-medium">+12.5%</div>
+                            <div class="text-xs text-gray-500">vs mês anterior</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <h3 class="text-sm font-medium text-gray-600">Receita Total</h3>
+                        <p class="text-2xl font-bold text-gray-900">R$ 847.250</p>
+                    </div>
+                    <div class="performance-bar bg-green-200">
+                        <div class="performance-bar bg-green-500" style="width: 85%"></div>
+                    </div>
                 </div>
-                <div class="kpi-card">
-                    <div class="chart-skeleton h-24 rounded-lg"></div>
+
+                <!-- KPI 2: Leads Convertidos -->
+                <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Leads convertidos: 342 leads" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-blue-600 font-medium">+8.3%</div>
+                            <div class="text-xs text-gray-500">vs mês anterior</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <h3 class="text-sm font-medium text-gray-600">Leads Convertidos</h3>
+                        <p class="text-2xl font-bold text-gray-900">342</p>
+                    </div>
+                    <div class="performance-bar bg-blue-200">
+                        <div class="performance-bar bg-blue-500" style="width: 68%"></div>
+                    </div>
                 </div>
-                <div class="kpi-card">
-                    <div class="chart-skeleton h-24 rounded-lg"></div>
+
+                <!-- KPI 3: Taxa de Conversão -->
+                <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Taxa de conversão: 24.8%" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-purple-600 font-medium">+3.2%</div>
+                            <div class="text-xs text-gray-500">vs mês anterior</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <h3 class="text-sm font-medium text-gray-600">Taxa de Conversão</h3>
+                        <p class="text-2xl font-bold text-gray-900">24.8%</p>
+                    </div>
+                    <div class="performance-bar bg-purple-200">
+                        <div class="performance-bar bg-purple-500" style="width: 75%"></div>
+                    </div>
                 </div>
-                <div class="kpi-card">
-                    <div class="chart-skeleton h-24 rounded-lg"></div>
-                </div>
-                <div class="kpi-card">
-                    <div class="chart-skeleton h-24 rounded-lg"></div>
-                </div>
-                <div class="kpi-card">
-                    <div class="chart-skeleton h-24 rounded-lg"></div>
+
+                <!-- KPI 4: Ticket Médio -->
+                <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Ticket médio: R$ 2.475" style="animation-delay: 0.3s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-orange-600 font-medium">+5.7%</div>
+                            <div class="text-xs text-gray-500">vs mês anterior</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <h3 class="text-sm font-medium text-gray-600">Ticket Médio</h3>
+                        <p class="text-2xl font-bold text-gray-900">R$ 2.475</p>
+                    </div>
+                    <div class="performance-bar bg-orange-200">
+                        <div class="performance-bar bg-orange-500" style="width: 62%"></div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Charts Section -->
-        <section id="charts-section" class="mb-8">
-            <!-- Charts serão injetados aqui pelo JavaScript -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="chart-container">
-                    <div class="chart-skeleton h-64 rounded-lg"></div>
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" aria-labelledby="charts-heading">
+            <h2 id="charts-heading" class="sr-only">Gráficos e análises</h2>
+            
+            <!-- Revenue Chart -->
+            <div class="chart-container fade-in" style="animation-delay: 0.4s;">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Receita por Período</h3>
+                    <div class="flex space-x-2">
+                        <button class="filter-pill active focus-visible" data-period="30d">30 dias</button>
+                        <button class="filter-pill inactive focus-visible" data-period="90d">90 dias</button>
+                        <button class="filter-pill inactive focus-visible" data-period="1y">1 ano</button>
+                    </div>
                 </div>
-                <div class="chart-container">
-                    <div class="chart-skeleton h-64 rounded-lg"></div>
+                <div id="revenue-chart" class="h-80" role="img" aria-label="Gráfico de receita por período">
+                    <div class="chart-skeleton h-full skeleton-loading"></div>
                 </div>
-                <div class="chart-container">
-                    <div class="chart-skeleton h-64 rounded-lg"></div>
+            </div>
+
+            <!-- Conversion Funnel -->
+            <div class="chart-container fade-in" style="animation-delay: 0.5s;">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Funil de Conversão</h3>
+                    <button class="btn-outline-sm focus-visible">Ver detalhes</button>
                 </div>
-                <div class="chart-container">
-                    <div class="chart-skeleton h-64 rounded-lg"></div>
+                <div id="funnel-chart" class="h-80" role="img" aria-label="Gráfico de funil de conversão">
+                    <div class="chart-skeleton h-full skeleton-loading"></div>
                 </div>
             </div>
         </section>
 
-        <!-- Rankings & Performance -->
-        <section id="rankings-section" class="mb-8">
-            <!-- Rankings serão injetados aqui pelo JavaScript -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card-premium p-6">
-                    <div class="chart-skeleton h-64 rounded-lg"></div>
-                </div>
-                <div class="card-premium p-6">
-                    <div class="chart-skeleton h-64 rounded-lg"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Insights & Forecasts -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Insights & Activity -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8" aria-labelledby="insights-heading">
+            <h2 id="insights-heading" class="sr-only">Insights e atividades</h2>
+            
             <!-- AI Insights -->
-            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                        <span class="text-purple-600">🤖</span>
-                        <span>Insights de IA</span>
+            <div class="lg:col-span-2">
+                <div class="card-premium p-6 fade-in" style="animation-delay: 0.6s;">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="mr-2" role="img" aria-label="Inteligência artificial">🤖</span>
+                        Insights de IA
                     </h3>
-                    <div class="flex items-center space-x-1">
-                        <div class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></div>
-                        <span class="text-xs text-gray-500">Atualizado agora</span>
-                    </div>
-                </div>
-                <div id="ai-insights-content" class="space-y-3">
-                    <div class="insight-card">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <span class="text-purple-600 text-sm">💡</span>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">Oportunidade detectada</p>
-                                <p class="text-xs text-gray-600 mt-1">Leads do Facebook têm 23% mais chance de conversão às sextas-feiras</p>
+                    
+                    <div class="space-y-4">
+                        <div class="insight-card">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900">Oportunidade de Crescimento</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Leads do segmento "Tecnologia" têm 35% mais chance de conversão. Considere aumentar investimento neste canal.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="insight-card">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <span class="text-blue-600 text-sm">📈</span>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">Tendência identificada</p>
-                                <p class="text-xs text-gray-600 mt-1">Ticket médio cresceu 15% nos últimos 30 dias</p>
+
+                        <div class="insight-card">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900">Padrão Temporal</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Terças e quartas-feiras apresentam 28% mais conversões. Otimize campanhas para estes dias.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="insight-card">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                <span class="text-green-600 text-sm">🎯</span>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">Meta próxima</p>
-                                <p class="text-xs text-gray-600 mt-1">Faltam apenas R$ 12.500 para bater a meta mensal</p>
+
+                        <div class="forecast-card">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900">Previsão para Próximo Mês</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Com base nos padrões atuais, esperamos receita de <strong>R$ 920.000</strong> (+8.6%) no próximo mês.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sales Forecast -->
-            <div class="card-premium p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                        <span class="text-green-600">🔮</span>
-                        <span>Previsão de Vendas</span>
-                    </h3>
-                    <select class="text-sm border border-gray-300 rounded px-2 py-1">
-                        <option>Próximos 30 dias</option>
-                        <option>Próximos 60 dias</option>
-                        <option>Próximos 90 dias</option>
-                    </select>
-                </div>
+            <!-- Recent Activity -->
+            <div class="card-premium p-6 fade-in" style="animation-delay: 0.7s;">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <span class="mr-2" role="img" aria-label="Atividade">⚡</span>
+                    Atividade Recente
+                </h3>
                 
                 <div class="space-y-4">
-                    <div class="forecast-card">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-medium text-gray-700">Receita Esperada</span>
-                            <span class="text-lg font-bold text-green-600">R$ 125.400</span>
+                    <div class="activity-item">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <span class="text-green-600 text-sm" role="img" aria-label="Venda">💰</span>
                         </div>
-                        <div class="w-full bg-green-100 rounded-full h-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 78%"></div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Venda fechada</p>
+                            <p class="text-xs text-gray-600">João Silva fechou negócio de R$ 8.500 com Empresa XYZ</p>
+                            <p class="text-xs text-gray-500 mt-1">2 minutos atrás</p>
                         </div>
-                        <p class="text-xs text-gray-600 mt-1">Confiança: 78%</p>
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <p class="text-xs text-gray-600">Pessimista</p>
-                            <p class="text-sm font-semibold text-gray-800">R$ 98.2K</p>
+                    <div class="activity-item">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <span class="text-blue-600 text-sm" role="img" aria-label="Lead">👤</span>
                         </div>
-                        <div class="text-center p-3 bg-blue-50 rounded-lg">
-                            <p class="text-xs text-blue-600">Provável</p>
-                            <p class="text-sm font-semibold text-blue-800">R$ 125.4K</p>
-                        </div>
-                        <div class="text-center p-3 bg-green-50 rounded-lg">
-                            <p class="text-xs text-green-600">Otimista</p>
-                            <p class="text-sm font-semibold text-green-800">R$ 152.8K</p>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Novo lead qualificado</p>
+                            <p class="text-xs text-gray-600">Maria Santos qualificou lead do Facebook Ads</p>
+                            <p class="text-xs text-gray-500 mt-1">15 minutos atrás</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Performance Table -->
-        <section class="card-premium p-6 mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                    <span class="text-yellow-600">🏆</span>
-                    <span>Performance da Equipe</span>
-                </h3>
-                <select class="text-sm border border-gray-300 rounded px-3 py-1">
-                    <option>Por Receita</option>
-                    <option>Por Leads</option>
-                    <option>Por Conversão</option>
-                    <option>Por Atividades</option>
-                </select>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="performance-table">
-                    <thead>
-                        <tr>
-                            <th>Posição</th>
-                            <th>Vendedor</th>
-                            <th>Receita</th>
-                            <th>Leads</th>
-                            <th>Conversão</th>
-                            <th>Atividades</th>
-                            <th>Performance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-800 font-bold text-xs">1</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-xs font-semibold">JS</div>
-                                    <span class="font-medium">João Silva</span>
-                                </div>
-                            </td>
-                            <td><span class="font-semibold text-green-600">R$ 45.200</span></td>
-                            <td>127</td>
-                            <td>23.5%</td>
-                            <td>89</td>
-                            <td>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-16 bg-gray-200 rounded-full h-2">
-                                        <div class="performance-bar bg-green-500" style="width: 92%"></div>
-                                    </div>
-                                    <span class="text-sm text-gray-600">92%</span>
-                                </div>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 font-bold text-xs">2</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-xs font-semibold">MS</div>
-                                    <span class="font-medium">Maria Santos</span>
-                                </div>
-                            </td>
-                            <td><span class="font-semibold text-green-600">R$ 38.900</span></td>
-                            <td>98</td>
-                            <td>26.1%</td>
-                            <td>76</td>
-                            <td>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-16 bg-gray-200 rounded-full h-2">
-                                        <div class="performance-bar bg-blue-500" style="width: 87%"></div>
-                                    </div>
-                                    <span class="text-sm text-gray-600">87%</span>
-                                </div>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center text-orange-800 font-bold text-xs">3</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-xs font-semibold">CO</div>
-                                    <span class="font-medium">Carlos Oliveira</span>
-                                </div>
-                            </td>
-                            <td><span class="font-semibold text-green-600">R$ 32.750</span></td>
-                            <td>85</td>
-                            <td>19.8%</td>
-                            <td>102</td>
-                            <td>
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-16 bg-gray-200 rounded-full h-2">
-                                        <div class="performance-bar bg-yellow-500" style="width: 75%"></div>
-                                    </div>
-                                    <span class="text-sm text-gray-600">75%</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Recent Activities -->
-        <section class="card-premium p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                    <span class="text-blue-600">📋</span>
-                    <span>Atividades Recentes</span>
-                </h3>
-                <a href="/leads.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Ver todas</a>
-            </div>
-            
-            <div class="space-y-3">
-                <div class="activity-item">
-                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <span class="text-green-600 text-sm">💰</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">Nova venda realizada</p>
-                        <p class="text-xs text-gray-600">João Silva fechou negócio de R$ 8.500 com Empresa XYZ</p>
-                        <p class="text-xs text-gray-500 mt-1">2 minutos atrás</p>
-                    </div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <span class="text-blue-600 text-sm">👤</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">Novo lead qualificado</p>
-                        <p class="text-xs text-gray-600">Maria Santos qualificou lead do Facebook Ads</p>
-                        <p class="text-xs text-gray-500 mt-1">15 minutos atrás</p>
-                    </div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <span class="text-purple-600 text-sm">📞</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">Follow-up agendado</p>
-                        <p class="text-xs text-gray-600">Carlos Oliveira agendou reunião para amanhã às 14h</p>
-                        <p class="text-xs text-gray-500 mt-1">1 hora atrás</p>
+                    
+                    <div class="activity-item">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <span class="text-purple-600 text-sm" role="img" aria-label="Reunião">📞</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Follow-up agendado</p>
+                            <p class="text-xs text-gray-600">Carlos Oliveira agendou reunião para amanhã às 14h</p>
+                            <p class="text-xs text-gray-500 mt-1">1 hora atrás</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -629,12 +846,28 @@
     </main>
 
     <!-- Export Options Modal -->
-    <div id="export-options" class="hidden">
+    <div id="export-options" class="hidden" role="dialog" aria-labelledby="export-modal-title" aria-modal="true">
         <!-- Modal será injetado aqui pelo JavaScript -->
     </div>
 
     <!-- Container para notificações -->
-    <div id="reports-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md"></div>
+    <div id="reports-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" role="region" aria-label="Notificações" aria-live="polite"></div>
+
+    <!-- Fallback para usuários sem JavaScript -->
+    <noscript>
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
+                <p class="text-gray-600 mb-6">
+                    Esta aplicação requer JavaScript para funcionar corretamente. 
+                    Por favor, habilite o JavaScript em seu navegador e recarregue a página.
+                </p>
+                <button onclick="location.reload()" class="btn-primary">
+                    Recarregar Página
+                </button>
+            </div>
+        </div>
+    </noscript>
 
     <!-- Scripts -->
     <script type="module">
@@ -646,9 +879,22 @@
             setTimeout(() => {
                 const skeletons = document.querySelectorAll('.chart-skeleton');
                 skeletons.forEach(skeleton => {
+                    skeleton.classList.remove('skeleton-loading');
                     skeleton.classList.add('fade-in');
                 });
             }, 2000);
+            
+            // Adicionar efeitos de hover aos KPIs
+            const kpiCards = document.querySelectorAll('.kpi-card');
+            kpiCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-4px)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                });
+            });
         });
     </script>
     
@@ -656,3 +902,4 @@
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+
