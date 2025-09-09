@@ -1,6 +1,33 @@
-// ALSHAM 360° PRIMA - Leads Real System CORRIGIDO
-// Interface premium para gestão completa de leads com CRM avançado
+// ALSHAM 360° PRIMA - Leads Enterprise System V4.1
+// Sistema completo de gestão de leads com dados reais do Supabase
 
+/**
+ * Dependency validation system
+ * @param {string} libName - Nome da biblioteca
+ * @param {any} lib - Referência da biblioteca
+ * @returns {any} Biblioteca validada
+ * @throws {Error} Se a biblioteca não estiver disponível
+ */
+function requireLib(libName, lib) {
+    if (!lib) {
+        throw new Error(`❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`);
+    }
+    return lib;
+}
+
+/**
+ * Validate all required dependencies
+ * @returns {Object} Validated dependencies
+ */
+function validateDependencies() {
+    return {
+        localStorage: requireLib('Local Storage', window.localStorage),
+        sessionStorage: requireLib('Session Storage', window.sessionStorage),
+        crypto: requireLib('Web Crypto API', window.crypto)
+    };
+}
+
+// Importações reais do Supabase
 import { 
     getCurrentUser,
     getLeads,
@@ -12,10 +39,37 @@ import {
     createLeadInteraction,
     getLeadSources,
     getLeadTags,
-    getUserProfiles
+    getUserProfiles,
+    createAuditLog,
+    subscribeToTable,
+    healthCheck
 } from '../lib/supabase.js';
 
-// ===== ESTADO GLOBAL =====
+// ===== ESTADO GLOBAL ENTERPRISE =====
+/**
+ * @typedef {Object} LeadsState
+ * @property {Object|null} user - Usuário atual autenticado
+ * @property {Object|null} currentUserProfile - Perfil do usuário atual
+ * @property {string|null} orgId - ID da organização
+ * @property {Array} leads - Lista completa de leads
+ * @property {Array} filteredLeads - Leads filtrados
+ * @property {Array} selectedLeads - IDs dos leads selecionados
+ * @property {string} currentView - Visualização atual (table, grid, kanban)
+ * @property {Object} filters - Filtros aplicados
+ * @property {Object} sorting - Configuração de ordenação
+ * @property {Object} pagination - Configuração de paginação
+ * @property {Object} kpis - Indicadores de performance
+ * @property {boolean} isLoading - Estado de carregamento
+ * @property {boolean} isRefreshing - Estado de atualização
+ * @property {string|null} error - Mensagem de erro atual
+ * @property {boolean} bulkActionMode - Modo de ações em lote
+ * @property {Object|null} editingLead - Lead sendo editado
+ * @property {Array} leadSources - Fontes de leads disponíveis
+ * @property {Array} leadTags - Tags disponíveis
+ * @property {Array} teamMembers - Membros da equipe
+ * @property {number|null} searchTimeout - Timeout da busca
+ * @property {Object|null} subscription - Subscription real-time
+ */
 const leadsState = {
     user: null,
     currentUserProfile: null,
@@ -57,10 +111,11 @@ const leadsState = {
     leadSources: [],
     leadTags: [],
     teamMembers: [],
-    searchTimeout: null
+    searchTimeout: null,
+    subscription: null
 };
 
-// ===== CONFIGURAÇÕES =====
+// ===== CONFIGURAÇÕES ENTERPRISE =====
 const leadsConfig = {
     statusOptions: [
         { value: 'novo', label: 'Novo', color: 'blue', icon: '🆕' },
@@ -85,7 +140,7 @@ const leadsConfig = {
         { value: 'event', label: 'Evento', icon: '🎯' },
         { value: 'other', label: 'Outro', icon: '📌' }
     ],
-    // CORRIGIDO: Classes CSS estáticas
+    // Classes CSS estáticas para evitar problemas de build
     statusStyles: {
         novo: { bg: 'bg-blue-100', text: 'text-blue-800' },
         contatado: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
@@ -97,14 +152,27 @@ const leadsConfig = {
     }
 };
 
-// ===== INICIALIZAÇÃO =====
+// ===== INICIALIZAÇÃO ENTERPRISE =====
 document.addEventListener('DOMContentLoaded', initializeLeadsPage);
 
+/**
+ * Inicializa o sistema de leads com dados reais
+ * @returns {Promise<void>}
+ */
 async function initializeLeadsPage() {
     try {
-        showLoading(true, 'Carregando sistema de leads...');
+        // Validar dependências
+        validateDependencies();
         
-        // CORRIGIDO: Melhor tratamento de autenticação
+        showLoading(true, 'Inicializando sistema de leads...');
+        
+        // Verificar saúde da conexão
+        const health = await healthCheck().catch(err => ({ error: err }));
+        if (health.error) {
+            console.warn('⚠️ Problema de conectividade:', health.error);
+        }
+        
+        // Autenticação enterprise
         try {
             const { user, profile, error } = await getCurrentUser();
             if (error) {
@@ -123,6 +191,14 @@ async function initializeLeadsPage() {
             leadsState.currentUserProfile = profile;
             leadsState.orgId = profile?.org_id || 'default-org-id';
             
+            // Log de auditoria
+            await createAuditLog({
+                action: 'leads_page_access',
+                user_id: user.id,
+                org_id: leadsState.orgId,
+                details: { page: 'leads', timestamp: new Date().toISOString() }
+            }).catch(err => console.warn('Erro ao criar log de auditoria:', err));
+            
         } catch (authError) {
             console.error('Erro ao verificar autenticação:', authError);
             window.location.href = '/login.html';
@@ -132,8 +208,11 @@ async function initializeLeadsPage() {
         // Carregar dados auxiliares
         await loadAuxiliaryData();
         
-        // Carregar leads
+        // Carregar leads reais
         await loadLeads();
+        
+        // Configurar real-time subscriptions
+        setupRealTimeSubscriptions();
         
         // Configurar interface
         setupEventListeners();
@@ -142,20 +221,26 @@ async function initializeLeadsPage() {
         leadsState.isLoading = false;
         showLoading(false);
         
-        console.log('🎯 Sistema de Leads Real inicializado');
-        showSuccess('Sistema de leads carregado com sucesso!');
+        console.log('🎯 Sistema de Leads Enterprise inicializado com sucesso');
+        showSuccess('Sistema de leads carregado com dados reais!');
         
     } catch (error) {
-        console.error('❌ Erro ao inicializar leads:', error);
+        console.error('❌ Erro crítico ao inicializar leads:', error);
         leadsState.error = error.message;
         leadsState.isLoading = false;
         showLoading(false);
         showError(`Erro ao carregar leads: ${error.message}`);
+        
+        // Fallback para dados demo apenas em caso de erro crítico
         loadDemoData();
     }
 }
 
-// ===== CARREGAMENTO DE DADOS =====
+// ===== CARREGAMENTO DE DADOS REAIS =====
+/**
+ * Carrega leads reais da tabela leads_crm
+ * @returns {Promise<void>}
+ */
 async function loadLeads() {
     if (leadsState.isRefreshing) {
         console.log('⏳ Carregamento já em andamento...');
@@ -170,7 +255,7 @@ async function loadLeads() {
         }).catch(err => ({ error: err }));
         
         if (result.error) {
-            throw new Error(result.error.message || 'Erro ao carregar leads');
+            throw new Error(result.error.message || 'Erro ao carregar leads da tabela leads_crm');
         }
         
         leadsState.leads = Array.isArray(result.data) ? result.data : [];
@@ -179,7 +264,7 @@ async function loadLeads() {
         calculateKPIs();
         applyFiltersAndSorting();
         
-        console.log(`✅ ${leadsState.leads.length} leads carregados`);
+        console.log(`✅ ${leadsState.leads.length} leads carregados da tabela leads_crm`);
         
     } catch (error) {
         console.error('❌ Erro ao carregar leads:', error);
@@ -189,9 +274,12 @@ async function loadLeads() {
     }
 }
 
+/**
+ * Carrega dados auxiliares das tabelas relacionadas
+ * @returns {Promise<void>}
+ */
 async function loadAuxiliaryData() {
     try {
-        // CORRIGIDO: Melhor tratamento de Promise.allSettled
         const promises = [
             getLeadSources(leadsState.orgId).catch(err => ({ error: err })),
             getLeadTags(leadsState.orgId).catch(err => ({ error: err })),
@@ -200,20 +288,26 @@ async function loadAuxiliaryData() {
         
         const [sourcesResult, tagsResult, teamResult] = await Promise.all(promises);
         
+        // Lead Sources da tabela lead_sources
         if (sourcesResult && sourcesResult.data && !sourcesResult.error) {
             leadsState.leadSources = Array.isArray(sourcesResult.data) ? sourcesResult.data : [];
+            console.log(`✅ ${leadsState.leadSources.length} fontes de leads carregadas`);
         } else if (sourcesResult?.error) {
             console.warn('Erro ao carregar fontes de leads:', sourcesResult.error);
         }
         
+        // Lead Tags da tabela lead_labels
         if (tagsResult && tagsResult.data && !tagsResult.error) {
             leadsState.leadTags = Array.isArray(tagsResult.data) ? tagsResult.data : [];
+            console.log(`✅ ${leadsState.leadTags.length} tags de leads carregadas`);
         } else if (tagsResult?.error) {
             console.warn('Erro ao carregar tags de leads:', tagsResult.error);
         }
         
+        // Team Members da tabela user_profiles
         if (teamResult && teamResult.data && !teamResult.error) {
             leadsState.teamMembers = Array.isArray(teamResult.data) ? teamResult.data : [];
+            console.log(`✅ ${leadsState.teamMembers.length} membros da equipe carregados`);
         } else if (teamResult?.error) {
             console.warn('Erro ao carregar membros da equipe:', teamResult.error);
         }
@@ -224,7 +318,63 @@ async function loadAuxiliaryData() {
     }
 }
 
-// ===== CÁLCULO DE KPIs =====
+// ===== REAL-TIME SUBSCRIPTIONS =====
+/**
+ * Configura subscriptions real-time para atualizações automáticas
+ */
+function setupRealTimeSubscriptions() {
+    try {
+        // Subscription para mudanças na tabela leads_crm
+        leadsState.subscription = subscribeToTable('leads_crm', {
+            event: '*', // INSERT, UPDATE, DELETE
+            schema: 'public',
+            filter: `org_id=eq.${leadsState.orgId}`
+        }, (payload) => {
+            console.log('🔄 Atualização real-time recebida:', payload);
+            
+            switch (payload.eventType) {
+                case 'INSERT':
+                    if (payload.new) {
+                        leadsState.leads.unshift(payload.new);
+                        showSuccess('Novo lead adicionado!');
+                    }
+                    break;
+                    
+                case 'UPDATE':
+                    if (payload.new) {
+                        const index = leadsState.leads.findIndex(lead => lead.id === payload.new.id);
+                        if (index !== -1) {
+                            leadsState.leads[index] = payload.new;
+                            showSuccess('Lead atualizado!');
+                        }
+                    }
+                    break;
+                    
+                case 'DELETE':
+                    if (payload.old) {
+                        leadsState.leads = leadsState.leads.filter(lead => lead.id !== payload.old.id);
+                        showSuccess('Lead removido!');
+                    }
+                    break;
+            }
+            
+            // Recalcular e re-renderizar
+            calculateKPIs();
+            applyFiltersAndSorting();
+            renderInterface();
+        });
+        
+        console.log('🔄 Real-time subscriptions configuradas');
+        
+    } catch (error) {
+        console.warn('⚠️ Erro ao configurar real-time subscriptions:', error);
+    }
+}
+
+// ===== CÁLCULO DE KPIs REAIS =====
+/**
+ * Calcula KPIs baseados nos dados reais dos leads
+ */
 function calculateKPIs() {
     const leads = leadsState.leads;
     if (!Array.isArray(leads)) {
@@ -237,7 +387,7 @@ function calculateKPIs() {
     
     leadsState.kpis.total = leads.length;
     
-    // Leads de hoje
+    // Leads criados hoje
     leadsState.kpis.newToday = leads.filter(lead => {
         try {
             return new Date(lead.created_at) >= startOfToday;
@@ -256,12 +406,12 @@ function calculateKPIs() {
         lead.status === 'convertido' || lead.status === 'converted'
     ).length;
     
-    // Taxa de conversão
+    // Taxa de conversão real
     leadsState.kpis.conversionRate = leadsState.kpis.total > 0 
         ? ((leadsState.kpis.converted / leadsState.kpis.total) * 100).toFixed(1)
         : 0;
     
-    // Valor médio
+    // Valor médio real dos leads
     const leadsWithValue = leads.filter(lead => {
         const value = parseFloat(lead.value);
         return !isNaN(value) && value > 0;
@@ -270,9 +420,14 @@ function calculateKPIs() {
     leadsState.kpis.avgValue = leadsWithValue.length > 0
         ? Math.round(leadsWithValue.reduce((sum, lead) => sum + parseFloat(lead.value), 0) / leadsWithValue.length)
         : 0;
+    
+    console.log('📊 KPIs calculados:', leadsState.kpis);
 }
 
 // ===== FILTROS E ORDENAÇÃO =====
+/**
+ * Aplica filtros e ordenação aos leads
+ */
 function applyFiltersAndSorting() {
     let filtered = [...leadsState.leads];
     
@@ -283,10 +438,12 @@ function applyFiltersAndSorting() {
             const name = (lead.name || '').toLowerCase();
             const email = (lead.email || '').toLowerCase();
             const company = (lead.company || '').toLowerCase();
+            const phone = (lead.phone || '').toLowerCase();
             
             return name.includes(search) || 
                    email.includes(search) || 
-                   company.includes(search);
+                   company.includes(search) ||
+                   phone.includes(search);
         });
     }
     
@@ -355,27 +512,47 @@ function applyFiltersAndSorting() {
     }
 }
 
-// ===== CRUD OPERATIONS =====
+// ===== CRUD OPERATIONS COM DADOS REAIS =====
+/**
+ * Cria um novo lead na tabela leads_crm
+ * @param {Object} leadData - Dados do lead
+ * @returns {Promise<Object>} Lead criado
+ */
 async function createNewLead(leadData) {
     try {
         showLoading(true, 'Criando lead...');
         
-        const result = await createLead(leadData, leadsState.orgId);
+        // Validar dados obrigatórios
+        if (!leadData.name || !leadData.email) {
+            throw new Error('Nome e email são obrigatórios');
+        }
+        
+        // Adicionar metadados
+        const enrichedData = {
+            ...leadData,
+            org_id: leadsState.orgId,
+            created_by: leadsState.user.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        const result = await createLead(enrichedData, leadsState.orgId);
         
         if (result.error) {
-            throw new Error(result.error.message || 'Erro ao criar lead');
+            throw new Error(result.error.message || 'Erro ao criar lead na tabela leads_crm');
         }
         
-        // Adicionar à lista local
-        if (result.data) {
-            leadsState.leads.unshift(result.data);
-            calculateKPIs();
-            applyFiltersAndSorting();
-            renderInterface();
-        }
+        // Log de auditoria
+        await createAuditLog({
+            action: 'lead_created',
+            user_id: leadsState.user.id,
+            org_id: leadsState.orgId,
+            resource_id: result.data?.id,
+            details: { lead_name: leadData.name, lead_email: leadData.email }
+        }).catch(err => console.warn('Erro ao criar log de auditoria:', err));
         
         showSuccess('Lead criado com sucesso!');
-        console.log('✅ Lead criado:', result.data);
+        console.log('✅ Lead criado na tabela leads_crm:', result.data);
         
         return result.data;
         
@@ -388,30 +565,40 @@ async function createNewLead(leadData) {
     }
 }
 
+/**
+ * Atualiza um lead existente na tabela leads_crm
+ * @param {string} leadId - ID do lead
+ * @param {Object} leadData - Dados atualizados
+ * @returns {Promise<Object>} Lead atualizado
+ */
 async function updateExistingLead(leadId, leadData) {
     try {
         showLoading(true, 'Atualizando lead...');
         
-        const result = await updateLead(leadId, leadData, leadsState.orgId);
+        // Adicionar metadados de atualização
+        const enrichedData = {
+            ...leadData,
+            updated_by: leadsState.user.id,
+            updated_at: new Date().toISOString()
+        };
+        
+        const result = await updateLead(leadId, enrichedData, leadsState.orgId);
         
         if (result.error) {
-            throw new Error(result.error.message || 'Erro ao atualizar lead');
+            throw new Error(result.error.message || 'Erro ao atualizar lead na tabela leads_crm');
         }
         
-        // Atualizar na lista local
-        if (result.data) {
-            const index = leadsState.leads.findIndex(lead => lead.id === leadId);
-            if (index !== -1) {
-                leadsState.leads[index] = result.data;
-            }
-            
-            calculateKPIs();
-            applyFiltersAndSorting();
-            renderInterface();
-        }
+        // Log de auditoria
+        await createAuditLog({
+            action: 'lead_updated',
+            user_id: leadsState.user.id,
+            org_id: leadsState.orgId,
+            resource_id: leadId,
+            details: { changes: Object.keys(leadData) }
+        }).catch(err => console.warn('Erro ao criar log de auditoria:', err));
         
         showSuccess('Lead atualizado com sucesso!');
-        console.log('✅ Lead atualizado:', result.data);
+        console.log('✅ Lead atualizado na tabela leads_crm:', result.data);
         
         return result.data;
         
@@ -424,6 +611,11 @@ async function updateExistingLead(leadId, leadData) {
     }
 }
 
+/**
+ * Exclui um lead da tabela leads_crm
+ * @param {string} leadId - ID do lead
+ * @returns {Promise<void>}
+ */
 async function deleteExistingLead(leadId) {
     try {
         if (!showConfirmDialog('Tem certeza que deseja excluir este lead?')) {
@@ -435,19 +627,20 @@ async function deleteExistingLead(leadId) {
         const result = await deleteLead(leadId, leadsState.orgId);
         
         if (result.error) {
-            throw new Error(result.error.message || 'Erro ao excluir lead');
+            throw new Error(result.error.message || 'Erro ao excluir lead da tabela leads_crm');
         }
         
-        // Remover da lista local
-        leadsState.leads = leadsState.leads.filter(lead => lead.id !== leadId);
-        leadsState.selectedLeads = leadsState.selectedLeads.filter(id => id !== leadId);
-        
-        calculateKPIs();
-        applyFiltersAndSorting();
-        renderInterface();
+        // Log de auditoria
+        await createAuditLog({
+            action: 'lead_deleted',
+            user_id: leadsState.user.id,
+            org_id: leadsState.orgId,
+            resource_id: leadId,
+            details: { timestamp: new Date().toISOString() }
+        }).catch(err => console.warn('Erro ao criar log de auditoria:', err));
         
         showSuccess('Lead excluído com sucesso!');
-        console.log('✅ Lead excluído:', leadId);
+        console.log('✅ Lead excluído da tabela leads_crm:', leadId);
         
     } catch (error) {
         console.error('❌ Erro ao excluir lead:', error);
@@ -458,7 +651,10 @@ async function deleteExistingLead(leadId) {
     }
 }
 
-// ===== RENDERIZAÇÃO =====
+// ===== RENDERIZAÇÃO ENTERPRISE =====
+/**
+ * Renderiza toda a interface do sistema de leads
+ */
 function renderInterface() {
     try {
         renderKPIs();
@@ -470,6 +666,9 @@ function renderInterface() {
     }
 }
 
+/**
+ * Renderiza os KPIs calculados dos dados reais
+ */
 function renderKPIs() {
     const kpisContainer = document.getElementById('kpis-section');
     if (!kpisContainer) return;
@@ -539,6 +738,9 @@ function renderKPIs() {
     `;
 }
 
+/**
+ * Renderiza os filtros do sistema
+ */
 function renderFilters() {
     const filtersContainer = document.getElementById('filters-section');
     if (!filtersContainer) return;
@@ -603,6 +805,9 @@ function renderFilters() {
     `;
 }
 
+/**
+ * Renderiza a tabela de leads com dados reais
+ */
 function renderLeadsTable() {
     const tableContainer = document.getElementById('leads-table-container');
     if (!tableContainer) return;
@@ -706,6 +911,9 @@ function renderLeadsTable() {
     `;
 }
 
+/**
+ * Renderiza a paginação
+ */
 function renderPagination() {
     const paginationContainer = document.getElementById('pagination-section');
     if (!paginationContainer) return;
@@ -748,8 +956,12 @@ function renderPagination() {
     `;
 }
 
-// ===== UTILITÁRIOS =====
-// CORRIGIDO: Status badge com classes estáticas
+// ===== UTILITÁRIOS ENTERPRISE =====
+/**
+ * Renderiza badge de status com classes CSS estáticas
+ * @param {string} status - Status do lead
+ * @returns {string} HTML do badge
+ */
 function renderStatusBadge(status) {
     const statusConfig = leadsConfig.statusOptions.find(s => s.value === status) || 
                         { label: status || 'N/A', color: 'gray', icon: '❓' };
@@ -764,16 +976,32 @@ function renderStatusBadge(status) {
     `;
 }
 
+/**
+ * Obtém o label da fonte de lead
+ * @param {string} source - Fonte do lead
+ * @returns {string} Label formatado
+ */
 function getSourceLabel(source) {
     const sourceConfig = leadsConfig.sourceOptions.find(s => s.value === source);
     return sourceConfig ? `${sourceConfig.icon} ${sourceConfig.label}` : (source || 'N/A');
 }
 
+/**
+ * Obtém ícone de ordenação
+ * @param {string} field - Campo de ordenação
+ * @returns {string} Ícone
+ */
 function getSortIcon(field) {
     if (leadsState.sorting.field !== field) return '';
     return leadsState.sorting.direction === 'asc' ? '▲' : '▼';
 }
 
+/**
+ * Gera botões de paginação
+ * @param {number} currentPage - Página atual
+ * @param {number} totalPages - Total de páginas
+ * @returns {string} HTML dos botões
+ */
 function generatePageButtons(currentPage, totalPages) {
     const buttons = [];
     const startPage = Math.max(1, currentPage - 2);
@@ -792,6 +1020,11 @@ function generatePageButtons(currentPage, totalPages) {
     return buttons.join('');
 }
 
+/**
+ * Formata data para exibição
+ * @param {string} dateString - String da data
+ * @returns {string} Data formatada
+ */
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     
@@ -808,7 +1041,11 @@ function formatDate(dateString) {
     }
 }
 
-// NOVO: Função para escape HTML
+/**
+ * Escapa HTML para prevenir XSS
+ * @param {any} text - Texto a ser escapado
+ * @returns {string} Texto escapado
+ */
 function escapeHtml(text) {
     if (text == null) return '';
     const div = document.createElement('div');
@@ -816,7 +1053,12 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// CORRIGIDO: Melhor sistema de notificações
+// ===== SISTEMA DE NOTIFICAÇÕES ENTERPRISE =====
+/**
+ * Exibe indicador de carregamento
+ * @param {boolean} show - Mostrar ou ocultar
+ * @param {string} message - Mensagem de carregamento
+ */
 function showLoading(show, message = 'Carregando...') {
     const loadingElement = document.getElementById('loading-indicator');
     if (loadingElement) {
@@ -830,10 +1072,13 @@ function showLoading(show, message = 'Carregando...') {
     console.log(show ? `🔄 ${message}` : '✅ Loading complete');
 }
 
+/**
+ * Exibe notificação de erro
+ * @param {string} message - Mensagem de erro
+ */
 function showError(message) {
     console.error('❌', message);
     
-    // Tentar usar notificação personalizada primeiro
     const errorElement = document.getElementById('error-notification');
     if (errorElement) {
         errorElement.textContent = message;
@@ -847,10 +1092,13 @@ function showError(message) {
     }
 }
 
+/**
+ * Exibe notificação de sucesso
+ * @param {string} message - Mensagem de sucesso
+ */
 function showSuccess(message) {
     console.log('✅', message);
     
-    // Tentar usar notificação personalizada primeiro
     const successElement = document.getElementById('success-notification');
     if (successElement) {
         successElement.textContent = message;
@@ -861,12 +1109,22 @@ function showSuccess(message) {
     }
 }
 
+/**
+ * Exibe diálogo de confirmação
+ * @param {string} message - Mensagem de confirmação
+ * @returns {boolean} Confirmação do usuário
+ */
 function showConfirmDialog(message) {
-    // Melhor seria implementar um modal customizado
+    // TODO: Implementar modal customizado
     return confirm(message);
 }
 
-// NOVO: Debounce para busca
+/**
+ * Função debounce para otimizar performance
+ * @param {Function} func - Função a ser executada
+ * @param {number} wait - Tempo de espera em ms
+ * @returns {Function} Função com debounce
+ */
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -879,9 +1137,12 @@ function debounce(func, wait) {
     };
 }
 
-// ===== EVENT LISTENERS =====
+// ===== EVENT LISTENERS ENTERPRISE =====
+/**
+ * Configura todos os event listeners do sistema
+ */
 function setupEventListeners() {
-    // CORRIGIDO: Busca com debounce
+    // Busca com debounce para performance
     document.addEventListener('input', (e) => {
         if (e.target.id === 'search-input') {
             if (leadsState.searchTimeout) {
@@ -890,13 +1151,14 @@ function setupEventListeners() {
             
             leadsState.searchTimeout = setTimeout(() => {
                 leadsState.filters.search = e.target.value;
-                leadsState.pagination.currentPage = 1; // Reset para primeira página
+                leadsState.pagination.currentPage = 1;
                 applyFiltersAndSorting();
                 renderInterface();
             }, 300);
         }
     });
     
+    // Filtros
     document.addEventListener('change', (e) => {
         if (e.target.id === 'status-filter') {
             leadsState.filters.status = e.target.value;
@@ -920,7 +1182,7 @@ function setupEventListeners() {
         }
     });
     
-    // Botões
+    // Botões e ações
     document.addEventListener('click', (e) => {
         if (e.target.id === 'clear-filters' || e.target.id === 'clear-filters-empty') {
             leadsState.filters = { search: '', status: '', period: '', priority: '', source: '', assignee: '' };
@@ -965,74 +1227,115 @@ function setupEventListeners() {
         }
     });
     
-    // Cleanup
+    // Cleanup ao sair da página
     window.addEventListener('beforeunload', () => {
         if (leadsState.searchTimeout) {
             clearTimeout(leadsState.searchTimeout);
+        }
+        
+        if (leadsState.subscription) {
+            try {
+                leadsState.subscription.unsubscribe();
+            } catch (error) {
+                console.warn('Erro ao cancelar subscription:', error);
+            }
         }
     });
 }
 
 // ===== MODAL DE LEAD =====
+/**
+ * Abre modal de criação/edição de lead
+ * @param {string|null} leadId - ID do lead para edição
+ */
 function openLeadModal(leadId = null) {
-    // Implementar modal de criação/edição de lead
     console.log('📝 Abrindo modal de lead:', leadId);
     showSuccess('Modal de lead em desenvolvimento');
+    // TODO: Implementar modal completo
 }
 
+/**
+ * Edita um lead existente
+ * @param {string} leadId - ID do lead
+ */
 function editLead(leadId) {
-    // Implementar edição de lead
     console.log('✏️ Editando lead:', leadId);
     openLeadModal(leadId);
 }
 
-// ===== DADOS DEMO =====
+// ===== DADOS DEMO (FALLBACK) =====
+/**
+ * Carrega dados demo apenas em caso de erro crítico
+ */
 function loadDemoData() {
-    console.log('🎯 Carregando dados demo de leads...');
+    console.log('🎯 Carregando dados demo de leads (fallback)...');
     
     leadsState.leads = [
         {
-            id: '1',
+            id: 'demo-1',
             name: 'João Silva',
             email: 'joao@exemplo.com',
             status: 'novo',
             source: 'website',
             value: 5000,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            org_id: leadsState.orgId
         },
         {
-            id: '2',
+            id: 'demo-2',
             name: 'Maria Santos',
             email: 'maria@exemplo.com',
             status: 'qualificado',
             source: 'social_media',
             value: 7500,
-            created_at: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-            id: '3',
-            name: 'Carlos Oliveira',
-            email: 'carlos@exemplo.com',
-            status: 'convertido',
-            source: 'referral',
-            value: 12000,
-            created_at: new Date(Date.now() - 172800000).toISOString()
+            created_at: new Date(Date.now() - 86400000).toISOString(),
+            org_id: leadsState.orgId
         }
     ];
     
     leadsState.filteredLeads = [...leadsState.leads];
     calculateKPIs();
+    applyFiltersAndSorting();
     renderInterface();
-    showSuccess('Dados demo carregados');
+    
+    showError('Usando dados demo - verifique a conexão com o Supabase');
 }
 
 // ===== API PÚBLICA =====
-window.leadsReal = {
-    refresh: loadLeads,
+/**
+ * API pública do sistema de leads
+ */
+window.LeadsSystem = {
+    // Estado
     getState: () => ({ ...leadsState }),
+    
+    // Ações
+    refresh: loadLeads,
     createLead: createNewLead,
     updateLead: updateExistingLead,
-    deleteLead: deleteExistingLead
+    deleteLead: deleteExistingLead,
+    
+    // Filtros
+    setFilter: (key, value) => {
+        leadsState.filters[key] = value;
+        leadsState.pagination.currentPage = 1;
+        applyFiltersAndSorting();
+        renderInterface();
+    },
+    
+    clearFilters: () => {
+        leadsState.filters = { search: '', status: '', period: '', priority: '', source: '', assignee: '' };
+        leadsState.pagination.currentPage = 1;
+        applyFiltersAndSorting();
+        renderInterface();
+    },
+    
+    // Utilitários
+    exportData: () => {
+        console.log('📤 Exportando dados de leads...');
+        return leadsState.filteredLeads;
+    }
 };
 
-console.log('🎯 Leads Real module loaded');
+console.log('🎯 Sistema de Leads Enterprise V4.1 carregado - Pronto para dados reais!');
+
