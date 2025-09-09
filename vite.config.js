@@ -22,14 +22,14 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        login: resolve(__dirname, 'login.html'),
-        register: resolve(__dirname, 'register.html'),
-        dashboard: resolve(__dirname, 'dashboard.html'),
-        leads: resolve(__dirname, 'leads-real.html'),
-        relatorios: resolve(__dirname, 'relatorios.html'),
-        automacoes: resolve(__dirname, 'automacoes.html'),
-        configuracoes: resolve(__dirname, 'configuracoes.html'),
-        gamificacao: resolve(__dirname, 'gamificacao.html')
+        login: resolve(__dirname, 'src/pages/auth/login.html'), // Ajustado para o caminho mais provável
+        register: resolve(__dirname, 'src/pages/auth/register.html'), // Ajustado para o caminho mais provável
+        dashboard: resolve(__dirname, 'src/pages/dashboard.html'),
+        leads: resolve(__dirname, 'src/pages/leads-real.html'),
+        relatorios: resolve(__dirname, 'src/pages/relatorios.html'),
+        automacoes: resolve(__dirname, 'src/pages/automacoes.html'),
+        configuracoes: resolve(__dirname, 'src/pages/configuracoes.html'),
+        gamificacao: resolve(__dirname, 'src/pages/gamificacao.html')
       }
     }
   }
