@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [REAL-TIME] All 55+ tables connected with real Supabase data
 // ✅ [MONITORING] Health checks and performance metrics integrated
 // ✅ [ENTERPRISE] Complete CRUD operations for all business entities
-// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization, getUserProfile
+// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization, getUserProfile, onAuthStateChange, updateUserProfile
 // =========================================================================
 
 // =========================================================================
@@ -559,6 +559,34 @@ export async function getUserProfile(userId, orgId = getCurrentOrgId()) {
   }
 }
 
+export async function updateUserProfile(userId, profileData, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ userId, profileData })
+  if (validation) return { data: null, error: validation, success: false }
+
+  try {
+    // Remove protected fields
+    const { user_id, org_id, created_at, ...safeUpdates } = profileData
+
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update(safeUpdates)
+      .eq('user_id', userId)
+      .eq('org_id', orgId || getCurrentOrgId())
+      .select(`
+        *,
+        teams(name, description),
+        user_organizations!user_profiles_user_id_fkey(
+          organizations(id, name)
+        )
+      `)
+      .single()
+
+    return handleSupabaseResponse(data, error, 'atualização de perfil do usuário', { userId, updates: safeUpdates })
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'atualização de perfil do usuário', { userId, updates: profileData })
+  }
+}
+
 export async function getCurrentUser() {
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -584,6 +612,49 @@ export async function getCurrentUser() {
     return { user, profile, error: null, success: true }
   } catch (error) {
     return { user: null, profile: null, error: createError(`Erro inesperado: ${error.message}`), success: false }
+  }
+}
+
+/**
+ * Monitora mudanças no estado de autenticação
+ * @param {Function} callback - Função callback para mudanças de estado
+ * @returns {Object} Subscription object para cleanup
+ */
+export function onAuthStateChange(callback) {
+  try {
+    if (typeof callback !== 'function') {
+      console.error('🚨 onAuthStateChange: callback deve ser uma função')
+      return null
+    }
+
+    // Wrapper para adicionar logging e error handling
+    const wrappedCallback = (event, session) => {
+      try {
+        if (import.meta.env.DEV) {
+          console.log('🔄 Auth state change:', { 
+            event, 
+            userId: session?.user?.id,
+            email: session?.user?.email 
+          })
+        }
+        
+        callback(event, session)
+      } catch (error) {
+        console.error('🚨 Erro no callback de auth state change:', error)
+      }
+    }
+
+    // Configurar listener do Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(wrappedCallback)
+    
+    if (import.meta.env.DEV) {
+      console.log('✅ Auth state listener configurado')
+    }
+    
+    return subscription
+  } catch (error) {
+    console.error('🚨 Erro ao configurar auth state listener:', error)
+    return null
   }
 }
 
