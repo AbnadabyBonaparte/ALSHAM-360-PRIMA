@@ -4,7 +4,7 @@
  * Script principal do dashboard com integração Supabase, UX premium e arquitetura NASA.
  * Implementa real-time updates, gamificação, animações e error handling robusto.
  * 
- * @version 2.0.0
+ * @version 2.0.1 - FIXED: Added getCurrentSession import
  * @author ALSHAM Team
  * @license MIT
  */
@@ -13,6 +13,7 @@
 import Chart from 'chart.js/auto';
 import { 
     getCurrentUser,  
+    getCurrentSession,
     getDashboardKPIs,
     getLeads,
     createAuditLog
@@ -1187,4 +1188,3 @@ export {
 };
 
 console.info('🚀 ALSHAM 360° PRIMA Main Script v2.0.0 loaded - Imports corrigidos!');
-
