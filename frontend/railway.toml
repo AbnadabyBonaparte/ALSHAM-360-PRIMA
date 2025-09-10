@@ -1,0 +1,14 @@
+# railway.toml
+# Configuração específica do Railway - ALSHAM 360° PRIMA
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[environments.production]
+NODE_ENV = "production"
+
