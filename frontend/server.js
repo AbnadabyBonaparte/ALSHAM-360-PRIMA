@@ -11,10 +11,12 @@ import { readFileSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PORT = process.env.PORT || 3000;
+const RATE_LIMIT_MAX = process.env.RATE_LIMIT_MAX || 1000;
+const RATE_LIMIT_WINDOW = process.env.RATE_LIMIT_WINDOW || 15 * 60 * 1000; // 15 min
 
 const app = express();
 
-// Middleware
+// Middleware de segurança
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -36,8 +38,8 @@ app.use(morgan('combined'));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 1000
+  windowMs: RATE_LIMIT_WINDOW,
+  max: RATE_LIMIT_MAX
 });
 app.use(limiter);
 
@@ -51,8 +53,11 @@ app.get('/health', (req, res) => {
 });
 
 // Servir arquivos estáticos
-app.use(express.static('dist'));
+app.use(express.static('dist', { extensions: ['html'] }));
 app.use(express.static('.'));
+
+// Ignorar favicon.ico para não poluir logs
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // SPA fallback
 app.get('*', (req, res) => {
@@ -60,12 +65,13 @@ app.get('*', (req, res) => {
     const indexPath = join(__dirname, 'dist', 'index.html');
     const indexContent = readFileSync(indexPath, 'utf8');
     res.send(indexContent);
-  } catch {
+  } catch (err1) {
     try {
       const indexPath = join(__dirname, 'index.html');
       const indexContent = readFileSync(indexPath, 'utf8');
       res.send(indexContent);
-    } catch (error) {
+    } catch (err2) {
+      console.error('Erro ao servir índice:', err1, err2);
       res.status(404).send('Página não encontrada');
     }
   }
