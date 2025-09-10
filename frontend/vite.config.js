@@ -9,18 +9,21 @@ export default defineConfig({
   
   server: {
     host: '0.0.0.0',
-    port: 5173,
-    cors: true
+    port: process.env.PORT || 5173,
+    cors: true,
+    strictPort: false
   },
   
   preview: {
     host: '0.0.0.0',
-    port: 4173,
+    port: process.env.PORT || 4173,
+    strictPort: false,
     allowedHosts: [
       'healthcheck.railway.app',
       '.railway.app',
       '.alshamglobal.com.br',
-      'localhost'
+      'localhost',
+      'app.alshamglobal.com.br'
     ]
   },
   
@@ -28,6 +31,8 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     minify: 'terser',
+    target: 'es2015',
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
@@ -48,7 +53,20 @@ export default defineConfig({
           vendor: ['@supabase/supabase-js'],
           charts: ['chart.js'],
           utils: ['canvas-confetti', 'jspdf', 'xlsx', 'papaparse']
-        }
+        },
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const extType = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            return `assets/images/[name]-[hash][extname]`;
+          }
+          if (/woff2?|eot|ttf|otf/i.test(extType)) {
+            return `assets/fonts/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js'
       }
     }
   },
@@ -72,6 +90,17 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 // 24 hours
               }
             }
+          },
+          {
+            urlPattern: /^https:\/\/.*\.railway\.app\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'railway-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 12 // 12 hours
+              }
+            }
           }
         ]
       },
@@ -82,6 +111,8 @@ export default defineConfig({
         theme_color: '#2563eb',
         background_color: '#ffffff',
         display: 'standalone',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: '/icon-192x192.png',
@@ -116,7 +147,29 @@ export default defineConfig({
   
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
-    __BUILD_TIME__: JSON.stringify(new Date().toISOString())
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+    'process.env.RAILWAY_ENVIRONMENT': JSON.stringify(process.env.RAILWAY_ENVIRONMENT || 'production')
+  },
+  
+  // Otimizações específicas para Railway
+  optimizeDeps: {
+    include: [
+      '@supabase/supabase-js',
+      'chart.js',
+      'canvas-confetti',
+      'jspdf',
+      'xlsx',
+      'papaparse'
+    ]
+  },
+  
+  // Configurações de ambiente
+  envPrefix: ['VITE_', 'SUPABASE_', 'OPENAI_'],
+  
+  // Configurações de performance
+  esbuild: {
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
   }
 });
 
