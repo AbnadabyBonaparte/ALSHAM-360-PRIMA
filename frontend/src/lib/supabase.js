@@ -13,6 +13,7 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [REAL-TIME] All 55+ tables connected with real Supabase data
 // ✅ [MONITORING] Health checks and performance metrics integrated
 // ✅ [ENTERPRISE] Complete CRUD operations for all business entities
+// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog
 // =========================================================================
 
 // =========================================================================
@@ -531,6 +532,155 @@ export async function getCurrentUser() {
     return { user, profile, error: null, success: true }
   } catch (error) {
     return { user: null, profile: null, error: createError(`Erro inesperado: ${error.message}`), success: false }
+  }
+}
+
+/**
+ * Obtém a sessão atual do usuário autenticado
+ * @returns {Promise<Object>} Resultado com dados da sessão ou erro
+ */
+export async function getCurrentSession() {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    
+    if (error) {
+      console.error('🚨 Erro ao obter sessão:', error)
+      return { 
+        data: null, 
+        error: createError(`Erro ao obter sessão: ${error.message}`, 'SESSION_ERROR', { 
+          supabaseError: error 
+        }),
+        success: false
+      }
+    }
+    
+    if (!session) {
+      console.warn('⚠️ Nenhuma sessão ativa encontrada')
+      return { 
+        data: null, 
+        error: createError('Usuário não autenticado', 'NO_SESSION'),
+        success: false
+      }
+    }
+    
+    // Log successful session retrieval in development
+    if (import.meta.env.DEV) {
+      console.log('✅ Sessão obtida com sucesso:', { 
+        userId: session.user?.id,
+        email: session.user?.email,
+        expiresAt: session.expires_at
+      })
+    }
+    
+    return { 
+      data: session, 
+      error: null, 
+      success: true 
+    }
+  } catch (error) {
+    console.error('🚨 Erro inesperado ao obter sessão:', error)
+    return { 
+      data: null, 
+      error: createError(`Erro inesperado: ${error.message}`, 'UNEXPECTED_ERROR', { 
+        originalError: error 
+      }),
+      success: false
+    }
+  }
+}
+
+/**
+ * Cria um registro de auditoria para rastreamento de ações
+ * @param {Object} auditData - Dados do log de auditoria
+ * @param {string} auditData.action - Ação realizada
+ * @param {string} auditData.table_name - Nome da tabela afetada
+ * @param {string} auditData.record_id - ID do registro afetado
+ * @param {Object} auditData.old_values - Valores antigos (opcional)
+ * @param {Object} auditData.new_values - Valores novos (opcional)
+ * @param {string} orgId - ID da organização (opcional, usa getCurrentOrgId se não fornecido)
+ * @returns {Promise<Object>} Resultado com dados do log criado ou erro
+ */
+export async function createAuditLog(auditData, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ auditData })
+  if (validation) return { data: null, error: validation, success: false }
+
+  if (!auditData.action || !auditData.table_name) {
+    return { 
+      data: null, 
+      error: createError('action e table_name são obrigatórios', 'BUSINESS_VALIDATION'),
+      success: false 
+    }
+  }
+
+  try {
+    // Obter usuário atual para o log
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    if (userError || !user) {
+      console.warn('⚠️ Usuário não autenticado para audit log')
+    }
+
+    // Preparar payload do audit log
+    const payload = {
+      action: auditData.action,
+      table_name: auditData.table_name,
+      record_id: auditData.record_id || null,
+      old_values: auditData.old_values || null,
+      new_values: auditData.new_values || null,
+      user_id: user?.id || null,
+      org_id: orgId || null,
+      ip_address: auditData.ip_address || null,
+      user_agent: auditData.user_agent || navigator.userAgent,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        environment: import.meta.env.MODE || 'production',
+        version: '8.0.0',
+        ...auditData.metadata
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('audit_log')
+      .insert([payload])
+      .select()
+      .single()
+
+    if (error) {
+      console.error('🚨 Erro ao criar audit log:', error)
+      return { 
+        data: null, 
+        error: createError(`Erro ao criar audit log: ${error.message}`, 'DATABASE_ERROR', { 
+          supabaseError: error,
+          auditData: payload 
+        }),
+        success: false
+      }
+    }
+
+    // Log successful audit creation in development
+    if (import.meta.env.DEV) {
+      console.log('✅ Audit log criado com sucesso:', { 
+        id: data.id,
+        action: data.action,
+        table: data.table_name
+      })
+    }
+
+    return { 
+      data, 
+      error: null, 
+      success: true 
+    }
+  } catch (error) {
+    console.error('🚨 Erro inesperado ao criar audit log:', error)
+    return { 
+      data: null, 
+      error: createError(`Erro inesperado: ${error.message}`, 'UNEXPECTED_ERROR', { 
+        originalError: error,
+        auditData 
+      }),
+      success: false
+    }
   }
 }
 
