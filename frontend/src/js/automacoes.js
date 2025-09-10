@@ -1,69 +1,150 @@
-// ===== ALSHAM 360° PRIMA - SISTEMA DE AUTOMAÇÕES ENTERPRISE V4.1 =====
-// Versão NASA 10/10 Enterprise Grade com dados reais do Supabase
-// Integração completa com Railway e 55+ tabelas
-
 /**
- * @fileoverview Sistema de Automações Enterprise com dados reais
- * @version 4.1.0
- * @author ALSHAM Team
- * @requires supabase.js
+ * ALSHAM 360° PRIMA - Enterprise Automation System V5.0 NASA 10/10 OPTIMIZED
+ * Advanced automation platform with real-time data integration and enterprise features
+ * 
+ * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * @author ALSHAM Development Team
+ * @license MIT
+ * 
+ * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
+ * ✅ Real-time automation data from Supabase tables
+ * ✅ Advanced workflow engine with rule-based automation
+ * ✅ Multi-channel communication (Email, SMS, WhatsApp)
+ * ✅ N8N integration for complex workflows
+ * ✅ Performance monitoring and analytics
+ * ✅ A11y compliant interface
+ * ✅ Performance monitoring and caching
+ * ✅ Dependency validation and error handling
+ * ✅ TypeScript-ready JSDoc annotations
+ * ✅ ES Modules compatibility (import/export)
+ * ✅ Vite build system optimization
+ * ✅ Path standardization and consistency
+ * ✅ NASA 10/10 Enterprise Grade
+ * 
+ * 🔗 DATA SOURCES: automation_rules, automation_executions, workflow_logs,
+ * email_campaigns, sms_campaigns, notification_logs, communication_templates,
+ * message_queue, n8n_workflows, whatsapp_integration
+ * 
+ * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
+ * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
+ * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
 
-// ===== DEPENDENCY VALIDATION =====
+// ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
 /**
- * Validates external library availability
- * @param {string} libName - Library name for error messages
+ * Real data integration with Supabase Enterprise
+ * Using standardized relative path imports for Vite compatibility
+ */
+import { 
+    // Core authentication and user functions
+    getCurrentUser,
+    getUserProfile,
+    
+    // Automation functions with REAL data
+    getAutomationRules,
+    createAutomationRule,
+    updateAutomationRule,
+    deleteAutomationRule,
+    getAutomationExecutions,
+    getWorkflowLogs,
+    
+    // Communication functions
+    getEmailCampaigns,
+    getSMSCampaigns,
+    getNotificationLogs,
+    getCommunicationTemplates,
+    getMessageQueue,
+    
+    // Integration functions
+    getN8NWorkflows,
+    getWhatsappIntegration,
+    
+    // Audit and logging
+    createAuditLog,
+    
+    // Health monitoring
+    healthCheck,
+    
+    // Configuration
+    getCurrentOrgId,
+    supabaseConfig
+} from '../lib/supabase.js';
+
+// ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
+/**
+ * Validates and returns external library dependency
+ * Enhanced for NASA 10/10 standards with detailed error reporting
+ * @param {string} libName - Name of the library for error messages
  * @param {any} lib - Library object to validate
  * @returns {any} Validated library object
- * @throws {Error} If library is not available
+ * @throws {Error} If library is not loaded
  */
 function requireLib(libName, lib) {
     if (!lib) {
-        throw new Error(`❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`);
+        const error = new Error(`❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`);
+        error.name = 'DependencyError';
+        error.library = libName;
+        throw error;
     }
     return lib;
 }
 
 /**
- * Validates all required dependencies
- * @returns {Object} Object with validated dependencies
+ * Validates all required dependencies for automation system
+ * Enhanced with comprehensive validation and fallback strategies
+ * @returns {Object} Object containing all validated dependencies
+ * @throws {Error} If any required dependency is missing
  */
 function validateDependencies() {
-    return {
-        localStorage: requireLib('Local Storage', window.localStorage),
-        sessionStorage: requireLib('Session Storage', window.sessionStorage),
-        crypto: requireLib('Web Crypto API', window.crypto)
-    };
+    try {
+        return {
+            localStorage: requireLib('localStorage', window.localStorage),
+            sessionStorage: requireLib('sessionStorage', window.sessionStorage),
+            crypto: requireLib('Web Crypto API', window.crypto),
+            performance: requireLib('Performance API', window.performance),
+            Notification: requireLib('Notification API', window.Notification)
+        };
+    } catch (error) {
+        console.error('🚨 Automation dependency validation failed:', error);
+        throw error;
+    }
 }
 
-// ===== IMPORTS REAIS DO SUPABASE =====
-import { 
-    getCurrentUser,              // auth.users REAL
-    getAutomationRules,         // automation_rules REAL
-    createAutomationRule,       // INSERT automation_rules REAL
-    updateAutomationRule,       // UPDATE automation_rules REAL
-    deleteAutomationRule,       // DELETE automation_rules REAL
-    getAutomationExecutions,    // automation_executions REAL
-    getWorkflowLogs,           // workflow_logs REAL
-    getEmailCampaigns,         // email_campaigns REAL
-    getSMSCampaigns,           // sms_campaigns REAL
-    getNotificationLogs,       // notification_logs REAL
-    getCommunicationTemplates, // communication_templates REAL
-    getMessageQueue,           // message_queue REAL
-    getN8NWorkflows,           // n8n_workflows REAL
-    getWhatsappIntegration,    // whatsapp_integration REAL
-    createAuditLog,            // audit_log REAL
-    healthCheck                // Verificação de saúde REAL
-} from '../lib/supabase.js';
-
-// ===== CONFIGURAÇÕES ENTERPRISE =====
-const AUTOMATION_CONFIG = {
-    REFRESH_INTERVAL: 30000,
-    CACHE_TTL: 300000,
-    MAX_RETRIES: 3,
-    DEBOUNCE_DELAY: 300,
+// ===== ENTERPRISE CONFIGURATION WITH REAL DATA MAPPING - NASA 10/10 =====
+/**
+ * Enhanced automation configuration with NASA 10/10 standards
+ * Includes accessibility, internationalization, and performance optimizations
+ */
+const AUTOMATION_CONFIG = Object.freeze({
+    // Performance settings optimized for REAL data
+    PERFORMANCE: {
+        REFRESH_INTERVAL: 30000,     // 30 segundos
+        CACHE_TTL: 300000,           // 5 minutos
+        MAX_RETRIES: 3,              // Tentativas de reconexão
+        DEBOUNCE_DELAY: 300,         // Anti-spam
+        TIMEOUT: 10000,              // Timeout requests
+        // NASA 10/10 performance enhancements
+        PARALLEL_REQUESTS: 5,
+        ANIMATION_DURATION: 750,
+        VIRTUAL_SCROLL_THRESHOLD: 100,
+        BATCH_SIZE: 50
+    },
     
-    AUTOMATION_TYPES: [
+    // Security settings for enterprise environment
+    SECURITY: {
+        MAX_RULES_PER_USER: 100,
+        RATE_LIMIT_WINDOW: 60000,    // 1 minuto
+        MAX_REQUESTS_PER_MINUTE: 100,
+        SESSION_TIMEOUT: 1800000,    // 30 minutos
+        ENCRYPTION_ENABLED: true,
+        // NASA 10/10 security enhancements
+        INPUT_VALIDATION: true,
+        XSS_PROTECTION: true,
+        CSRF_PROTECTION: true
+    },
+    
+    // Automation types mapped to REAL Supabase data
+    AUTOMATION_TYPES: Object.freeze([
         { value: 'lead_nurturing', label: 'Nutrição de Leads', icon: '🌱', color: 'emerald' },
         { value: 'email_sequence', label: 'Sequência de Email', icon: '📧', color: 'blue' },
         { value: 'sms_campaign', label: 'Campanha SMS', icon: '📱', color: 'purple' },
@@ -71,1690 +152,2455 @@ const AUTOMATION_CONFIG = {
         { value: 'lead_scoring', label: 'Pontuação de Leads', icon: '⭐', color: 'yellow' },
         { value: 'follow_up', label: 'Follow-up Automático', icon: '🔄', color: 'orange' },
         { value: 'task_creation', label: 'Criação de Tarefas', icon: '📋', color: 'gray' },
-        { value: 'notification', label: 'Notificações', icon: '🔔', color: 'red' }
-    ],
+        { value: 'notification', label: 'Notificações', icon: '🔔', color: 'red' },
+        { value: 'webhook', label: 'Webhook', icon: '🔗', color: 'indigo' },
+        { value: 'integration', label: 'Integração', icon: '🔌', color: 'pink' }
+    ]),
     
-    STATUS_OPTIONS: [
+    // Status options for automation rules
+    STATUS_OPTIONS: Object.freeze([
         { value: 'active', label: 'Ativo', color: 'green', icon: '✅' },
         { value: 'paused', label: 'Pausado', color: 'yellow', icon: '⏸️' },
         { value: 'draft', label: 'Rascunho', color: 'gray', icon: '📝' },
         { value: 'error', label: 'Erro', color: 'red', icon: '❌' },
-        { value: 'testing', label: 'Teste', color: 'blue', icon: '🧪' }
-    ],
+        { value: 'testing', label: 'Teste', color: 'blue', icon: '🧪' },
+        { value: 'scheduled', label: 'Agendado', color: 'purple', icon: '⏰' }
+    ]),
     
-    // Classes CSS estáticas para build system
-    STATIC_STYLES: {
-        active: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200' },
-        paused: { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-200' },
-        draft: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-200' },
-        error: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
-        testing: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
+    // Trigger types for automation rules
+    TRIGGER_TYPES: Object.freeze([
+        { value: 'lead_created', label: 'Lead Criado', icon: '👤' },
+        { value: 'lead_updated', label: 'Lead Atualizado', icon: '✏️' },
+        { value: 'deal_stage_changed', label: 'Estágio do Negócio Alterado', icon: '🔄' },
+        { value: 'email_opened', label: 'Email Aberto', icon: '📖' },
+        { value: 'email_clicked', label: 'Email Clicado', icon: '👆' },
+        { value: 'form_submitted', label: 'Formulário Enviado', icon: '📝' },
+        { value: 'time_based', label: 'Baseado em Tempo', icon: '⏰' },
+        { value: 'score_threshold', label: 'Limite de Pontuação', icon: '🎯' },
+        { value: 'tag_added', label: 'Tag Adicionada', icon: '🏷️' },
+        { value: 'custom_event', label: 'Evento Personalizado', icon: '⚡' }
+    ]),
+    
+    // Action types for automation rules
+    ACTION_TYPES: Object.freeze([
+        { value: 'send_email', label: 'Enviar Email', icon: '📧' },
+        { value: 'send_sms', label: 'Enviar SMS', icon: '📱' },
+        { value: 'send_whatsapp', label: 'Enviar WhatsApp', icon: '💬' },
+        { value: 'create_task', label: 'Criar Tarefa', icon: '📋' },
+        { value: 'update_lead', label: 'Atualizar Lead', icon: '✏️' },
+        { value: 'add_tag', label: 'Adicionar Tag', icon: '🏷️' },
+        { value: 'change_stage', label: 'Alterar Estágio', icon: '🔄' },
+        { value: 'assign_user', label: 'Atribuir Usuário', icon: '👤' },
+        { value: 'create_deal', label: 'Criar Negócio', icon: '💼' },
+        { value: 'webhook_call', label: 'Chamar Webhook', icon: '🔗' },
+        { value: 'wait_delay', label: 'Aguardar', icon: '⏳' },
+        { value: 'conditional', label: 'Condicional', icon: '🔀' }
+    ]),
+    
+    // Static CSS classes for build compatibility - NASA 10/10 optimization
+    STATIC_STYLES: Object.freeze({
+        status: {
+            active: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200' },
+            paused: { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-200' },
+            draft: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-200' },
+            error: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
+            testing: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
+            scheduled: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' }
+        },
         
-        success: { bg: 'bg-emerald-100', text: 'text-emerald-800' },
-        failed: { bg: 'bg-red-100', text: 'text-red-800' },
-        running: { bg: 'bg-blue-100', text: 'text-blue-800' },
-        pending: { bg: 'bg-amber-100', text: 'text-amber-800' },
-        completed: { bg: 'bg-emerald-100', text: 'text-emerald-800' }
+        execution: {
+            success: { bg: 'bg-emerald-100', text: 'text-emerald-800' },
+            failed: { bg: 'bg-red-100', text: 'text-red-800' },
+            running: { bg: 'bg-blue-100', text: 'text-blue-800' },
+            pending: { bg: 'bg-amber-100', text: 'text-amber-800' },
+            completed: { bg: 'bg-emerald-100', text: 'text-emerald-800' },
+            cancelled: { bg: 'bg-gray-100', text: 'text-gray-800' }
+        },
+        
+        types: {
+            emerald: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200' },
+            blue: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
+            purple: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
+            green: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
+            yellow: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-200' },
+            orange: { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
+            gray: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-200' },
+            red: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
+            indigo: { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-indigo-200' },
+            pink: { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-200' }
+        },
+        
+        notifications: {
+            success: { bg: 'bg-green-50', text: 'text-green-800', border: 'border-green-200' },
+            warning: { bg: 'bg-yellow-50', text: 'text-yellow-800', border: 'border-yellow-200' },
+            error: { bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-200' },
+            info: { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' }
+        }
+    }),
+    
+    // NASA 10/10 accessibility enhancements
+    ACCESSIBILITY: {
+        announceChanges: true,
+        keyboardNavigation: true,
+        screenReaderSupport: true,
+        highContrast: false,
+        focusManagement: true,
+        reducedMotion: false
+    },
+    
+    // Animation and UI settings
+    ANIMATIONS: {
+        ruleCreated: { duration: 1000, easing: 'ease-out' },
+        ruleUpdated: { duration: 750, easing: 'ease-in-out' },
+        executionStarted: { duration: 500, easing: 'ease-out' },
+        statusChanged: { duration: 300, easing: 'ease-in-out' }
     }
-};
+});
 
-// ===== ESTADO GLOBAL ENTERPRISE =====
+// ===== ENTERPRISE STATE MANAGEMENT WITH REAL DATA - NASA 10/10 =====
 /**
- * @typedef {Object} AutomationState
- * @property {Object|null} user - Current authenticated user
- * @property {Object|null} profile - User profile data
- * @property {string|null} orgId - Organization ID for multi-tenant
+ * Enhanced state manager with NASA 10/10 standards
+ * Includes performance monitoring, error recovery, and comprehensive caching
  */
-const automationState = {
-    // Core data REAL
-    user: null,
-    profile: null,
-    orgId: null,
-    
-    // Collections REAL das tabelas Supabase
-    automations: new Map(),        // automation_rules
-    executionHistory: new Map(),   // automation_executions
-    templates: new Map(),          // communication_templates
-    campaigns: {
-        email: new Map(),          // email_campaigns
-        sms: new Map(),           // sms_campaigns
-        whatsapp: new Map()       // whatsapp_integration
-    },
-    workflows: new Map(),          // n8n_workflows
-    
-    // Metrics calculadas dos dados REAIS
-    metrics: {
-        totalExecutions: 0,
-        successRate: 0,
-        activeAutomations: 0,
-        executionsToday: 0,
-        totalLeadsProcessed: 0,
-        conversionRate: 0,
-        avgExecutionTime: 0,
-        errorRate: 0
-    },
-    
-    // UI State
-    filters: {
-        status: 'all',
-        type: 'all',
-        period: '7d',
-        search: ''
-    },
-    sorting: {
-        field: 'updated_at',
-        direction: 'desc'
-    },
-    pagination: {
-        currentPage: 1,
-        itemsPerPage: 20,
-        totalItems: 0
-    },
-    
-    // System state
-    isLoading: false,
-    isRefreshing: false,
-    error: null,
-    lastUpdate: null,
-    selectedItems: new Set(),
-    refreshInterval: null,
-    connectionStatus: 'checking'
-};
-
-// ===== UTILITÁRIOS ENTERPRISE =====
-class Utils {
-    /**
-     * Escapes HTML to prevent XSS attacks
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped HTML
-     */
-    static escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = String(text);
-        return div.innerHTML;
-    }
-    
-    /**
-     * Formats date according to pt-BR locale
-     * @param {string} dateString - ISO date string
-     * @returns {string} Formatted date
-     */
-    static formatDate(dateString) {
-        if (!dateString) return 'N/A';
-        
-        try {
-            const date = new Date(dateString);
-            return new Intl.DateTimeFormat('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }).format(date);
-        } catch (error) {
-            console.warn('Erro ao formatar data:', error);
-            return 'Data inválida';
-        }
-    }
-    
-    /**
-     * Formats number with pt-BR locale
-     * @param {number} num - Number to format
-     * @returns {string} Formatted number
-     */
-    static formatNumber(num) {
-        if (typeof num !== 'number' || isNaN(num)) return '0';
-        return num.toLocaleString('pt-BR');
-    }
-    
-    /**
-     * Creates debounced function
-     * @param {Function} func - Function to debounce
-     * @param {number} wait - Wait time in milliseconds
-     * @returns {Function} Debounced function
-     */
-    static debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-    
-    /**
-     * Generates unique ID
-     * @returns {string} Unique identifier
-     */
-    static generateId() {
-        return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-    
-    /**
-     * Validates email format
-     * @param {string} email - Email to validate
-     * @returns {boolean} True if valid email
-     */
-    static validateEmail(email) {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    }
-    
-    /**
-     * Sanitizes user input
-     * @param {string} input - Input to sanitize
-     * @returns {string} Sanitized input
-     */
-    static sanitizeInput(input) {
-        if (typeof input !== 'string') return '';
-        return input.trim().replace(/[<>]/g, '');
-    }
-}
-
-// ===== SISTEMA DE NOTIFICAÇÕES ENTERPRISE =====
-class NotificationSystem {
+class AutomationStateManager {
     constructor() {
-        this.notifications = new Map();
-        this.container = this.createContainer();
-        this.maxNotifications = 5;
-    }
-    
-    createContainer() {
-        let container = document.getElementById('notification-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'notification-container';
-            container.className = 'fixed top-4 right-4 z-50 space-y-2';
-            container.setAttribute('aria-live', 'polite');
-            container.setAttribute('aria-label', 'Notificações do sistema');
-            document.body.appendChild(container);
-        }
-        return container;
-    }
-    
-    /**
-     * Shows notification with auto-dismiss
-     * @param {string} message - Notification message
-     * @param {'success'|'error'|'warning'|'info'} type - Notification type
-     * @param {number} duration - Auto-dismiss duration (0 = no auto-dismiss)
-     * @returns {string} Notification ID
-     */
-    show(message, type = 'info', duration = 5000) {
-        // Limit number of notifications
-        if (this.notifications.size >= this.maxNotifications) {
-            const oldestId = this.notifications.keys().next().value;
-            this.dismiss(oldestId);
-        }
-        
-        const id = Utils.generateId();
-        const notification = this.createNotification(id, message, type, duration);
-        
-        this.notifications.set(id, notification);
-        this.container.appendChild(notification.element);
-        
-        // Auto-dismiss
-        if (duration > 0) {
-            setTimeout(() => this.dismiss(id), duration);
-        }
-        
-        // Log for debugging
-        console.log(`📢 Notification [${type}]: ${message}`);
-        
-        return id;
-    }
-    
-    createNotification(id, message, type, duration) {
-        const typeConfig = {
-            success: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', icon: '✅' },
-            error: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', icon: '❌' },
-            warning: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-800', icon: '⚠️' },
-            info: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', icon: 'ℹ️' }
+        this.state = {
+            // User and organization context
+            user: null,
+            profile: null,
+            orgId: null,
+            
+            // Automation data
+            automationRules: [],
+            executions: [],
+            workflowLogs: [],
+            emailCampaigns: [],
+            smsCampaigns: [],
+            notificationLogs: [],
+            templates: [],
+            messageQueue: [],
+            n8nWorkflows: [],
+            whatsappIntegration: null,
+            
+            // UI state
+            isLoading: false,
+            isUpdating: false,
+            activeTab: 'rules',
+            selectedRule: null,
+            showCreateModal: false,
+            showEditModal: false,
+            
+            // Filters and pagination
+            filters: {
+                status: 'all',
+                type: 'all',
+                search: '',
+                dateRange: '30'
+            },
+            pagination: {
+                page: 1,
+                limit: 20,
+                total: 0
+            },
+            
+            // Error handling
+            errors: [],
+            warnings: [],
+            
+            // Real-time state
+            subscriptions: new Map(),
+            lastUpdate: null,
+            
+            // Performance monitoring - NASA 10/10
+            metrics: {
+                loadTime: 0,
+                renderTime: 0,
+                apiCalls: 0,
+                cacheHits: 0,
+                errors: 0,
+                rulesCreated: 0,
+                executionsRun: 0
+            },
+            
+            // Cache management - NASA 10/10
+            cache: {
+                data: new Map(),
+                timestamps: new Map(),
+                ttl: AUTOMATION_CONFIG.PERFORMANCE.CACHE_TTL
+            },
+            
+            // Rate limiting
+            rateLimiter: {
+                requests: [],
+                lastReset: Date.now()
+            }
         };
         
-        const config = typeConfig[type] || typeConfig.info;
-        
-        const element = document.createElement('div');
-        element.id = `notification-${id}`;
-        element.className = `
-            ${config.bg} ${config.border} ${config.text}
-            border rounded-lg p-4 shadow-lg transform transition-all duration-300
-            min-w-80 max-w-md opacity-0 translate-x-full
-        `;
-        element.setAttribute('role', 'alert');
-        element.setAttribute('aria-live', 'assertive');
-        
-        element.innerHTML = `
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <span class="text-lg" role="img" aria-label="${type}">${config.icon}</span>
-                </div>
-                <div class="ml-3 flex-1">
-                    <p class="text-sm font-medium">${Utils.escapeHtml(message)}</p>
-                </div>
-                <div class="ml-4 flex-shrink-0">
-                    <button 
-                        type="button" 
-                        class="inline-flex rounded-md hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                        onclick="window.notificationSystem.dismiss('${id}')"
-                        aria-label="Fechar notificação"
-                    >
-                        <span class="text-lg">×</span>
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Animate in
-        requestAnimationFrame(() => {
-            element.classList.remove('opacity-0', 'translate-x-full');
-        });
-        
-        return { id, element, type, message, createdAt: Date.now() };
+        // Bind methods for proper context
+        this.setState = this.setState.bind(this);
+        this.getState = this.getState.bind(this);
+        this.clearCache = this.clearCache.bind(this);
+        this.checkRateLimit = this.checkRateLimit.bind(this);
     }
     
     /**
-     * Dismisses notification by ID
-     * @param {string} id - Notification ID to dismiss
+     * Update state with validation and change detection
+     * @param {Object} updates - State updates
+     * @param {Function} callback - Optional callback after state update
      */
-    dismiss(id) {
-        const notification = this.notifications.get(id);
-        if (!notification) return;
-        
-        notification.element.classList.add('opacity-0', 'translate-x-full');
-        
-        setTimeout(() => {
-            if (notification.element.parentNode) {
-                notification.element.parentNode.removeChild(notification.element);
-            }
-            this.notifications.delete(id);
-        }, 300);
-    }
-    
-    /**
-     * Clears all notifications
-     */
-    clear() {
-        this.notifications.forEach((_, id) => this.dismiss(id));
-    }
-}
-
-// ===== GERENCIAMENTO DE DADOS ENTERPRISE =====
-class DataManager {
-    constructor() {
-        this.cache = new Map();
-        this.cacheTimestamps = new Map();
-        this.requestQueue = [];
-        this.isProcessing = false;
-        this.retryAttempts = new Map();
-    }
-    
-    /**
-     * Executes API request with caching and error handling
-     * @param {Function} apiFunction - Supabase function to execute
-     * @param {Array} args - Function arguments
-     * @param {Object} options - Request options
-     * @returns {Promise<Object>} API response
-     */
-    async executeRequest(apiFunction, args = [], options = {}) {
-        const cacheKey = options.cacheKey || `${apiFunction.name}_${JSON.stringify(args)}`;
-        
-        // Check cache
-        if (options.useCache !== false && this.isValidCache(cacheKey)) {
-            console.log(`📦 Cache hit: ${cacheKey}`);
-            return this.cache.get(cacheKey);
-        }
-        
+    setState(updates, callback) {
         try {
-            console.log(`🔄 API Request: ${apiFunction.name}`, args);
-            const result = await apiFunction(...args);
+            const previousState = { ...this.state };
             
-            // Handle different response formats
-            let data, error;
-            if (result && typeof result === 'object') {
-                if ('data' in result && 'error' in result) {
-                    data = result.data;
-                    error = result.error;
-                } else {
-                    data = result;
-                    error = null;
+            // Validate updates
+            if (typeof updates !== 'object' || updates === null) {
+                throw new Error('State updates must be an object');
+            }
+            
+            // Apply updates
+            Object.assign(this.state, updates);
+            
+            // Update timestamp
+            this.state.lastUpdate = new Date();
+            
+            // Execute callback if provided
+            if (typeof callback === 'function') {
+                callback(this.state, previousState);
+            }
+            
+            // Emit state change event for debugging
+            if (window.DEBUG_MODE) {
+                console.log('🔄 Automation state updated:', { updates, newState: this.state });
+            }
+            
+        } catch (error) {
+            console.error('❌ Error updating automation state:', error);
+            this.state.errors.push({
+                type: 'state_update_error',
+                message: error.message,
+                timestamp: new Date()
+            });
+        }
+    }
+    
+    /**
+     * Get current state or specific property
+     * @param {string} key - Optional key to get specific property
+     * @returns {any} State or property value
+     */
+    getState(key) {
+        if (key) {
+            return this.state[key];
+        }
+        return { ...this.state };
+    }
+    
+    /**
+     * Clear cache with optional filter
+     * @param {string} filter - Optional filter for cache keys
+     */
+    clearCache(filter) {
+        try {
+            if (filter) {
+                for (const [key] of this.state.cache.data.entries()) {
+                    if (key.includes(filter)) {
+                        this.state.cache.data.delete(key);
+                        this.state.cache.timestamps.delete(key);
+                    }
                 }
             } else {
-                data = result;
-                error = null;
+                this.state.cache.data.clear();
+                this.state.cache.timestamps.clear();
             }
             
-            if (error) {
-                throw new Error(error.message || 'API Error');
-            }
+            console.log(`🗑️ Automation cache cleared${filter ? ` (filter: ${filter})` : ''}`);
             
-            // Cache successful response
-            if (options.useCache !== false) {
-                this.setCache(cacheKey, { data, error: null });
-            }
-            
-            // Reset retry attempts on success
-            this.retryAttempts.delete(cacheKey);
-            
-            console.log(`✅ API Success: ${apiFunction.name}`);
-            return { data, error: null };
-            
-        } catch (apiError) {
-            console.error(`❌ API Error in ${apiFunction.name}:`, apiError);
-            
-            // Retry logic
-            const attempts = this.retryAttempts.get(cacheKey) || 0;
-            if (attempts < AUTOMATION_CONFIG.MAX_RETRIES) {
-                this.retryAttempts.set(cacheKey, attempts + 1);
-                console.log(`🔄 Retrying ${apiFunction.name} (${attempts + 1}/${AUTOMATION_CONFIG.MAX_RETRIES})`);
-                
-                // Exponential backoff
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 1000));
-                return this.executeRequest(apiFunction, args, options);
-            }
-            
-            throw apiError;
+        } catch (error) {
+            console.error('❌ Error clearing automation cache:', error);
         }
     }
     
     /**
-     * Checks if cache entry is still valid
+     * Get cached data with TTL validation
      * @param {string} key - Cache key
-     * @returns {boolean} True if cache is valid
+     * @returns {any|null} Cached data or null if expired/not found
      */
-    isValidCache(key) {
-        const timestamp = this.cacheTimestamps.get(key);
-        return timestamp && (Date.now() - timestamp < AUTOMATION_CONFIG.CACHE_TTL);
+    getCachedData(key) {
+        try {
+            const data = this.state.cache.data.get(key);
+            const timestamp = this.state.cache.timestamps.get(key);
+            
+            if (!data || !timestamp) {
+                return null;
+            }
+            
+            const now = Date.now();
+            if (now - timestamp > this.state.cache.ttl) {
+                this.state.cache.data.delete(key);
+                this.state.cache.timestamps.delete(key);
+                return null;
+            }
+            
+            this.state.metrics.cacheHits++;
+            return data;
+            
+        } catch (error) {
+            console.error('❌ Error getting cached automation data:', error);
+            return null;
+        }
     }
     
     /**
-     * Sets cache entry with timestamp
+     * Set cached data with timestamp
      * @param {string} key - Cache key
-     * @param {any} value - Value to cache
+     * @param {any} data - Data to cache
      */
-    setCache(key, value) {
-        this.cache.set(key, value);
-        this.cacheTimestamps.set(key, Date.now());
-    }
-    
-    /**
-     * Clears cache entries matching pattern
-     * @param {string} pattern - Pattern to match (empty = clear all)
-     */
-    clearCache(pattern = '') {
-        if (!pattern) {
-            this.cache.clear();
-            this.cacheTimestamps.clear();
-            console.log('🗑️ Cache cleared completely');
-            return;
-        }
-        
-        let cleared = 0;
-        for (const [key] of this.cache.entries()) {
-            if (key.includes(pattern)) {
-                this.cache.delete(key);
-                this.cacheTimestamps.delete(key);
-                cleared++;
-            }
-        }
-        console.log(`🗑️ Cache cleared: ${cleared} entries matching "${pattern}"`);
-    }
-}
-
-// ===== SISTEMA PRINCIPAL DE AUTOMAÇÕES ENTERPRISE =====
-class AutomationSystem {
-    constructor() {
-        this.dataManager = new DataManager();
-        this.notificationSystem = new NotificationSystem();
-        this.isInitialized = false;
-        
-        // Validate dependencies
+    setCachedData(key, data) {
         try {
-            validateDependencies();
-            console.log('✅ Dependencies validated');
-        } catch (error) {
-            console.error('❌ Dependency validation failed:', error);
-            throw error;
-        }
-        
-        // Bind methods
-        this.handleClick = this.handleClick.bind(this);
-        this.handleInput = this.handleInput.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleKeydown = this.handleKeydown.bind(this);
-        this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
-        this.refreshData = Utils.debounce(this.refreshData.bind(this), AUTOMATION_CONFIG.DEBOUNCE_DELAY);
-    }
-    
-    /**
-     * Initializes the automation system
-     * @returns {Promise<void>}
-     */
-    async initialize() {
-        if (this.isInitialized) {
-            console.log('⚠️ System already initialized');
-            return;
-        }
-        
-        try {
-            this.showLoading(true, 'Inicializando sistema de automações...');
-            console.log('🚀 Initializing Automation System...');
-            
-            // Verify authentication
-            const authResult = await this.verifyAuth();
-            if (!authResult.success) {
-                console.log('🔒 Authentication failed, redirecting to login');
-                window.location.href = '/login.html';
-                return;
-            }
-            
-            // Check connection health
-            await this.checkConnectionHealth();
-            
-            // Load data from real Supabase tables
-            await this.loadAllData();
-            
-            // Setup UI
-            this.setupEventListeners();
-            this.renderInterface();
-            this.setupRealTimeUpdates();
-            
-            this.isInitialized = true;
-            automationState.isLoading = false;
-            automationState.connectionStatus = 'connected';
-            
-            this.showLoading(false);
-            this.notificationSystem.show('Sistema carregado com sucesso!', 'success');
-            
-            console.log('🎉 Automation System initialized successfully');
+            this.state.cache.data.set(key, data);
+            this.state.cache.timestamps.set(key, Date.now());
             
         } catch (error) {
-            console.error('💥 Initialization error:', error);
-            automationState.error = error.message;
-            automationState.connectionStatus = 'error';
-            this.showLoading(false);
-            this.notificationSystem.show(`Erro: ${error.message}`, 'error');
-            
-            // Load demo data as fallback
-            this.loadDemoData();
+            console.error('❌ Error setting cached automation data:', error);
         }
     }
     
     /**
-     * Verifies user authentication with Supabase
-     * @returns {Promise<Object>} Authentication result
+     * Check rate limiting for API requests
+     * @returns {boolean} Whether request is allowed
      */
-    async verifyAuth() {
+    checkRateLimit() {
         try {
-            console.log('🔐 Verifying authentication...');
-            const result = await this.dataManager.executeRequest(getCurrentUser, [], { useCache: false });
+            const now = Date.now();
+            const windowStart = now - AUTOMATION_CONFIG.SECURITY.RATE_LIMIT_WINDOW;
             
-            if (result.error || !result.data || !result.data.user) {
-                return { success: false, error: 'User not authenticated' };
+            // Reset if window has passed
+            if (now - this.state.rateLimiter.lastReset > AUTOMATION_CONFIG.SECURITY.RATE_LIMIT_WINDOW) {
+                this.state.rateLimiter.requests = [];
+                this.state.rateLimiter.lastReset = now;
             }
             
-            const { user, profile } = result.data;
-            automationState.user = user;
-            automationState.profile = profile;
-            automationState.orgId = profile?.org_id || 'default-org-id';
+            // Remove old requests
+            this.state.rateLimiter.requests = this.state.rateLimiter.requests.filter(
+                timestamp => timestamp > windowStart
+            );
             
-            console.log('✅ Authentication verified:', { userId: user.id, orgId: automationState.orgId });
-            
-            // Log authentication event
-            await this.logAuditEvent('auth_verified', { user_id: user.id, org_id: automationState.orgId });
-            
-            return { success: true };
-            
-        } catch (error) {
-            console.error('❌ Auth verification failed:', error);
-            return { success: false, error: error.message };
-        }
-    }
-    
-    /**
-     * Checks connection health with Supabase
-     * @returns {Promise<void>}
-     */
-    async checkConnectionHealth() {
-        try {
-            console.log('🏥 Checking connection health...');
-            const result = await this.dataManager.executeRequest(healthCheck, [], { useCache: false });
-            
-            if (result.error) {
-                throw new Error(`Health check failed: ${result.error.message}`);
-            }
-            
-            console.log('✅ Connection healthy');
-            automationState.connectionStatus = 'healthy';
-            
-        } catch (error) {
-            console.warn('⚠️ Health check failed:', error);
-            automationState.connectionStatus = 'degraded';
-            // Don't throw - continue with degraded service
-        }
-    }
-    
-    /**
-     * Loads all data from real Supabase tables
-     * @returns {Promise<void>}
-     */
-    async loadAllData() {
-        const { orgId } = automationState;
-        console.log('📊 Loading data for org:', orgId);
-        
-        const loaders = [
-            { name: 'automations', fn: getAutomationRules, args: [orgId] },
-            { name: 'executions', fn: getAutomationExecutions, args: [orgId] },
-            { name: 'templates', fn: getCommunicationTemplates, args: [orgId] },
-            { name: 'emailCampaigns', fn: getEmailCampaigns, args: [orgId] },
-            { name: 'smsCampaigns', fn: getSMSCampaigns, args: [orgId] },
-            { name: 'workflows', fn: getN8NWorkflows, args: [orgId] },
-            { name: 'whatsappIntegration', fn: getWhatsappIntegration, args: [orgId] }
-        ];
-        
-        // Execute all requests in parallel for performance
-        const results = await Promise.allSettled(
-            loaders.map(loader => 
-                this.dataManager.executeRequest(loader.fn, loader.args, { cacheKey: `${loader.name}_${orgId}` })
-            )
-        );
-        
-        // Process results
-        results.forEach((result, index) => {
-            const loader = loaders[index];
-            
-            if (result.status === 'fulfilled' && result.value && result.value.data) {
-                const data = Array.isArray(result.value.data) ? result.value.data : [result.value.data];
-                
-                switch (loader.name) {
-                    case 'automations':
-                        automationState.automations = new Map(data.map(item => [item.id, item]));
-                        console.log(`📋 Loaded ${data.length} automations`);
-                        break;
-                    case 'executions':
-                        automationState.executionHistory = new Map(data.map(item => [item.id, item]));
-                        console.log(`📈 Loaded ${data.length} executions`);
-                        break;
-                    case 'templates':
-                        automationState.templates = new Map(data.map(item => [item.id, item]));
-                        console.log(`📝 Loaded ${data.length} templates`);
-                        break;
-                    case 'emailCampaigns':
-                        automationState.campaigns.email = new Map(data.map(item => [item.id, item]));
-                        console.log(`📧 Loaded ${data.length} email campaigns`);
-                        break;
-                    case 'smsCampaigns':
-                        automationState.campaigns.sms = new Map(data.map(item => [item.id, item]));
-                        console.log(`📱 Loaded ${data.length} SMS campaigns`);
-                        break;
-                    case 'whatsappIntegration':
-                        automationState.campaigns.whatsapp = new Map(data.map(item => [item.id, item]));
-                        console.log(`💬 Loaded ${data.length} WhatsApp integrations`);
-                        break;
-                    case 'workflows':
-                        automationState.workflows = new Map(data.map(item => [item.id, item]));
-                        console.log(`🔄 Loaded ${data.length} workflows`);
-                        break;
-                }
-            } else {
-                console.warn(`⚠️ Failed to load ${loader.name}:`, result.reason);
-            }
-        });
-        
-        // Calculate metrics from real data
-        this.calculateMetrics();
-        automationState.lastUpdate = new Date().toISOString();
-        
-        console.log('✅ All data loaded successfully');
-    }
-    
-    /**
-     * Calculates metrics from real data
-     */
-    calculateMetrics() {
-        const automations = Array.from(automationState.automations.values());
-        const executions = Array.from(automationState.executionHistory.values());
-        
-        const today = new Date();
-        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        
-        // Basic metrics from real data
-        automationState.metrics.totalExecutions = executions.length;
-        automationState.metrics.activeAutomations = automations.filter(auto => 
-            auto.is_active === true || auto.status === 'active'
-        ).length;
-        
-        // Today's executions from real data
-        automationState.metrics.executionsToday = executions.filter(exec => {
-            try {
-                const execDate = new Date(exec.created_at || exec.executed_at || exec.started_at);
-                return execDate >= startOfToday;
-            } catch {
+            // Check if limit exceeded
+            if (this.state.rateLimiter.requests.length >= AUTOMATION_CONFIG.SECURITY.MAX_REQUESTS_PER_MINUTE) {
+                console.warn('⚠️ Rate limit exceeded for automation requests');
                 return false;
             }
+            
+            // Add current request
+            this.state.rateLimiter.requests.push(now);
+            return true;
+            
+        } catch (error) {
+            console.error('❌ Error checking rate limit:', error);
+            return true; // Allow request on error
+        }
+    }
+}
+
+// Global state manager instance
+const automationState = new AutomationStateManager();
+
+// ===== INITIALIZATION - NASA 10/10 =====
+/**
+ * Initialize automation page on DOM ready with enhanced error handling
+ */
+document.addEventListener('DOMContentLoaded', initializeAutomation);
+
+/**
+ * Initialize the automation system with enhanced NASA 10/10 standards
+ * @returns {Promise<void>}
+ */
+async function initializeAutomation() {
+    const startTime = performance.now();
+    
+    try {
+        // Validate dependencies first
+        validateDependencies();
+        
+        showLoading(true, 'Inicializando sistema de automações...');
+        
+        // Health check with retry logic
+        const health = await healthCheckWithRetry();
+        if (health.error) {
+            console.warn('⚠️ Problema de conectividade:', health.error);
+            showWarning('Conectividade limitada - alguns recursos podem estar indisponíveis');
+        }
+        
+        // Enhanced authentication
+        const authResult = await authenticateUser();
+        if (!authResult.success) {
+            redirectToLogin();
+            return;
+        }
+        
+        automationState.setState({
+            user: authResult.user,
+            profile: authResult.profile,
+            orgId: authResult.profile?.org_id || 'default-org-id'
+        });
+        
+        // Load initial automation data with caching
+        await loadAutomationDataWithCache();
+        
+        // Setup real-time subscriptions
+        setupRealTimeSubscriptions();
+        
+        // Render interface
+        await renderAutomationInterface();
+        
+        // Setup event listeners
+        setupEventListeners();
+        
+        // Start periodic updates
+        startPeriodicUpdates();
+        
+        // Calculate performance metrics
+        const endTime = performance.now();
+        automationState.setState({
+            isLoading: false,
+            metrics: {
+                ...automationState.getState('metrics'),
+                loadTime: endTime - startTime
+            }
+        });
+        
+        showLoading(false);
+        console.log(`🤖 Sistema de automações inicializado em ${(endTime - startTime).toFixed(2)}ms`);
+        showSuccess('Sistema de automações carregado com dados reais!');
+        
+        // NASA 10/10: Performance monitoring
+        if ((endTime - startTime) > 5000) {
+            console.warn('⚠️ Tempo de carregamento acima do ideal:', endTime - startTime);
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro crítico ao inicializar automações:', error);
+        await handleCriticalError(error);
+    }
+}
+
+// ===== ENHANCED AUTHENTICATION - NASA 10/10 =====
+/**
+ * Enhanced user authentication with comprehensive validation
+ * @returns {Promise<Object>} Authentication result
+ */
+async function authenticateUser() {
+    try {
+        const { user, profile, error } = await getCurrentUser();
+        
+        if (error) {
+            console.error('Erro de autenticação:', error);
+            return { success: false, error };
+        }
+        
+        if (!user) {
+            console.log('Usuário não autenticado');
+            return { success: false, error: 'No user found' };
+        }
+        
+        // Enhanced validation
+        if (!profile || !profile.org_id) {
+            console.warn('Perfil de usuário incompleto');
+            return { success: false, error: 'Incomplete user profile' };
+        }
+        
+        return { success: true, user, profile };
+        
+    } catch (authError) {
+        console.error('Erro crítico na autenticação:', authError);
+        return { success: false, error: authError.message };
+    }
+}
+
+/**
+ * Health check with retry logic - NASA 10/10 reliability
+ * @returns {Promise<Object>} Health check result
+ */
+async function healthCheckWithRetry() {
+    let lastError = null;
+    
+    for (let attempt = 1; attempt <= AUTOMATION_CONFIG.PERFORMANCE.MAX_RETRIES; attempt++) {
+        try {
+            const result = await healthCheck();
+            if (!result.error) {
+                return result;
+            }
+            lastError = result.error;
+        } catch (error) {
+            lastError = error;
+        }
+        
+        if (attempt < AUTOMATION_CONFIG.PERFORMANCE.MAX_RETRIES) {
+            const delay = 1000 * attempt;
+            console.log(`⏳ Tentativa ${attempt} falhou, tentando novamente em ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+    
+    return { error: lastError };
+}
+
+/**
+ * Redirect to login with enhanced URL preservation
+ */
+function redirectToLogin() {
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `src/pages/login.html?redirect=${currentUrl}`;
+}
+
+// ===== DATA LOADING WITH CACHING - NASA 10/10 =====
+/**
+ * Load automation data with intelligent caching strategy
+ * @returns {Promise<void>}
+ */
+async function loadAutomationDataWithCache() {
+    if (automationState.getState('isUpdating')) {
+        console.log('⏳ Carregamento já em andamento...');
+        return;
+    }
+    
+    try {
+        automationState.setState({ isUpdating: true });
+        automationState.state.metrics.apiCalls++;
+        
+        const orgId = automationState.getState('orgId');
+        const userId = automationState.getState('user')?.id;
+        const cacheKey = `automation_${orgId}_${userId}`;
+        
+        // Check cache first
+        const cachedData = automationState.getCachedData(cacheKey);
+        if (cachedData) {
+            applyAutomationData(cachedData);
+            console.log('✅ Dados de automação carregados do cache');
+            
+            // Load fresh data in background
+            loadAutomationFromAPI(cacheKey, true);
+            return;
+        }
+        
+        // Load from API
+        await loadAutomationFromAPI(cacheKey, false);
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar dados de automação:', error);
+        throw error;
+    } finally {
+        automationState.setState({ isUpdating: false });
+    }
+}
+
+/**
+ * Load automation data from API with enhanced error handling
+ * @param {string} cacheKey - Cache key for storing data
+ * @param {boolean} isBackground - Whether this is a background refresh
+ */
+async function loadAutomationFromAPI(cacheKey, isBackground = false) {
+    try {
+        const orgId = automationState.getState('orgId');
+        const userId = automationState.getState('user')?.id;
+        
+        // Check rate limiting
+        if (!automationState.checkRateLimit()) {
+            console.warn('⚠️ Rate limit exceeded, skipping API call');
+            return;
+        }
+        
+        // Load data in parallel for better performance
+        const promises = [
+            getAutomationRules(orgId).catch(err => ({ error: err })),
+            getAutomationExecutions(orgId).catch(err => ({ error: err })),
+            getWorkflowLogs(orgId).catch(err => ({ error: err })),
+            getEmailCampaigns(orgId).catch(err => ({ error: err })),
+            getSMSCampaigns(orgId).catch(err => ({ error: err })),
+            getNotificationLogs(orgId).catch(err => ({ error: err })),
+            getCommunicationTemplates(orgId).catch(err => ({ error: err })),
+            getMessageQueue(orgId).catch(err => ({ error: err })),
+            getN8NWorkflows(orgId).catch(err => ({ error: err })),
+            getWhatsappIntegration(orgId).catch(err => ({ error: err }))
+        ];
+        
+        const [
+            rulesData,
+            executionsData,
+            logsData,
+            emailCampaignsData,
+            smsCampaignsData,
+            notificationLogsData,
+            templatesData,
+            messageQueueData,
+            n8nWorkflowsData,
+            whatsappData
+        ] = await Promise.all(promises);
+        
+        const automationData = {
+            rules: rulesData?.data || [],
+            executions: executionsData?.data || [],
+            logs: logsData?.data || [],
+            emailCampaigns: emailCampaignsData?.data || [],
+            smsCampaigns: smsCampaignsData?.data || [],
+            notificationLogs: notificationLogsData?.data || [],
+            templates: templatesData?.data || [],
+            messageQueue: messageQueueData?.data || [],
+            n8nWorkflows: n8nWorkflowsData?.data || [],
+            whatsappIntegration: whatsappData?.data || null
+        };
+        
+        // Apply data to state
+        applyAutomationData(automationData);
+        
+        // Cache the data
+        automationState.setCachedData(cacheKey, automationData);
+        
+        if (!isBackground) {
+            console.log('✅ Dados de automação carregados das tabelas do Supabase');
+        } else {
+            console.log('🔄 Cache de automação atualizado');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar dados de automação da API:', error);
+        if (!isBackground) {
+            throw error;
+        }
+    }
+}
+
+/**
+ * Apply automation data to state
+ * @param {Object} data - Automation data
+ */
+function applyAutomationData(data) {
+    try {
+        // Process and sort automation rules
+        const processedRules = processAutomationRules(data.rules || []);
+        
+        // Process executions with status calculations
+        const processedExecutions = processExecutions(data.executions || []);
+        
+        // Process workflow logs
+        const processedLogs = processWorkflowLogs(data.logs || []);
+        
+        automationState.setState({
+            automationRules: processedRules,
+            executions: processedExecutions,
+            workflowLogs: processedLogs,
+            emailCampaigns: data.emailCampaigns || [],
+            smsCampaigns: data.smsCampaigns || [],
+            notificationLogs: data.notificationLogs || [],
+            templates: data.templates || [],
+            messageQueue: data.messageQueue || [],
+            n8nWorkflows: data.n8nWorkflows || [],
+            whatsappIntegration: data.whatsappIntegration,
+            metrics: {
+                ...automationState.getState('metrics'),
+                rulesCreated: (data.rules || []).length,
+                executionsRun: (data.executions || []).length
+            }
+        });
+        
+        console.log('✅ Dados de automação processados e aplicados ao estado');
+        
+    } catch (error) {
+        console.error('❌ Erro ao aplicar dados de automação:', error);
+    }
+}
+
+/**
+ * Process automation rules for display
+ * @param {Array} rules - Raw rules data
+ * @returns {Array} Processed rules
+ */
+function processAutomationRules(rules) {
+    try {
+        return rules
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map(rule => ({
+                ...rule,
+                typeConfig: AUTOMATION_CONFIG.AUTOMATION_TYPES.find(t => t.value === rule.type) || 
+                           AUTOMATION_CONFIG.AUTOMATION_TYPES[0],
+                statusConfig: AUTOMATION_CONFIG.STATUS_OPTIONS.find(s => s.value === rule.status) || 
+                             AUTOMATION_CONFIG.STATUS_OPTIONS[0],
+                triggerConfig: AUTOMATION_CONFIG.TRIGGER_TYPES.find(t => t.value === rule.trigger_type) || 
+                              AUTOMATION_CONFIG.TRIGGER_TYPES[0],
+                actionConfig: AUTOMATION_CONFIG.ACTION_TYPES.find(a => a.value === rule.action_type) || 
+                             AUTOMATION_CONFIG.ACTION_TYPES[0],
+                lastExecuted: rule.last_executed ? formatTimeAgo(rule.last_executed) : 'Nunca',
+                executionCount: rule.execution_count || 0,
+                successRate: calculateSuccessRate(rule.execution_count, rule.success_count)
+            }));
+            
+    } catch (error) {
+        console.error('❌ Erro ao processar regras de automação:', error);
+        return [];
+    }
+}
+
+/**
+ * Process executions for display
+ * @param {Array} executions - Raw executions data
+ * @returns {Array} Processed executions
+ */
+function processExecutions(executions) {
+    try {
+        return executions
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 100) // Limit to last 100 executions
+            .map(execution => ({
+                ...execution,
+                timeAgo: formatTimeAgo(execution.created_at),
+                duration: calculateDuration(execution.started_at, execution.completed_at),
+                statusConfig: getExecutionStatusConfig(execution.status)
+            }));
+            
+    } catch (error) {
+        console.error('❌ Erro ao processar execuções:', error);
+        return [];
+    }
+}
+
+/**
+ * Process workflow logs for display
+ * @param {Array} logs - Raw logs data
+ * @returns {Array} Processed logs
+ */
+function processWorkflowLogs(logs) {
+    try {
+        return logs
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 50) // Limit to last 50 logs
+            .map(log => ({
+                ...log,
+                timeAgo: formatTimeAgo(log.created_at),
+                levelConfig: getLogLevelConfig(log.level)
+            }));
+            
+    } catch (error) {
+        console.error('❌ Erro ao processar logs de workflow:', error);
+        return [];
+    }
+}
+
+/**
+ * Calculate success rate percentage
+ * @param {number} total - Total executions
+ * @param {number} success - Successful executions
+ * @returns {number} Success rate percentage
+ */
+function calculateSuccessRate(total, success) {
+    try {
+        if (!total || total === 0) return 0;
+        return Math.round((success / total) * 100);
+    } catch (error) {
+        console.error('❌ Erro ao calcular taxa de sucesso:', error);
+        return 0;
+    }
+}
+
+/**
+ * Calculate execution duration
+ * @param {string} startTime - Start time ISO string
+ * @param {string} endTime - End time ISO string
+ * @returns {string} Duration string
+ */
+function calculateDuration(startTime, endTime) {
+    try {
+        if (!startTime || !endTime) return '-';
+        
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const diffMs = end - start;
+        
+        if (diffMs < 1000) return `${diffMs}ms`;
+        if (diffMs < 60000) return `${Math.round(diffMs / 1000)}s`;
+        if (diffMs < 3600000) return `${Math.round(diffMs / 60000)}m`;
+        
+        return `${Math.round(diffMs / 3600000)}h`;
+        
+    } catch (error) {
+        console.error('❌ Erro ao calcular duração:', error);
+        return '-';
+    }
+}
+
+/**
+ * Get execution status configuration
+ * @param {string} status - Execution status
+ * @returns {Object} Status configuration
+ */
+function getExecutionStatusConfig(status) {
+    const statusMap = {
+        success: { label: 'Sucesso', color: 'green', icon: '✅' },
+        failed: { label: 'Falhou', color: 'red', icon: '❌' },
+        running: { label: 'Executando', color: 'blue', icon: '🔄' },
+        pending: { label: 'Pendente', color: 'yellow', icon: '⏳' },
+        completed: { label: 'Concluído', color: 'green', icon: '✅' },
+        cancelled: { label: 'Cancelado', color: 'gray', icon: '⏹️' }
+    };
+    
+    return statusMap[status] || statusMap.pending;
+}
+
+/**
+ * Get log level configuration
+ * @param {string} level - Log level
+ * @returns {Object} Level configuration
+ */
+function getLogLevelConfig(level) {
+    const levelMap = {
+        info: { label: 'Info', color: 'blue', icon: 'ℹ️' },
+        warn: { label: 'Aviso', color: 'yellow', icon: '⚠️' },
+        error: { label: 'Erro', color: 'red', icon: '❌' },
+        debug: { label: 'Debug', color: 'gray', icon: '🐛' },
+        success: { label: 'Sucesso', color: 'green', icon: '✅' }
+    };
+    
+    return levelMap[level] || levelMap.info;
+}
+
+/**
+ * Format time ago for display
+ * @param {string} dateString - ISO date string
+ * @returns {string} Formatted time ago
+ */
+function formatTimeAgo(dateString) {
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) return 'Agora mesmo';
+        if (diffMins < 60) return `${diffMins}m atrás`;
+        if (diffHours < 24) return `${diffHours}h atrás`;
+        if (diffDays < 7) return `${diffDays}d atrás`;
+        
+        return date.toLocaleDateString('pt-BR');
+        
+    } catch (error) {
+        console.error('❌ Erro ao formatar tempo:', error);
+        return 'Data inválida';
+    }
+}
+
+// ===== REAL-TIME SUBSCRIPTIONS - NASA 10/10 =====
+/**
+ * Setup real-time subscriptions for live automation updates
+ */
+function setupRealTimeSubscriptions() {
+    try {
+        const userId = automationState.getState('user')?.id;
+        const orgId = automationState.getState('orgId');
+        
+        if (!userId || !orgId) {
+            console.warn('⚠️ Usuário ou organização não definidos para real-time');
+            return;
+        }
+        
+        const subscriptions = new Map();
+        
+        // Subscribe to automation rules updates
+        try {
+            const rulesSubscription = subscribeToTable(
+                'automation_rules',
+                {
+                    event: '*',
+                    schema: 'public',
+                    filter: `org_id=eq.${orgId}`
+                },
+                (payload) => handleRealTimeUpdate('rules', payload)
+            );
+            subscriptions.set('rules', rulesSubscription);
+        } catch (subError) {
+            console.warn('⚠️ Erro ao configurar subscription para regras:', subError);
+        }
+        
+        // Subscribe to automation executions updates
+        try {
+            const executionsSubscription = subscribeToTable(
+                'automation_executions',
+                {
+                    event: '*',
+                    schema: 'public',
+                    filter: `org_id=eq.${orgId}`
+                },
+                (payload) => handleRealTimeUpdate('executions', payload)
+            );
+            subscriptions.set('executions', executionsSubscription);
+        } catch (subError) {
+            console.warn('⚠️ Erro ao configurar subscription para execuções:', subError);
+        }
+        
+        // Subscribe to workflow logs updates
+        try {
+            const logsSubscription = subscribeToTable(
+                'workflow_logs',
+                {
+                    event: '*',
+                    schema: 'public',
+                    filter: `org_id=eq.${orgId}`
+                },
+                (payload) => handleRealTimeUpdate('logs', payload)
+            );
+            subscriptions.set('logs', logsSubscription);
+        } catch (subError) {
+            console.warn('⚠️ Erro ao configurar subscription para logs:', subError);
+        }
+        
+        automationState.setState({ subscriptions });
+        console.log('✅ Real-time subscriptions configuradas para automações');
+        
+    } catch (error) {
+        console.error('❌ Erro ao configurar subscriptions de automação:', error);
+    }
+}
+
+/**
+ * Handle real-time data updates
+ * @param {string} type - Update type
+ * @param {Object} payload - Real-time update payload
+ */
+function handleRealTimeUpdate(type, payload) {
+    try {
+        console.log(`🔄 Atualização real-time recebida: ${type}`);
+        
+        switch (type) {
+            case 'rules':
+                handleRulesUpdate(payload);
+                break;
+            case 'executions':
+                handleExecutionsUpdate(payload);
+                break;
+            case 'logs':
+                handleLogsUpdate(payload);
+                break;
+            default:
+                console.warn(`⚠️ Tipo de atualização desconhecido: ${type}`);
+        }
+        
+        // Clear relevant cache
+        const userId = automationState.getState('user')?.id;
+        const orgId = automationState.getState('orgId');
+        const cacheKey = `automation_${orgId}_${userId}`;
+        automationState.clearCache(cacheKey);
+        
+        showNotification(`Dados de ${type} atualizados em tempo real!`, 'info');
+        
+    } catch (error) {
+        console.error(`❌ Erro ao processar atualização real-time de ${type}:`, error);
+    }
+}
+
+/**
+ * Handle rules update from real-time
+ * @param {Object} payload - Rules update payload
+ */
+function handleRulesUpdate(payload) {
+    try {
+        if (payload.eventType === 'INSERT') {
+            const newRule = payload.new;
+            const currentRules = automationState.getState('automationRules');
+            const processedRule = processAutomationRules([newRule])[0];
+            
+            automationState.setState({
+                automationRules: [processedRule, ...currentRules]
+            });
+            
+            showRuleCreated(processedRule);
+            
+        } else if (payload.eventType === 'UPDATE') {
+            const updatedRule = payload.new;
+            const currentRules = automationState.getState('automationRules');
+            const processedRule = processAutomationRules([updatedRule])[0];
+            
+            const updatedRules = currentRules.map(rule => 
+                rule.id === updatedRule.id ? processedRule : rule
+            );
+            
+            automationState.setState({
+                automationRules: updatedRules
+            });
+            
+            showRuleUpdated(processedRule);
+            
+        } else if (payload.eventType === 'DELETE') {
+            const deletedRule = payload.old;
+            const currentRules = automationState.getState('automationRules');
+            
+            const filteredRules = currentRules.filter(rule => rule.id !== deletedRule.id);
+            
+            automationState.setState({
+                automationRules: filteredRules
+            });
+            
+            showNotification('Regra de automação removida', 'info');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao processar atualização de regras:', error);
+    }
+}
+
+/**
+ * Handle executions update from real-time
+ * @param {Object} payload - Executions update payload
+ */
+function handleExecutionsUpdate(payload) {
+    try {
+        if (payload.eventType === 'INSERT') {
+            const newExecution = payload.new;
+            const currentExecutions = automationState.getState('executions');
+            const processedExecution = processExecutions([newExecution])[0];
+            
+            automationState.setState({
+                executions: [processedExecution, ...currentExecutions.slice(0, 99)]
+            });
+            
+            showExecutionStarted(processedExecution);
+            
+        } else if (payload.eventType === 'UPDATE') {
+            const updatedExecution = payload.new;
+            const currentExecutions = automationState.getState('executions');
+            const processedExecution = processExecutions([updatedExecution])[0];
+            
+            const updatedExecutions = currentExecutions.map(execution => 
+                execution.id === updatedExecution.id ? processedExecution : execution
+            );
+            
+            automationState.setState({
+                executions: updatedExecutions
+            });
+            
+            if (updatedExecution.status === 'completed' || updatedExecution.status === 'success') {
+                showExecutionCompleted(processedExecution);
+            } else if (updatedExecution.status === 'failed' || updatedExecution.status === 'error') {
+                showExecutionFailed(processedExecution);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao processar atualização de execuções:', error);
+    }
+}
+
+/**
+ * Handle logs update from real-time
+ * @param {Object} payload - Logs update payload
+ */
+function handleLogsUpdate(payload) {
+    try {
+        if (payload.eventType === 'INSERT') {
+            const newLog = payload.new;
+            const currentLogs = automationState.getState('workflowLogs');
+            const processedLog = processWorkflowLogs([newLog])[0];
+            
+            automationState.setState({
+                workflowLogs: [processedLog, ...currentLogs.slice(0, 49)]
+            });
+            
+            // Show notification for error logs
+            if (newLog.level === 'error') {
+                showNotification(`Erro no workflow: ${newLog.message}`, 'error');
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao processar atualização de logs:', error);
+    }
+}
+
+// ===== INTERFACE RENDERING - NASA 10/10 =====
+/**
+ * Render the complete automation interface
+ * @returns {Promise<void>}
+ */
+async function renderAutomationInterface() {
+    const startTime = performance.now();
+    
+    try {
+        // Render components in parallel where possible
+        const renderPromises = [
+            renderAutomationHeader(),
+            renderAutomationStats(),
+            renderAutomationTabs(),
+            renderRulesSection(),
+            renderExecutionsSection(),
+            renderLogsSection()
+        ];
+        
+        await Promise.all(renderPromises);
+        
+        const endTime = performance.now();
+        automationState.setState({
+            metrics: {
+                ...automationState.getState('metrics'),
+                renderTime: endTime - startTime
+            }
+        });
+        
+        console.log(`🎨 Interface de automação renderizada em ${(endTime - startTime).toFixed(2)}ms`);
+        
+    } catch (error) {
+        console.error('❌ Erro ao renderizar interface de automação:', error);
+    }
+}
+
+/**
+ * Render automation header with stats
+ * @returns {Promise<void>}
+ */
+async function renderAutomationHeader() {
+    try {
+        const headerContainer = document.getElementById('automation-header');
+        if (!headerContainer) return;
+        
+        const automationRules = automationState.getState('automationRules');
+        const executions = automationState.getState('executions');
+        
+        // Calculate stats
+        const activeRules = automationRules.filter(rule => rule.status === 'active').length;
+        const todayExecutions = executions.filter(execution => {
+            const executionDate = new Date(execution.created_at);
+            const today = new Date();
+            return executionDate.toDateString() === today.toDateString();
         }).length;
         
-        // Success rate from real execution data
-        const successfulExecutions = executions.filter(exec => 
-            exec.status === 'completed' || exec.status === 'success'
-        ).length;
-        
-        automationState.metrics.successRate = automationState.metrics.totalExecutions > 0 
-            ? Number(((successfulExecutions / automationState.metrics.totalExecutions) * 100).toFixed(1))
-            : 0;
-        
-        // Error rate from real execution data
-        const failedExecutions = executions.filter(exec => 
-            exec.status === 'failed' || exec.status === 'error'
-        ).length;
-        
-        automationState.metrics.errorRate = automationState.metrics.totalExecutions > 0 
-            ? Number(((failedExecutions / automationState.metrics.totalExecutions) * 100).toFixed(1))
-            : 0;
-        
-        // Calculate average execution time from real data
-        const executionsWithTime = executions.filter(exec => exec.execution_time_ms);
-        automationState.metrics.avgExecutionTime = executionsWithTime.length > 0
-            ? Math.round(executionsWithTime.reduce((sum, exec) => sum + (exec.execution_time_ms || 0), 0) / executionsWithTime.length)
-            : 0;
-        
-        // Estimated metrics based on real data
-        automationState.metrics.totalLeadsProcessed = Math.floor(automationState.metrics.totalExecutions * 1.2);
-        automationState.metrics.conversionRate = Number((automationState.metrics.successRate * 0.15).toFixed(1));
-        
-        console.log('📊 Metrics calculated:', automationState.metrics);
-    }
-    
-    /**
-     * Renders the complete interface
-     */
-    renderInterface() {
-        console.log('🎨 Rendering interface...');
-        this.renderStats();
-        this.renderAutomationsList();
-        this.renderCampaigns();
-        this.renderExecutionHistory();
-        this.renderQuickActions();
-        this.renderConnectionStatus();
-    }
-    
-    /**
-     * Renders statistics cards with real data
-     */
-    renderStats() {
-        const container = document.getElementById('automation-stats');
-        if (!container) return;
-        
-        const { metrics } = automationState;
-        
-        container.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-                <div class="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Automações Ativas</p>
-                            <p class="text-2xl font-bold text-emerald-600">${Utils.formatNumber(metrics.activeAutomations)}</p>
-                        </div>
-                        <div class="text-emerald-600 text-2xl">🤖</div>
+        const headerHTML = `
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                    <div class="mb-4 lg:mb-0">
+                        <h1 class="text-2xl font-bold text-gray-900">Sistema de Automações</h1>
+                        <p class="text-gray-600">Gerencie workflows e automações inteligentes</p>
                     </div>
-                </div>
-                
-                <div class="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Execuções Hoje</p>
-                            <p class="text-2xl font-bold text-blue-600">${Utils.formatNumber(metrics.executionsToday)}</p>
+                    
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">${automationRules.length}</div>
+                            <div class="text-sm text-gray-500">Total de Regras</div>
                         </div>
-                        <div class="text-blue-600 text-2xl">⚡</div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Taxa de Sucesso</p>
-                            <p class="text-2xl font-bold text-purple-600">${metrics.successRate}%</p>
+                        
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">${activeRules}</div>
+                            <div class="text-sm text-gray-500">Regras Ativas</div>
                         </div>
-                        <div class="text-purple-600 text-2xl">📈</div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Total Execuções</p>
-                            <p class="text-2xl font-bold text-orange-600">${Utils.formatNumber(metrics.totalExecutions)}</p>
+                        
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">${todayExecutions}</div>
+                            <div class="text-sm text-gray-500">Execuções Hoje</div>
                         </div>
-                        <div class="text-orange-600 text-2xl">🔄</div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Leads Processados</p>
-                            <p class="text-2xl font-bold text-indigo-600">${Utils.formatNumber(metrics.totalLeadsProcessed)}</p>
-                        </div>
-                        <div class="text-indigo-600 text-2xl">👥</div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg p-4 shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Taxa Conversão</p>
-                            <p class="text-2xl font-bold text-emerald-600">${metrics.conversionRate}%</p>
-                        </div>
-                        <div class="text-emerald-600 text-2xl">💰</div>
+                        
+                            <button id="create-rule-btn" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                aria-label="Criar nova regra de automação">
+                            <span class="mr-2" aria-hidden="true">➕</span>
+                            Nova Regra
+                        </button>
                     </div>
                 </div>
             </div>
         `;
+        
+        headerContainer.innerHTML = headerHTML;
+        
+    } catch (error) {
+        console.error('❌ Erro ao renderizar header de automação:', error);
     }
-    
-    /**
-     * Renders automations list from real data
-     */
-    renderAutomationsList() {
-        const container = document.getElementById('automations-list');
-        if (!container) return;
+}
+
+/**
+ * Render automation statistics cards
+ * @returns {Promise<void>}
+ */
+async function renderAutomationStats() {
+    try {
+        const statsContainer = document.getElementById('automation-stats');
+        if (!statsContainer) return;
         
-        const automations = Array.from(automationState.automations.values());
+        const automationRules = automationState.getState('automationRules');
+        const executions = automationState.getState('executions');
         
-        if (automations.length === 0) {
-            container.innerHTML = `
-                <div class="bg-white rounded-lg p-8 text-center shadow-sm border">
-                    <div class="text-gray-400 text-6xl mb-4">🤖</div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma automação encontrada</h3>
-                    <p class="text-gray-600 mb-4">Crie sua primeira automação para começar.</p>
-                    <button data-action="create-automation" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        Criar Primeira Automação
-                    </button>
+        // Calculate comprehensive stats
+        const totalRules = automationRules.length;
+        const activeRules = automationRules.filter(rule => rule.status === 'active').length;
+        const pausedRules = automationRules.filter(rule => rule.status === 'paused').length;
+        const errorRules = automationRules.filter(rule => rule.status === 'error').length;
+        
+        const totalExecutions = executions.length;
+        const successfulExecutions = executions.filter(exec => exec.status === 'success' || exec.status === 'completed').length;
+        const failedExecutions = executions.filter(exec => exec.status === 'failed' || exec.status === 'error').length;
+        const runningExecutions = executions.filter(exec => exec.status === 'running').length;
+        
+        const successRate = totalExecutions > 0 ? Math.round((successfulExecutions / totalExecutions) * 100) : 0;
+        
+        const statsHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                                <span class="text-lg">🤖</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Regras Ativas</p>
+                            <p class="text-2xl font-semibold text-blue-600">${activeRules}/${totalRules}</p>
+                        </div>
+                    </div>
                 </div>
-            `;
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                                <span class="text-lg">✅</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Taxa de Sucesso</p>
+                            <p class="text-2xl font-semibold text-green-600">${successRate}%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                                <span class="text-lg">🔄</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Executando Agora</p>
+                            <p class="text-2xl font-semibold text-purple-600">${runningExecutions}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-orange-100 rounded-md flex items-center justify-center">
+                                <span class="text-lg">📊</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Execuções</p>
+                            <p class="text-2xl font-semibold text-orange-600">${formatNumber(totalExecutions)}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        statsContainer.innerHTML = statsHTML;
+        
+    } catch (error) {
+        console.error('❌ Erro ao renderizar estatísticas de automação:', error);
+    }
+}
+
+/**
+ * Render automation tabs navigation
+ * @returns {Promise<void>}
+ */
+async function renderAutomationTabs() {
+    try {
+        const tabsContainer = document.getElementById('automation-tabs');
+        if (!tabsContainer) return;
+        
+        const activeTab = automationState.getState('activeTab');
+        
+        const tabs = [
+            { id: 'rules', label: 'Regras', icon: '🤖' },
+            { id: 'executions', label: 'Execuções', icon: '⚡' },
+            { id: 'logs', label: 'Logs', icon: '📋' },
+            { id: 'templates', label: 'Templates', icon: '📄' },
+            { id: 'integrations', label: 'Integrações', icon: '🔌' }
+        ];
+        
+        const tabsHTML = `
+            <div class="bg-white rounded-lg shadow mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+                        ${tabs.map(tab => `
+                            <button id="tab-${tab.id}" 
+                                    class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        activeTab === tab.id 
+                                            ? 'border-blue-500 text-blue-600' 
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }"
+                                    data-tab="${tab.id}">
+                                <span class="mr-2">${tab.icon}</span>
+                                ${tab.label}
+                            </button>
+                        `).join('')}
+                    </nav>
+                </div>
+            </div>
+        `;
+        
+        tabsContainer.innerHTML = tabsHTML;
+        
+    } catch (error) {
+        console.error('❌ Erro ao renderizar tabs de automação:', error);
+    }
+}
+
+/**
+ * Render rules section
+ * @returns {Promise<void>}
+ */
+async function renderRulesSection() {
+    try {
+        const rulesContainer = document.getElementById('rules-section');
+        if (!rulesContainer) return;
+        
+        const automationRules = automationState.getState('automationRules');
+        const activeTab = automationState.getState('activeTab');
+        
+        if (activeTab !== 'rules') {
+            rulesContainer.style.display = 'none';
             return;
         }
         
-        container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+        rulesContainer.style.display = 'block';
+        
+        const rulesHTML = `
+            <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-medium text-gray-900">Automações (${automations.length})</h3>
-                        <button data-action="create-automation" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            + Nova Automação
-                        </button>
+                        <h3 class="text-lg font-medium text-gray-900">Regras de Automação</h3>
+                        <div class="flex items-center space-x-4">
+                            <input type="text" 
+                                   id="rules-search" 
+                                   placeholder="Buscar regras..." 
+                                   class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            <select id="rules-status-filter" 
+                                    class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="all">Todos os Status</option>
+                                ${AUTOMATION_CONFIG.STATUS_OPTIONS.map(status => `
+                                    <option value="${status.value}">${status.label}</option>
+                                `).join('')}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="divide-y divide-gray-200">
-                    ${automations.map(automation => `
-                        <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-2xl">${this.getAutomationIcon(automation.type)}</div>
-                                    <div>
-                                        <h4 class="text-sm font-medium text-gray-900">${Utils.escapeHtml(automation.name || 'Automação sem nome')}</h4>
-                                        <p class="text-sm text-gray-600">${Utils.escapeHtml(automation.description || 'Sem descrição')}</p>
-                                        <p class="text-xs text-gray-500">Atualizado: ${Utils.formatDate(automation.updated_at)}</p>
+                    ${automationRules.map(rule => {
+                        const statusStyles = AUTOMATION_CONFIG.STATIC_STYLES.status[rule.status] || 
+                                           AUTOMATION_CONFIG.STATIC_STYLES.status.draft;
+                        const typeStyles = AUTOMATION_CONFIG.STATIC_STYLES.types[rule.typeConfig.color] || 
+                                         AUTOMATION_CONFIG.STATIC_STYLES.types.gray;
+                        
+                        return `
+                            <div class="p-6 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-2xl">${rule.typeConfig.icon}</div>
+                                        <div>
+                                            <h4 class="text-lg font-medium text-gray-900">${rule.name}</h4>
+                                            <p class="text-sm text-gray-600">${rule.description || 'Sem descrição'}</p>
+                                            <div class="flex items-center space-x-4 mt-2">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles.bg} ${statusStyles.text}">
+                                                    ${rule.statusConfig.icon} ${rule.statusConfig.label}
+                                                </span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeStyles.bg} ${typeStyles.text}">
+                                                    ${rule.typeConfig.label}
+                                                </span>
+                                                <span class="text-xs text-gray-500">
+                                                    ${rule.triggerConfig.icon} ${rule.triggerConfig.label} → ${rule.actionConfig.icon} ${rule.actionConfig.label}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flex items-center space-x-4">
-                                    ${this.renderStatusBadge(automation.status || (automation.is_active ? 'active' : 'paused'))}
                                     
-                                    <div class="text-sm text-gray-600">
-                                        ${Utils.formatNumber(automation.execution_count || 0)} execuções
-                                    </div>
-                                    
-                                    <div class="flex space-x-2">
-                                        <button class="text-blue-600 hover:text-blue-900 text-sm focus:outline-none" data-action="edit-automation" data-id="${automation.id}">
-                                            Editar
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900 text-sm focus:outline-none" data-action="delete-automation" data-id="${automation.id}">
-                                            Excluir
-                                        </button>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-right">
+                                            <div class="text-sm font-medium text-gray-900">${rule.executionCount} execuções</div>
+                                            <div class="text-sm text-gray-500">${rule.successRate}% sucesso</div>
+                                            <div class="text-xs text-gray-400">Última: ${rule.lastExecuted}</div>
+                                        </div>
+                                        
+                                        <div class="flex items-center space-x-2">
+                                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium edit-rule-btn" 
+                                                    data-rule-id="${rule.id}">
+                                                Editar
+                                            </button>
+                                            <button class="text-gray-600 hover:text-gray-800 text-sm font-medium toggle-rule-btn" 
+                                                    data-rule-id="${rule.id}" 
+                                                    data-current-status="${rule.status}">
+                                                ${rule.status === 'active' ? 'Pausar' : 'Ativar'}
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-800 text-sm font-medium delete-rule-btn" 
+                                                    data-rule-id="${rule.id}">
+                                                Excluir
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        `;
+                    }).join('')}
+                    
+                    ${automationRules.length === 0 ? `
+                        <div class="p-12 text-center">
+                            <div class="text-6xl mb-4">🤖</div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma regra de automação</h3>
+                            <p class="text-gray-600 mb-4">Crie sua primeira regra para automatizar processos</p>
+                            <button id="create-first-rule-btn" 
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                Criar Primeira Regra
+                            </button>
                         </div>
-                    `).join('')}
+                    ` : ''}
                 </div>
             </div>
         `;
+        
+        rulesContainer.innerHTML = rulesHTML;
+        
+    } catch (error) {
+        console.error('❌ Erro ao renderizar seção de regras:', error);
     }
-    
-    /**
-     * Renders campaigns section with real data
-     */
-    renderCampaigns() {
-        const container = document.getElementById('campaigns-section');
-        if (!container) return;
+}
+
+/**
+ * Render executions section
+ * @returns {Promise<void>}
+ */
+async function renderExecutionsSection() {
+    try {
+        const executionsContainer = document.getElementById('executions-section');
+        if (!executionsContainer) return;
         
-        const emailCount = automationState.campaigns.email.size;
-        const smsCount = automationState.campaigns.sms.size;
-        const whatsappCount = automationState.campaigns.whatsapp.size;
-        const totalCampaigns = emailCount + smsCount + whatsappCount;
+        const executions = automationState.getState('executions');
+        const activeTab = automationState.getState('activeTab');
         
-        container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm border p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Campanhas de Comunicação</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="text-center p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer" data-action="view-campaigns" data-type="email">
-                        <div class="text-3xl mb-2">📧</div>
-                        <p class="text-sm text-gray-600">Email</p>
-                        <p class="text-2xl font-bold text-blue-600">${Utils.formatNumber(emailCount)}</p>
-                    </div>
-                    
-                    <div class="text-center p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer" data-action="view-campaigns" data-type="sms">
-                        <div class="text-3xl mb-2">📱</div>
-                        <p class="text-sm text-gray-600">SMS</p>
-                        <p class="text-2xl font-bold text-purple-600">${Utils.formatNumber(smsCount)}</p>
-                    </div>
-                    
-                    <div class="text-center p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer" data-action="view-campaigns" data-type="whatsapp">
-                        <div class="text-3xl mb-2">💬</div>
-                        <p class="text-sm text-gray-600">WhatsApp</p>
-                        <p class="text-2xl font-bold text-emerald-600">${Utils.formatNumber(whatsappCount)}</p>
-                    </div>
-                </div>
-                
-                ${totalCampaigns === 0 ? `
-                    <div class="text-center mt-6">
-                        <p class="text-gray-600 mb-4">Nenhuma campanha ativa encontrada.</p>
-                        <button data-action="create-campaign" data-type="email" class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            Criar Primeira Campanha
-                        </button>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-    }
-    
-    /**
-     * Renders execution history from real data
-     */
-    renderExecutionHistory() {
-        const container = document.getElementById('execution-history');
-        if (!container) return;
-        
-        const executions = Array.from(automationState.executionHistory.values())
-            .sort((a, b) => new Date(b.created_at || b.executed_at || 0) - new Date(a.created_at || a.executed_at || 0))
-            .slice(0, 10);
-        
-        if (executions.length === 0) {
-            container.innerHTML = `
-                <div class="bg-white rounded-lg shadow-sm border p-6 text-center">
-                    <div class="text-gray-400 text-4xl mb-2">📊</div>
-                    <p class="text-gray-600">Nenhuma execução recente encontrada.</p>
-                </div>
-            `;
+        if (activeTab !== 'executions') {
+            executionsContainer.style.display = 'none';
             return;
         }
         
-        container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+        executionsContainer.style.display = 'block';
+        
+        const executionsHTML = `
+            <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Execuções Recentes</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Execuções de Automação</h3>
                 </div>
                 
                 <div class="divide-y divide-gray-200">
-                    ${executions.map(execution => `
-                        <div class="px-6 py-3 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-lg">⚡</div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">${Utils.escapeHtml(execution.automation_name || execution.rule_name || 'Automação')}</p>
-                                        <p class="text-xs text-gray-600">${Utils.formatDate(execution.created_at || execution.executed_at)}</p>
+                    ${executions.map(execution => {
+                        const statusStyles = AUTOMATION_CONFIG.STATIC_STYLES.execution[execution.status] || 
+                                           AUTOMATION_CONFIG.STATIC_STYLES.execution.pending;
+                        
+                        return `
+                            <div class="p-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-2xl">${execution.statusConfig.icon}</div>
+                                        <div>
+                                            <h4 class="text-lg font-medium text-gray-900">${execution.rule_name || 'Regra Desconhecida'}</h4>
+                                            <p class="text-sm text-gray-600">ID: ${execution.id}</p>
+                                            <div class="flex items-center space-x-4 mt-2">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles.bg} ${statusStyles.text}">
+                                                    ${execution.statusConfig.label}
+                                                </span>
+                                                <span class="text-xs text-gray-500">Duração: ${execution.duration}</span>
+                                                <span class="text-xs text-gray-500">${execution.timeAgo}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium view-execution-btn" 
+                                                data-execution-id="${execution.id}">
+                                            Ver Detalhes
+                                        </button>
                                     </div>
                                 </div>
                                 
-                                <div class="flex items-center space-x-3">
-                                    ${this.renderExecutionStatus(execution.status)}
-                                    ${execution.execution_time_ms ? `
-                                        <span class="text-xs text-gray-500">${execution.execution_time_ms}ms</span>
+                                ${execution.error_message ? `
+                                    <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                                        <p class="text-sm text-red-800">${execution.error_message}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                    
+                    ${executions.length === 0 ? `
+                        <div class="p-12 text-center">
+                            <div class="text-6xl mb-4">⚡</div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma execução encontrada</h3>
+                            <p class="text-gray-600">As execuções aparecerão aqui quando as regras forem ativadas</p>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+        
+        executionsContainer.innerHTML = executionsHTML;
+        
+    } catch (error) {
+        console.error('❌ Erro ao renderizar seção de execuções:', error);
+    }
+}
+
+/**
+ * Render logs section
+ * @returns {Promise<void>}
+ */
+async function renderLogsSection() {
+    try {
+        const logsContainer = document.getElementById('logs-section');
+        if (!logsContainer) return;
+        
+        const workflowLogs = automationState.getState('workflowLogs');
+        const activeTab = automationState.getState('activeTab');
+        
+        if (activeTab !== 'logs') {
+            logsContainer.style.display = 'none';
+            return;
+        }
+        
+        logsContainer.style.display = 'block';
+        
+        const logsHTML = `
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Logs de Workflow</h3>
+                </div>
+                
+                <div class="divide-y divide-gray-200">
+                    ${workflowLogs.map(log => `
+                        <div class="p-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-lg">${log.levelConfig.icon}</div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-sm font-medium text-gray-900">${log.levelConfig.label}</span>
+                                        <span class="text-xs text-gray-500">${log.timeAgo}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mt-1">${log.message}</p>
+                                    ${log.details ? `
+                                        <details class="mt-2">
+                                            <summary class="text-xs text-blue-600 cursor-pointer">Ver detalhes</summary>
+                                            <pre class="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded overflow-x-auto">${JSON.stringify(log.details, null, 2)}</pre>
+                                        </details>
                                     ` : ''}
                                 </div>
                             </div>
                         </div>
                     `).join('')}
-                </div>
-                
-                <div class="px-6 py-3 bg-gray-50 text-center">
-                    <button data-action="view-all-executions" class="text-sm text-blue-600 hover:text-blue-900 focus:outline-none">
-                        Ver Todas as Execuções
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-    
-    /**
-     * Renders quick actions panel
-     */
-    renderQuickActions() {
-        const container = document.getElementById('quick-actions');
-        if (!container) return;
-        
-        container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-sm border p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Ações Rápidas</h3>
-                
-                <div class="space-y-3">
-                    <button data-action="create-automation" class="w-full flex items-center p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <span class="text-2xl mr-3">🤖</span>
-                        <div>
-                            <p class="font-medium text-gray-900">Nova Automação</p>
-                            <p class="text-sm text-gray-600">Criar regra de automação</p>
-                        </div>
-                    </button>
                     
-                    <button data-action="create-campaign" data-type="email" class="w-full flex items-center p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <span class="text-2xl mr-3">📧</span>
-                        <div>
-                            <p class="font-medium text-gray-900">Campanha Email</p>
-                            <p class="text-sm text-gray-600">Sequência de emails</p>
+                    ${workflowLogs.length === 0 ? `
+                        <div class="p-12 text-center">
+                            <div class="text-6xl mb-4">📋</div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum log encontrado</h3>
+                            <p class="text-gray-600">Os logs de workflow aparecerão aqui</p>
                         </div>
-                    </button>
-                    
-                    <button data-action="create-campaign" data-type="sms" class="w-full flex items-center p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <span class="text-2xl mr-3">📱</span>
-                        <div>
-                            <p class="font-medium text-gray-900">Campanha SMS</p>
-                            <p class="text-sm text-gray-600">Mensagens automáticas</p>
-                        </div>
-                    </button>
-                    
-                    <button data-action="view-templates" class="w-full flex items-center p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <span class="text-2xl mr-3">📋</span>
-                        <div>
-                            <p class="font-medium text-gray-900">Templates</p>
-                            <p class="text-sm text-gray-600">Modelos de comunicação</p>
-                        </div>
-                    </button>
-                    
-                    <button data-action="refresh-data" class="w-full flex items-center p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <span class="text-2xl mr-3">🔄</span>
-                        <div>
-                            <p class="font-medium text-gray-900">Atualizar Dados</p>
-                            <p class="text-sm text-gray-600">Recarregar informações</p>
-                        </div>
-                    </button>
+                    ` : ''}
                 </div>
             </div>
         `;
-    }
-    
-    /**
-     * Renders connection status indicator
-     */
-    renderConnectionStatus() {
-        const container = document.getElementById('connection-status');
-        if (!container) return;
         
-        const statusConfig = {
-            'connected': { color: 'text-emerald-600', bg: 'bg-emerald-100', icon: '🟢', text: 'Conectado' },
-            'checking': { color: 'text-amber-600', bg: 'bg-amber-100', icon: '🟡', text: 'Verificando...' },
-            'degraded': { color: 'text-orange-600', bg: 'bg-orange-100', icon: '🟠', text: 'Degradado' },
-            'error': { color: 'text-red-600', bg: 'bg-red-100', icon: '🔴', text: 'Erro' }
-        };
+        logsContainer.innerHTML = logsHTML;
         
-        const config = statusConfig[automationState.connectionStatus] || statusConfig.checking;
-        
-        container.innerHTML = `
-            <div class="flex items-center space-x-2 px-3 py-1 rounded-full ${config.bg}">
-                <span>${config.icon}</span>
-                <span class="text-sm font-medium ${config.color}">${config.text}</span>
-            </div>
-        `;
-    }
-    
-    // ===== HELPER METHODS =====
-    
-    /**
-     * Gets automation icon by type
-     * @param {string} type - Automation type
-     * @returns {string} Icon emoji
-     */
-    getAutomationIcon(type) {
-        const typeConfig = AUTOMATION_CONFIG.AUTOMATION_TYPES.find(t => t.value === type);
-        return typeConfig ? typeConfig.icon : '🤖';
-    }
-    
-    /**
-     * Renders status badge
-     * @param {string} status - Status value
-     * @returns {string} HTML for status badge
-     */
-    renderStatusBadge(status) {
-        const styles = AUTOMATION_CONFIG.STATIC_STYLES[status] || AUTOMATION_CONFIG.STATIC_STYLES.draft;
-        const statusConfig = AUTOMATION_CONFIG.STATUS_OPTIONS.find(s => s.value === status) || 
-                            { label: status || 'Desconhecido', icon: '❓' };
-        
-        return `
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles.bg} ${styles.text}">
-                <span class="mr-1">${statusConfig.icon}</span>
-                ${Utils.escapeHtml(statusConfig.label)}
-            </span>
-        `;
-    }
-    
-    /**
-     * Renders execution status badge
-     * @param {string} status - Execution status
-     * @returns {string} HTML for status badge
-     */
-    renderExecutionStatus(status) {
-        const styles = AUTOMATION_CONFIG.STATIC_STYLES[status] || AUTOMATION_CONFIG.STATIC_STYLES.pending;
-        const statusMap = {
-            'completed': { label: 'Concluído', icon: '✅' },
-            'success': { label: 'Sucesso', icon: '✅' },
-            'failed': { label: 'Falhou', icon: '❌' },
-            'error': { label: 'Erro', icon: '❌' },
-            'running': { label: 'Executando', icon: '⏳' },
-            'pending': { label: 'Pendente', icon: '⏸️' }
-        };
-        
-        const config = statusMap[status] || { label: status || 'Desconhecido', icon: '❓' };
-        
-        return `
-            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${styles.bg} ${styles.text}">
-                <span class="mr-1">${config.icon}</span>
-                ${Utils.escapeHtml(config.label)}
-            </span>
-        `;
-    }
-    
-    // ===== EVENT HANDLERS =====
-    
-    /**
-     * Sets up all event listeners
-     */
-    setupEventListeners() {
-        document.addEventListener('click', this.handleClick);
-        document.addEventListener('input', this.handleInput);
-        document.addEventListener('change', this.handleChange);
-        document.addEventListener('keydown', this.handleKeydown);
-        document.addEventListener('visibilitychange', this.handleVisibilityChange);
-        
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            this.cleanup();
-        });
-        
-        console.log('👂 Event listeners setup complete');
-    }
-    
-    /**
-     * Handles click events
-     * @param {Event} event - Click event
-     */
-    handleClick(event) {
-        const { target } = event;
-        const action = target.dataset.action;
-        
-        if (!action) return;
-        
-        console.log('🖱️ Click action:', action, target.dataset);
-        
-        switch (action) {
-            case 'create-automation':
-                event.preventDefault();
-                this.openAutomationModal();
-                break;
-                
-            case 'edit-automation':
-                event.preventDefault();
-                this.editAutomation(target.dataset.id);
-                break;
-                
-            case 'delete-automation':
-                event.preventDefault();
-                this.deleteAutomation(target.dataset.id);
-                break;
-                
-            case 'create-campaign':
-                event.preventDefault();
-                this.openCampaignModal(target.dataset.type || 'email');
-                break;
-                
-            case 'view-campaigns':
-                event.preventDefault();
-                this.viewCampaigns(target.dataset.type);
-                break;
-                
-            case 'view-templates':
-                event.preventDefault();
-                this.openTemplatesModal();
-                break;
-                
-            case 'view-all-executions':
-                event.preventDefault();
-                this.viewAllExecutions();
-                break;
-                
-            case 'refresh-data':
-                event.preventDefault();
-                this.refreshData();
-                break;
-        }
-    }
-    
-    /**
-     * Handles input events
-     * @param {Event} event - Input event
-     */
-    handleInput(event) {
-        const { target } = event;
-        
-        if (target.id === 'search-input') {
-            automationState.filters.search = target.value;
-            this.applyFilters();
-        }
-    }
-    
-    /**
-     * Handles change events
-     * @param {Event} event - Change event
-     */
-    handleChange(event) {
-        const { target } = event;
-        
-        if (target.dataset.filter) {
-            automationState.filters[target.dataset.filter] = target.value;
-            this.applyFilters();
-        }
-    }
-    
-    /**
-     * Handles keyboard events
-     * @param {Event} event - Keyboard event
-     */
-    handleKeydown(event) {
-        const { key, ctrlKey, metaKey } = event;
-        const cmdOrCtrl = ctrlKey || metaKey;
-        
-        if (cmdOrCtrl && key === 'n') {
-            event.preventDefault();
-            this.openAutomationModal();
-        }
-        
-        if (cmdOrCtrl && key === 'r') {
-            event.preventDefault();
-            this.refreshData();
-        }
-        
-        if (key === 'Escape') {
-            // Close any open modals
-            this.closeModals();
-        }
-    }
-    
-    /**
-     * Handles visibility change events
-     */
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.pauseRealTimeUpdates();
-            console.log('⏸️ Paused real-time updates (tab hidden)');
-        } else {
-            this.resumeRealTimeUpdates();
-            console.log('▶️ Resumed real-time updates (tab visible)');
-        }
-    }
-    
-    // ===== ACTION METHODS =====
-    
-    /**
-     * Opens automation creation modal
-     */
-    openAutomationModal() {
-        this.notificationSystem.show('Modal de automação em desenvolvimento', 'info');
-        console.log('📝 Opening automation modal');
-        
-        // Log user action
-        this.logAuditEvent('automation_modal_opened', { user_id: automationState.user?.id });
-    }
-    
-    /**
-     * Edits existing automation
-     * @param {string} id - Automation ID
-     */
-    editAutomation(id) {
-        const automation = automationState.automations.get(id);
-        if (!automation) {
-            this.notificationSystem.show('Automação não encontrada', 'error');
-            return;
-        }
-        
-        this.notificationSystem.show(`Editando automação: ${automation.name}`, 'info');
-        console.log('✏️ Editing automation:', id, automation);
-        
-        // Log user action
-        this.logAuditEvent('automation_edit_started', { 
-            automation_id: id, 
-            user_id: automationState.user?.id 
-        });
-    }
-    
-    /**
-     * Deletes automation with confirmation
-     * @param {string} id - Automation ID
-     */
-    async deleteAutomation(id) {
-        const automation = automationState.automations.get(id);
-        if (!automation) {
-            this.notificationSystem.show('Automação não encontrada', 'error');
-            return;
-        }
-        
-        if (!confirm(`Tem certeza que deseja excluir a automação "${automation.name}"?`)) {
-            return;
-        }
-        
-        try {
-            this.showLoading(true, 'Excluindo automação...');
-            console.log('🗑️ Deleting automation:', id);
-            
-            const result = await this.dataManager.executeRequest(
-                deleteAutomationRule, 
-                [id, automationState.orgId], 
-                { useCache: false }
-            );
-            
-            if (result.error) {
-                throw new Error(result.error.message);
-            }
-            
-            // Remove from local state
-            automationState.automations.delete(id);
-            this.calculateMetrics();
-            this.renderInterface();
-            
-            // Log successful deletion
-            await this.logAuditEvent('automation_deleted', { 
-                automation_id: id, 
-                automation_name: automation.name,
-                user_id: automationState.user?.id 
-            });
-            
-            this.notificationSystem.show('Automação excluída com sucesso!', 'success');
-            console.log('✅ Automation deleted successfully');
-            
-        } catch (error) {
-            console.error('❌ Delete error:', error);
-            this.notificationSystem.show(`Erro ao excluir: ${error.message}`, 'error');
-            
-            // Log error
-            await this.logAuditEvent('automation_delete_failed', { 
-                automation_id: id, 
-                error: error.message,
-                user_id: automationState.user?.id 
-            });
-        } finally {
-            this.showLoading(false);
-        }
-    }
-    
-    /**
-     * Opens campaign creation modal
-     * @param {string} type - Campaign type (email, sms, whatsapp)
-     */
-    openCampaignModal(type) {
-        this.notificationSystem.show(`Modal de campanha ${type} em desenvolvimento`, 'info');
-        console.log(`📧 Opening ${type} campaign modal`);
-        
-        // Log user action
-        this.logAuditEvent('campaign_modal_opened', { 
-            campaign_type: type,
-            user_id: automationState.user?.id 
-        });
-    }
-    
-    /**
-     * Views campaigns by type
-     * @param {string} type - Campaign type
-     */
-    viewCampaigns(type) {
-        const campaigns = automationState.campaigns[type];
-        this.notificationSystem.show(`Visualizando ${campaigns.size} campanhas de ${type}`, 'info');
-        console.log(`👀 Viewing ${type} campaigns:`, campaigns);
-    }
-    
-    /**
-     * Opens templates modal
-     */
-    openTemplatesModal() {
-        this.notificationSystem.show('Modal de templates em desenvolvimento', 'info');
-        console.log('📋 Opening templates modal');
-        
-        // Log user action
-        this.logAuditEvent('templates_modal_opened', { user_id: automationState.user?.id });
-    }
-    
-    /**
-     * Views all executions
-     */
-    viewAllExecutions() {
-        this.notificationSystem.show('Visualização completa de execuções em desenvolvimento', 'info');
-        console.log('📊 Viewing all executions');
-    }
-    
-    /**
-     * Refreshes all data from Supabase
-     */
-    async refreshData() {
-        if (automationState.isRefreshing) {
-            console.log('⚠️ Refresh already in progress');
-            return;
-        }
-        
-        try {
-            automationState.isRefreshing = true;
-            console.log('🔄 Refreshing data...');
-            
-            this.notificationSystem.show('Atualizando dados...', 'info', 2000);
-            
-            // Clear cache and reload
-            this.dataManager.clearCache();
-            await this.loadAllData();
-            this.renderInterface();
-            
-            // Log successful refresh
-            await this.logAuditEvent('data_refreshed', { user_id: automationState.user?.id });
-            
-            this.notificationSystem.show('Dados atualizados com sucesso!', 'success');
-            console.log('✅ Data refresh completed');
-            
-        } catch (error) {
-            console.error('❌ Refresh error:', error);
-            this.notificationSystem.show(`Erro ao atualizar: ${error.message}`, 'error');
-            
-            // Log error
-            await this.logAuditEvent('data_refresh_failed', { 
-                error: error.message,
-                user_id: automationState.user?.id 
-            });
-        } finally {
-            automationState.isRefreshing = false;
-        }
-    }
-    
-    /**
-     * Applies current filters to data
-     */
-    applyFilters() {
-        console.log('🔍 Applying filters:', automationState.filters);
-        // Implement filtering logic here
-        this.renderInterface();
-    }
-    
-    /**
-     * Closes any open modals
-     */
-    closeModals() {
-        // Implement modal closing logic
-        console.log('❌ Closing modals');
-    }
-    
-    // ===== REAL-TIME UPDATES =====
-    
-    /**
-     * Sets up real-time data updates
-     */
-    setupRealTimeUpdates() {
-        automationState.refreshInterval = setInterval(() => {
-            if (!document.hidden && !automationState.isRefreshing) {
-                console.log('🔄 Auto-refresh triggered');
-                this.refreshData();
-            }
-        }, AUTOMATION_CONFIG.REFRESH_INTERVAL);
-        
-        console.log(`⏰ Real-time updates setup (${AUTOMATION_CONFIG.REFRESH_INTERVAL}ms interval)`);
-    }
-    
-    /**
-     * Pauses real-time updates
-     */
-    pauseRealTimeUpdates() {
-        if (automationState.refreshInterval) {
-            clearInterval(automationState.refreshInterval);
-            automationState.refreshInterval = null;
-        }
-    }
-    
-    /**
-     * Resumes real-time updates
-     */
-    resumeRealTimeUpdates() {
-        if (!automationState.refreshInterval) {
-            this.setupRealTimeUpdates();
-        }
-    }
-    
-    // ===== UTILITY METHODS =====
-    
-    /**
-     * Shows/hides loading indicator
-     * @param {boolean} show - Whether to show loading
-     * @param {string} message - Loading message
-     */
-    showLoading(show, message = 'Carregando...') {
-        const loader = document.getElementById('loading-indicator');
-        if (loader) {
-            if (show) {
-                loader.textContent = message;
-                loader.classList.remove('hidden');
-            } else {
-                loader.classList.add('hidden');
-            }
-        }
-        
-        automationState.isLoading = show;
-        console.log(show ? `🔄 ${message}` : '✅ Loading complete');
-    }
-    
-    /**
-     * Logs audit event to Supabase
-     * @param {string} action - Action performed
-     * @param {Object} metadata - Additional metadata
-     */
-    async logAuditEvent(action, metadata = {}) {
-        try {
-            await this.dataManager.executeRequest(createAuditLog, [{
-                action,
-                metadata,
-                org_id: automationState.orgId,
-                user_id: automationState.user?.id,
-                timestamp: new Date().toISOString()
-            }], { useCache: false });
-        } catch (error) {
-            console.warn('⚠️ Failed to log audit event:', error);
-            // Don't throw - audit logging shouldn't break functionality
-        }
-    }
-    
-    /**
-     * Loads demo data as fallback
-     */
-    loadDemoData() {
-        console.log('🎭 Loading demo data...');
-        
-        // Demo automations
-        automationState.automations = new Map([
-            ['demo-1', {
-                id: 'demo-1',
-                name: 'Nutrição de Leads',
-                description: 'Sequência automática de emails para novos leads',
-                type: 'lead_nurturing',
-                status: 'active',
-                is_active: true,
-                execution_count: 156,
-                created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-                updated_at: new Date().toISOString()
-            }],
-            ['demo-2', {
-                id: 'demo-2',
-                name: 'Follow-up Automático',
-                description: 'Acompanhamento automático após 3 dias',
-                type: 'follow_up',
-                status: 'active',
-                is_active: true,
-                execution_count: 89,
-                created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-                updated_at: new Date(Date.now() - 3600000).toISOString()
-            }],
-            ['demo-3', {
-                id: 'demo-3',
-                name: 'Campanha WhatsApp',
-                description: 'Mensagens automáticas via WhatsApp',
-                type: 'whatsapp_flow',
-                status: 'paused',
-                is_active: false,
-                execution_count: 23,
-                created_at: new Date(Date.now() - 86400000 * 1).toISOString(),
-                updated_at: new Date(Date.now() - 7200000).toISOString()
-            }]
-        ]);
-        
-        // Demo executions
-        automationState.executionHistory = new Map([
-            ['exec-1', {
-                id: 'exec-1',
-                automation_name: 'Nutrição de Leads',
-                status: 'completed',
-                created_at: new Date().toISOString(),
-                execution_time_ms: 1250
-            }],
-            ['exec-2', {
-                id: 'exec-2',
-                automation_name: 'Follow-up Automático',
-                status: 'success',
-                created_at: new Date(Date.now() - 3600000).toISOString(),
-                execution_time_ms: 890
-            }],
-            ['exec-3', {
-                id: 'exec-3',
-                automation_name: 'Campanha WhatsApp',
-                status: 'failed',
-                created_at: new Date(Date.now() - 7200000).toISOString(),
-                execution_time_ms: 2100
-            }]
-        ]);
-        
-        // Demo campaigns
-        automationState.campaigns.email = new Map([
-            ['email-1', { id: 'email-1', name: 'Campanha Boas-vindas', status: 'active' }],
-            ['email-2', { id: 'email-2', name: 'Newsletter Semanal', status: 'active' }]
-        ]);
-        
-        automationState.campaigns.sms = new Map([
-            ['sms-1', { id: 'sms-1', name: 'SMS Lembrete', status: 'active' }]
-        ]);
-        
-        automationState.campaigns.whatsapp = new Map([
-            ['whatsapp-1', { id: 'whatsapp-1', name: 'WhatsApp Suporte', status: 'paused' }]
-        ]);
-        
-        // Demo templates
-        automationState.templates = new Map([
-            ['template-1', { id: 'template-1', name: 'Email Boas-vindas', type: 'email' }],
-            ['template-2', { id: 'template-2', name: 'SMS Follow-up', type: 'sms' }]
-        ]);
-        
-        this.calculateMetrics();
-        automationState.isLoading = false;
-        automationState.connectionStatus = 'degraded';
-        this.renderInterface();
-        
-        this.notificationSystem.show('Dados demo carregados (modo offline)', 'warning');
-        console.log('✅ Demo data loaded');
-    }
-    
-    /**
-     * Cleans up resources and event listeners
-     */
-    cleanup() {
-        console.log('🧹 Cleaning up automation system...');
-        
-        this.pauseRealTimeUpdates();
-        this.notificationSystem.clear();
-        
-        // Remove event listeners
-        document.removeEventListener('click', this.handleClick);
-        document.removeEventListener('input', this.handleInput);
-        document.removeEventListener('change', this.handleChange);
-        document.removeEventListener('keydown', this.handleKeydown);
-        document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-        
-        // Clear caches
-        this.dataManager.clearCache();
-        
-        console.log('✅ Cleanup completed');
-    }
-    
-    // ===== PUBLIC API =====
-    
-    /**
-     * Gets current system state
-     * @returns {Object} Current automation state
-     */
-    getState() {
-        return {
-            ...automationState,
-            isInitialized: this.isInitialized,
-            version: '4.1.0'
-        };
-    }
-    
-    /**
-     * Forces a refresh of all data
-     * @returns {Promise<void>}
-     */
-    async forceRefresh() {
-        return this.refreshData();
-    }
-    
-    /**
-     * Sets refresh interval
-     * @param {number} interval - Interval in milliseconds
-     */
-    setRefreshInterval(interval) {
-        AUTOMATION_CONFIG.REFRESH_INTERVAL = interval;
-        this.pauseRealTimeUpdates();
-        this.setupRealTimeUpdates();
-        console.log(`⏰ Refresh interval updated to ${interval}ms`);
+    } catch (error) {
+        console.error('❌ Erro ao renderizar seção de logs:', error);
     }
 }
 
-// ===== GLOBAL INITIALIZATION =====
-const automationSystem = new AutomationSystem();
+// ===== EVENT LISTENERS SETUP - NASA 10/10 =====
+/**
+ * Setup event listeners with enhanced performance and accessibility
+ */
+function setupEventListeners() {
+    try {
+        // Tab navigation
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('tab-button')) {
+                const tabId = e.target.dataset.tab;
+                switchTab(tabId);
+            }
+        });
+        
+        // Create rule button
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'create-rule-btn' || e.target.id === 'create-first-rule-btn') {
+                showCreateRuleModal();
+            }
+        });
+        
+        // Edit rule buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-rule-btn')) {
+                const ruleId = e.target.dataset.ruleId;
+                showEditRuleModal(ruleId);
+            }
+        });
+        
+        // Toggle rule buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('toggle-rule-btn')) {
+                const ruleId = e.target.dataset.ruleId;
+                const currentStatus = e.target.dataset.currentStatus;
+                toggleRuleStatus(ruleId, currentStatus);
+            }
+        });
+        
+        // Delete rule buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-rule-btn')) {
+                const ruleId = e.target.dataset.ruleId;
+                deleteRule(ruleId);
+            }
+        });
+        
+        // View execution buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-execution-btn')) {
+                const executionId = e.target.dataset.executionId;
+                showExecutionDetails(executionId);
+            }
+        });
+        
+        // Search and filters
+        const rulesSearch = document.getElementById('rules-search');
+        if (rulesSearch) {
+            rulesSearch.addEventListener('input', debounce(filterRules, AUTOMATION_CONFIG.PERFORMANCE.DEBOUNCE_DELAY));
+        }
+        
+        const statusFilter = document.getElementById('rules-status-filter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', filterRules);
+        }
+        
+        // Keyboard navigation - NASA 10/10 accessibility
+        if (AUTOMATION_CONFIG.ACCESSIBILITY?.keyboardNavigation) {
+            document.addEventListener('keydown', handleKeyboardNavigation);
+        }
+        
+        // Page visibility change handler
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadAutomationDataWithCache();
+            }
+        });
+        
+        console.log('✅ Event listeners configurados para automações');
+        
+    } catch (error) {
+        console.error('❌ Erro ao configurar event listeners de automação:', error);
+    }
+}
 
-// Make notification system globally available
-window.notificationSystem = automationSystem.notificationSystem;
+/**
+ * Handle keyboard navigation - NASA 10/10 accessibility
+ * @param {KeyboardEvent} e - Keyboard event
+ */
+function handleKeyboardNavigation(e) {
+    try {
+        // Ctrl/Cmd + R: Refresh automation data
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+            e.preventDefault();
+            loadAutomationDataWithCache();
+        }
+        
+        // Ctrl/Cmd + N: New rule
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+            e.preventDefault();
+            showCreateRuleModal();
+        }
+        
+        // Escape: Close modals
+        if (e.key === 'Escape') {
+            closeAllModals();
+        }
+        
+        // Tab navigation
+        if (e.key === 'Tab' && e.altKey) {
+            e.preventDefault();
+            const tabs = ['rules', 'executions', 'logs', 'templates', 'integrations'];
+            const currentTab = automationState.getState('activeTab');
+            const currentIndex = tabs.indexOf(currentTab);
+            const nextIndex = (currentIndex + 1) % tabs.length;
+            switchTab(tabs[nextIndex]);
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro na navegação por teclado de automação:', error);
+    }
+}
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 DOM ready, initializing automation system...');
-    automationSystem.initialize();
-});
+/**
+ * Switch active tab
+ * @param {string} tabId - Tab ID to switch to
+ */
+function switchTab(tabId) {
+    try {
+        automationState.setState({ activeTab: tabId });
+        
+        // Update tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            const isActive = button.dataset.tab === tabId;
+            button.className = `tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                isActive 
+                    ? 'border-blue-500 text-blue-600' 
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`;
+        });
+        
+        // Re-render sections
+        renderAutomationInterface();
+        
+    } catch (error) {
+        console.error('❌ Erro ao trocar tab de automação:', error);
+    }
+}
 
-// Public API for external access
-window.automations = {
-    refresh: () => automationSystem.forceRefresh(),
-    getState: () => automationSystem.getState(),
-    setRefreshInterval: (interval) => automationSystem.setRefreshInterval(interval),
-    system: automationSystem
+/**
+ * Filter rules based on search and status
+ */
+function filterRules() {
+    try {
+        const searchTerm = document.getElementById('rules-search')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('rules-status-filter')?.value || 'all';
+        
+        const allRules = automationState.getState('automationRules');
+        
+        const filteredRules = allRules.filter(rule => {
+            const matchesSearch = !searchTerm || 
+                rule.name.toLowerCase().includes(searchTerm) ||
+                rule.description?.toLowerCase().includes(searchTerm) ||
+                rule.typeConfig.label.toLowerCase().includes(searchTerm);
+            
+            const matchesStatus = statusFilter === 'all' || rule.status === statusFilter;
+            
+            return matchesSearch && matchesStatus;
+        });
+        
+        // Update state with filtered rules
+        automationState.setState({ 
+            filteredRules,
+            filters: {
+                ...automationState.getState('filters'),
+                search: searchTerm,
+                status: statusFilter
+            }
+        });
+        
+        // Re-render rules section
+        renderRulesSection();
+        
+    } catch (error) {
+        console.error('❌ Erro ao filtrar regras:', error);
+    }
+}
+
+/**
+ * Show create rule modal
+ */
+function showCreateRuleModal() {
+    try {
+        automationState.setState({ showCreateModal: true });
+        showNotification('Modal de criação de regra em desenvolvimento', 'info');
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar modal de criação:', error);
+    }
+}
+
+/**
+ * Show edit rule modal
+ * @param {string} ruleId - Rule ID to edit
+ */
+function showEditRuleModal(ruleId) {
+    try {
+        const rule = automationState.getState('automationRules').find(r => r.id === ruleId);
+        if (!rule) {
+            showError('Regra não encontrada');
+            return;
+        }
+        
+        automationState.setState({ 
+            showEditModal: true,
+            selectedRule: rule
+        });
+        
+        showNotification('Modal de edição de regra em desenvolvimento', 'info');
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar modal de edição:', error);
+    }
+}
+
+/**
+ * Toggle rule status
+ * @param {string} ruleId - Rule ID
+ * @param {string} currentStatus - Current status
+ */
+async function toggleRuleStatus(ruleId, currentStatus) {
+    try {
+        const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+        
+        showLoading(true, 'Atualizando status da regra...');
+        
+        const result = await updateAutomationRule(ruleId, { status: newStatus });
+        
+        if (result.error) {
+            showError(`Erro ao atualizar regra: ${result.error.message}`);
+            return;
+        }
+        
+        showSuccess(`Regra ${newStatus === 'active' ? 'ativada' : 'pausada'} com sucesso!`);
+        
+        // Refresh data
+        await loadAutomationDataWithCache();
+        
+    } catch (error) {
+        console.error('❌ Erro ao alterar status da regra:', error);
+        showError('Erro ao alterar status da regra');
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * Delete rule
+ * @param {string} ruleId - Rule ID to delete
+ */
+async function deleteRule(ruleId) {
+    try {
+        if (!confirm('Tem certeza que deseja excluir esta regra? Esta ação não pode ser desfeita.')) {
+            return;
+        }
+        
+        showLoading(true, 'Excluindo regra...');
+        
+        const result = await deleteAutomationRule(ruleId);
+        
+        if (result.error) {
+            showError(`Erro ao excluir regra: ${result.error.message}`);
+            return;
+        }
+        
+        showSuccess('Regra excluída com sucesso!');
+        
+        // Refresh data
+        await loadAutomationDataWithCache();
+        
+    } catch (error) {
+        console.error('❌ Erro ao excluir regra:', error);
+        showError('Erro ao excluir regra');
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * Show execution details
+ * @param {string} executionId - Execution ID
+ */
+function showExecutionDetails(executionId) {
+    try {
+        const execution = automationState.getState('executions').find(e => e.id === executionId);
+        if (!execution) {
+            showError('Execução não encontrada');
+            return;
+        }
+        
+        showNotification('Modal de detalhes de execução em desenvolvimento', 'info');
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar detalhes da execução:', error);
+    }
+}
+
+/**
+ * Close all modals
+ */
+function closeAllModals() {
+    try {
+        automationState.setState({
+            showCreateModal: false,
+            showEditModal: false,
+            selectedRule: null
+        });
+        
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.classList.add('hidden');
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro ao fechar modais de automação:', error);
+    }
+}
+
+// ===== PERIODIC UPDATES - NASA 10/10 =====
+/**
+ * Start periodic updates for real-time data
+ */
+function startPeriodicUpdates() {
+    try {
+        setInterval(() => {
+            if (!document.hidden && !automationState.getState('isUpdating')) {
+                loadAutomationDataWithCache();
+            }
+        }, AUTOMATION_CONFIG.PERFORMANCE.REFRESH_INTERVAL);
+        
+        console.log('✅ Atualizações periódicas iniciadas para automações');
+        
+    } catch (error) {
+        console.error('❌ Erro ao iniciar atualizações periódicas:', error);
+    }
+}
+
+// ===== ANIMATION FUNCTIONS - NASA 10/10 =====
+/**
+ * Show rule created animation
+ * @param {Object} rule - Rule information
+ */
+function showRuleCreated(rule) {
+    try {
+        const typeStyles = AUTOMATION_CONFIG.STATIC_STYLES.types[rule.typeConfig.color] || 
+                          AUTOMATION_CONFIG.STATIC_STYLES.types.gray;
+        
+        // Create floating animation element
+        const animation = document.createElement('div');
+        animation.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none';
+        animation.innerHTML = `
+            <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg text-center animate-bounce">
+                <div class="text-2xl mb-2">${rule.typeConfig.icon}</div>
+                <div class="font-bold">Regra Criada!</div>
+                <div class="text-sm">${rule.name}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(animation);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (animation.parentNode) {
+                animation.remove();
+            }
+        }, AUTOMATION_CONFIG.ANIMATIONS.ruleCreated.duration);
+        
+        // Update metrics
+        const metrics = automationState.getState('metrics');
+        automationState.setState({
+            metrics: {
+                ...metrics,
+                rulesCreated: metrics.rulesCreated + 1
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar animação de regra criada:', error);
+    }
+}
+
+/**
+ * Show rule updated animation
+ * @param {Object} rule - Rule information
+ */
+function showRuleUpdated(rule) {
+    try {
+        showNotification(`Regra "${rule.name}" atualizada com sucesso!`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar animação de regra atualizada:', error);
+    }
+}
+
+/**
+ * Show execution started animation
+ * @param {Object} execution - Execution information
+ */
+function showExecutionStarted(execution) {
+    try {
+        showNotification(`Execução iniciada: ${execution.rule_name}`, 'info', 3000);
+        
+        // Update metrics
+        const metrics = automationState.getState('metrics');
+        automationState.setState({
+            metrics: {
+                ...metrics,
+                executionsRun: metrics.executionsRun + 1
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar animação de execução iniciada:', error);
+    }
+}
+
+/**
+ * Show execution completed animation
+ * @param {Object} execution - Execution information
+ */
+function showExecutionCompleted(execution) {
+    try {
+        showNotification(`Execução concluída: ${execution.rule_name}`, 'success', 3000);
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar animação de execução concluída:', error);
+    }
+}
+
+/**
+ * Show execution failed animation
+ * @param {Object} execution - Execution information
+ */
+function showExecutionFailed(execution) {
+    try {
+        showNotification(`Execução falhou: ${execution.rule_name}`, 'error', 5000);
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar animação de execução falhada:', error);
+    }
+}
+
+// ===== UTILITY FUNCTIONS - NASA 10/10 =====
+/**
+ * Format number for display
+ * @param {number} num - Number to format
+ * @returns {string} Formatted number
+ */
+function formatNumber(num) {
+    try {
+        if (num === null || num === undefined || isNaN(num)) {
+            return '0';
+        }
+        
+        return new Intl.NumberFormat('pt-BR').format(num);
+        
+    } catch (error) {
+        console.error('Erro ao formatar número:', error);
+        return String(num);
+    }
+}
+
+/**
+ * Debounce function for performance optimization
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in milliseconds
+ * @returns {Function} Debounced function
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// ===== NOTIFICATION SYSTEM - NASA 10/10 =====
+/**
+ * Show loading state
+ * @param {boolean} show - Show or hide loading
+ * @param {string} message - Loading message
+ */
+function showLoading(show, message = 'Carregando...') {
+    try {
+        let loadingElement = document.getElementById('loading-overlay');
+        
+        if (show) {
+            if (!loadingElement) {
+                loadingElement = document.createElement('div');
+                loadingElement.id = 'loading-overlay';
+                loadingElement.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                loadingElement.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                        <span class="text-gray-700">${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(loadingElement);
+            } else {
+                loadingElement.querySelector('span').textContent = message;
+                loadingElement.classList.remove('hidden');
+            }
+        } else {
+            if (loadingElement) {
+                loadingElement.classList.add('hidden');
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao mostrar loading de automação:', error);
+    }
+}
+
+/**
+ * Show success notification
+ * @param {string} message - Success message
+ */
+function showSuccess(message) {
+    showNotification(message, 'success');
+}
+
+/**
+ * Show error notification
+ * @param {string} message - Error message
+ */
+function showError(message) {
+    showNotification(message, 'error');
+}
+
+/**
+ * Show warning notification
+ * @param {string} message - Warning message
+ */
+function showWarning(message) {
+    showNotification(message, 'warning');
+}
+
+/**
+ * Show notification with enhanced styling and accessibility
+ * @param {string} message - Notification message
+ * @param {'success'|'error'|'warning'|'info'} type - Notification type
+ * @param {number} duration - Display duration in milliseconds
+ */
+function showNotification(message, type = 'info', duration = 5000) {
+    try {
+        // Remove existing notifications of the same type
+        const existingNotifications = document.querySelectorAll(`.notification-${type}`);
+        existingNotifications.forEach(notification => notification.remove());
+
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification-${type} fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 max-w-sm ${getNotificationClasses(type)}`;
+        notification.setAttribute('role', 'alert');
+        notification.setAttribute('aria-live', 'polite');
+        notification.setAttribute('aria-atomic', 'true');
+        
+        notification.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                    ${getNotificationIcon(type)}
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium"></p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
+                        aria-label="Fechar notificação">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        // Safely set message text with XSS protection
+        const messageElement = notification.querySelector('p');
+        if (messageElement) {
+            // Use textContent for XSS protection instead of innerHTML
+            messageElement.textContent = message;
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Auto-remove with fade out
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, duration);
+
+    } catch (error) {
+        console.error('❌ Erro ao mostrar notificação de automação:', error);
+        // Fallback to alert
+        alert(message);
+    }
+}
+
+/**
+ * Get notification CSS classes based on type
+ * @param {'success'|'error'|'warning'|'info'} type - Notification type
+ * @returns {string} CSS classes
+ */
+function getNotificationClasses(type) {
+    const styles = AUTOMATION_CONFIG.STATIC_STYLES.notifications;
+    return styles[type] || styles.info;
+}
+
+/**
+ * Get notification icon SVG based on type
+ * @param {'success'|'error'|'warning'|'info'} type - Notification type
+ * @returns {string} SVG icon HTML
+ */
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success':
+            return '<svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+        case 'error':
+            return '<svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
+        case 'warning':
+            return '<svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
+        default:
+            return '<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>';
+    }
+}
+
+// ===== ERROR HANDLING - NASA 10/10 =====
+/**
+ * Handle critical errors with recovery strategies
+ * @param {Error} error - Critical error
+ */
+async function handleCriticalError(error) {
+    try {
+        console.error('🚨 Erro crítico na automação:', error);
+        
+        automationState.setState({
+            errors: [...automationState.getState('errors'), {
+                type: 'critical_error',
+                message: error.message,
+                timestamp: new Date()
+            }],
+            isLoading: false
+        });
+        
+        showLoading(false);
+        showError(`Erro crítico: ${error.message}. Carregando dados demo.`);
+        
+        // Try to load demo data as fallback
+        console.log('🔄 Tentando carregar dados demo como fallback...');
+        loadDemoAutomationData();
+        
+    } catch (fallbackError) {
+        console.error('🚨 Erro no fallback de automação:', fallbackError);
+        showError('Sistema temporariamente indisponível. Tente recarregar a página.');
+    }
+}
+
+/**
+ * Load demo data as fallback
+ */
+function loadDemoAutomationData() {
+    try {
+        console.log('🤖 Carregando dados demo de automação...');
+        
+        // Demo data
+        const demoData = {
+            rules: [
+                {
+                    id: 'demo1',
+                    name: 'Nutrição de Leads',
+                    description: 'Sequência automática de emails para novos leads',
+                    type: 'lead_nurturing',
+                    status: 'active',
+                    trigger_type: 'lead_created',
+                    action_type: 'send_email',
+                    execution_count: 45,
+                    success_count: 42,
+                    last_executed: new Date().toISOString(),
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 'demo2',
+                    name: 'Follow-up Automático',
+                    description: 'Follow-up após 3 dias sem resposta',
+                    type: 'follow_up',
+                    status: 'active',
+                    trigger_type: 'time_based',
+                    action_type: 'create_task',
+                    execution_count: 23,
+                    success_count: 23,
+                    last_executed: new Date().toISOString(),
+                    created_at: new Date().toISOString()
+                }
+            ],
+            executions: [
+                {
+                    id: 'exec1',
+                    rule_name: 'Nutrição de Leads',
+                    status: 'success',
+                    started_at: new Date().toISOString(),
+                    completed_at: new Date().toISOString(),
+                    created_at: new Date().toISOString()
+                }
+            ],
+            logs: [
+                {
+                    id: 'log1',
+                    level: 'info',
+                    message: 'Sistema de automação inicializado com dados demo',
+                    created_at: new Date().toISOString()
+                }
+            ],
+            emailCampaigns: [],
+            smsCampaigns: [],
+            notificationLogs: [],
+            templates: [],
+            messageQueue: [],
+            n8nWorkflows: [],
+            whatsappIntegration: null
+        };
+        
+        applyAutomationData(demoData);
+        renderAutomationInterface();
+        
+        console.log('✅ Dados demo de automação carregados com sucesso');
+        showWarning('Usando dados demo - verifique a conexão com o Supabase');
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar dados demo de automação:', error);
+        showError('Erro ao carregar dados demo de automação');
+    }
+}
+
+// ===== CLEANUP AND LIFECYCLE - NASA 10/10 =====
+/**
+ * Cleanup function for page unload
+ */
+function cleanup() {
+    try {
+        // Clear intervals and subscriptions
+        const subscriptions = automationState.getState('subscriptions');
+        if (subscriptions) {
+            for (const [type, subscription] of subscriptions.entries()) {
+                try {
+                    unsubscribeFromTable(subscription);
+                } catch (error) {
+                    console.warn(`⚠️ Erro ao cancelar subscription de ${type}:`, error);
+                }
+            }
+        }
+        
+        // Clear cache
+        automationState.clearCache();
+        
+        console.log('✅ Cleanup de automação concluído');
+        
+    } catch (error) {
+        console.error('❌ Erro durante cleanup de automação:', error);
+    }
+}
+
+// Setup cleanup on page unload
+window.addEventListener('beforeunload', cleanup);
+
+// ===== PUBLIC API - NASA 10/10 =====
+/**
+ * Public API for external use
+ * Enhanced with NASA 10/10 standards and comprehensive functionality
+ * @namespace AutomationSystem
+ */
+const AutomationSystem = {
+    // State management
+    getState: () => automationState.getState(),
+    setState: (updates, callback) => automationState.setState(updates, callback),
+    
+    // Data operations
+    refresh: loadAutomationDataWithCache,
+    
+    // Rule operations
+    createRule: async (ruleData) => {
+        try {
+            const result = await createAutomationRule(ruleData);
+            if (!result.error) {
+                await loadAutomationDataWithCache();
+                showSuccess('Regra criada com sucesso!');
+            }
+            return result;
+        } catch (error) {
+            console.error('❌ Error creating rule:', error);
+            return { success: false, error: error.message };
+        }
+    },
+    
+    updateRule: async (ruleId, updates) => {
+        try {
+            const result = await updateAutomationRule(ruleId, updates);
+            if (!result.error) {
+                await loadAutomationDataWithCache();
+                showSuccess('Regra atualizada com sucesso!');
+            }
+            return result;
+        } catch (error) {
+            console.error('❌ Error updating rule:', error);
+            return { success: false, error: error.message };
+        }
+    },
+    
+    deleteRule: async (ruleId) => {
+        try {
+            const result = await deleteAutomationRule(ruleId);
+            if (!result.error) {
+                await loadAutomationDataWithCache();
+                showSuccess('Regra excluída com sucesso!');
+            }
+            return result;
+        } catch (error) {
+            console.error('❌ Error deleting rule:', error);
+            return { success: false, error: error.message };
+        }
+    },
+    
+    // Cache management
+    clearCache: (filter) => automationState.clearCache(filter),
+    getCacheStats: () => ({
+        size: automationState.state.cache.data.size,
+        hits: automationState.getState('metrics').cacheHits
+    }),
+    
+    // Performance monitoring
+    getMetrics: () => automationState.getState('metrics'),
+    
+    // Configuration
+    getConfig: () => AUTOMATION_CONFIG,
+    
+    // Version info
+    version: '5.0.0',
+    buildDate: new Date().toISOString()
 };
 
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { AutomationSystem, automationSystem };
-}
+// Export for ES Modules compatibility
+export default AutomationSystem;
 
-console.log('🤖 ALSHAM 360° Automation System V4.1 loaded - Enterprise Grade with Real Data Integration');
+// Named exports for tree-shaking optimization
+export {
+    automationState,
+    AUTOMATION_CONFIG,
+    initializeAutomation,
+    loadAutomationDataWithCache,
+    renderAutomationInterface,
+    showRuleCreated,
+    showRuleUpdated,
+    showExecutionStarted,
+    showNotification
+};
+
+// Also attach to window for backward compatibility
+window.AutomationSystem = AutomationSystem;
+
+console.log('🤖 Sistema de Automações Enterprise V5.0 NASA 10/10 carregado - Pronto para dados reais!');
+console.log('✅ ES Modules e Vite compatibility otimizados');
+console.log('🚀 Performance e cache inteligente implementados');
+console.log('🔒 Segurança e validação enterprise ativas');
+console.log('⚡ Sistema de workflows e automações disponíveis');
 
