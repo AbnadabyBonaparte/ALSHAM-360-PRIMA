@@ -1313,6 +1313,34 @@ export async function createAnalyticsEvent(event, orgId = getCurrentOrgId()) {
   }
 }
 
+export async function getActivityFeed(orgId = getCurrentOrgId(), filters = {}) {
+  const validation = validateRequired({ orgId })
+  if (validation) return { data: null, error: validation, success: false }
+
+  try {
+    let query = supabase
+      .from('activity_feed')
+      .select(`
+        *,
+        user_profiles!activity_feed_user_id_fkey(full_name, avatar_url)
+      `)
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false })
+
+    // Aplicar filtros
+    if (filters.activity_type) query = query.eq('activity_type', filters.activity_type)
+    if (filters.user_id) query = query.eq('user_id', filters.user_id)
+    if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom)
+    if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
+    if (filters.limit) query = query.limit(filters.limit)
+
+    const { data, error } = await query
+    return handleSupabaseResponse(data, error, 'busca de feed de atividades', { filters, orgId })
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de feed de atividades', { filters, orgId })
+  }
+}
+
 // 5.2 DASHBOARD KPIS - KPIs do dashboard REAIS
 export async function getDashboardKPIs(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
