@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [REAL-TIME] All 55+ tables connected with real Supabase data
 // ✅ [MONITORING] Health checks and performance metrics integrated
 // ✅ [ENTERPRISE] Complete CRUD operations for all business entities
-// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID
+// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization
 // =========================================================================
 
 // =========================================================================
@@ -487,6 +487,30 @@ export async function getUserOrganizations(userId) {
     return handleSupabaseResponse(data, error, 'busca de organizações do usuário', { userId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de organizações do usuário', { userId })
+  }
+}
+
+export async function getOrganization(orgId) {
+  const validation = validateRequired({ orgId })
+  if (validation) return { data: null, error: validation, success: false }
+
+  try {
+    const { data, error } = await supabase
+      .from('organizations')
+      .select(`
+        *,
+        user_organizations(
+          user_id,
+          role,
+          user_profiles(full_name, email, avatar_url)
+        )
+      `)
+      .eq('id', orgId)
+      .single()
+
+    return handleSupabaseResponse(data, error, 'busca de organização', { orgId })
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de organização', { orgId })
   }
 }
 
