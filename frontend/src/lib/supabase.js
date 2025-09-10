@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [REAL-TIME] All 55+ tables connected with real Supabase data
 // ✅ [MONITORING] Health checks and performance metrics integrated
 // ✅ [ENTERPRISE] Complete CRUD operations for all business entities
-// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog
+// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID
 // =========================================================================
 
 // =========================================================================
@@ -101,6 +101,10 @@ const handleSupabaseResponse = (data, error, operation = 'operação', context =
 // =========================================================================
 // 🏢 ORGANIZATION MANAGEMENT - REAL MULTI-TENANT
 // =========================================================================
+
+// Default organization ID for new installations
+export const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000000'
+
 export function getCurrentOrgId() {
   try {
     const orgId = localStorage.getItem('alsham_org_id')
