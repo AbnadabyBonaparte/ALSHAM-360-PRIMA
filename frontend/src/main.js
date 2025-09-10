@@ -12,8 +12,7 @@
 // ===== IMPORTS CORRIGIDOS - ES MODULES PADRONIZADOS =====
 import Chart from 'chart.js/auto';
 import { 
-    getCurrentUser, 
-    getCurrentSession, 
+    getCurrentUser,  
     getDashboardKPIs,
     getLeads,
     createAuditLog
