@@ -12,20 +12,20 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://alsham360prima.com/">
+    <meta property="og:url" content="https://app.alshamglobal.com.br/">
     <meta property="og:title" content="ALSHAM 360° PRIMA - CRM Inteligente">
     <meta property="og:description" content="Dashboard enterprise para gestão completa de leads e vendas com IA.">
     <meta property="og:image" content="/assets/og-image.jpg">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://alsham360prima.com/">
+    <meta property="twitter:url" content="https://app.alshamglobal.com.br/">
     <meta property="twitter:title" content="ALSHAM 360° PRIMA - CRM Inteligente">
     <meta property="twitter:description" content="Dashboard enterprise para gestão completa de leads e vendas com IA.">
     <meta property="twitter:image" content="/assets/twitter-image.jpg">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -45,9 +45,7 @@
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     
     <!-- Critical CSS Inline -->
     <style>
@@ -68,10 +66,6 @@
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- External Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
     
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="./src/style.css">
@@ -290,214 +284,64 @@
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="gamification-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 id="gamification-title" class="text-xl font-bold text-gray-900">🏆 Seu Progresso Hoje</h3>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-gray-500">Level <span id="user-level">7</span>:</span>
-                        <span class="text-sm font-semibold text-secondary" id="user-level-name">Vendedor Expert</span>
-                    </div>
+                    <h3 id="gamification-title" class="text-xl font-bold text-gray-900">🏆 Seu Progresso</h3>
+                    <button class="btn-secondary text-sm px-4 py-2" onclick="window.navigateTo('gamificacao')">
+                        Ver Ranking
+                    </button>
                 </div>
                 
-                <!-- Progress Bar Principal -->
+                <!-- Nível e XP -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-gray-700">Progresso do Level</span>
-                        <span class="text-sm font-semibold text-secondary" id="level-progress-percentage">80%</span>
+                        <span class="text-sm font-medium text-gray-700">Nível 12 - Especialista</span>
+                        <span class="text-sm text-gray-500">2.340 / 3.000 XP</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-3">
                         <div class="bg-gradient-premium h-3 rounded-full transition-all duration-1000" 
-                             style="width: 80%" 
-                             id="level-progress-bar"
+                             style="width: 78%"
                              role="progressbar" 
-                             aria-valuenow="80" 
+                             aria-valuenow="78" 
                              aria-valuemin="0" 
                              aria-valuemax="100"
-                             aria-label="Progresso do level: 80%"></div>
+                             aria-label="Progresso do nível: 78%"></div>
                     </div>
-                </div>
-
-                <!-- Metas Diárias -->
-                <div id="daily-goals" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <!-- Metas serão populadas dinamicamente -->
-                    <div class="flex items-center space-x-3">
-                        <span class="text-green-500 text-xl">✅</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-700">5 ligações feitas</p>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                <div class="bg-success h-2 rounded-full transition-all duration-1000" 
-                                     style="width: 100%"
-                                     role="progressbar" 
-                                     aria-valuenow="100" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100"
-                                     aria-label="Ligações: 100% completo"></div>
-                            </div>
-                        </div>
-                        <span class="text-sm font-semibold text-success">100%</span>
-                    </div>
-                    
-                    <div class="flex items-center space-x-3">
-                        <span class="text-green-500 text-xl">✅</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-700">3 e-mails enviados</p>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                <div class="bg-success h-2 rounded-full transition-all duration-1000" 
-                                     style="width: 100%"
-                                     role="progressbar" 
-                                     aria-valuenow="100" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100"
-                                     aria-label="E-mails: 100% completo"></div>
-                            </div>
-                        </div>
-                        <span class="text-sm font-semibold text-success">100%</span>
-                    </div>
-                    
-                    <div class="flex items-center space-x-3">
-                        <span class="text-orange-500 text-xl">⏳</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-700">2 propostas criadas</p>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                <div class="bg-warning h-2 rounded-full transition-all duration-1000" 
-                                     style="width: 50%"
-                                     role="progressbar" 
-                                     aria-valuenow="50" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100"
-                                     aria-label="Propostas: 50% completo"></div>
-                            </div>
-                        </div>
-                        <span class="text-sm font-semibold text-warning">50%</span>
-                    </div>
-                </div>
-
-                <!-- Streak e Badges -->
-                <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xl">🔥</span>
-                            <div>
-                                <p class="text-sm font-medium text-gray-700">Streak atual</p>
-                                <p class="text-lg font-bold text-primary" id="current-streak">12 dias</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xl">🏅</span>
-                            <div>
-                                <p class="text-sm font-medium text-gray-700">Próximo badge</p>
-                                <p class="text-lg font-bold text-secondary" id="next-badge">15 dias</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-primary text-sm px-4 py-2" onclick="window.navigateTo('gamificacao')">
-                        Ver Conquistas
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Insights Proativos com IA -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="insights-title">
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
-                        <span class="text-white text-xl">🤖</span>
-                    </div>
-                    <h3 id="insights-title" class="text-xl font-bold text-gray-900">Insights Inteligentes</h3>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Insights -->
-                    <div class="space-y-4" id="ai-insights">
-                        <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-xl">
-                            <span class="text-xl">💡</span>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">"Seus leads de terça-feira convertem 34% mais"</p>
-                                <p class="text-xs text-gray-600 mt-1">Baseado em 3 meses de dados</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-3 p-4 bg-green-50 rounded-xl">
-                            <span class="text-xl">📊</span>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">"Clientes do setor Tech têm LTV 2.3x maior"</p>
-                                <p class="text-xs text-gray-600 mt-1">Oportunidade de foco estratégico</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-3 p-4 bg-purple-50 rounded-xl">
-                            <span class="text-xl">⚡</span>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">"Agora é o melhor momento para ligar para João"</p>
-                                <p class="text-xs text-gray-600 mt-1">89% de chance de atender</p>
-                            </div>
-                        </div>
+                <!-- Conquistas Recentes -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                        <div class="text-2xl mb-2">🥇</div>
+                        <div class="text-sm font-semibold text-yellow-800">Top Vendedor</div>
+                        <div class="text-xs text-yellow-600">Esta semana</div>
                     </div>
                     
-                    <!-- Ações Sugeridas -->
-                    <div class="space-y-4" id="suggested-actions">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">🎯 Próximas Ações</h4>
-                        
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-yellow-600">📞</span>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Ligar para Maria Silva</p>
-                                        <p class="text-xs text-gray-600">Lead quente - Tech Startup</p>
-                                    </div>
-                                </div>
-                                <button class="text-xs bg-yellow-600 text-white px-3 py-1 rounded-full hover:bg-yellow-700 transition-colors"
-                                        onclick="callLead('maria-silva')">
-                                    Ligar
-                                </button>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-blue-600">✉️</span>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Follow-up com Pedro Santos</p>
-                                        <p class="text-xs text-gray-600">Proposta enviada há 2 dias</p>
-                                    </div>
-                                </div>
-                                <button class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors"
-                                        onclick="sendFollowUp('pedro-santos')">
-                                    Enviar
-                                </button>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-green-600">📋</span>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Criar proposta para Ana Costa</p>
-                                        <p class="text-xs text-gray-600">Reunião agendada para amanhã</p>
-                                    </div>
-                                </div>
-                                <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors"
-                                        onclick="createProposal('ana-costa')">
-                                    Criar
-                                </button>
-                            </div>
-                        </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <div class="text-2xl mb-2">🎯</div>
+                        <div class="text-sm font-semibold text-blue-800">Meta Batida</div>
+                        <div class="text-xs text-blue-600">5 dias seguidos</div>
+                    </div>
+                    
+                    <div class="text-center p-4 bg-green-50 rounded-xl border border-green-200">
+                        <div class="text-2xl mb-2">⚡</div>
+                        <div class="text-sm font-semibold text-green-800">Resposta Rápida</div>
+                        <div class="text-xs text-green-600">< 2min média</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Funil de Conversão Interativo -->
+        <!-- Funil de Vendas Visual -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="funnel-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 id="funnel-title" class="text-xl font-bold text-gray-900">🎯 Funil de Conversão</h3>
-                    <div class="flex space-x-2">
-                        <button class="text-xs bg-primary text-white px-3 py-1 rounded-full">Esta Semana</button>
-                        <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Este Mês</button>
-                    </div>
+                    <h3 id="funnel-title" class="text-xl font-bold text-gray-900">🔄 Funil de Vendas</h3>
+                    <button class="btn-secondary text-sm px-4 py-2" onclick="window.navigateTo('relatorios')">
+                        Relatório Completo
+                    </button>
                 </div>
                 
-                <div id="conversion-funnel" class="space-y-4">
-                    <!-- Funil será populado dinamicamente -->
+                <!-- Funil Visual -->
+                <div class="space-y-4">
                     <div class="flex items-center space-x-4">
                         <div class="w-24 text-sm font-medium text-gray-700">Leads</div>
                         <div class="flex-1 bg-gray-200 rounded-full h-8 relative">
@@ -859,78 +703,31 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.info('🚀 Dashboard ALSHAM 360° PRIMA v2.0.0 iniciado');
             
-            // Configurar filtros de gráfico
+            // Configurar filtros do gráfico
             const chartFilters = document.querySelectorAll('[data-chart-filter]');
-            chartFilters.forEach(button => {
-                button.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-chart-filter');
-                    
-                    // Atualizar estado visual dos botões
-                    chartFilters.forEach(btn => {
-                        btn.classList.remove('bg-primary', 'text-white');
-                        btn.classList.add('bg-gray-200', 'text-gray-700');
+            chartFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    // Remove active class from all filters
+                    chartFilters.forEach(f => {
+                        f.classList.remove('bg-primary', 'text-white');
+                        f.classList.add('bg-gray-200', 'text-gray-700');
                     });
                     
+                    // Add active class to clicked filter
                     this.classList.remove('bg-gray-200', 'text-gray-700');
                     this.classList.add('bg-primary', 'text-white');
                     
-                    // Atualizar gráfico (será implementado no main.js)
-                    if (window.updateChart) {
-                        window.updateChart(filter);
-                    }
+                    // Update chart (implementar quando chart estiver carregado)
+                    const filterType = this.dataset.chartFilter;
+                    console.info(`📊 Filtro do gráfico alterado para: ${filterType}`);
                 });
             });
-            
-            // Configurar notificações
-            const notificationsButton = document.getElementById('notifications-button');
-            if (notificationsButton) {
-                notificationsButton.addEventListener('click', function() {
-                    if (window.navigationSystem) {
-                        window.navigationSystem.notificationManager.show(
-                            'Sistema de notificações em desenvolvimento', 
-                            'info'
-                        );
-                    }
-                });
-            }
-        });
-
-        /**
-         * Error handling global
-         */
-        window.addEventListener('error', function(event) {
-            console.error('🚨 Erro global capturado:', event.error);
-            
-            if (window.navigationSystem) {
-                window.navigationSystem.errorTracker.track(event.error, {
-                    source: 'global_error_handler',
-                    filename: event.filename,
-                    lineno: event.lineno,
-                    colno: event.colno
-                });
-            }
-        });
-
-        /**
-         * Performance monitoring
-         */
-        window.addEventListener('load', function() {
-            const loadTime = performance.now();
-            console.info(`⚡ Página carregada em ${loadTime.toFixed(2)}ms`);
-            
-            // Analytics
-            if (window.gtag) {
-                window.gtag('event', 'page_load_time', {
-                    value: Math.round(loadTime)
-                });
-            }
         });
     </script>
 
-    <!-- Module Scripts -->
-    <script type="module" src="./src/components/navigation.js"></script>
-    <script type="module" src="./src/js/auth.js"></script>
-    <script src="./src/main.js" defer></script>
+    <!-- Main Application Script -->
+    <script type="module" src="./src/main.js"></script>
+
 </body>
 </html>
 
