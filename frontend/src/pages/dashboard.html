@@ -42,8 +42,8 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="/src/pages/dashboard.html" />
   
-  <!-- Security Headers -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.railway.app wss://*.supabase.co; frame-ancestors 'none';" />
+  <!-- Security Headers - ATUALIZADO: Removido cdn.jsdelivr.net do CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.railway.app wss://*.supabase.co; frame-ancestors 'none';" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
@@ -52,7 +52,7 @@
   <!-- Performance hints -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <!-- REMOVIDO: <link rel="preconnect" href="https://cdn.jsdelivr.net" /> -->
   <link rel="dns-prefetch" href="https://www.google-analytics.com" />
   
   <!-- Fontes otimizadas -->
@@ -164,9 +164,9 @@
     });
   </script>
   
-  <!-- Libs externas (defer para não bloquear renderização) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+  <!-- REMOVIDO: Libs externas CDN - Agora serão carregadas via npm -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" defer></script> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script> -->
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -344,160 +344,68 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="kpis-title">
       <h2 id="kpis-title" class="sr-only">Indicadores de Performance</h2>
       
-      <!-- Loading skeletons -->
-      <div id="kpis-skeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="loading-skeleton"></div>
-        <div class="loading-skeleton"></div>
-        <div class="loading-skeleton"></div>
-        <div class="loading-skeleton"></div>
-      </div>
-      
-      <!-- KPIs container (preenchido pelo JavaScript) -->
-      <div id="dashboard-kpis" 
-           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" 
-           aria-live="polite"
-           aria-label="Indicadores de performance em tempo real">
-        <!-- Conteúdo será injetado pelo main.js -->
+      <!-- Container para KPIs dinâmicos -->
+      <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- KPIs serão populados dinamicamente pelo dashboard.js -->
+        
+        <!-- Loading Skeletons -->
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
       </div>
     </section>
 
-    <!-- Analytics e Ações rápidas -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Analytics container -->
-        <div class="lg:col-span-2 space-y-6">
-          <!-- Gráfico de performance -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-bold text-gray-900">📈 Performance Semanal</h3>
-              <div class="flex space-x-2">
-                <button class="text-xs bg-primary text-white px-3 py-1 rounded-full" data-chart-filter="week">7 dias</button>
-                <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full" data-chart-filter="month">30 dias</button>
-                <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full" data-chart-filter="quarter">90 dias</button>
-              </div>
-            </div>
-            <div class="relative h-64">
-              <canvas id="performanceChart" 
-                      aria-label="Gráfico de performance dos últimos 7 dias"
-                      role="img">
-                <!-- Fallback SVG será inserido aqui se Chart.js não carregar -->
-              </canvas>
+    <!-- Charts Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="charts-title">
+      <h2 id="charts-title" class="sr-only">Gráficos e Analytics</h2>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Gráfico de Performance -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">📈 Performance</h3>
+            <div class="flex space-x-2">
+              <button class="text-xs bg-primary text-white px-3 py-1 rounded-full" data-chart-filter="revenue">Receita</button>
+              <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors" data-chart-filter="leads">Leads</button>
             </div>
           </div>
-          
-          <!-- Funil de conversão -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h3 class="text-xl font-bold text-gray-900 mb-6">🎯 Funil de Conversão</h3>
-            <div id="conversion-funnel" class="space-y-4" aria-label="Funil de conversão de leads">
-              <!-- Conteúdo será injetado pelo main.js -->
-            </div>
+          <div class="h-64">
+            <canvas id="performanceChart" aria-label="Gráfico de performance"></canvas>
           </div>
         </div>
 
-        <!-- Sidebar com ações e insights -->
-        <aside class="space-y-6" aria-label="Ações rápidas e insights de IA">
-          <!-- Ações rápidas -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">⚡ Ações Rápidas</h3>
-            <div id="quick-actions" class="space-y-3">
-              <button class="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
-                <div class="flex items-center space-x-3">
-                  <span class="text-blue-600" aria-hidden="true">📞</span>
-                  <div>
-                    <p class="font-medium text-gray-900">Ligar para lead quente</p>
-                    <p class="text-sm text-gray-600">Maria Silva - Score 95</p>
-                  </div>
-                </div>
-              </button>
-              <button class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
-                <div class="flex items-center space-x-3">
-                  <span class="text-green-600" aria-hidden="true">📧</span>
-                  <div>
-                    <p class="font-medium text-gray-900">Enviar proposta</p>
-                    <p class="text-sm text-gray-600">João Santos - R$ 15.000</p>
-                  </div>
-                </div>
-              </button>
-              <button class="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
-                <div class="flex items-center space-x-3">
-                  <span class="text-purple-600" aria-hidden="true">🤖</span>
-                  <div>
-                    <p class="font-medium text-gray-900">Revisar automação</p>
-                    <p class="text-sm text-gray-600">Email follow-up ativo</p>
-                  </div>
-                </div>
-              </button>
-            </div>
+        <!-- Funil de Vendas -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">🔄 Funil de Vendas</h3>
+            <button class="btn-secondary text-sm px-4 py-2" onclick="window.navigateTo('relatorios')">
+              Ver Detalhes
+            </button>
           </div>
-
-          <!-- Insights de IA -->
-          <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🧠 Insights de IA</h3>
-            <div id="ai-insights" class="space-y-4">
-              <!-- Conteúdo será injetado pelo main.js -->
-            </div>
+          <div id="sales-funnel">
+            <!-- Funil será populado pelo JavaScript -->
           </div>
-          
-          <!-- Gamificação -->
-          <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">🏆 Seu Progresso</h3>
-            <div class="space-y-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-gray-900" id="user-level">Level 7</div>
-                <div class="text-sm text-gray-600" id="user-level-name">Vendedor Expert</div>
-              </div>
-              <div class="space-y-2">
-                <div class="flex justify-between text-sm">
-                  <span>XP Progress</span>
-                  <span id="level-progress-percentage">80%</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                  <div id="level-progress-bar" 
-                       class="bg-gradient-premium h-2 rounded-full transition-all duration-1000" 
-                       style="width: 80%"
-                       role="progressbar"
-                       aria-valuenow="80"
-                       aria-valuemin="0"
-                       aria-valuemax="100"
-                       aria-label="Progresso do nível: 80%"></div>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-sm">
-                <div>
-                  <span class="text-gray-600">Streak atual:</span>
-                  <span class="font-semibold text-primary" id="current-streak">12 dias</span>
-                </div>
-                <div>
-                  <span class="text-gray-600">Próximo badge:</span>
-                  <span class="font-semibold text-warning" id="next-badge">15 dias</span>
-                </div>
-              </div>
-              <button onclick="window.navigateTo('gamificacao')" 
-                      class="w-full bg-gradient-premium text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                Ver Conquistas
-              </button>
-            </div>
-          </div>
-        </aside>
+        </div>
       </div>
     </section>
 
-    <!-- Leads recentes -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="recent-leads-title">
+    <!-- Leads Recentes -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="leads-title">
       <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
         <div class="flex items-center justify-between mb-6">
-          <h3 id="recent-leads-title" class="text-xl font-bold text-gray-900">📋 Leads Recentes</h3>
-          <a href="/src/pages/leads-real.html" 
-             class="text-primary hover:text-primary-dark font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
-            Ver todos
-          </a>
-        </div>
-        
-        <!-- Loading skeleton para tabela -->
-        <div id="leads-skeleton" class="space-y-3">
-          <div class="loading-skeleton h-12"></div>
-          <div class="loading-skeleton h-12"></div>
-          <div class="loading-skeleton h-12"></div>
+          <h3 id="leads-title" class="text-xl font-bold text-gray-900">👥 Leads Recentes</h3>
+          <button class="btn-primary text-sm px-4 py-2" onclick="window.navigateTo('leads')">
+            Ver Todos
+          </button>
         </div>
         
         <!-- Tabela de leads (preenchida pelo JavaScript) -->
