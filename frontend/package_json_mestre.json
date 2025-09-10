@@ -1,0 +1,82 @@
+{
+  "name": "alsham-360-prima",
+  "version": "2.0.0",
+  "description": "ALSHAM 360° PRIMA - CRM Enterprise com IA, Gamificação e Automações",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "server:dev": "nodemon server.js",
+    "deploy": "npm run build && npm start",
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "fresh-install": "npm run clean && npm install",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "keywords": [
+    "crm",
+    "ia",
+    "automacao",
+    "leads",
+    "vendas",
+    "dashboard",
+    "analytics",
+    "gamificacao",
+    "supabase",
+    "n8n",
+    "enterprise"
+  ],
+  "author": "ALSHAM Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "express": "^4.21.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^7.4.1",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.4.5",
+    "redis": "^4.7.0",
+    "chart.js": "^4.4.0",
+    "canvas-confetti": "^1.6.0",
+    "jspdf": "^2.5.1",
+    "xlsx": "^0.18.5",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.8",
+    "tailwindcss": "^3.4.13",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "vite-plugin-pwa": "^0.19.5",
+    "rollup-plugin-visualizer": "^5.11.4",
+    "@vitejs/plugin-legacy": "^5.2.2",
+    "cssnano": "^6.0.1",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "nodemon": "^3.1.7",
+    "eslint": "^8.57.0",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alsham-team/alsham-360-prima.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alsham-team/alsham-360-prima/issues"
+  },
+  "homepage": "https://app.alshamglobal.com.br"
+}
+
