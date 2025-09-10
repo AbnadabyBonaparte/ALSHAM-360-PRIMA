@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [REAL-TIME] All 55+ tables connected with real Supabase data
 // ✅ [MONITORING] Health checks and performance metrics integrated
 // ✅ [ENTERPRISE] Complete CRUD operations for all business entities
-// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization
+// ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization, getUserProfile
 // =========================================================================
 
 // =========================================================================
@@ -532,6 +532,30 @@ export async function getUserProfiles(orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(data, error, 'busca de perfis', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de perfis', { orgId })
+  }
+}
+
+export async function getUserProfile(userId, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ userId })
+  if (validation) return { data: null, error: validation, success: false }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select(`
+        *,
+        teams(name, description),
+        user_organizations!user_profiles_user_id_fkey(
+          organizations(id, name)
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('org_id', orgId || getCurrentOrgId())
+      .single()
+
+    return handleSupabaseResponse(data, error, 'busca de perfil do usuário', { userId, orgId })
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de perfil do usuário', { userId, orgId })
   }
 }
 
