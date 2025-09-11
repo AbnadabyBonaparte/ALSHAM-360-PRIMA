@@ -14,15 +14,15 @@
  * @namespace NavigationConfig
  */
 const routes = {
-    'dashboard': '/src/pages/dashboard.html',
-    'leads': '/src/pages/leads.html',
-    'leads-real': '/src/pages/leads-real.html',
-    'login': '/src/pages/login.html',
-    'register': '/src/pages/register.html',
-    'relatorios': '/src/pages/relatorios.html',
-    'automacoes': '/src/pages/automacoes.html',
-    'gamificacao': '/src/pages/gamificacao.html',
-    'configuracoes': '/src/pages/configuracoes.html'
+    'dashboard': '/dashboard.html',
+    'leads': '/leads.html',
+    'leads-real': '/leads-real.html',
+    'login': '/login.html',
+    'register': '/register.html',
+    'relatorios': '/relatorios.html',
+    'automacoes': '/automacoes.html',
+    'gamificacao': '/gamificacao.html',
+    'configuracoes': '/configuracoes.html'
 };
     
     // Configuração de menu items com metadados
