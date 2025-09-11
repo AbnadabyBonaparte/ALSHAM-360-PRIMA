@@ -1,118 +1,104 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import { VitePWA } from 'vite-plugin-pwa';
 import legacy from '@vitejs/plugin-legacy';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  root: './',
-  base: './',
-  
-  server: {
-    host: '0.0.0.0',
-    port: process.env.PORT || 5173,
-    cors: true,
-    strictPort: false
-  },
-  
-  preview: {
-    host: '0.0.0.0',
-    port: process.env.PORT || 4173,
-    strictPort: false
-  },
-  
+  // CONFIGURAÇÃO MULTI-PAGE APPLICATION (MPA)
   build: {
-    outDir: 'dist',
-    sourcemap: false,
-    minify: 'terser',
-    target: 'es2015',
-    chunkSizeWarningLimit: 1000,
-    assetsDir: 'assets',
     rollupOptions: {
       input: {
-        main: resolve(process.cwd(), 'index.html'),
-        'create-org': resolve(process.cwd(), 'create-org.html'),
-        'test-supabase': resolve(process.cwd(), 'test-supabase.html'),
-        dashboard: resolve(process.cwd(), 'src/pages/dashboard.html'),
-        'leads-real': resolve(process.cwd(), 'src/pages/leads-real.html'),
-        leads: resolve(process.cwd(), 'src/pages/leads.html'),
-        login: resolve(process.cwd(), 'src/pages/login.html'),
-        register: resolve(process.cwd(), 'src/pages/register.html'),
-        relatorios: resolve(process.cwd(), 'src/pages/relatorios.html'),
-        automacoes: resolve(process.cwd(), 'src/pages/automacoes.html'),
-        gamificacao: resolve(process.cwd(), 'src/pages/gamificacao.html'),
-        configuracoes: resolve(process.cwd(), 'src/pages/configuracoes.html')
+        // Páginas na raiz
+        main: resolve(__dirname, 'index.html'),
+        'create-org': resolve(__dirname, 'create-org.html'),
+        'test-supabase': resolve(__dirname, 'test-supabase.html'),
+        
+        // Páginas em src/pages/ - MAPEAMENTO CORRETO
+        dashboard: resolve(__dirname, 'src/pages/dashboard.html'),
+        leads: resolve(__dirname, 'src/pages/leads.html'),
+        'leads-real': resolve(__dirname, 'src/pages/leads-real.html'),
+        login: resolve(__dirname, 'src/pages/login.html'),
+        register: resolve(__dirname, 'src/pages/register.html'),
+        automacoes: resolve(__dirname, 'src/pages/automacoes.html'),
+        gamificacao: resolve(__dirname, 'src/pages/gamificacao.html'),
+        relatorios: resolve(__dirname, 'src/pages/relatorios.html'),
+        configuracoes: resolve(__dirname, 'src/pages/configuracoes.html')
       },
       output: {
-        manualChunks: {
-          vendor: ['@supabase/supabase-js'],
-          charts: ['chart.js'],
-          utils: ['canvas-confetti', 'jspdf', 'xlsx', 'papaparse']
-        },
+        // CONFIGURAÇÃO PARA MOVER HTMLs PARA A RAIZ DO DIST
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.');
-          const extType = info[info.length - 1];
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            return `assets/images/[name]-[hash][extname]`;
+          // Manter CSS e outros assets em assets/
+          if (assetInfo.name?.endsWith('.css')) {
+            return 'assets/[name]-[hash][extname]';
           }
-          if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
-            return `assets/fonts/[name]-[hash][extname]`;
-          }
-          return `assets/[name]-[hash][extname]`;
+          return 'assets/[name]-[hash][extname]';
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: (chunkInfo) => {
-          // Gerar arquivos HTML na raiz da pasta dist
-          if (chunkInfo.name === 'dashboard') return 'dashboard.html';
-          if (chunkInfo.name === 'leads') return 'leads.html';
-          if (chunkInfo.name === 'leads-real') return 'leads-real.html';
-          if (chunkInfo.name === 'login') return 'login.html';
-          if (chunkInfo.name === 'register') return 'register.html';
-          if (chunkInfo.name === 'relatorios') return 'relatorios.html';
-          if (chunkInfo.name === 'automacoes') return 'automacoes.html';
-          if (chunkInfo.name === 'gamificacao') return 'gamificacao.html';
-          if (chunkInfo.name === 'configuracoes') return 'configuracoes.html';
+          // Apenas para JS, não HTML
           return 'assets/js/[name]-[hash].js';
         }
       }
+    },
+    // Configurações adicionais
+    target: 'es2015',
+    cssTarget: 'chrome80',
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
     }
   },
-  
+
+  // CONFIGURAÇÃO PARA DEVELOPMENT
+  server: {
+    open: '/',
+    port: 3000,
+    // Configuração para SPA fallback em desenvolvimento
+    middlewareMode: false
+  },
+
+  // PLUGINS
   plugins: [
+    // Plugin Legacy para compatibilidade
     legacy({
-      targets: ['defaults', 'not IE 11']
+      targets: ['defaults', 'not IE 11'],
+      additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+      renderLegacyChunks: true,
+      polyfills: [
+        'es.symbol',
+        'es.array.filter',
+        'es.promise',
+        'es.promise.finally',
+        'es/map',
+        'es/set',
+        'es.array.for-each',
+        'es.object.define-properties',
+        'es.object.define-property',
+        'es.object.get-own-property-descriptor',
+        'es.object.get-own-property-descriptors',
+        'es.object.keys',
+        'es.object.to-string',
+        'web.dom-collections.for-each',
+        'esnext.global-this',
+        'esnext.string.match-all'
+      ]
     }),
+
+    // PWA Plugin
     VitePWA({
       registerType: 'autoUpdate',
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
-              },
-              cacheKeyWillBeUsed: async ({ request }) => {
-                return `${request.url}`;
-              }
-            }
-          }
-        ]
-      },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'ALSHAM 360° PRIMA',
+        name: 'ALSHAM 360 PRIMA',
         short_name: 'ALSHAM360',
-        description: 'CRM Enterprise com IA, Gamificação e Automações',
-        theme_color: '#6366f1',
+        description: 'CRM Enterprise ALSHAM 360 PRIMA',
+        theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -125,25 +111,53 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\.supabase\.co\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-api-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 ano
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
       }
     })
   ],
-  
-  css: {
-    postcss: './postcss.config.js'
-  },
-  
+
+  // RESOLUÇÃO DE PATHS
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
       '@components': resolve(__dirname, 'src/components'),
-      '@pages': resolve(__dirname, 'src/pages'),
       '@js': resolve(__dirname, 'src/js'),
       '@lib': resolve(__dirname, 'src/lib'),
-      '@styles': resolve(__dirname, 'src/styles'),
-      '@assets': resolve(__dirname, 'src/assets'),
-      '@public': resolve(__dirname, 'public')
+      '@assets': resolve(__dirname, 'src/assets')
     }
+  },
+
+  // CONFIGURAÇÕES DE CSS
+  css: {
+    devSourcemap: false,
+    preprocessorOptions: {
+      css: {
+        charset: false
+      }
+    }
+  },
+
+  // CONFIGURAÇÕES DE OTIMIZAÇÃO
+  optimizeDeps: {
+    include: ['@supabase/supabase-js', 'chart.js']
   }
 });
 
