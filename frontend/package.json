@@ -16,7 +16,8 @@
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "postinstall": "npm run build"
   },
   "keywords": [
     "crm",
@@ -51,16 +52,16 @@
     "canvas-confetti": "^1.6.0",
     "jspdf": "^2.5.1",
     "xlsx": "^0.18.5",
-    "papaparse": "^5.4.1"
-  },
-  "devDependencies": {
+    "papaparse": "^5.4.1",
     "vite": "^5.4.8",
     "tailwindcss": "^3.4.13",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "vite-plugin-pwa": "^0.19.5",
+    "@vitejs/plugin-legacy": "^5.2.2"
+  },
+  "devDependencies": {
     "rollup-plugin-visualizer": "^5.11.4",
-    "@vitejs/plugin-legacy": "^5.2.2",
     "cssnano": "^6.0.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
@@ -79,4 +80,3 @@
   },
   "homepage": "https://app.alshamglobal.com.br"
 }
-
