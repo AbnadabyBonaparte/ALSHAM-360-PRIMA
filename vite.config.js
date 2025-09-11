@@ -4,8 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 import legacy from '@vitejs/plugin-legacy';
 
 export default defineConfig({
-  root: '.',
-  base: '/',
+  root: './',
+  base: './',
   
   server: {
     host: '0.0.0.0',
@@ -54,13 +54,25 @@ export default defineConfig({
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
             return `assets/images/[name]-[hash][extname]`;
           }
-          if (/woff2?|eot|ttf|otf/i.test(extType)) {
+          if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
             return `assets/fonts/[name]-[hash][extname]`;
           }
           return `assets/[name]-[hash][extname]`;
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js'
+        entryFileNames: (chunkInfo) => {
+          // Gerar arquivos HTML na raiz da pasta dist
+          if (chunkInfo.name === 'dashboard') return 'dashboard.html';
+          if (chunkInfo.name === 'leads') return 'leads.html';
+          if (chunkInfo.name === 'leads-real') return 'leads-real.html';
+          if (chunkInfo.name === 'login') return 'login.html';
+          if (chunkInfo.name === 'register') return 'register.html';
+          if (chunkInfo.name === 'relatorios') return 'relatorios.html';
+          if (chunkInfo.name === 'automacoes') return 'automacoes.html';
+          if (chunkInfo.name === 'gamificacao') return 'gamificacao.html';
+          if (chunkInfo.name === 'configuracoes') return 'configuracoes.html';
+          return 'assets/js/[name]-[hash].js';
+        }
       }
     }
   },
@@ -72,38 +84,43 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkFirst',
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'supabase-cache',
+              cacheName: 'google-fonts-cache',
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+              },
+              cacheKeyWillBeUsed: async ({ request }) => {
+                return `${request.url}`;
               }
             }
           }
         ]
       },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'ALSHAM 360° PRIMA',
         short_name: 'ALSHAM360',
         description: 'CRM Enterprise com IA, Gamificação e Automações',
-        theme_color: '#2563eb',
+        theme_color: '#6366f1',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/',
+        orientation: 'portrait',
         scope: '/',
+        start_url: '/',
         icons: [
           {
-            src: '/icon-192x192.png',
+            src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512x512.png',
+            src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png'
           }
@@ -112,45 +129,21 @@ export default defineConfig({
     })
   ],
   
-  resolve: {
-    alias: {
-      '@': resolve(process.cwd(), 'src'),
-      '@components': resolve(process.cwd(), 'src/components'),
-      '@pages': resolve(process.cwd(), 'src/pages'),
-      '@js': resolve(process.cwd(), 'src/js'),
-      '@lib': resolve(process.cwd(), 'src/lib'),
-      '@styles': resolve(process.cwd(), 'src/styles'),
-      '@assets': resolve(process.cwd(), 'src/assets')
-    }
-  },
-  
   css: {
     postcss: './postcss.config.js'
   },
   
-  define: {
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
-    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
-  },
-  
-  // Otimizações para build
-  optimizeDeps: {
-    include: [
-      '@supabase/supabase-js',
-      'chart.js',
-      'canvas-confetti',
-      'jspdf',
-      'xlsx',
-      'papaparse'
-    ]
-  },
-  
-  // Configurações de ambiente
-  envPrefix: ['VITE_', 'SUPABASE_', 'OPENAI_'],
-  
-  // Configurações de performance
-  esbuild: {
-    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@pages': resolve(__dirname, 'src/pages'),
+      '@js': resolve(__dirname, 'src/js'),
+      '@lib': resolve(__dirname, 'src/lib'),
+      '@styles': resolve(__dirname, 'src/styles'),
+      '@assets': resolve(__dirname, 'src/assets'),
+      '@public': resolve(__dirname, 'public')
+    }
   }
 });
+
