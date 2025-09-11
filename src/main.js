@@ -17,7 +17,7 @@ import {
     getDashboardKPIs,
     getLeads,
     createAuditLog
-} from './lib/supabase.js';
+} from '/src/lib/supabase.js';
 
 // ===== VARIÁVEIS GLOBAIS PARA MÓDULOS =====
 let supabaseModule = null;
