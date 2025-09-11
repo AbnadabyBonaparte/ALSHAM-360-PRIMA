@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/dashboard.html"
+    },
+    {
+      "src": "/leads-real",
+      "dest": "/leads-real.html"
+    },
+    {
+      "src": "/leads",
+      "dest": "/leads.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/register",
+      "dest": "/register.html"
+    },
+    {
+      "src": "/relatorios",
+      "dest": "/relatorios.html"
+    },
+    {
+      "src": "/automacoes",
+      "dest": "/automacoes.html"
+    },
+    {
+      "src": "/gamificacao",
+      "dest": "/gamificacao.html"
+    },
+    {
+      "src": "/configuracoes",
+      "dest": "/configuracoes.html"
+    },
+    {
+      "src": "/create-org",
+      "dest": "/create-org.html"
+    },
+    {
+      "src": "/test-supabase",
+      "dest": "/test-supabase.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
+
