@@ -17,14 +17,7 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: process.env.PORT || 4173,
-    strictPort: false,
-    allowedHosts: [
-      'healthcheck.railway.app',
-      '.railway.app',
-      '.alshamglobal.com.br',
-      'localhost',
-      'app.alshamglobal.com.br'
-    ]
+    strictPort: false
   },
   
   build: {
@@ -33,20 +26,21 @@ export default defineConfig({
     minify: 'terser',
     target: 'es2015',
     chunkSizeWarningLimit: 1000,
+    assetsDir: 'assets',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        'create-org': resolve(__dirname, 'create-org.html'),
-        'test-supabase': resolve(__dirname, 'test-supabase.html'),
-        dashboard: resolve(__dirname, 'src/pages/dashboard.html'),
-        'leads-real': resolve(__dirname, 'src/pages/leads-real.html'),
-        leads: resolve(__dirname, 'src/pages/leads.html'),
-        login: resolve(__dirname, 'src/pages/login.html'),
-        register: resolve(__dirname, 'src/pages/register.html'),
-        relatorios: resolve(__dirname, 'src/pages/relatorios.html'),
-        automacoes: resolve(__dirname, 'src/pages/automacoes.html'),
-        gamificacao: resolve(__dirname, 'src/pages/gamificacao.html'),
-        configuracoes: resolve(__dirname, 'src/pages/configuracoes.html')
+        main: resolve(process.cwd(), 'index.html'),
+        'create-org': resolve(process.cwd(), 'create-org.html'),
+        'test-supabase': resolve(process.cwd(), 'test-supabase.html'),
+        dashboard: resolve(process.cwd(), 'src/pages/dashboard.html'),
+        'leads-real': resolve(process.cwd(), 'src/pages/leads-real.html'),
+        leads: resolve(process.cwd(), 'src/pages/leads.html'),
+        login: resolve(process.cwd(), 'src/pages/login.html'),
+        register: resolve(process.cwd(), 'src/pages/register.html'),
+        relatorios: resolve(process.cwd(), 'src/pages/relatorios.html'),
+        automacoes: resolve(process.cwd(), 'src/pages/automacoes.html'),
+        gamificacao: resolve(process.cwd(), 'src/pages/gamificacao.html'),
+        configuracoes: resolve(process.cwd(), 'src/pages/configuracoes.html')
       },
       output: {
         manualChunks: {
@@ -90,17 +84,6 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 // 24 hours
               }
             }
-          },
-          {
-            urlPattern: /^https:\/\/.*\.railway\.app\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'railway-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 12 // 12 hours
-              }
-            }
           }
         ]
       },
@@ -131,13 +114,13 @@ export default defineConfig({
   
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@components': resolve(__dirname, 'src/components'),
-      '@pages': resolve(__dirname, 'src/pages'),
-      '@js': resolve(__dirname, 'src/js'),
-      '@lib': resolve(__dirname, 'src/lib'),
-      '@styles': resolve(__dirname, 'src/styles'),
-      '@assets': resolve(__dirname, 'src/assets')
+      '@': resolve(process.cwd(), 'src'),
+      '@components': resolve(process.cwd(), 'src/components'),
+      '@pages': resolve(process.cwd(), 'src/pages'),
+      '@js': resolve(process.cwd(), 'src/js'),
+      '@lib': resolve(process.cwd(), 'src/lib'),
+      '@styles': resolve(process.cwd(), 'src/styles'),
+      '@assets': resolve(process.cwd(), 'src/assets')
     }
   },
   
@@ -148,11 +131,10 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
-    'process.env.RAILWAY_ENVIRONMENT': JSON.stringify(process.env.RAILWAY_ENVIRONMENT || 'production')
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
   },
   
-  // Otimizações específicas para Railway
+  // Otimizações para build
   optimizeDeps: {
     include: [
       '@supabase/supabase-js',
@@ -172,4 +154,3 @@ export default defineConfig({
     drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
   }
 });
-
