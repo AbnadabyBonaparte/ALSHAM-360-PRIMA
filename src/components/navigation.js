@@ -13,19 +13,17 @@
  * Configuração central do sistema de navegação
  * @namespace NavigationConfig
  */
-const NavigationConfig = {
-    // Rotas corrigidas para a estrutura real do projeto
-    routes: {
-        'dashboard': '/index.html',
-        'leads': '/src/pages/leads-real.html',
-        'leads-alt': '/src/pages/leads.html',
-        'automacoes': '/src/pages/automacoes.html',
-        'relatorios': '/src/pages/relatorios.html',
-        'configuracoes': '/src/pages/configuracoes.html',
-        'gamificacao': '/src/pages/gamificacao.html',
-        'login': '/src/pages/login.html',
-        'register': '/src/pages/register.html'
-    },
+const routes = {
+    'dashboard': '/src/pages/dashboard.html',
+    'leads': '/src/pages/leads.html',
+    'leads-real': '/src/pages/leads-real.html',
+    'login': '/src/pages/login.html',
+    'register': '/src/pages/register.html',
+    'relatorios': '/src/pages/relatorios.html',
+    'automacoes': '/src/pages/automacoes.html',
+    'gamificacao': '/src/pages/gamificacao.html',
+    'configuracoes': '/src/pages/configuracoes.html'
+};
     
     // Configuração de menu items com metadados
     menuItems: [
