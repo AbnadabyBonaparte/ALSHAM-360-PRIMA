@@ -1,61 +1,62 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
   "routes": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/dashboard",
+      "src": "/dashboard.html",
       "dest": "/dashboard.html"
     },
     {
-      "src": "/leads-real",
-      "dest": "/leads-real.html"
-    },
-    {
-      "src": "/leads",
+      "src": "/leads.html", 
       "dest": "/leads.html"
     },
     {
-      "src": "/login",
+      "src": "/leads-real.html",
+      "dest": "/leads-real.html"
+    },
+    {
+      "src": "/login.html",
       "dest": "/login.html"
     },
     {
-      "src": "/register",
+      "src": "/register.html",
       "dest": "/register.html"
     },
     {
-      "src": "/relatorios",
+      "src": "/relatorios.html",
       "dest": "/relatorios.html"
     },
     {
-      "src": "/automacoes",
+      "src": "/automacoes.html",
       "dest": "/automacoes.html"
     },
     {
-      "src": "/gamificacao",
+      "src": "/gamificacao.html",
       "dest": "/gamificacao.html"
     },
     {
-      "src": "/configuracoes",
+      "src": "/configuracoes.html",
       "dest": "/configuracoes.html"
     },
     {
-      "src": "/create-org",
+      "src": "/create-org.html",
       "dest": "/create-org.html"
     },
     {
-      "src": "/test-supabase",
+      "src": "/test-supabase.html",
       "dest": "/test-supabase.html"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|mp4|webm|ogg|mp3|wav|flac|aac))",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
@@ -63,4 +64,3 @@
     }
   ]
 }
-
