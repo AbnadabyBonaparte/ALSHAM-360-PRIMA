@@ -1871,44 +1871,89 @@ export async function resetPassword(email) {
     return handleSupabaseResponse(null, error, 'reset de senha', { email })
   }
 }
-
-// JUSTIFICATIVA: Adição do bloco de código para login social (OAuth).
-// Estas funções estavam sendo importadas em `login.js` mas não existiam,
-// causando o erro de build. A adição delas resolve o problema.
-// =========================================================================
 // 13.5 SOCIAL LOGINS - Login com provedores OAuth (Google, etc.)
+async function signInWithProvider(provider) {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    return handleSupabaseResponse(data, error, `login com ${provider}`);
+  } catch (error) {
+    return handleSupabaseResponse(null, error, `login com ${provider}`);
+  }
+}
+export async function signInWithGoogle() {
+  return signInWithProvider('google');
+}
+export async function signInWithMicrosoft() {
+  return signInWithProvider('azure');
+}
+export async function signInWithApple() {
+  return signInWithProvider('apple');
+}
+
+// JUSTIFICATIVA: Adição do bloco de código para validações de usuário.
+// As funções `checkEmailExists` e `validateDomain` estavam sendo importadas em `register.js`
+// mas não existiam, causando o erro de build. A adição delas resolve o problema.
+// =========================================================================
+// 13.6 USER VALIDATION - Funções de validação para novos usuários
 // =========================================================================
 
 /**
- * Inicia o fluxo de login com um provedor OAuth (ex: Google).
- * @param {'google'|'azure'|'apple'} provider - O nome do provedor OAuth.
- * @returns {Promise<Object>} Resultado da operação de login.
+ * Verifica se um e-mail já existe na base de dados de perfis de usuário.
+ * @param {string} email - O e-mail a ser verificado.
+ * @returns {Promise<boolean>} Retorna `true` se o e-mail existir, `false` caso contrário.
  */
-async function signInWithProvider(provider) {
-    try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: provider,
-            options: {
-                redirectTo: window.location.origin // Redireciona de volta para a página principal após o login
-            }
-        });
-        return handleSupabaseResponse(data, error, `login com ${provider}`);
-    } catch (error) {
-        return handleSupabaseResponse(null, error, `login com ${provider}`);
+export async function checkEmailExists(email) {
+  const validation = validateRequired({ email });
+  if (validation) {
+    console.error('Email é obrigatório para a verificação.');
+    return true; // Assume que existe para previnir registro em caso de erro.
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('email')
+      .eq('email', email)
+      .single();
+
+    // Se houver um erro (que não seja "nenhuma linha encontrada"), trate como um problema.
+    if (error && error.code !== 'PGRST116') {
+      console.error('Erro ao verificar e-mail:', error);
+      return true; // Prevenção: bloqueia o registro se a verificação falhar.
     }
+    
+    // `data` será não-nulo se um registro for encontrado.
+    return !!data;
+  } catch (error) {
+    console.error('Erro inesperado ao verificar e-mail:', error);
+    return true; // Prevenção em caso de erro inesperado.
+  }
 }
 
-export async function signInWithGoogle() {
-    return signInWithProvider('google');
-}
-
-export async function signInWithMicrosoft() {
-    // Para Microsoft, o provedor no Supabase é 'azure'
-    return signInWithProvider('azure');
-}
-
-export async function signInWithApple() {
-    return signInWithProvider('apple');
+/**
+ * Valida se um domínio de e-mail é permitido para registro (placeholder).
+ * NOTA: Esta é uma implementação de exemplo. A lógica real deve ser adaptada
+ * para consultar uma tabela de domínios permitidos ou outra regra de negócio.
+ * @param {string} domain - O domínio a ser validado (ex: "gmail.com").
+ * @returns {Promise<boolean>} Retorna `true` se o domínio for válido.
+ */
+export async function validateDomain(domain) {
+  const validation = validateRequired({ domain });
+  if (validation) {
+      console.error('Domínio é obrigatório para a validação.');
+      return false;
+  }
+  // Lógica de exemplo: permitir apenas domínios específicos.
+  // Em um cenário real, isso poderia vir de uma tabela `allowed_domains`.
+  const allowedDomains = ['gmail.com', 'outlook.com', 'alsham.com'];
+  
+  // A função é async para simular uma chamada de DB, mantendo a consistência.
+  return Promise.resolve(allowedDomains.includes(domain.toLowerCase()));
 }
 
 
