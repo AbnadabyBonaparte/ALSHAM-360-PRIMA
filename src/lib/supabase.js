@@ -451,6 +451,36 @@ export async function getOrganization(orgId) {
     return handleSupabaseResponse(null, error, 'busca de organização', { orgId })
   }
 }
+
+// JUSTIFICATIVA: Adição da função `getOrganizations` e `updateOrganization`.
+// Estas funções estavam sendo importadas em `configuracoes.js` mas não existiam.
+// A sua adição é a correção direta para o problema.
+export async function getOrganizations(filters = {}) {
+    try {
+        let query = supabase.from('organizations').select('*');
+        if (filters.limit) query = query.limit(filters.limit);
+        const { data, error } = await query;
+        return handleSupabaseResponse(data, error, 'busca de organizações');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'busca de organizações');
+    }
+}
+export async function updateOrganization(orgId, orgUpdates) {
+    const validation = validateRequired({ orgId, orgUpdates });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        const { data, error } = await supabase
+            .from('organizations')
+            .update(orgUpdates)
+            .eq('id', orgId)
+            .select()
+            .single();
+        return handleSupabaseResponse(data, error, 'atualização de organização', { orgId, orgUpdates });
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'atualização de organização', { orgId, orgUpdates });
+    }
+}
+
 // 1.5 USER PROFILES - Perfis de usuários REAIS
 export async function getUserProfiles(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
@@ -894,10 +924,6 @@ export async function createAutomationRule(rule, orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'criação de regra de automação', { ruleData: rule })
   }
 }
-
-// JUSTIFICATIVA: Adição das funções `updateAutomationRule` e `deleteAutomationRule`.
-// Estas funções estavam sendo importadas em `automacoes.js` mas não existiam.
-// A adição delas completa o conjunto de operações CRUD para regras de automação e resolve o erro de build.
 export async function updateAutomationRule(ruleId, ruleUpdates, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ ruleId, ruleUpdates, orgId });
   if (validation) return { data: null, error: validation, success: false };
@@ -930,7 +956,6 @@ export async function deleteAutomationRule(ruleId, orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'exclusão de regra de automação', { ruleId });
   }
 }
-
 // 3.2 AUTOMATION EXECUTIONS - Execuções de automação REAIS
 export async function getAutomationExecutions(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
@@ -1588,6 +1613,77 @@ export async function createTeam(team, orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'criação de equipe', { teamData: team })
   }
 }
+
+// JUSTIFICATIVA: Adição do bloco de código para gerenciamento de membros da equipe.
+// As funções `getTeamMembers`, `inviteTeamMember`, e `removeTeamMember` estavam sendo
+// importadas em `configuracoes.js` mas não existiam. A adição delas resolve o erro de build.
+export async function getTeamMembers(teamId, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ teamId, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+
+    try {
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('team_id', teamId)
+            .eq('org_id', orgId);
+        return handleSupabaseResponse(data, error, 'busca de membros da equipe', { teamId });
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'busca de membros da equipe', { teamId });
+    }
+}
+export async function inviteTeamMember(email, teamId, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ email, teamId, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+
+    try {
+        // Esta é uma operação complexa. O ideal é usar uma Edge Function para segurança.
+        // Por agora, vamos chamar um RPC 'invite_team_member' que você precisaria criar no seu DB.
+        const { data, error } = await supabase.rpc('invite_team_member', {
+            invitee_email: email,
+            p_team_id: teamId,
+            p_org_id: orgId
+        });
+        return handleSupabaseResponse(data, error, 'convite de membro da equipe');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'convite de membro da equipe');
+    }
+}
+export async function removeTeamMember(userId, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ userId, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+
+    try {
+        // Remover um membro significa desassociá-lo de uma equipe, setando team_id para null.
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .update({ team_id: null })
+            .eq('user_id', userId)
+            .eq('org_id', orgId)
+            .select();
+        return handleSupabaseResponse(data, error, 'remoção de membro da equipe', { userId });
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'remoção de membro da equipe', { userId });
+    }
+}
+export async function updateTeamMemberRole(userId, role, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ userId, role, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+
+    try {
+        const { data, error } = await supabase
+            .from('user_profiles') // Assumindo que a role está em user_profiles
+            .update({ role: role })
+            .eq('user_id', userId)
+            .eq('org_id', orgId)
+            .select();
+        return handleSupabaseResponse(data, error, 'atualização de cargo do membro', { userId, role });
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'atualização de cargo do membro', { userId, role });
+    }
+}
+
+
 // =========================================================================
 // 10. AUDITORIA E LOGS (3 TABELAS) - REAL AUDIT DATA
 // =========================================================================
@@ -1753,6 +1849,43 @@ export async function createWebhookConfig(webhook, orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'criação de configuração de webhook', { webhookData: webhook })
   }
 }
+
+// JUSTIFICATIVA: Adição de um novo bloco para Funções de Configuração que estavam faltando.
+// As funções abaixo foram inferidas a partir do arquivo `configuracoes.js` e adicionadas
+// para resolver os erros de build `is not exported by`.
+// =========================================================================
+// 11.4 NOTIFICATION SETTINGS - Configurações de Notificação
+// =========================================================================
+export async function getNotificationSettings(userId, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ userId, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        const { data, error } = await supabase
+            .from('notification_settings')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('org_id', orgId)
+            .single();
+        return handleSupabaseResponse(data, error, 'busca de configurações de notificação');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'busca de configurações de notificação');
+    }
+}
+export async function updateNotificationSettings(userId, settings, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ userId, settings, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        const { data, error } = await supabase
+            .from('notification_settings')
+            .upsert({ user_id: userId, org_id: orgId, ...settings })
+            .select()
+            .single();
+        return handleSupabaseResponse(data, error, 'atualização de configurações de notificação');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'atualização de configurações de notificação');
+    }
+}
+
 // =========================================================================
 // 12. COACHING E ONBOARDING (4 TABELAS) - REAL COACHING DATA
 // =========================================================================
@@ -2316,6 +2449,82 @@ export async function getWhatsappIntegration(orgId = getCurrentOrgId()) {
         return handleSupabaseResponse(null, error, 'busca de integração WhatsApp');
     }
 }
+
+// JUSTIFICATIVA: Adição de um novo bloco para Funções de Configuração/Integração que estavam faltando.
+// As funções abaixo foram inferidas a partir do arquivo `configuracoes.js` e adicionadas
+// para resolver os erros de build `is not exported by`.
+// =========================================================================
+// 21. ADDITIONAL CONFIGURATION FUNCTIONS
+// =========================================================================
+export async function getIntegrationConfigs(orgId = getCurrentOrgId(), filters = {}) {
+    const validation = validateRequired({ orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        let query = supabase.from('integration_configs').select('*').eq('org_id', orgId);
+        if (filters.type) query = query.eq('type', filters.type);
+        const { data, error } = await query;
+        return handleSupabaseResponse(data, error, 'busca de configurações de integração');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'busca de configurações de integração');
+    }
+}
+export async function createIntegrationConfig(configData, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ configData, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        const payload = { ...configData, org_id: orgId };
+        const { data, error } = await supabase.from('integration_configs').insert([payload]).select().single();
+        return handleSupabaseResponse(data, error, 'criação de configuração de integração');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'criação de configuração de integração');
+    }
+}
+export async function updateIntegrationConfig(configId, configUpdates, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ configId, configUpdates, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        const { data, error } = await supabase.from('integration_configs').update(configUpdates).eq('id', configId).eq('org_id', orgId).select().single();
+        return handleSupabaseResponse(data, error, 'atualização de configuração de integração');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'atualização de configuração de integração');
+    }
+}
+export async function deleteIntegrationConfig(configId, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ configId, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        const { data, error } = await supabase.from('integration_configs').delete().eq('id', configId).eq('org_id', orgId);
+        return handleSupabaseResponse(data, error, 'exclusão de configuração de integração');
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'exclusão de configuração de integração');
+    }
+}
+export async function getSecurityAudits(orgId = getCurrentOrgId(), filters = {}) {
+    const validation = validateRequired({ orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        // Esta função é um alias para getAuditLogs, pois provavelmente se refere à mesma tabela.
+        return getAuditLogs(orgId, { ...filters, table_name: 'security_events' });
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'busca de auditorias de segurança');
+    }
+}
+export async function updateSecuritySettings(settings, orgId = getCurrentOrgId()) {
+    const validation = validateRequired({ settings, orgId });
+    if (validation) return { data: null, error: validation, success: false };
+    try {
+        // Esta função é um alias para updateOrgSettings, focando em um subconjunto de configurações.
+        const securitySettings = {
+            two_factor_enabled: settings.two_factor_enabled,
+            login_alerts_enabled: settings.login_alerts_enabled
+        };
+        return updateOrgSettings(securitySettings, orgId);
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'atualização de configurações de segurança');
+    }
+}
+
+
 // =========================================================================
 // 18. ENTERPRISE CONFIGURATION EXPORT - PRODUCTION READY
 // =========================================================================
