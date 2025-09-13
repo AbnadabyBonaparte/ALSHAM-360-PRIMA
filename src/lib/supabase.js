@@ -469,10 +469,6 @@ export async function getUserProfiles(orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'busca de perfis', { orgId })
   }
 }
-
-// JUSTIFICATIVA: Adição da função `createUserProfile`.
-// Esta função estava sendo importada em `register.js` mas não existia, causando o erro de build.
-// A sua adição é a correção direta para o problema.
 export async function createUserProfile(profileData) {
   const validation = validateRequired({ profileData, user_id: profileData.user_id, org_id: profileData.org_id });
   if (validation) return { data: null, error: validation, success: false };
@@ -488,7 +484,6 @@ export async function createUserProfile(profileData) {
     return handleSupabaseResponse(null, error, 'criação de perfil de usuário', { profileData });
   }
 }
-
 export async function getUserProfile(userId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId })
   if (validation) return { data: null, error: validation, success: false }
@@ -943,6 +938,19 @@ export async function createAutomationExecution(execution, orgId = getCurrentOrg
     return handleSupabaseResponse(null, error, 'criação de execução de automação', { executionData: execution })
   }
 }
+
+// JUSTIFICATIVA: Adição da função `getWorkflowLogs`.
+// Esta função estava sendo importada em `automacoes.js` mas não existia, causando o erro de build.
+// A sua adição é a correção direta para o problema, assumindo que os logs vêm da tabela `automation_executions`.
+export async function getWorkflowLogs(orgId = getCurrentOrgId(), filters = {}) {
+  const validation = validateRequired({ orgId });
+  if (validation) return { data: null, error: validation, success: false };
+  
+  // Reutilizando a função `getAutomationExecutions` pois "Workflow Logs" e "Automation Executions"
+  // provavelmente se referem aos mesmos dados neste contexto.
+  return getAutomationExecutions(orgId, filters);
+}
+
 // =========================================================================
 // 4. GAMIFICAÇÃO (4 TABELAS) - REAL GAMIFICATION DATA
 // =========================================================================
