@@ -2163,17 +2163,9 @@ export const BADGE_TYPES = {
   SKILL: 'skill',
   SPECIAL: 'special'
 }
-
-// JUSTIFICATIVA: Adição do bloco de código para funções de comunicação e campanhas.
-// As funções `getEmailCampaigns`, `getSMSCampaigns` e `getNotificationLogs`
-// estavam sendo importadas em `automacoes.js` mas não existiam, causando o erro de build.
-// A adição delas resolve o problema de forma proativa.
-// NOTA: Os nomes das tabelas (`email_campaigns`, etc.) são suposições lógicas
-// e podem precisar de ajuste se os nomes no banco de dados forem diferentes.
 // =========================================================================
 // 19. COMMUNICATION & CAMPAIGNS
 // =========================================================================
-
 export async function getEmailCampaigns(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId });
   if (validation) return { data: null, error: validation, success: false };
@@ -2192,7 +2184,6 @@ export async function getEmailCampaigns(orgId = getCurrentOrgId(), filters = {})
     return handleSupabaseResponse(null, error, 'busca de campanhas de email', { filters });
   }
 }
-
 export async function getSMSCampaigns(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId });
   if (validation) return { data: null, error: validation, success: false };
@@ -2211,7 +2202,6 @@ export async function getSMSCampaigns(orgId = getCurrentOrgId(), filters = {}) {
     return handleSupabaseResponse(null, error, 'busca de campanhas de SMS', { filters });
   }
 }
-
 export async function getNotificationLogs(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId });
   if (validation) return { data: null, error: validation, success: false };
@@ -2230,6 +2220,33 @@ export async function getNotificationLogs(orgId = getCurrentOrgId(), filters = {
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de logs de notificação', { filters });
   }
+}
+
+// JUSTIFICATIVA: Adição das funções `getCommunicationTemplates` e `getMessageQueue`.
+// Estas funções estavam sendo importadas em `automacoes.js` mas não existiam.
+// A adição delas resolve o erro de build de forma proativa.
+// NOTA: `getCommunicationTemplates` reutiliza a função `getEmailTemplates` existente.
+export async function getCommunicationTemplates(orgId = getCurrentOrgId(), filters = {}) {
+    return getEmailTemplates(orgId, filters);
+}
+export async function getMessageQueue(orgId = getCurrentOrgId(), filters = {}) {
+    const validation = validateRequired({ orgId });
+    if (validation) return { data: null, error: validation, success: false };
+
+    try {
+        let query = supabase
+            .from('message_queue')
+            .select('*')
+            .eq('org_id', orgId)
+            .order('created_at', { ascending: false });
+
+        if (filters.status) query = query.eq('status', filters.status);
+        if (filters.limit) query = query.limit(filters.limit);
+        const { data, error } = await query;
+        return handleSupabaseResponse(data, error, 'busca da fila de mensagens', { filters });
+    } catch (error) {
+        return handleSupabaseResponse(null, error, 'busca da fila de mensagens', { filters });
+    }
 }
 
 
