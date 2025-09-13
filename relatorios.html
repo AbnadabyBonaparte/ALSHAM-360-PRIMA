@@ -10,33 +10,33 @@
     <meta name="author" content="ALSHAM Development Team">
     <meta name="theme-color" content="#3B82F6">
     
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
     <meta property="og:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
     <meta property="og:image" content="/og-image.png">
     
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
     <meta property="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
     <meta property="twitter:image" content="/og-image.png">
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     
     <title>Relatórios Enterprise - ALSHAM 360° PRIMA</title>
     
-    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
     
-    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Stylesheets - Local build only, no CDN -->
     <link rel="stylesheet" href="/src/style.css">
 
     <style>
@@ -510,12 +510,10 @@
 </head>
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
     
-    <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
         Pular para o conteúdo principal
     </a>
     
-    <!-- Loading Indicator -->
     <div id="reports-loader" class="fixed top-0 left-0 right-0 z-50 hidden" role="status" aria-live="polite">
         <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium">
             <div class="flex items-center justify-center space-x-2">
@@ -525,12 +523,11 @@
         </div>
     </div>
     
-    <!-- Header Premium -->
     <header class="header-premium" role="banner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
-                    <a href="/" class="flex items-center space-x-3 group focus-visible" aria-label="Voltar ao Dashboard">
+                    <a href="/index.html" class="flex items-center space-x-3 group focus-visible" aria-label="Voltar ao Dashboard">
                         <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform" aria-hidden="true">
                             <span class="text-white font-bold text-lg">A</span>
                         </div>
@@ -545,7 +542,7 @@
                     <a href="/dashboard.html" class="nav-link focus-visible">Dashboard</a>
                     <a href="/leads.html" class="nav-link focus-visible">Leads</a>
                     <a href="/relatorios.html" class="nav-link active focus-visible" aria-current="page">Relatórios</a>
-                    <a href="/pipeline.html" class="nav-link focus-visible">Pipeline</a>
+                    <a href="/automacoes.html" class="nav-link focus-visible">Automações</a>
                 </nav>
                 
                 <div class="flex items-center space-x-4">
@@ -576,10 +573,9 @@
         </div>
     </header>
 
-    <!-- Breadcrumb -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <nav class="flex items-center space-x-2 text-sm" role="navigation" aria-label="Breadcrumb">
-            <a href="/" class="breadcrumb-link focus-visible">Home</a>
+            <a href="/index.html" class="breadcrumb-link focus-visible">Home</a>
             <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
             </svg>
@@ -587,10 +583,8 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
     <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
         
-        <!-- Header da Página -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-3xl font-bold text-gray-900 flex items-center space-x-3">
@@ -616,12 +610,10 @@
             </div>
         </div>
 
-        <!-- KPIs Grid -->
         <section class="mb-8" aria-labelledby="kpis-heading">
             <h2 id="kpis-heading" class="sr-only">Indicadores-chave de performance</h2>
             <div class="kpis-grid">
                 
-                <!-- KPI 1: Receita Total -->
                 <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Receita total: R$ 847.250">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
@@ -643,7 +635,6 @@
                     </div>
                 </div>
 
-                <!-- KPI 2: Leads Convertidos -->
                 <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Leads convertidos: 342 leads" style="animation-delay: 0.1s;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -665,7 +656,6 @@
                     </div>
                 </div>
 
-                <!-- KPI 3: Taxa de Conversão -->
                 <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Taxa de conversão: 24.8%" style="animation-delay: 0.2s;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -687,7 +677,6 @@
                     </div>
                 </div>
 
-                <!-- KPI 4: Ticket Médio -->
                 <div class="kpi-card fade-in focus-visible" tabindex="0" role="button" aria-label="Ticket médio: R$ 2.475" style="animation-delay: 0.3s;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -711,11 +700,9 @@
             </div>
         </section>
 
-        <!-- Charts Section -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" aria-labelledby="charts-heading">
             <h2 id="charts-heading" class="sr-only">Gráficos e análises</h2>
             
-            <!-- Revenue Chart -->
             <div class="chart-container fade-in" style="animation-delay: 0.4s;">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">Receita por Período</h3>
@@ -730,7 +717,6 @@
                 </div>
             </div>
 
-            <!-- Conversion Funnel -->
             <div class="chart-container fade-in" style="animation-delay: 0.5s;">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">Funil de Conversão</h3>
@@ -742,11 +728,9 @@
             </div>
         </section>
 
-        <!-- Insights & Activity -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-8" aria-labelledby="insights-heading">
             <h2 id="insights-heading" class="sr-only">Insights e atividades</h2>
             
-            <!-- AI Insights -->
             <div class="lg:col-span-2">
                 <div class="card-premium p-6 fade-in" style="animation-delay: 0.6s;">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -800,7 +784,6 @@
                 </div>
             </div>
 
-            <!-- Recent Activity -->
             <div class="card-premium p-6 fade-in" style="animation-delay: 0.7s;">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <span class="mr-2" role="img" aria-label="Atividade">⚡</span>
@@ -845,15 +828,11 @@
         </section>
     </main>
 
-    <!-- Export Options Modal -->
     <div id="export-options" class="hidden" role="dialog" aria-labelledby="export-modal-title" aria-modal="true">
-        <!-- Modal será injetado aqui pelo JavaScript -->
-    </div>
+        </div>
 
-    <!-- Container para notificações -->
     <div id="reports-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" role="region" aria-label="Notificações" aria-live="polite"></div>
 
-    <!-- Fallback para usuários sem JavaScript -->
     <noscript>
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
@@ -869,7 +848,11 @@
         </div>
     </noscript>
 
-    <!-- Scripts -->
+    <script type="module" src="/src/components/navigation.js"></script>
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/js/auth.js"></script>
+    <script type="module" src="/src/js/relatorios.js"></script>
+
     <script type="module">
         // Configuração inicial antes do carregamento do relatórios.js
         console.log('📊 Inicializando sistema de relatórios enterprise...');
@@ -897,9 +880,5 @@
             });
         });
     </script>
-    
-    <script type="module" src="./src/js/relatorios.js"></script>
-    <script type="module" src="./src/main.js"></script>
 </body>
 </html>
-
