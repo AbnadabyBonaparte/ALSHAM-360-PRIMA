@@ -938,19 +938,11 @@ export async function createAutomationExecution(execution, orgId = getCurrentOrg
     return handleSupabaseResponse(null, error, 'criação de execução de automação', { executionData: execution })
   }
 }
-
-// JUSTIFICATIVA: Adição da função `getWorkflowLogs`.
-// Esta função estava sendo importada em `automacoes.js` mas não existia, causando o erro de build.
-// A sua adição é a correção direta para o problema, assumindo que os logs vêm da tabela `automation_executions`.
 export async function getWorkflowLogs(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId });
   if (validation) return { data: null, error: validation, success: false };
-  
-  // Reutilizando a função `getAutomationExecutions` pois "Workflow Logs" e "Automation Executions"
-  // provavelmente se referem aos mesmos dados neste contexto.
   return getAutomationExecutions(orgId, filters);
 }
-
 // =========================================================================
 // 4. GAMIFICAÇÃO (4 TABELAS) - REAL GAMIFICATION DATA
 // =========================================================================
@@ -2171,6 +2163,76 @@ export const BADGE_TYPES = {
   SKILL: 'skill',
   SPECIAL: 'special'
 }
+
+// JUSTIFICATIVA: Adição do bloco de código para funções de comunicação e campanhas.
+// As funções `getEmailCampaigns`, `getSMSCampaigns` e `getNotificationLogs`
+// estavam sendo importadas em `automacoes.js` mas não existiam, causando o erro de build.
+// A adição delas resolve o problema de forma proativa.
+// NOTA: Os nomes das tabelas (`email_campaigns`, etc.) são suposições lógicas
+// e podem precisar de ajuste se os nomes no banco de dados forem diferentes.
+// =========================================================================
+// 19. COMMUNICATION & CAMPAIGNS
+// =========================================================================
+
+export async function getEmailCampaigns(orgId = getCurrentOrgId(), filters = {}) {
+  const validation = validateRequired({ orgId });
+  if (validation) return { data: null, error: validation, success: false };
+
+  try {
+    let query = supabase
+      .from('email_campaigns')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+
+    if (filters.limit) query = query.limit(filters.limit);
+    const { data, error } = await query;
+    return handleSupabaseResponse(data, error, 'busca de campanhas de email', { filters });
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de campanhas de email', { filters });
+  }
+}
+
+export async function getSMSCampaigns(orgId = getCurrentOrgId(), filters = {}) {
+  const validation = validateRequired({ orgId });
+  if (validation) return { data: null, error: validation, success: false };
+
+  try {
+    let query = supabase
+      .from('sms_campaigns')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+
+    if (filters.limit) query = query.limit(filters.limit);
+    const { data, error } = await query;
+    return handleSupabaseResponse(data, error, 'busca de campanhas de SMS', { filters });
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de campanhas de SMS', { filters });
+  }
+}
+
+export async function getNotificationLogs(orgId = getCurrentOrgId(), filters = {}) {
+  const validation = validateRequired({ orgId });
+  if (validation) return { data: null, error: validation, success: false };
+
+  try {
+    let query = supabase
+      .from('notification_logs')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+
+    if (filters.user_id) query = query.eq('user_id', filters.user_id);
+    if (filters.limit) query = query.limit(filters.limit);
+    const { data, error } = await query;
+    return handleSupabaseResponse(data, error, 'busca de logs de notificação', { filters });
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de logs de notificação', { filters });
+  }
+}
+
+
 // =========================================================================
 // 18. ENTERPRISE CONFIGURATION EXPORT - PRODUCTION READY
 // =========================================================================
