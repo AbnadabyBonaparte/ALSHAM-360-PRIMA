@@ -79,7 +79,7 @@ const handleSupabaseResponse = (data, error, operation = 'operação', context =
       success: false
     }
   }
- 
+
   // Log successful operations in development
   if (import.meta.env.DEV && data) {
     console.log(`✅ ${operation} successful:`, {
@@ -87,7 +87,7 @@ const handleSupabaseResponse = (data, error, operation = 'operação', context =
       operation
     })
   }
- 
+
   return { data, error: null, success: true }
 }
 // =========================================================================
@@ -102,14 +102,14 @@ export function getCurrentOrgId() {
       console.warn('⚠️ Nenhum org_id encontrado - usuário precisa selecionar organização')
       return null
     }
-   
+
     // Validate UUID format for security
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orgId)) {
       console.error('🚨 Invalid org_id format:', orgId)
       localStorage.removeItem('alsham_org_id')
       return null
     }
-   
+
     return orgId
   } catch (error) {
     console.error('🚨 Erro ao acessar localStorage:', error)
@@ -559,7 +559,7 @@ export function onAuthStateChange(callback) {
             email: session?.user?.email
           })
         }
-       
+
         callback(event, session)
       } catch (error) {
         console.error('🚨 Erro no callback de auth state change:', error)
@@ -567,11 +567,11 @@ export function onAuthStateChange(callback) {
     }
     // Configurar listener do Supabase
     const { data: { subscription } } = supabase.auth.onAuthStateChange(wrappedCallback)
-   
+
     if (import.meta.env.DEV) {
       console.log('✅ Auth state listener configurado')
     }
-   
+
     return subscription
   } catch (error) {
     console.error('🚨 Erro ao configurar auth state listener:', error)
@@ -585,7 +585,7 @@ export function onAuthStateChange(callback) {
 export async function getCurrentSession() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession()
-   
+
     if (error) {
       console.error('🚨 Erro ao obter sessão:', error)
       return {
@@ -596,7 +596,7 @@ export async function getCurrentSession() {
         success: false
       }
     }
-   
+
     if (!session) {
       console.warn('⚠️ Nenhuma sessão ativa encontrada')
       return {
@@ -605,7 +605,7 @@ export async function getCurrentSession() {
         success: false
       }
     }
-   
+
     // Log successful session retrieval in development
     if (import.meta.env.DEV) {
       console.log('✅ Sessão obtida com sucesso:', {
@@ -614,7 +614,7 @@ export async function getCurrentSession() {
         expiresAt: session.expires_at
       })
     }
-   
+
     return {
       data: session,
       error: null,
@@ -655,7 +655,7 @@ export async function createAuditLog(auditData, orgId = getCurrentOrgId()) {
   try {
     // Obter usuário atual para o log
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-   
+
     if (userError || !user) {
       console.warn('⚠️ Usuário não autenticado para audit log')
     }
@@ -1871,6 +1871,47 @@ export async function resetPassword(email) {
     return handleSupabaseResponse(null, error, 'reset de senha', { email })
   }
 }
+
+// JUSTIFICATIVA: Adição do bloco de código para login social (OAuth).
+// Estas funções estavam sendo importadas em `login.js` mas não existiam,
+// causando o erro de build. A adição delas resolve o problema.
+// =========================================================================
+// 13.5 SOCIAL LOGINS - Login com provedores OAuth (Google, etc.)
+// =========================================================================
+
+/**
+ * Inicia o fluxo de login com um provedor OAuth (ex: Google).
+ * @param {'google'|'azure'|'apple'} provider - O nome do provedor OAuth.
+ * @returns {Promise<Object>} Resultado da operação de login.
+ */
+async function signInWithProvider(provider) {
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: provider,
+            options: {
+                redirectTo: window.location.origin // Redireciona de volta para a página principal após o login
+            }
+        });
+        return handleSupabaseResponse(data, error, `login com ${provider}`);
+    } catch (error) {
+        return handleSupabaseResponse(null, error, `login com ${provider}`);
+    }
+}
+
+export async function signInWithGoogle() {
+    return signInWithProvider('google');
+}
+
+export async function signInWithMicrosoft() {
+    // Para Microsoft, o provedor no Supabase é 'azure'
+    return signInWithProvider('azure');
+}
+
+export async function signInWithApple() {
+    return signInWithProvider('apple');
+}
+
+
 // =========================================================================
 // 14. OPERAÇÕES EM LOTE - REAL BATCH OPERATIONS
 // =========================================================================
