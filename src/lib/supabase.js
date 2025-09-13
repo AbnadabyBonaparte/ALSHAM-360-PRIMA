@@ -894,6 +894,43 @@ export async function createAutomationRule(rule, orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'criação de regra de automação', { ruleData: rule })
   }
 }
+
+// JUSTIFICATIVA: Adição das funções `updateAutomationRule` e `deleteAutomationRule`.
+// Estas funções estavam sendo importadas em `automacoes.js` mas não existiam.
+// A adição delas completa o conjunto de operações CRUD para regras de automação e resolve o erro de build.
+export async function updateAutomationRule(ruleId, ruleUpdates, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ ruleId, ruleUpdates, orgId });
+  if (validation) return { data: null, error: validation, success: false };
+
+  try {
+    const { data, error } = await supabase
+      .from('automation_rules')
+      .update(ruleUpdates)
+      .eq('id', ruleId)
+      .eq('org_id', orgId)
+      .select()
+      .single();
+    return handleSupabaseResponse(data, error, 'atualização de regra de automação', { ruleId, ruleUpdates });
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'atualização de regra de automação', { ruleId, ruleUpdates });
+  }
+}
+export async function deleteAutomationRule(ruleId, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ ruleId, orgId });
+  if (validation) return { data: null, error: validation, success: false };
+
+  try {
+    const { data, error } = await supabase
+      .from('automation_rules')
+      .delete()
+      .eq('id', ruleId)
+      .eq('org_id', orgId);
+    return handleSupabaseResponse(data, error, 'exclusão de regra de automação', { ruleId });
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'exclusão de regra de automação', { ruleId });
+  }
+}
+
 // 3.2 AUTOMATION EXECUTIONS - Execuções de automação REAIS
 export async function getAutomationExecutions(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
@@ -2243,16 +2280,9 @@ export async function getMessageQueue(orgId = getCurrentOrgId(), filters = {}) {
         return handleSupabaseResponse(null, error, 'busca da fila de mensagens', { filters });
     }
 }
-
-// JUSTIFICATIVA: Adição das funções de integração `getN8NWorkflows` e `getWhatsappIntegration`.
-// Estas funções estavam sendo importadas em `automacoes.js` mas não existiam.
-// A adição delas resolve o erro de build de forma proativa.
-// NOTA: Os nomes das tabelas (`n8n_workflows`, etc.) são suposições lógicas
-// e podem precisar de ajuste se os nomes no banco de dados forem diferentes.
 // =========================================================================
 // 20. INTEGRATIONS
 // =========================================================================
-
 export async function getN8NWorkflows(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId });
   if (validation) return { data: null, error: validation, success: false };
@@ -2271,7 +2301,6 @@ export async function getN8NWorkflows(orgId = getCurrentOrgId(), filters = {}) {
       return handleSupabaseResponse(null, error, 'busca de workflows n8n', { filters });
   }
 }
-
 export async function getWhatsappIntegration(orgId = getCurrentOrgId()) {
     const validation = validateRequired({ orgId });
     if (validation) return { data: null, error: validation, success: false };
@@ -2287,8 +2316,6 @@ export async function getWhatsappIntegration(orgId = getCurrentOrgId()) {
         return handleSupabaseResponse(null, error, 'busca de integração WhatsApp');
     }
 }
-
-
 // =========================================================================
 // 18. ENTERPRISE CONFIGURATION EXPORT - PRODUCTION READY
 // =========================================================================
