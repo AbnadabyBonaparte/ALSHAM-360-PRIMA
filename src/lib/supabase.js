@@ -469,6 +469,26 @@ export async function getUserProfiles(orgId = getCurrentOrgId()) {
     return handleSupabaseResponse(null, error, 'busca de perfis', { orgId })
   }
 }
+
+// JUSTIFICATIVA: Adição da função `createUserProfile`.
+// Esta função estava sendo importada em `register.js` mas não existia, causando o erro de build.
+// A sua adição é a correção direta para o problema.
+export async function createUserProfile(profileData) {
+  const validation = validateRequired({ profileData, user_id: profileData.user_id, org_id: profileData.org_id });
+  if (validation) return { data: null, error: validation, success: false };
+
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .insert([profileData])
+      .select()
+      .single();
+    return handleSupabaseResponse(data, error, 'criação de perfil de usuário', { profileData });
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'criação de perfil de usuário', { profileData });
+  }
+}
+
 export async function getUserProfile(userId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId })
   if (validation) return { data: null, error: validation, success: false }
@@ -1894,69 +1914,38 @@ export async function signInWithMicrosoft() {
 export async function signInWithApple() {
   return signInWithProvider('apple');
 }
-
-// JUSTIFICATIVA: Adição do bloco de código para validações de usuário.
-// As funções `checkEmailExists` e `validateDomain` estavam sendo importadas em `register.js`
-// mas não existiam, causando o erro de build. A adição delas resolve o problema.
-// =========================================================================
 // 13.6 USER VALIDATION - Funções de validação para novos usuários
-// =========================================================================
-
-/**
- * Verifica se um e-mail já existe na base de dados de perfis de usuário.
- * @param {string} email - O e-mail a ser verificado.
- * @returns {Promise<boolean>} Retorna `true` se o e-mail existir, `false` caso contrário.
- */
 export async function checkEmailExists(email) {
   const validation = validateRequired({ email });
   if (validation) {
     console.error('Email é obrigatório para a verificação.');
-    return true; // Assume que existe para previnir registro em caso de erro.
+    return true;
   }
-
   try {
     const { data, error } = await supabase
       .from('user_profiles')
       .select('email')
       .eq('email', email)
       .single();
-
-    // Se houver um erro (que não seja "nenhuma linha encontrada"), trate como um problema.
     if (error && error.code !== 'PGRST116') {
       console.error('Erro ao verificar e-mail:', error);
-      return true; // Prevenção: bloqueia o registro se a verificação falhar.
+      return true;
     }
-    
-    // `data` será não-nulo se um registro for encontrado.
     return !!data;
   } catch (error) {
     console.error('Erro inesperado ao verificar e-mail:', error);
-    return true; // Prevenção em caso de erro inesperado.
+    return true;
   }
 }
-
-/**
- * Valida se um domínio de e-mail é permitido para registro (placeholder).
- * NOTA: Esta é uma implementação de exemplo. A lógica real deve ser adaptada
- * para consultar uma tabela de domínios permitidos ou outra regra de negócio.
- * @param {string} domain - O domínio a ser validado (ex: "gmail.com").
- * @returns {Promise<boolean>} Retorna `true` se o domínio for válido.
- */
 export async function validateDomain(domain) {
   const validation = validateRequired({ domain });
   if (validation) {
-      console.error('Domínio é obrigatório para a validação.');
-      return false;
+    console.error('Domínio é obrigatório para a validação.');
+    return false;
   }
-  // Lógica de exemplo: permitir apenas domínios específicos.
-  // Em um cenário real, isso poderia vir de uma tabela `allowed_domains`.
   const allowedDomains = ['gmail.com', 'outlook.com', 'alsham.com'];
-  
-  // A função é async para simular uma chamada de DB, mantendo a consistência.
   return Promise.resolve(allowedDomains.includes(domain.toLowerCase()));
 }
-
-
 // =========================================================================
 // 14. OPERAÇÕES EM LOTE - REAL BATCH OPERATIONS
 // =========================================================================
