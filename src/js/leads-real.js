@@ -59,9 +59,8 @@ import {
     supabaseConfig
 } from '../lib/supabase.js';
 
-// JUSTIFICATIVA 2: Nova importação adicionada para carregar os utilitários do local correto.
-// A correção assume que o arquivo se chama 'utils.js' e está na mesma pasta 'lib'.
-// Se o nome ou caminho for diferente, ajuste a linha abaixo.
+// JUSTIFICATIVA 2: Nova importação adicionada para carregar os utilitários do arquivo correto,
+// que acabamos de criar em 'src/lib/utils.js'.
 import {
     formatCurrency,
     formatDate,
