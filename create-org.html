@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Organização ALSHAM - ALSHAM 360° PRIMA</title>
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co;">
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -102,7 +105,6 @@
         <h1>🏢 Criar Organização ALSHAM</h1>
         <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Setup da Organização</p>
         
-        <!-- Formulário de Criação -->
         <div class="form-section">
             <h3>1. Dados da Organização</h3>
             
@@ -116,7 +118,6 @@
             <div id="create-status" class="status loading">Pronto para criar...</div>
         </div>
         
-        <!-- Verificação -->
         <div class="form-section">
             <h3>2. Verificar Organização</h3>
             <button onclick="verifyOrganization()">Verificar se Existe</button>
@@ -124,7 +125,6 @@
             <div id="verify-data" class="data-display" style="display: none;"></div>
         </div>
         
-        <!-- Listar Todas -->
         <div class="form-section">
             <h3>3. Listar Todas as Organizações</h3>
             <button onclick="listOrganizations()">Listar Organizações</button>
@@ -132,7 +132,6 @@
             <div id="list-data" class="data-display" style="display: none;"></div>
         </div>
         
-        <!-- Processo Completo -->
         <div class="form-section">
             <h3>🚀 Processo Completo</h3>
             <button onclick="setupComplete()" style="background: linear-gradient(135deg, #10b981, #059669);">Setup Completo da Organização</button>
@@ -298,4 +297,3 @@
     </script>
 </body>
 </html>
-
