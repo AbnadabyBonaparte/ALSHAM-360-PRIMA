@@ -1,10 +1,8 @@
 /**
  * 🚀 ALSHAM 360° PRIMA - Sistema de Navegação Enterprise 10/10
- * 
- * Sistema de navegação modular, seguro e de alta performance seguindo padrões NASA.
+ * * Sistema de navegação modular, seguro e de alta performance seguindo padrões NASA.
  * Implementa arquitetura SOLID, error handling robusto, cache inteligente e UX premium.
- * 
- * @version 2.0.0
+ * * @version 2.0.0
  * @author ALSHAM Team
  * @license MIT
  */
@@ -13,17 +11,19 @@
  * Configuração central do sistema de navegação
  * @namespace NavigationConfig
  */
-const routes = {
-    'dashboard': '/dashboard.html',
-    'leads': '/leads.html',
-    'leads-real': '/leads-real.html',
-    'login': '/login.html',
-    'register': '/register.html',
-    'relatorios': '/relatorios.html',
-    'automacoes': '/automacoes.html',
-    'gamificacao': '/gamificacao.html',
-    'configuracoes': '/configuracoes.html'
-};
+// JUSTIFICATIVA: A constante NavigationConfig foi criada para englobar todas as propriedades de configuração em um único objeto válido, corrigindo a sintaxe.
+const NavigationConfig = {
+    routes: {
+        'dashboard': '/dashboard.html',
+        'leads': '/leads.html',
+        'leads-real': '/leads-real.html',
+        'login': '/login.html',
+        'register': '/register.html',
+        'relatorios': '/relatorios.html',
+        'automacoes': '/automacoes.html',
+        'gamificacao': '/gamificacao.html',
+        'configuracoes': '/configuracoes.html'
+    }, // JUSTIFICATIVA: O ponto e vírgula (;) foi trocado por uma vírgula (,) para separar corretamente as propriedades dentro do objeto NavigationConfig.
     
     // Configuração de menu items com metadados
     menuItems: [
@@ -89,7 +89,7 @@ const routes = {
         focusManagement: true,
         keyboardNavigation: true
     }
-};
+}; // JUSTIFICATIVA: Esta chave e ponto e vírgula agora fecham corretamente o objeto NavigationConfig que foi aberto na linha 15.
 
 /**
  * Classe para gerenciamento de cache inteligente
@@ -1165,4 +1165,3 @@ window.NavigationSystem = NavigationSystem;
 window.NavigationConfig = NavigationConfig;
 
 console.info('🚀 ALSHAM 360° PRIMA Navigation System v2.0.0 loaded');
-
