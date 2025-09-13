@@ -1,465 +1,464 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-    <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  
-    <title>Dashboard — ALSHAM 360° PRIMA | CRM Enterprise</title>
-  <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA: KPIs em tempo real, analytics avançados, leads inteligentes e automações empresariais." />
-  <meta name="keywords" content="CRM, dashboard, analytics, leads, vendas, automação, IA, business intelligence" />
-  <meta name="author" content="ALSHAM Team" />
-  
-    <meta property="og:title" content="Dashboard — ALSHAM 360° PRIMA" />
-  <meta property="og:description" content="Dashboard executivo com KPIs em tempo real e analytics avançados" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="/dashboard.html" />
-  <meta property="og:image" content="/public/og-dashboard.jpg" />
-  <meta property="og:site_name" content="ALSHAM 360° PRIMA" />
-  
-    <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Dashboard — ALSHAM 360° PRIMA" />
-  <meta name="twitter:description" content="Dashboard executivo com KPIs em tempo real" />
-  <meta name="twitter:image" content="/public/twitter-dashboard.jpg" />
-  
-    <link rel="manifest" href="/site.webmanifest" />
-  <meta name="theme-color" content="#8b5cf6" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°" />
-  <link rel="apple-touch-icon" href="/public/apple-touch-icon.png" />
-  
-    <link rel="icon" type="image/x-icon" href="/public/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png" />
-  
-    <link rel="canonical" href="/dashboard.html" />
-  
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.railway.app wss://*.supabase.co; frame-ancestors 'none';" />
-  <meta http-equiv="X-Frame-Options" content="DENY" />
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
-  
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-  
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  
-    <style>
-    /* Critical CSS para above-the-fold */
-    :root {
-      --primary: #8b5cf6;
-      --primary-dark: #7c3aed;
-      --secondary: #3b82f6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --error: #ef4444;
-      --gray-50: #f9fafb;
-      --gray-100: #f3f4f6;
-      --gray-200: #e5e7eb;
-      --gray-300: #d1d5db;
-      --gray-400: #9ca3af;
-      --gray-500: #6b7280;
-      --gray-600: #4b5563;
-      --gray-700: #374151;
-      --gray-800: #1f2937;
-      --gray-900: #111827;
-    }
-    
-    .bg-gradient-premium {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    }
-    
-    .bg-gradient-hero {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .text-primary { color: var(--primary); }
-    .text-primary-dark { color: var(--primary-dark); }
-    .text-secondary { color: var(--secondary); }
-    .text-success { color: var(--success); }
-    .text-warning { color: var(--warning); }
-    .text-error { color: var(--error); }
-    
-    .border-primary { border-color: var(--primary); }
-    
-    /* Loading skeleton */
-    .loading-skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: loading-skeleton 1.5s infinite;
-      border-radius: 0.75rem;
-      height: 120px;
-    }
-    
-    @keyframes loading-skeleton {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    
-    /* Accessibility */
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-    
-    .focus\:not-sr-only:focus {
-      position: static;
-      width: auto;
-      height: auto;
-      padding: 0.5rem 1rem;
-      margin: 0;
-      overflow: visible;
-      clip: auto;
-      white-space: normal;
-      background: var(--primary);
-      color: white;
-      border-radius: 0.375rem;
-      text-decoration: none;
-    }
-    
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
-  
-    <link rel="stylesheet" href="/src/style.css" />
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'GA_MEASUREMENT_ID', {
-      page_title: 'Dashboard',
-      page_location: window.location.href
-    });
-  </script>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+    <title>Login — ALSHAM 360° PRIMA | CRM Enterprise</title>
+  <meta name="description" content="Acesse o ALSHAM 360° PRIMA para gerenciar seus KPIs em tempo real, analytics avançados, leads inteligentes e automações empresariais." />
+  <meta name="keywords" content="CRM, login, acesso, analytics, leads, vendas, automação, IA" />
+  <meta name="author" content="ALSHAM Team" />
+  
+    <meta property="og:title" content="Login — ALSHAM 360° PRIMA" />
+  <meta property="og:description" content="Acesse o dashboard executivo com KPIs em tempo real e analytics avançados" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="/login.html" />
+  <meta property="og:image" content="/public/og-dashboard.jpg" />
+  <meta property="og:site_name" content="ALSHAM 360° PRIMA" />
+  
+    <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Login — ALSHAM 360° PRIMA" />
+  <meta name="twitter:description" content="Acesse o dashboard executivo com KPIs em tempo real" />
+  <meta name="twitter:image" content="/public/twitter-dashboard.jpg" />
+  
+    <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°" />
+  <link rel="apple-touch-icon" href="/public/apple-touch-icon.png" />
+  
+    <link rel="icon" type="image/x-icon" href="/public/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png" />
+  
+    <link rel="canonical" href="/login.html" />
+  
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.supabase.co https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.railway.app wss://*.supabase.co; frame-ancestors 'none';" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+  
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+  
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  
+    <style>
+    /* Critical CSS para above-the-fold */
+    :root {
+      --primary: #8b5cf6;
+      --primary-dark: #7c3aed;
+      --secondary: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+    
+    .bg-gradient-premium {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    
+    .bg-gradient-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .text-primary { color: var(--primary); }
+    .text-primary-dark { color: var(--primary-dark); }
+    .text-secondary { color: var(--secondary); }
+    .text-success { color: var(--success); }
+    .text-warning { color: var(--warning); }
+    .text-error { color: var(--error); }
+    
+    .border-primary { border-color: var(--primary); }
+    
+    /* Loading skeleton */
+    .loading-skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading-skeleton 1.5s infinite;
+      border-radius: 0.75rem;
+      height: 120px;
+    }
+    
+    @keyframes loading-skeleton {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    .focus\:not-sr-only:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0.5rem 1rem;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+      background: var(--primary);
+      color: white;
+      border-radius: 0.375rem;
+      text-decoration: none;
+    }
+    
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+  
+    <link rel="stylesheet" href="/style.css" />
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID', {
+      page_title: 'Login', // Alterado para refletir a página de Login
+      page_location: window.location.href
+    });
+  </script>
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-    <a href="#main-content" class="sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
-  
-    <noscript>
-    <div style="padding:16px;background:#fee2e2;color:#991b1b;text-align:center;font-weight:600;">
-      ⚠️ Este aplicativo requer JavaScript habilitado para funcionar corretamente.
-      <br>Por favor, habilite JavaScript em seu navegador e recarregue a página.
-    </div>
-  </noscript>
-  
-    <div id="loading-indicator" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div class="text-center">
-      <div class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
-      <p class="text-gray-600 font-medium">Carregando dashboard...</p>
-    </div>
-  </div>
-  
-    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm" role="banner">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-                <a class="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2" 
+    <a href="#main-content" class="sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
+  
+    <noscript>
+    <div style="padding:16px;background:#fee2e2;color:#991b1b;text-align:center;font-weight:600;">
+      ⚠️ Este aplicativo requer JavaScript habilitado para funcionar corretamente.
+      <br>Por favor, habilite JavaScript em seu navegador e recarregue a página.
+    </div>
+  </noscript>
+  
+    <div id="loading-indicator" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600 font-medium">Carregando...</p>
+    </div>
+  </div>
+  
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm" role="banner">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+            <a class="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2" 
  href="/index.html" 
  aria-label="Ir para página inicial do ALSHAM 360° PRIMA">
-          <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center shadow-lg">
-            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-            <p class="text-xs text-gray-500">Dashboard Executivo</p>
-          </div>
-        </a>
+        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
+          <p class="text-xs text-gray-500">Dashboard Executivo</p>
+        </div>
+        </a>
 
-                <nav class="hidden md:flex items-center space-x-8" aria-label="Navegação principal" role="navigation">
-          <a href="/dashboard.html" 
-             class="text-primary font-medium border-b-2 border-primary pb-1 transition-colors"
-             aria-current="page">
-            Dashboard
-          </a>
-          <a href="/leads-real.html" 
-             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
-            Leads
-          </a>
-          <a href="/automacoes.html" 
-             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
-            Automações
-          </a>
-          <a href="/relatorios.html" 
-             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
-            Relatórios
-          </a>
-          <a href="/gamificacao.html" 
-             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
-            Gamificação
-          </a>
-          <a href="/configuracoes.html" 
-             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
-            Configurações
-          </a>
-        </nav>
+            <nav class="hidden md:flex items-center space-x-8" aria-label="Navegação principal" role="navigation">
+        <a href="/dashboard.html" 
+           class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+          Dashboard
+        </a>
+        <a href="/leads-real.html" 
+           class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+          Leads
+        </a>
+        <a href="/automacoes.html" 
+           class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+          Automações
+        </a>
+        <a href="/relatorios.html" 
+           class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+          Relatórios
+        </a>
+        <a href="/gamificacao.html" 
+           class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+          Gamificação
+        </a>
+        <a href="/configuracoes.html" 
+           class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+          Configurações
+        </a>
+        </nav>
 
-                <button class="md:hidden p-2 text-gray-600 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
-                id="mobile-menu-button"
-                aria-expanded="false"
-                aria-controls="mobile-menu"
-                aria-label="Abrir menu de navegação">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
+            <button class="md:hidden p-2 text-gray-600 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+            id="mobile-menu-button"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            aria-label="Abrir menu de navegação">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        </button>
 
-                <div class="flex items-center space-x-4">
-                    <div class="relative" aria-live="polite">
-            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-lg" 
-                    id="notifications-button"
-                    aria-label="Notificações (3 não lidas)"
-                    aria-describedby="notification-count">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-              </svg>
-            </button>
-            <span id="notification-count" 
-                  class="absolute -top-1 -right-1 w-3 h-3 bg-error rounded-full animate-pulse" 
-                  aria-label="3 notificações não lidas">
-              <span class="sr-only">3 notificações não lidas</span>
-            </span>
-          </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative" aria-live="polite">
+          <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-lg" 
+              id="notifications-button"
+              aria-label="Notificações (3 não lidas)"
+              aria-describedby="notification-count">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+          </button>
+          <span id="notification-count" 
+              class="absolute -top-1 -right-1 w-3 h-3 bg-error rounded-full animate-pulse" 
+              aria-label="3 notificações não lidas">
+            <span class="sr-only">3 notificações não lidas</span>
+          </span>
+        </div>
 
-                    <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center shadow-sm" 
-                 role="img" 
-                 aria-label="Avatar do usuário">
-              <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
-            </div>
-            <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
-            <button data-auth="logout-btn" 
-                    class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded p-1" 
-                    aria-label="Sair da conta">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-        <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
-      <div class="px-4 py-3 space-y-2">
-                <a href="/dashboard.html" class="block px-3 py-2 text-primary font-medium bg-primary/10 rounded-lg">Dashboard</a>
-        <a href="/leads-real.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Leads</a>
-        <a href="/automacoes.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Automações</a>
-        <a href="/relatorios.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Relatórios</a>
-        <a href="/gamificacao.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Gamificação</a>
-        <a href="/configuracoes.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Configurações</a>
-      </div>
-    </div>
-  </header>
+                <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center shadow-sm" 
+              role="img" 
+              aria-label="Avatar do usuário">
+            <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
+          </div>
+          <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
+          <button data-auth="logout-btn" 
+              class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded p-1" 
+              aria-label="Sair da conta">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+    
+      <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
+      <div class="px-4 py-3 space-y-2">
+            <a href="/dashboard.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Dashboard</a>
+        <a href="/leads-real.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Leads</a>
+        <a href="/automacoes.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Automações</a>
+        <a href="/relatorios.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Relatórios</a>
+        <a href="/gamificacao.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Gamificação</a>
+        <a href="/configuracoes.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Configurações</a>
+      </div>
+    </div>
+  </header>
 
-    <main id="main-content" role="main" tabindex="-1">
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" aria-labelledby="hero-title">
-      <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden shadow-xl">
-        <div class="absolute inset-0 bg-black/10"></div>
-        <div class="relative z-10">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div class="mb-6 lg:mb-0">
-              <h2 id="hero-title" class="text-3xl lg:text-4xl font-bold mb-2">🎉 Bem-vindo de volta!</h2>
-              <p class="text-xl mb-4 opacity-90">Você está fazendo um ótimo trabalho</p>
-              <div class="flex flex-wrap items-center gap-4 text-sm">
-                <span class="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
-                  <span class="text-green-300" aria-hidden="true">↗️</span>
-                  <span><strong>+23%</strong> vs. semana passada</span>
-                </span>
-                <span class="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
-                  <span class="text-yellow-300" aria-hidden="true">🔥</span>
-                  <span>Seu melhor mês até agora</span>
-                </span>
-              </div>
-            </div>
-            <div class="text-center lg:text-right">
-              <div class="text-sm opacity-90 mb-2">Meta Mensal</div>
-              <div class="text-3xl font-bold mb-1" id="monthly-progress" aria-live="polite">73%</div>
-              <div class="text-sm mb-3" id="monthly-remaining">Faltam R$ 8.250</div>
-              <div class="w-full lg:w-32 bg-white/20 rounded-full h-3 mx-auto lg:mx-0">
-                <div class="bg-yellow-300 h-3 rounded-full transition-all duration-1000" 
-                     style="width:73%"
-                     role="progressbar"
-                     aria-valuenow="73"
-                     aria-valuemin="0"
-                     aria-valuemax="100"
-                     aria-label="Progresso da meta mensal: 73%"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <main id="main-content" role="main" tabindex="-1">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" aria-labelledby="hero-title">
+      <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden shadow-xl">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative z-10">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div class="mb-6 lg:mb-0">
+              <h2 id="hero-title" class="text-3xl lg:text-4xl font-bold mb-2">🎉 Bem-vindo de volta!</h2>
+              <p class="text-xl mb-4 opacity-90">Você está fazendo um ótimo trabalho</p>
+              <div class="flex flex-wrap items-center gap-4 text-sm">
+                <span class="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
+                  <span class="text-green-300" aria-hidden="true">↗️</span>
+                  <span><strong>+23%</strong> vs. semana passada</span>
+                </span>
+                <span class="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
+                  <span class="text-yellow-300" aria-hidden="true">🔥</span>
+                  <span>Seu melhor mês até agora</span>
+                </span>
+              </div>
+            </div>
+            <div class="text-center lg:text-right">
+              <div class="text-sm opacity-90 mb-2">Meta Mensal</div>
+              <div class="text-3xl font-bold mb-1" id="monthly-progress" aria-live="polite">73%</div>
+              <div class="text-sm mb-3" id="monthly-remaining">Faltam R$ 8.250</div>
+              <div class="w-full lg:w-32 bg-white/20 rounded-full h-3 mx-auto lg:mx-0">
+                <div class="bg-yellow-300 h-3 rounded-full transition-all duration-1000" 
+                     style="width:73%"
+                     role="progressbar"
+                     aria-valuenow="73"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-label="Progresso da meta mensal: 73%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="kpis-title">
-      <h2 id="kpis-title" class="sr-only">Indicadores de Performance</h2>
-      
-            <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                
-                <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div class="loading-skeleton"></div>
-        </div>
-        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div class="loading-skeleton"></div>
-        </div>
-        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div class="loading-skeleton"></div>
-        </div>
-        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div class="loading-skeleton"></div>
-        </div>
-      </div>
-    </section>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="kpis-title">
+      <h2 id="kpis-title" class="sr-only">Indicadores de Performance</h2>
+      
+          <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              
+              <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="loading-skeleton"></div>
+      </div>
+      <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="loading-skeleton"></div>
+      </div>
+      <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="loading-skeleton"></div>
+      </div>
+      <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="loading-skeleton"></div>
+      </div>
+    </div>
+    </section>
 
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="charts-title">
-      <h2 id="charts-title" class="sr-only">Gráficos e Analytics</h2>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-gray-900">📈 Performance</h3>
-            <div class="flex space-x-2">
-              <button class="text-xs bg-primary text-white px-3 py-1 rounded-full" data-chart-filter="revenue">Receita</button>
-              <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors" data-chart-filter="leads">Leads</button>
-            </div>
-          </div>
-          <div class="h-64">
-            <canvas id="performanceChart" aria-label="Gráfico de performance"></canvas>
-          </div>
-        </div>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="charts-title">
+      <h2 id="charts-title" class="sr-only">Gráficos e Analytics</h2>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-gray-900">📈 Performance</h3>
+          <div class="flex space-x-2">
+            <button class="text-xs bg-primary text-white px-3 py-1 rounded-full" data-chart-filter="revenue">Receita</button>
+            <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors" data-chart-filter="leads">Leads</button>
+          </div>
+        </div>
+        <div class="h-64">
+          <canvas id="performanceChart" aria-label="Gráfico de performance"></canvas>
+        </div>
+      </div>
 
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-gray-900">🔄 Funil de Vendas</h3>
-            <button class="btn-secondary text-sm px-4 py-2" onclick="window.navigateTo('relatorios')">
-              Ver Detalhes
-            </button>
-          </div>
-          <div id="sales-funnel">
-                      </div>
-        </div>
-      </div>
-    </section>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-gray-900">🔄 Funil de Vendas</h3>
+          <button class="btn-secondary text-sm px-4 py-2" onclick="window.navigateTo('relatorios')">
+            Ver Detalhes
+          </button>
+        </div>
+        <div id="sales-funnel">
+                  </div>
+      </div>
+    </div>
+    </section>
 
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="leads-title">
-      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-6">
-          <h3 id="leads-title" class="text-xl font-bold text-gray-900">👥 Leads Recentes</h3>
-          <button class="btn-primary text-sm px-4 py-2" onclick="window.navigateTo('leads-real')">
-            Ver Todos
-          </button>
-        </div>
-        
-                <div id="leads-table" 
-             class="overflow-x-auto" 
-             aria-live="polite"
-             aria-label="Tabela de leads recentes">
-                  </div>
-      </div>
-    </section>
-  </main>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="leads-title">
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-6">
+          <h3 id="leads-title" class="text-xl font-bold text-gray-900">👥 Leads Recentes</h3>
+          <button class="btn-primary text-sm px-4 py-2" onclick="window.navigateTo('leads-real')">
+            Ver Todos
+          </button>
+        </div>
+        
+            <div id="leads-table" 
+           class="overflow-x-auto" 
+           aria-live="polite"
+           aria-label="Tabela de leads recentes">
+              </div>
+      </div>
+    </section>
+  </main>
 
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
-    <div class="text-center">
-      <p class="text-gray-500 text-sm mb-2">
-        © 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.
-      </p>
-      <p class="text-gray-400 text-xs">
-        Versão 2.0.0 | 
-        <a href="/configuracoes.html" class="hover:text-primary transition-colors">Configurações</a> | 
-        <a href="#" class="hover:text-primary transition-colors">Suporte</a>
-      </p>
-    </div>
-  </footer>
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
+    <div class="text-center">
+      <p class="text-gray-500 text-sm mb-2">
+        © 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.
+      </p>
+      <p class="text-gray-400 text-xs">
+        Versão 2.0.0 | 
+        <a href="/configuracoes.html" class="hover:text-primary transition-colors">Configurações</a> | 
+        <a href="#" class="hover:text-primary transition-colors">Suporte</a>
+      </p>
+    </div>
+  </footer>
 
-    <div id="toast-container" 
-       class="fixed top-4 right-4 z-50 space-y-2" 
-       aria-live="polite" 
-       aria-label="Notificações do sistema">
-      </div>
+    <div id="toast-container" 
+       class="fixed top-4 right-4 z-50 space-y-2" 
+       aria-live="polite" 
+       aria-label="Notificações do sistema">
+      </div>
 
-    <div id="sr-announcements" 
-       class="sr-only" 
-       aria-live="polite" 
-       aria-atomic="true">
-      </div>
+    <div id="sr-announcements" 
+       class="sr-only" 
+       aria-live="polite" 
+       aria-atomic="true">
+      </div>
 
-    <script type="module" src="/src/components/navigation.js" defer></script>
-  <script type="module" src="./src/main.js" defer></script>
-  <script type="module" src="./src/js/auth.js" defer></script>
-  <script type="module" src="./src/js/dashboard.js" defer></script>
+    <script type="module" src="/navigation.js" defer></script>
+  <script type="module" src="/main.js" defer></script>
+  <script type="module" src="/auth.js" defer></script>
+  <script type="module" src="/login.js" defer></script>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const mobileMenuButton = document.getElementById('mobile-menu-button');
-      const mobileMenu = document.getElementById('mobile-menu');
-      
-      if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', function() {
-          const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-          mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
-          mobileMenu.classList.toggle('hidden');
-        });
-      }
-    });
-  </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+          const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+          mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+    });
+  </script>
 
-    <script>
-    // Captura erros não tratados para debugging
-    window.addEventListener('unhandledrejection', (event) => {
-      console.error('🚨 Unhandled promise rejection:', event.reason);
-      
-      // Em produção, enviar para serviço de monitoramento
-      if (window.gtag) {
-        gtag('event', 'exception', {
-          description: 'Unhandled promise rejection: ' + (event.reason?.message || event.reason),
-          fatal: false
-        });
-      }
-    });
-    
-    window.addEventListener('error', (event) => {
-      console.error('🚨 Unhandled error:', event.message || event.error);
-      
-      // Em produção, enviar para serviço de monitoramento
-      if (window.gtag) {
-        gtag('event', 'exception', {
-          description: event.message || 'Unknown error',
-          fatal: false
-        });
-      }
-    });
-    
-    // Performance monitoring
-    window.addEventListener('load', () => {
-      const loadTime = performance.now();
-      console.info(`⚡ Dashboard carregado em ${loadTime.toFixed(2)}ms`);
-      
-      if (window.gtag) {
-        gtag('event', 'timing_complete', {
-          name: 'dashboard_load',
-          value: Math.round(loadTime)
-        });
-      }
-    });
-  </script>
+    <script>
+    // Captura erros não tratados para debugging
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('🚨 Unhandled promise rejection:', event.reason);
+      
+      // Em produção, enviar para serviço de monitoramento
+      if (window.gtag) {
+        gtag('event', 'exception', {
+          description: 'Unhandled promise rejection: ' + (event.reason?.message || event.reason),
+          fatal: false
+        });
+      }
+    });
+    
+    window.addEventListener('error', (event) => {
+      console.error('🚨 Unhandled error:', event.message || event.error);
+      
+      // Em produção, enviar para serviço de monitoramento
+      if (window.gtag) {
+        gtag('event', 'exception', {
+          description: event.message || 'Unknown error',
+          fatal: false
+        });
+      }
+    });
+    
+    // Performance monitoring
+    window.addEventListener('load', () => {
+      const loadTime = performance.now();
+      console.info(`⚡ Dashboard carregado em ${loadTime.toFixed(2)}ms`);
+      
+      if (window.gtag) {
+        gtag('event', 'timing_complete', {
+          name: 'dashboard_load',
+          value: Math.round(loadTime)
+        });
+      }
+    });
+  </script>
 </body>
 </html>
