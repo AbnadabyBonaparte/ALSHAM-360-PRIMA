@@ -1,7 +1,6 @@
 // ALSHAM 360° PRIMA - SUPABASE LIB COMPLETA V8 (55 TABELAS/VIEWS)
 // VERSÃO 8.0 - ENTERPRISE PRODUCTION READY WITH REAL DATA
 import { createClient } from '@supabase/supabase-js'
-
 // =========================================================================
 // 🚀 ENTERPRISE PRODUCTION NOTES V8 - NASA 10/10 GRADE
 // =========================================================================
@@ -15,13 +14,11 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [ENTERPRISE] Complete CRUD operations for all business entities
 // ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization, getUserProfile, onAuthStateChange, updateUserProfile
 // =========================================================================
-
 // =========================================================================
 // 🔐 REAL PRODUCTION CONFIGURATION - RAILWAY CREDENTIALS
 // =========================================================================
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY
-
 // 🚨 PRODUCTION SECURITY - Fail fast if real credentials missing
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   const errorMsg = '🚨 CRITICAL: Real Supabase credentials not found in environment variables'
@@ -30,7 +27,6 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('Railway URL should be: https://rgvnbtuqtxvfxhrdnkjg.supabase.co')
   throw new Error(errorMsg)
 }
-
 // 🏗️ ENTERPRISE CLIENT WITH REAL CREDENTIALS
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -51,7 +47,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     }
   }
 })
-
 // =========================================================================
 // 🔧 ENTERPRISE UTILITIES - ENHANCED ERROR HANDLING
 // =========================================================================
@@ -63,7 +58,6 @@ const createError = (message, code = 'VALIDATION_ERROR', context = {}) => ({
   service: 'supabase-lib',
   version: '8.0.0'
 })
-
 const validateRequired = (params) => {
   for (const [key, value] of Object.entries(params)) {
     if (value === null || value === undefined || value === '') {
@@ -72,39 +66,35 @@ const validateRequired = (params) => {
   }
   return null
 }
-
 const handleSupabaseResponse = (data, error, operation = 'operação', context = {}) => {
   if (error) {
     console.error(`🚨 Erro na ${operation}:`, error)
-    return { 
-      data: null, 
-      error: createError(`Erro na ${operation}: ${error.message}`, 'DATABASE_ERROR', { 
-        operation, 
+    return {
+      data: null,
+      error: createError(`Erro na ${operation}: ${error.message}`, 'DATABASE_ERROR', {
+        operation,
         supabaseError: error,
-        context 
+        context
       }),
       success: false
     }
   }
-  
+ 
   // Log successful operations in development
   if (import.meta.env.DEV && data) {
-    console.log(`✅ ${operation} successful:`, { 
+    console.log(`✅ ${operation} successful:`, {
       recordCount: Array.isArray(data) ? data.length : 1,
-      operation 
+      operation
     })
   }
-  
+ 
   return { data, error: null, success: true }
 }
-
 // =========================================================================
 // 🏢 ORGANIZATION MANAGEMENT - REAL MULTI-TENANT
 // =========================================================================
-
 // Default organization ID for new installations
 export const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000000'
-
 export function getCurrentOrgId() {
   try {
     const orgId = localStorage.getItem('alsham_org_id')
@@ -112,28 +102,26 @@ export function getCurrentOrgId() {
       console.warn('⚠️ Nenhum org_id encontrado - usuário precisa selecionar organização')
       return null
     }
-    
+   
     // Validate UUID format for security
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orgId)) {
       console.error('🚨 Invalid org_id format:', orgId)
       localStorage.removeItem('alsham_org_id')
       return null
     }
-    
+   
     return orgId
   } catch (error) {
     console.error('🚨 Erro ao acessar localStorage:', error)
     return null
   }
 }
-
 export function setCurrentOrgId(orgId) {
   const validation = validateRequired({ orgId })
   if (validation) {
     console.error('🚨 Erro ao definir org_id:', validation.message)
     return false
   }
-
   try {
     localStorage.setItem('alsham_org_id', orgId)
     console.log('✅ Organization ID set:', orgId)
@@ -143,7 +131,6 @@ export function setCurrentOrgId(orgId) {
     return false
   }
 }
-
 export function clearOrgId() {
   try {
     localStorage.removeItem('alsham_org_id')
@@ -154,16 +141,13 @@ export function clearOrgId() {
     return false
   }
 }
-
 // =========================================================================
 // 1. CORE CRM (5 TABELAS PRINCIPAIS) - REAL DATA INTEGRATION
 // =========================================================================
-
 // 1.1 LEADS CRM - Tabela principal de leads COM DADOS REAIS
 export async function getLeads(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('leads_crm')
@@ -174,7 +158,6 @@ export async function getLeads(orgId = getCurrentOrgId(), filters = {}) {
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     // Aplicar filtros reais
     if (filters.status) query = query.eq('status', filters.status)
     if (filters.source) query = query.eq('origem', filters.source)
@@ -187,26 +170,22 @@ export async function getLeads(orgId = getCurrentOrgId(), filters = {}) {
     if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
     if (filters.limit) query = query.limit(filters.limit)
     if (filters.offset) query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de leads', { filters, orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de leads', { filters, orgId })
   }
 }
-
 export async function createLead(lead, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ lead, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!lead.nome || !lead.email) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome e email são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   // Email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(lead.email)) {
@@ -216,11 +195,10 @@ export async function createLead(lead, orgId = getCurrentOrgId()) {
       success: false
     }
   }
-
   try {
     // Prepare real payload
-    const payload = { 
-      ...lead, 
+    const payload = {
+      ...lead,
       org_id: orgId,
       status: lead.status || 'novo',
       temperatura: lead.temperatura || 'frio',
@@ -228,7 +206,6 @@ export async function createLead(lead, orgId = getCurrentOrgId()) {
       consentimento: lead.consentimento || false,
       consentimento_at: lead.consentimento ? new Date().toISOString() : null
     }
-
     const { data, error } = await supabase
       .from('leads_crm')
       .insert([payload])
@@ -238,21 +215,17 @@ export async function createLead(lead, orgId = getCurrentOrgId()) {
         user_profiles!leads_crm_owner_id_fkey(full_name, avatar_url)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de lead', { leadData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de lead', { leadData: lead })
   }
 }
-
 export async function updateLead(leadId, lead, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, lead, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     // Remove protected fields
     const { org_id, created_at, ...safeUpdates } = lead
-
     const { data, error } = await supabase
       .from('leads_crm')
       .update(safeUpdates)
@@ -264,17 +237,14 @@ export async function updateLead(leadId, lead, orgId = getCurrentOrgId()) {
         user_profiles!leads_crm_owner_id_fkey(full_name, avatar_url)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'atualização de lead', { leadId, updates: safeUpdates })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização de lead', { leadId, updates: lead })
   }
 }
-
 export async function deleteLead(leadId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('leads_crm')
@@ -283,17 +253,14 @@ export async function deleteLead(leadId, orgId = getCurrentOrgId()) {
       .eq('org_id', orgId)
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'exclusão de lead', { leadId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'exclusão de lead', { leadId })
   }
 }
-
 export async function getLeadById(leadId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('leads_crm')
@@ -314,18 +281,15 @@ export async function getLeadById(leadId, orgId = getCurrentOrgId()) {
       .eq('id', leadId)
       .eq('org_id', orgId)
       .single()
-
     return handleSupabaseResponse(data, error, 'busca de lead por ID', { leadId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de lead por ID', { leadId })
   }
 }
-
 // 1.2 LEAD INTERACTIONS - Histórico de interações REAL
 export async function getLeadInteractions(leadId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('lead_interactions')
@@ -336,31 +300,26 @@ export async function getLeadInteractions(leadId, orgId = getCurrentOrgId()) {
       .eq('lead_id', leadId)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de interações', { leadId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de interações', { leadId })
   }
 }
-
 export async function createLeadInteraction(interaction, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ interaction, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!interaction.lead_id || !interaction.interaction_type) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('lead_id e interaction_type são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...interaction, 
+    const payload = {
+      ...interaction,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('lead_interactions')
       .insert([payload])
@@ -369,18 +328,15 @@ export async function createLeadInteraction(interaction, orgId = getCurrentOrgId
         user_profiles!lead_interactions_user_id_fkey(full_name, avatar_url)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de interação', { interactionData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de interação', { interactionData: interaction })
   }
 }
-
 // 1.3 SALES OPPORTUNITIES - Oportunidades de venda REAIS
 export async function getSalesOpportunities(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('sales_opportunities')
@@ -391,39 +347,33 @@ export async function getSalesOpportunities(orgId = getCurrentOrgId(), filters =
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.etapa) query = query.eq('etapa', filters.etapa)
     if (filters.owner_id) query = query.eq('owner_id', filters.owner_id)
     if (filters.minValue) query = query.gte('valor', filters.minValue)
     if (filters.maxValue) query = query.lte('valor', filters.maxValue)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de oportunidades', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de oportunidades', { filters })
   }
 }
-
 export async function createSalesOpportunity(opportunity, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ opportunity, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!opportunity.titulo || !opportunity.valor) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Título e valor são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...opportunity, 
+    const payload = {
+      ...opportunity,
       org_id: orgId,
       etapa: opportunity.etapa || 'prospeccao'
     }
-
     const { data, error } = await supabase
       .from('sales_opportunities')
       .insert([payload])
@@ -433,47 +383,39 @@ export async function createSalesOpportunity(opportunity, orgId = getCurrentOrgI
         user_profiles!sales_opportunities_owner_id_fkey(full_name, avatar_url)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de oportunidade', { opportunityData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de oportunidade', { opportunityData: opportunity })
   }
 }
-
 // 1.4 ORGANIZATIONS - Gestão de organizações REAL
 export async function createOrganization(org) {
   const validation = validateRequired({ org })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!org.name) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome da organização é obrigatório', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
+    const payload = {
       ...org
     }
-
     const { data, error } = await supabase
       .from('organizations')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de organização', { orgData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de organização', { orgData: org })
   }
 }
-
 export async function getUserOrganizations(userId) {
   const validation = validateRequired({ userId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('user_organizations')
@@ -483,17 +425,14 @@ export async function getUserOrganizations(userId) {
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de organizações do usuário', { userId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de organizações do usuário', { userId })
   }
 }
-
 export async function getOrganization(orgId) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('organizations')
@@ -507,18 +446,15 @@ export async function getOrganization(orgId) {
       `)
       .eq('id', orgId)
       .single()
-
     return handleSupabaseResponse(data, error, 'busca de organização', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de organização', { orgId })
   }
 }
-
 // 1.5 USER PROFILES - Perfis de usuários REAIS
 export async function getUserProfiles(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('user_profiles')
@@ -528,17 +464,14 @@ export async function getUserProfiles(orgId = getCurrentOrgId()) {
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de perfis', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de perfis', { orgId })
   }
 }
-
 export async function getUserProfile(userId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('user_profiles')
@@ -552,21 +485,17 @@ export async function getUserProfile(userId, orgId = getCurrentOrgId()) {
       .eq('user_id', userId)
       .eq('org_id', orgId || getCurrentOrgId())
       .single()
-
     return handleSupabaseResponse(data, error, 'busca de perfil do usuário', { userId, orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de perfil do usuário', { userId, orgId })
   }
 }
-
 export async function updateUserProfile(userId, profileData, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, profileData })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     // Remove protected fields
     const { user_id, org_id, created_at, ...safeUpdates } = profileData
-
     const { data, error } = await supabase
       .from('user_profiles')
       .update(safeUpdates)
@@ -580,18 +509,15 @@ export async function updateUserProfile(userId, profileData, orgId = getCurrentO
         )
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'atualização de perfil do usuário', { userId, updates: safeUpdates })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização de perfil do usuário', { userId, updates: profileData })
   }
 }
-
 export async function getCurrentUser() {
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) return { user: null, profile: null, error: userError, success: false }
-
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select(`
@@ -603,18 +529,15 @@ export async function getCurrentUser() {
       `)
       .eq('user_id', user.id)
       .single()
-
     if (profileError) {
       console.warn('⚠️ User profile not found, user may need to complete setup')
       return { user, profile: null, error: profileError, success: false }
     }
-
     return { user, profile, error: null, success: true }
   } catch (error) {
     return { user: null, profile: null, error: createError(`Erro inesperado: ${error.message}`), success: false }
   }
 }
-
 /**
  * Monitora mudanças no estado de autenticação
  * @param {Function} callback - Função callback para mudanças de estado
@@ -626,38 +549,35 @@ export function onAuthStateChange(callback) {
       console.error('🚨 onAuthStateChange: callback deve ser uma função')
       return null
     }
-
     // Wrapper para adicionar logging e error handling
     const wrappedCallback = (event, session) => {
       try {
         if (import.meta.env.DEV) {
-          console.log('🔄 Auth state change:', { 
-            event, 
+          console.log('🔄 Auth state change:', {
+            event,
             userId: session?.user?.id,
-            email: session?.user?.email 
+            email: session?.user?.email
           })
         }
-        
+       
         callback(event, session)
       } catch (error) {
         console.error('🚨 Erro no callback de auth state change:', error)
       }
     }
-
     // Configurar listener do Supabase
     const { data: { subscription } } = supabase.auth.onAuthStateChange(wrappedCallback)
-    
+   
     if (import.meta.env.DEV) {
       console.log('✅ Auth state listener configurado')
     }
-    
+   
     return subscription
   } catch (error) {
     console.error('🚨 Erro ao configurar auth state listener:', error)
     return null
   }
 }
-
 /**
  * Obtém a sessão atual do usuário autenticado
  * @returns {Promise<Object>} Resultado com dados da sessão ou erro
@@ -665,53 +585,52 @@ export function onAuthStateChange(callback) {
 export async function getCurrentSession() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession()
-    
+   
     if (error) {
       console.error('🚨 Erro ao obter sessão:', error)
-      return { 
-        data: null, 
-        error: createError(`Erro ao obter sessão: ${error.message}`, 'SESSION_ERROR', { 
-          supabaseError: error 
+      return {
+        data: null,
+        error: createError(`Erro ao obter sessão: ${error.message}`, 'SESSION_ERROR', {
+          supabaseError: error
         }),
         success: false
       }
     }
-    
+   
     if (!session) {
       console.warn('⚠️ Nenhuma sessão ativa encontrada')
-      return { 
-        data: null, 
+      return {
+        data: null,
         error: createError('Usuário não autenticado', 'NO_SESSION'),
         success: false
       }
     }
-    
+   
     // Log successful session retrieval in development
     if (import.meta.env.DEV) {
-      console.log('✅ Sessão obtida com sucesso:', { 
+      console.log('✅ Sessão obtida com sucesso:', {
         userId: session.user?.id,
         email: session.user?.email,
         expiresAt: session.expires_at
       })
     }
-    
-    return { 
-      data: session, 
-      error: null, 
-      success: true 
+   
+    return {
+      data: session,
+      error: null,
+      success: true
     }
   } catch (error) {
     console.error('🚨 Erro inesperado ao obter sessão:', error)
-    return { 
-      data: null, 
-      error: createError(`Erro inesperado: ${error.message}`, 'UNEXPECTED_ERROR', { 
-        originalError: error 
+    return {
+      data: null,
+      error: createError(`Erro inesperado: ${error.message}`, 'UNEXPECTED_ERROR', {
+        originalError: error
       }),
       success: false
     }
   }
 }
-
 /**
  * Cria um registro de auditoria para rastreamento de ações
  * @param {Object} auditData - Dados do log de auditoria
@@ -726,23 +645,20 @@ export async function getCurrentSession() {
 export async function createAuditLog(auditData, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ auditData })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!auditData.action || !auditData.table_name) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('action e table_name são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
     // Obter usuário atual para o log
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+   
     if (userError || !user) {
       console.warn('⚠️ Usuário não autenticado para audit log')
     }
-
     // Preparar payload do audit log
     const payload = {
       action: auditData.action,
@@ -761,61 +677,54 @@ export async function createAuditLog(auditData, orgId = getCurrentOrgId()) {
         ...auditData.metadata
       }
     }
-
     const { data, error } = await supabase
       .from('audit_log')
       .insert([payload])
       .select()
       .single()
-
     if (error) {
       console.error('🚨 Erro ao criar audit log:', error)
-      return { 
-        data: null, 
-        error: createError(`Erro ao criar audit log: ${error.message}`, 'DATABASE_ERROR', { 
+      return {
+        data: null,
+        error: createError(`Erro ao criar audit log: ${error.message}`, 'DATABASE_ERROR', {
           supabaseError: error,
-          auditData: payload 
+          auditData: payload
         }),
         success: false
       }
     }
-
     // Log successful audit creation in development
     if (import.meta.env.DEV) {
-      console.log('✅ Audit log criado com sucesso:', { 
+      console.log('✅ Audit log criado com sucesso:', {
         id: data.id,
         action: data.action,
         table: data.table_name
       })
     }
-
-    return { 
-      data, 
-      error: null, 
-      success: true 
+    return {
+      data,
+      error: null,
+      success: true
     }
   } catch (error) {
     console.error('🚨 Erro inesperado ao criar audit log:', error)
-    return { 
-      data: null, 
-      error: createError(`Erro inesperado: ${error.message}`, 'UNEXPECTED_ERROR', { 
+    return {
+      data: null,
+      error: createError(`Erro inesperado: ${error.message}`, 'UNEXPECTED_ERROR', {
         originalError: error,
-        auditData 
+        auditData
       }),
       success: false
     }
   }
 }
-
 // =========================================================================
 // 2. INTELIGÊNCIA ARTIFICIAL (3 TABELAS) - REAL AI DATA
 // =========================================================================
-
 // 2.1 AI PREDICTIONS - Predições de IA REAIS
 export async function getAIPredictions(leadId = null, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('ai_predictions')
@@ -825,26 +734,21 @@ export async function getAIPredictions(leadId = null, orgId = getCurrentOrgId())
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (leadId) query = query.eq('lead_id', leadId)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de predições AI', { leadId, orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de predições AI', { leadId, orgId })
   }
 }
-
 export async function createAIPrediction(prediction, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ prediction, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
-    const payload = { 
-      ...prediction, 
+    const payload = {
+      ...prediction,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('ai_predictions')
       .insert([payload])
@@ -853,18 +757,15 @@ export async function createAIPrediction(prediction, orgId = getCurrentOrgId()) 
         leads_crm!ai_predictions_lead_id_fkey(nome, email, empresa)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de predição AI', { predictionData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de predição AI', { predictionData: prediction })
   }
 }
-
 // 2.2 IA LOGS - Logs de execuções de IA REAIS
 export async function getIALogs(orgId = getCurrentOrgId(), limit = 100) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('ia_logs')
@@ -872,40 +773,33 @@ export async function getIALogs(orgId = getCurrentOrgId(), limit = 100) {
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
       .limit(limit)
-
     return handleSupabaseResponse(data, error, 'busca de logs IA', { orgId, limit })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de logs IA', { orgId, limit })
   }
 }
-
 export async function createIALog(log, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ log, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
-    const payload = { 
+    const payload = {
       ...log,
-      org_id: orgId 
+      org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('ia_logs')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de log IA', { logData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de log IA', { logData: log })
   }
 }
-
 // 2.3 SENTIMENT ANALYSIS LOGS - Análise de sentimento REAL
 export async function getSentimentAnalysisLogs(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('sentiment_analysis_logs')
@@ -915,23 +809,19 @@ export async function getSentimentAnalysisLogs(orgId = getCurrentOrgId()) {
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de análise de sentimento', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de análise de sentimento', { orgId })
   }
 }
-
 export async function createSentimentAnalysis(analysis, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ analysis, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const payload = {
       ...analysis,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('sentiment_analysis_logs')
       .insert([payload])
@@ -940,71 +830,59 @@ export async function createSentimentAnalysis(analysis, orgId = getCurrentOrgId(
         leads_crm!sentiment_analysis_logs_lead_id_fkey(nome, email)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de análise de sentimento', { analysisData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de análise de sentimento', { analysisData: analysis })
   }
 }
-
 // =========================================================================
 // 3. AUTOMAÇÕES (3 TABELAS) - REAL AUTOMATION DATA
 // =========================================================================
-
 // 3.1 AUTOMATION RULES - Regras de automação REAIS
 export async function getAutomationRules(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('automation_rules')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de regras de automação', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de regras de automação', { orgId })
   }
 }
-
 export async function createAutomationRule(rule, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ rule, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!rule.name || !rule.trigger_event) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome e evento de trigger são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...rule, 
+    const payload = {
+      ...rule,
       org_id: orgId,
       is_active: rule.is_active !== undefined ? rule.is_active : true
     }
-
     const { data, error } = await supabase
       .from('automation_rules')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de regra de automação', { ruleData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de regra de automação', { ruleData: rule })
   }
 }
-
 // 3.2 AUTOMATION EXECUTIONS - Execuções de automação REAIS
 export async function getAutomationExecutions(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('automation_executions')
@@ -1014,29 +892,24 @@ export async function getAutomationExecutions(orgId = getCurrentOrgId(), filters
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.status) query = query.eq('status', filters.status)
     if (filters.rule_id) query = query.eq('rule_id', filters.rule_id)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de execuções de automação', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de execuções de automação', { filters })
   }
 }
-
 export async function createAutomationExecution(execution, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ execution, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
-    const payload = { 
-      ...execution, 
+    const payload = {
+      ...execution,
       org_id: orgId,
       status: execution.status || 'pending'
     }
-
     const { data, error } = await supabase
       .from('automation_executions')
       .insert([payload])
@@ -1045,71 +918,59 @@ export async function createAutomationExecution(execution, orgId = getCurrentOrg
         automation_rules!automation_executions_rule_id_fkey(name, trigger_event)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de execução de automação', { executionData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de execução de automação', { executionData: execution })
   }
 }
-
 // =========================================================================
 // 4. GAMIFICAÇÃO (4 TABELAS) - REAL GAMIFICATION DATA
 // =========================================================================
-
 // 4.1 GAMIFICATION BADGES - Badges do sistema REAIS
 export async function getGamificationBadges(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('gamification_badges')
       .select('*')
       .eq('org_id', orgId)
       .order('points_required', { ascending: true })
-
     return handleSupabaseResponse(data, error, 'busca de badges de gamificação', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de badges de gamificação', { orgId })
   }
 }
-
 export async function createGamificationBadge(badge, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ badge, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!badge.name || !badge.description) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome e descrição são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...badge, 
+    const payload = {
+      ...badge,
       org_id: orgId,
       is_active: badge.is_active !== undefined ? badge.is_active : true
     }
-
     const { data, error } = await supabase
       .from('gamification_badges')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de badge de gamificação', { badgeData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de badge de gamificação', { badgeData: badge })
   }
 }
-
 // 4.2 USER BADGES - Badges dos usuários REAIS
 export async function getUserBadges(userId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('user_badges')
@@ -1126,17 +987,14 @@ export async function getUserBadges(userId, orgId = getCurrentOrgId()) {
       .eq('user_id', userId)
       .eq('org_id', orgId)
       .order('earned_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de badges do usuário', { userId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de badges do usuário', { userId })
   }
 }
-
 export async function awardUserBadge(userId, badgeId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, badgeId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const payload = {
       user_id: userId,
@@ -1144,7 +1002,6 @@ export async function awardUserBadge(userId, badgeId, orgId = getCurrentOrgId())
       org_id: orgId,
       earned_at: new Date().toISOString()
     }
-
     const { data, error } = await supabase
       .from('user_badges')
       .insert([payload])
@@ -1159,18 +1016,15 @@ export async function awardUserBadge(userId, badgeId, orgId = getCurrentOrgId())
         )
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'concessão de badge ao usuário', { userId, badgeId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'concessão de badge ao usuário', { userId, badgeId })
   }
 }
-
 // 4.3 GAMIFICATION POINTS - Pontos de gamificação REAIS
 export async function getGamificationPoints(userId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('gamification_points')
@@ -1178,17 +1032,14 @@ export async function getGamificationPoints(userId, orgId = getCurrentOrgId()) {
       .eq('user_id', userId)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de pontos de gamificação', { userId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de pontos de gamificação', { userId })
   }
 }
-
 export async function addGamificationPoints(userId, points, reason, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, points, reason, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const payload = {
       user_id: userId,
@@ -1196,24 +1047,20 @@ export async function addGamificationPoints(userId, points, reason, orgId = getC
       reason: reason,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('gamification_points')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'adição de pontos de gamificação', { userId, points, reason })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'adição de pontos de gamificação', { userId, points, reason })
   }
 }
-
 // 4.4 TEAM LEADERBOARDS - Rankings da equipe REAIS
 export async function getTeamLeaderboards(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('team_leaderboards')
@@ -1223,22 +1070,18 @@ export async function getTeamLeaderboards(orgId = getCurrentOrgId(), filters = {
       `)
       .eq('org_id', orgId)
       .order('total_points', { ascending: false })
-
     if (filters.period) query = query.eq('period', filters.period)
     if (filters.team_id) query = query.eq('team_id', filters.team_id)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de rankings da equipe', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de rankings da equipe', { filters })
   }
 }
-
 export async function updateTeamLeaderboard(userId, points, period, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, points, period, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .rpc('update_team_leaderboard', {
@@ -1247,76 +1090,63 @@ export async function updateTeamLeaderboard(userId, points, period, orgId = getC
         p_period: period,
         p_org_id: orgId
       })
-
     return handleSupabaseResponse(data, error, 'atualização de ranking da equipe', { userId, points, period })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização de ranking da equipe', { userId, points, period })
   }
 }
-
 // =========================================================================
 // 5. ANALYTICS E RELATÓRIOS (5 TABELAS) - REAL ANALYTICS DATA
 // =========================================================================
-
 // 5.1 ANALYTICS EVENTS - Eventos de analytics REAIS
 export async function getAnalyticsEvents(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('analytics_events')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.event_type) query = query.eq('event_type', filters.event_type)
     if (filters.user_id) query = query.eq('user_id', filters.user_id)
     if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom)
     if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de eventos de analytics', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de eventos de analytics', { filters })
   }
 }
-
 export async function createAnalyticsEvent(event, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ event, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!event.event_type) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Tipo de evento é obrigatório', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...event, 
+    const payload = {
+      ...event,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('analytics_events')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de evento de analytics', { eventData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de evento de analytics', { eventData: event })
   }
 }
-
 export async function getActivityFeed(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('activity_feed')
@@ -1326,26 +1156,22 @@ export async function getActivityFeed(orgId = getCurrentOrgId(), filters = {}) {
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     // Aplicar filtros
     if (filters.activity_type) query = query.eq('activity_type', filters.activity_type)
     if (filters.user_id) query = query.eq('user_id', filters.user_id)
     if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom)
     if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de feed de atividades', { filters, orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de feed de atividades', { filters, orgId })
   }
 }
-
 // 5.2 DASHBOARD KPIS - KPIs do dashboard REAIS
 export async function getDashboardKPIs(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('dashboard_kpis')
@@ -1354,40 +1180,33 @@ export async function getDashboardKPIs(orgId = getCurrentOrgId()) {
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
-
     return handleSupabaseResponse(data, error, 'busca de KPIs do dashboard', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de KPIs do dashboard', { orgId })
   }
 }
-
 export async function updateDashboardKPIs(kpis, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ kpis, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const payload = {
       ...kpis,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('dashboard_kpis')
       .upsert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'atualização de KPIs do dashboard', { kpisData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização de KPIs do dashboard', { kpisData: kpis })
   }
 }
-
 // 5.3 DASHBOARD SUMMARY - Resumo do dashboard REAL
 export async function getDashboardSummary(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('dashboard_summary')
@@ -1396,41 +1215,34 @@ export async function getDashboardSummary(orgId = getCurrentOrgId()) {
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
-
     return handleSupabaseResponse(data, error, 'busca de resumo do dashboard', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de resumo do dashboard', { orgId })
   }
 }
-
 // 5.4 CONVERSION FUNNELS - Funis de conversão REAIS
 export async function getConversionFunnels(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('conversion_funnels')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.funnel_name) query = query.eq('funnel_name', filters.funnel_name)
     if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom)
     if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de funis de conversão', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de funis de conversão', { filters })
   }
 }
-
 // 5.5 PERFORMANCE METRICS - Métricas de performance REAIS
 export async function getPerformanceMetrics(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('performance_metrics')
@@ -1440,75 +1252,62 @@ export async function getPerformanceMetrics(orgId = getCurrentOrgId(), filters =
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.user_id) query = query.eq('user_id', filters.user_id)
     if (filters.metric_type) query = query.eq('metric_type', filters.metric_type)
     if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom)
     if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de métricas de performance', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de métricas de performance', { filters })
   }
 }
-
 // =========================================================================
 // 6. LEAD SOURCES E LABELS (4 TABELAS) - REAL LEAD DATA
 // =========================================================================
-
 // 6.1 LEAD SOURCES - Fontes de leads REAIS
 export async function getLeadSources(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('lead_sources')
       .select('*')
       .eq('org_id', orgId)
       .order('name', { ascending: true })
-
     return handleSupabaseResponse(data, error, 'busca de fontes de leads', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de fontes de leads', { orgId })
   }
 }
-
 export async function createLeadSource(source, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ source, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!source.name || !source.key) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome e chave são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...source, 
+    const payload = {
+      ...source,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('lead_sources')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de fonte de lead', { sourceData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de fonte de lead', { sourceData: source })
   }
 }
-
 export async function setLeadSource(leadId, sourceKey, sourceName = null, channel = null, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, sourceKey, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .rpc('set_lead_source', {
@@ -1518,67 +1317,56 @@ export async function setLeadSource(leadId, sourceKey, sourceName = null, channe
         p_channel: channel,
         p_org_id: orgId
       })
-
     return handleSupabaseResponse(data, error, 'definição de fonte do lead', { leadId, sourceKey })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'definição de fonte do lead', { leadId, sourceKey })
   }
 }
-
 // 6.2 LEAD LABELS - Labels de leads REAIS
-export async function getLeadLabels(orgId = getCurrentOrgId()) {
+export async function getLeadTags(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('lead_labels')
       .select('*')
       .eq('org_id', orgId)
       .order('name', { ascending: true })
-
     return handleSupabaseResponse(data, error, 'busca de labels de leads', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de labels de leads', { orgId })
   }
 }
-
 export async function createLeadLabel(label, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ label, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!label.name) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome do label é obrigatório', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...label, 
+    const payload = {
+      ...label,
       org_id: orgId,
       color: label.color || '#3B82F6'
     }
-
     const { data, error } = await supabase
       .from('lead_labels')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de label de lead', { labelData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de label de lead', { labelData: label })
   }
 }
-
 // 6.3 LEAD LABEL LINKS - Ligações entre leads e labels REAIS
 export async function addLabelToLead(leadId, labelName, color = null, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, labelName, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .rpc('add_label_to_lead', {
@@ -1587,17 +1375,14 @@ export async function addLabelToLead(leadId, labelName, color = null, orgId = ge
         p_color: color,
         p_org_id: orgId
       })
-
     return handleSupabaseResponse(data, error, 'adição de label ao lead', { leadId, labelName })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'adição de label ao lead', { leadId, labelName })
   }
 }
-
 export async function removeLabelFromLead(leadId, labelName, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leadId, labelName, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .rpc('remove_label_from_lead', {
@@ -1605,44 +1390,36 @@ export async function removeLabelFromLead(leadId, labelName, orgId = getCurrentO
         p_label_name: labelName,
         p_org_id: orgId
       })
-
     return handleSupabaseResponse(data, error, 'remoção de label do lead', { leadId, labelName })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'remoção de label do lead', { leadId, labelName })
   }
 }
-
 // =========================================================================
 // 7. ROI E CÁLCULOS (2 TABELAS) - REAL ROI DATA
 // =========================================================================
-
 // 7.1 ROI CALCULATIONS - Cálculos de ROI REAIS
 export async function getRoiCalculations(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('roi_calculations')
       .select('*')
       .eq('org_id', orgId)
       .order('period_date', { ascending: false })
-
     if (filters.dateFrom) query = query.gte('period_date', filters.dateFrom)
     if (filters.dateTo) query = query.lte('period_date', filters.dateTo)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de cálculos de ROI', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de cálculos de ROI', { filters })
   }
 }
-
 export async function roiUpsertThisMonth(spend, revenue, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ spend, revenue, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .rpc('roi_upsert_this_month', {
@@ -1650,86 +1427,71 @@ export async function roiUpsertThisMonth(spend, revenue, orgId = getCurrentOrgId
         p_revenue: revenue,
         p_org_id: orgId
       })
-
     return handleSupabaseResponse(data, error, 'upsert de ROI do mês', { spend, revenue })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'upsert de ROI do mês', { spend, revenue })
   }
 }
-
 // =========================================================================
 // 8. VIEWS ESPECIAIS - REAL VIEW DATA
 // =========================================================================
-
 // 8.1 V_LEADS_WITH_LABELS - View de leads com labels REAL
 export async function getLeadsWithLabels(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('v_leads_with_labels')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.status) query = query.eq('status', filters.status)
     if (filters.search) {
       query = query.or(`nome.ilike.%${filters.search}%,email.ilike.%${filters.search}%`)
     }
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de leads com labels', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de leads com labels', { filters })
   }
 }
-
 // 8.2 V_ROI_MONTHLY - View de ROI mensal REAL
 export async function getRoiMonthly(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('v_roi_monthly')
       .select('*')
       .eq('org_id', orgId)
       .order('period_date', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de ROI mensal', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de ROI mensal', { orgId })
   }
 }
-
 // 8.3 LEADS_BY_STATUS_VIEW - View de leads por status REAL
 export async function getLeadsByStatusView(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('leads_by_status_view')
       .select('*')
       .eq('org_id', orgId)
-
     return handleSupabaseResponse(data, error, 'busca de leads por status', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de leads por status', { orgId })
   }
 }
-
 // =========================================================================
 // 9. SISTEMA DE USUÁRIOS E EQUIPES (4 TABELAS) - REAL USER DATA
 // =========================================================================
-
 // 9.1 TEAMS - Equipes REAIS
 export async function getTeams(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('teams')
@@ -1739,52 +1501,43 @@ export async function getTeams(orgId = getCurrentOrgId()) {
       `)
       .eq('org_id', orgId)
       .order('name', { ascending: true })
-
     return handleSupabaseResponse(data, error, 'busca de equipes', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de equipes', { orgId })
   }
 }
-
 export async function createTeam(team, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ team, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!team.name) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome da equipe é obrigatório', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...team, 
+    const payload = {
+      ...team,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('teams')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de equipe', { teamData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de equipe', { teamData: team })
   }
 }
-
 // =========================================================================
 // 10. AUDITORIA E LOGS (3 TABELAS) - REAL AUDIT DATA
 // =========================================================================
-
 // 10.1 AUDIT_LOG - Logs de auditoria REAIS
 export async function getAuditLogs(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('audit_log')
@@ -1794,195 +1547,162 @@ export async function getAuditLogs(orgId = getCurrentOrgId(), filters = {}) {
       `)
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.table_name) query = query.eq('table_name', filters.table_name)
     if (filters.operation) query = query.eq('operation', filters.operation)
     if (filters.user_id) query = query.eq('user_id', filters.user_id)
     if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom)
     if (filters.dateTo) query = query.lte('created_at', filters.dateTo)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de logs de auditoria', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de logs de auditoria', { filters })
   }
 }
-
 // 10.2 DATA_AUDITS - Auditorias de dados REAIS
 export async function getDataAudits(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('data_audits')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     if (filters.audit_type) query = query.eq('audit_type', filters.audit_type)
     if (filters.status) query = query.eq('status', filters.status)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de auditorias de dados', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de auditorias de dados', { filters })
   }
 }
-
 // =========================================================================
 // 11. CONFIGURAÇÕES E INTEGRAÇÕES (6 TABELAS) - REAL CONFIG DATA
 // =========================================================================
-
 // 11.1 ORG_SETTINGS - Configurações da organização REAIS
 export async function getOrgSettings(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('org_settings')
       .select('*')
       .eq('org_id', orgId)
       .single()
-
     return handleSupabaseResponse(data, error, 'busca de configurações da organização', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de configurações da organização', { orgId })
   }
 }
-
 export async function updateOrgSettings(settings, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ settings, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const payload = {
       ...settings,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('org_settings')
       .upsert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'atualização de configurações da organização', { settingsData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização de configurações da organização', { settingsData: settings })
   }
 }
-
 // 11.2 EMAIL TEMPLATES - Templates de email REAIS
 export async function getEmailTemplates(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('email_templates')
       .select('*')
       .eq('org_id', orgId)
       .order('name', { ascending: true })
-
     return handleSupabaseResponse(data, error, 'busca de templates de email', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de templates de email', { orgId })
   }
 }
-
 export async function createEmailTemplate(template, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ template, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!template.name || !template.subject || !template.body) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome, assunto e corpo são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...template, 
+    const payload = {
+      ...template,
       org_id: orgId,
       is_active: template.is_active !== undefined ? template.is_active : true
     }
-
     const { data, error } = await supabase
       .from('email_templates')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de template de email', { templateData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de template de email', { templateData: template })
   }
 }
-
 // 11.3 WEBHOOK CONFIGS - Configurações de webhooks REAIS
 export async function getWebhookConfigs(orgId = getCurrentOrgId()) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('webhook_configs')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
-
     return handleSupabaseResponse(data, error, 'busca de configurações de webhook', { orgId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de configurações de webhook', { orgId })
   }
 }
-
 export async function createWebhookConfig(webhook, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ webhook, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!webhook.name || !webhook.url || !webhook.event_type) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Nome, URL e tipo de evento são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...webhook, 
+    const payload = {
+      ...webhook,
       org_id: orgId,
       is_active: webhook.is_active !== undefined ? webhook.is_active : true
     }
-
     const { data, error } = await supabase
       .from('webhook_configs')
       .insert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de configuração de webhook', { webhookData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de configuração de webhook', { webhookData: webhook })
   }
 }
-
 // =========================================================================
 // 12. COACHING E ONBOARDING (4 TABELAS) - REAL COACHING DATA
 // =========================================================================
-
 // 12.1 COACHING SESSIONS - Sessões de coaching REAIS
 export async function getCoachingSessions(orgId = getCurrentOrgId(), filters = {}) {
   const validation = validateRequired({ orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     let query = supabase
       .from('coaching_sessions')
@@ -1993,38 +1713,32 @@ export async function getCoachingSessions(orgId = getCurrentOrgId(), filters = {
       `)
       .eq('org_id', orgId)
       .order('scheduled_at', { ascending: false })
-
     if (filters.coach_id) query = query.eq('coach_id', filters.coach_id)
     if (filters.coachee_id) query = query.eq('coachee_id', filters.coachee_id)
     if (filters.status) query = query.eq('status', filters.status)
     if (filters.limit) query = query.limit(filters.limit)
-
     const { data, error } = await query
     return handleSupabaseResponse(data, error, 'busca de sessões de coaching', { filters })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de sessões de coaching', { filters })
   }
 }
-
 export async function createCoachingSession(session, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ session, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!session.coach_id || !session.coachee_id || !session.scheduled_at) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Coach, coachee e data são obrigatórios', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
-    const payload = { 
-      ...session, 
+    const payload = {
+      ...session,
       org_id: orgId,
       status: session.status || 'scheduled'
     }
-
     const { data, error } = await supabase
       .from('coaching_sessions')
       .insert([payload])
@@ -2034,18 +1748,15 @@ export async function createCoachingSession(session, orgId = getCurrentOrgId()) 
         user_profiles!coaching_sessions_coachee_id_fkey(full_name, avatar_url)
       `)
       .single()
-
     return handleSupabaseResponse(data, error, 'criação de sessão de coaching', { sessionData: payload })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação de sessão de coaching', { sessionData: session })
   }
 }
-
 // 12.2 ONBOARDING PROGRESS - Progresso de onboarding REAL
 export async function getOnboardingProgress(userId, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase
       .from('onboarding_progress')
@@ -2053,17 +1764,14 @@ export async function getOnboardingProgress(userId, orgId = getCurrentOrgId()) {
       .eq('user_id', userId)
       .eq('org_id', orgId)
       .order('step_order', { ascending: true })
-
     return handleSupabaseResponse(data, error, 'busca de progresso de onboarding', { userId })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'busca de progresso de onboarding', { userId })
   }
 }
-
 export async function updateOnboardingStep(userId, stepName, completed, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ userId, stepName, completed, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const payload = {
       user_id: userId,
@@ -2072,28 +1780,23 @@ export async function updateOnboardingStep(userId, stepName, completed, orgId = 
       completed_at: completed ? new Date().toISOString() : null,
       org_id: orgId
     }
-
     const { data, error } = await supabase
       .from('onboarding_progress')
       .upsert([payload])
       .select()
       .single()
-
     return handleSupabaseResponse(data, error, 'atualização de step de onboarding', { userId, stepName, completed })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização de step de onboarding', { userId, stepName, completed })
   }
 }
-
 // =========================================================================
 // 13. AUTENTICAÇÃO E SEGURANÇA - REAL AUTH SYSTEM
 // =========================================================================
-
 // 13.1 SIGN UP - Cadastro com validação enterprise
 export async function signUpWithEmail(email, password, metadata = {}) {
   const validation = validateRequired({ email, password })
   if (validation) return { data: null, error: validation, success: false }
-
   // Password strength validation
   if (password.length < 8) {
     return {
@@ -2102,7 +1805,6 @@ export async function signUpWithEmail(email, password, metadata = {}) {
       success: false
     }
   }
-
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email)) {
     return {
@@ -2111,7 +1813,6 @@ export async function signUpWithEmail(email, password, metadata = {}) {
       success: false
     }
   }
-
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -2124,81 +1825,66 @@ export async function signUpWithEmail(email, password, metadata = {}) {
         }
       }
     })
-
     return handleSupabaseResponse(data, error, 'cadastro com email', { email })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'cadastro com email', { email })
   }
 }
-
 // 13.2 SIGN IN - Login com validação enterprise
 export async function signInWithEmail(email, password) {
   const validation = validateRequired({ email, password })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     })
-
     if (data.user && !error) {
       console.log('✅ User signed in successfully:', data.user.email)
     }
-
     return handleSupabaseResponse(data, error, 'login com email', { email })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'login com email', { email })
   }
 }
-
 // 13.3 SIGN OUT - Logout com limpeza
 export async function signOut() {
   try {
     const { error } = await supabase.auth.signOut()
-
     if (!error) {
       clearOrgId()
       console.log('✅ User signed out successfully')
     }
-
     return handleSupabaseResponse(null, error, 'logout')
   } catch (error) {
     return handleSupabaseResponse(null, error, 'logout')
   }
 }
-
 // 13.4 PASSWORD RESET - Reset de senha
 export async function resetPassword(email) {
   const validation = validateRequired({ email })
   if (validation) return { data: null, error: validation, success: false }
-
   try {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email)
-
     return handleSupabaseResponse(data, error, 'reset de senha', { email })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'reset de senha', { email })
   }
 }
-
 // =========================================================================
 // 14. OPERAÇÕES EM LOTE - REAL BATCH OPERATIONS
 // =========================================================================
-
 // 14.1 BULK CREATE LEADS - Criação em lote de leads
 export async function bulkCreateLeads(leads, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ leads, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!Array.isArray(leads) || leads.length === 0) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Array de leads é obrigatório e não pode estar vazio', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
     const payload = leads.map(lead => ({
       ...lead,
@@ -2207,36 +1893,30 @@ export async function bulkCreateLeads(leads, orgId = getCurrentOrgId()) {
       temperatura: lead.temperatura || 'frio',
       score_ia: lead.score_ia || 0
     }))
-
     const { data, error } = await supabase
       .from('leads_crm')
       .insert(payload)
       .select()
-
     return handleSupabaseResponse(data, error, 'criação em lote de leads', { count: leads.length })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'criação em lote de leads', { count: leads.length })
   }
 }
-
 // 14.2 BULK UPDATE LEADS - Atualização em lote de leads
 export async function bulkUpdateLeads(updates, orgId = getCurrentOrgId()) {
   const validation = validateRequired({ updates, orgId })
   if (validation) return { data: null, error: validation, success: false }
-
   if (!Array.isArray(updates) || updates.length === 0) {
-    return { 
-      data: null, 
+    return {
+      data: null,
       error: createError('Array de atualizações é obrigatório e não pode estar vazio', 'BUSINESS_VALIDATION'),
-      success: false 
+      success: false
     }
   }
-
   try {
     const results = []
     for (const update of updates) {
       if (!update.id) continue
-
       const { id, ...updateData } = update
       const { data, error } = await supabase
         .from('leads_crm')
@@ -2245,24 +1925,20 @@ export async function bulkUpdateLeads(updates, orgId = getCurrentOrgId()) {
         .eq('org_id', orgId)
         .select()
         .single()
-
       if (error) {
         console.error(`Erro ao atualizar lead ${id}:`, error)
       } else {
         results.push(data)
       }
     }
-
     return handleSupabaseResponse(results, null, 'atualização em lote de leads', { count: updates.length })
   } catch (error) {
     return handleSupabaseResponse(null, error, 'atualização em lote de leads', { count: updates.length })
   }
 }
-
 // =========================================================================
 // 15. REAL-TIME SUBSCRIPTIONS - ENTERPRISE GRADE
 // =========================================================================
-
 // 15.1 SUBSCRIBE TO TABLE - Inscrição em tabela com filtros
 export function subscribeToTable(table, callback, filters = {}) {
   const validation = validateRequired({ table, callback })
@@ -2270,7 +1946,6 @@ export function subscribeToTable(table, callback, filters = {}) {
     console.error('🚨 Subscription validation failed:', validation.message)
     return null
   }
-
   try {
     let subscription = supabase
       .channel(`${table}_changes`)
@@ -2287,7 +1962,6 @@ export function subscribeToTable(table, callback, filters = {}) {
         }
       })
       .subscribe()
-
     console.log(`✅ Subscribed to ${table} changes`)
     return subscription
   } catch (error) {
@@ -2295,11 +1969,9 @@ export function subscribeToTable(table, callback, filters = {}) {
     return null
   }
 }
-
 // 15.2 UNSUBSCRIBE FROM TABLE - Cancelar inscrição
 export function unsubscribeFromTable(subscription) {
   if (!subscription) return false
-
   try {
     supabase.removeChannel(subscription)
     console.log('✅ Unsubscribed from table changes')
@@ -2309,24 +1981,19 @@ export function unsubscribeFromTable(subscription) {
     return false
   }
 }
-
 // =========================================================================
 // 16. HEALTH MONITORING - PRODUCTION DIAGNOSTICS
 // =========================================================================
-
 // 16.1 HEALTH CHECK - Verificação de saúde do sistema
 export async function healthCheck() {
   try {
     const startTime = Date.now()
-
     // Test basic connectivity
     const { data, error } = await supabase
       .from('organizations')
       .select('id')
       .limit(1)
-
     const responseTime = Date.now() - startTime
-
     if (error) {
       return {
         status: 'unhealthy',
@@ -2336,7 +2003,6 @@ export async function healthCheck() {
         url: SUPABASE_URL
       }
     }
-
     return {
       status: 'healthy',
       responseTime,
@@ -2353,7 +2019,6 @@ export async function healthCheck() {
     }
   }
 }
-
 // 16.2 CONNECTION STATUS - Status da conexão
 export async function getConnectionStatus() {
   try {
@@ -2372,11 +2037,9 @@ export async function getConnectionStatus() {
     }
   }
 }
-
 // =========================================================================
 // 17. CONSTANTS & CONFIGURATION - ENTERPRISE STANDARDS
 // =========================================================================
-
 // Lead status constants
 export const LEAD_STATUSES = {
   NOVO: 'novo',
@@ -2387,7 +2050,6 @@ export const LEAD_STATUSES = {
   FECHADO_GANHO: 'fechado_ganho',
   FECHADO_PERDIDO: 'fechado_perdido'
 }
-
 // Lead temperature levels
 export const LEAD_TEMPERATURES = {
   FRIO: 'frio',
@@ -2395,7 +2057,6 @@ export const LEAD_TEMPERATURES = {
   QUENTE: 'quente',
   MUITO_QUENTE: 'muito_quente'
 }
-
 // Interaction types
 export const INTERACTION_TYPES = {
   EMAIL: 'email',
@@ -2405,7 +2066,6 @@ export const INTERACTION_TYPES = {
   SMS: 'sms',
   OUTRO: 'outro'
 }
-
 // Priority levels
 export const PRIORITY_LEVELS = {
   BAIXA: 'baixa',
@@ -2413,7 +2073,6 @@ export const PRIORITY_LEVELS = {
   ALTA: 'alta',
   URGENTE: 'urgente'
 }
-
 // Automation statuses
 export const AUTOMATION_STATUSES = {
   PENDING: 'pending',
@@ -2422,7 +2081,6 @@ export const AUTOMATION_STATUSES = {
   FAILED: 'failed',
   CANCELLED: 'cancelled'
 }
-
 // Badge types
 export const BADGE_TYPES = {
   ACHIEVEMENT: 'achievement',
@@ -2430,11 +2088,9 @@ export const BADGE_TYPES = {
   SKILL: 'skill',
   SPECIAL: 'special'
 }
-
 // =========================================================================
 // 18. ENTERPRISE CONFIGURATION EXPORT - PRODUCTION READY
 // =========================================================================
-
 export const supabaseConfig = {
   url: SUPABASE_URL,
   version: '8.0.0',
@@ -2470,7 +2126,6 @@ export const supabaseConfig = {
   totalTables: 55,
   realDataIntegration: true
 }
-
 // 🎯 PRODUCTION INITIALIZATION LOG
 if (import.meta.env.DEV) {
   console.log('🚀 ALSHAM 360° PRIMA - Supabase Enterprise Lib v8.0 PRODUCTION READY')
@@ -2482,5 +2137,4 @@ if (import.meta.env.DEV) {
   console.log('✅ NASA 10/10 quality standards applied')
   console.log('🎯 ZERO mock data - 100% real production integration')
 }
-
 export default supabase
