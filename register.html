@@ -10,33 +10,29 @@
     <meta name="author" content="ALSHAM Development Team">
     <meta name="theme-color" content="#3B82F6">
     
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Criar Conta - ALSHAM 360° PRIMA">
     <meta property="og:description" content="Cadastre-se no CRM mais avançado do mercado">
     <meta property="og:image" content="/og-image.png">
     
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Criar Conta - ALSHAM 360° PRIMA">
     <meta property="twitter:description" content="Cadastre-se no CRM mais avançado do mercado">
     <meta property="twitter:image" content="/og-image.png">
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co;">
     
     <title>Criar Conta - ALSHAM 360° PRIMA</title>
     
-    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
     
-    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Stylesheets - Local build only, no CDN -->
     <link rel="stylesheet" href="/src/style.css">
 
     <style>
@@ -451,29 +447,23 @@
 </head>
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen relative overflow-hidden">
     
-    <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
         Pular para o conteúdo principal
     </a>
     
-    <!-- Floating Background Elements -->
     <div class="floating-pattern" aria-hidden="true"></div>
     <div class="floating-pattern" aria-hidden="true"></div>
     <div class="floating-pattern" aria-hidden="true"></div>
     
-    <!-- Grid Pattern Background -->
     <div class="absolute inset-0 opacity-5 pointer-events-none" aria-hidden="true">
         <div class="absolute inset-0" style="background-image: linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
     </div>
     
-    <!-- Main Container -->
     <main id="main-content" class="relative min-h-screen flex items-center justify-center p-4" role="main">
         <div class="w-full max-w-lg">
             
-            <!-- Register Card -->
             <div class="card-premium glass-effect animate-on-load" style="animation-delay: 0.2s;">
                 
-                <!-- Header with Logo -->
                 <div class="bg-gradient-premium p-8 text-center relative overflow-hidden">
                     <div class="absolute inset-0 bg-black opacity-10" aria-hidden="true"></div>
                     <div class="relative z-10">
@@ -487,7 +477,6 @@
                 
                 <div class="p-8">
                     
-                    <!-- Progress Indicator -->
                     <div class="mb-6" role="progressbar" aria-label="Progresso do formulário">
                         <div class="step-indicator" id="step-indicator" aria-live="polite">0/6 campos completos</div>
                         <div class="progress-container">
@@ -495,7 +484,6 @@
                         </div>
                     </div>
                     
-                    <!-- Error Messages -->
                     <div id="error-message" class="hidden mb-4" role="alert" aria-live="assertive">
                         <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
                             <div class="flex">
@@ -507,7 +495,6 @@
                         </div>
                     </div>
 
-                    <!-- Success Messages -->
                     <div id="success-message" class="hidden mb-4" role="alert" aria-live="polite">
                         <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
                             <div class="flex items-center">
@@ -519,10 +506,8 @@
                         </div>
                     </div>
                     
-                    <!-- Register Form -->
                     <form id="register-form" class="space-y-6" novalidate aria-label="Formulário de cadastro">
                         
-                        <!-- Nome Completo -->
                         <div class="form-field">
                             <label for="fullName" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Nome Completo *
@@ -550,7 +535,6 @@
                             <div id="fullName-error" class="field-error hidden" role="alert"></div>
                         </div>
 
-                        <!-- Email -->
                         <div class="form-field">
                             <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
                                 E-mail *
@@ -578,7 +562,6 @@
                             <div id="email-suggestion" class="email-suggestion hidden" role="button" tabindex="0" aria-label="Sugestão de correção de email"></div>
                         </div>
 
-                        <!-- Senha -->
                         <div class="form-field">
                             <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Senha *
@@ -619,7 +602,6 @@
                                 </button>
                             </div>
                             
-                            <!-- Password Strength Indicator -->
                             <div class="strength-indicator" aria-label="Indicador de força da senha">
                                 <div class="strength-bar" id="strength-1"></div>
                                 <div class="strength-bar" id="strength-2"></div>
@@ -630,7 +612,6 @@
                             
                             <div id="password-error" class="field-error hidden" role="alert"></div>
                             
-                            <!-- Password Requirements -->
                             <div id="password-requirements" class="text-xs text-gray-500 mt-2">
                                 <p>A senha deve conter:</p>
                                 <ul class="list-disc list-inside space-y-1 mt-1">
@@ -643,7 +624,6 @@
                             </div>
                         </div>
 
-                        <!-- Confirmar Senha -->
                         <div class="form-field">
                             <label for="confirmPassword" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Confirmar Senha *
@@ -669,7 +649,6 @@
                             <div id="confirmPassword-error" class="field-error hidden" role="alert"></div>
                         </div>
 
-                        <!-- Empresa -->
                         <div class="form-field">
                             <label for="company" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Empresa
@@ -694,7 +673,6 @@
                             <div id="company-error" class="field-error hidden" role="alert"></div>
                         </div>
 
-                        <!-- Telefone -->
                         <div class="form-field">
                             <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Telefone
@@ -719,7 +697,6 @@
                             <div id="phone-error" class="field-error hidden" role="alert"></div>
                         </div>
 
-                        <!-- Termos e Condições -->
                         <div class="form-field">
                             <div class="flex items-start space-x-3">
                                 <input
@@ -741,7 +718,6 @@
                             <div id="terms-error" class="field-error hidden" role="alert"></div>
                         </div>
 
-                        <!-- Marketing Opt-in -->
                         <div class="form-field">
                             <div class="flex items-start space-x-3">
                                 <input
@@ -756,7 +732,6 @@
                             </div>
                         </div>
 
-                        <!-- Register Button -->
                         <button
                             type="submit"
                             id="register-btn"
@@ -770,7 +745,6 @@
                         <div id="register-status" class="sr-only" aria-live="polite"></div>
                     </form>
 
-                    <!-- Divider -->
                     <div class="mt-8 mb-6">
                         <div class="relative">
                             <div class="absolute inset-0 flex items-center" aria-hidden="true">
@@ -782,7 +756,6 @@
                         </div>
                     </div>
 
-                    <!-- OAuth Buttons -->
                     <div class="space-y-3">
                         <button id="google-register" class="oauth-btn focus-visible" aria-label="Cadastrar-se com Google">
                             <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true">
@@ -805,17 +778,15 @@
                         </button>
                     </div>
 
-                    <!-- Login Link -->
                     <div class="mt-8 text-center">
                         <p class="text-sm text-gray-600">
                             Já tem uma conta? 
-                            <a href="/src/pages/login.html" class="font-medium text-blue-600 hover:text-blue-500 transition-colors focus-visible">
+                            <a href="/login.html" class="font-medium text-blue-600 hover:text-blue-500 transition-colors focus-visible">
                                 Faça login
                             </a>
                         </p>
                     </div>
 
-                    <!-- Security & Privacy Notice -->
                     <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <div class="flex items-start">
                             <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -830,7 +801,6 @@
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="mt-8 text-center text-sm text-gray-500 animate-on-load" style="animation-delay: 0.6s;">
                 <p>&copy; 2024 ALSHAM 360° PRIMA. Todos os direitos reservados.</p>
                 <div class="mt-2 space-x-4">
@@ -842,7 +812,6 @@
         </div>
     </main>
 
-    <!-- Fallback para usuários sem JavaScript -->
     <noscript>
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
@@ -858,8 +827,9 @@
         </div>
     </noscript>
 
-    <!-- Scripts -->
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="/src/components/navigation.js"></script>
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/js/auth.js"></script>
+    <script type="module" src="/src/js/register.js"></script>
 </body>
 </html>
-
