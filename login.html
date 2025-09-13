@@ -1,667 +1,465 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Faça login com segurança no ALSHAM 360° PRIMA CRM. Acesso rápido via e-mail, Google ou Microsoft com recursos avançados de segurança e autenticação biométrica.">
-    <meta name="keywords" content="login, CRM, ALSHAM, segurança, autenticação, biometria">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="author" content="ALSHAM Development Team">
-    <meta name="theme-color" content="#3B82F6">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Login - ALSHAM 360° PRIMA">
-    <meta property="og:description" content="Acesso seguro ao CRM mais avançado do mercado">
-    <meta property="og:image" content="/og-image.png">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Login - ALSHAM 360° PRIMA">
-    <meta property="twitter:description" content="Acesso seguro ao CRM mais avançado do mercado">
-    <meta property="twitter:image" content="/og-image.png">
-    
-    <title>Login - ALSHAM 360° PRIMA</title>
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Stylesheets - Local build only, no CDN -->
-    <link rel="stylesheet" href="/src/style.css">
-
-    <style>
-        /* Enterprise CSS Variables */
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --info-color: #3b82f6;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-            --border-radius-xl: 0.75rem;
-            --border-radius-2xl: 1rem;
-            --transition-all: all 0.3s ease-in-out;
-        }
-        
-        /* Base styles */
-        body { 
-            font-family: 'Inter', sans-serif; 
-            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-            overflow-x: hidden;
-        }
-        
-        /* Premium gradient background */
-        .bg-gradient-premium {
-            background: var(--primary-gradient);
-        }
-        
-        /* Enterprise button styles - No @apply rules */
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            background: var(--primary-gradient);
-            color: white;
-            font-weight: 600;
-            border-radius: var(--border-radius-xl);
-            box-shadow: var(--shadow-lg);
-            transform: translateY(0);
-            transition: var(--transition-all);
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-        }
-        
-        .btn-primary:hover {
-            box-shadow: var(--shadow-xl);
-            transform: translateY(-0.125rem);
-        }
-        
-        .btn-primary:focus {
-            outline: none;
-            box-shadow: var(--shadow-xl), 0 0 0 4px rgb(59 130 246 / 0.3);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* Premium input styles */
-        .input-premium {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--border-radius-xl);
-            background: white;
-            transition: var(--transition-all);
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-        }
-        
-        .input-premium:focus {
-            border-color: #3b82f6;
-            outline: none;
-            box-shadow: 0 0 0 4px rgb(59 130 246 / 0.1);
-        }
-        
-        .input-premium.error {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 4px rgb(239 68 68 / 0.1);
-        }
-        
-        /* Premium card styles */
-        .card-premium {
-            background: white;
-            border-radius: var(--border-radius-2xl);
-            box-shadow: var(--shadow-2xl);
-            border: 1px solid #f3f4f6;
-            overflow: hidden;
-        }
-        
-        /* Glass effect */
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        /* OAuth button styles */
-        .oauth-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--border-radius-xl);
-            box-shadow: var(--shadow-sm);
-            background: white;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition-all);
-            transform: translateY(0);
-        }
-        
-        .oauth-btn:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-            box-shadow: var(--shadow-md);
-            transform: translateY(-0.125rem);
-        }
-        
-        .oauth-btn:focus {
-            outline: none;
-            box-shadow: var(--shadow-md), 0 0 0 4px rgb(156 163 175 / 0.3);
-        }
-        
-        /* Floating background patterns */
-        .floating-pattern {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .floating-pattern:nth-child(1) {
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-        
-        .floating-pattern:nth-child(2) {
-            top: 70%;
-            right: 10%;
-            animation-delay: 2s;
-        }
-        
-        .floating-pattern:nth-child(3) {
-            top: 50%;
-            left: -10%;
-            animation-delay: 4s;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-        
-        /* Animation styles */
-        .animate-on-load {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: slideInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        
-        @keyframes slideInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .logo-glow {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
-        }
-        
-        .form-field {
-            position: relative;
-        }
-        
-        .form-field input:focus + .field-icon {
-            color: #3b82f6;
-            transform: scale(1.1);
-        }
-        
-        .field-icon {
-            transition: all 0.3s ease;
-        }
-        
-        .shake {
-            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97);
-        }
-        
-        @keyframes shake {
-            10%, 90% { transform: translateX(-2px); }
-            20%, 80% { transform: translateX(4px); }
-            30%, 50%, 70% { transform: translateX(-8px); }
-            40%, 60% { transform: translateX(8px); }
-        }
-        
-        .loading-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        /* Notification styles */
-        .security-notice {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            color: #92400e;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            max-width: 24rem;
-            margin: 0 auto;
-        }
-        
-        .offline-notice {
-            background: #fef2f2;
-            border: 1px solid #ef4444;
-            color: #991b1b;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            max-width: 24rem;
-            margin: 0 auto;
-        }
-        
-        .success-checkmark {
-            animation: checkmark 0.6s ease-in-out;
-        }
-        
-        @keyframes checkmark {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .biometric-pulse {
-            animation: biometricPulse 2s infinite;
-        }
-        
-        @keyframes biometricPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-        }
-        
-        /* Loading spinner */
-        .loading-spinner {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Field error styles */
-        .field-error {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-        }
-        
-        .field-error.hidden {
-            display: none;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .floating-pattern {
-                width: 200px;
-                height: 200px;
-            }
-            
-            .card-premium {
-                margin: 1rem;
-            }
-        }
-        
-        /* Accessibility improvements */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-        
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-            .card-premium {
-                border: 2px solid #000;
-            }
-            
-            .btn-primary {
-                border: 2px solid #000;
-            }
-            
-            .oauth-btn {
-                border: 2px solid #000;
-            }
-        }
-        
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #1f2937;
-                --text-color: #f9fafb;
-                --card-bg: #374151;
-            }
-        }
-        
-        /* Focus visible for better accessibility */
-        .focus-visible:focus {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-        }
-    </style>
+    <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+    <title>Dashboard — ALSHAM 360° PRIMA | CRM Enterprise</title>
+  <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA: KPIs em tempo real, analytics avançados, leads inteligentes e automações empresariais." />
+  <meta name="keywords" content="CRM, dashboard, analytics, leads, vendas, automação, IA, business intelligence" />
+  <meta name="author" content="ALSHAM Team" />
+  
+    <meta property="og:title" content="Dashboard — ALSHAM 360° PRIMA" />
+  <meta property="og:description" content="Dashboard executivo com KPIs em tempo real e analytics avançados" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="/dashboard.html" />
+  <meta property="og:image" content="/public/og-dashboard.jpg" />
+  <meta property="og:site_name" content="ALSHAM 360° PRIMA" />
+  
+    <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Dashboard — ALSHAM 360° PRIMA" />
+  <meta name="twitter:description" content="Dashboard executivo com KPIs em tempo real" />
+  <meta name="twitter:image" content="/public/twitter-dashboard.jpg" />
+  
+    <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°" />
+  <link rel="apple-touch-icon" href="/public/apple-touch-icon.png" />
+  
+    <link rel="icon" type="image/x-icon" href="/public/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png" />
+  
+    <link rel="canonical" href="/dashboard.html" />
+  
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://*.railway.app wss://*.supabase.co; frame-ancestors 'none';" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+  
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+  
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  
+    <style>
+    /* Critical CSS para above-the-fold */
+    :root {
+      --primary: #8b5cf6;
+      --primary-dark: #7c3aed;
+      --secondary: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+    
+    .bg-gradient-premium {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    
+    .bg-gradient-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .text-primary { color: var(--primary); }
+    .text-primary-dark { color: var(--primary-dark); }
+    .text-secondary { color: var(--secondary); }
+    .text-success { color: var(--success); }
+    .text-warning { color: var(--warning); }
+    .text-error { color: var(--error); }
+    
+    .border-primary { border-color: var(--primary); }
+    
+    /* Loading skeleton */
+    .loading-skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading-skeleton 1.5s infinite;
+      border-radius: 0.75rem;
+      height: 120px;
+    }
+    
+    @keyframes loading-skeleton {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    .focus\:not-sr-only:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0.5rem 1rem;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+      background: var(--primary);
+      color: white;
+      border-radius: 0.375rem;
+      text-decoration: none;
+    }
+    
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+  
+    <link rel="stylesheet" href="/src/style.css" />
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID', {
+      page_title: 'Dashboard',
+      page_location: window.location.href
+    });
+  </script>
 </head>
-<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen relative overflow-hidden">
-    
-    <!-- Skip to main content for accessibility -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
-        Pular para o conteúdo principal
-    </a>
-    
-    <!-- Floating Background Elements -->
-    <div class="floating-pattern" aria-hidden="true"></div>
-    <div class="floating-pattern" aria-hidden="true"></div>
-    <div class="floating-pattern" aria-hidden="true"></div>
-    
-    <!-- Grid Pattern Background -->
-    <div class="absolute inset-0 opacity-5 pointer-events-none" aria-hidden="true">
-        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
-    </div>
-    
-    <!-- Security & Offline Notices -->
-    <div id="security-notice" class="fixed top-4 left-4 right-4 z-50 hidden" role="alert" aria-live="assertive">
-        <div class="security-notice">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Aviso de Segurança</span>
-            </div>
-        </div>
-    </div>
-    
-    <div id="offline-notice" class="fixed top-4 left-4 right-4 z-50 hidden" role="alert" aria-live="assertive">
-        <div class="offline-notice">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Sem conexão com a internet</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Main Container -->
-    <main id="main-content" class="relative min-h-screen flex items-center justify-center p-4" role="main">
-        <div class="w-full max-w-md">
-            
-            <!-- Login Card -->
-            <div class="card-premium glass-effect animate-on-load" style="animation-delay: 0.2s;">
-                
-                <!-- Header with Logo -->
-                <div class="bg-gradient-premium p-8 text-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-black opacity-10" aria-hidden="true"></div>
-                    <div class="relative z-10">
-                        <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 logo-glow transform hover:scale-105 transition-transform duration-300" aria-hidden="true">
-                            <span class="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent">A</span>
-                        </div>
-                        <h1 class="text-2xl font-bold text-white mb-2">ALSHAM 360° PRIMA</h1>
-                        <p class="text-blue-100 text-sm">Bem-vindo de volta! Faça login para continuar.</p>
-                    </div>
-                </div>
-                
-                <div class="p-8">
-                    
-                    <!-- Error Messages -->
-                    <div id="error-message" class="hidden mb-4" role="alert" aria-live="assertive">
-                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-                            <div class="flex">
-                                <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span id="error-text" class="text-red-700 text-sm font-medium"></span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Success Messages -->
-                    <div id="success-message" class="hidden mb-4" role="alert" aria-live="polite">
-                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-green-400 mr-3 success-checkmark" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span id="success-text" class="text-green-700 text-sm font-medium"></span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Login Form -->
-                    <form id="login-form" class="space-y-6" novalidate aria-label="Formulário de login">
-                        
-                        <!-- Email Field -->
-                        <div class="form-field">
-                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                                E-mail *
-                            </label>
-                            <div class="relative">
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    required
-                                    autocomplete="email"
-                                    class="input-premium pl-12 focus-visible"
-                                    placeholder="seu@email.com"
-                                    aria-describedby="email-error"
-                                    aria-invalid="false"
-                                >
-                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 field-icon" aria-hidden="true">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div id="email-error" class="field-error hidden" role="alert"></div>
-                        </div>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <a href="#main-content" class="sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
+  
+    <noscript>
+    <div style="padding:16px;background:#fee2e2;color:#991b1b;text-align:center;font-weight:600;">
+      ⚠️ Este aplicativo requer JavaScript habilitado para funcionar corretamente.
+      <br>Por favor, habilite JavaScript em seu navegador e recarregue a página.
+    </div>
+  </noscript>
+  
+    <div id="loading-indicator" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600 font-medium">Carregando dashboard...</p>
+    </div>
+  </div>
+  
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm" role="banner">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+                <a class="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2" 
+           href="/index.html" 
+           aria-label="Ir para página inicial do ALSHAM 360° PRIMA">
+          <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center shadow-lg">
+            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
+            <p class="text-xs text-gray-500">Dashboard Executivo</p>
+          </div>
+        </a>
 
-                        <!-- Password Field -->
-                        <div class="form-field">
-                            <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Senha *
-                            </label>
-                            <div class="relative">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    required
-                                    autocomplete="current-password"
-                                    class="input-premium pl-12 pr-12 focus-visible"
-                                    placeholder="••••••••"
-                                    aria-describedby="password-error"
-                                    aria-invalid="false"
-                                >
-                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 field-icon" aria-hidden="true">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                </div>
-                                <button
-                                    type="button"
-                                    id="toggle-password"
-                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus-visible"
-                                    aria-label="Mostrar/ocultar senha"
-                                    aria-pressed="false"
-                                >
-                                    <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    <svg id="eye-closed" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L12 12m-3.122-3.122L12 12m0 0l3.878 3.878M12 12l6.878-6.878M3 3l18 18"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div id="password-error" class="field-error hidden" role="alert"></div>
-                        </div>
+                <nav class="hidden md:flex items-center space-x-8" aria-label="Navegação principal" role="navigation">
+          <a href="/dashboard.html" 
+             class="text-primary font-medium border-b-2 border-primary pb-1 transition-colors"
+             aria-current="page">
+            Dashboard
+          </a>
+          <a href="/leads-real.html" 
+             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+            Leads
+          </a>
+          <a href="/automacoes.html" 
+             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+            Automações
+          </a>
+          <a href="/relatorios.html" 
+             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+            Relatórios
+          </a>
+          <a href="/gamificacao.html" 
+             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+            Gamificação
+          </a>
+          <a href="/configuracoes.html" 
+             class="text-gray-600 hover:text-primary transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1">
+            Configurações
+          </a>
+        </nav>
 
-                        <!-- Remember Me & Forgot Password -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input
-                                    id="remember"
-                                    name="remember"
-                                    type="checkbox"
-                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors focus-visible"
-                                >
-                                <label for="remember" class="ml-2 block text-sm text-gray-700">
-                                    Lembrar de mim
-                                </label>
-                            </div>
+                <button class="md:hidden p-2 text-gray-600 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                id="mobile-menu-button"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+                aria-label="Abrir menu de navegação">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
 
-                            <a href="#" id="forgot-password" class="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors focus-visible">
-                                Esqueceu a senha?
-                            </a>
-                        </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative" aria-live="polite">
+            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-lg" 
+                    id="notifications-button"
+                    aria-label="Notificações (3 não lidas)"
+                    aria-describedby="notification-count">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+            <span id="notification-count" 
+                  class="absolute -top-1 -right-1 w-3 h-3 bg-error rounded-full animate-pulse" 
+                  aria-label="3 notificações não lidas">
+              <span class="sr-only">3 notificações não lidas</span>
+            </span>
+          </div>
 
-                        <!-- Login Button -->
-                        <button
-                            type="submit"
-                            id="login-btn"
-                            class="btn-primary focus-visible"
-                            aria-describedby="login-status"
-                        >
-                            <span id="login-btn-text">Entrar</span>
-                            <div id="login-spinner" class="loading-spinner w-5 h-5 border-2 border-white border-t-transparent rounded-full ml-2 hidden" aria-hidden="true"></div>
-                        </button>
-                        
-                        <div id="login-status" class="sr-only" aria-live="polite"></div>
-                    </form>
+                    <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center shadow-sm" 
+                 role="img" 
+                 aria-label="Avatar do usuário">
+              <span class="text-white text-sm font-semibold" data-auth="user-avatar">U</span>
+            </div>
+            <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
+            <button data-auth="logout-btn" 
+                    class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded p-1" 
+                    aria-label="Sair da conta">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+        <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
+      <div class="px-4 py-3 space-y-2">
+                <a href="/dashboard.html" class="block px-3 py-2 text-primary font-medium bg-primary/10 rounded-lg">Dashboard</a>
+        <a href="/leads-real.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Leads</a>
+        <a href="/automacoes.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Automações</a>
+        <a href="/relatorios.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Relatórios</a>
+        <a href="/gamificacao.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Gamificação</a>
+        <a href="/configuracoes.html" class="block px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors">Configurações</a>
+      </div>
+    </div>
+  </header>
 
-                    <!-- Divider -->
-                    <div class="mt-8 mb-6">
-                        <div class="relative">
-                            <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                                <div class="w-full border-t border-gray-300"></div>
-                            </div>
-                            <div class="relative flex justify-center text-sm">
-                                <span class="px-2 bg-white text-gray-500">Ou continue com</span>
-                            </div>
-                        </div>
-                    </div>
+    <main id="main-content" role="main" tabindex="-1">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" aria-labelledby="hero-title">
+      <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden shadow-xl">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative z-10">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div class="mb-6 lg:mb-0">
+              <h2 id="hero-title" class="text-3xl lg:text-4xl font-bold mb-2">🎉 Bem-vindo de volta!</h2>
+              <p class="text-xl mb-4 opacity-90">Você está fazendo um ótimo trabalho</p>
+              <div class="flex flex-wrap items-center gap-4 text-sm">
+                <span class="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
+                  <span class="text-green-300" aria-hidden="true">↗️</span>
+                  <span><strong>+23%</strong> vs. semana passada</span>
+                </span>
+                <span class="flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
+                  <span class="text-yellow-300" aria-hidden="true">🔥</span>
+                  <span>Seu melhor mês até agora</span>
+                </span>
+              </div>
+            </div>
+            <div class="text-center lg:text-right">
+              <div class="text-sm opacity-90 mb-2">Meta Mensal</div>
+              <div class="text-3xl font-bold mb-1" id="monthly-progress" aria-live="polite">73%</div>
+              <div class="text-sm mb-3" id="monthly-remaining">Faltam R$ 8.250</div>
+              <div class="w-full lg:w-32 bg-white/20 rounded-full h-3 mx-auto lg:mx-0">
+                <div class="bg-yellow-300 h-3 rounded-full transition-all duration-1000" 
+                     style="width:73%"
+                     role="progressbar"
+                     aria-valuenow="73"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-label="Progresso da meta mensal: 73%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                    <!-- OAuth Buttons -->
-                    <div class="space-y-3">
-                        <button id="google-login" class="oauth-btn focus-visible" aria-label="Entrar com Google">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Entrar com Google
-                        </button>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="kpis-title">
+      <h2 id="kpis-title" class="sr-only">Indicadores de Performance</h2>
+      
+            <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                
+                <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+        <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="loading-skeleton"></div>
+        </div>
+      </div>
+    </section>
 
-                        <button id="microsoft-login" class="oauth-btn focus-visible" aria-label="Entrar com Microsoft">
-                            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill="#F25022" d="M1 1h10v10H1z"/>
-                                <path fill="#00A4EF" d="M13 1h10v10H13z"/>
-                                <path fill="#7FBA00" d="M1 13h10v10H1z"/>
-                                <path fill="#FFB900" d="M13 13h10v10H13z"/>
-                            </svg>
-                            Entrar com Microsoft
-                        </button>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="charts-title">
+      <h2 id="charts-title" class="sr-only">Gráficos e Analytics</h2>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">📈 Performance</h3>
+            <div class="flex space-x-2">
+              <button class="text-xs bg-primary text-white px-3 py-1 rounded-full" data-chart-filter="revenue">Receita</button>
+              <button class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors" data-chart-filter="leads">Leads</button>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="performanceChart" aria-label="Gráfico de performance"></canvas>
+          </div>
+        </div>
 
-                        <!-- Biometric Login (if supported) -->
-                        <button id="biometric-login" class="oauth-btn biometric-pulse hidden focus-visible" aria-label="Entrar com biometria">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                            Entrar com Biometria
-                        </button>
-                    </div>
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">🔄 Funil de Vendas</h3>
+            <button class="btn-secondary text-sm px-4 py-2" onclick="window.navigateTo('relatorios')">
+              Ver Detalhes
+            </button>
+          </div>
+          <div id="sales-funnel">
+                      </div>
+        </div>
+      </div>
+    </section>
 
-                    <!-- Register Link -->
-                    <div class="mt-8 text-center">
-                        <p class="text-sm text-gray-600">
-                            Não tem uma conta? 
-                            <a href="/src/pages/register.html" class="font-medium text-blue-600 hover:text-blue-500 transition-colors focus-visible">
-                                Cadastre-se gratuitamente
-                            </a>
-                        </p>
-                    </div>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="leads-title">
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center justify-between mb-6">
+          <h3 id="leads-title" class="text-xl font-bold text-gray-900">👥 Leads Recentes</h3>
+          <button class="btn-primary text-sm px-4 py-2" onclick="window.navigateTo('leads-real')">
+            Ver Todos
+          </button>
+        </div>
+        
+                <div id="leads-table" 
+             class="overflow-x-auto" 
+             aria-live="polite"
+             aria-label="Tabela de leads recentes">
+                  </div>
+      </div>
+    </section>
+  </main>
 
-                    <!-- Security Notice -->
-                    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div class="flex items-start">
-                            <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <div class="text-sm text-blue-700">
-                                <p class="font-medium mb-1">Sua segurança é nossa prioridade</p>
-                                <p>Utilizamos criptografia de ponta e autenticação multifator para proteger seus dados.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
+    <div class="text-center">
+      <p class="text-gray-500 text-sm mb-2">
+        © 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.
+      </p>
+      <p class="text-gray-400 text-xs">
+        Versão 2.0.0 | 
+        <a href="/configuracoes.html" class="hover:text-primary transition-colors">Configurações</a> | 
+        <a href="#" class="hover:text-primary transition-colors">Suporte</a>
+      </p>
+    </div>
+  </footer>
 
-            <!-- Footer -->
-            <div class="mt-8 text-center text-sm text-gray-500">
-                <p>&copy; 2024 ALSHAM 360° PRIMA. Todos os direitos reservados.</p>
-                <div class="mt-2 space-x-4">
-                    <a href="#" class="hover:text-gray-700 transition-colors focus-visible">Termos de Uso</a>
-                    <a href="#" class="hover:text-gray-700 transition-colors focus-visible">Política de Privacidade</a>
-                    <a href="#" class="hover:text-gray-700 transition-colors focus-visible">Suporte</a>
-                </div>
-            </div>
-        </div>
-    </main>
+    <div id="toast-container" 
+       class="fixed top-4 right-4 z-50 space-y-2" 
+       aria-live="polite" 
+       aria-label="Notificações do sistema">
+      </div>
 
-    <!-- Fallback para usuários sem JavaScript -->
-    <noscript>
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
-                <p class="text-gray-600 mb-6">
-                    Esta aplicação requer JavaScript para funcionar corretamente. 
-                    Por favor, habilite o JavaScript em seu navegador e recarregue a página.
-                </p>
-                <button onclick="location.reload()" class="btn-primary">
-                    Recarregar Página
-                </button>
-            </div>
-        </div>
-    </noscript>
+    <div id="sr-announcements" 
+       class="sr-only" 
+       aria-live="polite" 
+       aria-atomic="true">
+      </div>
 
-    <!-- Scripts -->
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="/src/components/navigation.js" defer></script>
+  <script type="module" src="./src/main.js" defer></script>
+  <script type="module" src="./src/js/auth.js" defer></script>
+  <script type="module" src="./src/js/dashboard.js" defer></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+          const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+          mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+    });
+  </script>
+
+    <script>
+    // Captura erros não tratados para debugging
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('🚨 Unhandled promise rejection:', event.reason);
+      
+      // Em produção, enviar para serviço de monitoramento
+      if (window.gtag) {
+        gtag('event', 'exception', {
+          description: 'Unhandled promise rejection: ' + (event.reason?.message || event.reason),
+          fatal: false
+        });
+      }
+    });
+    
+    window.addEventListener('error', (event) => {
+      console.error('🚨 Unhandled error:', event.message || event.error);
+      
+      // Em produção, enviar para serviço de monitoramento
+      if (window.gtag) {
+        gtag('event', 'exception', {
+          description: event.message || 'Unknown error',
+          fatal: false
+        });
+      }
+    });
+    
+    // Performance monitoring
+    window.addEventListener('load', () => {
+      const loadTime = performance.now();
+      console.info(`⚡ Dashboard carregado em ${loadTime.toFixed(2)}ms`);
+      
+      if (window.gtag) {
+        gtag('event', 'timing_complete', {
+          name: 'dashboard_load',
+          value: Math.round(loadTime)
+        });
+      }
+    });
+  </script>
 </body>
 </html>
-
