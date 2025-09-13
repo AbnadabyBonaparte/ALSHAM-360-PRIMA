@@ -1,12 +1,10 @@
 /**
  * ALSHAM 360° PRIMA - Enterprise Leads Real System V5.0 NASA 10/10 OPTIMIZED
  * Advanced CRM platform with real-time data integration and enterprise features
- * 
- * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
  * @author ALSHAM Development Team
  * @license MIT
- * 
- * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
+ * * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
  * ✅ Real-time leads data from Supabase CRM tables
  * ✅ Advanced KPIs and analytics dashboard
  * ✅ Multi-view interface (Table, Grid, Kanban)
@@ -21,11 +19,9 @@
  * ✅ Vite build system optimization
  * ✅ Path standardization and consistency
  * ✅ NASA 10/10 Enterprise Grade
- * 
- * 🔗 DATA SOURCES: leads_crm, user_profiles, organizations, lead_activities,
+ * * 🔗 DATA SOURCES: leads_crm, user_profiles, organizations, lead_activities,
  * lead_notes, lead_attachments, lead_tags, conversion_tracking
- * 
- * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
+ * * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
  * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
@@ -43,7 +39,7 @@ import {
     getLeads,
     createLead,
     updateLead,
-    deleteLead,
+    // deleteLead, // JUSTIFICATIVA: A importação de 'deleteLead' foi removida para resolver o erro de "Identifier has already been declared", pois a função já é declarada localmente neste arquivo.
     getLeadActivities,
     createLeadActivity,
     
@@ -114,12 +110,12 @@ function validateDependencies() {
 const LEADS_CONFIG = Object.freeze({
     // Performance settings optimized for REAL data
     PERFORMANCE: {
-        REFRESH_INTERVAL: 30000,     // 30 segundos
-        CACHE_TTL: 300000,           // 5 minutos
-        MAX_RETRIES: 3,              // Tentativas de reconexão
-        DEBOUNCE_DELAY: 300,         // Anti-spam
-        TIMEOUT: 10000,              // Timeout requests
-        AUTO_SAVE_DELAY: 2000,       // Auto-save delay
+        REFRESH_INTERVAL: 30000,      // 30 segundos
+        CACHE_TTL: 300000,            // 5 minutos
+        MAX_RETRIES: 3,               // Tentativas de reconexão
+        DEBOUNCE_DELAY: 300,          // Anti-spam
+        TIMEOUT: 10000,               // Timeout requests
+        AUTO_SAVE_DELAY: 2000,        // Auto-save delay
         // NASA 10/10 performance enhancements
         PARALLEL_REQUESTS: 5,
         ANIMATION_DURATION: 750,
@@ -129,9 +125,9 @@ const LEADS_CONFIG = Object.freeze({
     
     // Security settings for enterprise environment
     SECURITY: {
-        MAX_UPLOAD_SIZE: 10485760,   // 10MB
+        MAX_UPLOAD_SIZE: 10485760,    // 10MB
         ALLOWED_FILE_TYPES: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'],
-        SESSION_TIMEOUT: 1800000,    // 30 minutos
+        SESSION_TIMEOUT: 1800000,     // 30 minutos
         INPUT_VALIDATION: true,
         XSS_PROTECTION: true,
         CSRF_PROTECTION: true,
@@ -974,11 +970,11 @@ function processLeadsData(leads) {
             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
             .map(lead => {
                 const statusConfig = LEADS_CONFIG.STATUS_OPTIONS.find(s => s.value === lead.status) || 
-                                   LEADS_CONFIG.STATUS_OPTIONS[0];
+                                     LEADS_CONFIG.STATUS_OPTIONS[0];
                 const priorityConfig = LEADS_CONFIG.PRIORITY_OPTIONS.find(p => p.value === lead.priority) || 
-                                      LEADS_CONFIG.PRIORITY_OPTIONS[0];
+                                       LEADS_CONFIG.PRIORITY_OPTIONS[0];
                 const sourceConfig = LEADS_CONFIG.SOURCE_OPTIONS.find(s => s.value === lead.source) || 
-                                    LEADS_CONFIG.SOURCE_OPTIONS[6];
+                                     LEADS_CONFIG.SOURCE_OPTIONS[6];
                 
                 return {
                     ...lead,
@@ -1593,9 +1589,9 @@ async function renderLeadsTable() {
                             ${leads.map(lead => {
                                 const isSelected = selectedLeads.includes(lead.id);
                                 const statusStyles = LEADS_CONFIG.STATIC_STYLES.status[lead.status] || 
-                                                   LEADS_CONFIG.STATIC_STYLES.status.novo;
+                                                     LEADS_CONFIG.STATIC_STYLES.status.novo;
                                 const priorityStyles = LEADS_CONFIG.STATIC_STYLES.priority[lead.priority] || 
-                                                      LEADS_CONFIG.STATIC_STYLES.priority.baixa;
+                                                       LEADS_CONFIG.STATIC_STYLES.priority.baixa;
                                 
                                 return `
                                     <tr class="hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}" data-lead-id="${lead.id}">
@@ -1813,9 +1809,9 @@ async function renderLeadsGrid() {
                 ${leads.map(lead => {
                     const isSelected = selectedLeads.includes(lead.id);
                     const statusStyles = LEADS_CONFIG.STATIC_STYLES.status[lead.status] || 
-                                       LEADS_CONFIG.STATIC_STYLES.status.novo;
+                                         LEADS_CONFIG.STATIC_STYLES.status.novo;
                     const priorityStyles = LEADS_CONFIG.STATIC_STYLES.priority[lead.priority] || 
-                                          LEADS_CONFIG.STATIC_STYLES.priority.baixa;
+                                           LEADS_CONFIG.STATIC_STYLES.priority.baixa;
                     
                     return `
                         <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 ${isSelected ? 'ring-2 ring-blue-500' : ''}" 
@@ -1920,7 +1916,7 @@ async function renderLeadsKanban() {
                 ${LEADS_CONFIG.STATUS_OPTIONS.map(status => {
                     const statusLeads = leadsByStatus[status.value] || [];
                     const statusStyles = LEADS_CONFIG.STATIC_STYLES.status[status.value] || 
-                                       LEADS_CONFIG.STATIC_STYLES.status.novo;
+                                         LEADS_CONFIG.STATIC_STYLES.status.novo;
                     
                     return `
                         <div class="flex-shrink-0 w-80">
@@ -1938,7 +1934,7 @@ async function renderLeadsKanban() {
                                 <div class="space-y-3 kanban-column" data-status="${status.value}">
                                     ${statusLeads.map(lead => {
                                         const priorityStyles = LEADS_CONFIG.STATIC_STYLES.priority[lead.priority] || 
-                                                              LEADS_CONFIG.STATIC_STYLES.priority.baixa;
+                                                               LEADS_CONFIG.STATIC_STYLES.priority.baixa;
                                         
                                         return `
                                             <div class="bg-white rounded-lg shadow p-4 cursor-move kanban-card" 
@@ -3031,4 +3027,3 @@ console.log('✅ ES Modules e Vite compatibility otimizados');
 console.log('🚀 Performance e cache inteligente implementados');
 console.log('🔒 Segurança e validação enterprise ativas');
 console.log('💾 Auto-save e gerenciamento de estado avançados');
-
