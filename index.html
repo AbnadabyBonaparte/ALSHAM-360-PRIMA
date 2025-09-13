@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<!-- 🚀 ALSHAM 360° PRIMA - Dashboard Enterprise 10/10 NASA Standard -->
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-    <!-- Meta Tags Enterprise -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ALSHAM 360° PRIMA - CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas.">
@@ -10,28 +8,24 @@
     <meta name="author" content="ALSHAM Team">
     <meta name="robots" content="index, follow">
     
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://app.alshamglobal.com.br/">
     <meta property="og:title" content="ALSHAM 360° PRIMA - CRM Inteligente">
     <meta property="og:description" content="Dashboard enterprise para gestão completa de leads e vendas com IA.">
     <meta property="og:image" content="/assets/og-image.jpg">
     
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://app.alshamglobal.com.br/">
     <meta property="twitter:title" content="ALSHAM 360° PRIMA - CRM Inteligente">
     <meta property="twitter:description" content="Dashboard enterprise para gestão completa de leads e vendas com IA.">
     <meta property="twitter:image" content="/assets/twitter-image.jpg">
     
-    <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     
-    <!-- PWA Support -->
     <meta name="theme-color" content="#3B82F6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -39,15 +33,12 @@
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
     
-    <!-- Title -->
     <title>ALSHAM 360° PRIMA - Dashboard Obra-Prima</title>
     
-    <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     
-    <!-- Critical CSS Inline -->
     <style>
         /* Critical CSS for above-the-fold content */
         .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -64,13 +55,10 @@
         .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
     </style>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="./src/style.css">
     
-    <!-- Loading Indicator -->
     <style>
         #loading-indicator {
             position: fixed;
@@ -103,19 +91,15 @@
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen" data-page="dashboard">
     
-    <!-- Loading Indicator -->
     <div id="loading-indicator" class="hidden"></div>
     
-    <!-- Skip Navigation for Accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded z-50">
         Pular para o conteúdo principal
     </a>
     
-    <!-- Header Premium -->
     <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm" role="banner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo e Branding -->
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center" role="img" aria-label="Logo ALSHAM">
@@ -128,27 +112,22 @@
                     </div>
                 </div>
                 
-                <!-- Navegação Principal -->
                 <nav class="hidden md:flex items-center space-x-8" role="navigation" aria-label="Navegação principal">
-                    <!-- Navigation items will be populated by navigation.js -->
-                </nav>
+                    </nav>
                 
-                <!-- User Actions -->
                 <div class="flex items-center space-x-4">
-                    <!-- Notifications -->
                     <div class="relative">
                         <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" 
                                 aria-label="Notificações" 
                                 id="notifications-button">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                             </svg>
                         </button>
                         <span class="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-pulse" aria-hidden="true"></span>
                     </div>
                     
-                    <!-- User Profile -->
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center" role="img" aria-label="Avatar do usuário">
                             <span class="text-white text-sm font-semibold" id="user-initials">JD</span>
@@ -160,15 +139,11 @@
         </div>
     </header>
 
-    <!-- Breadcrumb -->
     <div id="breadcrumb" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <!-- Breadcrumb will be populated by navigation.js -->
-    </div>
+        </div>
 
-    <!-- Main Content -->
     <main id="main-content" role="main">
         
-        <!-- Hero Section - Demonstração Contínua de Valor -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" aria-labelledby="hero-title">
             <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden" role="banner">
                 <div class="absolute inset-0 bg-black/10" aria-hidden="true"></div>
@@ -208,15 +183,10 @@
             </div>
         </section>
 
-        <!-- KPIs Inteligentes com Storytelling -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="kpis-title">
             <h2 id="kpis-title" class="sr-only">Indicadores de Performance</h2>
             
-            <!-- Container para KPIs dinâmicos -->
             <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- KPIs serão populados dinamicamente pelo main.js -->
-                
-                <!-- Loading Skeletons -->
                 <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-gray-200 rounded-xl loading-skeleton"></div>
@@ -232,7 +202,6 @@
                     </div>
                 </div>
                 
-                <!-- Repetir skeleton para outros KPIs -->
                 <div class="kpi-skeleton bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-gray-200 rounded-xl loading-skeleton"></div>
@@ -280,7 +249,6 @@
             </div>
         </section>
 
-        <!-- Gamificação Visual -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="gamification-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
@@ -290,7 +258,6 @@
                     </button>
                 </div>
                 
-                <!-- Nível e XP -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-sm font-medium text-gray-700">Nível 12 - Especialista</span>
@@ -307,7 +274,6 @@
                     </div>
                 </div>
                 
-                <!-- Conquistas Recentes -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="text-center p-4 bg-yellow-50 rounded-xl border border-yellow-200">
                         <div class="text-2xl mb-2">🥇</div>
@@ -330,7 +296,6 @@
             </div>
         </section>
 
-        <!-- Funil de Vendas Visual -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="funnel-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
@@ -340,7 +305,6 @@
                     </button>
                 </div>
                 
-                <!-- Funil Visual -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-4">
                         <div class="w-24 text-sm font-medium text-gray-700">Leads</div>
@@ -387,7 +351,6 @@
                     </div>
                 </div>
                 
-                <!-- Insights do Funil -->
                 <div class="mt-6 p-4 bg-gray-50 rounded-xl">
                     <div class="flex items-center space-x-2 mb-2">
                         <span class="text-lg">🎯</span>
@@ -407,7 +370,6 @@
             </div>
         </section>
 
-        <!-- Tabela de Leads Recentes -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="leads-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
@@ -417,11 +379,7 @@
                     </button>
                 </div>
                 
-                <!-- Container para tabela de leads -->
                 <div id="leads-table" class="overflow-x-auto">
-                    <!-- Tabela será populada dinamicamente pelo main.js -->
-                    
-                    <!-- Loading Skeleton -->
                     <div class="leads-skeleton">
                         <div class="space-y-3">
                             <div class="flex items-center space-x-4 p-3">
@@ -459,7 +417,6 @@
             </div>
         </section>
 
-        <!-- Gráfico de Performance -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="chart-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
@@ -478,14 +435,12 @@
 
     </main>
 
-    <!-- Footer -->
     <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
         <div class="text-center text-gray-500 text-sm">
             <p>&copy; 2025 ALSHAM 360° PRIMA. Desenvolvido com ❤️ para revolucionar seu CRM.</p>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script>
         /**
          * Configurações globais da aplicação
@@ -725,9 +680,7 @@
         });
     </script>
 
-    <!-- Main Application Script -->
     <script type="module" src="./src/main.js"></script>
 
 </body>
 </html>
-
