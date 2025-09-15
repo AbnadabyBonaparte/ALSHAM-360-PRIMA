@@ -2770,5 +2770,10 @@ export function sanitizeInput(input, options = {}) {
     return options.allowNull ? null : ''
   }
 }
-
+// Função compatível com Supabase v2: retorna a sessão crua (direto)
+export async function getSession() {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  return session;
+}
 export default supabase
