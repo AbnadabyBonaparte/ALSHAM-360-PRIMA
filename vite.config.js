@@ -4,17 +4,11 @@ import legacy from '@vitejs/plugin-legacy';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  // JUSTIFICATIVA: Adicionada a seção 'resolve.alias' para mapear os caminhos de importação.
-  // Isso instrui o Vite a encontrar os arquivos corretos na pasta 'src' durante o build,
-  // resolvendo o erro "failed to resolve import" sem precisar alterar os arquivos HTML.
   resolve: {
     alias: {
-      // Mapeia arquivos que estão na raiz de 'src'
       '/style.css': resolve(__dirname, 'src/style.css'),
       '/main.js': resolve(__dirname, 'src/main.js'),
-      // Mapeia o arquivo de navegação que está em 'src/components'
       '/navigation.js': resolve(__dirname, 'src/components/navigation.js'),
-      // Mapeia os scripts que estão em 'src/js'
       '/auth.js': resolve(__dirname, 'src/js/auth.js'),
       '/automacoes.js': resolve(__dirname, 'src/js/automacoes.js'),
       '/configuracoes.js': resolve(__dirname, 'src/js/configuracoes.js'),
@@ -50,7 +44,28 @@ export default defineConfig({
       targets: ['defaults', 'not IE 11']
     }),
     VitePWA({
-      registerType: 'autoUpdate'
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'ALSHAM 360° PRIMA',
+        short_name: 'ALSHAM360',
+        description: 'CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas.',
+        start_url: '.',
+        display: 'standalone',
+        background_color: '#3B82F6',
+        theme_color: '#3B82F6',
+        icons: [
+          {
+            src: 'icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
     })
   ]
 });
