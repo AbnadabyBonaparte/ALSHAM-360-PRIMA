@@ -2054,7 +2054,7 @@ header {
   background-size: contain;
   border: 1px solid var(--gray-300);
   appearance: none;
-  color-adjust: exact;
+  print-color-adjust: exact; /* <-- CORRIGIDO */
   transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
