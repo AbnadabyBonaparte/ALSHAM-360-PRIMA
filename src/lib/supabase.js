@@ -2575,4 +2575,200 @@ if (import.meta.env.DEV) {
   console.log('🎯 ZERO mock data - 100% real production integration')
 }
 
+// =========================================================================
+// 🔧 FUNÇÕES UTILITÁRIAS ADICIONAIS - CORREÇÃO DE EXPORTS FALTANTES
+// =========================================================================
+
+// JUSTIFICATIVA: Adicionada função getLeadActivities para buscar atividades de leads
+// Esta função é um alias para getLeadInteractions, mantendo compatibilidade
+export async function getLeadActivities(leadId, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ leadId, orgId })
+  if (validation) return { data: null, error: validation, success: false }
+  
+  try {
+    // Reutiliza a função existente getLeadInteractions
+    return await getLeadInteractions(leadId, orgId)
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'busca de atividades do lead', { leadId })
+  }
+}
+
+// JUSTIFICATIVA: Adicionada função createLeadActivity para criar atividades de leads
+// Esta função é um alias para createLeadInteraction, mantendo compatibilidade
+export async function createLeadActivity(activity, orgId = getCurrentOrgId()) {
+  const validation = validateRequired({ activity, orgId })
+  if (validation) return { data: null, error: validation, success: false }
+  
+  try {
+    // Reutiliza a função existente createLeadInteraction
+    return await createLeadInteraction(activity, orgId)
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'criação de atividade do lead', { activityData: activity })
+  }
+}
+
+// JUSTIFICATIVA: Adicionada função refreshSession para renovar sessão de autenticação
+export async function refreshSession() {
+  try {
+    const { data, error } = await supabase.auth.refreshSession()
+    
+    if (error) {
+      console.error('🚨 Erro ao renovar sessão:', error)
+      return { data: null, error: createError(`Erro ao renovar sessão: ${error.message}`, 'AUTH_ERROR'), success: false }
+    }
+    
+    console.log('✅ Sessão renovada com sucesso')
+    return { data, error: null, success: true }
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'renovação de sessão')
+  }
+}
+
+// JUSTIFICATIVA: Adicionada função validateSession para validar sessão atual
+export async function validateSession() {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    
+    if (error) {
+      console.error('🚨 Erro ao validar sessão:', error)
+      return { data: null, error: createError(`Erro ao validar sessão: ${error.message}`, 'AUTH_ERROR'), success: false }
+    }
+    
+    if (!session) {
+      return { data: null, error: createError('Sessão não encontrada ou expirada', 'SESSION_EXPIRED'), success: false }
+    }
+    
+    // Verificar se a sessão está próxima do vencimento (menos de 5 minutos)
+    const expiresAt = new Date(session.expires_at * 1000)
+    const now = new Date()
+    const timeUntilExpiry = expiresAt.getTime() - now.getTime()
+    const fiveMinutes = 5 * 60 * 1000
+    
+    const isValid = timeUntilExpiry > fiveMinutes
+    
+    return { 
+      data: { 
+        session, 
+        isValid, 
+        expiresAt, 
+        timeUntilExpiry: Math.max(0, timeUntilExpiry) 
+      }, 
+      error: null, 
+      success: true 
+    }
+  } catch (error) {
+    return handleSupabaseResponse(null, error, 'validação de sessão')
+  }
+}
+
+// JUSTIFICATIVA: Adicionada função formatDate para formatar datas de forma consistente
+export function formatDate(date, options = {}) {
+  try {
+    if (!date) return ''
+    
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    if (isNaN(dateObj.getTime())) {
+      console.warn('⚠️ Data inválida fornecida para formatDate:', date)
+      return 'Data inválida'
+    }
+    
+    const defaultOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Sao_Paulo',
+      ...options
+    }
+    
+    return dateObj.toLocaleDateString('pt-BR', defaultOptions)
+  } catch (error) {
+    console.error('🚨 Erro ao formatar data:', error)
+    return 'Erro na formatação'
+  }
+}
+
+// JUSTIFICATIVA: Adicionada função formatTimeAgo para mostrar tempo relativo
+export function formatTimeAgo(date) {
+  try {
+    if (!date) return ''
+    
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    if (isNaN(dateObj.getTime())) {
+      console.warn('⚠️ Data inválida fornecida para formatTimeAgo:', date)
+      return 'Data inválida'
+    }
+    
+    const now = new Date()
+    const diffInSeconds = Math.floor((now - dateObj) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return 'agora mesmo'
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes} minuto${minutes > 1 ? 's' : ''} atrás`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours} hora${hours > 1 ? 's' : ''} atrás`
+    } else if (diffInSeconds < 2592000) {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days} dia${days > 1 ? 's' : ''} atrás`
+    } else if (diffInSeconds < 31536000) {
+      const months = Math.floor(diffInSeconds / 2592000)
+      return `${months} mês${months > 1 ? 'es' : ''} atrás`
+    } else {
+      const years = Math.floor(diffInSeconds / 31536000)
+      return `${years} ano${years > 1 ? 's' : ''} atrás`
+    }
+  } catch (error) {
+    console.error('🚨 Erro ao calcular tempo relativo:', error)
+    return 'Erro no cálculo'
+  }
+}
+
+// JUSTIFICATIVA: Adicionada função sanitizeInput para sanitizar entradas de dados
+export function sanitizeInput(input, options = {}) {
+  try {
+    if (input === null || input === undefined) {
+      return options.allowNull ? null : ''
+    }
+    
+    if (typeof input !== 'string') {
+      input = String(input)
+    }
+    
+    // Remover caracteres perigosos por padrão
+    let sanitized = input
+      .replace(/[<>]/g, '') // Remove < e >
+      .replace(/javascript:/gi, '') // Remove javascript:
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .trim()
+    
+    // Aplicar opções específicas
+    if (options.maxLength && sanitized.length > options.maxLength) {
+      sanitized = sanitized.substring(0, options.maxLength)
+    }
+    
+    if (options.removeSpecialChars) {
+      sanitized = sanitized.replace(/[^\w\s@.-]/g, '')
+    }
+    
+    if (options.toLowerCase) {
+      sanitized = sanitized.toLowerCase()
+    }
+    
+    if (options.removeExtraSpaces) {
+      sanitized = sanitized.replace(/\s+/g, ' ')
+    }
+    
+    return sanitized
+  } catch (error) {
+    console.error('🚨 Erro ao sanitizar input:', error)
+    return options.allowNull ? null : ''
+  }
+}
+
 export default supabase
