@@ -1,12 +1,10 @@
 /**
  * ALSHAM 360° PRIMA - Enterprise Authentication System V5.0 NASA 10/10 OPTIMIZED
  * Advanced authentication middleware with real-time user management
- * 
- * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
  * @author ALSHAM Development Team
  * @license MIT
- * 
- * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
+ * * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
  * ✅ Real-time authentication with Supabase Auth
  * ✅ Railway credentials integration
  * ✅ Multi-tenant security with RLS enforcement
@@ -20,11 +18,9 @@
  * ✅ Vite build system optimization
  * ✅ Path standardization and consistency
  * ✅ NASA 10/10 Enterprise Grade
- * 
- * 🔗 DATA SOURCES: auth.users, user_profiles, user_organizations, 
+ * * 🔗 DATA SOURCES: auth.users, user_profiles, user_organizations, 
  * user_badges, teams, organizations
- * 
- * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
+ * * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
  * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
@@ -287,7 +283,7 @@ class AuthStateManager {
      */
     async refreshSession() {
         try {
-            const session = await getCurrentSession();
+            const session = await getSession();
             
             if (session?.user) {
                 this.sessionExpiry = new Date(session.expires_at);
@@ -540,7 +536,7 @@ async function initializeAuth() {
         console.log('🔄 Initializing authentication system...');
 
         // Check for existing session
-        const session = await getCurrentSession();
+        const session = await getSession();
         
         if (session?.user) {
             console.log('📋 Existing session found, loading user data...');
@@ -933,8 +929,8 @@ function updateUserInfo() {
         const userNameElements = document.querySelectorAll('[data-auth="user-name"]');
         userNameElements.forEach(element => {
             const displayName = authState.currentProfile?.full_name || 
-                              authState.currentUser?.email?.split('@')[0] || 
-                              'Usuário';
+                                authState.currentUser?.email?.split('@')[0] || 
+                                'Usuário';
             element.textContent = displayName;
         });
         
@@ -1010,8 +1006,8 @@ function updateUserAvatar() {
             } else {
                 // Generate initials avatar
                 const fullName = authState.currentProfile?.full_name || 
-                               authState.currentUser?.email?.split('@')[0] || 
-                               'U';
+                                 authState.currentUser?.email?.split('@')[0] || 
+                                 'U';
                 
                 const initials = fullName
                     .split(' ')
@@ -1124,7 +1120,7 @@ function updatePermissionBasedElements() {
             
             // Check role hierarchy
             const hasRoleAccess = userRole === requiredRole || 
-                                authState.getRoleLevel() >= getRoleLevel(requiredRole);
+                                  authState.getRoleLevel() >= getRoleLevel(requiredRole);
             
             if (hasRoleAccess) {
                 element.classList.remove('hidden');
@@ -1221,7 +1217,7 @@ async function handleLogout() {
  */
 async function checkSessionValidity() {
     try {
-        const session = await getCurrentSession();
+        const session = await getSession();
         
         if (!session || !session.user) {
             console.log('🚫 Session invalid, logging out...');
@@ -1509,4 +1505,3 @@ console.log('✅ Real-time integration with Supabase Auth enabled');
 console.log('🛡️ Multi-tenant security and RLS enforcement active');
 console.log('⚡ ES Modules and Vite compatibility optimized');
 console.log('🎯 Path standardization and consistency implemented');
-
