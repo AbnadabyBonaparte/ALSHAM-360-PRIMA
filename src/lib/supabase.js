@@ -2574,4 +2574,19 @@ if (import.meta.env.DEV) {
   console.log('✅ NASA 10/10 quality standards applied')
   console.log('🎯 ZERO mock data - 100% real production integration')
 }
+// CORREÇÃO: Exports faltantes para resolver erro de build
+export { 
+  getTeamMembers,
+  inviteTeamMember, 
+  removeTeamMember,
+  updateTeamMemberRole,
+  getNotificationSettings,
+  updateNotificationSettings,
+  getIntegrationConfigs,
+  createIntegrationConfig,
+  updateIntegrationConfig,
+  deleteIntegrationConfig,
+  getSecurityAudits,
+  updateSecuritySettings
+}
 export default supabase
