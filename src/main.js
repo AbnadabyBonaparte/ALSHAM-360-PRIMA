@@ -13,7 +13,6 @@
 import Chart from 'chart.js/auto';
 import { 
     getCurrentUser,  
-    getCurrentSession,
     getDashboardKPIs,
     getLeads,
     createAuditLog
