@@ -36,7 +36,7 @@
  */
 import { 
     getCurrentUser, 
-    getCurrentSession, 
+    getSession,
     onAuthStateChange,
     signOut,
     getUserProfile,
