@@ -31,27 +31,29 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error("Supabase credentials are not configured. Application cannot start.");
 } else {
     console.log("✅ Credenciais do Supabase carregadas com sucesso!");
+    // <<< ADICIONEI ESTA LINHA PARA FORÇAR A ATUALIZAÇÃO DO CACHE
+    console.log("✅✅✅ VERSÃO DO ARQUIVO: " + new Date().toISOString());
 }
 
 // 🏗️ ENTERPRISE CLIENT WITH REAL CREDENTIALS
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'alsham-360-prima@8.0.0',
-      'X-Environment': import.meta.env.MODE || 'production'
-    }
-  }
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'alsham-360-prima@8.0.0',
+      'X-Environment': import.meta.env.MODE || 'production'
+    }
+  }
 })
 // =========================================================================
 // 🔧 ENTERPRISE UTILITIES - ENHANCED ERROR HANDLING
