@@ -1,14 +1,14 @@
+// src/js/dashboard-real.js - VERSÃO FIXADA PARA PRODUÇÃO REAL COM SUPABASE V9
 // ===== CLIENTE SUPABASE UNIFICADO =====
-import { supabase } from '../lib/supabase.js';
+import { supabase, getCurrentSession, genericSelect, genericInsert, subscribeToTable } from '../lib/supabase.js';
 
 /**
  * ALSHAM 360° PRIMA - Integração Real com Supabase
  * Versão corrigida para build sem erros
- * 
+ *
  * @version 6.1.0 - BUILD COMPATIBLE
  * @author ALSHAM Development Team
  */
-
 // ===== SISTEMA DE AUTENTICAÇÃO REAL =====
 class AuthManager {
     constructor() {
@@ -16,54 +16,36 @@ class AuthManager {
         this.currentProfile = null;
         this.isAuthenticated = false;
     }
-
     async checkAuth() {
         try {
             if (!supabase) {
                 throw new Error('Supabase não inicializado');
             }
-
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (error) {
-                console.error('Erro ao verificar sessão:', error);
-                return { authenticated: false, error };
-            }
-
+            const session = await getCurrentSession(); // Use helper do supabase.js
+           
             if (!session || !session.user) {
                 console.log('Usuário não autenticado');
                 return { authenticated: false };
             }
-
             this.currentUser = session.user;
             this.isAuthenticated = true;
-
-            // Buscar perfil do usuário
-            const { data: profile, error: profileError } = await supabase
-                .from('user_profiles')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .single();
-
-            if (profileError && profileError.code !== 'PGRST116') {
-                console.error('Erro ao buscar perfil:', profileError);
+            // Buscar perfil do usuário (usando genérica do supabase.js)
+            const profile = await genericSelect('user_profiles', { user_id: session.user.id }, session.user.user_metadata.org_id, 1);
+            if (profile && profile.length > 0) {
+                this.currentProfile = profile[0];
+            } else {
                 await this.createUserProfile(session.user);
-            } else if (profile) {
-                this.currentProfile = profile;
             }
-
-            return { 
-                authenticated: true, 
-                user: this.currentUser, 
-                profile: this.currentProfile 
+            return {
+                authenticated: true,
+                user: this.currentUser,
+                profile: this.currentProfile
             };
-
         } catch (error) {
             console.error('Erro crítico na autenticação:', error);
             return { authenticated: false, error: error.message };
         }
     }
-
     async createUserProfile(user) {
         try {
             const profileData = {
@@ -75,145 +57,86 @@ class AuthManager {
                 role: 'user',
                 created_at: new Date().toISOString()
             };
-
-            const { data, error } = await supabase
-                .from('user_profiles')
-                .insert(profileData)
-                .select()
-                .single();
-
-            if (error) throw error;
-
-            this.currentProfile = data;
-            console.log('✅ Perfil de usuário criado:', data);
-            return data;
-
+            await genericInsert('user_profiles', profileData, 'default-org'); // Use genérica
+            const newProfile = await genericSelect('user_profiles', { user_id: user.id }, 'default-org', 1);
+            this.currentProfile = newProfile[0];
+            console.log('✅ Perfil de usuário criado:', this.currentProfile);
+            return this.currentProfile;
         } catch (error) {
             console.error('Erro ao criar perfil:', error);
             return null;
         }
     }
-
     async signOut() {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-
             this.currentUser = null;
             this.currentProfile = null;
             this.isAuthenticated = false;
-            
+           
             window.location.href = '/login.html';
             return { success: true };
-
         } catch (error) {
             console.error('Erro ao fazer logout:', error);
             return { success: false, error: error.message };
         }
     }
 }
-
 // ===== SISTEMA DE DADOS REAIS =====
 class DataManager {
     constructor(authManager) {
         this.auth = authManager;
     }
-
     async getLeads(limit = 100) {
         try {
             if (!this.auth.isAuthenticated || !supabase) {
                 throw new Error('Usuário não autenticado ou Supabase não disponível');
             }
-
             const orgId = this.auth.currentProfile?.org_id;
             if (!orgId) {
                 throw new Error('Organização não identificada');
             }
-
-            const { data, error } = await supabase
-                .from('leads')
-                .select(`
-                    id,
-                    name,
-                    email,
-                    phone,
-                    status,
-                    source,
-                    created_at,
-                    updated_at,
-                    org_id,
-                    assigned_to
-                `)
-                .eq('org_id', orgId)
-                .order('created_at', { ascending: false })
-                .limit(limit);
-
-            if (error) throw error;
-
-            console.log(`✅ ${(data || []).length} leads carregados`);
-            return { success: true, data: data || [] };
-
+            const data = await genericSelect('leads_crm', {}, orgId, limit); // Dados reais
+            console.log(`✅ ${data.length} leads carregados`);
+            return { success: true, data };
         } catch (error) {
             console.error('❌ Erro ao carregar leads:', error);
             return { success: false, error: error.message, data: [] };
         }
     }
-
     async getSalesOpportunities() {
         try {
             if (!this.auth.isAuthenticated || !supabase) {
                 throw new Error('Usuário não autenticado ou Supabase não disponível');
             }
-
             const orgId = this.auth.currentProfile?.org_id;
-            
-            const { data, error } = await supabase
-                .from('sales_opportunities')
-                .select(`
-                    id,
-                    title,
-                    value,
-                    stage,
-                    probability,
-                    expected_close_date,
-                    created_at,
-                    org_id,
-                    lead_id
-                `)
-                .eq('org_id', orgId)
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-
-            console.log(`✅ ${(data || []).length} oportunidades carregadas`);
-            return { success: true, data: data || [] };
-
+           
+            const data = await genericSelect('sales_opportunities', {}, orgId); // Dados reais
+            console.log(`✅ ${data.length} oportunidades carregadas`);
+            return { success: true, data };
         } catch (error) {
             console.error('❌ Erro ao carregar oportunidades:', error);
             return { success: false, error: error.message, data: [] };
         }
     }
-
     async getDashboardKPIs() {
         try {
             const [leadsResult, opportunitiesResult] = await Promise.all([
                 this.getLeads(1000),
                 this.getSalesOpportunities()
             ]);
-
             const leads = leadsResult.data || [];
             const opportunities = opportunitiesResult.data || [];
-
             // Calcular KPIs reais
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
             const kpis = {
                 totalLeads: leads.length,
                 newLeadsToday: leads.filter(lead => new Date(lead.created_at) >= today).length,
                 leadsThisMonth: leads.filter(lead => new Date(lead.created_at) >= thisMonth).length,
-                activeOpportunities: opportunities.filter(opp => 
+                activeOpportunities: opportunities.filter(opp =>
                     ['prospecting', 'qualification', 'proposal', 'negotiation'].includes(opp.stage)
                 ).length,
                 totalRevenue: opportunities
@@ -222,45 +145,39 @@ class DataManager {
                 conversionRate: this.calculateConversionRate(leads),
                 avgDealSize: this.calculateAvgDealSize(opportunities)
             };
-
             console.log('✅ KPIs calculados:', kpis);
             return { success: true, data: kpis };
-
         } catch (error) {
             console.error('❌ Erro ao calcular KPIs:', error);
             return { success: false, error: error.message, data: {} };
         }
     }
-
     calculateConversionRate(leads) {
         if (!leads || leads.length === 0) return 0;
-        
+       
         const convertedLeads = leads.filter(lead => lead.status === 'converted').length;
-        const qualifiedLeads = leads.filter(lead => 
+        const qualifiedLeads = leads.filter(lead =>
             ['qualified', 'proposal', 'negotiation', 'converted', 'lost'].includes(lead.status)
         ).length;
-        
+       
         return qualifiedLeads > 0 ? ((convertedLeads / qualifiedLeads) * 100).toFixed(1) : 0;
     }
-
     calculateAvgDealSize(opportunities) {
         if (!opportunities || opportunities.length === 0) return 0;
-        
+       
         const closedWon = opportunities.filter(opp => opp.stage === 'closed_won');
         if (closedWon.length === 0) return 0;
-        
+       
         const totalRevenue = closedWon.reduce((sum, opp) => sum + (parseFloat(opp.value) || 0), 0);
         return (totalRevenue / closedWon.length).toFixed(2);
     }
 }
-
 // ===== SISTEMA DE NAVEGAÇÃO =====
 class NavigationManager {
     constructor() {
         this.currentPage = 'dashboard';
         this.setupEventListeners();
     }
-
     setupEventListeners() {
         document.addEventListener('click', (e) => {
             const link = e.target.closest('[data-page]');
@@ -271,29 +188,26 @@ class NavigationManager {
             }
         });
     }
-
     navigateTo(page) {
         try {
             console.log(`🔄 Navegando para: ${page}`);
-            
+           
             const validPages = ['dashboard', 'leads', 'automacoes', 'relatorios', 'gamificacao', 'configuracoes'];
             if (!validPages.includes(page)) {
                 console.warn(`⚠️ Página inválida: ${page}`);
                 return;
             }
-
             if (page === 'dashboard') {
                 window.location.href = '/';
             } else {
                 window.location.href = `/${page}.html`;
             }
-            
+           
         } catch (error) {
             console.error('❌ Erro na navegação:', error);
         }
     }
 }
-
 // ===== DASHBOARD PRINCIPAL =====
 class DashboardApp {
     constructor() {
@@ -308,18 +222,12 @@ class DashboardApp {
             lastUpdate: null
         };
     }
-
     async init() {
         try {
             console.log('🚀 Inicializando ALSHAM 360° PRIMA...');
-            
+           
             this.showLoading(true, 'Verificando autenticação...');
-            
-            // Verificar se Supabase está disponível
-            if (!supabase) {
-                throw new Error('Supabase não configurado. Configure suas credenciais.');
-            }
-            
+           
             // Verificar autenticação
             const authResult = await this.auth.checkAuth();
             if (!authResult.authenticated) {
@@ -327,24 +235,25 @@ class DashboardApp {
                 window.location.href = '/login.html';
                 return;
             }
-
             console.log('✅ Usuário autenticado:', authResult.user.email);
             this.updateUserInfo(authResult.user, authResult.profile);
-
             // Carregar dados reais
             await this.loadRealData();
-            
+           
             // Renderizar dashboard
             await this.renderDashboard();
-            
-            // Configurar atualizações
+           
+            // Configurar atualizações real-time
+            this.setupRealTimeSubscriptions();
+           
+            // Configurar auto refresh
             this.setupAutoRefresh();
-            
+           
             this.showLoading(false);
             this.showNotification('Dashboard carregado com dados reais!', 'success');
-            
+           
             console.log('✅ ALSHAM 360° PRIMA inicializado');
-            
+           
         } catch (error) {
             console.error('❌ Erro na inicialização:', error);
             this.showLoading(false);
@@ -352,29 +261,25 @@ class DashboardApp {
             this.loadDemoData();
         }
     }
-
     async loadRealData() {
         try {
             this.state.isLoading = true;
             console.log('📊 Carregando dados reais...');
-            
+           
             const [kpisResult, leadsResult, opportunitiesResult] = await Promise.all([
                 this.data.getDashboardKPIs(),
                 this.data.getLeads(),
                 this.data.getSalesOpportunities()
             ]);
-
             this.state.kpis = kpisResult.success ? kpisResult.data : {};
             this.state.leads = leadsResult.success ? leadsResult.data : [];
             this.state.opportunities = opportunitiesResult.success ? opportunitiesResult.data : [];
             this.state.lastUpdate = new Date();
-
             console.log('✅ Dados carregados:', {
                 kpis: Object.keys(this.state.kpis).length,
                 leads: this.state.leads.length,
                 opportunities: this.state.opportunities.length
             });
-
         } catch (error) {
             console.error('❌ Erro ao carregar dados:', error);
             throw error;
@@ -382,60 +287,67 @@ class DashboardApp {
             this.state.isLoading = false;
         }
     }
-
+    setupRealTimeSubscriptions() {
+        subscribeToTable('leads_crm', this.auth.currentProfile.org_id, (payload) => {
+            console.log('Atualização real-time em leads:', payload);
+            this.loadRealData(); // Refresh dados
+            this.renderDashboard();
+        });
+        subscribeToTable('sales_opportunities', this.auth.currentProfile.org_id, (payload) => {
+            console.log('Atualização real-time em oportunidades:', payload);
+            this.loadRealData();
+            this.renderDashboard();
+        });
+        // Adicione para outras tabelas se necessário
+    }
     async renderDashboard() {
         try {
             console.log('🎨 Renderizando dashboard...');
-            
+           
             this.renderKPIs();
             this.renderRecentLeads();
             this.renderHeroSection();
-            
+           
             console.log('✅ Dashboard renderizado');
-            
+           
         } catch (error) {
             console.error('❌ Erro ao renderizar:', error);
         }
     }
-
     renderKPIs() {
         try {
             const kpisContainer = document.getElementById('dashboard-kpis');
             if (!kpisContainer) return;
-
             const kpis = this.state.kpis;
-            
+           
             // Criar HTML usando createElement para evitar erros de parsing
             kpisContainer.innerHTML = '';
-            
+           
             const kpiData = [
                 { icon: '👥', title: 'Total de Leads', value: kpis.totalLeads || 0, color: 'blue', extra: `+${kpis.newLeadsToday || 0} novos hoje` },
                 { icon: '💰', title: 'Receita Total', value: `R$ ${(kpis.totalRevenue || 0).toLocaleString('pt-BR')}`, color: 'green', extra: `Ticket médio: R$ ${parseFloat(kpis.avgDealSize || 0).toLocaleString('pt-BR')}` },
                 { icon: '📈', title: 'Taxa de Conversão', value: `${kpis.conversionRate || 0}%`, color: 'purple', extra: `${kpis.activeOpportunities || 0} oportunidades ativas` },
                 { icon: '📅', title: 'Leads Este Mês', value: kpis.leadsThisMonth || 0, color: 'orange', extra: 'Meta mensal em andamento' }
             ];
-
             kpiData.forEach(kpi => {
                 const kpiElement = this.createKPIElement(kpi);
                 kpisContainer.appendChild(kpiElement);
             });
-
         } catch (error) {
             console.error('❌ Erro ao renderizar KPIs:', error);
         }
     }
-
     createKPIElement(kpi) {
         const div = document.createElement('div');
         div.className = 'bg-white rounded-xl p-6 shadow-sm border border-gray-100';
-        
+       
         const colorClasses = {
             blue: 'bg-blue-50 text-blue-600',
             green: 'bg-green-50 text-green-600',
             purple: 'bg-purple-50 text-purple-600',
             orange: 'bg-orange-50 text-orange-600'
         };
-        
+       
         div.innerHTML = `
             <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 ${colorClasses[kpi.color]} rounded-xl flex items-center justify-center">
@@ -448,17 +360,14 @@ class DashboardApp {
             </div>
             <div class="text-sm text-gray-600">${kpi.extra}</div>
         `;
-        
+       
         return div;
     }
-
     renderRecentLeads() {
         try {
             const leadsContainer = document.getElementById('leads-table');
             if (!leadsContainer) return;
-
             const recentLeads = this.state.leads.slice(0, 5);
-
             if (recentLeads.length === 0) {
                 leadsContainer.innerHTML = `
                     <div class="text-center py-8">
@@ -471,28 +380,25 @@ class DashboardApp {
                 `;
                 return;
             }
-
             leadsContainer.innerHTML = '';
-            
+           
             recentLeads.forEach(lead => {
                 const leadElement = this.createLeadElement(lead);
                 leadsContainer.appendChild(leadElement);
             });
-
         } catch (error) {
             console.error('❌ Erro ao renderizar leads:', error);
         }
     }
-
     createLeadElement(lead) {
         const div = document.createElement('div');
         div.className = 'flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors';
-        
+       
         const statusColor = this.getStatusColor(lead.status);
         const statusLabel = this.getStatusLabel(lead.status);
         const initials = this.getInitials(lead.name);
         const formattedDate = this.formatDate(lead.created_at);
-        
+       
         div.innerHTML = `
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
@@ -510,48 +416,41 @@ class DashboardApp {
                 <div class="text-xs text-gray-500 mt-1">${formattedDate}</div>
             </div>
         `;
-        
+       
         return div;
     }
-
     renderHeroSection() {
         try {
             const heroGreeting = document.getElementById('hero-greeting');
             const heroRevenue = document.getElementById('hero-revenue');
-            
+           
             if (heroGreeting) {
                 const userName = this.auth.currentProfile?.full_name?.split(' ')[0] || 'Usuário';
                 heroGreeting.textContent = `Parabéns, ${userName}!`;
             }
-            
+           
             if (heroRevenue) {
                 const revenue = this.state.kpis.totalRevenue || 0;
                 heroRevenue.textContent = `R$ ${revenue.toLocaleString('pt-BR')}`;
             }
-
         } catch (error) {
             console.error('❌ Erro ao renderizar hero:', error);
         }
     }
-
     updateUserInfo(user, profile) {
         try {
             const userInitials = document.getElementById('user-initials');
             const userName = document.getElementById('user-name');
-
             if (userInitials && profile?.full_name) {
                 userInitials.textContent = this.getInitials(profile.full_name);
             }
-
             if (userName && profile?.full_name) {
                 userName.textContent = profile.full_name;
             }
-
         } catch (error) {
             console.error('❌ Erro ao atualizar info do usuário:', error);
         }
     }
-
     setupAutoRefresh() {
         try {
             setInterval(async () => {
@@ -559,14 +458,11 @@ class DashboardApp {
                     await this.refresh();
                 }
             }, 5 * 60 * 1000); // 5 minutos
-
             console.log('⏰ Auto refresh configurado');
-
         } catch (error) {
             console.error('❌ Erro no auto refresh:', error);
         }
     }
-
     async refresh() {
         try {
             console.log('🔄 Atualizando dashboard...');
@@ -577,13 +473,11 @@ class DashboardApp {
             console.error('❌ Erro ao atualizar:', error);
         }
     }
-
     // Métodos auxiliares
     getInitials(name) {
         if (!name) return '?';
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     }
-
     getStatusColor(status) {
         const colors = {
             new: 'bg-blue-100 text-blue-800',
@@ -595,7 +489,6 @@ class DashboardApp {
         };
         return colors[status] || 'bg-gray-100 text-gray-800';
     }
-
     getStatusLabel(status) {
         const labels = {
             new: 'Novo',
@@ -607,7 +500,6 @@ class DashboardApp {
         };
         return labels[status] || status;
     }
-
     formatDate(dateString) {
         try {
             return new Date(dateString).toLocaleDateString('pt-BR');
@@ -615,11 +507,10 @@ class DashboardApp {
             return '-';
         }
     }
-
     // Sistema de notificações
     showLoading(show, message = 'Carregando...') {
         let loadingElement = document.getElementById('loading-indicator');
-        
+       
         if (show) {
             if (!loadingElement) {
                 loadingElement = document.createElement('div');
@@ -634,11 +525,9 @@ class DashboardApp {
             }
         }
     }
-
     showNotification(message, type = 'info', duration = 5000) {
         const existing = document.querySelectorAll('.notification');
         existing.forEach(n => n.remove());
-
         const notification = document.createElement('div');
         notification.className = `notification fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${this.getNotificationClasses(type)}`;
         notification.innerHTML = `
@@ -651,14 +540,13 @@ class DashboardApp {
                 </button>
             </div>
         `;
-        
+       
         document.body.appendChild(notification);
-        
+       
         setTimeout(() => {
             notification.remove();
         }, duration);
     }
-
     getNotificationClasses(type) {
         switch (type) {
             case 'success':
@@ -671,11 +559,10 @@ class DashboardApp {
                 return 'bg-blue-50 border border-blue-200 text-blue-800';
         }
     }
-
     // Dados demo como fallback
     loadDemoData() {
         console.log('📋 Carregando dados demo...');
-        
+       
         this.state.kpis = {
             totalLeads: 50,
             newLeadsToday: 3,
@@ -685,7 +572,7 @@ class DashboardApp {
             avgDealSize: 2500,
             leadsThisMonth: 18
         };
-        
+       
         this.state.leads = [
             {
                 id: 1,
@@ -702,15 +589,13 @@ class DashboardApp {
                 created_at: new Date().toISOString()
             }
         ];
-        
+       
         this.renderDashboard();
         this.showNotification('Sistema em modo demo - Configure o Supabase', 'warning');
     }
 }
-
 // ===== INICIALIZAÇÃO =====
 let dashboardApp = null;
-
 window.navigateTo = function(page) {
     if (dashboardApp && dashboardApp.navigation) {
         dashboardApp.navigation.navigateTo(page);
@@ -723,7 +608,6 @@ window.navigateTo = function(page) {
         }
     }
 };
-
 window.logout = async function() {
     try {
         if (dashboardApp && dashboardApp.auth) {
@@ -740,20 +624,19 @@ window.logout = async function() {
         window.location.href = '/login.html';
     }
 };
-
 // Inicializar quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         console.log('🚀 Iniciando ALSHAM 360° PRIMA...');
-        
+       
         dashboardApp = new DashboardApp();
         window.dashboardApp = dashboardApp;
-        
+       
         await dashboardApp.init();
-        
+       
     } catch (error) {
         console.error('❌ Erro fatal:', error);
-        
+       
         const errorDiv = document.createElement('div');
         errorDiv.className = 'fixed inset-0 bg-red-50 flex items-center justify-center z-50';
         errorDiv.innerHTML = `
@@ -769,5 +652,4 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.body.appendChild(errorDiv);
     }
 });
-
 console.log('📊 Dashboard System v6.1.0 - Build Compatible carregado!');
