@@ -11,8 +11,8 @@
 // ===== IMPORTS CORRIGIDOS - ES MODULES PADRONIZADOS =====
 import Chart from 'chart.js/auto';
 import {
-    getCurrentSession,  // Substituído getCurrentUser por getCurrentSession
-    genericSelect,      // Para getLeads e getDashboardKPIs
+    getCurrentSession,  // Para auth real
+    genericSelect,      // Para getLeads e getDashboardKPIs reais
     createAuditLog,
     subscribeToTable    // Para real-time
 } from '/src/lib/supabase.js';
@@ -476,7 +476,7 @@ async function renderLeadsTable() {
             if (AppState.isDemoMode || !supabaseModule) {
                 data = window.demoData?.leads || generateDemoLeads();
             } else {
-                const orgId = (await getCurrentSession()).user.user_metadata.org_id; // Pegue orgId real
+                const orgId = (await getCurrentSession()).user.user_metadata.org_id; // Pegue org_id real
                 data = await genericSelect('leads_crm', {}, orgId); // Dados reais
             }
            
