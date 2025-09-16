@@ -1,11 +1,11 @@
 /**
  * ALSHAM 360° PRIMA - Enterprise Gamification System V5.0 NASA 10/10 OPTIMIZED
  * Advanced gamification platform with real-time data integration and enterprise features
- * 
+ *
  * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
  * @author ALSHAM Development Team
  * @license MIT
- * 
+ *
  * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
  * ✅ Real-time gamification data from Supabase tables
  * ✅ Advanced points system with multipliers and levels
@@ -20,44 +20,34 @@
  * ✅ Vite build system optimization
  * ✅ Path standardization and consistency
  * ✅ NASA 10/10 Enterprise Grade
- * 
- * 🔗 DATA SOURCES: gamification_points, user_badges, team_leaderboards, 
+ *
+ * 🔗 DATA SOURCES: gamification_points, user_badges, team_leaderboards,
  * gamification_badges, performance_metrics, user_profiles
- * 
+ *
  * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
  * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
-
 // ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
 /**
  * Real data integration with Supabase Enterprise
  * Using standardized relative path imports for Vite compatibility
  */
-import { 
+import {
     // Core authentication and user functions
-    getCurrentUser,
+    getCurrentSession,
     getUserProfile,
-    
-    // Gamification functions with REAL data
-    getUserBadges,
-    getGamificationPoints,
-    getTeamLeaderboards,
-    getGamificationBadges,
-    getPerformanceMetrics,
-    getUserOrganizations,
-    
+   
+    // Gamification functions with REAL data (using generics)
+    genericSelect,
+    subscribeToTable,
+   
     // Audit and logging
     createAuditLog,
-    
-    // Health monitoring
-    healthCheck,
-    
+   
     // Configuration
-    getCurrentOrgId,
-    supabaseConfig
+    getCurrentOrgId
 } from '../lib/supabase.js';
-
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
  * Validates and returns external library dependency
@@ -76,7 +66,6 @@ function requireLib(libName, lib) {
     }
     return lib;
 }
-
 /**
  * Validates all required dependencies for gamification system
  * Enhanced with comprehensive validation and fallback strategies
@@ -97,7 +86,6 @@ function validateDependencies() {
         throw error;
     }
 }
-
 // ===== ENTERPRISE CONFIGURATION WITH REAL DATA MAPPING - NASA 10/10 =====
 /**
  * Enhanced gamification configuration with NASA 10/10 standards
@@ -106,31 +94,31 @@ function validateDependencies() {
 const GAMIFICATION_CONFIG = Object.freeze({
     // Performance settings optimized for REAL data
     PERFORMANCE: {
-        CACHE_TTL: 300000,           // 5 minutos
-        BATCH_SIZE: 50,              // Processamento em lotes
-        DEBOUNCE_DELAY: 300,         // Anti-spam
-        RETRY_ATTEMPTS: 3,           // Tentativas de reconexão
-        TIMEOUT: 10000,              // Timeout requests
-        UPDATE_INTERVAL: 30000,      // Auto-refresh
+        CACHE_TTL: 300000, // 5 minutos
+        BATCH_SIZE: 50, // Processamento em lotes
+        DEBOUNCE_DELAY: 300, // Anti-spam
+        RETRY_ATTEMPTS: 3, // Tentativas de reconexão
+        TIMEOUT: 10000, // Timeout requests
+        UPDATE_INTERVAL: 30000, // Auto-refresh
         // NASA 10/10 performance enhancements
         PARALLEL_REQUESTS: 5,
         ANIMATION_DURATION: 750,
         VIRTUAL_SCROLL_THRESHOLD: 100
     },
-    
+   
     // Security settings for enterprise environment
     SECURITY: {
         MAX_POINTS_PER_ACTION: 1000,
-        RATE_LIMIT_WINDOW: 60000,    // 1 minuto
+        RATE_LIMIT_WINDOW: 60000, // 1 minuto
         MAX_REQUESTS_PER_MINUTE: 100,
-        SESSION_TIMEOUT: 1800000,    // 30 minutos
+        SESSION_TIMEOUT: 1800000, // 30 minutos
         ENCRYPTION_ENABLED: true,
         // NASA 10/10 security enhancements
         INPUT_VALIDATION: true,
         XSS_PROTECTION: true,
         CSRF_PROTECTION: true
     },
-    
+   
     // Level system configuration mapped to REAL Supabase data
     LEVELS: Object.freeze([
         { level: 1, name: 'Iniciante', minPoints: 0, maxPoints: 499, color: 'gray', icon: '🥚', multiplier: 1.0 },
@@ -144,7 +132,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
         { level: 9, name: 'Épico', minPoints: 15000, maxPoints: 24999, color: 'rainbow', icon: '🌟', multiplier: 1.8 },
         { level: 10, name: 'Lendário', minPoints: 25000, maxPoints: 999999, color: 'cosmic', icon: '🚀', multiplier: 2.0 }
     ]),
-    
+   
     // Point actions mapped to REAL Supabase events
     POINT_ACTIONS: Object.freeze({
         lead_created: { points: 10, description: 'Lead criado', category: 'sales' },
@@ -159,7 +147,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
         daily_login: { points: 2, description: 'Login diário', category: 'engagement' },
         profile_completed: { points: 15, description: 'Perfil completado', category: 'setup' }
     }),
-    
+   
     // Badge tier system for achievements
     BADGE_TIERS: Object.freeze({
         bronze: { color: 'amber-600', multiplier: 1.0, icon: '🥉' },
@@ -168,7 +156,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
         platinum: { color: 'purple-500', multiplier: 2.0, icon: '💎' },
         legendary: { color: 'red-500', multiplier: 3.0, icon: '🏆' }
     }),
-    
+   
     // Static CSS classes for build compatibility - NASA 10/10 optimization
     STATIC_STYLES: Object.freeze({
         levels: {
@@ -183,7 +171,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
             rainbow: { bg: 'bg-gradient-to-r from-purple-400 to-pink-400', text: 'text-white', border: 'border-purple-300' },
             cosmic: { bg: 'bg-gradient-to-r from-blue-600 to-purple-600', text: 'text-white', border: 'border-blue-300' }
         },
-        
+       
         badges: {
             bronze: { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
             silver: { bg: 'bg-gray-50', text: 'text-gray-800', border: 'border-gray-200' },
@@ -191,7 +179,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
             platinum: { bg: 'bg-purple-50', text: 'text-purple-800', border: 'border-purple-200' },
             legendary: { bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-200' }
         },
-        
+       
         notifications: {
             success: { bg: 'bg-green-50', text: 'text-green-800', border: 'border-green-200' },
             warning: { bg: 'bg-yellow-50', text: 'text-yellow-800', border: 'border-yellow-200' },
@@ -199,7 +187,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
             info: { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' }
         }
     }),
-    
+   
     // NASA 10/10 accessibility enhancements
     ACCESSIBILITY: {
         announceChanges: true,
@@ -209,7 +197,7 @@ const GAMIFICATION_CONFIG = Object.freeze({
         focusManagement: true,
         reducedMotion: false
     },
-    
+   
     // Animation and UI settings
     ANIMATIONS: {
         pointsEarned: { duration: 1000, easing: 'ease-out' },
@@ -218,7 +206,6 @@ const GAMIFICATION_CONFIG = Object.freeze({
         leaderboardUpdate: { duration: 500, easing: 'ease-in-out' }
     }
 });
-
 // ===== ENTERPRISE STATE MANAGEMENT WITH REAL DATA - NASA 10/10 =====
 /**
  * Enhanced state manager with NASA 10/10 standards
@@ -231,7 +218,7 @@ class GamificationStateManager {
             user: null,
             profile: null,
             orgId: null,
-            
+           
             // Gamification data
             userPoints: 0,
             userLevel: 1,
@@ -239,21 +226,21 @@ class GamificationStateManager {
             availableBadges: [],
             leaderboard: [],
             recentActivities: [],
-            
+           
             // UI state
             isLoading: false,
             isUpdating: false,
             activeTab: 'overview',
             selectedPeriod: '30',
-            
+           
             // Error handling
             errors: [],
             warnings: [],
-            
+           
             // Real-time state
             subscriptions: new Map(),
             lastUpdate: null,
-            
+           
             // Performance monitoring - NASA 10/10
             metrics: {
                 loadTime: 0,
@@ -264,28 +251,28 @@ class GamificationStateManager {
                 pointsEarned: 0,
                 badgesUnlocked: 0
             },
-            
+           
             // Cache management - NASA 10/10
             cache: {
                 data: new Map(),
                 timestamps: new Map(),
                 ttl: GAMIFICATION_CONFIG.PERFORMANCE.CACHE_TTL
             },
-            
+           
             // Rate limiting
             rateLimiter: {
                 requests: [],
                 lastReset: Date.now()
             }
         };
-        
+       
         // Bind methods for proper context
         this.setState = this.setState.bind(this);
         this.getState = this.getState.bind(this);
         this.clearCache = this.clearCache.bind(this);
         this.checkRateLimit = this.checkRateLimit.bind(this);
     }
-    
+   
     /**
      * Update state with validation and change detection
      * @param {Object} updates - State updates
@@ -294,28 +281,28 @@ class GamificationStateManager {
     setState(updates, callback) {
         try {
             const previousState = { ...this.state };
-            
+           
             // Validate updates
             if (typeof updates !== 'object' || updates === null) {
                 throw new Error('State updates must be an object');
             }
-            
+           
             // Apply updates
             Object.assign(this.state, updates);
-            
+           
             // Update timestamp
             this.state.lastUpdate = new Date();
-            
+           
             // Execute callback if provided
             if (typeof callback === 'function') {
                 callback(this.state, previousState);
             }
-            
+           
             // Emit state change event for debugging
             if (window.DEBUG_MODE) {
                 console.log('🔄 Gamification state updated:', { updates, newState: this.state });
             }
-            
+           
         } catch (error) {
             console.error('❌ Error updating gamification state:', error);
             this.state.errors.push({
@@ -325,7 +312,7 @@ class GamificationStateManager {
             });
         }
     }
-    
+   
     /**
      * Get current state or specific property
      * @param {string} key - Optional key to get specific property
@@ -337,7 +324,7 @@ class GamificationStateManager {
         }
         return { ...this.state };
     }
-    
+   
     /**
      * Clear cache with optional filter
      * @param {string} filter - Optional filter for cache keys
@@ -355,14 +342,14 @@ class GamificationStateManager {
                 this.state.cache.data.clear();
                 this.state.cache.timestamps.clear();
             }
-            
+           
             console.log(`🗑️ Gamification cache cleared${filter ? ` (filter: ${filter})` : ''}`);
-            
+           
         } catch (error) {
             console.error('❌ Error clearing gamification cache:', error);
         }
     }
-    
+   
     /**
      * Get cached data with TTL validation
      * @param {string} key - Cache key
@@ -372,27 +359,27 @@ class GamificationStateManager {
         try {
             const data = this.state.cache.data.get(key);
             const timestamp = this.state.cache.timestamps.get(key);
-            
+           
             if (!data || !timestamp) {
                 return null;
             }
-            
+           
             const now = Date.now();
             if (now - timestamp > this.state.cache.ttl) {
                 this.state.cache.data.delete(key);
                 this.state.cache.timestamps.delete(key);
                 return null;
             }
-            
+           
             this.state.metrics.cacheHits++;
             return data;
-            
+           
         } catch (error) {
             console.error('❌ Error getting cached gamification data:', error);
             return null;
         }
     }
-    
+   
     /**
      * Set cached data with timestamp
      * @param {string} key - Cache key
@@ -402,12 +389,12 @@ class GamificationStateManager {
         try {
             this.state.cache.data.set(key, data);
             this.state.cache.timestamps.set(key, Date.now());
-            
+           
         } catch (error) {
             console.error('❌ Error setting cached gamification data:', error);
         }
     }
-    
+   
     /**
      * Check rate limiting for API requests
      * @returns {boolean} Whether request is allowed
@@ -416,92 +403,89 @@ class GamificationStateManager {
         try {
             const now = Date.now();
             const windowStart = now - GAMIFICATION_CONFIG.SECURITY.RATE_LIMIT_WINDOW;
-            
+           
             // Reset if window has passed
             if (now - this.state.rateLimiter.lastReset > GAMIFICATION_CONFIG.SECURITY.RATE_LIMIT_WINDOW) {
                 this.state.rateLimiter.requests = [];
                 this.state.rateLimiter.lastReset = now;
             }
-            
+           
             // Remove old requests
             this.state.rateLimiter.requests = this.state.rateLimiter.requests.filter(
                 timestamp => timestamp > windowStart
             );
-            
+           
             // Check if limit exceeded
             if (this.state.rateLimiter.requests.length >= GAMIFICATION_CONFIG.SECURITY.MAX_REQUESTS_PER_MINUTE) {
                 console.warn('⚠️ Rate limit exceeded for gamification requests');
                 return false;
             }
-            
+           
             // Add current request
             this.state.rateLimiter.requests.push(now);
             return true;
-            
+           
         } catch (error) {
             console.error('❌ Error checking rate limit:', error);
             return true; // Allow request on error
         }
     }
 }
-
 // Global state manager instance
 const gamificationState = new GamificationStateManager();
-
 // ===== INITIALIZATION - NASA 10/10 =====
 /**
  * Initialize gamification page on DOM ready with enhanced error handling
  */
 document.addEventListener('DOMContentLoaded', initializeGamification);
-
 /**
  * Initialize the gamification system with enhanced NASA 10/10 standards
  * @returns {Promise<void>}
  */
 async function initializeGamification() {
     const startTime = performance.now();
-    
+   
     try {
         // Validate dependencies first
         validateDependencies();
-        
+       
         showLoading(true, 'Inicializando sistema de gamificação...');
-        
+       
         // Health check with retry logic
         const health = await healthCheckWithRetry();
         if (health.error) {
             console.warn('⚠️ Problema de conectividade:', health.error);
             showWarning('Conectividade limitada - alguns recursos podem estar indisponíveis');
         }
-        
+       
         // Enhanced authentication
         const authResult = await authenticateUser();
         if (!authResult.success) {
             redirectToLogin();
             return;
         }
-        
+       
         gamificationState.setState({
             user: authResult.user,
             profile: authResult.profile,
             orgId: authResult.profile?.org_id || 'default-org-id'
         });
-        
+       
         // Load initial gamification data with caching
         await loadGamificationDataWithCache();
-        
+       
         // Setup real-time subscriptions
         setupRealTimeSubscriptions();
-        
+       
         // Render interface
         await renderGamificationInterface();
-        
+       
         // Setup event listeners
         setupEventListeners();
-        
+       
         // Start periodic updates
         startPeriodicUpdates();
-        
+       
         // Calculate performance metrics
         const endTime = performance.now();
         gamificationState.setState({
@@ -511,22 +495,21 @@ async function initializeGamification() {
                 loadTime: endTime - startTime
             }
         });
-        
+       
         showLoading(false);
         console.log(`🎮 Sistema de gamificação inicializado em ${(endTime - startTime).toFixed(2)}ms`);
         showSuccess('Sistema de gamificação carregado com dados reais!');
-        
+       
         // NASA 10/10: Performance monitoring
         if ((endTime - startTime) > 5000) {
             console.warn('⚠️ Tempo de carregamento acima do ideal:', endTime - startTime);
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro crítico ao inicializar gamificação:', error);
         await handleCriticalError(error);
     }
 }
-
 // ===== ENHANCED AUTHENTICATION - NASA 10/10 =====
 /**
  * Enhanced user authentication with comprehensive validation
@@ -534,39 +517,29 @@ async function initializeGamification() {
  */
 async function authenticateUser() {
     try {
-        const { user, profile, error } = await getCurrentUser();
-        
-        if (error) {
-            console.error('Erro de autenticação:', error);
-            return { success: false, error };
-        }
-        
-        if (!user) {
+        const session = await getCurrentSession();
+       
+        if (!session || !session.user) {
             console.log('Usuário não autenticado');
-            return { success: false, error: 'No user found' };
+            return { success: false };
         }
-        
-        // Enhanced validation
-        if (!profile || !profile.org_id) {
-            console.warn('Perfil de usuário incompleto');
-            return { success: false, error: 'Incomplete user profile' };
-        }
-        
-        return { success: true, user, profile };
-        
-    } catch (authError) {
-        console.error('Erro crítico na autenticação:', authError);
-        return { success: false, error: authError.message };
+       
+        const profile = await getUserProfile(session.user.id, session.user.user_metadata.org_id);
+       
+        return { success: true, user: session.user, profile };
+       
+    } catch (error) {
+        console.error('Erro de autenticação:', error);
+        return { success: false, error };
     }
 }
-
 /**
  * Health check with retry logic - NASA 10/10 reliability
  * @returns {Promise<Object>} Health check result
  */
 async function healthCheckWithRetry() {
     let lastError = null;
-    
+   
     for (let attempt = 1; attempt <= GAMIFICATION_CONFIG.PERFORMANCE.RETRY_ATTEMPTS; attempt++) {
         try {
             const result = await healthCheck();
@@ -577,17 +550,16 @@ async function healthCheckWithRetry() {
         } catch (error) {
             lastError = error;
         }
-        
+       
         if (attempt < GAMIFICATION_CONFIG.PERFORMANCE.RETRY_ATTEMPTS) {
             const delay = 1000 * attempt;
             console.log(`⏳ Tentativa ${attempt} falhou, tentando novamente em ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
-    
+   
     return { error: lastError };
 }
-
 /**
  * Redirect to login with enhanced URL preservation
  */
@@ -595,7 +567,6 @@ function redirectToLogin() {
     const currentUrl = encodeURIComponent(window.location.href);
     window.location.href = `src/pages/login.html?redirect=${currentUrl}`;
 }
-
 // ===== DATA LOADING WITH CACHING - NASA 10/10 =====
 /**
  * Load gamification data with intelligent caching strategy
@@ -606,29 +577,29 @@ async function loadGamificationDataWithCache() {
         console.log('⏳ Carregamento já em andamento...');
         return;
     }
-    
+   
     try {
         gamificationState.setState({ isUpdating: true });
         gamificationState.state.metrics.apiCalls++;
-        
+       
         const orgId = gamificationState.getState('orgId');
         const userId = gamificationState.getState('user')?.id;
         const cacheKey = `gamification_${orgId}_${userId}`;
-        
+       
         // Check cache first
         const cachedData = gamificationState.getCachedData(cacheKey);
         if (cachedData) {
             applyGamificationData(cachedData);
             console.log('✅ Dados de gamificação carregados do cache');
-            
+           
             // Load fresh data in background
             loadGamificationFromAPI(cacheKey, true);
             return;
         }
-        
+       
         // Load from API
         await loadGamificationFromAPI(cacheKey, false);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar dados de gamificação:', error);
         throw error;
@@ -636,7 +607,6 @@ async function loadGamificationDataWithCache() {
         gamificationState.setState({ isUpdating: false });
     }
 }
-
 /**
  * Load gamification data from API with enhanced error handling
  * @param {string} cacheKey - Cache key for storing data
@@ -646,22 +616,22 @@ async function loadGamificationFromAPI(cacheKey, isBackground = false) {
     try {
         const orgId = gamificationState.getState('orgId');
         const userId = gamificationState.getState('user')?.id;
-        
+       
         // Check rate limiting
         if (!gamificationState.checkRateLimit()) {
             console.warn('⚠️ Rate limit exceeded, skipping API call');
             return;
         }
-        
+       
         // Load data in parallel for better performance
         const promises = [
-            getGamificationPoints(userId, orgId).catch(err => ({ error: err })),
-            getUserBadges(userId, orgId).catch(err => ({ error: err })),
-            getGamificationBadges(orgId).catch(err => ({ error: err })),
-            getTeamLeaderboards(orgId).catch(err => ({ error: err })),
-            getPerformanceMetrics(userId, orgId).catch(err => ({ error: err }))
+            genericSelect('gamification_points', { user_id: userId }, orgId),
+            genericSelect('user_badges', { user_id: userId }, orgId),
+            genericSelect('gamification_badges', {}, orgId),
+            genericSelect('team_leaderboards', {}, orgId),
+            genericSelect('performance_metrics', { user_id: userId }, orgId)
         ];
-        
+       
         const [
             pointsData,
             userBadgesData,
@@ -669,27 +639,27 @@ async function loadGamificationFromAPI(cacheKey, isBackground = false) {
             leaderboardData,
             metricsData
         ] = await Promise.all(promises);
-        
+       
         const gamificationData = {
-            points: pointsData?.data || { total_points: 0, level: 1, activities: [] },
-            userBadges: userBadgesData?.data || [],
-            availableBadges: availableBadgesData?.data || [],
-            leaderboard: leaderboardData?.data || [],
-            metrics: metricsData?.data || {}
+            points: pointsData[0] || { total_points: 0, level: 1, activities: [] },
+            userBadges: userBadgesData || [],
+            availableBadges: availableBadgesData || [],
+            leaderboard: leaderboardData || [],
+            metrics: metricsData[0] || {}
         };
-        
+       
         // Apply data to state
         applyGamificationData(gamificationData);
-        
+       
         // Cache the data
         gamificationState.setCachedData(cacheKey, gamificationData);
-        
+       
         if (!isBackground) {
             console.log('✅ Dados de gamificação carregados das tabelas do Supabase');
         } else {
             console.log('🔄 Cache de gamificação atualizado');
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar dados de gamificação da API:', error);
         if (!isBackground) {
@@ -697,7 +667,6 @@ async function loadGamificationFromAPI(cacheKey, isBackground = false) {
         }
     }
 }
-
 /**
  * Apply gamification data to state
  * @param {Object} data - Gamification data
@@ -706,10 +675,10 @@ function applyGamificationData(data) {
     try {
         // Calculate user level based on points
         const userLevel = calculateUserLevel(data.points.total_points || 0);
-        
+       
         // Process recent activities
         const recentActivities = processRecentActivities(data.points.activities || []);
-        
+       
         gamificationState.setState({
             userPoints: data.points.total_points || 0,
             userLevel: userLevel,
@@ -723,14 +692,13 @@ function applyGamificationData(data) {
                 badgesUnlocked: (data.userBadges || []).length
             }
         });
-        
+       
         console.log('✅ Dados de gamificação processados e aplicados ao estado');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao aplicar dados de gamificação:', error);
     }
 }
-
 /**
  * Calculate user level based on points
  * @param {number} points - User points
@@ -743,16 +711,15 @@ function calculateUserLevel(points) {
                 return level;
             }
         }
-        
+       
         // Default to highest level if points exceed maximum
         return GAMIFICATION_CONFIG.LEVELS[GAMIFICATION_CONFIG.LEVELS.length - 1];
-        
+       
     } catch (error) {
         console.error('❌ Erro ao calcular nível do usuário:', error);
         return GAMIFICATION_CONFIG.LEVELS[0]; // Return first level as fallback
     }
 }
-
 /**
  * Process recent activities for display
  * @param {Array} activities - Raw activities data
@@ -772,13 +739,12 @@ function processRecentActivities(activities) {
                 },
                 timeAgo: formatTimeAgo(activity.created_at)
             }));
-            
+           
     } catch (error) {
         console.error('❌ Erro ao processar atividades recentes:', error);
         return [];
     }
 }
-
 /**
  * Format time ago for display
  * @param {string} dateString - ISO date string
@@ -792,20 +758,19 @@ function formatTimeAgo(dateString) {
         const diffMins = Math.floor(diffMs / 60000);
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
-        
+       
         if (diffMins < 1) return 'Agora mesmo';
         if (diffMins < 60) return `${diffMins}m atrás`;
         if (diffHours < 24) return `${diffHours}h atrás`;
         if (diffDays < 7) return `${diffDays}d atrás`;
-        
+       
         return date.toLocaleDateString('pt-BR');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao formatar tempo:', error);
         return 'Data inválida';
     }
 }
-
 // ===== REAL-TIME SUBSCRIPTIONS - NASA 10/10 =====
 /**
  * Setup real-time subscriptions for live gamification updates
@@ -814,70 +779,57 @@ function setupRealTimeSubscriptions() {
     try {
         const userId = gamificationState.getState('user')?.id;
         const orgId = gamificationState.getState('orgId');
-        
+       
         if (!userId || !orgId) {
             console.warn('⚠️ Usuário ou organização não definidos para real-time');
             return;
         }
-        
+       
         const subscriptions = new Map();
-        
+       
         // Subscribe to gamification points updates
         try {
             const pointsSubscription = subscribeToTable(
                 'gamification_points',
-                {
-                    event: '*',
-                    schema: 'public',
-                    filter: `user_id=eq.${userId}`
-                },
+                orgId,
                 (payload) => handleRealTimeUpdate('points', payload)
             );
             subscriptions.set('points', pointsSubscription);
         } catch (subError) {
             console.warn('⚠️ Erro ao configurar subscription para pontos:', subError);
         }
-        
+       
         // Subscribe to user badges updates
         try {
             const badgesSubscription = subscribeToTable(
                 'user_badges',
-                {
-                    event: '*',
-                    schema: 'public',
-                    filter: `user_id=eq.${userId}`
-                },
+                orgId,
                 (payload) => handleRealTimeUpdate('badges', payload)
             );
             subscriptions.set('badges', badgesSubscription);
         } catch (subError) {
             console.warn('⚠️ Erro ao configurar subscription para badges:', subError);
         }
-        
+       
         // Subscribe to leaderboard updates
         try {
             const leaderboardSubscription = subscribeToTable(
                 'team_leaderboards',
-                {
-                    event: '*',
-                    schema: 'public',
-                    filter: `org_id=eq.${orgId}`
-                },
+                orgId,
                 (payload) => handleRealTimeUpdate('leaderboard', payload)
             );
             subscriptions.set('leaderboard', leaderboardSubscription);
         } catch (subError) {
             console.warn('⚠️ Erro ao configurar subscription para leaderboard:', subError);
         }
-        
+       
         gamificationState.setState({ subscriptions });
         console.log('✅ Real-time subscriptions configuradas para gamificação');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao configurar subscriptions de gamificação:', error);
     }
 }
-
 /**
  * Handle real-time data updates
  * @param {string} type - Update type
@@ -886,7 +838,7 @@ function setupRealTimeSubscriptions() {
 function handleRealTimeUpdate(type, payload) {
     try {
         console.log(`🔄 Atualização real-time recebida: ${type}`);
-        
+       
         switch (type) {
             case 'points':
                 handlePointsUpdate(payload);
@@ -900,20 +852,19 @@ function handleRealTimeUpdate(type, payload) {
             default:
                 console.warn(`⚠️ Tipo de atualização desconhecido: ${type}`);
         }
-        
+       
         // Clear relevant cache
         const userId = gamificationState.getState('user')?.id;
         const orgId = gamificationState.getState('orgId');
         const cacheKey = `gamification_${orgId}_${userId}`;
         gamificationState.clearCache(cacheKey);
-        
+       
         showNotification(`Dados de ${type} atualizados em tempo real!`, 'info');
-        
+       
     } catch (error) {
         console.error(`❌ Erro ao processar atualização real-time de ${type}:`, error);
     }
 }
-
 /**
  * Handle points update from real-time
  * @param {Object} payload - Points update payload
@@ -924,33 +875,32 @@ function handlePointsUpdate(payload) {
             const newPoints = payload.new;
             const currentPoints = gamificationState.getState('userPoints');
             const totalPoints = currentPoints + (newPoints.points || 0);
-            
+           
             // Update points and level
             const newLevel = calculateUserLevel(totalPoints);
             const currentLevel = gamificationState.getState('userLevel');
-            
+           
             gamificationState.setState({
                 userPoints: totalPoints,
                 userLevel: newLevel
             });
-            
+           
             // Show points earned animation
             showPointsEarned(newPoints.points || 0, newPoints.action);
-            
+           
             // Check for level up
             if (newLevel.level > currentLevel.level) {
                 showLevelUp(newLevel);
             }
-            
+           
             // Update recent activities
             loadGamificationDataWithCache();
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar atualização de pontos:', error);
     }
 }
-
 /**
  * Handle badges update from real-time
  * @param {Object} payload - Badges update payload
@@ -960,14 +910,14 @@ function handleBadgesUpdate(payload) {
         if (payload.eventType === 'INSERT') {
             const newBadge = payload.new;
             const currentBadges = gamificationState.getState('userBadges');
-            
+           
             gamificationState.setState({
                 userBadges: [...currentBadges, newBadge]
             });
-            
+           
             // Show badge unlocked animation
             showBadgeUnlocked(newBadge);
-            
+           
             // Update metrics
             const metrics = gamificationState.getState('metrics');
             gamificationState.setState({
@@ -977,12 +927,11 @@ function handleBadgesUpdate(payload) {
                 }
             });
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar atualização de badges:', error);
     }
 }
-
 /**
  * Handle leaderboard update from real-time
  * @param {Object} payload - Leaderboard update payload
@@ -991,15 +940,14 @@ function handleLeaderboardUpdate(payload) {
     try {
         // Refresh leaderboard data
         loadGamificationDataWithCache();
-        
+       
         // Show subtle notification
         showNotification('Leaderboard atualizado!', 'info', 3000);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar atualização de leaderboard:', error);
     }
 }
-
 // ===== INTERFACE RENDERING - NASA 10/10 =====
 /**
  * Render the complete gamification interface
@@ -1007,7 +955,7 @@ function handleLeaderboardUpdate(payload) {
  */
 async function renderGamificationInterface() {
     const startTime = performance.now();
-    
+   
     try {
         // Render components in parallel where possible
         const renderPromises = [
@@ -1018,9 +966,9 @@ async function renderGamificationInterface() {
             renderLeaderboard(),
             renderRecentActivities()
         ];
-        
+       
         await Promise.all(renderPromises);
-        
+       
         const endTime = performance.now();
         gamificationState.setState({
             metrics: {
@@ -1028,14 +976,13 @@ async function renderGamificationInterface() {
                 renderTime: endTime - startTime
             }
         });
-        
+       
         console.log(`🎨 Interface de gamificação renderizada em ${(endTime - startTime).toFixed(2)}ms`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar interface de gamificação:', error);
     }
 }
-
 /**
  * Render gamification header with user stats
  * @returns {Promise<void>}
@@ -1044,14 +991,14 @@ async function renderGamificationHeader() {
     try {
         const headerContainer = document.getElementById('gamification-header');
         if (!headerContainer) return;
-        
+       
         const userLevel = gamificationState.getState('userLevel');
         const userPoints = gamificationState.getState('userPoints');
         const profile = gamificationState.getState('profile');
-        
-        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[userLevel.color] || 
+       
+        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[userLevel.color] ||
                            GAMIFICATION_CONFIG.STATIC_STYLES.levels.gray;
-        
+       
         const headerHTML = `
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -1059,13 +1006,13 @@ async function renderGamificationHeader() {
                         <h1 class="text-2xl font-bold text-gray-900">Sistema de Gamificação</h1>
                         <p class="text-gray-600">Acompanhe seu progresso e conquistas</p>
                     </div>
-                    
+                   
                     <div class="flex items-center space-x-6">
                         <div class="text-center">
                             <div class="text-2xl font-bold text-blue-600">${formatNumber(userPoints)}</div>
                             <div class="text-sm text-gray-500">Pontos Totais</div>
                         </div>
-                        
+                       
                         <div class="text-center">
                             <div class="flex items-center justify-center space-x-2">
                                 <span class="text-2xl">${userLevel.icon}</span>
@@ -1073,7 +1020,7 @@ async function renderGamificationHeader() {
                             </div>
                             <div class="text-sm text-gray-500">Nível ${userLevel.level}</div>
                         </div>
-                        
+                       
                         <div class="text-center">
                             <div class="text-2xl font-bold text-green-600">${gamificationState.getState('userBadges').length}</div>
                             <div class="text-sm text-gray-500">Badges</div>
@@ -1082,14 +1029,13 @@ async function renderGamificationHeader() {
                 </div>
             </div>
         `;
-        
+       
         headerContainer.innerHTML = headerHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar header de gamificação:', error);
     }
 }
-
 /**
  * Render user statistics cards
  * @returns {Promise<void>}
@@ -1098,26 +1044,26 @@ async function renderUserStats() {
     try {
         const statsContainer = document.getElementById('user-stats');
         if (!statsContainer) return;
-        
+       
         const userLevel = gamificationState.getState('userLevel');
         const userPoints = gamificationState.getState('userPoints');
         const recentActivities = gamificationState.getState('recentActivities');
         const leaderboard = gamificationState.getState('leaderboard');
-        
+       
         // Calculate user rank
         const userRank = calculateUserRank(leaderboard, gamificationState.getState('user')?.id);
-        
+       
         // Calculate points to next level
-        const pointsToNext = userLevel.level < 10 ? 
+        const pointsToNext = userLevel.level < 10 ?
             GAMIFICATION_CONFIG.LEVELS[userLevel.level].minPoints - userPoints : 0;
-        
+       
         // Calculate recent activity stats
         const todayActivities = recentActivities.filter(activity => {
             const activityDate = new Date(activity.created_at);
             const today = new Date();
             return activityDate.toDateString() === today.toDateString();
         }).length;
-        
+       
         const statsHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow p-6">
@@ -1133,7 +1079,7 @@ async function renderUserStats() {
                         </div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -1147,7 +1093,7 @@ async function renderUserStats() {
                         </div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -1161,7 +1107,7 @@ async function renderUserStats() {
                         </div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -1177,14 +1123,13 @@ async function renderUserStats() {
                 </div>
             </div>
         `;
-        
+       
         statsContainer.innerHTML = statsHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar estatísticas do usuário:', error);
     }
 }
-
 /**
  * Calculate user rank in leaderboard
  * @param {Array} leaderboard - Leaderboard data
@@ -1200,7 +1145,6 @@ function calculateUserRank(leaderboard, userId) {
         return 0;
     }
 }
-
 /**
  * Render progress section with level progression
  * @returns {Promise<void>}
@@ -1209,27 +1153,27 @@ async function renderProgressSection() {
     try {
         const progressContainer = document.getElementById('progress-section');
         if (!progressContainer) return;
-        
+       
         const userLevel = gamificationState.getState('userLevel');
         const userPoints = gamificationState.getState('userPoints');
-        
+       
         // Calculate progress to next level
         const currentLevelMin = userLevel.minPoints;
-        const nextLevelMin = userLevel.level < 10 ? 
+        const nextLevelMin = userLevel.level < 10 ?
             GAMIFICATION_CONFIG.LEVELS[userLevel.level].minPoints : userLevel.maxPoints;
-        
+       
         const progressInLevel = userPoints - currentLevelMin;
         const totalLevelPoints = nextLevelMin - currentLevelMin;
-        const progressPercentage = userLevel.level < 10 ? 
+        const progressPercentage = userLevel.level < 10 ?
             Math.min((progressInLevel / totalLevelPoints) * 100, 100) : 100;
-        
-        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[userLevel.color] || 
+       
+        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[userLevel.color] ||
                            GAMIFICATION_CONFIG.STATIC_STYLES.levels.gray;
-        
+       
         const progressHTML = `
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Progresso do Nível</h3>
-                
+               
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
                         <span class="text-2xl">${userLevel.icon}</span>
@@ -1240,12 +1184,12 @@ async function renderProgressSection() {
                         ${formatNumber(userPoints)} / ${userLevel.level < 10 ? formatNumber(nextLevelMin) : 'MAX'} pontos
                     </div>
                 </div>
-                
+               
                 <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
-                    <div class="h-3 rounded-full transition-all duration-500 ${userLevel.color === 'rainbow' ? 'bg-gradient-to-r from-purple-400 to-pink-400' : userLevel.color === 'cosmic' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-blue-600'}" 
+                    <div class="h-3 rounded-full transition-all duration-500 ${userLevel.color === 'rainbow' ? 'bg-gradient-to-r from-purple-400 to-pink-400' : userLevel.color === 'cosmic' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-blue-600'}"
                          style="width: ${progressPercentage}%"></div>
                 </div>
-                
+               
                 ${userLevel.level < 10 ? `
                     <div class="text-center">
                         <p class="text-sm text-gray-600">
@@ -1263,14 +1207,13 @@ async function renderProgressSection() {
                 `}
             </div>
         `;
-        
+       
         progressContainer.innerHTML = progressHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar seção de progresso:', error);
     }
 }
-
 /**
  * Render badges section with user badges and available badges
  * @returns {Promise<void>}
@@ -1279,28 +1222,28 @@ async function renderBadgesSection() {
     try {
         const badgesContainer = document.getElementById('badges-section');
         if (!badgesContainer) return;
-        
+       
         const userBadges = gamificationState.getState('userBadges');
         const availableBadges = gamificationState.getState('availableBadges');
-        
+       
         // Separate earned and unearned badges
         const earnedBadgeIds = userBadges.map(badge => badge.badge_id);
         const unearnedBadges = availableBadges.filter(badge => !earnedBadgeIds.includes(badge.id));
-        
+       
         const badgesHTML = `
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Badges e Conquistas</h3>
-                
+               
                 <div class="mb-6">
                     <h4 class="text-md font-medium text-gray-700 mb-3">Badges Conquistados (${userBadges.length})</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         ${userBadges.map(userBadge => {
                             const badge = availableBadges.find(b => b.id === userBadge.badge_id);
                             if (!badge) return '';
-                            
+                           
                             const tierConfig = GAMIFICATION_CONFIG.BADGE_TIERS[badge.tier] || GAMIFICATION_CONFIG.BADGE_TIERS.bronze;
                             const badgeStyles = GAMIFICATION_CONFIG.STATIC_STYLES.badges[badge.tier] || GAMIFICATION_CONFIG.STATIC_STYLES.badges.bronze;
-                            
+                           
                             return `
                                 <div class="text-center p-3 rounded-lg ${badgeStyles.bg} ${badgeStyles.border} border">
                                     <div class="text-3xl mb-2">${tierConfig.icon}</div>
@@ -1310,7 +1253,7 @@ async function renderBadgesSection() {
                                 </div>
                             `;
                         }).join('')}
-                        
+                       
                         ${userBadges.length === 0 ? `
                             <div class="col-span-full text-center py-8 text-gray-500">
                                 <div class="text-4xl mb-2">🏆</div>
@@ -1320,13 +1263,13 @@ async function renderBadgesSection() {
                         ` : ''}
                     </div>
                 </div>
-                
+               
                 <div>
                     <h4 class="text-md font-medium text-gray-700 mb-3">Badges Disponíveis (${unearnedBadges.length})</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         ${unearnedBadges.slice(0, 12).map(badge => {
                             const tierConfig = GAMIFICATION_CONFIG.BADGE_TIERS[badge.tier] || GAMIFICATION_CONFIG.BADGE_TIERS.bronze;
-                            
+                           
                             return `
                                 <div class="text-center p-3 rounded-lg bg-gray-50 border border-gray-200 opacity-60">
                                     <div class="text-3xl mb-2 grayscale">${tierConfig.icon}</div>
@@ -1336,7 +1279,7 @@ async function renderBadgesSection() {
                                 </div>
                             `;
                         }).join('')}
-                        
+                       
                         ${unearnedBadges.length === 0 ? `
                             <div class="col-span-full text-center py-8 text-gray-500">
                                 <div class="text-4xl mb-2">🎉</div>
@@ -1348,14 +1291,13 @@ async function renderBadgesSection() {
                 </div>
             </div>
         `;
-        
+       
         badgesContainer.innerHTML = badgesHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar seção de badges:', error);
     }
 }
-
 /**
  * Render leaderboard with team rankings
  * @returns {Promise<void>}
@@ -1364,26 +1306,26 @@ async function renderLeaderboard() {
     try {
         const leaderboardContainer = document.getElementById('leaderboard-section');
         if (!leaderboardContainer) return;
-        
+       
         const leaderboard = gamificationState.getState('leaderboard');
         const currentUserId = gamificationState.getState('user')?.id;
-        
+       
         const leaderboardHTML = `
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Leaderboard da Equipe</h3>
-                
+               
                 <div class="space-y-3">
                     ${leaderboard.slice(0, 10).map((entry, index) => {
                         const isCurrentUser = entry.user_id === currentUserId;
                         const userLevel = calculateUserLevel(entry.total_points);
-                        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[userLevel.color] || 
+                        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[userLevel.color] ||
                                            GAMIFICATION_CONFIG.STATIC_STYLES.levels.gray;
-                        
+                       
                         let rankIcon = '🏅';
                         if (index === 0) rankIcon = '🥇';
                         else if (index === 1) rankIcon = '🥈';
                         else if (index === 2) rankIcon = '🥉';
-                        
+                       
                         return `
                             <div class="flex items-center justify-between p-3 rounded-lg ${isCurrentUser ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'}">
                                 <div class="flex items-center space-x-3">
@@ -1400,7 +1342,7 @@ async function renderLeaderboard() {
                                         </div>
                                     </div>
                                 </div>
-                                
+                               
                                 <div class="text-right">
                                     <div class="font-semibold text-gray-900">${formatNumber(entry.total_points)}</div>
                                     <div class="text-sm text-gray-500">pontos</div>
@@ -1408,7 +1350,7 @@ async function renderLeaderboard() {
                             </div>
                         `;
                     }).join('')}
-                    
+                   
                     ${leaderboard.length === 0 ? `
                         <div class="text-center py-8 text-gray-500">
                             <div class="text-4xl mb-2">🏆</div>
@@ -1417,7 +1359,7 @@ async function renderLeaderboard() {
                         </div>
                     ` : ''}
                 </div>
-                
+               
                 ${leaderboard.length > 10 ? `
                     <div class="mt-4 text-center">
                         <button id="load-more-leaderboard" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
@@ -1427,14 +1369,13 @@ async function renderLeaderboard() {
                 ` : ''}
             </div>
         `;
-        
+       
         leaderboardContainer.innerHTML = leaderboardHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar leaderboard:', error);
     }
 }
-
 /**
  * Render recent activities feed
  * @returns {Promise<void>}
@@ -1443,13 +1384,13 @@ async function renderRecentActivities() {
     try {
         const activitiesContainer = document.getElementById('recent-activities');
         if (!activitiesContainer) return;
-        
+       
         const recentActivities = gamificationState.getState('recentActivities');
-        
+       
         const activitiesHTML = `
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Atividades Recentes</h3>
-                
+               
                 <div class="space-y-3">
                     ${recentActivities.map(activity => {
                         const actionConfig = activity.actionConfig;
@@ -1462,9 +1403,9 @@ async function renderRecentActivities() {
                             setup: 'text-gray-600 bg-gray-100',
                             other: 'text-gray-600 bg-gray-100'
                         };
-                        
+                       
                         const categoryStyle = categoryColors[actionConfig.category] || categoryColors.other;
-                        
+                       
                         return `
                             <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
                                 <div class="flex items-center space-x-3">
@@ -1476,7 +1417,7 @@ async function renderRecentActivities() {
                                         <div class="text-sm text-gray-500">${activity.timeAgo}</div>
                                     </div>
                                 </div>
-                                
+                               
                                 <div class="text-right">
                                     <div class="font-semibold text-green-600">+${actionConfig.points}</div>
                                     <div class="text-xs text-gray-500">${actionConfig.category}</div>
@@ -1484,7 +1425,7 @@ async function renderRecentActivities() {
                             </div>
                         `;
                     }).join('')}
-                    
+                   
                     ${recentActivities.length === 0 ? `
                         <div class="text-center py-8 text-gray-500">
                             <div class="text-4xl mb-2">📋</div>
@@ -1493,7 +1434,7 @@ async function renderRecentActivities() {
                         </div>
                     ` : ''}
                 </div>
-                
+               
                 ${recentActivities.length > 0 ? `
                     <div class="mt-4 text-center">
                         <button id="load-more-activities" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
@@ -1503,14 +1444,13 @@ async function renderRecentActivities() {
                 ` : ''}
             </div>
         `;
-        
+       
         activitiesContainer.innerHTML = activitiesHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar atividades recentes:', error);
     }
 }
-
 // ===== EVENT LISTENERS SETUP - NASA 10/10 =====
 /**
  * Setup event listeners with enhanced performance and accessibility
@@ -1522,32 +1462,31 @@ function setupEventListeners() {
         if (loadMoreLeaderboard) {
             loadMoreLeaderboard.addEventListener('click', loadMoreLeaderboardEntries);
         }
-        
+       
         // Load more activities button
         const loadMoreActivities = document.getElementById('load-more-activities');
         if (loadMoreActivities) {
             loadMoreActivities.addEventListener('click', loadMoreActivitiesEntries);
         }
-        
+       
         // Keyboard navigation - NASA 10/10 accessibility
         if (GAMIFICATION_CONFIG.ACCESSIBILITY?.keyboardNavigation) {
             document.addEventListener('keydown', handleKeyboardNavigation);
         }
-        
+       
         // Page visibility change handler
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 loadGamificationDataWithCache();
             }
         });
-        
+       
         console.log('✅ Event listeners configurados para gamificação');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao configurar event listeners de gamificação:', error);
     }
 }
-
 /**
  * Handle keyboard navigation - NASA 10/10 accessibility
  * @param {KeyboardEvent} e - Keyboard event
@@ -1559,17 +1498,16 @@ function handleKeyboardNavigation(e) {
             e.preventDefault();
             loadGamificationDataWithCache();
         }
-        
+       
         // Escape: Close modals
         if (e.key === 'Escape') {
             closeAllModals();
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro na navegação por teclado de gamificação:', error);
     }
 }
-
 /**
  * Load more leaderboard entries
  */
@@ -1578,12 +1516,11 @@ function loadMoreLeaderboardEntries() {
         // Implementation for loading more leaderboard entries
         console.log('📊 Carregando mais entradas do leaderboard...');
         showNotification('Funcionalidade em desenvolvimento', 'info');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar mais entradas do leaderboard:', error);
     }
 }
-
 /**
  * Load more activities entries
  */
@@ -1592,12 +1529,11 @@ function loadMoreActivitiesEntries() {
         // Implementation for loading more activities
         console.log('📋 Carregando mais atividades...');
         showNotification('Funcionalidade em desenvolvimento', 'info');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar mais atividades:', error);
     }
 }
-
 /**
  * Close all modals
  */
@@ -1607,12 +1543,11 @@ function closeAllModals() {
         modals.forEach(modal => {
             modal.classList.add('hidden');
         });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao fechar modais de gamificação:', error);
     }
 }
-
 // ===== PERIODIC UPDATES - NASA 10/10 =====
 /**
  * Start periodic updates for real-time data
@@ -1624,14 +1559,13 @@ function startPeriodicUpdates() {
                 loadGamificationDataWithCache();
             }
         }, GAMIFICATION_CONFIG.PERFORMANCE.UPDATE_INTERVAL);
-        
+       
         console.log('✅ Atualizações periódicas iniciadas para gamificação');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao iniciar atualizações periódicas:', error);
     }
 }
-
 // ===== ANIMATION FUNCTIONS - NASA 10/10 =====
 /**
  * Show points earned animation
@@ -1644,7 +1578,7 @@ function showPointsEarned(points, action) {
             description: 'Pontos ganhos',
             category: 'other'
         };
-        
+       
         // Create floating animation element
         const animation = document.createElement('div');
         animation.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none';
@@ -1654,16 +1588,16 @@ function showPointsEarned(points, action) {
                 <div class="text-sm">${actionConfig.description}</div>
             </div>
         `;
-        
+       
         document.body.appendChild(animation);
-        
+       
         // Remove after animation
         setTimeout(() => {
             if (animation.parentNode) {
                 animation.remove();
             }
         }, GAMIFICATION_CONFIG.ANIMATIONS.pointsEarned.duration);
-        
+       
         // Update metrics
         const metrics = gamificationState.getState('metrics');
         gamificationState.setState({
@@ -1672,21 +1606,20 @@ function showPointsEarned(points, action) {
                 pointsEarned: metrics.pointsEarned + points
             }
         });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de pontos:', error);
     }
 }
-
 /**
  * Show level up animation
  * @param {Object} newLevel - New level information
  */
 function showLevelUp(newLevel) {
     try {
-        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[newLevel.color] || 
+        const levelStyles = GAMIFICATION_CONFIG.STATIC_STYLES.levels[newLevel.color] ||
                            GAMIFICATION_CONFIG.STATIC_STYLES.levels.gray;
-        
+       
         // Create level up modal
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
@@ -1696,22 +1629,22 @@ function showLevelUp(newLevel) {
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Parabéns!</h2>
                 <p class="text-lg ${levelStyles.text} mb-4">Você subiu para ${newLevel.name}!</p>
                 <p class="text-sm text-gray-600 mb-6">Nível ${newLevel.level} • Multiplicador ${newLevel.multiplier}x</p>
-                <button onclick="this.parentElement.parentElement.remove()" 
+                <button onclick="this.parentElement.parentElement.remove()"
                         class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
                     Continuar
                 </button>
             </div>
         `;
-        
+       
         document.body.appendChild(modal);
-        
+       
         // Auto-remove after delay
         setTimeout(() => {
             if (modal.parentNode) {
                 modal.remove();
             }
         }, GAMIFICATION_CONFIG.ANIMATIONS.levelUp.duration);
-        
+       
         // Play sound if available
         if (window.Audio) {
             try {
@@ -1719,12 +1652,11 @@ function showLevelUp(newLevel) {
                 audio.play().catch(() => {}); // Ignore errors
             } catch (e) {}
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de level up:', error);
     }
 }
-
 /**
  * Show badge unlocked animation
  * @param {Object} badge - Badge information
@@ -1733,12 +1665,12 @@ function showBadgeUnlocked(badge) {
     try {
         const availableBadges = gamificationState.getState('availableBadges');
         const badgeInfo = availableBadges.find(b => b.id === badge.badge_id);
-        
+       
         if (!badgeInfo) return;
-        
+       
         const tierConfig = GAMIFICATION_CONFIG.BADGE_TIERS[badgeInfo.tier] || GAMIFICATION_CONFIG.BADGE_TIERS.bronze;
         const badgeStyles = GAMIFICATION_CONFIG.STATIC_STYLES.badges[badgeInfo.tier] || GAMIFICATION_CONFIG.STATIC_STYLES.badges.bronze;
-        
+       
         // Create badge unlocked modal
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
@@ -1748,27 +1680,26 @@ function showBadgeUnlocked(badge) {
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Badge Desbloqueado!</h2>
                 <p class="text-lg ${badgeStyles.text} mb-4">${badgeInfo.name}</p>
                 <p class="text-sm text-gray-600 mb-6">${badgeInfo.description}</p>
-                <button onclick="this.parentElement.parentElement.remove()" 
+                <button onclick="this.parentElement.parentElement.remove()"
                         class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
                     Incrível!
                 </button>
             </div>
         `;
-        
+       
         document.body.appendChild(modal);
-        
+       
         // Auto-remove after delay
         setTimeout(() => {
             if (modal.parentNode) {
                 modal.remove();
             }
         }, GAMIFICATION_CONFIG.ANIMATIONS.badgeUnlocked.duration);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de badge:', error);
     }
 }
-
 // ===== UTILITY FUNCTIONS - NASA 10/10 =====
 /**
  * Format number for display
@@ -1780,15 +1711,14 @@ function formatNumber(num) {
         if (num === null || num === undefined || isNaN(num)) {
             return '0';
         }
-        
+       
         return new Intl.NumberFormat('pt-BR').format(num);
-        
+       
     } catch (error) {
         console.error('Erro ao formatar número:', error);
         return String(num);
     }
 }
-
 /**
  * Format date for display
  * @param {string} dateString - ISO date string
@@ -1797,22 +1727,21 @@ function formatNumber(num) {
 function formatDate(dateString) {
     try {
         if (!dateString) return '-';
-        
+       
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return '-';
-        
+       
         return date.toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
         });
-        
+       
     } catch (error) {
         console.error('Erro ao formatar data:', error);
         return '-';
     }
 }
-
 // ===== NOTIFICATION SYSTEM - NASA 10/10 =====
 /**
  * Show loading state
@@ -1822,7 +1751,7 @@ function formatDate(dateString) {
 function showLoading(show, message = 'Carregando...') {
     try {
         let loadingElement = document.getElementById('loading-overlay');
-        
+       
         if (show) {
             if (!loadingElement) {
                 loadingElement = document.createElement('div');
@@ -1844,12 +1773,11 @@ function showLoading(show, message = 'Carregando...') {
                 loadingElement.classList.add('hidden');
             }
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao mostrar loading de gamificação:', error);
     }
 }
-
 /**
  * Show success notification
  * @param {string} message - Success message
@@ -1857,7 +1785,6 @@ function showLoading(show, message = 'Carregando...') {
 function showSuccess(message) {
     showNotification(message, 'success');
 }
-
 /**
  * Show error notification
  * @param {string} message - Error message
@@ -1865,7 +1792,6 @@ function showSuccess(message) {
 function showError(message) {
     showNotification(message, 'error');
 }
-
 /**
  * Show warning notification
  * @param {string} message - Warning message
@@ -1873,7 +1799,6 @@ function showError(message) {
 function showWarning(message) {
     showNotification(message, 'warning');
 }
-
 /**
  * Show notification with enhanced styling and accessibility
  * @param {string} message - Notification message
@@ -1885,13 +1810,12 @@ function showNotification(message, type = 'info', duration = 5000) {
         // Remove existing notifications of the same type
         const existingNotifications = document.querySelectorAll(`.notification-${type}`);
         existingNotifications.forEach(notification => notification.remove());
-
         // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification-${type} fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 max-w-sm ${getNotificationClasses(type)}`;
         notification.setAttribute('role', 'alert');
         notification.setAttribute('aria-live', 'polite');
-        
+       
         notification.innerHTML = `
             <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
@@ -1900,7 +1824,7 @@ function showNotification(message, type = 'info', duration = 5000) {
                 <div class="flex-1">
                     <p class="text-sm font-medium"></p>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()" 
+                <button onclick="this.parentElement.parentElement.remove()"
                         class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
                         aria-label="Fechar notificação">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -1909,21 +1833,21 @@ function showNotification(message, type = 'info', duration = 5000) {
                 </button>
             </div>
         `;
-        
+       
         // Safely set message text with XSS protection
         const messageElement = notification.querySelector('p');
         if (messageElement) {
             // Use textContent for XSS protection instead of innerHTML
             messageElement.textContent = message;
         }
-        
+       
         document.body.appendChild(notification);
-        
+       
         // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 100);
-        
+       
         // Auto-remove with fade out
         setTimeout(() => {
             notification.style.transform = 'translateX(100%)';
@@ -1934,14 +1858,12 @@ function showNotification(message, type = 'info', duration = 5000) {
                 }
             }, 300);
         }, duration);
-
     } catch (error) {
         console.error('❌ Erro ao mostrar notificação de gamificação:', error);
         // Fallback to alert
         alert(message);
     }
 }
-
 /**
  * Get notification CSS classes based on type
  * @param {'success'|'error'|'warning'|'info'} type - Notification type
@@ -1951,7 +1873,6 @@ function getNotificationClasses(type) {
     const styles = GAMIFICATION_CONFIG.STATIC_STYLES.notifications;
     return styles[type] || styles.info;
 }
-
 /**
  * Get notification icon SVG based on type
  * @param {'success'|'error'|'warning'|'info'} type - Notification type
@@ -1969,7 +1890,6 @@ function getNotificationIcon(type) {
             return '<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>';
     }
 }
-
 // ===== ERROR HANDLING - NASA 10/10 =====
 /**
  * Handle critical errors with recovery strategies
@@ -1978,7 +1898,7 @@ function getNotificationIcon(type) {
 async function handleCriticalError(error) {
     try {
         console.error('🚨 Erro crítico na gamificação:', error);
-        
+       
         gamificationState.setState({
             errors: [...gamificationState.getState('errors'), {
                 type: 'critical_error',
@@ -1987,27 +1907,26 @@ async function handleCriticalError(error) {
             }],
             isLoading: false
         });
-        
+       
         showLoading(false);
         showError(`Erro crítico: ${error.message}. Carregando dados demo.`);
-        
+       
         // Try to load demo data as fallback
         console.log('🔄 Tentando carregar dados demo como fallback...');
         loadDemoGamificationData();
-        
+       
     } catch (fallbackError) {
         console.error('🚨 Erro no fallback de gamificação:', fallbackError);
         showError('Sistema temporariamente indisponível. Tente recarregar a página.');
     }
 }
-
 /**
  * Load demo data as fallback
  */
 function loadDemoGamificationData() {
     try {
         console.log('🎮 Carregando dados demo de gamificação...');
-        
+       
         // Demo data
         const demoData = {
             points: {
@@ -2032,19 +1951,18 @@ function loadDemoGamificationData() {
             ],
             metrics: {}
         };
-        
+       
         applyGamificationData(demoData);
         renderGamificationInterface();
-        
+       
         console.log('✅ Dados demo de gamificação carregados com sucesso');
         showWarning('Usando dados demo - verifique a conexão com o Supabase');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar dados demo de gamificação:', error);
         showError('Erro ao carregar dados demo de gamificação');
     }
 }
-
 // ===== CLEANUP AND LIFECYCLE - NASA 10/10 =====
 /**
  * Cleanup function for page unload
@@ -2056,26 +1974,24 @@ function cleanup() {
         if (subscriptions) {
             for (const [type, subscription] of subscriptions.entries()) {
                 try {
-                    unsubscribeFromTable(subscription);
+                    subscription.unsubscribe();
                 } catch (error) {
                     console.warn(`⚠️ Erro ao cancelar subscription de ${type}:`, error);
                 }
             }
         }
-        
+       
         // Clear cache
         gamificationState.clearCache();
-        
+       
         console.log('✅ Cleanup de gamificação concluído');
-        
+       
     } catch (error) {
         console.error('❌ Erro durante cleanup de gamificação:', error);
     }
 }
-
 // Setup cleanup on page unload
 window.addEventListener('beforeunload', cleanup);
-
 // ===== PUBLIC API - NASA 10/10 =====
 /**
  * Public API for external use
@@ -2086,10 +2002,10 @@ const GamificationSystem = {
     // State management
     getState: () => gamificationState.getState(),
     setState: (updates, callback) => gamificationState.setState(updates, callback),
-    
+   
     // Data operations
     refresh: loadGamificationDataWithCache,
-    
+   
     // Points operations
     addPoints: async (action, points) => {
         try {
@@ -2102,7 +2018,7 @@ const GamificationSystem = {
             return { success: false, error: error.message };
         }
     },
-    
+   
     // Badge operations
     unlockBadge: async (badgeId) => {
         try {
@@ -2114,40 +2030,38 @@ const GamificationSystem = {
             return { success: false, error: error.message };
         }
     },
-    
+   
     // Level operations
     getCurrentLevel: () => gamificationState.getState('userLevel'),
     getPointsToNextLevel: () => {
         const userLevel = gamificationState.getState('userLevel');
         const userPoints = gamificationState.getState('userPoints');
-        
+       
         if (userLevel.level >= 10) return 0;
-        
+       
         const nextLevel = GAMIFICATION_CONFIG.LEVELS[userLevel.level];
         return nextLevel.minPoints - userPoints;
     },
-    
+   
     // Cache management
     clearCache: (filter) => gamificationState.clearCache(filter),
     getCacheStats: () => ({
         size: gamificationState.state.cache.data.size,
         hits: gamificationState.getState('metrics').cacheHits
     }),
-    
+   
     // Performance monitoring
     getMetrics: () => gamificationState.getState('metrics'),
-    
+   
     // Configuration
     getConfig: () => GAMIFICATION_CONFIG,
-    
+   
     // Version info
     version: '5.0.0',
     buildDate: new Date().toISOString()
 };
-
 // Export for ES Modules compatibility
 export default GamificationSystem;
-
 // Named exports for tree-shaking optimization
 export {
     gamificationState,
@@ -2160,13 +2074,10 @@ export {
     showBadgeUnlocked,
     showNotification
 };
-
 // Also attach to window for backward compatibility
 window.GamificationSystem = GamificationSystem;
-
 console.log('🎮 Sistema de Gamificação Enterprise V5.0 NASA 10/10 carregado - Pronto para dados reais!');
 console.log('✅ ES Modules e Vite compatibility otimizados');
 console.log('🚀 Performance e cache inteligente implementados');
 console.log('🔒 Segurança e validação enterprise ativas');
 console.log('🏆 Sistema de pontos, badges e leaderboards disponíveis');
-
