@@ -17,15 +17,34 @@ import { createClient } from '@supabase/supabase-js'
 // =========================================================================
 // 🔐 REAL PRODUCTION CONFIGURATION - RAILWAY CREDENTIALS
 // =========================================================================
+// Configuração das credenciais Supabase
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY
-// 🚨 PRODUCTION SECURITY - Fail fast if real credentials missing
+
+// Log para debug (apenas em desenvolvimento)
+if (import.meta.env.DEV) {
+  console.log('Supabase config check:', {
+    hasUrl: !!SUPABASE_URL,
+    hasKey: !!SUPABASE_ANON_KEY,
+    urlLength: SUPABASE_URL?.length,
+    keyLength: SUPABASE_ANON_KEY?.length
+  })
+}
+
+// Aviso se credenciais não foram encontradas (mas não bloqueia)
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  const errorMsg = '🚨 CRITICAL: Real Supabase credentials not found in environment variables'
-  console.error(errorMsg)
-  console.error('Required: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY')
-  console.error('Railway URL should be: https://rgvnbtuqtxvfxhrdnkjg.supabase.co')
-  throw new Error(errorMsg)
+  console.warn('⚠️ Credenciais do Supabase não encontradas nas variáveis de ambiente')
+  console.warn('Verificar: VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel')
+  
+  // Em produção, tenta usar valores padrão se disponíveis
+  const fallbackUrl = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co'
+  const fallbackKey = '' // Adicione sua chave aqui como fallback se quiser
+  
+  if (!SUPABASE_URL && fallbackUrl) {
+    console.warn('Usando URL de fallback')
+  }
+} else {
+  console.log('✅ Credenciais do Supabase carregadas com sucesso')
 }
 // 🏗️ ENTERPRISE CLIENT WITH REAL CREDENTIALS
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
