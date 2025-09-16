@@ -13,11 +13,8 @@
  * - Performance otimizada
  */
 
-// ===== IMPORTS SIMPLIFICADOS =====
-import { 
-    getCurrentUser, 
-    supabase 
-} from '../lib/supabase.js';
+// ===== IMPORTAÇÃO DO CLIENTE SUPABASE UNIFICADO =====
+import { supabase } from '../lib/supabase.js';
 
 // ===== CONFIGURAÇÃO =====
 const LEADS_CONFIG = {
