@@ -1,3 +1,6 @@
+// ===== CLIENTE SUPABASE UNIFICADO =====
+import { supabase } from '../lib/supabase.js';
+
 /**
  * ALSHAM 360° PRIMA - Integração Real com Supabase
  * Versão corrigida para build sem erros
@@ -5,34 +8,6 @@
  * @version 6.1.0 - BUILD COMPATIBLE
  * @author ALSHAM Development Team
  */
-
-// ===== CONFIGURAÇÃO REAL DO SUPABASE =====
-const SUPABASE_CONFIG = {
-    // SUBSTITUA pelas suas credenciais reais do Supabase
-    url: 'https://your-project-ref.supabase.co',
-    key: 'your-anon-key'
-};
-
-// Validação das credenciais
-if (SUPABASE_CONFIG.url.includes('your-project') || SUPABASE_CONFIG.key.includes('your-anon')) {
-    console.error('🚨 Configure suas credenciais reais do Supabase!');
-}
-
-// Inicializar cliente Supabase
-let supabase = null;
-try {
-    if (window.supabase && window.supabase.createClient) {
-        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key, {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
-        });
-    }
-} catch (error) {
-    console.error('Erro ao inicializar Supabase:', error);
-}
 
 // ===== SISTEMA DE AUTENTICAÇÃO REAL =====
 class AuthManager {
