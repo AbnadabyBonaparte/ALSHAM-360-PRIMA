@@ -1,10 +1,10 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Leads Simplificado V1.0
  * Versão funcional e otimizada para resolver problemas de build
- * 
+ *
  * @version 1.0.0 - FUNCIONAL
  * @author ALSHAM Development Team
- * 
+ *
  * ✅ CORREÇÕES APLICADAS:
  * - Importações corrigidas e validadas
  * - Código simplificado e funcional
@@ -12,10 +12,8 @@
  * - Sem dependências circulares
  * - Performance otimizada
  */
-
 // ===== IMPORTAÇÃO DO CLIENTE SUPABASE UNIFICADO =====
-import { supabase } from '../lib/supabase.js';
-
+import { supabase, getCurrentSession, genericSelect, genericInsert, subscribeToTable } from '../lib/supabase.js';
 // ===== CONFIGURAÇÃO =====
 const LEADS_CONFIG = {
     statusOptions: [
@@ -26,7 +24,7 @@ const LEADS_CONFIG = {
         { value: 'convertido', label: 'Convertido', color: 'green', icon: '💰' },
         { value: 'perdido', label: 'Perdido', color: 'red', icon: '❌' }
     ],
-    
+   
     priorityOptions: [
         { value: 'baixa', label: 'Baixa', color: 'gray' },
         { value: 'media', label: 'Média', color: 'yellow' },
@@ -34,7 +32,6 @@ const LEADS_CONFIG = {
         { value: 'urgente', label: 'Urgente', color: 'red' }
     ]
 };
-
 // ===== ESTADO GLOBAL =====
 const leadsState = {
     user: null,
@@ -49,9 +46,9 @@ const leadsState = {
         priority: ''
     },
     pagination: {
-        currentPage: 1,
-        itemsPerPage: 20,
-        totalItems: 0
+        current: 1,
+        perPage: 20,
+        total: 0
     },
     kpis: {
         total: 0,
@@ -61,36 +58,36 @@ const leadsState = {
         conversionRate: 0
     }
 };
-
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', initializeLeadsSystem);
-
 async function initializeLeadsSystem() {
     try {
         showLoading(true, 'Inicializando sistema de leads...');
-        
+       
         // Verificar autenticação
         const authResult = await authenticateUser();
         if (!authResult.success) {
             redirectToLogin();
             return;
         }
-        
+       
         leadsState.user = authResult.user;
         leadsState.orgId = authResult.profile?.org_id || 'default-org';
-        
+       
         // Carregar dados
         await loadLeadsData();
-        
+       
         // Configurar interface
         setupEventListeners();
         renderInterface();
-        
+       
+        setupRealTimeSubscriptions();
+       
         showLoading(false);
         showSuccess('Sistema de leads carregado com sucesso!');
-        
+       
         console.log('✅ Sistema de leads inicializado');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao inicializar sistema de leads:', error);
         showLoading(false);
@@ -98,59 +95,44 @@ async function initializeLeadsSystem() {
         showWarning('Carregando dados demo - verifique a conexão');
     }
 }
-
 // ===== AUTENTICAÇÃO =====
 async function authenticateUser() {
     try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        if (error || !user) {
+        const session = await getCurrentSession();
+       
+        if (!session || !session.user) {
             return { success: false };
         }
-        
+       
         // Buscar perfil do usuário
-        const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-        
-        return { success: true, user, profile };
-        
+        const profile = await genericSelect('user_profiles', { user_id: session.user.id }, session.user.user_metadata.org_id, 1);
+       
+        return { success: true, user: session.user, profile: profile[0] || null };
+       
     } catch (error) {
         console.error('Erro na autenticação:', error);
         return { success: false };
     }
 }
-
 function redirectToLogin() {
     window.location.href = '/login.html';
 }
-
 // ===== CARREGAMENTO DE DADOS =====
 async function loadLeadsData() {
     try {
         leadsState.isLoading = true;
-        
+       
         // Tentar carregar leads reais do Supabase
-        const { data: leads, error } = await supabase
-            .from('leads_crm')
-            .select('*')
-            .eq('org_id', leadsState.orgId)
-            .order('created_at', { ascending: false });
-        
-        if (error) {
-            throw new Error('Erro ao carregar leads: ' + error.message);
-        }
-        
+        const leads = await genericSelect('leads_crm', {}, leadsState.orgId);
+       
         leadsState.leads = leads || [];
         leadsState.filteredLeads = [...leadsState.leads];
-        
+       
         calculateKPIs();
         applyFilters();
-        
+       
         console.log(`✅ ${leadsState.leads.length} leads carregados do Supabase`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar leads:', error);
         throw error;
@@ -158,13 +140,12 @@ async function loadLeadsData() {
         leadsState.isLoading = false;
     }
 }
-
 // ===== DADOS DEMO =====
 function loadDemoData() {
     try {
         const demoLeads = [
             {
-                id: 'demo-1',
+                id: 1,
                 name: 'João Silva',
                 email: 'joao@exemplo.com',
                 company: 'Tech Solutions',
@@ -176,7 +157,7 @@ function loadDemoData() {
                 created_at: new Date().toISOString()
             },
             {
-                id: 'demo-2',
+                id: 2,
                 name: 'Maria Santos',
                 email: 'maria@exemplo.com',
                 company: 'Digital Corp',
@@ -188,7 +169,7 @@ function loadDemoData() {
                 created_at: new Date(Date.now() - 86400000).toISOString()
             },
             {
-                id: 'demo-3',
+                id: 3,
                 name: 'Pedro Costa',
                 email: 'pedro@exemplo.com',
                 company: 'Innovation Ltd',
@@ -200,87 +181,84 @@ function loadDemoData() {
                 created_at: new Date(Date.now() - 172800000).toISOString()
             }
         ];
-        
+       
         leadsState.leads = demoLeads;
         leadsState.filteredLeads = [...demoLeads];
-        
+       
         calculateKPIs();
         applyFilters();
         renderInterface();
-        
+       
         console.log('✅ Dados demo carregados');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar dados demo:', error);
     }
 }
-
 // ===== CÁLCULO DE KPIS =====
 function calculateKPIs() {
     try {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        
+       
         leadsState.kpis.total = leadsState.leads.length;
-        
-        leadsState.kpis.newToday = leadsState.leads.filter(lead => 
+       
+        leadsState.kpis.newToday = leadsState.leads.filter(lead =>
             new Date(lead.created_at) >= today
         ).length;
-        
-        leadsState.kpis.qualified = leadsState.leads.filter(lead => 
+       
+        leadsState.kpis.qualified = leadsState.leads.filter(lead =>
             lead.status === 'qualificado'
         ).length;
-        
-        leadsState.kpis.converted = leadsState.leads.filter(lead => 
+       
+        leadsState.kpis.converted = leadsState.leads.filter(lead =>
             lead.status === 'convertido'
         ).length;
-        
-        leadsState.kpis.conversionRate = leadsState.kpis.total > 0 
+       
+        leadsState.kpis.conversionRate = leadsState.kpis.total > 0
             ? ((leadsState.kpis.converted / leadsState.kpis.total) * 100).toFixed(1)
             : 0;
-        
+       
         console.log('📊 KPIs calculados:', leadsState.kpis);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao calcular KPIs:', error);
     }
 }
-
 // ===== FILTROS =====
 function applyFilters() {
     try {
         let filtered = [...leadsState.leads];
-        
+       
         // Filtro de busca
         if (leadsState.filters.search) {
             const search = leadsState.filters.search.toLowerCase();
-            filtered = filtered.filter(lead => 
+            filtered = filtered.filter(lead =>
                 (lead.name && lead.name.toLowerCase().includes(search)) ||
                 (lead.email && lead.email.toLowerCase().includes(search)) ||
                 (lead.company && lead.company.toLowerCase().includes(search))
             );
         }
-        
+       
         // Filtro de status
         if (leadsState.filters.status) {
             filtered = filtered.filter(lead => lead.status === leadsState.filters.status);
         }
-        
+       
         // Filtro de prioridade
         if (leadsState.filters.priority) {
             filtered = filtered.filter(lead => lead.priority === leadsState.filters.priority);
         }
-        
+       
         leadsState.filteredLeads = filtered;
-        leadsState.pagination.totalItems = filtered.length;
-        
+        leadsState.pagination.total = filtered.length;
+       
         console.log(`🔍 Filtros aplicados - ${filtered.length} resultados`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao aplicar filtros:', error);
     }
 }
-
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
     try {
@@ -293,7 +271,7 @@ function setupEventListeners() {
                 renderLeadsList();
             }, 300));
         }
-        
+       
         // Filtro de status
         const statusFilter = document.getElementById('filter-status');
         if (statusFilter) {
@@ -303,7 +281,7 @@ function setupEventListeners() {
                 renderLeadsList();
             });
         }
-        
+       
         // Filtro de prioridade
         const priorityFilter = document.getElementById('filter-priority');
         if (priorityFilter) {
@@ -313,45 +291,43 @@ function setupEventListeners() {
                 renderLeadsList();
             });
         }
-        
+       
         // Botão refresh
         const refreshBtn = document.getElementById('refresh-leads');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', refreshData);
         }
-        
+       
         // Botão limpar filtros
         const clearBtn = document.getElementById('clear-filters');
         if (clearBtn) {
             clearBtn.addEventListener('click', clearFilters);
         }
-        
+       
         console.log('✅ Event listeners configurados');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao configurar event listeners:', error);
     }
 }
-
 // ===== RENDERIZAÇÃO =====
 function renderInterface() {
     try {
         renderKPIs();
         renderFilters();
         renderLeadsList();
-        
+       
         console.log('🎨 Interface renderizada');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar interface:', error);
     }
 }
-
 function renderKPIs() {
     try {
         const kpisContainer = document.getElementById('kpis-container');
         if (!kpisContainer) return;
-        
+       
         const kpisHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                 <div class="bg-white rounded-lg shadow p-4">
@@ -360,28 +336,28 @@ function renderKPIs() {
                         <div class="text-sm text-gray-600">Total de Leads</div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-green-600">${leadsState.kpis.newToday}</div>
                         <div class="text-sm text-gray-600">Novos Hoje</div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-purple-600">${leadsState.kpis.qualified}</div>
                         <div class="text-sm text-gray-600">Qualificados</div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-yellow-600">${leadsState.kpis.converted}</div>
                         <div class="text-sm text-gray-600">Convertidos</div>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-indigo-600">${leadsState.kpis.conversionRate}%</div>
@@ -390,58 +366,57 @@ function renderKPIs() {
                 </div>
             </div>
         `;
-        
+       
         kpisContainer.innerHTML = kpisHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar KPIs:', error);
     }
 }
-
 function renderFilters() {
     try {
         const filtersContainer = document.getElementById('filters-container');
         if (!filtersContainer) return;
-        
-        const statusOptions = LEADS_CONFIG.statusOptions.map(option => 
+       
+        const statusOptions = LEADS_CONFIG.statusOptions.map(option =>
             `<option value="${option.value}">${option.icon} ${option.label}</option>`
         ).join('');
-        
-        const priorityOptions = LEADS_CONFIG.priorityOptions.map(option => 
+       
+        const priorityOptions = LEADS_CONFIG.priorityOptions.map(option =>
             `<option value="${option.value}">${option.label}</option>`
         ).join('');
-        
+       
         const filtersHTML = `
             <div class="bg-white rounded-lg shadow p-4 mb-6">
                 <div class="flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-64">
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             id="search-leads"
-                            placeholder="Buscar leads..." 
+                            placeholder="Buscar leads..."
                             value="${leadsState.filters.search}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md"
                         />
                     </div>
-                    
+                   
                     <select id="filter-status" class="px-3 py-2 border border-gray-300 rounded-md">
                         <option value="">Todos os Status</option>
                         ${statusOptions}
                     </select>
-                    
+                   
                     <select id="filter-priority" class="px-3 py-2 border border-gray-300 rounded-md">
                         <option value="">Todas as Prioridades</option>
                         ${priorityOptions}
                     </select>
-                    
-                    <button 
+                   
+                    <button
                         id="clear-filters"
                         class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                     >
                         Limpar Filtros
                     </button>
-                    
-                    <button 
+                   
+                    <button
                         id="refresh-leads"
                         class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                     >
@@ -450,19 +425,18 @@ function renderFilters() {
                 </div>
             </div>
         `;
-        
+       
         filtersContainer.innerHTML = filtersHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar filtros:', error);
     }
 }
-
 function renderLeadsList() {
     try {
         const leadsContainer = document.getElementById('leads-container');
         if (!leadsContainer) return;
-        
+       
         if (leadsState.filteredLeads.length === 0) {
             leadsContainer.innerHTML = `
                 <div class="bg-white rounded-lg shadow p-8 text-center">
@@ -473,10 +447,10 @@ function renderLeadsList() {
             `;
             return;
         }
-        
+       
         const leadsHTML = leadsState.filteredLeads.map(lead => {
             const statusConfig = LEADS_CONFIG.statusOptions.find(s => s.value === lead.status) || {};
-            
+           
             return `
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -515,7 +489,7 @@ function renderLeadsList() {
                 </tr>
             `;
         }).join('');
-        
+       
         const tableHTML = `
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -523,7 +497,7 @@ function renderLeadsList() {
                         Leads (${leadsState.filteredLeads.length})
                     </h3>
                 </div>
-                
+               
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -555,14 +529,13 @@ function renderLeadsList() {
                 </div>
             </div>
         `;
-        
+       
         leadsContainer.innerHTML = tableHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar lista de leads:', error);
     }
 }
-
 // ===== AÇÕES =====
 async function refreshData() {
     try {
@@ -571,14 +544,13 @@ async function refreshData() {
         renderInterface();
         showLoading(false);
         showSuccess('Dados atualizados com sucesso!');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao atualizar dados:', error);
         showLoading(false);
         showError('Erro ao atualizar dados');
     }
 }
-
 function clearFilters() {
     try {
         leadsState.filters = {
@@ -586,27 +558,26 @@ function clearFilters() {
             status: '',
             priority: ''
         };
-        
+       
         // Limpar inputs
         const searchInput = document.getElementById('search-leads');
         if (searchInput) searchInput.value = '';
-        
+       
         const statusFilter = document.getElementById('filter-status');
         if (statusFilter) statusFilter.value = '';
-        
+       
         const priorityFilter = document.getElementById('filter-priority');
         if (priorityFilter) priorityFilter.value = '';
-        
+       
         applyFilters();
         renderLeadsList();
-        
+       
         showSuccess('Filtros limpos!');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao limpar filtros:', error);
     }
 }
-
 // ===== UTILIDADES =====
 function debounce(func, wait) {
     let timeout;
@@ -619,7 +590,6 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-
 function formatDate(dateString) {
     try {
         if (!dateString) return '-';
@@ -633,12 +603,11 @@ function formatDate(dateString) {
         return '-';
     }
 }
-
 // ===== NOTIFICAÇÕES =====
 function showLoading(show, message = 'Carregando...') {
     try {
         let loadingElement = document.getElementById('loading-overlay');
-        
+       
         if (show) {
             if (!loadingElement) {
                 loadingElement = document.createElement('div');
@@ -661,7 +630,6 @@ function showLoading(show, message = 'Carregando...') {
         console.error('Erro no loading:', error);
     }
 }
-
 function showNotification(message, type = 'info', duration = 5000) {
     try {
         const notification = document.createElement('div');
@@ -671,26 +639,25 @@ function showNotification(message, type = 'info', duration = 5000) {
                 <div class="flex-1">
                     <p class="text-sm font-medium">${message}</p>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()" 
+                <button onclick="this.parentElement.parentElement.remove()"
                         class="text-gray-400 hover:text-gray-600">
                     ✕
                 </button>
             </div>
         `;
-        
+       
         document.body.appendChild(notification);
-        
+       
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.remove();
             }
         }, duration);
-        
+       
     } catch (error) {
         console.error('Erro na notificação:', error);
     }
 }
-
 function getNotificationClasses(type) {
     switch (type) {
         case 'success':
@@ -703,19 +670,27 @@ function getNotificationClasses(type) {
             return 'bg-blue-50 border border-blue-200 text-blue-800';
     }
 }
-
 function showSuccess(message) {
     showNotification(message, 'success');
 }
-
 function showError(message) {
     showNotification(message, 'error');
 }
-
 function showWarning(message) {
     showNotification(message, 'warning');
 }
-
+// ===== REAL-TIME =====
+function setupRealTimeSubscriptions() {
+    try {
+        subscribeToTable('leads_crm', leadsState.orgId, (payload) => {
+            console.log('Atualização real-time em leads:', payload);
+            loadLeadsData(); // Refresh dados
+            renderInterface();
+        });
+    } catch (error) {
+        console.error('❌ Erro ao configurar real-time:', error);
+    }
+}
 // ===== EXPORT =====
 export default {
     init: initializeLeadsSystem,
@@ -723,5 +698,4 @@ export default {
     clearFilters: clearFilters,
     state: leadsState
 };
-
 console.log('📋 Sistema de Leads Simplificado carregado - Pronto para uso!');
