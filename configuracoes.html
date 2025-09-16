@@ -38,33 +38,170 @@
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     
     <style>
-        /* Seu bloco de estilos inline de 400+ linhas permanece 100% intacto aqui */
-        body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #374151; }
-        .gradient-premium { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .bg-primary { background-color: #3B82F6; }
-        .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background-color 0.2s; border: none; cursor: pointer; font-weight: 500; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-        .btn-primary:focus { outline: 2px solid #3b82f6; outline-offset: 2px; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem; }
-        .form-input, .form-textarea, .form-select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; transition: all 0.2s; font-size: 0.875rem; background-color: white; }
-        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: 2px solid #3b82f6; outline-offset: 2px; border-color: #3b82f6; }
-        .form-textarea { resize: vertical; min-height: 80px; }
-        .form-checkbox { width: 1rem; height: 1rem; color: #2563eb; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer; }
-        .form-checkbox:focus { outline: 2px solid #3b82f6; outline-offset: 2px; }
-        .nav-item { width: 100%; text-align: left; padding: 0.75rem 1rem; border-radius: 0.5rem; transition: all 0.2s; display: flex; align-items: center; gap: 0.75rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; }
-        .nav-item:hover { background-color: #f9fafb; }
-        .nav-item.active { background-color: #2563eb; color: white; }
-        .nav-item.active:hover { background-color: #1d4ed8; }
-        .nav-item:focus { outline: 2px solid #3b82f6; outline-offset: 2px; }
-        .loading-skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .slide-in { animation: slideIn 0.2s ease-out; }
-        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .hidden { display: none !important; }
-        /* ...e assim por diante, todo o seu CSS original está aqui... */
+        /* Enterprise CSS Variables */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --blue-gradient: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-radius-xl: 0.75rem;
+            --border-radius-2xl: 1rem;
+            --transition-all: all 0.3s ease-in-out;
+        }
+        
+        /* Base styles */
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: #374151; 
+        }
+        
+        .gradient-premium { 
+            background: var(--primary-gradient); 
+        }
+        
+        .bg-primary { 
+            background-color: #3B82F6; 
+        }
+        
+        .btn-primary { 
+            background-color: #2563eb; 
+            color: white; 
+            padding: 0.5rem 1rem; 
+            border-radius: 0.5rem; 
+            transition: background-color 0.2s; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 500; 
+        }
+        
+        .btn-primary:hover { 
+            background-color: #1d4ed8; 
+        }
+        
+        .btn-primary:focus { 
+            outline: 2px solid #3b82f6; 
+            outline-offset: 2px; 
+        }
+        
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .form-label { 
+            display: block; 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: #374151; 
+            margin-bottom: 0.5rem; 
+        }
+        
+        .form-input, .form-textarea, .form-select { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #d1d5db; 
+            border-radius: 0.5rem; 
+            transition: all 0.2s; 
+            font-size: 0.875rem; 
+            background-color: white; 
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus { 
+            outline: 2px solid #3b82f6; 
+            outline-offset: 2px; 
+            border-color: #3b82f6; 
+        }
+        
+        .form-textarea { 
+            resize: vertical; 
+            min-height: 80px; 
+        }
+        
+        .form-checkbox { 
+            width: 1rem; 
+            height: 1rem; 
+            color: #2563eb; 
+            border: 1px solid #d1d5db; 
+            border-radius: 0.25rem; 
+            cursor: pointer; 
+        }
+        
+        .form-checkbox:focus { 
+            outline: 2px solid #3b82f6; 
+            outline-offset: 2px; 
+        }
+        
+        .nav-item { 
+            width: 100%; 
+            text-align: left; 
+            padding: 0.75rem 1rem; 
+            border-radius: 0.5rem; 
+            transition: all 0.2s; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            font-size: 0.875rem; 
+        }
+        
+        .nav-item:hover { 
+            background-color: #f9fafb; 
+        }
+        
+        .nav-item.active { 
+            background-color: #2563eb; 
+            color: white; 
+        }
+        
+        .nav-item.active:hover { 
+            background-color: #1d4ed8; 
+        }
+        
+        .nav-item:focus { 
+            outline: 2px solid #3b82f6; 
+            outline-offset: 2px; 
+        }
+        
+        .loading-skeleton { 
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); 
+            background-size: 200% 100%; 
+            animation: loading 1.5s infinite; 
+        }
+        
+        @keyframes loading { 
+            0% { background-position: 200% 0; } 
+            100% { background-position: -200% 0; } 
+        }
+        
+        .fade-in { 
+            animation: fadeIn 0.3s ease-in-out; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .slide-in { 
+            animation: slideIn 0.2s ease-out; 
+        }
+        
+        @keyframes slideIn { 
+            from { transform: translateX(-10px); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
     </style>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -117,7 +254,9 @@
             <div class="flex justify-between items-center h-16">
                 
                 <div class="flex items-center space-x-4">
-                    <a href="/index.html" class="flex items-center space-x-3 group" aria-label="Voltar ao Dashboard Principal">
+                    <a href="/index.html" 
+                       class="flex items-center space-x-3 group" 
+                       aria-label="Voltar ao Dashboard Principal">
                         <div class="w-10 h-10 gradient-premium rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
                             <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
                         </div>
@@ -138,7 +277,11 @@
                 
                 <nav class="hidden md:flex items-center space-x-6" aria-label="Navegação Principal">
                     <div class="main-nav flex items-center space-x-6">
-                        </div>
+                        <a href="/dashboard.html" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Dashboard</a>
+                        <a href="/leads.html" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Leads</a>
+                        <a href="/relatorios.html" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Relatórios</a>
+                        <a href="/configuracoes.html" class="text-blue-600 font-semibold" aria-current="page">Configurações</a>
+                    </div>
                 </nav>
                 
                 <div class="flex items-center space-x-3">
@@ -446,7 +589,7 @@
                                         autocomplete="tel"
                                     >
                                 </div>
-                            </div>
+                                </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="form-group">
@@ -532,159 +675,7 @@
                     </div>
                     
                     <div class="p-6">
-                        <form id="organization-form" class="space-y-6" novalidate>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="org_name" class="form-label">
-                                        Nome da Empresa <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="org_name"
-                                        name="name"
-                                        class="form-input"
-                                        placeholder="Nome da sua empresa"
-                                        required
-                                    >
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="cnpj" class="form-label">CNPJ</label>
-                                    <input
-                                        type="text"
-                                        id="cnpj"
-                                        name="cnpj"
-                                        class="form-input"
-                                        placeholder="00.000.000/0000-00"
-                                        pattern="[0-9]{2}.[0-9]{3}.[0-9]{3}/[0-9]{4}-[0-9]{2}"
-                                    >
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="industry" class="form-label">Setor</label>
-                                    <select id="industry" name="industry" class="form-select">
-                                        <option value="">Selecione o setor</option>
-                                        <option value="technology">Tecnologia</option>
-                                        <option value="retail">Varejo</option>
-                                        <option value="services">Serviços</option>
-                                        <option value="manufacturing">Manufatura</option>
-                                        <option value="healthcare">Saúde</option>
-                                        <option value="education">Educação</option>
-                                        <option value="finance">Financeiro</option>
-                                        <option value="real_estate">Imobiliário</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="company_size" class="form-label">Tamanho da Empresa</label>
-                                    <select id="company_size" name="size" class="form-select">
-                                        <option value="">Selecione o tamanho</option>
-                                        <option value="1-10">1-10 funcionários</option>
-                                        <option value="11-50">11-50 funcionários</option>
-                                        <option value="51-200">51-200 funcionários</option>
-                                        <option value="201-500">201-500 funcionários</option>
-                                        <option value="500+">500+ funcionários</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="address" class="form-label">Endereço</label>
-                                <textarea
-                                    id="address"
-                                    name="address"
-                                    rows="3"
-                                    class="form-textarea"
-                                    placeholder="Endereço completo da empresa"
-                                ></textarea>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="website" class="form-label">Website</label>
-                                    <input
-                                        type="url"
-                                        id="website"
-                                        name="website"
-                                        class="form-input"
-                                        placeholder="https://suaempresa.com.br"
-                                    >
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="currency" class="form-label">Moeda</label>
-                                    <select id="currency" name="currency" class="form-select">
-                                        <option value="BRL">Real Brasileiro (R$)</option>
-                                        <option value="USD">Dólar Americano ($)</option>
-                                        <option value="EUR">Euro (€)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="description" class="form-label">Descrição da Empresa</label>
-                                <textarea
-                                    id="description"
-                                    name="description"
-                                    rows="4"
-                                    class="form-textarea"
-                                    placeholder="Descreva sua empresa, missão e valores..."
-                                ></textarea>
-                            </div>
-                        </form>
-                        
-                        <div class="mt-8 pt-8 border-t border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Configurações Organizacionais</h3>
-                            
-                            <form id="org-settings-form" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="form-group">
-                                        <label for="date_format" class="form-label">Formato de Data</label>
-                                        <select id="date_format" name="date_format" class="form-select">
-                                            <option value="dd/mm/yyyy">DD/MM/AAAA</option>
-                                            <option value="mm/dd/yyyy">MM/DD/AAAA</option>
-                                            <option value="yyyy-mm-dd">AAAA-MM-DD</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="time_format" class="form-label">Formato de Hora</label>
-                                        <select id="time_format" name="time_format" class="form-select">
-                                            <option value="24h">24 horas</option>
-                                            <option value="12h">12 horas (AM/PM)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="space-y-4">
-                                    <div class="flex items-center space-x-3">
-                                        <input
-                                            type="checkbox"
-                                            id="auto_assign_leads"
-                                            name="auto_assign_leads"
-                                            class="form-checkbox"
-                                        >
-                                        <label for="auto_assign_leads" class="text-sm font-medium text-gray-700">
-                                            Atribuição automática de leads
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="flex items-center space-x-3">
-                                        <input
-                                            type="checkbox"
-                                            id="lead_scoring_enabled"
-                                            name="lead_scoring_enabled"
-                                            class="form-checkbox"
-                                        >
-                                        <label for="lead_scoring_enabled" class="text-sm font-medium text-gray-700">
-                                            Pontuação automática de leads
-                                        </label>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                        <p class="text-gray-600">Configurações de organização serão carregadas aqui...</p>
                     </div>
                 </section>
 
@@ -699,7 +690,6 @@
                                 <p class="text-sm text-gray-600 mt-1">Gerencie membros da equipe, permissões e acessos</p>
                             </div>
                             <button
-                                onclick="inviteTeamMember()"
                                 class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                             >
                                 Convidar Membro
@@ -708,26 +698,7 @@
                     </div>
                     
                     <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div class="bg-blue-50 rounded-lg p-4 text-center">
-                                <div class="text-2xl font-bold text-blue-600" id="team-total-count">-</div>
-                                <div class="text-sm text-blue-700">Total de Membros</div>
-                            </div>
-                            <div class="bg-green-50 rounded-lg p-4 text-center">
-                                <div class="text-2xl font-bold text-green-600" id="team-active-count">-</div>
-                                <div class="text-sm text-green-700">Membros Ativos</div>
-                            </div>
-                            <div class="bg-purple-50 rounded-lg p-4 text-center">
-                                <div class="text-2xl font-bold text-purple-600" id="team-online-count">-</div>
-                                <div class="text-sm text-purple-700">Online Agora</div>
-                            </div>
-                        </div>
-                        
-                        <div id="team-members-list" class="space-y-4">
-                            <div class="loading-skeleton rounded-xl h-20"></div>
-                            <div class="loading-skeleton rounded-xl h-20"></div>
-                            <div class="loading-skeleton rounded-xl h-20"></div>
-                        </div>
+                        <p class="text-gray-600">Gerenciamento de equipe será carregado aqui...</p>
                     </div>
                 </section>
 
