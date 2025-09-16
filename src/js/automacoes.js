@@ -1,12 +1,10 @@
 /**
  * ALSHAM 360° PRIMA - Enterprise Automation System V5.0 NASA 10/10 OPTIMIZED
  * Advanced automation platform with real-time data integration and enterprise features
- * 
- * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * * @version 5.0.1 - SURGICALLY CORRECTED
  * @author ALSHAM Development Team
  * @license MIT
- * 
- * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
+ * * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
  * ✅ Real-time automation data from Supabase tables
  * ✅ Advanced workflow engine with rule-based automation
  * ✅ Multi-channel communication (Email, SMS, WhatsApp)
@@ -20,12 +18,10 @@
  * ✅ Vite build system optimization
  * ✅ Path standardization and consistency
  * ✅ NASA 10/10 Enterprise Grade
- * 
- * 🔗 DATA SOURCES: automation_rules, automation_executions, workflow_logs,
+ * * 🔗 DATA SOURCES: automation_rules, automation_executions, workflow_logs,
  * email_campaigns, sms_campaigns, notification_logs, communication_templates,
  * message_queue, n8n_workflows, whatsapp_integration
- * 
- * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
+ * * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
  * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
@@ -34,12 +30,16 @@
 /**
  * Real data integration with Supabase Enterprise
  * Using standardized relative path imports for Vite compatibility
+ * NOTE: These functions must be correctly exported from '../lib/supabase.js'
  */
-import { 
-    // Core authentication and user functions
+import {
+    // Core Supabase client and auth
+    supabase,
     getCurrentUser,
     getUserProfile,
-    
+    healthCheck,
+    supabaseConfig,
+
     // Automation functions with REAL data
     getAutomationRules,
     createAutomationRule,
@@ -47,28 +47,26 @@ import {
     deleteAutomationRule,
     getAutomationExecutions,
     getWorkflowLogs,
-    
+
     // Communication functions
     getEmailCampaigns,
     getSMSCampaigns,
     getNotificationLogs,
     getCommunicationTemplates,
     getMessageQueue,
-    
+
     // Integration functions
     getN8NWorkflows,
     getWhatsappIntegration,
-    
+
     // Audit and logging
     createAuditLog,
-    
-    // Health monitoring
-    healthCheck,
-    
-    // Configuration
-    getCurrentOrgId,
-    supabaseConfig
+
+    // Real-time helpers
+    subscribeToTable,
+    unsubscribeFromTable
 } from '../lib/supabase.js';
+
 
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
@@ -129,7 +127,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         VIRTUAL_SCROLL_THRESHOLD: 100,
         BATCH_SIZE: 50
     },
-    
+
     // Security settings for enterprise environment
     SECURITY: {
         MAX_RULES_PER_USER: 100,
@@ -142,7 +140,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         XSS_PROTECTION: true,
         CSRF_PROTECTION: true
     },
-    
+
     // Automation types mapped to REAL Supabase data
     AUTOMATION_TYPES: Object.freeze([
         { value: 'lead_nurturing', label: 'Nutrição de Leads', icon: '🌱', color: 'emerald' },
@@ -156,7 +154,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         { value: 'webhook', label: 'Webhook', icon: '🔗', color: 'indigo' },
         { value: 'integration', label: 'Integração', icon: '🔌', color: 'pink' }
     ]),
-    
+
     // Status options for automation rules
     STATUS_OPTIONS: Object.freeze([
         { value: 'active', label: 'Ativo', color: 'green', icon: '✅' },
@@ -166,7 +164,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         { value: 'testing', label: 'Teste', color: 'blue', icon: '🧪' },
         { value: 'scheduled', label: 'Agendado', color: 'purple', icon: '⏰' }
     ]),
-    
+
     // Trigger types for automation rules
     TRIGGER_TYPES: Object.freeze([
         { value: 'lead_created', label: 'Lead Criado', icon: '👤' },
@@ -180,7 +178,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         { value: 'tag_added', label: 'Tag Adicionada', icon: '🏷️' },
         { value: 'custom_event', label: 'Evento Personalizado', icon: '⚡' }
     ]),
-    
+
     // Action types for automation rules
     ACTION_TYPES: Object.freeze([
         { value: 'send_email', label: 'Enviar Email', icon: '📧' },
@@ -196,7 +194,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         { value: 'wait_delay', label: 'Aguardar', icon: '⏳' },
         { value: 'conditional', label: 'Condicional', icon: '🔀' }
     ]),
-    
+
     // Static CSS classes for build compatibility - NASA 10/10 optimization
     STATIC_STYLES: Object.freeze({
         status: {
@@ -207,7 +205,7 @@ const AUTOMATION_CONFIG = Object.freeze({
             testing: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
             scheduled: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' }
         },
-        
+
         execution: {
             success: { bg: 'bg-emerald-100', text: 'text-emerald-800' },
             failed: { bg: 'bg-red-100', text: 'text-red-800' },
@@ -216,7 +214,7 @@ const AUTOMATION_CONFIG = Object.freeze({
             completed: { bg: 'bg-emerald-100', text: 'text-emerald-800' },
             cancelled: { bg: 'bg-gray-100', text: 'text-gray-800' }
         },
-        
+
         types: {
             emerald: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200' },
             blue: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
@@ -229,15 +227,15 @@ const AUTOMATION_CONFIG = Object.freeze({
             indigo: { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-indigo-200' },
             pink: { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-200' }
         },
-        
+
         notifications: {
-            success: { bg: 'bg-green-50', text: 'text-green-800', border: 'border-green-200' },
-            warning: { bg: 'bg-yellow-50', text: 'text-yellow-800', border: 'border-yellow-200' },
-            error: { bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-200' },
-            info: { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' }
+            success: 'bg-green-50 text-green-800 border-green-200',
+            warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+            error: 'bg-red-50 text-red-800 border-red-200',
+            info: 'bg-blue-50 text-blue-800 border-blue-200'
         }
     }),
-    
+
     // NASA 10/10 accessibility enhancements
     ACCESSIBILITY: {
         announceChanges: true,
@@ -247,7 +245,7 @@ const AUTOMATION_CONFIG = Object.freeze({
         focusManagement: true,
         reducedMotion: false
     },
-    
+
     // Animation and UI settings
     ANIMATIONS: {
         ruleCreated: { duration: 1000, easing: 'ease-out' },
@@ -269,7 +267,7 @@ class AutomationStateManager {
             user: null,
             profile: null,
             orgId: null,
-            
+
             // Automation data
             automationRules: [],
             executions: [],
@@ -281,7 +279,7 @@ class AutomationStateManager {
             messageQueue: [],
             n8nWorkflows: [],
             whatsappIntegration: null,
-            
+
             // UI state
             isLoading: false,
             isUpdating: false,
@@ -289,7 +287,7 @@ class AutomationStateManager {
             selectedRule: null,
             showCreateModal: false,
             showEditModal: false,
-            
+
             // Filters and pagination
             filters: {
                 status: 'all',
@@ -302,15 +300,15 @@ class AutomationStateManager {
                 limit: 20,
                 total: 0
             },
-            
+
             // Error handling
             errors: [],
             warnings: [],
-            
+
             // Real-time state
             subscriptions: new Map(),
             lastUpdate: null,
-            
+
             // Performance monitoring - NASA 10/10
             metrics: {
                 loadTime: 0,
@@ -321,28 +319,28 @@ class AutomationStateManager {
                 rulesCreated: 0,
                 executionsRun: 0
             },
-            
+
             // Cache management - NASA 10/10
             cache: {
                 data: new Map(),
                 timestamps: new Map(),
                 ttl: AUTOMATION_CONFIG.PERFORMANCE.CACHE_TTL
             },
-            
+
             // Rate limiting
             rateLimiter: {
                 requests: [],
                 lastReset: Date.now()
             }
         };
-        
+
         // Bind methods for proper context
         this.setState = this.setState.bind(this);
         this.getState = this.getState.bind(this);
         this.clearCache = this.clearCache.bind(this);
         this.checkRateLimit = this.checkRateLimit.bind(this);
     }
-    
+
     /**
      * Update state with validation and change detection
      * @param {Object} updates - State updates
@@ -351,28 +349,28 @@ class AutomationStateManager {
     setState(updates, callback) {
         try {
             const previousState = { ...this.state };
-            
+
             // Validate updates
             if (typeof updates !== 'object' || updates === null) {
                 throw new Error('State updates must be an object');
             }
-            
+
             // Apply updates
             Object.assign(this.state, updates);
-            
+
             // Update timestamp
             this.state.lastUpdate = new Date();
-            
+
             // Execute callback if provided
             if (typeof callback === 'function') {
                 callback(this.state, previousState);
             }
-            
+
             // Emit state change event for debugging
             if (window.DEBUG_MODE) {
                 console.log('🔄 Automation state updated:', { updates, newState: this.state });
             }
-            
+
         } catch (error) {
             console.error('❌ Error updating automation state:', error);
             this.state.errors.push({
@@ -382,7 +380,7 @@ class AutomationStateManager {
             });
         }
     }
-    
+
     /**
      * Get current state or specific property
      * @param {string} key - Optional key to get specific property
@@ -394,7 +392,7 @@ class AutomationStateManager {
         }
         return { ...this.state };
     }
-    
+
     /**
      * Clear cache with optional filter
      * @param {string} filter - Optional filter for cache keys
@@ -412,14 +410,14 @@ class AutomationStateManager {
                 this.state.cache.data.clear();
                 this.state.cache.timestamps.clear();
             }
-            
+
             console.log(`🗑️ Automation cache cleared${filter ? ` (filter: ${filter})` : ''}`);
-            
+
         } catch (error) {
             console.error('❌ Error clearing automation cache:', error);
         }
     }
-    
+
     /**
      * Get cached data with TTL validation
      * @param {string} key - Cache key
@@ -429,27 +427,27 @@ class AutomationStateManager {
         try {
             const data = this.state.cache.data.get(key);
             const timestamp = this.state.cache.timestamps.get(key);
-            
+
             if (!data || !timestamp) {
                 return null;
             }
-            
+
             const now = Date.now();
             if (now - timestamp > this.state.cache.ttl) {
                 this.state.cache.data.delete(key);
                 this.state.cache.timestamps.delete(key);
                 return null;
             }
-            
+
             this.state.metrics.cacheHits++;
             return data;
-            
+
         } catch (error) {
             console.error('❌ Error getting cached automation data:', error);
             return null;
         }
     }
-    
+
     /**
      * Set cached data with timestamp
      * @param {string} key - Cache key
@@ -459,12 +457,12 @@ class AutomationStateManager {
         try {
             this.state.cache.data.set(key, data);
             this.state.cache.timestamps.set(key, Date.now());
-            
+
         } catch (error) {
             console.error('❌ Error setting cached automation data:', error);
         }
     }
-    
+
     /**
      * Check rate limiting for API requests
      * @returns {boolean} Whether request is allowed
@@ -473,28 +471,28 @@ class AutomationStateManager {
         try {
             const now = Date.now();
             const windowStart = now - AUTOMATION_CONFIG.SECURITY.RATE_LIMIT_WINDOW;
-            
+
             // Reset if window has passed
             if (now - this.state.rateLimiter.lastReset > AUTOMATION_CONFIG.SECURITY.RATE_LIMIT_WINDOW) {
                 this.state.rateLimiter.requests = [];
                 this.state.rateLimiter.lastReset = now;
             }
-            
+
             // Remove old requests
             this.state.rateLimiter.requests = this.state.rateLimiter.requests.filter(
                 timestamp => timestamp > windowStart
             );
-            
+
             // Check if limit exceeded
             if (this.state.rateLimiter.requests.length >= AUTOMATION_CONFIG.SECURITY.MAX_REQUESTS_PER_MINUTE) {
                 console.warn('⚠️ Rate limit exceeded for automation requests');
                 return false;
             }
-            
+
             // Add current request
             this.state.rateLimiter.requests.push(now);
             return true;
-            
+
         } catch (error) {
             console.error('❌ Error checking rate limit:', error);
             return true; // Allow request on error
@@ -517,48 +515,63 @@ document.addEventListener('DOMContentLoaded', initializeAutomation);
  */
 async function initializeAutomation() {
     const startTime = performance.now();
-    
+
     try {
         // Validate dependencies first
         validateDependencies();
-        
+
         showLoading(true, 'Inicializando sistema de automações...');
-        
+
         // Health check with retry logic
         const health = await healthCheckWithRetry();
         if (health.error) {
             console.warn('⚠️ Problema de conectividade:', health.error);
             showWarning('Conectividade limitada - alguns recursos podem estar indisponíveis');
         }
-        
+
         // Enhanced authentication
         const authResult = await authenticateUser();
         if (!authResult.success) {
             redirectToLogin();
             return;
         }
-        
+
+        // 🎯 Alteração Cirúrgica: Validar org_id
+        // Garante que a organização (org_id) existe no perfil do usuário.
+        // Sem um org_id válido, as regras de segurança (RLS) do Supabase podem falhar.
+        // Em vez de usar um valor padrão que mascara o erro, a operação é abortada.
+        const orgId = authResult.profile?.org_id;
+        if (!orgId) {
+            console.error('❌ Erro crítico de segurança: org_id não encontrado no perfil do usuário.');
+            showError('Falha ao carregar perfil da organização. Por favor, faça login novamente.');
+            showLoading(false);
+            // Opcional: Deslogar o usuário para forçar uma nova autenticação completa
+            // await supabase.auth.signOut();
+            // redirectToLogin();
+            return; // Bloqueia a inicialização
+        }
+
         automationState.setState({
             user: authResult.user,
             profile: authResult.profile,
-            orgId: authResult.profile?.org_id || 'default-org-id'
+            orgId: orgId
         });
-        
+
         // Load initial automation data with caching
         await loadAutomationDataWithCache();
-        
+
         // Setup real-time subscriptions
         setupRealTimeSubscriptions();
-        
+
         // Render interface
         await renderAutomationInterface();
-        
+
         // Setup event listeners
         setupEventListeners();
-        
+
         // Start periodic updates
         startPeriodicUpdates();
-        
+
         // Calculate performance metrics
         const endTime = performance.now();
         automationState.setState({
@@ -568,16 +581,16 @@ async function initializeAutomation() {
                 loadTime: endTime - startTime
             }
         });
-        
+
         showLoading(false);
         console.log(`🤖 Sistema de automações inicializado em ${(endTime - startTime).toFixed(2)}ms`);
         showSuccess('Sistema de automações carregado com dados reais!');
-        
+
         // NASA 10/10: Performance monitoring
         if ((endTime - startTime) > 5000) {
             console.warn('⚠️ Tempo de carregamento acima do ideal:', endTime - startTime);
         }
-        
+
     } catch (error) {
         console.error('❌ Erro crítico ao inicializar automações:', error);
         await handleCriticalError(error);
@@ -592,25 +605,25 @@ async function initializeAutomation() {
 async function authenticateUser() {
     try {
         const { user, profile, error } = await getCurrentUser();
-        
+
         if (error) {
             console.error('Erro de autenticação:', error);
             return { success: false, error };
         }
-        
+
         if (!user) {
             console.log('Usuário não autenticado');
             return { success: false, error: 'No user found' };
         }
-        
+
         // Enhanced validation
-        if (!profile || !profile.org_id) {
-            console.warn('Perfil de usuário incompleto');
+        if (!profile) { // A validação de org_id agora é feita em initializeAutomation
+            console.warn('Perfil de usuário não encontrado ou incompleto');
             return { success: false, error: 'Incomplete user profile' };
         }
-        
+
         return { success: true, user, profile };
-        
+
     } catch (authError) {
         console.error('Erro crítico na autenticação:', authError);
         return { success: false, error: authError.message };
@@ -623,7 +636,7 @@ async function authenticateUser() {
  */
 async function healthCheckWithRetry() {
     let lastError = null;
-    
+
     for (let attempt = 1; attempt <= AUTOMATION_CONFIG.PERFORMANCE.MAX_RETRIES; attempt++) {
         try {
             const result = await healthCheck();
@@ -634,14 +647,14 @@ async function healthCheckWithRetry() {
         } catch (error) {
             lastError = error;
         }
-        
+
         if (attempt < AUTOMATION_CONFIG.PERFORMANCE.MAX_RETRIES) {
             const delay = 1000 * attempt;
             console.log(`⏳ Tentativa ${attempt} falhou, tentando novamente em ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
-    
+
     return { error: lastError };
 }
 
@@ -650,7 +663,7 @@ async function healthCheckWithRetry() {
  */
 function redirectToLogin() {
     const currentUrl = encodeURIComponent(window.location.href);
-    window.location.href = `src/pages/login.html?redirect=${currentUrl}`;
+    window.location.href = `/src/pages/login.html?redirect=${currentUrl}`;
 }
 
 // ===== DATA LOADING WITH CACHING - NASA 10/10 =====
@@ -663,29 +676,29 @@ async function loadAutomationDataWithCache() {
         console.log('⏳ Carregamento já em andamento...');
         return;
     }
-    
+
     try {
         automationState.setState({ isUpdating: true });
         automationState.state.metrics.apiCalls++;
-        
+
         const orgId = automationState.getState('orgId');
         const userId = automationState.getState('user')?.id;
         const cacheKey = `automation_${orgId}_${userId}`;
-        
+
         // Check cache first
         const cachedData = automationState.getCachedData(cacheKey);
         if (cachedData) {
             applyAutomationData(cachedData);
             console.log('✅ Dados de automação carregados do cache');
-            
+
             // Load fresh data in background
             loadAutomationFromAPI(cacheKey, true);
             return;
         }
-        
+
         // Load from API
         await loadAutomationFromAPI(cacheKey, false);
-        
+
     } catch (error) {
         console.error('❌ Erro ao carregar dados de automação:', error);
         throw error;
@@ -702,28 +715,27 @@ async function loadAutomationDataWithCache() {
 async function loadAutomationFromAPI(cacheKey, isBackground = false) {
     try {
         const orgId = automationState.getState('orgId');
-        const userId = automationState.getState('user')?.id;
-        
+
         // Check rate limiting
         if (!automationState.checkRateLimit()) {
             console.warn('⚠️ Rate limit exceeded, skipping API call');
             return;
         }
-        
+
         // Load data in parallel for better performance
         const promises = [
-            getAutomationRules(orgId).catch(err => ({ error: err })),
-            getAutomationExecutions(orgId).catch(err => ({ error: err })),
-            getWorkflowLogs(orgId).catch(err => ({ error: err })),
-            getEmailCampaigns(orgId).catch(err => ({ error: err })),
-            getSMSCampaigns(orgId).catch(err => ({ error: err })),
-            getNotificationLogs(orgId).catch(err => ({ error: err })),
-            getCommunicationTemplates(orgId).catch(err => ({ error: err })),
-            getMessageQueue(orgId).catch(err => ({ error: err })),
-            getN8NWorkflows(orgId).catch(err => ({ error: err })),
-            getWhatsappIntegration(orgId).catch(err => ({ error: err }))
+            getAutomationRules(orgId),
+            getAutomationExecutions(orgId),
+            getWorkflowLogs(orgId),
+            getEmailCampaigns(orgId),
+            getSMSCampaigns(orgId),
+            getNotificationLogs(orgId),
+            getCommunicationTemplates(orgId),
+            getMessageQueue(orgId),
+            getN8NWorkflows(orgId),
+            getWhatsappIntegration(orgId)
         ];
-        
+
         const [
             rulesData,
             executionsData,
@@ -736,7 +748,7 @@ async function loadAutomationFromAPI(cacheKey, isBackground = false) {
             n8nWorkflowsData,
             whatsappData
         ] = await Promise.all(promises);
-        
+
         const automationData = {
             rules: rulesData?.data || [],
             executions: executionsData?.data || [],
@@ -749,19 +761,19 @@ async function loadAutomationFromAPI(cacheKey, isBackground = false) {
             n8nWorkflows: n8nWorkflowsData?.data || [],
             whatsappIntegration: whatsappData?.data || null
         };
-        
+
         // Apply data to state
         applyAutomationData(automationData);
-        
+
         // Cache the data
         automationState.setCachedData(cacheKey, automationData);
-        
+
         if (!isBackground) {
             console.log('✅ Dados de automação carregados das tabelas do Supabase');
         } else {
             console.log('🔄 Cache de automação atualizado');
         }
-        
+
     } catch (error) {
         console.error('❌ Erro ao carregar dados de automação da API:', error);
         if (!isBackground) {
@@ -778,13 +790,13 @@ function applyAutomationData(data) {
     try {
         // Process and sort automation rules
         const processedRules = processAutomationRules(data.rules || []);
-        
+
         // Process executions with status calculations
         const processedExecutions = processExecutions(data.executions || []);
-        
+
         // Process workflow logs
         const processedLogs = processWorkflowLogs(data.logs || []);
-        
+
         automationState.setState({
             automationRules: processedRules,
             executions: processedExecutions,
@@ -802,9 +814,9 @@ function applyAutomationData(data) {
                 executionsRun: (data.executions || []).length
             }
         });
-        
+
         console.log('✅ Dados de automação processados e aplicados ao estado');
-        
+
     } catch (error) {
         console.error('❌ Erro ao aplicar dados de automação:', error);
     }
@@ -821,19 +833,19 @@ function processAutomationRules(rules) {
             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
             .map(rule => ({
                 ...rule,
-                typeConfig: AUTOMATION_CONFIG.AUTOMATION_TYPES.find(t => t.value === rule.type) || 
-                           AUTOMATION_CONFIG.AUTOMATION_TYPES[0],
-                statusConfig: AUTOMATION_CONFIG.STATUS_OPTIONS.find(s => s.value === rule.status) || 
-                             AUTOMATION_CONFIG.STATUS_OPTIONS[0],
-                triggerConfig: AUTOMATION_CONFIG.TRIGGER_TYPES.find(t => t.value === rule.trigger_type) || 
-                              AUTOMATION_CONFIG.TRIGGER_TYPES[0],
-                actionConfig: AUTOMATION_CONFIG.ACTION_TYPES.find(a => a.value === rule.action_type) || 
-                             AUTOMATION_CONFIG.ACTION_TYPES[0],
+                typeConfig: AUTOMATION_CONFIG.AUTOMATION_TYPES.find(t => t.value === rule.type) ||
+                    AUTOMATION_CONFIG.AUTOMATION_TYPES[0],
+                statusConfig: AUTOMATION_CONFIG.STATUS_OPTIONS.find(s => s.value === rule.status) ||
+                    AUTOMATION_CONFIG.STATUS_OPTIONS[0],
+                triggerConfig: AUTOMATION_CONFIG.TRIGGER_TYPES.find(t => t.value === rule.trigger_type) ||
+                    AUTOMATION_CONFIG.TRIGGER_TYPES[0],
+                actionConfig: AUTOMATION_CONFIG.ACTION_TYPES.find(a => a.value === rule.action_type) ||
+                    AUTOMATION_CONFIG.ACTION_TYPES[0],
                 lastExecuted: rule.last_executed ? formatTimeAgo(rule.last_executed) : 'Nunca',
                 executionCount: rule.execution_count || 0,
-                successRate: calculateSuccessRate(rule.execution_count, rule.success_count)
+                successRate: calculateSuccessRate(rule.success_count, rule.execution_count)
             }));
-            
+
     } catch (error) {
         console.error('❌ Erro ao processar regras de automação:', error);
         return [];
@@ -856,7 +868,7 @@ function processExecutions(executions) {
                 duration: calculateDuration(execution.started_at, execution.completed_at),
                 statusConfig: getExecutionStatusConfig(execution.status)
             }));
-            
+
     } catch (error) {
         console.error('❌ Erro ao processar execuções:', error);
         return [];
@@ -878,7 +890,7 @@ function processWorkflowLogs(logs) {
                 timeAgo: formatTimeAgo(log.created_at),
                 levelConfig: getLogLevelConfig(log.level)
             }));
-            
+
     } catch (error) {
         console.error('❌ Erro ao processar logs de workflow:', error);
         return [];
@@ -887,11 +899,11 @@ function processWorkflowLogs(logs) {
 
 /**
  * Calculate success rate percentage
- * @param {number} total - Total executions
  * @param {number} success - Successful executions
+ * @param {number} total - Total executions
  * @returns {number} Success rate percentage
  */
-function calculateSuccessRate(total, success) {
+function calculateSuccessRate(success, total) {
     try {
         if (!total || total === 0) return 0;
         return Math.round((success / total) * 100);
@@ -910,17 +922,17 @@ function calculateSuccessRate(total, success) {
 function calculateDuration(startTime, endTime) {
     try {
         if (!startTime || !endTime) return '-';
-        
+
         const start = new Date(startTime);
         const end = new Date(endTime);
         const diffMs = end - start;
-        
+
         if (diffMs < 1000) return `${diffMs}ms`;
-        if (diffMs < 60000) return `${Math.round(diffMs / 1000)}s`;
-        if (diffMs < 3600000) return `${Math.round(diffMs / 60000)}m`;
-        
-        return `${Math.round(diffMs / 3600000)}h`;
-        
+        if (diffMs < 60000) return `${(diffMs / 1000).toFixed(1)}s`;
+        if (diffMs < 3600000) return `${(diffMs / 60000).toFixed(1)}m`;
+
+        return `${(diffMs / 3600000).toFixed(1)}h`;
+
     } catch (error) {
         console.error('❌ Erro ao calcular duração:', error);
         return '-';
@@ -941,7 +953,7 @@ function getExecutionStatusConfig(status) {
         completed: { label: 'Concluído', color: 'green', icon: '✅' },
         cancelled: { label: 'Cancelado', color: 'gray', icon: '⏹️' }
     };
-    
+
     return statusMap[status] || statusMap.pending;
 }
 
@@ -958,7 +970,7 @@ function getLogLevelConfig(level) {
         debug: { label: 'Debug', color: 'gray', icon: '🐛' },
         success: { label: 'Sucesso', color: 'green', icon: '✅' }
     };
-    
+
     return levelMap[level] || levelMap.info;
 }
 
@@ -975,14 +987,14 @@ function formatTimeAgo(dateString) {
         const diffMins = Math.floor(diffMs / 60000);
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
-        
+
         if (diffMins < 1) return 'Agora mesmo';
         if (diffMins < 60) return `${diffMins}m atrás`;
         if (diffHours < 24) return `${diffHours}h atrás`;
         if (diffDays < 7) return `${diffDays}d atrás`;
-        
+
         return date.toLocaleDateString('pt-BR');
-        
+
     } catch (error) {
         console.error('❌ Erro ao formatar tempo:', error);
         return 'Data inválida';
@@ -995,67 +1007,36 @@ function formatTimeAgo(dateString) {
  */
 function setupRealTimeSubscriptions() {
     try {
-        const userId = automationState.getState('user')?.id;
         const orgId = automationState.getState('orgId');
-        
-        if (!userId || !orgId) {
-            console.warn('⚠️ Usuário ou organização não definidos para real-time');
+
+        if (!orgId) {
+            console.warn('⚠️ Organização não definida para real-time, subscriptions abortadas.');
             return;
         }
-        
+
         const subscriptions = new Map();
-        
-        // Subscribe to automation rules updates
-        try {
-            const rulesSubscription = subscribeToTable(
-                'automation_rules',
-                {
-                    event: '*',
-                    schema: 'public',
-                    filter: `org_id=eq.${orgId}`
-                },
-                (payload) => handleRealTimeUpdate('rules', payload)
-            );
-            subscriptions.set('rules', rulesSubscription);
-        } catch (subError) {
-            console.warn('⚠️ Erro ao configurar subscription para regras:', subError);
-        }
-        
-        // Subscribe to automation executions updates
-        try {
-            const executionsSubscription = subscribeToTable(
-                'automation_executions',
-                {
-                    event: '*',
-                    schema: 'public',
-                    filter: `org_id=eq.${orgId}`
-                },
-                (payload) => handleRealTimeUpdate('executions', payload)
-            );
-            subscriptions.set('executions', executionsSubscription);
-        } catch (subError) {
-            console.warn('⚠️ Erro ao configurar subscription para execuções:', subError);
-        }
-        
-        // Subscribe to workflow logs updates
-        try {
-            const logsSubscription = subscribeToTable(
-                'workflow_logs',
-                {
-                    event: '*',
-                    schema: 'public',
-                    filter: `org_id=eq.${orgId}`
-                },
-                (payload) => handleRealTimeUpdate('logs', payload)
-            );
-            subscriptions.set('logs', logsSubscription);
-        } catch (subError) {
-            console.warn('⚠️ Erro ao configurar subscription para logs:', subError);
-        }
-        
+        const tablesToSubscribe = ['automation_rules', 'automation_executions', 'workflow_logs'];
+
+        tablesToSubscribe.forEach(table => {
+            try {
+                const subscription = subscribeToTable(
+                    table,
+                    {
+                        event: '*',
+                        schema: 'public',
+                        filter: `org_id=eq.${orgId}`
+                    },
+                    (payload) => handleRealTimeUpdate(table, payload)
+                );
+                subscriptions.set(table, subscription);
+            } catch (subError) {
+                console.warn(`⚠️ Erro ao configurar subscription para ${table}:`, subError);
+            }
+        });
+
         automationState.setState({ subscriptions });
         console.log('✅ Real-time subscriptions configuradas para automações');
-        
+
     } catch (error) {
         console.error('❌ Erro ao configurar subscriptions de automação:', error);
     }
@@ -1063,37 +1044,36 @@ function setupRealTimeSubscriptions() {
 
 /**
  * Handle real-time data updates
- * @param {string} type - Update type
+ * @param {string} table - Table name for the update
  * @param {Object} payload - Real-time update payload
  */
-function handleRealTimeUpdate(type, payload) {
+function handleRealTimeUpdate(table, payload) {
     try {
-        console.log(`🔄 Atualização real-time recebida: ${type}`);
-        
-        switch (type) {
-            case 'rules':
-                handleRulesUpdate(payload);
-                break;
-            case 'executions':
-                handleExecutionsUpdate(payload);
-                break;
-            case 'logs':
-                handleLogsUpdate(payload);
-                break;
-            default:
-                console.warn(`⚠️ Tipo de atualização desconhecido: ${type}`);
+        console.log(`🔄 Atualização real-time recebida: ${table}`, payload);
+
+        const updateHandlers = {
+            'automation_rules': handleRulesUpdate,
+            'automation_executions': handleExecutionsUpdate,
+            'workflow_logs': handleLogsUpdate,
+        };
+
+        const handler = updateHandlers[table];
+        if (handler) {
+            handler(payload);
+        } else {
+            console.warn(`⚠️ Tipo de atualização desconhecido: ${table}`);
         }
-        
+
         // Clear relevant cache
-        const userId = automationState.getState('user')?.id;
         const orgId = automationState.getState('orgId');
+        const userId = automationState.getState('user')?.id;
         const cacheKey = `automation_${orgId}_${userId}`;
         automationState.clearCache(cacheKey);
-        
-        showNotification(`Dados de ${type} atualizados em tempo real!`, 'info');
-        
+
+        showNotification(`Dados de ${table.replace('_', ' ')} atualizados em tempo real!`, 'info');
+
     } catch (error) {
-        console.error(`❌ Erro ao processar atualização real-time de ${type}:`, error);
+        console.error(`❌ Erro ao processar atualização real-time de ${table}:`, error);
     }
 }
 
@@ -1103,45 +1083,35 @@ function handleRealTimeUpdate(type, payload) {
  */
 function handleRulesUpdate(payload) {
     try {
+        const currentRules = automationState.getState('automationRules');
+        let updatedRules = [...currentRules];
+
         if (payload.eventType === 'INSERT') {
             const newRule = payload.new;
-            const currentRules = automationState.getState('automationRules');
             const processedRule = processAutomationRules([newRule])[0];
-            
-            automationState.setState({
-                automationRules: [processedRule, ...currentRules]
-            });
-            
+            updatedRules.unshift(processedRule);
             showRuleCreated(processedRule);
-            
+
         } else if (payload.eventType === 'UPDATE') {
             const updatedRule = payload.new;
-            const currentRules = automationState.getState('automationRules');
             const processedRule = processAutomationRules([updatedRule])[0];
-            
-            const updatedRules = currentRules.map(rule => 
-                rule.id === updatedRule.id ? processedRule : rule
-            );
-            
-            automationState.setState({
-                automationRules: updatedRules
-            });
-            
+            const index = updatedRules.findIndex(rule => rule.id === updatedRule.id);
+            if (index !== -1) {
+                updatedRules[index] = processedRule;
+            } else {
+                updatedRules.unshift(processedRule); // Add if not found
+            }
             showRuleUpdated(processedRule);
-            
+
         } else if (payload.eventType === 'DELETE') {
             const deletedRule = payload.old;
-            const currentRules = automationState.getState('automationRules');
-            
-            const filteredRules = currentRules.filter(rule => rule.id !== deletedRule.id);
-            
-            automationState.setState({
-                automationRules: filteredRules
-            });
-            
+            updatedRules = updatedRules.filter(rule => rule.id !== deletedRule.id);
             showNotification('Regra de automação removida', 'info');
         }
-        
+
+        automationState.setState({ automationRules: updatedRules });
+        renderRulesSection();
+
     } catch (error) {
         console.error('❌ Erro ao processar atualização de regras:', error);
     }
@@ -1153,37 +1123,35 @@ function handleRulesUpdate(payload) {
  */
 function handleExecutionsUpdate(payload) {
     try {
+        const currentExecutions = automationState.getState('executions');
+        let updatedExecutions = [...currentExecutions];
+
         if (payload.eventType === 'INSERT') {
             const newExecution = payload.new;
-            const currentExecutions = automationState.getState('executions');
             const processedExecution = processExecutions([newExecution])[0];
-            
-            automationState.setState({
-                executions: [processedExecution, ...currentExecutions.slice(0, 99)]
-            });
-            
+            updatedExecutions.unshift(processedExecution);
             showExecutionStarted(processedExecution);
-            
+
         } else if (payload.eventType === 'UPDATE') {
             const updatedExecution = payload.new;
-            const currentExecutions = automationState.getState('executions');
             const processedExecution = processExecutions([updatedExecution])[0];
-            
-            const updatedExecutions = currentExecutions.map(execution => 
-                execution.id === updatedExecution.id ? processedExecution : execution
-            );
-            
-            automationState.setState({
-                executions: updatedExecutions
-            });
-            
-            if (updatedExecution.status === 'completed' || updatedExecution.status === 'success') {
+            const index = updatedExecutions.findIndex(exec => exec.id === updatedExecution.id);
+            if (index !== -1) {
+                updatedExecutions[index] = processedExecution;
+            } else {
+                updatedExecutions.unshift(processedExecution);
+            }
+
+            if (['completed', 'success'].includes(updatedExecution.status)) {
                 showExecutionCompleted(processedExecution);
-            } else if (updatedExecution.status === 'failed' || updatedExecution.status === 'error') {
+            } else if (['failed', 'error'].includes(updatedExecution.status)) {
                 showExecutionFailed(processedExecution);
             }
         }
-        
+
+        automationState.setState({ executions: updatedExecutions.slice(0, 100) });
+        renderExecutionsSection();
+
     } catch (error) {
         console.error('❌ Erro ao processar atualização de execuções:', error);
     }
@@ -1199,21 +1167,21 @@ function handleLogsUpdate(payload) {
             const newLog = payload.new;
             const currentLogs = automationState.getState('workflowLogs');
             const processedLog = processWorkflowLogs([newLog])[0];
-            
-            automationState.setState({
-                workflowLogs: [processedLog, ...currentLogs.slice(0, 49)]
-            });
-            
-            // Show notification for error logs
+
+            const updatedLogs = [processedLog, ...currentLogs].slice(0, 50);
+            automationState.setState({ workflowLogs: updatedLogs });
+
             if (newLog.level === 'error') {
                 showNotification(`Erro no workflow: ${newLog.message}`, 'error');
             }
+            renderLogsSection();
         }
-        
+
     } catch (error) {
         console.error('❌ Erro ao processar atualização de logs:', error);
     }
 }
+
 
 // ===== INTERFACE RENDERING - NASA 10/10 =====
 /**
@@ -1222,7 +1190,7 @@ function handleLogsUpdate(payload) {
  */
 async function renderAutomationInterface() {
     const startTime = performance.now();
-    
+
     try {
         // Render components in parallel where possible
         const renderPromises = [
@@ -1233,9 +1201,9 @@ async function renderAutomationInterface() {
             renderExecutionsSection(),
             renderLogsSection()
         ];
-        
+
         await Promise.all(renderPromises);
-        
+
         const endTime = performance.now();
         automationState.setState({
             metrics: {
@@ -1243,9 +1211,9 @@ async function renderAutomationInterface() {
                 renderTime: endTime - startTime
             }
         });
-        
+
         console.log(`🎨 Interface de automação renderizada em ${(endTime - startTime).toFixed(2)}ms`);
-        
+
     } catch (error) {
         console.error('❌ Erro ao renderizar interface de automação:', error);
     }
@@ -1259,10 +1227,10 @@ async function renderAutomationHeader() {
     try {
         const headerContainer = document.getElementById('automation-header');
         if (!headerContainer) return;
-        
+
         const automationRules = automationState.getState('automationRules');
         const executions = automationState.getState('executions');
-        
+
         // Calculate stats
         const activeRules = automationRules.filter(rule => rule.status === 'active').length;
         const todayExecutions = executions.filter(execution => {
@@ -1270,7 +1238,7 @@ async function renderAutomationHeader() {
             const today = new Date();
             return executionDate.toDateString() === today.toDateString();
         }).length;
-        
+
         const headerHTML = `
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -1305,9 +1273,9 @@ async function renderAutomationHeader() {
                 </div>
             </div>
         `;
-        
+
         headerContainer.innerHTML = headerHTML;
-        
+
     } catch (error) {
         console.error('❌ Erro ao renderizar header de automação:', error);
     }
@@ -1321,23 +1289,23 @@ async function renderAutomationStats() {
     try {
         const statsContainer = document.getElementById('automation-stats');
         if (!statsContainer) return;
-        
+
         const automationRules = automationState.getState('automationRules');
         const executions = automationState.getState('executions');
-        
+
         // Calculate comprehensive stats
         const totalRules = automationRules.length;
         const activeRules = automationRules.filter(rule => rule.status === 'active').length;
         const pausedRules = automationRules.filter(rule => rule.status === 'paused').length;
         const errorRules = automationRules.filter(rule => rule.status === 'error').length;
-        
+
         const totalExecutions = executions.length;
         const successfulExecutions = executions.filter(exec => exec.status === 'success' || exec.status === 'completed').length;
         const failedExecutions = executions.filter(exec => exec.status === 'failed' || exec.status === 'error').length;
         const runningExecutions = executions.filter(exec => exec.status === 'running').length;
-        
+
         const successRate = totalExecutions > 0 ? Math.round((successfulExecutions / totalExecutions) * 100) : 0;
-        
+
         const statsHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow p-6">
@@ -1397,9 +1365,9 @@ async function renderAutomationStats() {
                 </div>
             </div>
         `;
-        
+
         statsContainer.innerHTML = statsHTML;
-        
+
     } catch (error) {
         console.error('❌ Erro ao renderizar estatísticas de automação:', error);
     }
@@ -1413,9 +1381,9 @@ async function renderAutomationTabs() {
     try {
         const tabsContainer = document.getElementById('automation-tabs');
         if (!tabsContainer) return;
-        
+
         const activeTab = automationState.getState('activeTab');
-        
+
         const tabs = [
             { id: 'rules', label: 'Regras', icon: '🤖' },
             { id: 'executions', label: 'Execuções', icon: '⚡' },
@@ -1423,7 +1391,7 @@ async function renderAutomationTabs() {
             { id: 'templates', label: 'Templates', icon: '📄' },
             { id: 'integrations', label: 'Integrações', icon: '🔌' }
         ];
-        
+
         const tabsHTML = `
             <div class="bg-white rounded-lg shadow mb-6">
                 <div class="border-b border-gray-200">
@@ -1444,9 +1412,9 @@ async function renderAutomationTabs() {
                 </div>
             </div>
         `;
-        
+
         tabsContainer.innerHTML = tabsHTML;
-        
+
     } catch (error) {
         console.error('❌ Erro ao renderizar tabs de automação:', error);
     }
@@ -1460,17 +1428,17 @@ async function renderRulesSection() {
     try {
         const rulesContainer = document.getElementById('rules-section');
         if (!rulesContainer) return;
-        
+
         const automationRules = automationState.getState('automationRules');
         const activeTab = automationState.getState('activeTab');
-        
+
         if (activeTab !== 'rules') {
             rulesContainer.style.display = 'none';
             return;
         }
-        
+
         rulesContainer.style.display = 'block';
-        
+
         const rulesHTML = `
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -1492,62 +1460,8 @@ async function renderRulesSection() {
                     </div>
                 </div>
                 
-                <div class="divide-y divide-gray-200">
-                    ${automationRules.map(rule => {
-                        const statusStyles = AUTOMATION_CONFIG.STATIC_STYLES.status[rule.status] || 
-                                           AUTOMATION_CONFIG.STATIC_STYLES.status.draft;
-                        const typeStyles = AUTOMATION_CONFIG.STATIC_STYLES.types[rule.typeConfig.color] || 
-                                         AUTOMATION_CONFIG.STATIC_STYLES.types.gray;
-                        
-                        return `
-                            <div class="p-6 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="text-2xl">${rule.typeConfig.icon}</div>
-                                        <div>
-                                            <h4 class="text-lg font-medium text-gray-900">${rule.name}</h4>
-                                            <p class="text-sm text-gray-600">${rule.description || 'Sem descrição'}</p>
-                                            <div class="flex items-center space-x-4 mt-2">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles.bg} ${statusStyles.text}">
-                                                    ${rule.statusConfig.icon} ${rule.statusConfig.label}
-                                                </span>
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeStyles.bg} ${typeStyles.text}">
-                                                    ${rule.typeConfig.label}
-                                                </span>
-                                                <span class="text-xs text-gray-500">
-                                                    ${rule.triggerConfig.icon} ${rule.triggerConfig.label} → ${rule.actionConfig.icon} ${rule.actionConfig.label}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center space-x-4">
-                                        <div class="text-right">
-                                            <div class="text-sm font-medium text-gray-900">${rule.executionCount} execuções</div>
-                                            <div class="text-sm text-gray-500">${rule.successRate}% sucesso</div>
-                                            <div class="text-xs text-gray-400">Última: ${rule.lastExecuted}</div>
-                                        </div>
-                                        
-                                        <div class="flex items-center space-x-2">
-                                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium edit-rule-btn" 
-                                                    data-rule-id="${rule.id}">
-                                                Editar
-                                            </button>
-                                            <button class="text-gray-600 hover:text-gray-800 text-sm font-medium toggle-rule-btn" 
-                                                    data-rule-id="${rule.id}" 
-                                                    data-current-status="${rule.status}">
-                                                ${rule.status === 'active' ? 'Pausar' : 'Ativar'}
-                                            </button>
-                                            <button class="text-red-600 hover:text-red-800 text-sm font-medium delete-rule-btn" 
-                                                    data-rule-id="${rule.id}">
-                                                Excluir
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                <div id="rules-list" class="divide-y divide-gray-200">
+                    ${automationRules.map(rule => renderRuleCard(rule)).join('')}
                     
                     ${automationRules.length === 0 ? `
                         <div class="p-12 text-center">
@@ -1563,12 +1477,80 @@ async function renderRulesSection() {
                 </div>
             </div>
         `;
-        
+
         rulesContainer.innerHTML = rulesHTML;
         
+        // Re-attach listeners for dynamic content
+        const searchInput = document.getElementById('rules-search');
+        if (searchInput) searchInput.addEventListener('input', debounce(filterRules, AUTOMATION_CONFIG.PERFORMANCE.DEBOUNCE_DELAY));
+
+        const statusFilter = document.getElementById('rules-status-filter');
+        if(statusFilter) statusFilter.addEventListener('change', filterRules);
+
+
     } catch (error) {
         console.error('❌ Erro ao renderizar seção de regras:', error);
     }
+}
+
+
+/**
+ * Renders a single rule card.
+ * @param {Object} rule - The rule object to render.
+ * @returns {string} HTML string for the rule card.
+ */
+function renderRuleCard(rule) {
+    const statusStyles = AUTOMATION_CONFIG.STATIC_STYLES.status[rule.status] || AUTOMATION_CONFIG.STATIC_STYLES.status.draft;
+    const typeStyles = AUTOMATION_CONFIG.STATIC_STYLES.types[rule.typeConfig.color] || AUTOMATION_CONFIG.STATIC_STYLES.types.gray;
+
+    return `
+        <div class="p-6 hover:bg-gray-50 transition-colors" data-rule-id-card="${rule.id}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-2xl">${rule.typeConfig.icon}</div>
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-900">${rule.name}</h4>
+                        <p class="text-sm text-gray-600">${rule.description || 'Sem descrição'}</p>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles.bg} ${statusStyles.text}">
+                                ${rule.statusConfig.icon} ${rule.statusConfig.label}
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeStyles.bg} ${typeStyles.text}">
+                                ${rule.typeConfig.label}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                ${rule.triggerConfig.icon} ${rule.triggerConfig.label} → ${rule.actionConfig.icon} ${rule.actionConfig.label}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <div class="text-sm font-medium text-gray-900">${rule.executionCount} execuções</div>
+                        <div class="text-sm text-gray-500">${rule.successRate}% sucesso</div>
+                        <div class="text-xs text-gray-400">Última: ${rule.lastExecuted}</div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium edit-rule-btn" 
+                                data-rule-id="${rule.id}">
+                            Editar
+                        </button>
+                        <button class="text-gray-600 hover:text-gray-800 text-sm font-medium toggle-rule-btn" 
+                                data-rule-id="${rule.id}" 
+                                data-current-status="${rule.status}">
+                            ${rule.status === 'active' ? 'Pausar' : 'Ativar'}
+                        </button>
+                        <button class="text-red-600 hover:text-red-800 text-sm font-medium delete-rule-btn" 
+                                data-rule-id="${rule.id}">
+                            Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 /**
@@ -1579,17 +1561,17 @@ async function renderExecutionsSection() {
     try {
         const executionsContainer = document.getElementById('executions-section');
         if (!executionsContainer) return;
-        
+
         const executions = automationState.getState('executions');
         const activeTab = automationState.getState('activeTab');
-        
+
         if (activeTab !== 'executions') {
             executionsContainer.style.display = 'none';
             return;
         }
-        
+
         executionsContainer.style.display = 'block';
-        
+
         const executionsHTML = `
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -1598,8 +1580,7 @@ async function renderExecutionsSection() {
                 
                 <div class="divide-y divide-gray-200">
                     ${executions.map(execution => {
-                        const statusStyles = AUTOMATION_CONFIG.STATIC_STYLES.execution[execution.status] || 
-                                           AUTOMATION_CONFIG.STATIC_STYLES.execution.pending;
+                        const statusStyles = AUTOMATION_CONFIG.STATIC_STYLES.execution[execution.status] || AUTOMATION_CONFIG.STATIC_STYLES.execution.pending;
                         
                         return `
                             <div class="p-6">
@@ -1646,9 +1627,9 @@ async function renderExecutionsSection() {
                 </div>
             </div>
         `;
-        
+
         executionsContainer.innerHTML = executionsHTML;
-        
+
     } catch (error) {
         console.error('❌ Erro ao renderizar seção de execuções:', error);
     }
@@ -1662,17 +1643,17 @@ async function renderLogsSection() {
     try {
         const logsContainer = document.getElementById('logs-section');
         if (!logsContainer) return;
-        
+
         const workflowLogs = automationState.getState('workflowLogs');
         const activeTab = automationState.getState('activeTab');
-        
+
         if (activeTab !== 'logs') {
             logsContainer.style.display = 'none';
             return;
         }
-        
+
         logsContainer.style.display = 'block';
-        
+
         const logsHTML = `
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -1711,9 +1692,9 @@ async function renderLogsSection() {
                 </div>
             </div>
         `;
-        
+
         logsContainer.innerHTML = logsHTML;
-        
+
     } catch (error) {
         console.error('❌ Erro ao renderizar seção de logs:', error);
     }
@@ -1725,83 +1706,61 @@ async function renderLogsSection() {
  */
 function setupEventListeners() {
     try {
-        // Tab navigation
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('tab-button')) {
-                const tabId = e.target.dataset.tab;
-                switchTab(tabId);
-            }
-        });
-        
-        // Create rule button
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'create-rule-btn' || e.target.id === 'create-first-rule-btn') {
+        // Use event delegation on a stable parent element to handle clicks
+        const appContainer = document.getElementById('app'); // Assuming your main container has id 'app'
+        if (!appContainer) {
+            console.error("Container #app não encontrado. Event listeners podem não funcionar.");
+            return;
+        }
+
+        appContainer.addEventListener('click', (e) => {
+            const target = e.target;
+            const button = target.closest('button');
+            if (!button) return;
+
+            if (button.classList.contains('tab-button')) {
+                switchTab(button.dataset.tab);
+            } else if (button.id === 'create-rule-btn' || button.id === 'create-first-rule-btn') {
                 showCreateRuleModal();
+            } else if (button.classList.contains('edit-rule-btn')) {
+                showEditRuleModal(button.dataset.ruleId);
+            } else if (button.classList.contains('toggle-rule-btn')) {
+                toggleRuleStatus(button.dataset.ruleId, button.dataset.currentStatus);
+            } else if (button.classList.contains('delete-rule-btn')) {
+                deleteRule(button.dataset.ruleId);
+            } else if (button.classList.contains('view-execution-btn')) {
+                showExecutionDetails(button.dataset.executionId);
             }
         });
-        
-        // Edit rule buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('edit-rule-btn')) {
-                const ruleId = e.target.dataset.ruleId;
-                showEditRuleModal(ruleId);
-            }
-        });
-        
-        // Toggle rule buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('toggle-rule-btn')) {
-                const ruleId = e.target.dataset.ruleId;
-                const currentStatus = e.target.dataset.currentStatus;
-                toggleRuleStatus(ruleId, currentStatus);
-            }
-        });
-        
-        // Delete rule buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-rule-btn')) {
-                const ruleId = e.target.dataset.ruleId;
-                deleteRule(ruleId);
-            }
-        });
-        
-        // View execution buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-execution-btn')) {
-                const executionId = e.target.dataset.executionId;
-                showExecutionDetails(executionId);
-            }
-        });
-        
-        // Search and filters
+
+        // Listeners for non-delegated events
         const rulesSearch = document.getElementById('rules-search');
         if (rulesSearch) {
             rulesSearch.addEventListener('input', debounce(filterRules, AUTOMATION_CONFIG.PERFORMANCE.DEBOUNCE_DELAY));
         }
-        
+
         const statusFilter = document.getElementById('rules-status-filter');
         if (statusFilter) {
             statusFilter.addEventListener('change', filterRules);
         }
-        
-        // Keyboard navigation - NASA 10/10 accessibility
+
         if (AUTOMATION_CONFIG.ACCESSIBILITY?.keyboardNavigation) {
             document.addEventListener('keydown', handleKeyboardNavigation);
         }
-        
-        // Page visibility change handler
+
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 loadAutomationDataWithCache();
             }
         });
-        
+
         console.log('✅ Event listeners configurados para automações');
-        
+
     } catch (error) {
         console.error('❌ Erro ao configurar event listeners de automação:', error);
     }
 }
+
 
 /**
  * Handle keyboard navigation - NASA 10/10 accessibility
@@ -1814,18 +1773,18 @@ function handleKeyboardNavigation(e) {
             e.preventDefault();
             loadAutomationDataWithCache();
         }
-        
+
         // Ctrl/Cmd + N: New rule
         if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
             e.preventDefault();
             showCreateRuleModal();
         }
-        
+
         // Escape: Close modals
         if (e.key === 'Escape') {
             closeAllModals();
         }
-        
+
         // Tab navigation
         if (e.key === 'Tab' && e.altKey) {
             e.preventDefault();
@@ -1835,7 +1794,7 @@ function handleKeyboardNavigation(e) {
             const nextIndex = (currentIndex + 1) % tabs.length;
             switchTab(tabs[nextIndex]);
         }
-        
+
     } catch (error) {
         console.error('❌ Erro na navegação por teclado de automação:', error);
     }
@@ -1848,7 +1807,7 @@ function handleKeyboardNavigation(e) {
 function switchTab(tabId) {
     try {
         automationState.setState({ activeTab: tabId });
-        
+
         // Update tab buttons
         document.querySelectorAll('.tab-button').forEach(button => {
             const isActive = button.dataset.tab === tabId;
@@ -1858,10 +1817,12 @@ function switchTab(tabId) {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`;
         });
-        
+
         // Re-render sections
-        renderAutomationInterface();
-        
+        renderRulesSection();
+        renderExecutionsSection();
+        renderLogsSection();
+
     } catch (error) {
         console.error('❌ Erro ao trocar tab de automação:', error);
     }
@@ -1874,33 +1835,25 @@ function filterRules() {
     try {
         const searchTerm = document.getElementById('rules-search')?.value.toLowerCase() || '';
         const statusFilter = document.getElementById('rules-status-filter')?.value || 'all';
-        
+
         const allRules = automationState.getState('automationRules');
-        
+
         const filteredRules = allRules.filter(rule => {
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 rule.name.toLowerCase().includes(searchTerm) ||
                 rule.description?.toLowerCase().includes(searchTerm) ||
                 rule.typeConfig.label.toLowerCase().includes(searchTerm);
-            
+
             const matchesStatus = statusFilter === 'all' || rule.status === statusFilter;
-            
+
             return matchesSearch && matchesStatus;
         });
-        
-        // Update state with filtered rules
-        automationState.setState({ 
-            filteredRules,
-            filters: {
-                ...automationState.getState('filters'),
-                search: searchTerm,
-                status: statusFilter
-            }
-        });
-        
-        // Re-render rules section
-        renderRulesSection();
-        
+
+        const rulesListContainer = document.getElementById('rules-list');
+        if (rulesListContainer) {
+            rulesListContainer.innerHTML = filteredRules.map(rule => renderRuleCard(rule)).join('') || `<p class="p-6 text-center text-gray-500">Nenhuma regra encontrada com os filtros aplicados.</p>`;
+        }
+
     } catch (error) {
         console.error('❌ Erro ao filtrar regras:', error);
     }
@@ -1913,7 +1866,7 @@ function showCreateRuleModal() {
     try {
         automationState.setState({ showCreateModal: true });
         showNotification('Modal de criação de regra em desenvolvimento', 'info');
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar modal de criação:', error);
     }
@@ -1930,14 +1883,14 @@ function showEditRuleModal(ruleId) {
             showError('Regra não encontrada');
             return;
         }
-        
-        automationState.setState({ 
+
+        automationState.setState({
             showEditModal: true,
             selectedRule: rule
         });
-        
+
         showNotification('Modal de edição de regra em desenvolvimento', 'info');
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar modal de edição:', error);
     }
@@ -1951,21 +1904,30 @@ function showEditRuleModal(ruleId) {
 async function toggleRuleStatus(ruleId, currentStatus) {
     try {
         const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-        
+
         showLoading(true, 'Atualizando status da regra...');
-        
+
         const result = await updateAutomationRule(ruleId, { status: newStatus });
-        
+
         if (result.error) {
             showError(`Erro ao atualizar regra: ${result.error.message}`);
             return;
         }
-        
+
         showSuccess(`Regra ${newStatus === 'active' ? 'ativada' : 'pausada'} com sucesso!`);
-        
-        // Refresh data
-        await loadAutomationDataWithCache();
-        
+
+        // No need to reload all data, just update the state locally for responsiveness
+        const currentRules = automationState.getState('automationRules');
+        const updatedRules = currentRules.map(rule => {
+            if (rule.id === ruleId) {
+                return { ...rule, status: newStatus };
+            }
+            return rule;
+        });
+        automationState.setState({ automationRules: processAutomationRules(updatedRules) });
+        renderRulesSection();
+
+
     } catch (error) {
         console.error('❌ Erro ao alterar status da regra:', error);
         showError('Erro ao alterar status da regra');
@@ -1983,21 +1945,25 @@ async function deleteRule(ruleId) {
         if (!confirm('Tem certeza que deseja excluir esta regra? Esta ação não pode ser desfeita.')) {
             return;
         }
-        
+
         showLoading(true, 'Excluindo regra...');
-        
+
         const result = await deleteAutomationRule(ruleId);
-        
+
         if (result.error) {
             showError(`Erro ao excluir regra: ${result.error.message}`);
             return;
         }
-        
+
         showSuccess('Regra excluída com sucesso!');
-        
-        // Refresh data
-        await loadAutomationDataWithCache();
-        
+
+        // Update state locally for better UX
+        const currentRules = automationState.getState('automationRules');
+        const updatedRules = currentRules.filter(rule => rule.id !== ruleId);
+        automationState.setState({ automationRules: updatedRules });
+        renderRulesSection();
+
+
     } catch (error) {
         console.error('❌ Erro ao excluir regra:', error);
         showError('Erro ao excluir regra');
@@ -2017,9 +1983,9 @@ function showExecutionDetails(executionId) {
             showError('Execução não encontrada');
             return;
         }
-        
+
         showNotification('Modal de detalhes de execução em desenvolvimento', 'info');
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar detalhes da execução:', error);
     }
@@ -2035,12 +2001,12 @@ function closeAllModals() {
             showEditModal: false,
             selectedRule: null
         });
-        
+
         const modals = document.querySelectorAll('.modal');
         modals.forEach(modal => {
             modal.classList.add('hidden');
         });
-        
+
     } catch (error) {
         console.error('❌ Erro ao fechar modais de automação:', error);
     }
@@ -2054,12 +2020,12 @@ function startPeriodicUpdates() {
     try {
         setInterval(() => {
             if (!document.hidden && !automationState.getState('isUpdating')) {
-                loadAutomationDataWithCache();
+                loadAutomationFromAPI(`automation_${automationState.getState('orgId')}_${automationState.getState('user')?.id}`, true);
             }
         }, AUTOMATION_CONFIG.PERFORMANCE.REFRESH_INTERVAL);
-        
+
         console.log('✅ Atualizações periódicas iniciadas para automações');
-        
+
     } catch (error) {
         console.error('❌ Erro ao iniciar atualizações periódicas:', error);
     }
@@ -2072,9 +2038,9 @@ function startPeriodicUpdates() {
  */
 function showRuleCreated(rule) {
     try {
-        const typeStyles = AUTOMATION_CONFIG.STATIC_STYLES.types[rule.typeConfig.color] || 
-                          AUTOMATION_CONFIG.STATIC_STYLES.types.gray;
-        
+        const typeStyles = AUTOMATION_CONFIG.STATIC_STYLES.types[rule.typeConfig.color] ||
+            AUTOMATION_CONFIG.STATIC_STYLES.types.gray;
+
         // Create floating animation element
         const animation = document.createElement('div');
         animation.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none';
@@ -2085,16 +2051,16 @@ function showRuleCreated(rule) {
                 <div class="text-sm">${rule.name}</div>
             </div>
         `;
-        
+
         document.body.appendChild(animation);
-        
+
         // Remove after animation
         setTimeout(() => {
             if (animation.parentNode) {
                 animation.remove();
             }
         }, AUTOMATION_CONFIG.ANIMATIONS.ruleCreated.duration);
-        
+
         // Update metrics
         const metrics = automationState.getState('metrics');
         automationState.setState({
@@ -2103,7 +2069,7 @@ function showRuleCreated(rule) {
                 rulesCreated: metrics.rulesCreated + 1
             }
         });
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de regra criada:', error);
     }
@@ -2116,7 +2082,7 @@ function showRuleCreated(rule) {
 function showRuleUpdated(rule) {
     try {
         showNotification(`Regra "${rule.name}" atualizada com sucesso!`, 'success');
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de regra atualizada:', error);
     }
@@ -2129,7 +2095,7 @@ function showRuleUpdated(rule) {
 function showExecutionStarted(execution) {
     try {
         showNotification(`Execução iniciada: ${execution.rule_name}`, 'info', 3000);
-        
+
         // Update metrics
         const metrics = automationState.getState('metrics');
         automationState.setState({
@@ -2138,7 +2104,7 @@ function showExecutionStarted(execution) {
                 executionsRun: metrics.executionsRun + 1
             }
         });
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de execução iniciada:', error);
     }
@@ -2151,7 +2117,7 @@ function showExecutionStarted(execution) {
 function showExecutionCompleted(execution) {
     try {
         showNotification(`Execução concluída: ${execution.rule_name}`, 'success', 3000);
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de execução concluída:', error);
     }
@@ -2164,7 +2130,7 @@ function showExecutionCompleted(execution) {
 function showExecutionFailed(execution) {
     try {
         showNotification(`Execução falhou: ${execution.rule_name}`, 'error', 5000);
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar animação de execução falhada:', error);
     }
@@ -2181,9 +2147,9 @@ function formatNumber(num) {
         if (num === null || num === undefined || isNaN(num)) {
             return '0';
         }
-        
+
         return new Intl.NumberFormat('pt-BR').format(num);
-        
+
     } catch (error) {
         console.error('Erro ao formatar número:', error);
         return String(num);
@@ -2217,7 +2183,7 @@ function debounce(func, wait) {
 function showLoading(show, message = 'Carregando...') {
     try {
         let loadingElement = document.getElementById('loading-overlay');
-        
+
         if (show) {
             if (!loadingElement) {
                 loadingElement = document.createElement('div');
@@ -2239,7 +2205,7 @@ function showLoading(show, message = 'Carregando...') {
                 loadingElement.classList.add('hidden');
             }
         }
-        
+
     } catch (error) {
         console.error('❌ Erro ao mostrar loading de automação:', error);
     }
@@ -2277,17 +2243,24 @@ function showWarning(message) {
  */
 function showNotification(message, type = 'info', duration = 5000) {
     try {
-        // Remove existing notifications of the same type
-        const existingNotifications = document.querySelectorAll(`.notification-${type}`);
-        existingNotifications.forEach(notification => notification.remove());
+        // 🎯 Alteração Cirúrgica: Prevenir notificações duplicadas sem remover as outras.
+        // O código original removia TODAS as notificações de um mesmo tipo, o que é uma má experiência.
+        // Esta versão gera um ID baseado no conteúdo e previne apenas a recriação da MESMA notificação.
+        const notificationId = 'notif-' + btoa(encodeURIComponent(message)).replace(/=/g, '');
+
+        if (document.getElementById(notificationId)) {
+            console.warn("Notificação idêntica já está na tela. Ignorando.", message);
+            return; // Notificação idêntica já está na tela.
+        }
 
         // Create notification element
         const notification = document.createElement('div');
-        notification.className = `notification-${type} fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 max-w-sm ${getNotificationClasses(type)}`;
+        notification.id = notificationId;
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 max-w-sm ${getNotificationClasses(type)}`;
         notification.setAttribute('role', 'alert');
         notification.setAttribute('aria-live', 'polite');
         notification.setAttribute('aria-atomic', 'true');
-        
+
         notification.innerHTML = `
             <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
@@ -2296,8 +2269,8 @@ function showNotification(message, type = 'info', duration = 5000) {
                 <div class="flex-1">
                     <p class="text-sm font-medium"></p>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()" 
-                        class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
+                <button onclick="this.closest('#${notificationId}').remove()" 
+                        class="flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         aria-label="Fechar notificação">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
@@ -2305,38 +2278,38 @@ function showNotification(message, type = 'info', duration = 5000) {
                 </button>
             </div>
         `;
-        
+
         // Safely set message text with XSS protection
         const messageElement = notification.querySelector('p');
         if (messageElement) {
-            // Use textContent for XSS protection instead of innerHTML
             messageElement.textContent = message;
         }
-        
+
         document.body.appendChild(notification);
-        
+
         // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 100);
-        
+
         // Auto-remove with fade out
         setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 300);
+            const el = document.getElementById(notificationId);
+            if (el) {
+                el.style.transform = 'translateX(100%)';
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.remove();
+                }, 300);
+            }
         }, duration);
 
     } catch (error) {
         console.error('❌ Erro ao mostrar notificação de automação:', error);
-        // Fallback to alert
         alert(message);
     }
 }
+
 
 /**
  * Get notification CSS classes based on type
@@ -2374,7 +2347,7 @@ function getNotificationIcon(type) {
 async function handleCriticalError(error) {
     try {
         console.error('🚨 Erro crítico na automação:', error);
-        
+
         automationState.setState({
             errors: [...automationState.getState('errors'), {
                 type: 'critical_error',
@@ -2383,14 +2356,22 @@ async function handleCriticalError(error) {
             }],
             isLoading: false
         });
-        
+
         showLoading(false);
-        showError(`Erro crítico: ${error.message}. Carregando dados demo.`);
-        
-        // Try to load demo data as fallback
-        console.log('🔄 Tentando carregar dados demo como fallback...');
-        loadDemoAutomationData();
-        
+        showError(`Erro crítico: ${error.message}. O sistema pode não funcionar corretamente.`);
+
+        // 🎯 Alteração Cirúrgica: Controlar fallback de dados demo
+        // Carregar dados de demonstração em produção pode confundir o usuário e mascarar erros reais.
+        // Esta verificação garante que os dados demo só sejam carregados em ambiente de desenvolvimento.
+        // Em um build de produção com Vite, `import.meta.env.DEV` é a forma correta.
+        if (import.meta.env.DEV) {
+            console.warn('🔄 Modo de desenvolvimento: Carregando dados demo como fallback...');
+            loadDemoAutomationData();
+        } else {
+            console.error('PROD: Fallback para dados demo desativado.');
+            showWarning('O sistema encontrou um erro e não pôde carregar os dados.');
+        }
+
     } catch (fallbackError) {
         console.error('🚨 Erro no fallback de automação:', fallbackError);
         showError('Sistema temporariamente indisponível. Tente recarregar a página.');
@@ -2403,13 +2384,13 @@ async function handleCriticalError(error) {
 function loadDemoAutomationData() {
     try {
         console.log('🤖 Carregando dados demo de automação...');
-        
+
         // Demo data
         const demoData = {
             rules: [
                 {
                     id: 'demo1',
-                    name: 'Nutrição de Leads',
+                    name: 'Nutrição de Leads (DEMO)',
                     description: 'Sequência automática de emails para novos leads',
                     type: 'lead_nurturing',
                     status: 'active',
@@ -2422,7 +2403,7 @@ function loadDemoAutomationData() {
                 },
                 {
                     id: 'demo2',
-                    name: 'Follow-up Automático',
+                    name: 'Follow-up Automático (DEMO)',
                     description: 'Follow-up após 3 dias sem resposta',
                     type: 'follow_up',
                     status: 'active',
@@ -2437,7 +2418,7 @@ function loadDemoAutomationData() {
             executions: [
                 {
                     id: 'exec1',
-                    rule_name: 'Nutrição de Leads',
+                    rule_name: 'Nutrição de Leads (DEMO)',
                     status: 'success',
                     started_at: new Date().toISOString(),
                     completed_at: new Date().toISOString(),
@@ -2460,13 +2441,13 @@ function loadDemoAutomationData() {
             n8nWorkflows: [],
             whatsappIntegration: null
         };
-        
+
         applyAutomationData(demoData);
         renderAutomationInterface();
-        
+
         console.log('✅ Dados demo de automação carregados com sucesso');
         showWarning('Usando dados demo - verifique a conexão com o Supabase');
-        
+
     } catch (error) {
         console.error('❌ Erro ao carregar dados demo de automação:', error);
         showError('Erro ao carregar dados demo de automação');
@@ -2479,7 +2460,7 @@ function loadDemoAutomationData() {
  */
 function cleanup() {
     try {
-        // Clear intervals and subscriptions
+        // Unsubscribe from all real-time channels
         const subscriptions = automationState.getState('subscriptions');
         if (subscriptions) {
             for (const [type, subscription] of subscriptions.entries()) {
@@ -2490,12 +2471,12 @@ function cleanup() {
                 }
             }
         }
-        
+
         // Clear cache
         automationState.clearCache();
-        
+
         console.log('✅ Cleanup de automação concluído');
-        
+
     } catch (error) {
         console.error('❌ Erro durante cleanup de automação:', error);
     }
@@ -2514,10 +2495,10 @@ const AutomationSystem = {
     // State management
     getState: () => automationState.getState(),
     setState: (updates, callback) => automationState.setState(updates, callback),
-    
+
     // Data operations
     refresh: loadAutomationDataWithCache,
-    
+
     // Rule operations
     createRule: async (ruleData) => {
         try {
@@ -2532,7 +2513,7 @@ const AutomationSystem = {
             return { success: false, error: error.message };
         }
     },
-    
+
     updateRule: async (ruleId, updates) => {
         try {
             const result = await updateAutomationRule(ruleId, updates);
@@ -2546,7 +2527,7 @@ const AutomationSystem = {
             return { success: false, error: error.message };
         }
     },
-    
+
     deleteRule: async (ruleId) => {
         try {
             const result = await deleteAutomationRule(ruleId);
@@ -2560,22 +2541,22 @@ const AutomationSystem = {
             return { success: false, error: error.message };
         }
     },
-    
+
     // Cache management
     clearCache: (filter) => automationState.clearCache(filter),
     getCacheStats: () => ({
         size: automationState.state.cache.data.size,
         hits: automationState.getState('metrics').cacheHits
     }),
-    
+
     // Performance monitoring
     getMetrics: () => automationState.getState('metrics'),
-    
+
     // Configuration
     getConfig: () => AUTOMATION_CONFIG,
-    
+
     // Version info
-    version: '5.0.0',
+    version: '5.0.1',
     buildDate: new Date().toISOString()
 };
 
@@ -2598,9 +2579,8 @@ export {
 // Also attach to window for backward compatibility
 window.AutomationSystem = AutomationSystem;
 
-console.log('🤖 Sistema de Automações Enterprise V5.0 NASA 10/10 carregado - Pronto para dados reais!');
+console.log('🤖 Sistema de Automações Enterprise V5.0.1 NASA 10/10 CORRIGIDO - Pronto para dados reais!');
 console.log('✅ ES Modules e Vite compatibility otimizados');
 console.log('🚀 Performance e cache inteligente implementados');
 console.log('🔒 Segurança e validação enterprise ativas');
 console.log('⚡ Sistema de workflows e automações disponíveis');
-
