@@ -15,56 +15,43 @@ import { createClient } from '@supabase/supabase-js'
 // ✅ [FIXED] Added missing exports: getCurrentSession, createAuditLog, DEFAULT_ORG_ID, getOrganization, getUserProfile, onAuthStateChange, updateUserProfile
 // =========================================================================
 // =========================================================================
-// 🔐 REAL PRODUCTION CONFIGURATION - RAILWAY CREDENTIALS
+// 🔐 CONFIGURAÇÃO DE PRODUÇÃO - CORRIGIDO PARA VITE/VERCEL
 // =========================================================================
-// Configuração das credenciais Supabase
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Log para debug (apenas em desenvolvimento)
-if (import.meta.env.DEV) {
-  console.log('Supabase config check:', {
-    hasUrl: !!SUPABASE_URL,
-    hasKey: !!SUPABASE_ANON_KEY,
-    urlLength: SUPABASE_URL?.length,
-    keyLength: SUPABASE_ANON_KEY?.length
-  })
-}
-
-// Aviso se credenciais não foram encontradas (mas não bloqueia)
+// Verificação Robusta de Credenciais
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Credenciais do Supabase não encontradas nas variáveis de ambiente')
-  console.warn('Verificar: VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel')
-  
-  // Em produção, tenta usar valores padrão se disponíveis
-  const fallbackUrl = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co'
-  const fallbackKey = '' // Adicione sua chave aqui como fallback se quiser
-  
-  if (!SUPABASE_URL && fallbackUrl) {
-    console.warn('Usando URL de fallback')
-  }
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.error("🚨 ERRO CRÍTICO: Credenciais do Supabase não configuradas! 🚨");
+    console.error("Verifique suas variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel.");
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    // Lançar um erro para parar a execução e evitar comportamento inesperado.
+    // Isso garante que o problema seja óbvio e não passe despercebido.
+    throw new Error("Supabase credentials are not configured. Application cannot start.");
 } else {
-  console.log('✅ Credenciais do Supabase carregadas com sucesso')
+    console.log("✅ Credenciais do Supabase carregadas com sucesso!");
 }
+
 // 🏗️ ENTERPRISE CLIENT WITH REAL CREDENTIALS
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'alsham-360-prima@8.0.0',
-      'X-Environment': import.meta.env.MODE || 'production'
-    }
-  }
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'alsham-360-prima@8.0.0',
+      'X-Environment': import.meta.env.MODE || 'production'
+    }
+  }
 })
 // =========================================================================
 // 🔧 ENTERPRISE UTILITIES - ENHANCED ERROR HANDLING
