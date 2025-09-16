@@ -4,22 +4,21 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Analytics e Relatórios Enterprise do ALSHAM 360° PRIMA. Dashboards avançados, KPIs em tempo real, previsões de IA e exportação multi-formato com conformidade LGPD.">
-    <meta name="keywords" content="analytics, relatórios, dashboard, KPI, BI, business intelligence, CRM, ALSHAM">
+    <meta name="description" content="Sistema de Gamificação Enterprise do ALSHAM 360° PRIMA. Pontos, badges, leaderboards e progressão em tempo real com integração Supabase.">
+    <meta name="keywords" content="gamificação, pontos, badges, leaderboard, CRM, ALSHAM">
     <meta name="robots" content="noindex, nofollow">
     <meta name="author" content="ALSHAM Development Team">
     <meta name="theme-color" content="#3B82F6">
-    
+   
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
-    <meta property="og:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
+    <meta property="og:title" content="Gamificação Enterprise - ALSHAM 360° PRIMA">
+    <meta property="og:description" content="Sistema de pontos, badges e leaderboards para motivar sua equipe">
     <meta property="og:image" content="/og-image.png">
-    
+   
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
-    <meta property="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
+    <meta property="twitter:title" content="Gamificação Enterprise - ALSHAM 360° PRIMA">
+    <meta property="twitter:description" content="Sistema de pontos, badges e leaderboards para motivar sua equipe">
     <meta property="twitter:image" content="/og-image.png">
-
     <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
@@ -33,20 +32,19 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    
-    <title>Relatórios Enterprise - ALSHAM 360° PRIMA</title>
-    
+   
+    <title>Gamificação Enterprise - ALSHAM 360° PRIMA</title>
+   
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.webmanifest">
-    
+   
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+   
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+   
     <link rel="stylesheet" href="/src/style.css">
-
     <style>
         /* Enterprise CSS Variables */
         :root {
@@ -65,19 +63,19 @@
             --border-radius-2xl: 1rem;
             --transition-all: all 0.3s ease-in-out;
         }
-        
+       
         /* Base styles */
-        body { 
-            font-family: 'Inter', sans-serif; 
+        body {
+            font-family: 'Inter', sans-serif;
             font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
             overflow-x: hidden;
         }
-        
+       
         /* Premium gradient background */
         .bg-gradient-premium {
             background: var(--primary-gradient);
         }
-        
+       
         /* Enterprise button styles - No @apply rules */
         .btn-primary {
             display: inline-flex;
@@ -97,17 +95,17 @@
             font-size: 0.875rem;
             line-height: 1.25rem;
         }
-        
+       
         .btn-primary:hover {
             box-shadow: var(--shadow-xl);
             transform: translateY(-0.125rem);
         }
-        
+       
         .btn-primary:focus {
             outline: none;
             box-shadow: var(--shadow-xl), 0 0 0 4px rgb(59 130 246 / 0.3);
         }
-        
+       
         .btn-outline {
             display: inline-flex;
             align-items: center;
@@ -123,17 +121,17 @@
             text-decoration: none;
             font-size: 0.875rem;
         }
-        
+       
         .btn-outline:hover {
             border-color: #9ca3af;
             background: #f9fafb;
         }
-        
+       
         .btn-outline:focus {
             outline: none;
             box-shadow: 0 0 0 4px rgb(156 163 175 / 0.3);
         }
-        
+       
         .btn-outline-sm {
             padding: 0.25rem 0.75rem;
             font-size: 0.875rem;
@@ -143,11 +141,11 @@
             background: white;
             transition: all 0.2s ease-in-out;
         }
-        
+       
         .btn-outline-sm:hover {
             background: #f9fafb;
         }
-        
+       
         /* Premium card styles */
         .card-premium {
             background: white;
@@ -156,11 +154,11 @@
             border: 1px solid #f3f4f6;
             transition: var(--transition-all);
         }
-        
+       
         .card-premium:hover {
             box-shadow: var(--shadow-xl);
         }
-        
+       
         /* KPI Card styles */
         .kpi-card {
             background: white;
@@ -172,12 +170,12 @@
             cursor: pointer;
             transform: translateY(0);
         }
-        
+       
         .kpi-card:hover {
             box-shadow: var(--shadow-xl);
             transform: translateY(-0.25rem);
         }
-        
+       
         /* Chart container styles */
         .chart-container {
             background: white;
@@ -187,45 +185,45 @@
             border: 1px solid #f3f4f6;
             min-height: 400px;
         }
-        
+       
         /* Loading spinner */
         .loading-spinner {
             animation: spin 1s linear infinite;
         }
-        
+       
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        
+       
         /* Animation styles */
         .fade-in {
             animation: fadeIn 0.6s ease-out;
         }
-        
+       
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+       
         .slide-in {
             animation: slideIn 0.4s ease-out;
         }
-        
+       
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(-20px); }
             to { opacity: 1; transform: translateX(0); }
         }
-        
+       
         .pulse-dot {
             animation: pulse 2s infinite;
         }
-        
+       
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        
+       
         /* Gradient text */
         .gradient-text {
             background: var(--primary-gradient);
@@ -233,28 +231,28 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+       
         /* Glass effect */
         .glass-effect {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+       
         /* Chart skeleton loading */
         .chart-skeleton {
             background: #e5e7eb;
             border-radius: 0.5rem;
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+       
         /* Performance bar */
         .performance-bar {
             height: 4px;
             border-radius: 2px;
             transition: width 0.5s ease-in-out;
         }
-        
+       
         /* Insight card */
         .insight-card {
             background: linear-gradient(to bottom right, #faf5ff, #eff6ff);
@@ -263,7 +261,7 @@
             padding: 1rem;
             margin-bottom: 0.75rem;
         }
-        
+       
         /* Forecast card */
         .forecast-card {
             background: linear-gradient(to bottom right, #f0fdf4, #ecfdf5);
@@ -271,7 +269,7 @@
             border-radius: var(--border-radius-xl);
             padding: 1rem;
         }
-        
+       
         /* Activity item */
         .activity-item {
             display: flex;
@@ -281,35 +279,35 @@
             border-radius: 0.5rem;
             transition: background-color 0.2s ease-in-out;
         }
-        
+       
         .activity-item:hover {
             background: #f9fafb;
         }
-        
+       
         /* Goal progress ring */
         .goal-progress-ring {
             transform: rotate(-90deg);
         }
-        
+       
         /* Notification animations */
         .notification-enter {
             animation: slideInRight 0.3s ease-out;
         }
-        
+       
         .notification-exit {
             animation: slideOutRight 0.3s ease-in;
         }
-        
+       
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        
+       
         @keyframes slideOutRight {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
         }
-        
+       
         /* Chart.js custom styles */
         .chartjs-tooltip {
             background: #1f2937;
@@ -319,20 +317,20 @@
             padding: 0.75rem;
             box-shadow: var(--shadow-lg);
         }
-        
+       
         /* Responsive grid for KPIs */
         .kpis-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
         }
-        
+       
         /* Performance table styles */
         .performance-table {
             width: 100%;
             border-collapse: collapse;
         }
-        
+       
         .performance-table th {
             background: #f9fafb;
             text-align: left;
@@ -344,7 +342,7 @@
             padding: 0.75rem 1.5rem;
             border-bottom: 1px solid #e5e7eb;
         }
-        
+       
         .performance-table td {
             padding: 1rem 1.5rem;
             white-space: nowrap;
@@ -352,11 +350,11 @@
             color: #1f2937;
             border-bottom: 1px solid #f3f4f6;
         }
-        
+       
         .performance-table tbody tr:hover {
             background: #eff6ff;
         }
-        
+       
         /* Filter pills */
         .filter-pill {
             display: inline-flex;
@@ -368,21 +366,21 @@
             cursor: pointer;
             transition: all 0.2s ease-in-out;
         }
-        
+       
         .filter-pill.active {
             background: #dbeafe;
             color: #1e40af;
         }
-        
+       
         .filter-pill.inactive {
             background: #f3f4f6;
             color: #6b7280;
         }
-        
+       
         .filter-pill.inactive:hover {
             background: #e5e7eb;
         }
-        
+       
         /* Header styles */
         .header-premium {
             background: rgba(255, 255, 255, 0.9);
@@ -395,71 +393,71 @@
         }
     </style>
 </head>
-
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-    
+   
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
         Pular para o conteúdo principal
     </a>
-    
-    <div id="reports-loader" class="fixed top-0 left-0 right-0 z-50 hidden" role="status" aria-live="polite">
+   
+    <div id="gamification-loader" class="fixed top-0 left-0 right-0 z-50 hidden" role="status" aria-live="polite">
         <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium">
             <div class="flex items-center justify-center space-x-2">
                 <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full" aria-hidden="true"></div>
-                <span>Carregando analytics...</span>
+                <span>Carregando gamificação...</span>
             </div>
         </div>
     </div>
-    
+   
     <header class="header-premium" role="banner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
-                    <a href="/index.html" 
-                       class="flex items-center space-x-3 group focus-visible" 
+                    <a href="/index.html"
+                       class="flex items-center space-x-3 group focus-visible"
                        aria-label="Voltar ao Dashboard">
                         <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform" aria-hidden="true">
                             <span class="text-white font-bold text-lg">A</span>
                         </div>
                         <div>
                             <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-                            <p class="text-xs text-gray-500 -mt-1">Enterprise Analytics</p>
+                            <p class="text-xs text-gray-500 -mt-1">Enterprise Gamificação</p>
                         </div>
                     </a>
                 </div>
-                
+               
                 <nav class="hidden md:flex items-center space-x-8" role="navigation" aria-label="Navegação Principal">
                     <a href="/dashboard.html" class="nav-link focus-visible">Dashboard</a>
                     <a href="/leads.html" class="nav-link focus-visible">Leads</a>
-                    <a href="/relatorios.html" class="nav-link active focus-visible" aria-current="page">Relatórios</a>
+                    <a href="/relatorios.html" class="nav-link focus-visible">Relatórios</a>
                     <a href="/automacoes.html" class="nav-link focus-visible">Automações</a>
+                    <a href="/gamificacao.html" class="nav-link active focus-visible" aria-current="page">Gamificação</a>
                 </nav>
-                
+               
                 <div class="flex items-center space-x-4">
-                    <button id="refresh-reports" 
-                            class="p-2 text-gray-400 hover:text-gray-600 transition-colors relative focus-visible" 
-                            title="Atualizar dados" 
-                            aria-label="Atualizar dados dos relatórios">
+                    <button id="refresh-gamification"
+                            class="p-2 text-gray-400 hover:text-gray-600 transition-colors relative focus-visible"
+                            title="Atualizar dados"
+                            aria-label="Atualizar dados de gamificação">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                         <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full pulse-dot status-online" aria-hidden="true"></span>
                     </button>
-                    
-                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus-visible" 
-                            title="Notificações" 
+                   
+                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus-visible"
+                            title="Notificações"
                             aria-label="Abrir notificações">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.97 4.97a.75.75 0 0 0-1.08 1.08L15.44 11.6a.75.75 0 0 0 1.08-1.08L10.97 4.97z"></path>
                         </svg>
                     </button>
-                    
+                   
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold" data-auth="user-avatar" aria-hidden="true">A</div>
-                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Analista</span>
-                        <button data-auth="logout-btn" 
-                                class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus-visible" 
-                                title="Sair" 
+                        <span class="hidden sm:block text-sm font-medium text-gray-700" data-auth="user-name">Usuário</span>
+                        <button data-auth="logout-btn"
+                                class="p-2 text-gray-400 hover:text-gray-600 transition-colors focus-visible"
+                                title="Sair"
                                 aria-label="Fazer logout">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -470,52 +468,49 @@
             </div>
         </div>
     </header>
-
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <nav class="flex items-center space-x-2 text-sm" role="navigation" aria-label="Breadcrumb">
             <a href="/index.html" class="breadcrumb-link focus-visible">Home</a>
             <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
             </svg>
-            <span class="text-gray-900 font-medium" aria-current="page">Analytics & Relatórios</span>
+            <span class="text-gray-900 font-medium" aria-current="page">Gamificação</span>
         </nav>
     </div>
-
     <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
-        
+       
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-3xl font-bold text-gray-900 flex items-center space-x-3">
-                    <span class="text-4xl" role="img" aria-label="Gráfico">📊</span>
-                    <span class="gradient-text">Analytics Enterprise</span>
+                    <span class="text-4xl" role="img" aria-label="Jogo">🎮</span>
+                    <span class="gradient-text">Gamificação Enterprise</span>
                 </h1>
-                <p class="text-gray-600 mt-2">Insights inteligentes e previsões em tempo real para maximizar resultados</p>
+                <p class="text-gray-600 mt-2">Pontos, badges e leaderboards para motivar sua equipe em tempo real</p>
             </div>
-            
+           
             <div class="flex items-center space-x-3">
-                <button class="btn-outline focus-visible" aria-label="Exportar relatórios">
+                <button class="btn-outline focus-visible" aria-label="Exportar progresso">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Exportar
                 </button>
-                <button id="export-menu-toggle" class="btn-primary focus-visible" aria-label="Gerar novo relatório">
+                <button id="refresh-gamification" class="btn-primary focus-visible" aria-label="Atualizar gamificação">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    Gerar Relatório
+                    Atualizar
                 </button>
             </div>
         </div>
-
-        <section class="mb-8" aria-labelledby="kpis-heading">
-            <h2 id="kpis-heading" class="sr-only">Indicadores-chave de performance</h2>
+        <section class="mb-8" aria-labelledby="stats-heading">
+            <h2 id="stats-heading" class="sr-only">Estatísticas de gamificação</h2>
             <div class="kpis-grid">
-                
-                <div class="kpi-card fade-in focus-visible" 
-                     tabindex="0" 
-                     role="button" 
-                     aria-label="Receita total: R$ 847.250">
+               
+                <div class="kpi-card fade-in focus-visible"
+                     tabindex="0"
+                     role="button"
+                     aria-label="Pontos totais: 1.250 pontos">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -528,18 +523,17 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h3 class="text-sm font-medium text-gray-600">Receita Total</h3>
-                        <p class="text-2xl font-bold text-gray-900">R$ 847.250</p>
+                        <h3 class="text-sm font-medium text-gray-600">Pontos Totais</h3>
+                        <p class="text-2xl font-bold text-gray-900">1.250</p>
                     </div>
                     <div class="performance-bar bg-green-200">
                         <div class="performance-bar bg-green-500" style="width: 85%"></div>
                     </div>
                 </div>
-
-                <div class="kpi-card fade-in focus-visible" 
-                     tabindex="0" 
-                     role="button" 
-                     aria-label="Leads convertidos: 342 leads" 
+                <div class="kpi-card fade-in focus-visible"
+                     tabindex="0"
+                     role="button"
+                     aria-label="Badges conquistados: 12 badges"
                      style="animation-delay: 0.1s;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -553,18 +547,17 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h3 class="text-sm font-medium text-gray-600">Leads Convertidos</h3>
-                        <p class="text-2xl font-bold text-gray-900">342</p>
+                        <h3 class="text-sm font-medium text-gray-600">Badges Conquistados</h3>
+                        <p class="text-2xl font-bold text-gray-900">12</p>
                     </div>
                     <div class="performance-bar bg-blue-200">
                         <div class="performance-bar bg-blue-500" style="width: 68%"></div>
                     </div>
                 </div>
-
-                <div class="kpi-card fade-in focus-visible" 
-                     tabindex="0" 
-                     role="button" 
-                     aria-label="Taxa de conversão: 24.8%" 
+                <div class="kpi-card fade-in focus-visible"
+                     tabindex="0"
+                     role="button"
+                     aria-label="Nível atual: 7 níveis"
                      style="animation-delay: 0.2s;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -578,18 +571,17 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h3 class="text-sm font-medium text-gray-600">Taxa de Conversão</h3>
-                        <p class="text-2xl font-bold text-gray-900">24.8%</p>
+                        <h3 class="text-sm font-medium text-gray-600">Nível Atual</h3>
+                        <p class="text-2xl font-bold text-gray-900">7</p>
                     </div>
                     <div class="performance-bar bg-purple-200">
                         <div class="performance-bar bg-purple-500" style="width: 75%"></div>
                     </div>
                 </div>
-
-                <div class="kpi-card fade-in focus-visible" 
-                     tabindex="0" 
-                     role="button" 
-                     aria-label="Ticket médio: R$ 2.475" 
+                <div class="kpi-card fade-in focus-visible"
+                     tabindex="0"
+                     role="button"
+                     aria-label="Posição no leaderboard: #3"
                      style="animation-delay: 0.3s;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -603,8 +595,8 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h3 class="text-sm font-medium text-gray-600">Ticket Médio</h3>
-                        <p class="text-2xl font-bold text-gray-900">R$ 2.475</p>
+                        <h3 class="text-sm font-medium text-gray-600">Posição no Leaderboard</h3>
+                        <p class="text-2xl font-bold text-gray-900">#3</p>
                     </div>
                     <div class="performance-bar bg-orange-200">
                         <div class="performance-bar bg-orange-500" style="width: 62%"></div>
@@ -612,45 +604,42 @@
                 </div>
             </div>
         </section>
-
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" aria-labelledby="charts-heading">
-            <h2 id="charts-heading" class="sr-only">Gráficos e análises</h2>
-            
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" aria-labelledby="progress-heading">
+            <h2 id="progress-heading" class="sr-only">Progresso e badges</h2>
+           
             <div class="chart-container fade-in" style="animation-delay: 0.4s;">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900">Receita por Período</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Progresso de Pontos</h3>
                     <div class="flex space-x-2">
                         <button class="filter-pill active focus-visible" data-period="30d">30 dias</button>
                         <button class="filter-pill inactive focus-visible" data-period="90d">90 dias</button>
                         <button class="filter-pill inactive focus-visible" data-period="1y">1 ano</button>
                     </div>
                 </div>
-                <div id="revenue-chart" class="h-80" role="img" aria-label="Gráfico de receita por período">
-                    <canvas id="revenueChart" aria-label="Gráfico de receita por período"></canvas>
+                <div id="points-chart" class="h-80" role="img" aria-label="Gráfico de progresso de pontos">
+                    <canvas id="pointsChart" aria-label="Gráfico de progresso de pontos"></canvas>
                 </div>
             </div>
-
             <div class="chart-container fade-in" style="animation-delay: 0.5s;">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900">Funil de Conversão</h3>
-                    <button class="btn-outline-sm focus-visible">Ver detalhes</button>
+                    <h3 class="text-lg font-semibold text-gray-900">Badges Conquistados</h3>
+                    <button class="btn-outline-sm focus-visible">Ver todos</button>
                 </div>
-                <div id="funnel-chart" class="h-80" role="img" aria-label="Gráfico de funil de conversão">
-                    <canvas id="funnelChart" aria-label="Gráfico de funil de conversão"></canvas>
+                <div id="badges-grid" class="h-80" role="img" aria-label="Grid de badges conquistados">
+                    <!-- Badges serão renderizados aqui via JS -->
                 </div>
             </div>
         </section>
-
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-8" aria-labelledby="insights-heading">
             <h2 id="insights-heading" class="sr-only">Insights e atividades</h2>
-            
+           
             <div class="lg:col-span-2">
                 <div class="card-premium p-6 fade-in" style="animation-delay: 0.6s;">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <span class="mr-2" role="img" aria-label="Inteligência artificial">🤖</span>
-                        Insights de IA
+                        Insights de Gamificação
                     </h3>
-                    
+                   
                     <div class="space-y-4">
                         <div class="insight-card">
                             <div class="flex items-start space-x-3">
@@ -660,12 +649,11 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-medium text-gray-900">Oportunidade de Crescimento</h4>
-                                    <p class="text-sm text-gray-600 mt-1">Leads do segmento "Tecnologia" têm 35% mais chance de conversão. Considere aumentar investimento neste canal.</p>
+                                    <h4 class="font-medium text-gray-900">Dica para Pontos</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Complete follow-ups diários para multiplicar seus pontos por 1.5x.</p>
                                 </div>
                             </div>
                         </div>
-
                         <div class="insight-card">
                             <div class="flex items-start space-x-3">
                                 <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -674,12 +662,11 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-medium text-gray-900">Padrão Temporal</h4>
-                                    <p class="text-sm text-gray-600 mt-1">Terças e quartas-feiras apresentam 28% mais conversões. Otimize campanhas para estes dias.</p>
+                                    <h4 class="font-medium text-gray-900">Próximo Badge</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Feche 5 negócios para desbloquear 'Vendedor Estrela'.</p>
                                 </div>
                             </div>
                         </div>
-
                         <div class="forecast-card">
                             <div class="flex items-start space-x-3">
                                 <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -688,21 +675,20 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-medium text-gray-900">Previsão para Próximo Mês</h4>
-                                    <p class="text-sm text-gray-600 mt-1">Com base nos padrões atuais, esperamos receita de <strong>R$ 920.000</strong> (+8.6%) no próximo mês.</p>
+                                    <h4 class="font-medium text-gray-900">Previsão de Nível</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Mantenha o ritmo para atingir Nível 8 em 2 semanas.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="card-premium p-6 fade-in" style="animation-delay: 0.7s;">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <span class="mr-2" role="img" aria-label="Atividade">⚡</span>
                     Atividade Recente
                 </h3>
-                
+               
                 <div class="space-y-4">
                     <div class="activity-item">
                         <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -714,7 +700,7 @@
                             <p class="text-xs text-gray-500 mt-1">2 minutos atrás</p>
                         </div>
                     </div>
-                    
+                   
                     <div class="activity-item">
                         <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                             <span class="text-blue-600 text-sm" role="img" aria-label="Lead">👤</span>
@@ -725,7 +711,7 @@
                             <p class="text-xs text-gray-500 mt-1">15 minutos atrás</p>
                         </div>
                     </div>
-                    
+                   
                     <div class="activity-item">
                         <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                             <span class="text-purple-600 text-sm" role="img" aria-label="Reunião">📞</span>
@@ -740,18 +726,13 @@
             </div>
         </section>
     </main>
-
-    <div id="export-options" class="hidden" role="dialog" aria-labelledby="export-modal-title" aria-modal="true">
-    </div>
-
-    <div id="reports-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" role="region" aria-label="Notificações" aria-live="polite"></div>
-
+    <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" role="region" aria-label="Notificações" aria-live="polite"></div>
     <noscript>
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
                 <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
                 <p class="text-gray-600 mb-6">
-                    Esta aplicação requer JavaScript para funcionar corretamente. 
+                    Esta aplicação requer JavaScript para funcionar corretamente.
                     Por favor, habilite o JavaScript em seu navegador e recarregue a página.
                 </p>
                 <button onclick="location.reload()" class="btn-primary">
@@ -760,17 +741,15 @@
             </div>
         </div>
     </noscript>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="/src/components/navigation.js"></script>
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/js/auth.js"></script>
-    <script type="module" src="/src/js/relatorios.js"></script>
-
+    <script type="module" src="/src/js/gamificacao.js"></script>
     <script type="module">
-        // Configuração inicial antes do carregamento do relatórios.js
-        console.log('📊 Inicializando sistema de relatórios enterprise...');
-        
+        // Configuração inicial antes do carregamento do gamificacao.js
+        console.log('🎮 Inicializando sistema de gamificação enterprise...');
+       
         document.addEventListener('DOMContentLoaded', () => {
             // Remover skeletons quando dados carregarem
             setTimeout(() => {
@@ -780,14 +759,14 @@
                     skeleton.classList.add('fade-in');
                 });
             }, 2000);
-            
+           
             // Adicionar efeitos de hover aos KPIs
             const kpiCards = document.querySelectorAll('.kpi-card');
             kpiCards.forEach(card => {
                 card.addEventListener('mouseenter', () => {
                     card.style.transform = 'translateY(-4px)';
                 });
-                
+               
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = 'translateY(0)';
                 });
