@@ -26,11 +26,12 @@
   <!-- Segurança -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     font-src 'self' https://fonts.gstatic.com;
+    frame-src 'self' https://apis.google.com;
   " />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
@@ -47,14 +48,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
 
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
   <a href="#main-content" class="sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
 
   <!-- Loader -->
-  <div id="gamification-loader" class="hidden fixed top-0 left-0 right-0 z-50" role="status" aria-live="polite">
+  <div id="gamification-loader" class="fixed top-0 left-0 right-0 z-50" role="status" aria-live="polite">
     <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium flex items-center justify-center space-x-2">
       <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
       <span>Carregando gamificação...</span>
@@ -85,9 +86,9 @@
     </div>
   </header>
 
-  <!-- Conteúdo principal (KPIs, gráficos, insights, atividades) -->
+  <!-- Conteúdo principal -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- ... (mantém mesma estrutura das cards, charts e insights do seu HTML atual) ... -->
+    <!-- ... KPIs, gráficos, insights ... -->
   </main>
 
   <!-- Notificações -->
@@ -95,15 +96,14 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/gamificacao.js"></script>
+  <script type="module" src="/src/components/navigation.js"></script>
+  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/js/auth.js"></script>
+  <script type="module" src="/src/js/gamificacao.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🎮 Gamificação enterprise inicializada');
-      // Esconde loader após carregar
-      document.getElementById('gamification-loader').classList.add('hidden');
+      document.getElementById('gamification-loader').style.display = 'none';
     });
   </script>
 </body>
