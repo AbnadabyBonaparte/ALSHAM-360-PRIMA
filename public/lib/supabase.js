@@ -1,6 +1,6 @@
 // ALSHAM 360° PRIMA - SUPABASE LIB COMPLETA V9 (55 TABELAS/VIEWS)
 // VERSÃO 9.0 - ENTERPRISE PRODUCTION READY WITH REAL DATA
-import { createClient } from '@supabase/supabase-js';
+// CORRIGIDO PARA BROWSER - SEM ES6 MODULES
 
 // =========================================================================
 // 🚀 ENTERPRISE PRODUCTION NOTES V9 - NASA 10/10 GRADE
@@ -15,44 +15,64 @@ import { createClient } from '@supabase/supabase-js';
 // ✅ [ENTERPRISE] Complete CRUD for all entities (no mocks)
 // ✅ [FIXED] Full exports, added real-time helpers, performance limits
 // ✅ [NEW] Integrated Sentry-like logging (console for now; extend to tool)
+// ✅ [BROWSER-FIXED] Removido ES6 imports - usa CDN via window.supabase
 // =========================================================================
 
-// 🔐 CONFIGURAÇÃO DE PRODUÇÃO - VITE/VERCEL OPTIMIZED
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// IMPORTANTE: Adicione este script no HTML ANTES de carregar este arquivo:
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-// Verificação Robusta de Credenciais
+// 🔐 CONFIGURAÇÃO DE PRODUÇÃO - VITE/VERCEL OPTIMIZED
+const SUPABASE_URL = import.meta?.env?.VITE_SUPABASE_URL || window.__VITE_SUPABASE_URL__;
+const SUPABASE_ANON_KEY = import.meta?.env?.VITE_SUPABASE_ANON_KEY || window.__VITE_SUPABASE_ANON_KEY__;
+
+// Fallback para desenvolvimento se as variáveis não estiverem disponíveis
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  console.error("🚨 ERRO CRÍTICO: Credenciais do Supabase não configuradas! 🚨");
-  console.error("Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel.");
-  console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  throw new Error("Supabase credentials not configured. Application cannot start.");
-} else {
-  console.log("✅ Credenciais do Supabase carregadas com sucesso!");
-  console.log("✅✅✅ VERSÃO DO ARQUIVO: " + new Date().toISOString());
+  console.warn("⚠️ Variáveis de ambiente não encontradas via import.meta, tentando window...");
+  if (!window.__VITE_SUPABASE_URL__ || !window.__VITE_SUPABASE_ANON_KEY__) {
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.error("🚨 ERRO CRÍTICO: Credenciais do Supabase não configuradas! 🚨");
+    console.error("Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel.");
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    throw new Error("Supabase credentials not configured. Application cannot start.");
+  }
 }
 
+// Verificar se o Supabase CDN foi carregado
+if (!window.supabase) {
+  console.error("🚨 ERRO: Supabase CDN não carregado!");
+  console.error("Adicione este script no HTML: <script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'></script>");
+  throw new Error("Supabase CDN not loaded. Add the CDN script to your HTML.");
+}
+
+const { createClient } = window.supabase;
+
+console.log("✅ Credenciais do Supabase carregadas com sucesso!");
+console.log("✅✅✅ VERSÃO DO ARQUIVO: " + new Date().toISOString());
+
 // 🏗️ ENTERPRISE CLIENT WITH REAL CREDENTIALS
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'alsham-360-prima@9.0.0',
-      'X-Environment': import.meta.env.MODE || 'production'
+export const supabase = createClient(
+  SUPABASE_URL || window.__VITE_SUPABASE_URL__, 
+  SUPABASE_ANON_KEY || window.__VITE_SUPABASE_ANON_KEY__, 
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce'
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'alsham-360-prima@9.0.0',
+        'X-Environment': 'production'
+      }
     }
   }
-});
+);
 
 // =========================================================================
 // 🔧 ENTERPRISE UTILITIES - ENHANCED ERROR HANDLING
@@ -292,3 +312,22 @@ export function sanitizeInput(input, options = {}) {
 
 // Export Default (para import fácil)
 export default supabase;
+
+// Para compatibility com window global
+if (typeof window !== 'undefined') {
+  window.AlshamSupabase = {
+    supabase,
+    getCurrentSession,
+    onAuthStateChange,
+    createAuditLog,
+    getOrganization,
+    getUserProfile,
+    updateUserProfile,
+    getLeads,
+    createLead,
+    subscribeToTable,
+    formatDateBR,
+    formatTimeAgo,
+    sanitizeInput
+  };
+}
