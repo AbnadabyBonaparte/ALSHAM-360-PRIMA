@@ -1,6 +1,6 @@
-// src/js/dashboard-real.js - VERSÃO FIXADA PARA PRODUÇÃO REAL COM SUPABASE V9
+// public/js/dashboard-real.js - VERSÃO FIXADA PARA PRODUÇÃO REAL COM SUPABASE V9
 // ===== CLIENTE SUPABASE UNIFICADO =====
-import { supabase, getCurrentSession, genericSelect, genericInsert, subscribeToTable } from '../lib/supabase.js';
+import { supabase, getCurrentSession, genericSelect, genericInsert, subscribeToTable } from '/lib/supabase.js';
 
 /**
  * ALSHAM 360° PRIMA - Integração Real com Supabase
