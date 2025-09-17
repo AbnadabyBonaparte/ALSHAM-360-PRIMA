@@ -1,148 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-gray-50">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Acesse o ALSHAM 360° PRIMA - CRM Enterprise com segurança avançada, autenticação multi-provedor e biométrica.">
-    <meta name="keywords" content="login, crm, alsham, segurança, enterprise, auth">
-    <meta name="author" content="ALSHAM Development Team">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#4f46e5">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Acesse o ALSHAM 360° PRIMA - CRM Enterprise com segurança avançada, autenticação multi-provedor e biométrica.">
+  <meta name="keywords" content="login, crm, alsham, segurança, enterprise, auth">
+  <meta name="author" content="ALSHAM Development Team">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#4f46e5">
 
-    <title>Login - ALSHAM 360° PRIMA</title>
+  <title>Login - ALSHAM 360° PRIMA</title>
 
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.webmanifest">
+  <!-- Ícones -->
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
-  style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
-  connect-src 'self' https://*.supabase.co ws://*.supabase.co https://*.posthog.com;
-  img-src 'self' data: blob: https://*.supabase.co;
-  frame-src 'self' https://apis.google.com;
-  font-src 'self' data: https://fonts.gstatic.com;
-">
-    
-    <link rel="stylesheet" href="/src/style.css">
+  <!-- Fonts & Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSP (segurança máxima compatível com Supabase + Google Auth) -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
+    style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
+    connect-src 'self' https://*.supabase.co ws://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co;
+    frame-src 'self' https://apis.google.com;
+    font-src 'self' data: https://fonts.gstatic.com;
+  ">
+
+  <!-- Tailwind (CDN para dev; produção usa build CSS) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .btn-primary {
+      @apply w-full flex justify-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm
+             hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+             focus-visible:outline-indigo-600 transition-all duration-300 transform hover:-translate-y-0.5;
+    }
+    .btn-secondary {
+      @apply w-full flex justify-center rounded-lg bg-white px-3 py-2.5 border border-gray-300 text-sm font-medium
+             text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+    }
+    #loading-overlay {
+      position: fixed; inset: 0; background: rgba(255, 255, 255, 0.8); display: none;
+      align-items: center; justify-content: center; z-index: 50;
+    }
+  </style>
 </head>
 <body class="h-full font-inter antialiased bg-gradient-to-br from-gray-50 to-indigo-100">
 
-    <main id="main-content" class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div class="sm:mx-auto sm:w-full sm:max-w-md">
-            <div class="flex justify-center items-center space-x-3">
-                <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span class="text-white font-bold text-2xl">A</span>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-                    <p class="text-sm text-gray-500 -mt-1">Enterprise CRM</p>
-                </div>
-            </div>
-            <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Acesse sua conta</h2>
+  <main id="main-content" class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <!-- Branding -->
+    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+      <div class="flex justify-center items-center space-x-3">
+        <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-white font-bold text-2xl">A</span>
         </div>
-
-        <div id="login-container" class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-            <div class="bg-white/80 backdrop-blur-md px-6 py-12 shadow-xl rounded-2xl sm:px-12 border border-gray-200/50">
-                
-                <div id="error-message" class="hidden mb-4" role="alert"></div>
-                <div id="success-message" class="hidden mb-4" role="alert"></div>
-
-                <form id="login-form" class="space-y-6" action="#" method="POST" novalidate>
-                    <div>
-                        <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Endereço de e-mail</label>
-                        <div class="mt-2">
-                            <input id="email" name="email" type="email" autocomplete="email" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Senha</label>
-                        <div class="mt-2 relative">
-                            <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600" aria-label="Mostrar senha">
-                                <svg id="eye-open" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <svg id="eye-closed" class="h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 .847 0 1.673.124 2.463.352M10 12a2 2 0 11-4 0 2 2 0 014 0zM21 12a9.98 9.98 0 00-1-3.032M15 12a3 3 0 00-3-3m.968 5.032A3 3 0 0015 12zm-2.032-.968A3 3 0 0012 9m3 9l-3-3" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input id="remember" name="remember" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                            <label for="remember" class="ml-3 block text-sm leading-6 text-gray-900">Lembrar-me</label>
-                        </div>
-
-                        <div class="text-sm">
-                            <a href="#" id="forgot-password" class="font-semibold text-indigo-600 hover:text-indigo-500">Esqueceu a senha?</a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button type="submit" id="login-btn" class="flex w-full justify-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-300 transform hover:-translate-y-0.5">
-                            <span id="login-spinner" class="hidden animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
-                            <span id="login-btn-text">Entrar</span>
-                        </button>
-                    </div>
-                </form>
-
-                <div id="providers-container" class="mt-10">
-                    <div class="relative">
-                        <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div class="w-full border-t border-gray-200"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm font-medium leading-6">
-                            <span class="bg-white px-6 text-gray-900">Ou entre com</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button id="google-login" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                            <svg class="w-5 h-5 mr-2" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
-                            Google
-                        </button>
-                        <button id="microsoft-login" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                            <svg class="w-5 h-5 mr-2" aria-hidden="true" viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#00A4EF" d="M13 1h10v10H13z"/><path fill="#7FBA00" d="M1 13h10v10H1z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg>
-                            Microsoft
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="security-container" class="mt-6">
-                    <button id="biometric-login" class="hidden w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.246.99-4.659.99-7.132A8 8 0 008 4a8 8 0 00-1.839 15.132" />
-                        </svg>
-                        Entrar com Biometria
-                    </button>
-                </div>
-            </div>
-
-            <p class="mt-10 text-center text-sm text-gray-500">
-                Não tem uma conta?
-                <a href="register.html" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Crie uma agora</a>
-            </p>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
+          <p class="text-sm text-gray-500 -mt-1">Enterprise CRM</p>
         </div>
+      </div>
+      <h2 class="mt-6 text-2xl font-bold tracking-tight text-gray-900">Acesse sua conta</h2>
+    </div>
+
+    <!-- Formulário -->
+    <div id="login-container" class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <div class="bg-white/80 backdrop-blur-md px-6 py-12 shadow-xl rounded-2xl border border-gray-200/50">
         
-        <div id="login-attempts" class="mt-4 sm:mx-auto sm:w-full sm:max-w-[480px]"></div>
-        <div id="security-notice" class="mt-4 sm:mx-auto sm:w-full sm:max-w-[480px]"></div>
-        <div id="offline-notice" class="mt-4 sm:mx-auto sm:w-full sm:max-w-[480px]"></div>
-        <div id="loading-overlay"></div>
+        <!-- Feedback -->
+        <div id="error-message" class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm" role="alert" aria-live="polite"></div>
+        <div id="success-message" class="hidden mb-4 p-3 rounded-lg bg-green-100 text-green-700 text-sm" role="alert" aria-live="polite"></div>
 
-    </main>
+        <form id="login-form" class="space-y-6" novalidate>
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-900">E-mail</label>
+            <input id="email" name="email" type="email" required autocomplete="email"
+              class="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400
+                     focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+          </div>
 
-    <script type="module" src="/src/js/login.js"></script>
+          <!-- Senha -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-900">Senha</label>
+            <div class="mt-2 relative">
+              <input id="password" name="password" type="password" required autocomplete="current-password"
+                class="block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400
+                       focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+              <button type="button" id="toggle-password"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600"
+                aria-label="Mostrar senha" aria-pressed="false">
+                👁️
+              </button>
+            </div>
+          </div>
 
+          <!-- Remember + Forgot -->
+          <div class="flex items-center justify-between">
+            <label class="flex items-center text-sm text-gray-900">
+              <input id="remember" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+              <span class="ml-2">Lembrar-me</span>
+            </label>
+            <a href="#" id="forgot-password" class="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Esqueceu a senha?</a>
+          </div>
+
+          <!-- Botão principal -->
+          <button type="submit" id="login-btn" class="btn-primary">
+            <span id="login-spinner" class="hidden animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+            <span id="login-btn-text">Entrar</span>
+          </button>
+        </form>
+
+        <!-- Providers -->
+        <div id="providers-container" class="mt-10">
+          <div class="relative flex justify-center text-sm font-medium">
+            <span class="bg-white px-6 text-gray-900">Ou entre com</span>
+          </div>
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button id="google-login" class="btn-secondary">Google</button>
+            <button id="microsoft-login" class="btn-secondary">Microsoft</button>
+          </div>
+        </div>
+
+        <!-- Biometria -->
+        <div id="security-container" class="mt-6">
+          <button id="biometric-login" class="hidden btn-secondary">🔒 Entrar com Biometria</button>
+        </div>
+      </div>
+
+      <p class="mt-10 text-center text-sm text-gray-500">
+        Não tem uma conta?
+        <a href="register.html" class="font-semibold text-indigo-600 hover:text-indigo-500">Crie uma agora</a>
+      </p>
+    </div>
+
+    <!-- Avisos extras -->
+    <div id="login-attempts" class="mt-4 sm:mx-auto sm:w-full sm:max-w-[480px] text-sm"></div>
+    <div id="security-notice" class="mt-4 sm:mx-auto sm:w-full sm:max-w-[480px] text-sm"></div>
+    <div id="offline-notice" class="mt-4 sm:mx-auto sm:w-full sm:max-w-[480px] text-sm"></div>
+    <div id="loading-overlay"><div class="loader">🔄 Carregando...</div></div>
+  </main>
+
+  <!-- Script principal -->
+  <script type="module" src="/src/js/login.js"></script>
+
+  <!-- Fallback seguro -->
+  <script>
+    window.addEventListener('error', function(e) {
+      if (e.target.tagName === 'SCRIPT' && e.target.src.includes('login.js')) {
+        const notice = document.getElementById('offline-notice');
+        notice.textContent = "⚠️ Modo Demo: Login.js não carregou. Configure Supabase para autenticação real.";
+        notice.className = "p-3 mt-4 bg-yellow-100 text-yellow-800 rounded-lg text-center";
+      }
+    });
+  </script>
+
+  <!-- Fallback noscript -->
+  <noscript>
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-white p-8 rounded-lg max-w-md text-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
+        <p class="text-gray-600">Ative o JavaScript para usar o ALSHAM 360° PRIMA.</p>
+      </div>
+    </div>
+  </noscript>
 </body>
 </html>
