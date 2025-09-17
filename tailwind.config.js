@@ -2,43 +2,47 @@
 export default {
   content: [
     "./*.html",
-    "./src/**/*.js", // Inclui todos JS para purge de classes
+    "./src/**/*.js", // Inclui todos os JS para purge de classes
   ],
   theme: {
     extend: {
+      // ✅ Correção dos warnings: use valores arbitrários em vez de '05'
       translate: {
-        '05': '0.125rem', // Fix: '0.5' → '05' para evitar warnings
-        '15': '0.375rem',
-        '25': '0.625rem',
-        '35': '0.875rem',
+        // Agora é só usar class="translate-x-[0.125rem]" etc.
+        // Não gera mais warning no build
       },
       scale: {
-        '105': '1.05', // Extensões para animations suaves
+        '105': '1.05',
         '110': '1.10',
         '115': '1.15',
         '120': '1.20',
       },
       colors: {
-        // Temas custom enterprise para CRM (ajuste conforme UI)
-        primary: '#1E40AF', // Azul para ações principais (leads, auth)
+        // 🎨 Paleta enterprise padronizada ALSHAM
+        primary: '#1E40AF',   // Azul para ações principais
         secondary: '#10B981', // Verde para sucesso/gamificação
-        accent: '#F59E0B', // Amarelo para warnings/automations
-        danger: '#EF4444', // Vermelho para errors/relatórios
-        neutral: '#6B7280', // Cinza para texts/settings
+        accent: '#F59E0B',    // Amarelo para alertas/automations
+        danger: '#EF4444',    // Vermelho para erros/relatórios
+        neutral: '#6B7280',   // Cinza para textos/settings
       },
       boxShadow: {
-        'premium': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', // Sombras premium para cards
+        premium: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)', // Sombras premium
       },
       transitionProperty: {
-        'width-height': 'width, height', // Para animations em UI
+        'width-height': 'width, height', // Transições suaves em UI dinâmica
       },
     },
   },
   plugins: [
-    // Adicione plugins se necessário, ex.: require('@tailwindcss/forms') para forms premium
+    // Plugins recomendados para padrão enterprise:
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
   ],
   safelist: [
-    // Opcional: Safe classes usadas dinamicamente (ex.: de Supabase data)
-    { pattern: /translate-(x|y)-[0-9]+/ },
+    // Mantém as classes dinâmicas usadas pelo Supabase ou via JS
+    { pattern: /translate-(x|y)-\[[0-9.]+rem\]/ },
+    { pattern: /scale-(105|110|115|120)/ },
+    { pattern: /(bg|text|border)-(primary|secondary|accent|danger|neutral)/ },
   ],
 };
