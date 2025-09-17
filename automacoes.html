@@ -24,11 +24,11 @@
   <!-- 🚀 CSP reforçada -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.supabase.co;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.supabase.co https://*.posthog.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com data:;
-    img-src 'self' data: blob: https:;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     worker-src 'self' blob:;
     frame-src 'self';
     manifest-src 'self';
@@ -150,9 +150,19 @@
     <p>&copy; 2025 ALSHAM 360° PRIMA. Automações integradas com Supabase e N8N.</p>
   </footer>
 
-  <!-- Scripts -->
-  <script type="module" src="/js/components/navigation.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/automacoes.js"></script>
+  <!-- Scripts corrigidos -->
+  <script type="module" src="/src/components/navigation.js"></script>
+  <script type="module" src="/src/js/auth.js"></script>
+  <script type="module" src="/src/js/automacoes.js"></script>
+
+  <!-- Fallback noscript -->
+  <noscript>
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-white p-8 rounded-lg max-w-md text-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
+        <p class="text-gray-600">Ative o JavaScript para usar as automações do ALSHAM 360° PRIMA.</p>
+      </div>
+    </div>
+  </noscript>
 </body>
 </html>
