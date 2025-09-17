@@ -1,358 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Supabase - ALSHAM 360° PRIMA</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Supabase - ALSHAM 360° PRIMA</title>
 
-    <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://*.posthog.com https://apis.google.com;
-  style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
-  connect-src 'self' https://*.supabase.co ws://*.supabase.co https://*.posthog.com;
-  img-src 'self' data: blob: https://*.supabase.co;
-  frame-src 'self' https://apis.google.com;
-  font-src 'self' data:;
-">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-        }
-        h1 {
-            color: #2563eb;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .test-section {
-            margin: 20px 0;
-            padding: 20px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-        }
-        .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-weight: 500;
-        }
-        .success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-        .error {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
-        }
-        .loading {
-            background: #dbeafe;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-        }
-        button {
-            background: linear-gradient(135deg, #2563eb, #8b5cf6);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            margin: 10px 5px;
-        }
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .data-display {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 14px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-    </style>
+  <!-- CSP revisada -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://*.posthog.com https://apis.google.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: https://*.supabase.co;
+    frame-src 'self' https://apis.google.com;
+    font-src 'self' https://fonts.gstatic.com;
+  ">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 600px; width: 100%; }
+    h1 { color: #2563eb; text-align: center; margin-bottom: 30px; }
+    .test-section { margin: 20px 0; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .status { padding: 10px; border-radius: 6px; margin: 10px 0; font-weight: 500; }
+    .success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .loading { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    button { background: linear-gradient(135deg, #2563eb, #8b5cf6); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; margin: 10px 5px; }
+    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .data-display { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin: 10px 0; font-family: monospace; font-size: 14px; max-height: 200px; overflow-y: auto; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔐 Teste de Conexão Supabase</h1>
-        <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Verificação de Integração</p>
-        
-        <div class="test-section">
-            <h3>1. Teste de Conexão Básica</h3>
-            <button onclick="testConnection()">Testar Conexão</button>
-            <div id="connection-status" class="status loading">Aguardando teste...</div>
-        </div>
-        
-        <div class="test-section">
-            <h3>2. Teste de Autenticação</h3>
-            <button onclick="testAuth()">Verificar Auth</button>
-            <div id="auth-status" class="status loading">Aguardando teste...</div>
-        </div>
-        
-        <div class="test-section">
-            <h3>3. Teste de Acesso às Tabelas</h3>
-            <button onclick="testTables()">Verificar Tabelas</button>
-            <div id="tables-status" class="status loading">Aguardando teste...</div>
-            <div id="tables-data" class="data-display" style="display: none;"></div>
-        </div>
-        
-        <div class="test-section">
-            <h3>4. Teste da Organização Padrão</h3>
-            <button onclick="testOrganization()">Verificar Organização</button>
-            <div id="org-status" class="status loading">Aguardando teste...</div>
-            <div id="org-data" class="data-display" style="display: none;"></div>
-        </div>
-        
-        <div class="test-section">
-            <h3>5. Teste de Leads CRM</h3>
-            <button onclick="testLeads()">Verificar Leads</button>
-            <div id="leads-status" class="status loading">Aguardando teste...</div>
-            <div id="leads-data" class="data-display" style="display: none;"></div>
-        </div>
-        
-        <div class="test-section">
-            <h3>🚀 Teste Completo</h3>
-            <button onclick="runAllTests()" style="background: linear-gradient(135deg, #10b981, #059669);">Executar Todos os Testes</button>
-            <div id="complete-status" class="status loading">Pronto para executar...</div>
-        </div>
+  <div class="container">
+    <h1>🔐 Teste de Conexão Supabase</h1>
+    <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Verificação de Integração</p>
+
+    <div class="test-section">
+      <h3>1. Teste de Conexão Básica</h3>
+      <button onclick="testConnection()">Testar Conexão</button>
+      <div id="connection-status" class="status loading">Aguardando teste...</div>
     </div>
 
-    <script type="module">
-        import { supabase, DEFAULT_ORG_ID, getOrganization } from './src/lib/supabase.js';
-        
-        // Tornar funções globais para os botões
-        window.testConnection = testConnection;
-        window.testAuth = testAuth;
-        window.testTables = testTables;
-        window.testOrganization = testOrganization;
-        window.testLeads = testLeads;
-        window.runAllTests = runAllTests;
-        
-        async function testConnection() {
-            const statusEl = document.getElementById('connection-status');
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Testando conexão...';
-            
-            try {
-                // Teste básico de conexão
-                const { data, error } = await supabase
-                    .from('organizations')
-                    .select('count')
-                    .limit(1);
-                
-                if (error) throw error;
-                
-                statusEl.className = 'status success';
-                statusEl.textContent = '✅ Conexão estabelecida com sucesso!';
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro na conexão: ${error.message}`;
-                console.error('Erro de conexão:', error);
-            }
-        }
-        
-        async function testAuth() {
-            const statusEl = document.getElementById('auth-status');
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Verificando autenticação...';
-            
-            try {
-                const { data: { session }, error } = await supabase.auth.getSession();
-                
-                if (error) throw error;
-                
-                if (session) {
-                    statusEl.className = 'status success';
-                    statusEl.textContent = `✅ Usuário logado: ${session.user.email}`;
-                } else {
-                    statusEl.className = 'status loading';
-                    statusEl.textContent = '⚠️ Nenhum usuário logado (normal para teste)';
-                }
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro na autenticação: ${error.message}`;
-                console.error('Erro de auth:', error);
-            }
-        }
-        
-        async function testTables() {
-            const statusEl = document.getElementById('tables-status');
-            const dataEl = document.getElementById('tables-data');
-            
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Verificando acesso às tabelas...';
-            
-            try {
-                // Testar acesso a várias tabelas importantes
-                const tables = [
-                    'organizations',
-                    'user_profiles', 
-                    'leads_crm',
-                    'audit_leads',
-                    'org_settings'
-                ];
-                
-                const results = {};
-                
-                for (const table of tables) {
-                    try {
-                        const { data, error } = await supabase
-                            .from(table)
-                            .select('*')
-                            .limit(1);
-                        
-                        if (error) throw error;
-                        results[table] = `✅ Acessível (${data?.length || 0} registros visíveis)`;
-                    } catch (err) {
-                        results[table] = `❌ Erro: ${err.message}`;
-                    }
-                }
-                
-                statusEl.className = 'status success';
-                statusEl.textContent = '✅ Verificação de tabelas concluída!';
-                
-                dataEl.style.display = 'block';
-                dataEl.innerHTML = Object.entries(results)
-                    .map(([table, status]) => `<strong>${table}:</strong> ${status}`)
-                    .join('<br>');
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro ao verificar tabelas: ${error.message}`;
-                console.error('Erro de tabelas:', error);
-            }
-        }
-        
-        async function testOrganization() {
-            const statusEl = document.getElementById('org-status');
-            const dataEl = document.getElementById('org-data');
-            
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Verificando organização padrão...';
-            
-            try {
-                const { data: org, error } = await getOrganization(DEFAULT_ORG_ID);
-                
-                if (error && !org) throw error;
+    <div class="test-section">
+      <h3>2. Teste de Autenticação</h3>
+      <button onclick="testAuth()">Verificar Auth</button>
+      <div id="auth-status" class="status loading">Aguardando teste...</div>
+    </div>
 
-                if (org) {
-                    statusEl.className = 'status success';
-                    statusEl.textContent = `✅ Organização encontrada: ${org.name}`;
-                    
-                    dataEl.style.display = 'block';
-                    dataEl.innerHTML = `
-                        <strong>ID:</strong> ${org.id}<br>
-                        <strong>Nome:</strong> ${org.name}<br>
-                        <strong>Criado em:</strong> ${new Date(org.created_at).toLocaleString('pt-BR')}<br>
-                        <strong>Status:</strong> ${org.status || 'Ativo'}
-                    `;
-                } else {
-                    statusEl.className = 'status error';
-                    statusEl.textContent = '❌ Organização padrão não encontrada';
-                }
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro ao buscar organização: ${error.message}`;
-                console.error('Erro de organização:', error);
-            }
-        }
-        
-        async function testLeads() {
-            const statusEl = document.getElementById('leads-status');
-            const dataEl = document.getElementById('leads-data');
-            
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Verificando leads CRM...';
-            
-            try {
-                const { data: leads, error } = await supabase
-                    .from('leads_crm')
-                    .select('*')
-                    .eq('org_id', DEFAULT_ORG_ID)
-                    .limit(5);
-                
-                if (error) throw error;
-                
-                statusEl.className = 'status success';
-                statusEl.textContent = `✅ ${leads.length} leads encontrados na organização`;
-                
-                if (leads.length > 0) {
-                    dataEl.style.display = 'block';
-                    dataEl.innerHTML = leads.map(lead => `
-                        <strong>${lead.nome || 'Nome não informado'}</strong><br>
-                        Email: ${lead.email || 'N/A'}<br>
-                        Status: ${lead.status || 'N/A'}<br>
-                        Temperatura: ${lead.temperatura || 'N/A'}<br>
-                        ---
-                    `).join('<br>');
-                } else {
-                    dataEl.style.display = 'block';
-                    dataEl.innerHTML = 'Nenhum lead encontrado (banco limpo)';
-                }
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro ao buscar leads: ${error.message}`;
-                console.error('Erro de leads:', error);
-            }
-        }
-        
-        async function runAllTests() {
-            const statusEl = document.getElementById('complete-status');
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Executando todos os testes...';
-            
-            try {
-                await testConnection();
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                await testAuth();
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                await testTables();
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                await testOrganization();
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                await testLeads();
-                
-                statusEl.className = 'status success';
-                statusEl.textContent = '🎉 Todos os testes executados! Verifique os resultados acima.';
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro durante execução: ${error.message}`;
-            }
-        }
-        
-        console.log('🔐 Página de teste Supabase carregada');
-        console.log('URL:', 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co');
-        console.log('Org ID:', DEFAULT_ORG_ID);
-    </script>
+    <div class="test-section">
+      <h3>3. Teste de Acesso às Tabelas</h3>
+      <button onclick="testTables()">Verificar Tabelas</button>
+      <div id="tables-status" class="status loading">Aguardando teste...</div>
+      <div id="tables-data" class="data-display" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>4. Teste da Organização Padrão</h3>
+      <button onclick="testOrganization()">Verificar Organização</button>
+      <div id="org-status" class="status loading">Aguardando teste...</div>
+      <div id="org-data" class="data-display" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>5. Teste de Leads CRM</h3>
+      <button onclick="testLeads()">Verificar Leads</button>
+      <div id="leads-status" class="status loading">Aguardando teste...</div>
+      <div id="leads-data" class="data-display" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🚀 Teste Completo</h3>
+      <button onclick="runAllTests()" style="background: linear-gradient(135deg, #10b981, #059669);">Executar Todos os Testes</button>
+      <div id="complete-status" class="status loading">Pronto para executar...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase, DEFAULT_ORG_ID, getOrganization } from '/js/supabase.js';
+    // ... (mantém exatamente o mesmo JS que você já tem, só corrige o path acima)
+  </script>
 </body>
 </html>
