@@ -21,15 +21,15 @@
   <meta property="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
   <meta property="twitter:image" content="/og-image.png">
 
-  <!-- CSP otimizada -->
+  <!-- 🚀 CSP otimizada -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
-    img-src 'self' data: https://*.supabase.co;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
+    font-src 'self' https://fonts.gstatic.com data:;
     frame-src 'self' https://apis.google.com;
-    font-src 'self' https://fonts.gstatic.com;
   ">
 
   <!-- Security headers -->
@@ -49,23 +49,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- CSS compilado -->
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 
   <!-- Estilos customizados -->
   <style>
-    /* ... (mantém o mesmo conteúdo CSS que você já tinha, não precisa mudar nada aqui) ... */
+    /* Mantém os estilos críticos que você já tinha */
   </style>
 </head>
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+  
+  <main id="main-content" role="main" class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Conteúdo real de relatórios aqui -->
+  </main>
 
-  <!-- conteúdo principal (mantém igual ao seu atual) -->
+  <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/relatorios.js"></script>
+  <script type="module" src="/src/js/navigation.js"></script>
+  <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/auth.js"></script>
+  <script type="module" src="/src/js/relatorios.js"></script>
 
   <script type="module">
     console.log('📊 Inicializando sistema de relatórios enterprise...');
@@ -77,11 +81,23 @@
           s.classList.add('fade-in');
         });
       }, 2000);
+
       const kpiCards = document.querySelectorAll('.kpi-card');
       kpiCards.forEach(card => {
         card.addEventListener('mouseenter', () => { card.style.transform = 'translateY(-4px)'; });
         card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0)'; });
       });
+    });
+
+    window.addEventListener('error', (e) => {
+      if (e.target.tagName === 'SCRIPT' && e.target.src.includes('relatorios.js')) {
+        const notice = document.getElementById('offline-notice');
+        if (notice) {
+          notice.textContent = "⚠️ Relatórios não carregaram. Verifique Supabase.";
+          notice.className = "p-3 mt-4 bg-yellow-100 text-yellow-800 rounded-lg text-center";
+          notice.classList.remove('hidden');
+        }
+      }
     });
   </script>
 </body>
