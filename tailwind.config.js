@@ -1,41 +1,44 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
-    './index.html',
-    './src/**/*.{html,js,ts,jsx,tsx}',
-    './src/pages/**/*.html'
+    "./*.html",
+    "./src/**/*.js", // Inclui todos JS para purge de classes
   ],
-  darkMode: 'class',
   theme: {
     extend: {
+      translate: {
+        '05': '0.125rem', // Fix: '0.5' → '05' para evitar warnings
+        '15': '0.375rem',
+        '25': '0.625rem',
+        '35': '0.875rem',
+      },
+      scale: {
+        '105': '1.05', // Extensões para animations suaves
+        '110': '1.10',
+        '115': '1.15',
+        '120': '1.20',
+      },
       colors: {
-        primary: {
-          50:  '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a'
-        },
-        secondary: {
-          500: '#f59e42'
-        },
-        danger: {
-          500: '#ef4444'
-        }
+        // Temas custom enterprise para CRM (ajuste conforme UI)
+        primary: '#1E40AF', // Azul para ações principais (leads, auth)
+        secondary: '#10B981', // Verde para sucesso/gamificação
+        accent: '#F59E0B', // Amarelo para warnings/automations
+        danger: '#EF4444', // Vermelho para errors/relatórios
+        neutral: '#6B7280', // Cinza para texts/settings
       },
-      fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+      boxShadow: {
+        'premium': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', // Sombras premium para cards
       },
-      spacing: {
-        '128': '32rem',
-        '144': '36rem'
-      }
-    }
+      transitionProperty: {
+        'width-height': 'width, height', // Para animations em UI
+      },
+    },
   },
-  plugins: []
+  plugins: [
+    // Adicione plugins se necessário, ex.: require('@tailwindcss/forms') para forms premium
+  ],
+  safelist: [
+    // Opcional: Safe classes usadas dinamicamente (ex.: de Supabase data)
+    { pattern: /translate-(x|y)-[0-9]+/ },
+  ],
 };
