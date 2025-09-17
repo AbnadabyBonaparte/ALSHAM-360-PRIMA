@@ -5,23 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Relatórios Enterprise - ALSHAM 360° PRIMA</title>
 
-  <meta name="description" content="Analytics e Relatórios Enterprise do ALSHAM 360° PRIMA. Dashboards avançados, KPIs em tempo real, previsões de IA e exportação multi-formato com conformidade LGPD.">
-  <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#3B82F6">
+  <meta name="description" content="Analytics e Relatórios Enterprise do ALSHAM 360° PRIMA. Dashboards avançados, KPIs em tempo real, previsões de IA e exportação multi-formato com conformidade LGPD." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#3B82F6" />
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
-  <meta property="og:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
-  <meta property="og:image" content="/og-image.png">
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Analytics Enterprise - ALSHAM 360° PRIMA" />
+  <meta property="og:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados" />
+  <meta property="og:image" content="/og-image.png" />
 
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Analytics Enterprise - ALSHAM 360° PRIMA">
-  <meta property="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados">
-  <meta property="twitter:image" content="/og-image.png">
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Analytics Enterprise - ALSHAM 360° PRIMA" />
+  <meta name="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados" />
+  <meta name="twitter:image" content="/og-image.png" />
 
-  <!-- Segurança (CSP) -->
+  <!-- Segurança -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
@@ -30,18 +30,16 @@
     img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     font-src 'self' https://fonts.gstatic.com data:;
     frame-src 'self' https://apis.google.com;
-  ">
-
-  <!-- Security Headers -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  " />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
 
   <!-- Favicons -->
   <link rel="icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -70,18 +68,16 @@
     console.log('📊 Inicializando sistema de relatórios enterprise...');
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
-        const skeletons = document.querySelectorAll('.chart-skeleton');
-        skeletons.forEach(s => {
-          s.classList.remove('skeleton-loading');
-          s.classList.add('fade-in');
+        document.querySelectorAll('.chart-skeleton').forEach(el => {
+          el.classList.remove('skeleton-loading');
+          el.classList.add('fade-in');
+        });
+
+        document.querySelectorAll('.kpi-card').forEach(card => {
+          card.addEventListener('mouseenter', () => card.style.transform = 'translateY(-4px)');
+          card.addEventListener('mouseleave', () => card.style.transform = 'translateY(0)');
         });
       }, 2000);
-
-      const kpiCards = document.querySelectorAll('.kpi-card');
-      kpiCards.forEach(card => {
-        card.addEventListener('mouseenter', () => { card.style.transform = 'translateY(-4px)'; });
-        card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0)'; });
-      });
     });
 
     window.addEventListener('error', (e) => {
