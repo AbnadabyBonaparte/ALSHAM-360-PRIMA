@@ -14,11 +14,12 @@
   <!-- Segurança -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: https://*.supabase.co;
-    font-src 'self' https://fonts.gstatic.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
+    font-src 'self' https://fonts.gstatic.com data:;
+    frame-src 'self' https://apis.google.com;
   " />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
@@ -34,8 +35,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/style.css" />
+  <!-- CSS Global -->
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 via-green-50 to-blue-50 min-h-screen antialiased">
@@ -60,7 +61,7 @@
   <header class="bg-white/90 backdrop-blur-xl border-b border-gray-200 sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
       <a href="/index.html" class="flex items-center space-x-3">
-        <div class="w-10 h-10 gradient-premium rounded-xl flex items-center justify-center text-white font-bold">A</div>
+        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center text-white font-bold">A</div>
         <div>
           <h1 class="text-xl font-bold text-gray-900">ALSHAM 360°</h1>
           <p class="text-xs text-gray-500">PRIMA Enterprise</p>
@@ -78,7 +79,6 @@
 
   <!-- Main -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- KPIs / Filtros / Tabela (mesma estrutura do seu arquivo atual, mantida 100%) -->
     <section>
       <h2 class="sr-only">Gestão de Leads</h2>
       <div id="leads-container" class="bg-white rounded-xl shadow p-6"> 
@@ -92,9 +92,9 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/leads-real.js"></script>
+  <script type="module" src="/src/js/navigation.js"></script>
+  <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/auth.js"></script>
+  <script type="module" src="/src/js/leads-real.js"></script>
 </body>
 </html>
