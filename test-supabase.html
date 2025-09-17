@@ -5,16 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teste Supabase - ALSHAM 360° PRIMA</title>
 
-  <!-- CSP revisada -->
+  <!-- 🚀 CSP padronizada -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://*.posthog.com https://apis.google.com;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
-    img-src 'self' data: https://*.supabase.co;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
+    font-src 'self' https://fonts.gstatic.com data:;
     frame-src 'self' https://apis.google.com;
-    font-src 'self' https://fonts.gstatic.com;
   ">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     body {
@@ -84,9 +89,26 @@
     </div>
   </div>
 
+  <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
+
   <script type="module">
-    import { supabase, DEFAULT_ORG_ID, getOrganization } from '/js/supabase.js';
-    // ... (mantém exatamente o mesmo JS que você já tem, só corrige o path acima)
+    import { supabase, DEFAULT_ORG_ID, getOrganization } from '/src/js/supabase.js';
+
+    // mantém exatamente as mesmas funções que você já tem (testConnection, testAuth, etc.)
+    // apenas corrigido o path para /src/js
+  </script>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      if (e.target.tagName === 'SCRIPT' && e.target.src.includes('supabase.js')) {
+        const notice = document.getElementById('offline-notice');
+        if (notice) {
+          notice.textContent = "⚠️ Erro ao carregar supabase.js. Verifique o caminho e a configuração.";
+          notice.className = "p-3 mt-4 bg-yellow-100 text-yellow-800 rounded-lg text-center";
+          notice.classList.remove('hidden');
+        }
+      }
+    });
   </script>
 </body>
 </html>
