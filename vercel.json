@@ -4,7 +4,7 @@
   "trailingSlash": false,
   "headers": [
     {
-      "source": "/**",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "source": "/assets/**",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
