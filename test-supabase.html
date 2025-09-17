@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Teste Supabase - ALSHAM 360° PRIMA</title>
 
-  <!-- 🚀 CSP padronizada -->
+  <!-- Segurança -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
@@ -14,12 +14,12 @@
     img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     font-src 'self' https://fonts.gstatic.com data:;
     frame-src 'self' https://apis.google.com;
-  ">
+  " />
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
     body {
@@ -32,18 +32,74 @@
       margin: 0;
       padding: 20px;
     }
-    .container { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 600px; width: 100%; }
-    h1 { color: #2563eb; text-align: center; margin-bottom: 30px; }
-    .test-section { margin: 20px 0; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; }
-    .status { padding: 10px; border-radius: 6px; margin: 10px 0; font-weight: 500; }
-    .success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    .error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-    .loading { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    button { background: linear-gradient(135deg, #2563eb, #8b5cf6); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; margin: 10px 5px; }
-    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .data-display { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin: 10px 0; font-family: monospace; font-size: 14px; max-height: 200px; overflow-y: auto; }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      color: #2563eb;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-weight: 500;
+    }
+    .success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+    .error {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    .loading {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    button {
+      background: linear-gradient(135deg, #2563eb, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      margin: 10px 5px;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .data-display {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 15px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>🔐 Teste de Conexão Supabase</h1>
@@ -91,12 +147,11 @@
 
   <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
-  <!-- Import corrigido -->
   <script type="module">
     import { supabase, DEFAULT_ORG_ID, getOrganization } from '/js/supabase.js';
 
-    // mantém exatamente as mesmas funções que você já tem (testConnection, testAuth, etc.)
-    // apenas corrigido o path para /js
+    // As funções como testConnection, testAuth, etc. devem estar disponíveis em /js/supabase.js
+    // Este script importa e utiliza a lógica desses testes diretamente
   </script>
 
   <script>
