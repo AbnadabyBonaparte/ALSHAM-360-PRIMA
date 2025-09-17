@@ -6,14 +6,17 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
 
   return {
-    base: '/', // Caminho raiz da aplicação
+    // Caminho raiz da aplicação
+    base: '/',
 
+    // Servidor de desenvolvimento
     server: {
       port: 5173,
       open: true,
       host: true,
     },
 
+    // Configuração de build (multi-page app)
     build: {
       outDir: 'dist',
       emptyOutDir: true,
@@ -22,7 +25,6 @@ export default defineConfig(({ mode }) => {
       target: 'esnext',
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
-        // Multi-Page App: cada HTML precisa estar aqui
         input: {
           main: 'index.html',
           leads: 'leads.html',
@@ -41,10 +43,12 @@ export default defineConfig(({ mode }) => {
       },
     },
 
+    // Dependências otimizadas
     optimizeDeps: {
       include: ['@supabase/supabase-js', 'lodash', 'chart.js'],
     },
 
+    // Plugins
     plugins: [
       VitePWA({
         strategies: 'generateSW',
@@ -54,7 +58,7 @@ export default defineConfig(({ mode }) => {
           clientsClaim: true,
           skipWaiting: true,
           globPatterns: [
-            '**/*.{js,css,html,png,svg,jpg,jpeg,gif,webp,woff,woff2,ttf,eot,ico}',
+            '**/*.{js,css,html,png,svg,webp,woff2}'
           ],
           globDirectory: 'dist/',
           runtimeCaching: [
@@ -103,9 +107,10 @@ export default defineConfig(({ mode }) => {
       }),
     ],
 
+    // Aliases para imports
     resolve: {
       alias: {
-        '@': '/src',
+        '@': '/js', // Ajustado para apontar para /js
       },
     },
   };
