@@ -1,14 +1,14 @@
 /**
  * ALSHAM 360° PRIMA - Enterprise Reports System V5.0 NASA 10/10 OPTIMIZED
  * Advanced analytics and reporting platform with real-time data integration
- * 
+ *
  * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
  * @author ALSHAM Development Team
  * @license MIT
- * 
+ *
  * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
  * ✅ Real-time data from 55+ Supabase tables
- * ✅ Railway credentials integration  
+ * ✅ Railway credentials integration
  * ✅ Advanced analytics with live metrics
  * ✅ Interactive charts with Chart.js
  * ✅ Multi-format export (PDF, Excel, CSV, PowerPoint)
@@ -20,65 +20,32 @@
  * ✅ Vite build system optimization
  * ✅ Path standardization and consistency
  * ✅ NASA 10/10 Enterprise Grade
- * 
- * 🔗 DATA SOURCES: analytics_events, dashboard_kpis, leads_crm, 
+ *
+ * 🔗 DATA SOURCES: analytics_events, dashboard_kpis, leads_crm,
  * sales_opportunities, performance_metrics, conversion_funnels, user_profiles
- * 
+ *
  * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
  * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
-
 // ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
 /**
  * Real data integration with Supabase Enterprise
  * Using standardized relative path imports for Vite compatibility
  */
-import { 
+import {
     // Core CRM functions with REAL data
-    getCurrentUser,
-    getLeads,
-    getSalesOpportunities,
-    getLeadInteractions,
-    getLeadSources,
-    
-    // Analytics functions with REAL data
-    getAnalyticsEvents,
-    getDashboardKPIs,
-    getDashboardSummary,
-    getPerformanceMetrics,
-    getConversionFunnels,
-    
-    // User and team functions with REAL data
-    getUserProfiles,
-    getTeams,
-    getTeamLeaderboards,
-    
-    // Gamification functions with REAL data
-    getUserBadges,
-    getGamificationPoints,
-    
-    // ROI functions with REAL data
-    getRoiCalculations,
-    getRoiMonthly,
-    
-    // Views with REAL data
-    getLeadsWithLabels,
-    getLeadsByStatusView,
-    
-    // Real-time subscriptions
+    getCurrentSession,
+    getUserProfile,
+    genericSelect,
     subscribeToTable,
-    unsubscribeFromTable,
-    
+   
+    // Audit and logging
+    createAuditLog,
+   
     // Health monitoring
-    healthCheck,
-    getConnectionStatus,
-    
-    // Configuration
-    getCurrentOrgId,
-    supabaseConfig
+    healthCheck
 } from '../lib/supabase.js';
-
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
  * Validates and returns external library dependency
@@ -97,7 +64,6 @@ function requireLib(libName, lib) {
     }
     return lib;
 }
-
 /**
  * Validates all required external dependencies
  * Enhanced with comprehensive validation and fallback strategies
@@ -118,7 +84,6 @@ function validateDependencies() {
         throw error;
     }
 }
-
 // ===== ENTERPRISE CONFIGURATION WITH REAL DATA MAPPING - NASA 10/10 =====
 /**
  * Enhanced configuration with NASA 10/10 standards
@@ -140,7 +105,7 @@ const REPORTS_CONFIG = Object.freeze({
         RETRY_DELAY: 1000,
         PARALLEL_REQUESTS: 5
     },
-    
+   
     // Export settings for REAL data
     EXPORT: {
         FORMATS: ['pdf', 'excel', 'csv', 'powerpoint'],
@@ -154,7 +119,7 @@ const REPORTS_CONFIG = Object.freeze({
             powerpoint: { template: 'business', quality: 'high' }
         }
     },
-    
+   
     // Chart configuration optimized for REAL data visualization
     CHARTS: {
         COLORS: {
@@ -167,21 +132,21 @@ const REPORTS_CONFIG = Object.freeze({
             indigo: '#6366F1',
             teal: '#14B8A6'
         },
-        
+       
         GRADIENTS: {
             revenue: ['#667eea', '#764ba2'],
             leads: ['#f093fb', '#f5576c'],
             conversion: ['#4facfe', '#00f2fe'],
             activities: ['#a8edea', '#fed6e3']
         },
-        
+       
         DEFAULTS: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: { position: 'bottom' },
-                tooltip: { 
-                    mode: 'index', 
+                tooltip: {
+                    mode: 'index',
                     intersect: false,
                     callbacks: {
                         // Custom tooltips for real data
@@ -197,11 +162,11 @@ const REPORTS_CONFIG = Object.freeze({
                 }
             },
             scales: {
-                x: { 
+                x: {
                     grid: { display: false },
                     title: { display: true, text: 'Período' }
                 },
-                y: { 
+                y: {
                     beginAtZero: true,
                     title: { display: true, text: 'Valor' }
                 }
@@ -212,7 +177,7 @@ const REPORTS_CONFIG = Object.freeze({
             }
         }
     },
-    
+   
     // Period definitions for REAL data queries
     PERIODS: Object.freeze({
         '7': { label: 'Últimos 7 dias', days: 7, sqlInterval: '7 days' },
@@ -222,14 +187,14 @@ const REPORTS_CONFIG = Object.freeze({
         '365': { label: 'Último ano', days: 365, sqlInterval: '365 days' },
         'custom': { label: 'Período customizado', days: null, sqlInterval: null }
     }),
-    
+   
     // Static CSS classes for build compatibility - NASA 10/10 optimization
     STATIC_STYLES: Object.freeze({
         success: { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-200' },
         warning: { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
         error: { bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-200' },
         info: { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' },
-        
+       
         kpi: {
             revenue: { text: 'text-emerald-600', bg: 'bg-emerald-50', icon: '💰' },
             leads: { text: 'text-blue-600', bg: 'bg-blue-50', icon: '👥' },
@@ -239,76 +204,76 @@ const REPORTS_CONFIG = Object.freeze({
             growth: { text: 'text-emerald-600', bg: 'bg-emerald-50', icon: '📈' }
         }
     }),
-    
+   
     // Metrics definitions mapped to REAL Supabase tables
     METRICS: Object.freeze([
-        { 
-            value: 'revenue', 
-            label: 'Receita', 
-            icon: '💰', 
-            color: 'emerald', 
+        {
+            value: 'revenue',
+            label: 'Receita',
+            icon: '💰',
+            color: 'emerald',
             format: 'currency',
             table: 'sales_opportunities',
             field: 'valor',
             aggregation: 'sum'
         },
-        { 
-            value: 'leads', 
-            label: 'Leads', 
-            icon: '👥', 
-            color: 'blue', 
+        {
+            value: 'leads',
+            label: 'Leads',
+            icon: '👥',
+            color: 'blue',
             format: 'number',
             table: 'leads_crm',
             field: 'id',
             aggregation: 'count'
         },
-        { 
-            value: 'conversion', 
-            label: 'Conversão', 
-            icon: '📈', 
-            color: 'purple', 
+        {
+            value: 'conversion',
+            label: 'Conversão',
+            icon: '📈',
+            color: 'purple',
             format: 'percentage',
             table: 'conversion_funnels',
             field: 'conversion_rate',
             aggregation: 'avg'
         },
-        { 
-            value: 'activities', 
-            label: 'Atividades', 
-            icon: '⚡', 
-            color: 'orange', 
+        {
+            value: 'activities',
+            label: 'Atividades',
+            icon: '⚡',
+            color: 'orange',
             format: 'number',
             table: 'analytics_events',
             field: 'id',
             aggregation: 'count'
         },
-        { 
-            value: 'opportunities', 
-            label: 'Oportunidades', 
-            icon: '🎯', 
-            color: 'indigo', 
+        {
+            value: 'opportunities',
+            label: 'Oportunidades',
+            icon: '🎯',
+            color: 'indigo',
             format: 'number',
             table: 'sales_opportunities',
             field: 'id',
             aggregation: 'count'
         },
-        { 
-            value: 'growth', 
-            label: 'Crescimento', 
-            icon: '📊', 
-            color: 'emerald', 
+        {
+            value: 'growth',
+            label: 'Crescimento',
+            icon: '📊',
+            color: 'emerald',
             format: 'percentage',
             table: 'roi_calculations',
             field: 'growth_rate',
             aggregation: 'avg'
         }
     ]),
-    
+   
     // Real-time subscription configuration
     REAL_TIME: {
         TABLES: [
             'analytics_events',
-            'dashboard_kpis', 
+            'dashboard_kpis',
             'leads_crm',
             'sales_opportunities',
             'performance_metrics'
@@ -317,7 +282,7 @@ const REPORTS_CONFIG = Object.freeze({
         RECONNECT_INTERVAL: 5000,
         MAX_RECONNECT_ATTEMPTS: 10
     },
-    
+   
     // NASA 10/10 accessibility enhancements
     ACCESSIBILITY: {
         announceChanges: true,
@@ -327,7 +292,6 @@ const REPORTS_CONFIG = Object.freeze({
         focusManagement: true
     }
 });
-
 // ===== ENTERPRISE STATE MANAGEMENT WITH REAL DATA - NASA 10/10 =====
 /**
  * Enhanced state manager with NASA 10/10 standards
@@ -340,32 +304,32 @@ class ReportsStateManager {
             user: null,
             profile: null,
             orgId: null,
-            
+           
             // Report configuration
             selectedMetrics: ['revenue', 'leads', 'conversion'],
             selectedPeriod: '30',
             customDateRange: { start: null, end: null },
             selectedChartType: 'line',
-            
+           
             // Data state
             rawData: new Map(),
             processedData: new Map(),
             chartInstances: new Map(),
-            
+           
             // UI state
             isLoading: false,
             isExporting: false,
             isRefreshing: false,
             activeTab: 'overview',
-            
+           
             // Error handling
             errors: [],
             warnings: [],
-            
+           
             // Real-time state
             subscriptions: new Map(),
             lastUpdate: null,
-            
+           
             // Performance monitoring - NASA 10/10
             metrics: {
                 loadTime: 0,
@@ -374,7 +338,7 @@ class ReportsStateManager {
                 cacheHits: 0,
                 errors: 0
             },
-            
+           
             // Cache management - NASA 10/10
             cache: {
                 data: new Map(),
@@ -382,13 +346,13 @@ class ReportsStateManager {
                 ttl: REPORTS_CONFIG.PERFORMANCE.CACHE_TTL
             }
         };
-        
+       
         // Bind methods for proper context
         this.setState = this.setState.bind(this);
         this.getState = this.getState.bind(this);
         this.clearCache = this.clearCache.bind(this);
     }
-    
+   
     /**
      * Update state with validation and change detection
      * @param {Object} updates - State updates
@@ -397,28 +361,28 @@ class ReportsStateManager {
     setState(updates, callback) {
         try {
             const previousState = { ...this.state };
-            
+           
             // Validate updates
             if (typeof updates !== 'object' || updates === null) {
                 throw new Error('State updates must be an object');
             }
-            
+           
             // Apply updates
             Object.assign(this.state, updates);
-            
+           
             // Update timestamp
             this.state.lastUpdate = new Date();
-            
+           
             // Execute callback if provided
             if (typeof callback === 'function') {
                 callback(this.state, previousState);
             }
-            
+           
             // Emit state change event for debugging
             if (window.DEBUG_MODE) {
                 console.log('🔄 State updated:', { updates, newState: this.state });
             }
-            
+           
         } catch (error) {
             console.error('❌ Error updating state:', error);
             this.state.errors.push({
@@ -428,7 +392,7 @@ class ReportsStateManager {
             });
         }
     }
-    
+   
     /**
      * Get current state or specific property
      * @param {string} key - Optional key to get specific property
@@ -440,7 +404,7 @@ class ReportsStateManager {
         }
         return { ...this.state };
     }
-    
+   
     /**
      * Clear cache with optional filter
      * @param {string} filter - Optional filter for cache keys
@@ -458,14 +422,14 @@ class ReportsStateManager {
                 this.state.cache.data.clear();
                 this.state.cache.timestamps.clear();
             }
-            
+           
             console.log(`🗑️ Cache cleared${filter ? ` (filter: ${filter})` : ''}`);
-            
+           
         } catch (error) {
             console.error('❌ Error clearing cache:', error);
         }
     }
-    
+   
     /**
      * Get cached data with TTL validation
      * @param {string} key - Cache key
@@ -475,27 +439,27 @@ class ReportsStateManager {
         try {
             const data = this.state.cache.data.get(key);
             const timestamp = this.state.cache.timestamps.get(key);
-            
+           
             if (!data || !timestamp) {
                 return null;
             }
-            
+           
             const now = Date.now();
             if (now - timestamp > this.state.cache.ttl) {
                 this.state.cache.data.delete(key);
                 this.state.cache.timestamps.delete(key);
                 return null;
             }
-            
+           
             this.state.metrics.cacheHits++;
             return data;
-            
+           
         } catch (error) {
             console.error('❌ Error getting cached data:', error);
             return null;
         }
     }
-    
+   
     /**
      * Set cached data with timestamp
      * @param {string} key - Cache key
@@ -505,67 +469,64 @@ class ReportsStateManager {
         try {
             this.state.cache.data.set(key, data);
             this.state.cache.timestamps.set(key, Date.now());
-            
+           
         } catch (error) {
             console.error('❌ Error setting cached data:', error);
         }
     }
 }
-
 // Global state manager instance
 const reportsState = new ReportsStateManager();
-
 // ===== INITIALIZATION - NASA 10/10 =====
 /**
  * Initialize reports page on DOM ready with enhanced error handling
  */
 document.addEventListener('DOMContentLoaded', initializeReports);
-
 /**
  * Initialize the reports system with enhanced NASA 10/10 standards
  * @returns {Promise<void>}
  */
 async function initializeReports() {
     const startTime = performance.now();
-    
+   
     try {
         // Validate dependencies first
         validateDependencies();
-        
+       
         showLoading(true, 'Inicializando sistema de relatórios...');
-        
+       
         // Health check with retry logic
         const health = await healthCheckWithRetry();
         if (health.error) {
             console.warn('⚠️ Problema de conectividade:', health.error);
             showWarning('Conectividade limitada - alguns relatórios podem estar indisponíveis');
         }
-        
+       
         // Enhanced authentication
         const authResult = await authenticateUser();
         if (!authResult.success) {
             redirectToLogin();
             return;
         }
-        
+       
         reportsState.setState({
             user: authResult.user,
             profile: authResult.profile,
             orgId: authResult.profile?.org_id || 'default-org-id'
         });
-        
+       
         // Load initial data with caching
         await loadReportsDataWithCache();
-        
+       
         // Setup real-time subscriptions
         setupRealTimeSubscriptions();
-        
+       
         // Render interface
         await renderReportsInterface();
-        
+       
         // Setup event listeners
         setupEventListeners();
-        
+       
         // Calculate performance metrics
         const endTime = performance.now();
         reportsState.setState({
@@ -575,22 +536,21 @@ async function initializeReports() {
                 loadTime: endTime - startTime
             }
         });
-        
+       
         showLoading(false);
         console.log(`📊 Sistema de relatórios inicializado em ${(endTime - startTime).toFixed(2)}ms`);
         showSuccess('Sistema de relatórios carregado com dados reais!');
-        
+       
         // NASA 10/10: Performance monitoring
         if ((endTime - startTime) > 5000) {
             console.warn('⚠️ Tempo de carregamento acima do ideal:', endTime - startTime);
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro crítico ao inicializar relatórios:', error);
         await handleCriticalError(error);
     }
 }
-
 // ===== ENHANCED AUTHENTICATION - NASA 10/10 =====
 /**
  * Enhanced user authentication with comprehensive validation
@@ -598,39 +558,29 @@ async function initializeReports() {
  */
 async function authenticateUser() {
     try {
-        const { user, profile, error } = await getCurrentUser();
-        
-        if (error) {
-            console.error('Erro de autenticação:', error);
-            return { success: false, error };
-        }
-        
-        if (!user) {
+        const session = await getCurrentSession();
+       
+        if (!session || !session.user) {
             console.log('Usuário não autenticado');
-            return { success: false, error: 'No user found' };
+            return { success: false };
         }
-        
-        // Enhanced validation
-        if (!profile || !profile.org_id) {
-            console.warn('Perfil de usuário incompleto');
-            return { success: false, error: 'Incomplete user profile' };
-        }
-        
-        return { success: true, user, profile };
-        
-    } catch (authError) {
-        console.error('Erro crítico na autenticação:', authError);
-        return { success: false, error: authError.message };
+       
+        const profile = await getUserProfile(session.user.id, session.user.user_metadata.org_id);
+       
+        return { success: true, user: session.user, profile };
+       
+    } catch (error) {
+        console.error('Erro de autenticação:', error);
+        return { success: false, error };
     }
 }
-
 /**
  * Health check with retry logic - NASA 10/10 reliability
  * @returns {Promise<Object>} Health check result
  */
 async function healthCheckWithRetry() {
     let lastError = null;
-    
+   
     for (let attempt = 1; attempt <= REPORTS_CONFIG.PERFORMANCE.RETRY_ATTEMPTS; attempt++) {
         try {
             const result = await healthCheck();
@@ -641,25 +591,23 @@ async function healthCheckWithRetry() {
         } catch (error) {
             lastError = error;
         }
-        
+       
         if (attempt < REPORTS_CONFIG.PERFORMANCE.RETRY_ATTEMPTS) {
             const delay = REPORTS_CONFIG.PERFORMANCE.RETRY_DELAY * attempt;
             console.log(`⏳ Tentativa ${attempt} falhou, tentando novamente em ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
-    
+   
     return { error: lastError };
 }
-
 /**
  * Redirect to login with enhanced URL preservation
  */
 function redirectToLogin() {
     const currentUrl = encodeURIComponent(window.location.href);
-    window.location.href = `src/pages/login.html?redirect=${currentUrl}`;
+    window.location.href = `/login.html?redirect=${currentUrl}`;
 }
-
 // ===== DATA LOADING WITH CACHING - NASA 10/10 =====
 /**
  * Load reports data with intelligent caching strategy
@@ -670,28 +618,28 @@ async function loadReportsDataWithCache() {
         console.log('⏳ Carregamento já em andamento...');
         return;
     }
-    
+   
     try {
         reportsState.setState({ isRefreshing: true });
         reportsState.state.metrics.apiCalls++;
-        
+       
         const orgId = reportsState.getState('orgId');
         const cacheKey = `reports_${orgId}_${reportsState.getState('selectedPeriod')}`;
-        
+       
         // Check cache first
         const cachedData = reportsState.getCachedData(cacheKey);
         if (cachedData) {
             applyReportsData(cachedData);
             console.log('✅ Dados dos relatórios carregados do cache');
-            
+           
             // Load fresh data in background
             loadReportsFromAPI(cacheKey, true);
             return;
         }
-        
+       
         // Load from API
         await loadReportsFromAPI(cacheKey, false);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar dados dos relatórios:', error);
         throw error;
@@ -699,7 +647,6 @@ async function loadReportsDataWithCache() {
         reportsState.setState({ isRefreshing: false });
     }
 }
-
 /**
  * Load reports data from API with enhanced error handling
  * @param {string} cacheKey - Cache key for storing data
@@ -709,18 +656,18 @@ async function loadReportsFromAPI(cacheKey, isBackground = false) {
     try {
         const orgId = reportsState.getState('orgId');
         const period = reportsState.getState('selectedPeriod');
-        
+       
         // Load data in parallel for better performance
         const promises = [
-            getAnalyticsEvents(orgId, { period }).catch(err => ({ error: err })),
-            getDashboardKPIs(orgId).catch(err => ({ error: err })),
-            getLeads(orgId, { limit: 1000 }).catch(err => ({ error: err })),
-            getSalesOpportunities(orgId).catch(err => ({ error: err })),
-            getPerformanceMetrics(orgId).catch(err => ({ error: err })),
-            getConversionFunnels(orgId).catch(err => ({ error: err })),
-            getRoiCalculations(orgId).catch(err => ({ error: err }))
+            genericSelect('analytics_events', {}, orgId),
+            genericSelect('dashboard_kpis', {}, orgId),
+            genericSelect('leads_crm', {}, orgId),
+            genericSelect('sales_opportunities', {}, orgId),
+            genericSelect('performance_metrics', {}, orgId),
+            genericSelect('conversion_funnels', {}, orgId),
+            genericSelect('roi_calculations', {}, orgId)
         ];
-        
+       
         const [
             analyticsData,
             kpisData,
@@ -730,30 +677,30 @@ async function loadReportsFromAPI(cacheKey, isBackground = false) {
             funnelsData,
             roiData
         ] = await Promise.all(promises);
-        
+       
         const reportsData = {
-            analytics: analyticsData?.data || [],
-            kpis: kpisData?.data || {},
-            leads: leadsData?.data || [],
-            opportunities: opportunitiesData?.data || [],
-            metrics: metricsData?.data || {},
-            funnels: funnelsData?.data || [],
-            roi: roiData?.data || []
+            analytics: analyticsData || [],
+            kpis: kpisData[0] || {},
+            leads: leadsData || [],
+            opportunities: opportunitiesData || [],
+            metrics: metricsData[0] || {},
+            funnels: funnelsData || [],
+            roi: roiData || []
         };
-        
+       
         // ===== DATA APPLICATION SECTION =====
         // Apply data to state
         applyReportsData(reportsData);
-        
+       
         // Cache the data
         reportsState.setCachedData(cacheKey, reportsData);
-        
+       
         if (!isBackground) {
             console.log('✅ Dados dos relatórios carregados das tabelas do Supabase');
         } else {
             console.log('🔄 Cache dos relatórios atualizado');
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao carregar dados dos relatórios da API:', error);
         if (!isBackground) {
@@ -761,7 +708,6 @@ async function loadReportsFromAPI(cacheKey, isBackground = false) {
         }
     }
 }
-
 /**
  * Apply reports data to state
  * @param {Object} data - Reports data
@@ -780,17 +726,16 @@ function applyReportsData(data) {
                 ['roi', data.roi]
             ])
         });
-        
+       
         // Process data for charts and KPIs
         processReportsData(data);
-        
+       
         console.log('✅ Dados dos relatórios processados e aplicados ao estado');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao aplicar dados dos relatórios:', error);
     }
 }
-
 /**
  * Process reports data for visualization
  * @param {Object} data - Raw reports data
@@ -798,34 +743,33 @@ function applyReportsData(data) {
 function processReportsData(data) {
     try {
         const processedData = new Map();
-        
+       
         // Process analytics events for time series
         if (data.analytics && Array.isArray(data.analytics)) {
             processedData.set('timeSeriesData', processTimeSeriesData(data.analytics));
         }
-        
+       
         // Process leads for funnel analysis
         if (data.leads && Array.isArray(data.leads)) {
             processedData.set('funnelData', processFunnelData(data.leads));
         }
-        
+       
         // Process opportunities for revenue analysis
         if (data.opportunities && Array.isArray(data.opportunities)) {
             processedData.set('revenueData', processRevenueData(data.opportunities));
         }
-        
+       
         // Process KPIs for dashboard
         if (data.kpis && typeof data.kpis === 'object') {
             processedData.set('kpiData', processKPIData(data.kpis));
         }
-        
+       
         reportsState.setState({ processedData });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar dados dos relatórios:', error);
     }
 }
-
 /**
  * Process time series data for charts
  * @param {Array} analytics - Analytics events
@@ -835,17 +779,17 @@ function processTimeSeriesData(analytics) {
     try {
         const period = reportsState.getState('selectedPeriod');
         const days = REPORTS_CONFIG.PERIODS[period]?.days || 30;
-        
+       
         // Generate date range
         const dateRange = [];
         const now = new Date();
-        
+       
         for (let i = days - 1; i >= 0; i--) {
             const date = new Date(now);
             date.setDate(date.getDate() - i);
             dateRange.push(date.toISOString().split('T')[0]);
         }
-        
+       
         // Group analytics by date
         const groupedData = analytics.reduce((acc, event) => {
             const date = new Date(event.created_at).toISOString().split('T')[0];
@@ -855,14 +799,14 @@ function processTimeSeriesData(analytics) {
             acc[date].push(event);
             return acc;
         }, {});
-        
+       
         // Create time series
         const timeSeries = dateRange.map(date => ({
             date,
             events: groupedData[date]?.length || 0,
             revenue: groupedData[date]?.reduce((sum, event) => sum + (event.value || 0), 0) || 0
         }));
-        
+       
         return {
             labels: dateRange.map(date => new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })),
             datasets: [
@@ -883,13 +827,12 @@ function processTimeSeriesData(analytics) {
                 }
             ]
         };
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar dados de série temporal:', error);
         return { labels: [], datasets: [] };
     }
 }
-
 /**
  * Process funnel data for conversion analysis
  * @param {Array} leads - Leads data
@@ -902,14 +845,14 @@ function processFunnelData(leads) {
             acc[status] = (acc[status] || 0) + 1;
             return acc;
         }, {});
-        
+       
         const funnelStages = [
             { stage: 'Novos', count: statusCounts.novo || 0, color: REPORTS_CONFIG.CHARTS.COLORS.primary },
             { stage: 'Qualificados', count: statusCounts.qualificado || 0, color: REPORTS_CONFIG.CHARTS.COLORS.secondary },
             { stage: 'Propostas', count: statusCounts.proposta || 0, color: REPORTS_CONFIG.CHARTS.COLORS.accent },
             { stage: 'Convertidos', count: statusCounts.convertido || 0, color: REPORTS_CONFIG.CHARTS.COLORS.purple }
         ];
-        
+       
         return {
             labels: funnelStages.map(stage => stage.stage),
             datasets: [{
@@ -919,13 +862,12 @@ function processFunnelData(leads) {
                 borderColor: '#ffffff'
             }]
         };
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar dados do funil:', error);
         return { labels: [], datasets: [] };
     }
 }
-
 /**
  * Process revenue data for financial analysis
  * @param {Array} opportunities - Sales opportunities
@@ -941,16 +883,16 @@ function processRevenueData(opportunities) {
             }
             return acc;
         }, {});
-        
+       
         // Get last 12 months
         const months = [];
         const now = new Date();
-        
+       
         for (let i = 11; i >= 0; i--) {
             const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
             months.push(date.toISOString().slice(0, 7));
         }
-        
+       
         return {
             labels: months.map(month => {
                 const date = new Date(month + '-01');
@@ -964,13 +906,12 @@ function processRevenueData(opportunities) {
                 borderWidth: 1
             }]
         };
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar dados de receita:', error);
         return { labels: [], datasets: [] };
     }
 }
-
 /**
  * Process KPI data for dashboard
  * @param {Object} kpis - KPI data
@@ -980,20 +921,20 @@ function processKPIData(kpis) {
     try {
         const leads = reportsState.getState('rawData')?.get('leads') || [];
         const opportunities = reportsState.getState('rawData')?.get('opportunities') || [];
-        
+       
         // Calculate additional KPIs from raw data
         const totalLeads = leads.length;
         const convertedLeads = leads.filter(lead => lead.status === 'convertido').length;
         const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads * 100).toFixed(1) : 0;
-        
+       
         const totalRevenue = opportunities
             .filter(opp => opp.stage === 'closed_won')
             .reduce((sum, opp) => sum + (opp.value || 0), 0);
-        
+       
         const activeOpportunities = opportunities
             .filter(opp => ['prospecting', 'qualification', 'proposal', 'negotiation'].includes(opp.stage))
             .length;
-        
+       
         return {
             ...kpis,
             totalLeads,
@@ -1002,13 +943,12 @@ function processKPIData(kpis) {
             activeOpportunities,
             avgDealSize: activeOpportunities > 0 ? (totalRevenue / activeOpportunities).toFixed(2) : 0
         };
-        
+       
     } catch (error) {
         console.error('❌ Erro ao processar dados de KPI:', error);
         return kpis || {};
     }
 }
-
 // ===== REAL-TIME SUBSCRIPTIONS - NASA 10/10 =====
 /**
  * Setup real-time subscriptions for live data updates
@@ -1019,10 +959,10 @@ function setupRealTimeSubscriptions() {
             console.log('⏸️ Real-time desabilitado na configuração');
             return;
         }
-        
+       
         const orgId = reportsState.getState('orgId');
         const subscriptions = new Map();
-        
+       
         REPORTS_CONFIG.REAL_TIME.TABLES.forEach(table => {
             try {
                 const subscription = subscribeToTable(
@@ -1034,22 +974,21 @@ function setupRealTimeSubscriptions() {
                     },
                     (payload) => handleRealTimeUpdate(table, payload)
                 );
-                
+               
                 subscriptions.set(table, subscription);
-                
+               
             } catch (subError) {
                 console.warn(`⚠️ Erro ao configurar subscription para ${table}:`, subError);
             }
         });
-        
+       
         reportsState.setState({ subscriptions });
         console.log('✅ Real-time subscriptions configuradas para relatórios');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao configurar subscriptions:', error);
     }
 }
-
 /**
  * Handle real-time data updates
  * @param {string} table - Table name
@@ -1058,24 +997,23 @@ function setupRealTimeSubscriptions() {
 function handleRealTimeUpdate(table, payload) {
     try {
         console.log(`🔄 Atualização real-time recebida: ${table}`);
-        
+       
         // Clear relevant cache
         const orgId = reportsState.getState('orgId');
         const period = reportsState.getState('selectedPeriod');
         const cacheKey = `reports_${orgId}_${period}`;
-        
+       
         reportsState.clearCache(cacheKey);
-        
+       
         // Refresh data
         loadReportsDataWithCache();
-        
+       
         showNotification(`Dados de ${table} atualizados em tempo real!`, 'info');
-        
+       
     } catch (error) {
         console.error(`❌ Erro ao processar atualização real-time de ${table}:`, error);
     }
 }
-
 // ===== INTERFACE RENDERING - NASA 10/10 =====
 /**
  * Render the complete reports interface
@@ -1083,7 +1021,7 @@ function handleRealTimeUpdate(table, payload) {
  */
 async function renderReportsInterface() {
     const startTime = performance.now();
-    
+   
     try {
         // Render components in parallel where possible
         const renderPromises = [
@@ -1093,9 +1031,9 @@ async function renderReportsInterface() {
             renderDataTable(),
             renderExportControls()
         ];
-        
+       
         await Promise.all(renderPromises);
-        
+       
         const endTime = performance.now();
         reportsState.setState({
             metrics: {
@@ -1103,14 +1041,13 @@ async function renderReportsInterface() {
                 renderTime: endTime - startTime
             }
         });
-        
+       
         console.log(`🎨 Interface de relatórios renderizada em ${(endTime - startTime).toFixed(2)}ms`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar interface de relatórios:', error);
     }
 }
-
 /**
  * Render reports header with controls
  * @returns {Promise<void>}
@@ -1119,10 +1056,10 @@ async function renderReportsHeader() {
     try {
         const headerContainer = document.getElementById('reports-header');
         if (!headerContainer) return;
-        
+       
         const selectedPeriod = reportsState.getState('selectedPeriod');
         const selectedMetrics = reportsState.getState('selectedMetrics');
-        
+       
         const headerHTML = `
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -1130,7 +1067,7 @@ async function renderReportsHeader() {
                         <h1 class="text-2xl font-bold text-gray-900">Relatórios Avançados</h1>
                         <p class="text-gray-600">Analytics em tempo real com dados do Supabase</p>
                     </div>
-                    
+                   
                     <div class="flex flex-col sm:flex-row gap-4">
                         <div class="flex items-center space-x-2">
                             <label for="period-select" class="text-sm font-medium text-gray-700">Período:</label>
@@ -1140,7 +1077,7 @@ async function renderReportsHeader() {
                                 `).join('')}
                             </select>
                         </div>
-                        
+                       
                         <div class="flex items-center space-x-2">
                             <label for="metrics-select" class="text-sm font-medium text-gray-700">Métricas:</label>
                             <select id="metrics-select" multiple class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1149,7 +1086,7 @@ async function renderReportsHeader() {
                                 `).join('')}
                             </select>
                         </div>
-                        
+                       
                         <button id="refresh-reports" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             🔄 Atualizar
                         </button>
@@ -1157,14 +1094,13 @@ async function renderReportsHeader() {
                 </div>
             </div>
         `;
-        
+       
         headerContainer.innerHTML = headerHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar header dos relatórios:', error);
     }
 }
-
 /**
  * Render KPI cards
  * @returns {Promise<void>}
@@ -1173,17 +1109,17 @@ async function renderKPICards() {
     try {
         const kpiContainer = document.getElementById('kpi-cards');
         if (!kpiContainer) return;
-        
+       
         const kpiData = reportsState.getState('processedData')?.get('kpiData') || {};
         const selectedMetrics = reportsState.getState('selectedMetrics');
-        
+       
         const kpiCards = REPORTS_CONFIG.METRICS
             .filter(metric => selectedMetrics.includes(metric.value))
             .map(metric => {
                 const value = kpiData[metric.value] || 0;
                 const formattedValue = formatValue(value, metric.format);
                 const styles = REPORTS_CONFIG.STATIC_STYLES.kpi[metric.color] || REPORTS_CONFIG.STATIC_STYLES.kpi.revenue;
-                
+               
                 return `
                     <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex items-center">
@@ -1200,18 +1136,17 @@ async function renderKPICards() {
                     </div>
                 `;
             }).join('');
-        
+       
         kpiContainer.innerHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-6">
                 ${kpiCards}
             </div>
         `;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar KPI cards:', error);
     }
 }
-
 /**
  * Render charts section
  * @returns {Promise<void>}
@@ -1220,7 +1155,7 @@ async function renderChartsSection() {
     try {
         const chartsContainer = document.getElementById('charts-section');
         if (!chartsContainer) return;
-        
+       
         const chartsHTML = `
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow p-6">
@@ -1229,21 +1164,21 @@ async function renderChartsSection() {
                         <canvas id="time-series-chart"></canvas>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Funil de Conversão</h3>
                     <div class="relative h-64">
                         <canvas id="funnel-chart"></canvas>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Receita Mensal</h3>
                     <div class="relative h-64">
                         <canvas id="revenue-chart"></canvas>
                     </div>
                 </div>
-                
+               
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Distribuição por Fonte</h3>
                     <div class="relative h-64">
@@ -1252,9 +1187,9 @@ async function renderChartsSection() {
                 </div>
             </div>
         `;
-        
+       
         chartsContainer.innerHTML = chartsHTML;
-        
+       
         // Render individual charts
         await Promise.all([
             renderTimeSeriesChart(),
@@ -1262,12 +1197,11 @@ async function renderChartsSection() {
             renderRevenueChart(),
             renderSourceChart()
         ]);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar seção de gráficos:', error);
     }
 }
-
 /**
  * Render time series chart
  * @returns {Promise<void>}
@@ -1276,16 +1210,16 @@ async function renderTimeSeriesChart() {
     try {
         const canvas = document.getElementById('time-series-chart');
         if (!canvas) return;
-        
+       
         // Destroy existing chart
         const existingChart = reportsState.getState('chartInstances')?.get('timeSeries');
         if (existingChart) {
             existingChart.destroy();
         }
-        
+       
         const ctx = canvas.getContext('2d');
         const timeSeriesData = reportsState.getState('processedData')?.get('timeSeriesData') || { labels: [], datasets: [] };
-        
+       
         const chart = new Chart(ctx, {
             type: 'line',
             data: timeSeriesData,
@@ -1304,17 +1238,16 @@ async function renderTimeSeriesChart() {
                 }
             }
         });
-        
+       
         // Store chart instance
         const chartInstances = reportsState.getState('chartInstances');
         chartInstances.set('timeSeries', chart);
         reportsState.setState({ chartInstances });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar gráfico de série temporal:', error);
     }
 }
-
 /**
  * Render funnel chart
  * @returns {Promise<void>}
@@ -1323,16 +1256,16 @@ async function renderFunnelChart() {
     try {
         const canvas = document.getElementById('funnel-chart');
         if (!canvas) return;
-        
+       
         // Destroy existing chart
         const existingChart = reportsState.getState('chartInstances')?.get('funnel');
         if (existingChart) {
             existingChart.destroy();
         }
-        
+       
         const ctx = canvas.getContext('2d');
         const funnelData = reportsState.getState('processedData')?.get('funnelData') || { labels: [], datasets: [] };
-        
+       
         const chart = new Chart(ctx, {
             type: 'doughnut',
             data: funnelData,
@@ -1346,17 +1279,16 @@ async function renderFunnelChart() {
                 }
             }
         });
-        
+       
         // Store chart instance
         const chartInstances = reportsState.getState('chartInstances');
         chartInstances.set('funnel', chart);
         reportsState.setState({ chartInstances });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar gráfico de funil:', error);
     }
 }
-
 /**
  * Render revenue chart
  * @returns {Promise<void>}
@@ -1365,16 +1297,16 @@ async function renderRevenueChart() {
     try {
         const canvas = document.getElementById('revenue-chart');
         if (!canvas) return;
-        
+       
         // Destroy existing chart
         const existingChart = reportsState.getState('chartInstances')?.get('revenue');
         if (existingChart) {
             existingChart.destroy();
         }
-        
+       
         const ctx = canvas.getContext('2d');
         const revenueData = reportsState.getState('processedData')?.get('revenueData') || { labels: [], datasets: [] };
-        
+       
         const chart = new Chart(ctx, {
             type: 'bar',
             data: revenueData,
@@ -1393,17 +1325,16 @@ async function renderRevenueChart() {
                 }
             }
         });
-        
+       
         // Store chart instance
         const chartInstances = reportsState.getState('chartInstances');
         chartInstances.set('revenue', chart);
         reportsState.setState({ chartInstances });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar gráfico de receita:', error);
     }
 }
-
 /**
  * Render source distribution chart
  * @returns {Promise<void>}
@@ -1412,15 +1343,15 @@ async function renderSourceChart() {
     try {
         const canvas = document.getElementById('source-chart');
         if (!canvas) return;
-        
+       
         // Destroy existing chart
         const existingChart = reportsState.getState('chartInstances')?.get('source');
         if (existingChart) {
             existingChart.destroy();
         }
-        
+       
         const ctx = canvas.getContext('2d');
-        
+       
         // Process leads by source
         const leads = reportsState.getState('rawData')?.get('leads') || [];
         const sourceData = leads.reduce((acc, lead) => {
@@ -1428,7 +1359,7 @@ async function renderSourceChart() {
             acc[source] = (acc[source] || 0) + 1;
             return acc;
         }, {});
-        
+       
         const chartData = {
             labels: Object.keys(sourceData),
             datasets: [{
@@ -1445,23 +1376,22 @@ async function renderSourceChart() {
                 borderColor: '#ffffff'
             }]
         };
-        
+       
         const chart = new Chart(ctx, {
             type: 'pie',
             data: chartData,
             options: REPORTS_CONFIG.CHARTS.DEFAULTS
         });
-        
+       
         // Store chart instance
         const chartInstances = reportsState.getState('chartInstances');
         chartInstances.set('source', chart);
         reportsState.setState({ chartInstances });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar gráfico de fontes:', error);
     }
 }
-
 /**
  * Render data table
  * @returns {Promise<void>}
@@ -1470,10 +1400,10 @@ async function renderDataTable() {
     try {
         const tableContainer = document.getElementById('data-table');
         if (!tableContainer) return;
-        
+       
         const leads = reportsState.getState('rawData')?.get('leads') || [];
         const displayLeads = leads.slice(0, 50); // Show first 50 for performance
-        
+       
         const tableHTML = `
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -1490,7 +1420,7 @@ async function renderDataTable() {
                         </button>
                     </div>
                 </div>
-                
+               
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -1519,7 +1449,7 @@ async function renderDataTable() {
                         </tbody>
                     </table>
                 </div>
-                
+               
                 ${leads.length > 50 ? `
                     <div class="mt-4 text-center">
                         <p class="text-sm text-gray-500">Mostrando 50 de ${leads.length} registros</p>
@@ -1530,14 +1460,13 @@ async function renderDataTable() {
                 ` : ''}
             </div>
         `;
-        
+       
         tableContainer.innerHTML = tableHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar tabela de dados:', error);
     }
 }
-
 /**
  * Get status badge CSS class
  * @param {string} status - Lead status
@@ -1557,7 +1486,6 @@ function getStatusBadgeClass(status) {
             return 'bg-gray-100 text-gray-800';
     }
 }
-
 /**
  * Render export controls
  * @returns {Promise<void>}
@@ -1566,33 +1494,33 @@ async function renderExportControls() {
     try {
         const exportContainer = document.getElementById('export-controls');
         if (!exportContainer) return;
-        
+       
         const exportHTML = `
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Exportar Relatórios</h3>
-                
+               
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <button id="export-full-pdf" class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <span class="mr-2">📋</span>
                         Relatório PDF
                     </button>
-                    
+                   
                     <button id="export-full-excel" class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <span class="mr-2">📊</span>
                         Planilha Excel
                     </button>
-                    
+                   
                     <button id="export-powerpoint" class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <span class="mr-2">📈</span>
                         PowerPoint
                     </button>
-                    
+                   
                     <button id="export-dashboard" class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <span class="mr-2">📱</span>
                         Dashboard
                     </button>
                 </div>
-                
+               
                 <div class="mt-4 p-4 bg-blue-50 rounded-md">
                     <div class="flex">
                         <div class="flex-shrink-0">
@@ -1613,14 +1541,13 @@ async function renderExportControls() {
                 </div>
             </div>
         `;
-        
+       
         exportContainer.innerHTML = exportHTML;
-        
+       
     } catch (error) {
         console.error('❌ Erro ao renderizar controles de exportação:', error);
     }
 }
-
 // ===== EVENT LISTENERS SETUP - NASA 10/10 =====
 /**
  * Setup event listeners with enhanced performance and accessibility
@@ -1632,46 +1559,45 @@ function setupEventListeners() {
         if (periodSelect) {
             periodSelect.addEventListener('change', handlePeriodChange);
         }
-        
+       
         // Metrics selection
         const metricsSelect = document.getElementById('metrics-select');
         if (metricsSelect) {
             metricsSelect.addEventListener('change', handleMetricsChange);
         }
-        
+       
         // Refresh button
         const refreshBtn = document.getElementById('refresh-reports');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', refreshReports);
         }
-        
+       
         // Export buttons
         setupExportEventListeners();
-        
+       
         // Keyboard navigation - NASA 10/10 accessibility
         if (REPORTS_CONFIG.ACCESSIBILITY?.keyboardNavigation) {
             document.addEventListener('keydown', handleKeyboardNavigation);
         }
-        
+       
         // Window resize handler for responsive charts
         window.addEventListener('resize', debounce(() => {
             resizeCharts();
         }, 250));
-        
+       
         // Page visibility change handler
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 refreshReports();
             }
         });
-        
+       
         console.log('✅ Event listeners configurados para relatórios');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao configurar event listeners:', error);
     }
 }
-
 /**
  * Setup export event listeners
  */
@@ -1687,19 +1613,18 @@ function setupExportEventListeners() {
             { id: 'export-powerpoint', handler: () => exportFullReport('powerpoint') },
             { id: 'export-dashboard', handler: () => exportDashboard() }
         ];
-        
+       
         exportButtons.forEach(({ id, handler }) => {
             const button = document.getElementById(id);
             if (button) {
                 button.addEventListener('click', handler);
             }
         });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao configurar event listeners de exportação:', error);
     }
 }
-
 /**
  * Handle period change
  * @param {Event} event - Change event
@@ -1708,20 +1633,19 @@ function handlePeriodChange(event) {
     try {
         const newPeriod = event.target.value;
         reportsState.setState({ selectedPeriod: newPeriod });
-        
+       
         // Clear cache for new period
         reportsState.clearCache();
-        
+       
         // Reload data
         loadReportsDataWithCache();
-        
+       
         console.log(`📅 Período alterado para: ${REPORTS_CONFIG.PERIODS[newPeriod]?.label}`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao alterar período:', error);
     }
 }
-
 /**
  * Handle metrics selection change
  * @param {Event} event - Change event
@@ -1730,19 +1654,18 @@ function handleMetricsChange(event) {
     try {
         const selectedOptions = Array.from(event.target.selectedOptions);
         const selectedMetrics = selectedOptions.map(option => option.value);
-        
+       
         reportsState.setState({ selectedMetrics });
-        
+       
         // Re-render KPI cards
         renderKPICards();
-        
+       
         console.log(`📊 Métricas selecionadas: ${selectedMetrics.join(', ')}`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao alterar métricas:', error);
     }
 }
-
 /**
  * Handle keyboard navigation - NASA 10/10 accessibility
  * @param {KeyboardEvent} e - Keyboard event
@@ -1754,29 +1677,28 @@ function handleKeyboardNavigation(e) {
             e.preventDefault();
             refreshReports();
         }
-        
+       
         // Ctrl/Cmd + E: Export to Excel
         if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
             e.preventDefault();
             exportData('excel');
         }
-        
+       
         // Ctrl/Cmd + P: Export to PDF
         if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
             e.preventDefault();
             exportFullReport('pdf');
         }
-        
+       
         // Escape: Close modals
         if (e.key === 'Escape') {
             closeAllModals();
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro na navegação por teclado:', error);
     }
 }
-
 /**
  * Debounce function for performance optimization
  * @param {Function} func - Function to debounce
@@ -1794,7 +1716,6 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-
 /**
  * Resize charts for responsive design
  */
@@ -1808,12 +1729,11 @@ function resizeCharts() {
                 }
             }
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao redimensionar gráficos:', error);
     }
 }
-
 // ===== ACTION FUNCTIONS - NASA 10/10 =====
 /**
  * Refresh reports data
@@ -1824,25 +1744,24 @@ async function refreshReports() {
             console.log('⏳ Atualização já em andamento...');
             return;
         }
-        
+       
         showLoading(true, 'Atualizando relatórios...');
-        
+       
         // Clear cache to force fresh data
         reportsState.clearCache();
-        
+       
         await loadReportsDataWithCache();
         await renderReportsInterface();
-        
+       
         showLoading(false);
         showSuccess('Relatórios atualizados com sucesso!');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao atualizar relatórios:', error);
         showLoading(false);
         showError('Erro ao atualizar relatórios');
     }
 }
-
 /**
  * Export data in specified format
  * @param {string} format - Export format (csv, excel, pdf)
@@ -1853,12 +1772,12 @@ async function exportData(format) {
             console.log('⏳ Exportação já em andamento...');
             return;
         }
-        
+       
         reportsState.setState({ isExporting: true });
         showLoading(true, `Exportando dados em formato ${format.toUpperCase()}...`);
-        
+       
         const leads = reportsState.getState('rawData')?.get('leads') || [];
-        
+       
         switch (format) {
             case 'csv':
                 await exportToCSV(leads);
@@ -1872,9 +1791,9 @@ async function exportData(format) {
             default:
                 throw new Error(`Formato de exportação não suportado: ${format}`);
         }
-        
+       
         showSuccess(`Dados exportados em formato ${format.toUpperCase()} com sucesso!`);
-        
+       
     } catch (error) {
         console.error(`❌ Erro ao exportar dados em formato ${format}:`, error);
         showError(`Erro ao exportar dados em formato ${format.toUpperCase()}`);
@@ -1883,7 +1802,6 @@ async function exportData(format) {
         showLoading(false);
     }
 }
-
 /**
  * Export to CSV format
  * @param {Array} data - Data to export
@@ -1891,20 +1809,19 @@ async function exportData(format) {
 async function exportToCSV(data) {
     try {
         const { Papa } = validateDependencies();
-        
+       
         const csvContent = Papa.unparse(data, {
             header: true,
             encoding: 'utf-8'
         });
-        
+       
         downloadFile(csvContent, `relatorios_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
-        
+       
     } catch (error) {
         console.error('❌ Erro ao exportar CSV:', error);
         throw error;
     }
 }
-
 /**
  * Export to Excel format
  * @param {Array} data - Data to export
@@ -1912,22 +1829,21 @@ async function exportToCSV(data) {
 async function exportToExcel(data) {
     try {
         const { XLSX } = validateDependencies();
-        
+       
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatórios');
-        
+       
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        
+       
         downloadBlob(blob, `relatorios_${new Date().toISOString().split('T')[0]}.xlsx`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao exportar Excel:', error);
         throw error;
     }
 }
-
 /**
  * Export to PDF format
  * @param {Array} data - Data to export
@@ -1935,39 +1851,38 @@ async function exportToExcel(data) {
 async function exportToPDF(data) {
     try {
         const { jsPDF } = validateDependencies();
-        
+       
         const doc = new jsPDF();
-        
+       
         // Add title
         doc.setFontSize(20);
         doc.text('Relatório de Dados', 20, 20);
-        
+       
         // Add date
         doc.setFontSize(12);
         doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 20, 35);
-        
+       
         // Add data table (simplified)
         let yPosition = 50;
         const pageHeight = doc.internal.pageSize.height;
-        
+       
         data.slice(0, 50).forEach((item, index) => {
             if (yPosition > pageHeight - 20) {
                 doc.addPage();
                 yPosition = 20;
             }
-            
+           
             doc.text(`${index + 1}. ${item.nome || 'N/A'} - ${item.email || 'N/A'}`, 20, yPosition);
             yPosition += 10;
         });
-        
+       
         doc.save(`relatorios_${new Date().toISOString().split('T')[0]}.pdf`);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao exportar PDF:', error);
         throw error;
     }
 }
-
 /**
  * Export full report in specified format
  * @param {string} format - Export format
@@ -1975,48 +1890,46 @@ async function exportToPDF(data) {
 async function exportFullReport(format) {
     try {
         showLoading(true, `Gerando relatório completo em formato ${format.toUpperCase()}...`);
-        
+       
         // Implementation would depend on the specific format
         // This is a placeholder for the full report generation
-        
+       
         console.log(`📄 Gerando relatório completo em formato ${format}`);
-        
+       
         setTimeout(() => {
             showLoading(false);
             showSuccess(`Relatório completo em formato ${format.toUpperCase()} gerado com sucesso!`);
         }, 2000);
-        
+       
     } catch (error) {
         console.error(`❌ Erro ao gerar relatório completo em formato ${format}:`, error);
         showLoading(false);
         showError(`Erro ao gerar relatório completo em formato ${format.toUpperCase()}`);
     }
 }
-
 /**
  * Export dashboard snapshot
  */
 async function exportDashboard() {
     try {
         showLoading(true, 'Gerando snapshot do dashboard...');
-        
+       
         // Implementation would capture the current dashboard state
         // This is a placeholder for dashboard export
-        
+       
         console.log('📱 Gerando snapshot do dashboard');
-        
+       
         setTimeout(() => {
             showLoading(false);
             showSuccess('Snapshot do dashboard gerado com sucesso!');
         }, 1500);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao gerar snapshot do dashboard:', error);
         showLoading(false);
         showError('Erro ao gerar snapshot do dashboard');
     }
 }
-
 /**
  * Download file with content
  * @param {string} content - File content
@@ -2027,13 +1940,12 @@ function downloadFile(content, filename, mimeType) {
     try {
         const blob = new Blob([content], { type: mimeType });
         downloadBlob(blob, filename);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao fazer download do arquivo:', error);
         throw error;
     }
 }
-
 /**
  * Download blob as file
  * @param {Blob} blob - Blob to download
@@ -2043,23 +1955,22 @@ function downloadBlob(blob, filename) {
     try {
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
-        
+       
         link.setAttribute('href', url);
         link.setAttribute('download', filename);
         link.style.visibility = 'hidden';
-        
+       
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+       
         URL.revokeObjectURL(url);
-        
+       
     } catch (error) {
         console.error('❌ Erro ao fazer download do blob:', error);
         throw error;
     }
 }
-
 /**
  * Close all modals
  */
@@ -2069,12 +1980,11 @@ function closeAllModals() {
         modals.forEach(modal => {
             modal.classList.add('hidden');
         });
-        
+       
     } catch (error) {
         console.error('❌ Erro ao fechar modais:', error);
     }
 }
-
 // ===== UTILITY FUNCTIONS - NASA 10/10 =====
 /**
  * Format value based on type
@@ -2087,34 +1997,33 @@ function formatValue(value, format) {
         if (value === null || value === undefined || isNaN(value)) {
             return '-';
         }
-        
+       
         const numValue = parseFloat(value);
-        
+       
         switch (format) {
             case 'currency':
                 return new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
                 }).format(numValue);
-                
+               
             case 'percentage':
                 return new Intl.NumberFormat('pt-BR', {
                     style: 'percent',
                     minimumFractionDigits: 1,
                     maximumFractionDigits: 1
                 }).format(numValue / 100);
-                
+               
             case 'number':
             default:
                 return new Intl.NumberFormat('pt-BR').format(numValue);
         }
-        
+       
     } catch (error) {
         console.error('Erro ao formatar valor:', error);
         return String(value);
     }
 }
-
 /**
  * Format date for display
  * @param {string} dateString - ISO date string
@@ -2123,22 +2032,21 @@ function formatValue(value, format) {
 function formatDate(dateString) {
     try {
         if (!dateString) return '-';
-        
+       
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return '-';
-        
+       
         return date.toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
         });
-        
+       
     } catch (error) {
         console.error('Erro ao formatar data:', error);
         return '-';
     }
 }
-
 // ===== NOTIFICATION SYSTEM - NASA 10/10 =====
 /**
  * Show loading state
@@ -2148,7 +2056,7 @@ function formatDate(dateString) {
 function showLoading(show, message = 'Carregando...') {
     try {
         let loadingElement = document.getElementById('loading-overlay');
-        
+       
         if (show) {
             if (!loadingElement) {
                 loadingElement = document.createElement('div');
@@ -2170,12 +2078,11 @@ function showLoading(show, message = 'Carregando...') {
                 loadingElement.classList.add('hidden');
             }
         }
-        
+       
     } catch (error) {
         console.error('❌ Erro ao mostrar loading:', error);
     }
 }
-
 /**
  * Show success notification
  * @param {string} message - Success message
@@ -2183,7 +2090,6 @@ function showLoading(show, message = 'Carregando...') {
 function showSuccess(message) {
     showNotification(message, 'success');
 }
-
 /**
  * Show error notification
  * @param {string} message - Error message
@@ -2191,7 +2097,6 @@ function showSuccess(message) {
 function showError(message) {
     showNotification(message, 'error');
 }
-
 /**
  * Show warning notification
  * @param {string} message - Warning message
@@ -2199,7 +2104,6 @@ function showError(message) {
 function showWarning(message) {
     showNotification(message, 'warning');
 }
-
 /**
  * Show notification with enhanced styling and accessibility
  * @param {string} message - Notification message
@@ -2211,13 +2115,12 @@ function showNotification(message, type = 'info', duration = 5000) {
         // Remove existing notifications of the same type
         const existingNotifications = document.querySelectorAll(`.notification-${type}`);
         existingNotifications.forEach(notification => notification.remove());
-
         // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification-${type} fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 max-w-sm ${getNotificationClasses(type)}`;
         notification.setAttribute('role', 'alert');
         notification.setAttribute('aria-live', 'polite');
-        
+       
         notification.innerHTML = `
             <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
@@ -2226,262 +2129,8 @@ function showNotification(message, type = 'info', duration = 5000) {
                 <div class="flex-1">
                     <p class="text-sm font-medium"></p>
                 </div>
-                <button onclick="this.parentElement.parentElement.remove()" 
+                <button onclick="this.parentElement.parentElement.remove()"
                         class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
                         aria-label="Fechar notificação">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-        `;
-        
-        // Safely set message text with XSS protection
-        const messageElement = notification.querySelector('p');
-        if (messageElement) {
-            // Use textContent for XSS protection instead of innerHTML
-            messageElement.textContent = message;
-        }
-        
-        document.body.appendChild(notification);
-        
-        // Animate in
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-        
-        // Auto-remove with fade out
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 300);
-        }, duration);
-
-    } catch (error) {
-        console.error('❌ Erro ao mostrar notificação:', error);
-        // Fallback to alert
-        alert(message);
-    }
-}
-
-/**
- * Get notification CSS classes based on type
- * @param {'success'|'error'|'warning'|'info'} type - Notification type
- * @returns {string} CSS classes
- */
-function getNotificationClasses(type) {
-    switch (type) {
-        case 'success':
-            return 'bg-green-50 border border-green-200 text-green-800';
-        case 'error':
-            return 'bg-red-50 border border-red-200 text-red-800';
-        case 'warning':
-            return 'bg-yellow-50 border border-yellow-200 text-yellow-800';
-        default:
-            return 'bg-blue-50 border border-blue-200 text-blue-800';
-    }
-}
-
-/**
- * Get notification icon SVG based on type
- * @param {'success'|'error'|'warning'|'info'} type - Notification type
- * @returns {string} SVG icon HTML
- */
-function getNotificationIcon(type) {
-    switch (type) {
-        case 'success':
-            return '<svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
-        case 'error':
-            return '<svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
-        case 'warning':
-            return '<svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
-        default:
-            return '<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>';
-    }
-}
-
-// ===== ERROR HANDLING - NASA 10/10 =====
-/**
- * Handle critical errors with recovery strategies
- * @param {Error} error - Critical error
- */
-async function handleCriticalError(error) {
-    try {
-        console.error('🚨 Erro crítico nos relatórios:', error);
-        
-        reportsState.setState({
-            errors: [...reportsState.getState('errors'), {
-                type: 'critical_error',
-                message: error.message,
-                timestamp: new Date()
-            }],
-            isLoading: false
-        });
-        
-        showLoading(false);
-        showError(`Erro crítico: ${error.message}. Carregando dados demo.`);
-        
-        // Try to load demo data as fallback
-        console.log('🔄 Tentando carregar dados demo como fallback...');
-        loadDemoReportsData();
-        
-    } catch (fallbackError) {
-        console.error('🚨 Erro no fallback:', fallbackError);
-        showError('Sistema temporariamente indisponível. Tente recarregar a página.');
-    }
-}
-
-/**
- * Load demo data as fallback
- */
-function loadDemoReportsData() {
-    try {
-        console.log('📋 Carregando dados demo dos relatórios...');
-        
-        // Demo data
-        const demoData = {
-            analytics: [
-                { id: 1, event_type: 'page_view', created_at: new Date().toISOString(), value: 1 },
-                { id: 2, event_type: 'lead_created', created_at: new Date().toISOString(), value: 100 }
-            ],
-            kpis: {
-                totalLeads: 150,
-                conversionRate: 22.5,
-                totalRevenue: 125000,
-                activeOpportunities: 25
-            },
-            leads: [
-                { id: 1, nome: 'João Silva', email: 'joao@email.com', status: 'novo', source: 'Website', created_at: new Date().toISOString() },
-                { id: 2, nome: 'Maria Santos', email: 'maria@email.com', status: 'qualificado', source: 'Facebook', created_at: new Date().toISOString() }
-            ],
-            opportunities: [
-                { id: 1, title: 'Oportunidade Demo', stage: 'closed_won', value: 10000, closed_date: new Date().toISOString() }
-            ],
-            metrics: {},
-            funnels: [],
-            roi: []
-        };
-        
-        applyReportsData(demoData);
-        renderReportsInterface();
-        
-        console.log('✅ Dados demo dos relatórios carregados com sucesso');
-        showWarning('Usando dados demo - verifique a conexão com o Supabase');
-        
-    } catch (error) {
-        console.error('❌ Erro ao carregar dados demo dos relatórios:', error);
-        showError('Erro ao carregar dados demo dos relatórios');
-    }
-}
-
-// ===== CLEANUP AND LIFECYCLE - NASA 10/10 =====
-/**
- * Cleanup function for page unload
- */
-function cleanup() {
-    try {
-        // Clear intervals and subscriptions
-        const subscriptions = reportsState.getState('subscriptions');
-        if (subscriptions) {
-            for (const [table, subscription] of subscriptions.entries()) {
-                try {
-                    unsubscribeFromTable(subscription);
-                } catch (error) {
-                    console.warn(`⚠️ Erro ao cancelar subscription de ${table}:`, error);
-                }
-            }
-        }
-        
-        // Destroy charts
-        const chartInstances = reportsState.getState('chartInstances');
-        if (chartInstances) {
-            for (const [name, chart] of chartInstances.entries()) {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
-                }
-            }
-        }
-        
-        // Clear cache
-        reportsState.clearCache();
-        
-        console.log('✅ Cleanup dos relatórios concluído');
-        
-    } catch (error) {
-        console.error('❌ Erro durante cleanup dos relatórios:', error);
-    }
-}
-
-// Setup cleanup on page unload
-window.addEventListener('beforeunload', cleanup);
-
-// ===== PUBLIC API - NASA 10/10 =====
-/**
- * Public API for external use
- * Enhanced with NASA 10/10 standards and comprehensive functionality
- * @namespace ReportsSystem
- */
-const ReportsSystem = {
-    // State management
-    getState: () => reportsState.getState(),
-    setState: (updates, callback) => reportsState.setState(updates, callback),
-    
-    // Data operations
-    refresh: refreshReports,
-    loadData: loadReportsDataWithCache,
-    
-    // Export operations
-    exportData: exportData,
-    exportFullReport: exportFullReport,
-    exportDashboard: exportDashboard,
-    
-    // Chart operations
-    getCharts: () => reportsState.getState('chartInstances'),
-    resizeCharts: resizeCharts,
-    
-    // Cache management
-    clearCache: (filter) => reportsState.clearCache(filter),
-    getCacheStats: () => ({
-        size: reportsState.state.cache.data.size,
-        hits: reportsState.getState('metrics').cacheHits
-    }),
-    
-    // Performance monitoring
-    getMetrics: () => reportsState.getState('metrics'),
-    
-    // Configuration
-    getConfig: () => REPORTS_CONFIG,
-    
-    // Version info
-    version: '5.0.0',
-    buildDate: new Date().toISOString()
-};
-
-// Export for ES Modules compatibility
-export default ReportsSystem;
-
-// Named exports for tree-shaking optimization
-export {
-    reportsState,
-    REPORTS_CONFIG,
-    initializeReports,
-    loadReportsDataWithCache,
-    renderReportsInterface,
-    refreshReports,
-    exportData,
-    showNotification
-};
-
-// Also attach to window for backward compatibility
-window.ReportsSystem = ReportsSystem;
-
-console.log('📊 Sistema de Relatórios Enterprise V5.0 NASA 10/10 carregado - Pronto para dados reais!');
-console.log('✅ ES Modules e Vite compatibility otimizados');
-console.log('🚀 Performance e cache inteligente implementados');
-console.log('🔒 Segurança e validação enterprise ativas');
-console.log('📈 Analytics avançados e exportação multi-formato disponíveis');
-
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0
