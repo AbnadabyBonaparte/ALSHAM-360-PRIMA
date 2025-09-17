@@ -6,12 +6,13 @@
   <meta name="description" content="Sistema Enterprise de Configurações - ALSHAM 360° PRIMA. Gerencie perfil, organização, equipe, segurança e integrações." />
   <meta name="robots" content="noindex, nofollow" />
 
+  <!-- CSP unificado -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: blob: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     font-src 'self' https://fonts.gstatic.com;
     frame-src 'self' https://apis.google.com;
   " />
@@ -28,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 min-h-screen antialiased">
@@ -83,9 +84,19 @@
     </div>
   </main>
 
-  <!-- Scripts -->
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/configuracoes.js"></script>
+  <!-- Scripts corrigidos -->
+  <script type="module" src="/src/components/navigation.js"></script>
+  <script type="module" src="/src/js/auth.js"></script>
+  <script type="module" src="/src/js/configuracoes.js"></script>
+
+  <!-- Fallback noscript -->
+  <noscript>
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-white p-8 rounded-lg max-w-md text-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
+        <p class="text-gray-600">Ative o JavaScript para usar as configurações do ALSHAM 360° PRIMA.</p>
+      </div>
+    </div>
+  </noscript>
 </body>
 </html>
