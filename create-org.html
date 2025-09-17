@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Criar Organização - ALSHAM 360° PRIMA</title>
 
-  <!-- CSP unificado -->
+  <!-- Segurança (CSP) -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
@@ -16,7 +16,7 @@
     frame-src 'self' https://apis.google.com;
   " />
 
-  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-6 font-inter">
 
@@ -69,7 +69,7 @@
   <script type="module">
     import { supabase, DEFAULT_ORG_ID } from '/src/lib/supabase.js';
 
-    window.createOrganization = async function createOrganization() {
+    window.createOrganization = async function () {
       const status = document.getElementById('create-status');
       const name = document.getElementById('org-name').value.trim();
       const id = document.getElementById('org-id').value.trim();
@@ -100,7 +100,7 @@
       }
     };
 
-    window.verifyOrganization = async function verifyOrganization() {
+    window.verifyOrganization = async function () {
       const status = document.getElementById('verify-status');
       const dataEl = document.getElementById('verify-data');
       const id = document.getElementById('org-id').value.trim();
@@ -130,7 +130,7 @@
       }
     };
 
-    window.listOrganizations = async function listOrganizations() {
+    window.listOrganizations = async function () {
       const status = document.getElementById('list-status');
       const dataEl = document.getElementById('list-data');
 
@@ -149,8 +149,8 @@
         status.textContent = `✅ ${data.length} encontradas`;
         dataEl.classList.remove('hidden');
         dataEl.innerHTML = data.map(org => `
-          <strong>${org.name}</strong> (${org.id})
-          <br>Criada: ${new Date(org.created_at).toLocaleString('pt-BR')}
+          <strong>${org.name}</strong> (${org.id})<br>
+          Criada: ${new Date(org.created_at).toLocaleString('pt-BR')}
           <hr>
         `).join('');
       } catch (err) {
@@ -159,7 +159,7 @@
       }
     };
 
-    window.setupComplete = async function setupComplete() {
+    window.setupComplete = async function () {
       const status = document.getElementById('complete-status');
       status.className = 'status loading';
       status.textContent = 'Executando setup...';
