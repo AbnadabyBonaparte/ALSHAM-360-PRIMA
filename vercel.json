@@ -8,7 +8,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-eval' https://*.supabase.co https://*.vercel.app; connect-src 'self' https://*.supabase.co ws://*.supabase.co; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self';"
         },
         {
           "key": "X-Content-Type-Options",
@@ -25,6 +25,14 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=()"
         }
       ]
     },
@@ -57,33 +65,12 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/leads",
-      "destination": "/leads.html"
-    },
-    {
-      "source": "/gamificacao",
-      "destination": "/gamificacao.html"
-    },
-    {
-      "source": "/automacoes",
-      "destination": "/automacoes.html"
-    },
-    {
-      "source": "/relatorios",
-      "destination": "/relatorios.html"
-    },
-    {
-      "source": "/configuracoes",
-      "destination": "/configuracoes.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/register",
-      "destination": "/register.html"
-    }
+    { "source": "/leads", "destination": "/leads.html" },
+    { "source": "/gamificacao", "destination": "/gamificacao.html" },
+    { "source": "/automacoes", "destination": "/automacoes.html" },
+    { "source": "/relatorios", "destination": "/relatorios.html" },
+    { "source": "/configuracoes", "destination": "/configuracoes.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/register.html" }
   ]
 }
