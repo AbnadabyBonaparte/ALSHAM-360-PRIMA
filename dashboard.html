@@ -55,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SEU_ID_REAL"></script>
@@ -93,13 +93,12 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/src/components/navigation.js" defer></script>
-  <script type="module" src="/src/main.js" defer></script>
-  <script type="module" src="/src/js/auth.js" defer></script>
-  <script type="module" src="/src/js/dashboard.js" defer></script>
+  <script type="module" src="/js/navigation.js" defer></script>
+  <script type="module" src="/js/main.js" defer></script>
+  <script type="module" src="/js/auth.js" defer></script>
+  <script type="module" src="/js/dashboard.js" defer></script>
 
   <script>
-    // Remover loading quando dashboard.js carregar
     window.addEventListener('load', () => {
       document.getElementById('loading-indicator').style.display = 'none';
     });
