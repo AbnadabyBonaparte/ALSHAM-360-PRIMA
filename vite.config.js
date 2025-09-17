@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import fs from 'node:fs/promises'; // Para leitura async de arquivos no plugin
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -58,6 +59,20 @@ export default defineConfig(({ command, mode }) => {
       exclude: [
         // Exclude if causing issues, e.g., dynamic imports
       ],
+      esbuildOptions: {
+        // Plugin para tratar .js como .jsx (resolve erro de JSX em .js)
+        plugins: [
+          {
+            name: 'load-js-files-as-jsx',
+            setup(build) {
+              build.onLoad({ filter: /src\/.*\.js$/ }, async (args) => ({
+                loader: 'jsx',
+                contents: await fs.readFile(args.path, 'utf8'),
+              }));
+            },
+          },
+        ],
+      },
     },
 
     // Plugins: PWA for offline support, installability
@@ -135,6 +150,25 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         '@': '/src', // Adjust if src/ is used
       },
+    },
+    
+    // Configuração global para esbuild (para JSX em build, similar ao optimizeDeps)
+    esbuild: {
+      // Define factory para JSX vanilla (se não usar React)
+      jsxFactory: 'h',
+      jsxFragment: 'Fragment',
+      // Plugin similar para build (se necessário, expanda se erros persistirem)
+      plugins: [
+        {
+          name: 'load-js-files-as-jsx-build',
+          setup(build) {
+            build.onLoad({ filter: /src\/.*\.js$/ }, async (args) => ({
+              loader: 'jsx',
+              contents: await fs.readFile(args.path, 'utf8'),
+            }));
+          },
+        },
+      ],
     },
   };
 });
