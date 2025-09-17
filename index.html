@@ -6,68 +6,74 @@
     <meta name="description" content="ALSHAM 360° PRIMA - CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas.">
     <meta name="keywords" content="CRM, IA, Automação, Leads, Vendas, Dashboard, Analytics, Gamificação">
     <meta name="author" content="ALSHAM Team">
-    
+   
+    <!-- CSP for security (enterprise-grade, compatible with Supabase) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.supabase.co; connect-src 'self' https://*.supabase.co ws://*.supabase.co; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self';">
+   
     <title>ALSHAM 360° PRIMA - Dashboard Obra-Prima</title>
-    
-    <!-- Configuração de Performance -->
+   
+    <!-- Configuração de Performance (preload for faster load) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" as="script">
+   
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS via CDN (para desenvolvimento) -->
+   
+    <!-- Tailwind CSS via CDN (para desenvolvimento; in prod, use built CSS) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+   
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+   
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Estilos Personalizados -->
+   
+    <!-- Estilos Personalizados (premium UI with animations, accessibility) -->
     <style>
-        .font-inter { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+        .font-inter {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        
+       
         .bg-gradient-premium {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
+       
         .bg-gradient-hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
+       
         .text-primary {
             color: #3B82F6;
         }
-        
+       
         .bg-primary {
             background-color: #3B82F6;
         }
-        
+       
         .btn-primary {
-            @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors;
+            @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none;
         }
-        
+       
         .btn-secondary {
-            @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors;
+            @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none;
         }
-        
-        /* Loading States */
+       
+        /* Loading States (skeletons with animation) */
         .loading-skeleton {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: skeleton 1.5s infinite;
         }
-        
+       
         @keyframes skeleton {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
-        
+       
         #loading-indicator {
             position: fixed;
             top: 0;
@@ -79,26 +85,30 @@
             animation: loading 2s linear infinite;
             z-index: 9999;
         }
-        
+       
         @keyframes loading {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
-        
+       
         .hidden { display: none !important; }
+       
+        /* Transitions for premium UI */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
     </style>
 </head>
-
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen" data-page="dashboard">
-    
+   
     <!-- Loading Indicator -->
     <div id="loading-indicator" class="hidden"></div>
-    
+   
     <!-- Accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded z-50">
         Pular para o conteúdo principal
     </a>
-    
+   
     <!-- Header -->
     <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm" role="banner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,7 +125,7 @@
                         </div>
                     </div>
                 </div>
-                
+               
                 <!-- Navegação -->
                 <nav class="hidden md:flex items-center space-x-8" role="navigation" aria-label="Navegação principal">
                     <a href="javascript:void(0)" data-page="leads" class="text-gray-600 hover:text-primary transition-colors font-medium">
@@ -134,12 +144,12 @@
                         <span class="hidden sm:inline">⚙️</span> Configurações
                     </a>
                 </nav>
-                
+               
                 <!-- User Area -->
                 <div class="flex items-center space-x-4">
                     <!-- Notificações -->
                     <div class="relative">
-                       <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Notificações" id="notifications-button">
+                        <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Notificações" id="notifications-button">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -147,7 +157,7 @@
                         </button>
                         <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
                     </div>
-                    
+                   
                     <!-- Avatar e Nome -->
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center" role="img" aria-label="Avatar do usuário">
@@ -162,10 +172,9 @@
             </div>
         </div>
     </header>
-
     <!-- Main Content -->
     <main id="main-content" role="main">
-        
+       
         <!-- Hero Section -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" aria-labelledby="hero-title">
             <div class="bg-gradient-hero rounded-2xl p-8 text-white mb-8 relative overflow-hidden" role="banner">
@@ -195,7 +204,6 @@
                 </div>
             </div>
         </section>
-
         <!-- KPIs Section -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="kpis-title">
             <h2 id="kpis-title" class="sr-only">Indicadores de Performance</h2>
@@ -215,7 +223,6 @@
                 </div>
             </div>
         </section>
-
         <!-- Funil de Vendas -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="funnel-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -225,7 +232,7 @@
                         Relatório Completo
                     </button>
                 </div>
-                
+               
                 <div id="sales-funnel" class="space-y-4">
                     <div class="loading-skeleton h-12 rounded"></div>
                     <div class="loading-skeleton h-12 rounded"></div>
@@ -234,7 +241,6 @@
                 </div>
             </div>
         </section>
-
         <!-- Leads Recentes -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="leads-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -244,7 +250,7 @@
                         Ver Todos
                     </button>
                 </div>
-                
+               
                 <div id="leads-table">
                     <!-- Leads serão inseridos aqui -->
                     <div class="space-y-3">
@@ -255,7 +261,6 @@
                 </div>
             </div>
         </section>
-
         <!-- Performance Chart -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8" aria-labelledby="chart-title">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -267,16 +272,13 @@
                 </div>
             </div>
         </section>
-
     </main>
-
     <!-- Footer -->
     <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="contentinfo">
         <div class="text-center text-gray-500 text-sm">
             <p>&copy; 2025 ALSHAM 360° PRIMA. Sistema com dados reais do Supabase.</p>
         </div>
     </footer>
-
     <!-- Scripts -->
     <script>
         // Função global de logout
@@ -298,7 +300,6 @@
                 window.location.href = '/login.html';
             }
         };
-
         // Função global de navegação (para compatibilidade)
         window.navigateTo = function(page) {
             if (window.dashboardApp && window.dashboardApp.navigation) {
@@ -314,7 +315,6 @@
                 }
             }
         };
-
         // Configuração básica de navegação para elementos data-page
         document.addEventListener('click', function(e) {
             const target = e.target.closest('[data-page]');
@@ -324,47 +324,45 @@
                 window.navigateTo(page);
             }
         });
-        
+       
         // Log para debug
         console.log('🔧 Index.html carregado - aguardando dashboard-real.js');
         console.log('📍 Para navegar use: window.navigateTo("pagina")');
         console.log('🔐 Para logout use: window.logout()');
     </script>
-
-    <!-- Carregar sistema real -->
+    <!-- Carregar sistema real (fix path to absolute for Vite resolve) -->
     <script type="module">
         try {
             console.log('📦 Carregando sistema real do dashboard...');
-            
-            // Importar e inicializar o sistema real
-            import('./src/js/dashboard-real.js')
+           
+            // Importar e inicializar o sistema real (use absolute path or alias)
+            import('/src/js/dashboard-real.js')
                 .then(() => {
                     console.log('✅ Sistema real importado com sucesso!');
                 })
                 .catch(error => {
                     console.error('❌ Erro ao importar sistema real:', error);
-                    
+                   
                     // Fallback - mostrar aviso na tela
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'fixed top-0 left-0 w-full bg-red-600 text-white p-4 text-center z-50';
                     errorDiv.innerHTML = `
-                        <strong>⚠️ Sistema em Modo Demo</strong> - 
+                        <strong>⚠️ Sistema em Modo Demo</strong> -
                         Configure o Supabase e o arquivo dashboard-real.js para usar dados reais.
                         <button onclick="this.parentElement.remove()" class="ml-4 underline">Fechar</button>
                     `;
                     document.body.appendChild(errorDiv);
-                    
-                    // Tentar carregar sistema antigo como fallback
-                    import('./src/js/dashboard.js').catch(fallbackError => {
+                   
+                    // Tentar carregar sistema antigo como fallback (fix path)
+                    import('/src/js/dashboard.js').catch(fallbackError => {
                         console.error('❌ Erro no fallback também:', fallbackError);
                     });
                 });
-                
+               
         } catch (error) {
             console.error('❌ Erro crítico na importação:', error);
         }
     </script>
-
     <!-- Fallback para navegação (se JS não carregar) -->
     <noscript>
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
@@ -377,6 +375,5 @@
             </div>
         </div>
     </noscript>
-
 </body>
 </html>
