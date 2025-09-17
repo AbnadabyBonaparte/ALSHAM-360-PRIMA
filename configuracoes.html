@@ -1,838 +1,91 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-gray-50 scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sistema Enterprise de Configurações - ALSHAM 360° PRIMA. Gerencie perfil, organização, equipe, segurança e integrações.">
-    <meta name="keywords" content="configurações, perfil, organização, equipe, segurança, integrações, crm">
-    <meta name="author" content="ALSHAM 360° PRIMA">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#3B82F6">
-    
-    <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
-  style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
-  connect-src 'self' https://*.supabase.co ws://*.supabase.co https://*.posthog.com;
-  img-src 'self' data: blob: https://*.supabase.co;
-  frame-src 'self' https://apis.google.com;
-  font-src 'self' data: https://fonts.gstatic.com;
-">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-    
-    <title>Configurações Enterprise - ALSHAM 360° PRIMA</title>
-    <meta property="og:title" content="Configurações Enterprise - ALSHAM 360° PRIMA">
-    <meta property="og:description" content="Sistema Enterprise de Configurações e Administração">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="ALSHAM 360° PRIMA">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Configurações Enterprise - ALSHAM 360° PRIMA">
-    <meta name="twitter:description" content="Sistema Enterprise de Configurações e Administração">
-    
-    <link rel="icon" type="image/svg+xml" href="/vite.svg">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.webmanifest">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    
-    <style>
-        /* Enterprise CSS Variables */
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --blue-gradient: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --info-color: #3b82f6;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            --border-radius-xl: 0.75rem;
-            --border-radius-2xl: 1rem;
-            --transition-all: all 0.3s ease-in-out;
-        }
-        
-        /* Base styles */
-        body { 
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            line-height: 1.6; 
-            color: #374151; 
-        }
-        
-        .gradient-premium { 
-            background: var(--primary-gradient); 
-        }
-        
-        .bg-primary { 
-            background-color: #3B82F6; 
-        }
-        
-        .btn-primary { 
-            background-color: #2563eb; 
-            color: white; 
-            padding: 0.5rem 1rem; 
-            border-radius: 0.5rem; 
-            transition: background-color 0.2s; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: 500; 
-        }
-        
-        .btn-primary:hover { 
-            background-color: #1d4ed8; 
-        }
-        
-        .btn-primary:focus { 
-            outline: 2px solid #3b82f6; 
-            outline-offset: 2px; 
-        }
-        
-        .form-group { 
-            margin-bottom: 1.5rem; 
-        }
-        
-        .form-label { 
-            display: block; 
-            font-size: 0.875rem; 
-            font-weight: 500; 
-            color: #374151; 
-            margin-bottom: 0.5rem; 
-        }
-        
-        .form-input, .form-textarea, .form-select { 
-            width: 100%; 
-            padding: 0.75rem; 
-            border: 1px solid #d1d5db; 
-            border-radius: 0.5rem; 
-            transition: all 0.2s; 
-            font-size: 0.875rem; 
-            background-color: white; 
-        }
-        
-        .form-input:focus, .form-textarea:focus, .form-select:focus { 
-            outline: 2px solid #3b82f6; 
-            outline-offset: 2px; 
-            border-color: #3b82f6; 
-        }
-        
-        .form-textarea { 
-            resize: vertical; 
-            min-height: 80px; 
-        }
-        
-        .form-checkbox { 
-            width: 1rem; 
-            height: 1rem; 
-            color: #2563eb; 
-            border: 1px solid #d1d5db; 
-            border-radius: 0.25rem; 
-            cursor: pointer; 
-        }
-        
-        .form-checkbox:focus { 
-            outline: 2px solid #3b82f6; 
-            outline-offset: 2px; 
-        }
-        
-        .nav-item { 
-            width: 100%; 
-            text-align: left; 
-            padding: 0.75rem 1rem; 
-            border-radius: 0.5rem; 
-            transition: all 0.2s; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.75rem; 
-            border: none; 
-            background: none; 
-            cursor: pointer; 
-            font-size: 0.875rem; 
-        }
-        
-        .nav-item:hover { 
-            background-color: #f9fafb; 
-        }
-        
-        .nav-item.active { 
-            background-color: #2563eb; 
-            color: white; 
-        }
-        
-        .nav-item.active:hover { 
-            background-color: #1d4ed8; 
-        }
-        
-        .nav-item:focus { 
-            outline: 2px solid #3b82f6; 
-            outline-offset: 2px; 
-        }
-        
-        .loading-skeleton { 
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); 
-            background-size: 200% 100%; 
-            animation: loading 1.5s infinite; 
-        }
-        
-        @keyframes loading { 
-            0% { background-position: 200% 0; } 
-            100% { background-position: -200% 0; } 
-        }
-        
-        .fade-in { 
-            animation: fadeIn 0.3s ease-in-out; 
-        }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        .slide-in { 
-            animation: slideIn 0.2s ease-out; 
-        }
-        
-        @keyframes slideIn { 
-            from { transform: translateX(-10px); opacity: 0; } 
-            to { transform: translateX(0); opacity: 1; } 
-        }
-        
-        .hidden { 
-            display: none !important; 
-        }
-    </style>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/src/style.css">
-    
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "ALSHAM 360° PRIMA - Configurações",
-        "description": "Sistema Enterprise de Configurações e Administração",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web Browser"
-    }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sistema Enterprise de Configurações - ALSHAM 360° PRIMA. Gerencie perfil, organização, equipe, segurança e integrações." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    img-src 'self' data: blob: https://*.supabase.co;
+    font-src 'self' https://fonts.gstatic.com;
+    frame-src 'self' https://apis.google.com;
+  " />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+
+  <title>Configurações Enterprise - ALSHAM 360° PRIMA</title>
+
+  <link rel="icon" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 min-h-screen antialiased">
-
-    <noscript>
-        <div role="alert" class="fixed inset-0 z-50 flex items-center justify-center bg-red-50 p-4">
-            <div class="bg-white border border-red-200 rounded-lg p-6 max-w-md text-center shadow-lg">
-                <div class="text-red-600 text-4xl mb-4" aria-hidden="true">⚠️</div>
-                <h1 class="text-lg font-bold text-red-800 mb-2">JavaScript Necessário</h1>
-                <p class="text-red-700 mb-4">Este sistema requer JavaScript para funcionar. Por favor, habilite o JavaScript no seu navegador.</p>
-                <button onclick="location.reload()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                    Tentar Novamente
-                </button>
-            </div>
-        </div>
-    </noscript>
-
-    <div id="config-loader" class="fixed inset-0 z-40 bg-white/90 backdrop-blur-sm hidden" aria-live="polite">
-        <div class="flex items-center justify-center h-full">
-            <div class="text-center">
-                <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p id="loader-message" class="text-gray-700 font-medium">Carregando configurações...</p>
-                <p class="text-gray-500 text-sm mt-2">Sincronizando dados enterprise</p>
-            </div>
-        </div>
+  <!-- Loader -->
+  <div id="config-loader" class="fixed inset-0 hidden bg-white/90 backdrop-blur-sm flex items-center justify-center z-40">
+    <div class="text-center">
+      <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+      <p class="mt-4 text-gray-700">Carregando configurações...</p>
     </div>
+  </div>
 
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
-        Pular para o conteúdo principal
-    </a>
+  <!-- Skip link -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded">Pular para o conteúdo</a>
 
-    <header class="bg-white/90 backdrop-blur-xl border-b border-gray-200/60 sticky top-0 z-30 shadow-sm" role="banner">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                
-                <div class="flex items-center space-x-4">
-                    <a href="/index.html" 
-                       class="flex items-center space-x-3 group" 
-                       aria-label="Voltar ao Dashboard Principal">
-                        <div class="w-10 h-10 gradient-premium rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                            <span class="text-white font-bold text-lg" aria-hidden="true">A</span>
-                        </div>
-                        <div class="hidden sm:block">
-                            <h1 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">ALSHAM 360°</h1>
-                            <p class="text-xs text-gray-500 font-medium">PRIMA Enterprise</p>
-                        </div>
-                    </a>
-                    
-                    <nav aria-label="Breadcrumb" class="hidden lg:flex">
-                        <ol class="flex items-center space-x-2 text-sm">
-                            <li><a href="/dashboard.html" class="text-gray-500 hover:text-gray-700">Dashboard</a></li>
-                            <li class="text-gray-400" aria-hidden="true">/</li>
-                            <li class="text-gray-900 font-medium" aria-current="page">Configurações</li>
-                        </ol>
-                    </nav>
-                </div>
-                
-                <nav class="hidden md:flex items-center space-x-6" aria-label="Navegação Principal">
-                    <div class="main-nav flex items-center space-x-6">
-                        <a href="/dashboard.html" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Dashboard</a>
-                        <a href="/leads.html" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Leads</a>
-                        <a href="/relatorios.html" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Relatórios</a>
-                        <a href="/configuracoes.html" class="text-blue-600 font-semibold" aria-current="page">Configurações</a>
-                    </div>
-                </nav>
-                
-                <div class="flex items-center space-x-3">
-                    <div id="autosave-indicator" class="hidden items-center space-x-2 text-sm text-gray-600">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span>Auto-salvando...</span>
-                    </div>
-                    
-                    <button
-                        data-save-all
-                        class="hidden sm:flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
-                        title="Salvar todas as configurações"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        <span class="font-medium">Salvar Tudo</span>
-                    </button>
-                    
-                    <div class="flex items-center space-x-3 pl-3 border-l border-gray-200">
-                        <div
-                            class="w-8 h-8 gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm"
-                            data-auth="user-avatar"
-                            aria-label="Avatar do usuário"
-                        >
-                            <span data-auth="user-initials">U</span>
-                        </div>
-                        <div class="hidden sm:block">
-                            <p class="text-sm font-medium text-gray-700" data-auth="user-name">Carregando...</p>
-                            <p class="text-xs text-gray-500" data-auth="user-role">Configurações</p>
-                        </div>
-                        <button
-                            data-auth="logout-btn"
-                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:outline-none"
-                            title="Sair do Sistema"
-                            aria-label="Fazer logout"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-xl border-b border-gray-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-6">
+      <a href="/index.html" class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold">A</div>
+        <span class="font-bold text-gray-900">ALSHAM 360°</span>
+      </a>
+      <nav class="hidden md:flex space-x-6">
+        <a href="/dashboard.html" class="text-gray-600 hover:text-blue-600">Dashboard</a>
+        <a href="/leads.html" class="text-gray-600 hover:text-blue-600">Leads</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-blue-600">Relatórios</a>
+        <a href="/configuracoes.html" class="text-blue-600 font-semibold" aria-current="page">Configurações</a>
+      </nav>
+    </div>
+  </header>
 
-    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
-        
-        <section class="mb-8" aria-labelledby="page-title">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                <div class="flex-1">
-                    <h1 id="page-title" class="text-4xl font-bold text-gray-900 mb-3 flex items-center">
-                        <span class="text-3xl mr-3" aria-hidden="true">⚙️</span>
-                        Configurações Enterprise
-                        <span id="unsaved-indicator" class="hidden ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-1 animate-pulse"></span>
-                            Alterações não salvas
-                        </span>
-                    </h1>
-                    <p class="text-lg text-gray-600 max-w-3xl">
-                        Central de controle completa para personalizar sua experiência no 
-                        <span class="font-medium text-blue-600">Sistema ALSHAM 360° PRIMA</span>
-                    </p>
-                    
-                    <div class="mt-3 flex flex-wrap items-center gap-4 text-sm">
-                        <div class="flex items-center text-green-600">
-                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                            <span>Sistema Conectado</span>
-                        </div>
-                        <div class="flex items-center text-blue-600">
-                            <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                            <span>Auto-save Ativo</span>
-                        </div>
-                        <div class="flex items-center text-purple-600">
-                            <div class="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                            <span>Dados Sincronizados</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <!-- Main -->
+  <main id="main-content" class="max-w-7xl mx-auto px-6 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 flex items-center mb-6">⚙️ Configurações</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar -->
+      <aside class="bg-white rounded-xl border border-gray-200 p-4">
+        <ul class="space-y-2">
+          <li><button data-section="profile" class="nav-item active">👤 Perfil</button></li>
+          <li><button data-section="organization" class="nav-item">🏢 Organização</button></li>
+          <li><button data-section="team" class="nav-item">👥 Equipe</button></li>
+          <li><button data-section="notifications" class="nav-item">🔔 Notificações</button></li>
+          <li><button data-section="security" class="nav-item">🔒 Segurança</button></li>
+          <li><button data-section="billing" class="nav-item">💳 Faturamento</button></li>
+          <li><button data-section="analytics" class="nav-item">📊 Analytics</button></li>
+        </ul>
+      </aside>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            
-            <aside class="lg:col-span-1" role="complementary">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-lg font-bold text-gray-900">Menu de Configurações</h2>
-                        <p class="text-sm text-gray-600 mt-1">Navegue pelas opções</p>
-                    </div>
-                    
-                    <nav class="p-4" aria-label="Menu de configurações">
-                        <ul class="space-y-2" id="settings-nav">
-                            <li>
-                                <button
-                                    class="nav-item active"
-                                    data-section="profile"
-                                    role="tab"
-                                    aria-selected="true"
-                                    aria-controls="section-profile"
-                                >
-                                    <span class="text-xl" aria-hidden="true">👤</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Perfil do Usuário</div>
-                                        <div class="text-xs opacity-75">Dados pessoais</div>
-                                    </div>
-                                </button>
-                            </li>
-                            
-                            <li>
-                                <button
-                                    class="nav-item"
-                                    data-section="organization"
-                                    role="tab"
-                                    aria-selected="false"
-                                    aria-controls="section-organization"
-                                >
-                                    <span class="text-xl" aria-hidden="true">🏢</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Organização</div>
-                                        <div class="text-xs opacity-75">Dados da empresa</div>
-                                    </div>
-                                </button>
-                            </li>
-                            
-                            <li>
-                                <button
-                                    class="nav-item"
-                                    data-section="team"
-                                    role="tab"
-                                    aria-selected="false"
-                                    aria-controls="section-team"
-                                >
-                                    <span class="text-xl" aria-hidden="true">👥</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Equipe</div>
-                                        <div class="text-xs opacity-75">Membros e permissões</div>
-                                    </div>
-                                </button>
-                            </li>
-                            
-                            <li>
-                                <button
-                                    class="nav-item"
-                                    data-section="notifications"
-                                    role="tab"
-                                    aria-selected="false"
-                                    aria-controls="section-notifications"
-                                >
-                                    <span class="text-xl" aria-hidden="true">🔔</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Notificações</div>
-                                        <div class="text-xs opacity-75">Alertas e avisos</div>
-                                    </div>
-                                </button>
-                            </li>
-                            
-                            <li>
-                                <button
-                                    class="nav-item"
-                                    data-section="security"
-                                    role="tab"
-                                    aria-selected="false"
-                                    aria-controls="section-security"
-                                >
-                                    <span class="text-xl" aria-hidden="true">🔒</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Segurança</div>
-                                        <div class="text-xs opacity-75">Senha e 2FA</div>
-                                    </div>
-                                </button>
-                            </li>
-                            
-                            <li>
-                                <button
-                                    class="nav-item"
-                                    data-section="billing"
-                                    role="tab"
-                                    aria-selected="false"
-                                    aria-controls="section-billing"
-                                >
-                                    <span class="text-xl" aria-hidden="true">💳</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Faturamento</div>
-                                        <div class="text-xs opacity-75">Planos e pagamentos</div>
-                                    </div>
-                                </button>
-                            </li>
-                            
-                            <li>
-                                <button
-                                    class="nav-item"
-                                    data-section="analytics"
-                                    role="tab"
-                                    aria-selected="false"
-                                    aria-controls="section-analytics"
-                                >
-                                    <span class="text-xl" aria-hidden="true">📊</span>
-                                    <div class="text-left">
-                                        <div class="font-medium">Analytics</div>
-                                        <div class="text-xs opacity-75">Relatórios e métricas</div>
-                                    </div>
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </aside>
-            
-            <div class="lg:col-span-3">
-                
-                <section id="section-profile" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" role="tabpanel" aria-labelledby="profile-tab">
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">👤</span>
-                                    Perfil do Usuário
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Gerencie suas informações pessoais e preferências</p>
-                            </div>
-                            <button
-                                data-save="profile"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            >
-                                Salvar Perfil
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <form id="profile-form" class="space-y-6" novalidate>
-                            <div class="flex items-center space-x-6">
-                                <div class="w-20 h-20 gradient-premium rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                                    <span data-auth="user-initials-large">U</span>
-                                </div>
-                                <div>
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors focus:ring-2 focus:ring-gray-500 focus:outline-none"
-                                    >
-                                        Alterar Foto
-                                    </button>
-                                    <p class="text-sm text-gray-500 mt-1">JPG, PNG ou GIF. Máximo 2MB.</p>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="first_name" class="form-label">
-                                        Nome <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="first_name"
-                                        name="first_name"
-                                        class="form-input"
-                                        placeholder="Seu primeiro nome"
-                                        required
-                                        autocomplete="given-name"
-                                    >
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="last_name" class="form-label">
-                                        Sobrenome <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="last_name"
-                                        name="last_name"
-                                        class="form-input"
-                                        placeholder="Seu sobrenome"
-                                        required
-                                        autocomplete="family-name"
-                                    >
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="email" class="form-label">
-                                        Email <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        class="form-input"
-                                        placeholder="seu@email.com"
-                                        required
-                                        autocomplete="email"
-                                    >
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="phone" class="form-label">Telefone</label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        name="phone"
-                                        class="form-input"
-                                        placeholder="(11) 99999-9999"
-                                        autocomplete="tel"
-                                    >
-                                </div>
-                                </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="job_title" class="form-label">Cargo</label>
-                                    <input
-                                        type="text"
-                                        id="job_title"
-                                        name="job_title"
-                                        class="form-input"
-                                        placeholder="Seu cargo atual"
-                                        autocomplete="organization-title"
-                                    >
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="department" class="form-label">Departamento</label>
-                                    <select id="department" name="department" class="form-select">
-                                        <option value="">Selecione o departamento</option>
-                                        <option value="sales">Vendas</option>
-                                        <option value="marketing">Marketing</option>
-                                        <option value="support">Suporte</option>
-                                        <option value="management">Gestão</option>
-                                        <option value="finance">Financeiro</option>
-                                        <option value="hr">Recursos Humanos</option>
-                                        <option value="it">TI</option>
-                                        <option value="operations">Operações</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="timezone" class="form-label">Fuso Horário</label>
-                                    <select id="timezone" name="timezone" class="form-select">
-                                        <option value="America/Sao_Paulo">São Paulo (GMT-3)</option>
-                                        <option value="America/New_York">Nova York (GMT-5)</option>
-                                        <option value="Europe/London">Londres (GMT+0)</option>
-                                        <option value="Europe/Madrid">Madrid (GMT+1)</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="language" class="form-label">Idioma</label>
-                                    <select id="language" name="language" class="form-select">
-                                        <option value="pt-BR">Português (Brasil)</option>
-                                        <option value="en-US">English (US)</option>
-                                        <option value="es-ES">Español</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="linkedin_url" class="form-label">LinkedIn URL</label>
-                                <input
-                                    type="url"
-                                    id="linkedin_url"
-                                    name="linkedin_url"
-                                    class="form-input"
-                                    placeholder="https://linkedin.com/in/seuperfil"
-                                >
-                            </div>
-                        </form>
-                    </div>
-                </section>
+      <!-- Content -->
+      <section class="lg:col-span-3 bg-white rounded-xl border border-gray-200 p-6">
+        <p class="text-gray-600">Selecione uma seção no menu para gerenciar suas configurações.</p>
+      </section>
+    </div>
+  </main>
 
-                <section id="section-organization" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="organization-tab">
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">🏢</span>
-                                    Organização
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Configure os dados da sua empresa e preferências organizacionais</p>
-                            </div>
-                            <button
-                                data-save="organization"
-                                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            >
-                                Salvar Organização
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <p class="text-gray-600">Configurações de organização serão carregadas aqui...</p>
-                    </div>
-                </section>
-
-                <section id="section-team" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="team-tab">
-                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">👥</span>
-                                    Gerenciamento de Equipe
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Gerencie membros da equipe, permissões e acessos</p>
-                            </div>
-                            <button
-                                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                            >
-                                Convidar Membro
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <p class="text-gray-600">Gerenciamento de equipe será carregado aqui...</p>
-                    </div>
-                </section>
-
-                <section id="section-notifications" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="notifications-tab">
-                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">🔔</span>
-                                    Configurações de Notificações
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Configure como e quando receber notificações</p>
-                            </div>
-                            <button
-                                data-save="notifications"
-                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors focus:ring-2 focus:ring-orange-500 focus:outline-none"
-                            >
-                                Salvar Notificações
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <p class="text-gray-600">Configurações de notificações serão carregadas aqui...</p>
-                    </div>
-                </section>
-
-                <section id="section-security" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="security-tab">
-                    <div class="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">🔒</span>
-                                    Configurações de Segurança
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Gerencie senha, autenticação e dispositivos</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <p class="text-gray-600">Configurações de segurança serão carregadas aqui...</p>
-                    </div>
-                </section>
-
-                <section id="section-billing" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="billing-tab">
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">💳</span>
-                                    Faturamento e Assinatura
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Gerencie planos, pagamentos e histórico de cobrança</p>
-                            </div>
-                            <span id="billing-status" class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                                Ativo
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <p class="text-gray-600">Informações de faturamento serão carregadas aqui...</p>
-                    </div>
-                </section>
-
-                <section id="section-analytics" class="config-section bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hidden" role="tabpanel" aria-labelledby="analytics-tab">
-                    <div class="bg-gradient-to-r from-cyan-50 to-blue-50 px-6 py-5 border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                                    <span class="text-2xl mr-3" aria-hidden="true">📊</span>
-                                    Analytics e Relatórios
-                                </h2>
-                                <p class="text-sm text-gray-600 mt-1">Configure métricas, relatórios e dashboards personalizados</p>
-                            </div>
-                            <button
-                                data-save="analytics"
-                                class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-                            >
-                                Salvar Analytics
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6">
-                        <p class="text-gray-600">Configurações de analytics serão carregadas aqui...</p>
-                    </div>
-                </section>
-
-            </div>
-        </div>
-    </main>
-
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="/src/components/navigation.js"></script>
-    <script type="module" src="/src/main.js"></script>
-    <script type="module" src="/src/js/auth.js"></script>
-    <script type="module" src="/src/js/configuracoes.js"></script>
-    
-    <script>
-        // Google Analytics
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'GA_MEASUREMENT_ID');
-        
-        // Error Tracking
-        window.addEventListener('error', function(e) {
-            console.error('Global error:', e.error);
-            gtag('event', 'exception', {
-                'description': e.error?.message || 'Unknown error',
-                'fatal': false
-            });
-        });
-        
-        window.addEventListener('unhandledrejection', function(e) {
-            console.error('Unhandled promise rejection:', e.reason);
-            gtag('event', 'exception', {
-                'description': e.reason?.message || 'Unhandled promise rejection',
-                'fatal': false
-            });
-        });
-    </script>
-
+  <!-- Scripts -->
+  <script type="module" src="/js/navigation.js"></script>
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/configuracoes.js"></script>
 </body>
 </html>
