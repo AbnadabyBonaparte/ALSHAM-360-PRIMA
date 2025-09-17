@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Criar Organização - ALSHAM 360° PRIMA</title>
 
+  <!-- CSP unificado -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     font-src 'self' https://fonts.gstatic.com;
     frame-src 'self' https://apis.google.com;
   " />
 
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-6 font-inter">
 
@@ -66,7 +67,7 @@
   </div>
 
   <script type="module">
-    import { supabase, DEFAULT_ORG_ID } from '/js/lib/supabase.js';
+    import { supabase, DEFAULT_ORG_ID } from '/src/lib/supabase.js';
 
     window.createOrganization = async function createOrganization() {
       const status = document.getElementById('create-status');
@@ -175,5 +176,15 @@
       }
     };
   </script>
+
+  <!-- Fallback noscript -->
+  <noscript>
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-white p-8 rounded-lg max-w-md text-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
+        <p class="text-gray-600">Ative o JavaScript para criar organizações no ALSHAM 360° PRIMA.</p>
+      </div>
+    </div>
+  </noscript>
 </body>
 </html>
