@@ -5,42 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="ALSHAM 360° PRIMA - CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas." />
   <meta name="keywords" content="CRM, IA, Automação, Leads, Vendas, Dashboard, Analytics, Gamificação" />
-  <meta name="author" content="ALSHAM Team" />
+  <meta name="author" content="ALSHAM Development Team" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#3B82F6" />
 
-  <!-- 🚀 CSP reforçada (compatível com Supabase + PostHog opcional) -->
+  <!-- 🚀 CSP reforçada -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.supabase.co https://*.posthog.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com data:;
-    img-src 'self' data: https:;
+    img-src 'self' data: blob: https:;
     worker-src 'self' blob:;
     frame-src 'self';
     manifest-src 'self';
   " />
 
-  <title>ALSHAM 360° PRIMA - Dashboard Obra-Prima</title>
+  <title>ALSHAM 360° PRIMA - Dashboard</title>
 
-  <!-- 🚀 Performance: Preload & DNS Prefetch -->
+  <!-- Performance: Preload -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" />
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" />
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" as="script" />
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind CSS (dev) → em prod usar buildado -->
+  <!-- Tailwind (dev) → em prod usar buildado -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Supabase Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Estilos Customizados -->
   <style>
@@ -58,7 +52,7 @@
       @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none;
     }
 
-    /* Skeletons */
+    /* Skeleton */
     .loading-skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
@@ -69,7 +63,7 @@
       100% { background-position: -200% 0; }
     }
 
-    /* Loading bar */
+    /* Barra de loading */
     #loading-indicator {
       position: fixed; top: 0; left: 0; width: 100%; height: 4px;
       background: linear-gradient(90deg, #3B82F6, #8B5CF6, #06B6D4);
@@ -87,7 +81,7 @@
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen" data-page="dashboard">
-  <!-- Loading Indicator -->
+  <!-- Loading -->
   <div id="loading-indicator" class="hidden"></div>
 
   <!-- Skip link -->
@@ -106,7 +100,7 @@
           </div>
           <div>
             <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-            <p class="text-xs text-gray-500">Dashboard Obra-Prima</p>
+            <p class="text-xs text-gray-500">Dashboard</p>
           </div>
         </div>
 
@@ -119,7 +113,7 @@
           <a href="#" data-page="configuracoes" class="text-gray-600 hover:text-primary font-medium">⚙️ Configurações</a>
         </nav>
 
-        <!-- User Area -->
+        <!-- User -->
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center" aria-label="Avatar do usuário">
             <span class="text-white text-sm font-semibold" id="user-initials">--</span>
@@ -222,7 +216,7 @@
     // Carregamento do sistema real
     const script = document.createElement('script');
     script.type = 'module';
-    script.src = '/js/dashboard.js'; // 🚀 padrão unificado
+    script.src = '/js/dashboard.js'; // 🚀 unificado
     script.onload = () => console.log('✅ Sistema real carregado!');
     script.onerror = () => {
       console.error('❌ Erro ao carregar dashboard.js - fallback ativado');
