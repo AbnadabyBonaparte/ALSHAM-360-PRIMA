@@ -22,16 +22,16 @@
   <!-- CSP -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://apis.google.com;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
+    font-src 'self' https://fonts.gstatic.com data:;
     frame-src 'self' https://apis.google.com;
-    font-src 'self' https://fonts.gstatic.com;
   ">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 
   <style>
     body { font-family: 'Inter', sans-serif; }
@@ -92,7 +92,7 @@
         
         <div class="relative">
           <input id="password" name="password" type="password" placeholder="Senha *" required minlength="8" class="input-premium pr-12">
-          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-600">👁️</button>
+          <button type="button" id="toggle-password" aria-label="Mostrar senha" aria-pressed="false" class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-600">👁️</button>
           <div id="password-strength" class="text-xs text-gray-500 mt-1"></div>
         </div>
 
@@ -127,17 +127,21 @@
   </main>
 
   <div id="loading-overlay"><div class="loader">🔄 Processando...</div></div>
+  <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
   <!-- Scripts -->
-  <script type="module" src="/js/register.js"></script>
+  <script type="module" src="/src/js/register.js"></script>
 
   <!-- Fallback -->
   <script>
     window.addEventListener('error', (e) => {
       if (e.target.tagName === 'SCRIPT' && e.target.src.includes('register.js')) {
-        const errBox = document.getElementById('error-message');
-        errBox.textContent = "⚠️ Register.js não carregou. Configure Supabase.";
-        errBox.classList.remove('hidden');
+        const notice = document.getElementById('offline-notice');
+        if (notice) {
+          notice.textContent = "⚠️ Register.js não carregou. Configure Supabase.";
+          notice.className = "p-3 mt-4 bg-yellow-100 text-yellow-800 rounded-lg text-center";
+          notice.classList.remove('hidden');
+        }
       }
     });
   </script>
