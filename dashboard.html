@@ -39,11 +39,12 @@
   <!-- Segurança -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
     font-src 'self' https://fonts.gstatic.com;
+    frame-src 'self' https://apis.google.com;
   " />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -54,7 +55,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SEU_ID_REAL"></script>
@@ -67,7 +68,7 @@
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  <a href="#main-content" class="sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md">Pular para o conteúdo principal</a>
 
   <!-- Loading -->
   <div id="loading-indicator" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -92,10 +93,10 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js" defer></script>
-  <script type="module" src="/js/main.js" defer></script>
-  <script type="module" src="/js/auth.js" defer></script>
-  <script type="module" src="/js/dashboard.js" defer></script>
+  <script type="module" src="/src/components/navigation.js" defer></script>
+  <script type="module" src="/src/main.js" defer></script>
+  <script type="module" src="/src/js/auth.js" defer></script>
+  <script type="module" src="/src/js/dashboard.js" defer></script>
 
   <script>
     // Remover loading quando dashboard.js carregar
