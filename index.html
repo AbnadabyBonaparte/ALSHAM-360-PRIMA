@@ -330,38 +330,51 @@
         console.log('📍 Para navegar use: window.navigateTo("pagina")');
         console.log('🔐 Para logout use: window.logout()');
     </script>
-    <!-- Carregar sistema real (CORRIGIDO PARA BUILD) -->
-    <script type="module">
-        try {
-            console.log('📦 Carregando sistema real do dashboard...');
-           
-            // Importar e inicializar o sistema real (CAMINHO CORRIGIDO)
-            import('./src/js/dashboard-real.js')
-                .then(() => {
-                    console.log('✅ Sistema real importado com sucesso!');
-                })
-                .catch(error => {
-                    console.error('❌ Erro ao importar sistema real:', error);
-                   
-                    // Fallback - mostrar aviso na tela
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'fixed top-0 left-0 w-full bg-red-600 text-white p-4 text-center z-50';
-                    errorDiv.innerHTML = `
-                        <strong>⚠️ Sistema em Modo Demo</strong> -
-                        Configure o Supabase e o arquivo dashboard-real.js para usar dados reais.
-                        <button onclick="this.parentElement.remove()" class="ml-4 underline">Fechar</button>
-                    `;
-                    document.body.appendChild(errorDiv);
-                   
-                    // Tentar carregar sistema antigo como fallback
-                    import('./src/js/dashboard.js').catch(fallbackError => {
-                        console.error('❌ Erro no fallback também:', fallbackError);
-                    });
-                });
-               
-        } catch (error) {
-            console.error('❌ Erro crítico na importação:', error);
-        }
+    <!-- Carregar sistema real (USANDO PASTA PÚBLICA) -->
+    <script>
+        // Primeiro tenta carregar da pasta pública (mais compatível com Vite)
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = '/js/dashboard-real.js';
+        script.onload = function() {
+            console.log('✅ Sistema real carregado da pasta pública!');
+        };
+        script.onerror = function() {
+            console.error('❌ Erro ao carregar da pasta pública, tentando fallback...');
+            
+            // Fallback - tentativa inline básica
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-0 left-0 w-full bg-orange-600 text-white p-4 text-center z-50';
+            errorDiv.innerHTML = `
+                <strong>⚠️ Sistema em Modo Básico</strong> - 
+                Configure o Supabase corretamente para usar dados reais.
+                <button onclick="this.parentElement.remove()" class="ml-4 underline">Fechar</button>
+            `;
+            document.body.appendChild(errorDiv);
+            
+            // Inicializar sistema básico de fallback
+            setTimeout(() => {
+                // Sistema mínimo para não quebrar a página
+                window.dashboardApp = {
+                    navigation: {
+                        navigateTo: window.navigateTo
+                    },
+                    auth: {
+                        signOut: window.logout
+                    }
+                };
+                
+                // Preencher dados básicos de demo
+                document.getElementById('hero-greeting').textContent = 'Bem-vindo ao Sistema Demo!';
+                document.getElementById('hero-revenue').textContent = 'R$ 0';
+                document.getElementById('user-initials').textContent = 'US';
+                document.getElementById('user-name').textContent = 'Usuário Demo';
+                
+                console.log('🎯 Sistema básico inicializado');
+            }, 1000);
+        };
+        
+        document.head.appendChild(script);
     </script>
     <!-- Fallback para navegação (se JS não carregar) -->
     <noscript>
