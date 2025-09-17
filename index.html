@@ -330,13 +330,13 @@
         console.log('📍 Para navegar use: window.navigateTo("pagina")');
         console.log('🔐 Para logout use: window.logout()');
     </script>
-    <!-- Carregar sistema real (fix path to absolute for Vite resolve) -->
+    <!-- Carregar sistema real (CORRIGIDO PARA BUILD) -->
     <script type="module">
         try {
             console.log('📦 Carregando sistema real do dashboard...');
            
-            // Importar e inicializar o sistema real (use absolute path or alias)
-            import('/src/js/dashboard-real.js')
+            // Importar e inicializar o sistema real (CAMINHO CORRIGIDO)
+            import('./src/js/dashboard-real.js')
                 .then(() => {
                     console.log('✅ Sistema real importado com sucesso!');
                 })
@@ -353,8 +353,8 @@
                     `;
                     document.body.appendChild(errorDiv);
                    
-                    // Tentar carregar sistema antigo como fallback (fix path)
-                    import('/src/js/dashboard.js').catch(fallbackError => {
+                    // Tentar carregar sistema antigo como fallback
+                    import('./src/js/dashboard.js').catch(fallbackError => {
                         console.error('❌ Erro no fallback também:', fallbackError);
                     });
                 });
