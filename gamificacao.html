@@ -47,17 +47,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- CSS corrigido -->
+  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-  <a href="#main-content" class="sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md">Pular para o conteúdo principal</a>
 
   <!-- Loader -->
   <div id="gamification-loader" class="fixed top-0 left-0 right-0 z-50" role="status" aria-live="polite">
     <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium flex items-center justify-center space-x-2">
-      <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+      <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
       <span>Carregando gamificação...</span>
     </div>
   </div>
@@ -66,7 +66,9 @@
   <header class="header-premium" role="banner">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
       <a href="/index.html" class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center"><span class="text-white font-bold">A</span></div>
+        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
+          <span class="text-white font-bold">A</span>
+        </div>
         <div>
           <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
           <p class="text-xs text-gray-500">Enterprise Gamificação</p>
@@ -88,13 +90,13 @@
 
   <!-- Conteúdo principal -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- ... KPIs, gráficos, insights ... -->
+    <!-- KPIs, Gráficos, Insights... -->
   </main>
 
   <!-- Notificações -->
   <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" aria-live="polite"></div>
 
-  <!-- Scripts corrigidos -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="/js/navigation.js"></script>
   <script type="module" src="/js/main.js"></script>
