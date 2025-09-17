@@ -1,9 +1,46 @@
-# railway.toml - Versão Simplificada
+# ================================================
+# 🚀 ALSHAM 360° PRIMA - Configuração Railway
+# ================================================
+
 [build]
-builder = "nixpacks"
+builder = "nixpacks"   # Railway usa Nixpacks para Node.js automaticamente
 
 [deploy]
 startCommand = "node server.js"
+restartPolicyType = "ON_FAILURE"
 
+# ================================================
+# 🌍 Ambiente de Produção
+# ================================================
 [environments.production]
 NODE_ENV = "production"
+PORT = "3000"
+
+# Variáveis críticas do Supabase
+SUPABASE_URL = "https://SEU-PROJETO.supabase.co"
+SUPABASE_ANON_KEY = "coloque_sua_chave_anon_producao_aqui"
+SUPABASE_SERVICE_ROLE = "coloque_sua_chave_service_role_producao_aqui"
+
+# Variáveis para o frontend (Vite)
+VITE_SUPABASE_URL = "${SUPABASE_URL}"
+VITE_SUPABASE_ANON_KEY = "${SUPABASE_ANON_KEY}"
+
+# Segurança / Rate limiting
+RATE_LIMIT_MAX = "2000"
+RATE_LIMIT_WINDOW = "900000"
+
+# OpenAI
+OPENAI_API_BASE = "https://api.openai.com/v1"
+OPENAI_API_KEY = "coloque_sua_chave_openai_producao_aqui"
+
+# Redis (opcional)
+REDIS_URL = "redis://default:senha@host:6379"
+
+# Deploy / Domínio
+APP_BASE_URL = "https://app.alshamglobal.com.br"
+RAILWAY_STATIC_URL = "app.alshamglobal.com.br"
+
+# Logs e performance
+LOG_LEVEL = "warn"
+DB_TIMEOUT = "30"
+MAX_PAYLOAD_SIZE = "10"
