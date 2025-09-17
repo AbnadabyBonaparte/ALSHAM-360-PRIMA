@@ -1,307 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Organização ALSHAM - ALSHAM 360° PRIMA</title>
-    
-    <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
-  style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
-  connect-src 'self' https://*.supabase.co ws://*.supabase.co https://*.posthog.com;
-  img-src 'self' data: blob: https://*.supabase.co;
-  frame-src 'self' https://apis.google.com;
-  font-src 'self' data: https://fonts.gstatic.com;
-">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-        }
-        h1 {
-            color: #2563eb;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-section {
-            margin: 20px 0;
-            padding: 20px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-        }
-        .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-weight: 500;
-        }
-        .success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-        .error {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
-        }
-        .loading {
-            background: #dbeafe;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-        }
-        button {
-            background: linear-gradient(135deg, #2563eb, #8b5cf6);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            margin: 10px 5px;
-            width: 100%;
-        }
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        label {
-            font-weight: 500;
-            color: #374151;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .data-display {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 14px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🏢 Criar Organização ALSHAM</h1>
-        <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Setup da Organização</p>
-        
-        <div class="form-section">
-            <h3>1. Dados da Organização</h3>
-            
-            <label for="org-name">Nome da Organização:</label>
-            <input type="text" id="org-name" value="ALSHAM Global Default" placeholder="Nome da organização">
-            
-            <label for="org-id">ID da Organização (UUID):</label>
-            <input type="text" id="org-id" value="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe" placeholder="UUID da organização">
-            
-            <button onclick="createOrganization()">Criar Organização</button>
-            <div id="create-status" class="status loading">Pronto para criar...</div>
-        </div>
-        
-        <div class="form-section">
-            <h3>2. Verificar Organização</h3>
-            <button onclick="verifyOrganization()">Verificar se Existe</button>
-            <div id="verify-status" class="status loading">Aguardando verificação...</div>
-            <div id="verify-data" class="data-display" style="display: none;"></div>
-        </div>
-        
-        <div class="form-section">
-            <h3>3. Listar Todas as Organizações</h3>
-            <button onclick="listOrganizations()">Listar Organizações</button>
-            <div id="list-status" class="status loading">Aguardando listagem...</div>
-            <div id="list-data" class="data-display" style="display: none;"></div>
-        </div>
-        
-        <div class="form-section">
-            <h3>🚀 Processo Completo</h3>
-            <button onclick="setupComplete()" style="background: linear-gradient(135deg, #10b981, #059669);">Setup Completo da Organização</button>
-            <div id="complete-status" class="status loading">Pronto para executar...</div>
-        </div>
-    </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Organização - ALSHAM 360° PRIMA</title>
 
-    <script type="module">
-        import { supabase, DEFAULT_ORG_ID } from './src/lib/supabase.js';
-        
-        // Tornar funções globais
-        window.createOrganization = createOrganization;
-        window.verifyOrganization = verifyOrganization;
-        window.listOrganizations = listOrganizations;
-        window.setupComplete = setupComplete;
-        
-        async function createOrganization() {
-            const statusEl = document.getElementById('create-status');
-            const nameEl = document.getElementById('org-name');
-            const idEl = document.getElementById('org-id');
-            
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Criando organização...';
-            
-            try {
-                const orgData = {
-                    id: idEl.value.trim(),
-                    name: nameEl.value.trim(),
-                    created_at: new Date().toISOString()
-                };
-                
-                const { data, error } = await supabase
-                    .from('organizations')
-                    .insert([orgData])
-                    .select();
-                
-                if (error) {
-                    if (error.code === '23505') {
-                        statusEl.className = 'status success';
-                        statusEl.textContent = '✅ Organização já existe (isso é bom!)';
-                    } else {
-                        throw error;
-                    }
-                } else {
-                    statusEl.className = 'status success';
-                    statusEl.textContent = `✅ Organização criada com sucesso: ${orgData.name}`;
-                }
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro ao criar organização: ${error.message}`;
-                console.error('Erro de criação:', error);
-            }
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    img-src 'self' data: https://*.supabase.co;
+    font-src 'self' https://fonts.gstatic.com;
+    frame-src 'self' https://apis.google.com;
+  " />
+
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-6 font-inter">
+
+  <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-8">
+    <h1 class="text-2xl font-bold text-blue-600 text-center mb-6">🏢 Criar Organização ALSHAM</h1>
+    <p class="text-center text-gray-500 mb-8">Setup inicial da sua organização no ALSHAM 360° PRIMA</p>
+
+    <!-- Formulário -->
+    <div class="space-y-6">
+      <!-- Dados -->
+      <section>
+        <h2 class="font-semibold mb-2">1. Dados da Organização</h2>
+        <label for="org-name" class="block text-sm font-medium text-gray-700">Nome:</label>
+        <input id="org-name" class="form-input" value="ALSHAM Global Default" />
+
+        <label for="org-id" class="block text-sm font-medium text-gray-700 mt-4">ID (UUID):</label>
+        <input id="org-id" class="form-input" value="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe" />
+
+        <button onclick="createOrganization()" class="btn-primary mt-4 w-full" aria-label="Criar Organização">
+          Criar Organização
+        </button>
+        <div id="create-status" class="status loading mt-2">Pronto para criar...</div>
+      </section>
+
+      <!-- Verificar -->
+      <section>
+        <h2 class="font-semibold mb-2">2. Verificar Organização</h2>
+        <button onclick="verifyOrganization()" class="btn-primary w-full" aria-label="Verificar Organização">Verificar</button>
+        <div id="verify-status" class="status loading mt-2">Aguardando verificação...</div>
+        <div id="verify-data" class="data-display hidden"></div>
+      </section>
+
+      <!-- Listar -->
+      <section>
+        <h2 class="font-semibold mb-2">3. Listar Organizações</h2>
+        <button onclick="listOrganizations()" class="btn-primary w-full" aria-label="Listar Organizações">Listar</button>
+        <div id="list-status" class="status loading mt-2">Aguardando listagem...</div>
+        <div id="list-data" class="data-display hidden"></div>
+      </section>
+
+      <!-- Setup Completo -->
+      <section>
+        <h2 class="font-semibold mb-2">🚀 Processo Completo</h2>
+        <button onclick="setupComplete()" class="btn-success w-full" aria-label="Executar Setup Completo">Setup Completo</button>
+        <div id="complete-status" class="status loading mt-2">Pronto para executar...</div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase, DEFAULT_ORG_ID } from '/js/lib/supabase.js';
+
+    window.createOrganization = async function createOrganization() {
+      const status = document.getElementById('create-status');
+      const name = document.getElementById('org-name').value.trim();
+      const id = document.getElementById('org-id').value.trim();
+
+      status.className = 'status loading';
+      status.textContent = 'Criando organização...';
+
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .insert([{ id, name, created_at: new Date().toISOString() }])
+          .select();
+
+        if (error) {
+          if (error.code === '23505') {
+            status.className = 'status success';
+            status.textContent = '✅ Organização já existe.';
+          } else {
+            throw error;
+          }
+        } else {
+          status.className = 'status success';
+          status.textContent = `✅ Criada: ${name}`;
         }
-        
-        async function verifyOrganization() {
-            const statusEl = document.getElementById('verify-status');
-            const dataEl = document.getElementById('verify-data');
-            const idEl = document.getElementById('org-id');
-            
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Verificando organização...';
-            
-            try {
-                const { data: org, error } = await supabase
-                    .from('organizations')
-                    .select('*')
-                    .eq('id', idEl.value.trim())
-                    .single();
-                
-                if (error) {
-                    if (error.code === 'PGRST116') {
-                        statusEl.className = 'status error';
-                        statusEl.textContent = '❌ Organização não encontrada';
-                    } else {
-                        throw error;
-                    }
-                } else {
-                    statusEl.className = 'status success';
-                    statusEl.textContent = `✅ Organização encontrada: ${org.name}`;
-                    
-                    dataEl.style.display = 'block';
-                    dataEl.innerHTML = `
-                        <strong>ID:</strong> ${org.id}<br>
-                        <strong>Nome:</strong> ${org.name}<br>
-                        <strong>Criado em:</strong> ${new Date(org.created_at).toLocaleString('pt-BR')}
-                    `;
-                }
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro ao verificar: ${error.message}`;
-                console.error('Erro de verificação:', error);
-            }
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = `❌ Erro: ${err.message}`;
+      }
+    };
+
+    window.verifyOrganization = async function verifyOrganization() {
+      const status = document.getElementById('verify-status');
+      const dataEl = document.getElementById('verify-data');
+      const id = document.getElementById('org-id').value.trim();
+
+      status.className = 'status loading';
+      status.textContent = 'Verificando...';
+
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          status.className = 'status error';
+          status.textContent = '❌ Não encontrada.';
+        } else {
+          status.className = 'status success';
+          status.textContent = `✅ Encontrada: ${data.name}`;
+          dataEl.classList.remove('hidden');
+          dataEl.innerHTML = `<strong>ID:</strong> ${data.id}<br><strong>Nome:</strong> ${data.name}`;
         }
-        
-        async function listOrganizations() {
-            const statusEl = document.getElementById('list-status');
-            const dataEl = document.getElementById('list-data');
-            
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Listando organizações...';
-            
-            try {
-                const { data: orgs, error } = await supabase
-                    .from('organizations')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                statusEl.className = 'status success';
-                statusEl.textContent = `✅ ${orgs.length} organizações encontradas`;
-                
-                if (orgs.length > 0) {
-                    dataEl.style.display = 'block';
-                    dataEl.innerHTML = orgs.map(org => `
-                        <strong>${org.name}</strong><br>
-                        ID: ${org.id}<br>
-                        Criado: ${new Date(org.created_at).toLocaleString('pt-BR')}<br>
-                        ---
-                    `).join('<br>');
-                } else {
-                    dataEl.style.display = 'block';
-                    dataEl.innerHTML = 'Nenhuma organização encontrada';
-                }
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro ao listar: ${error.message}`;
-                console.error('Erro de listagem:', error);
-            }
-        }
-        
-        async function setupComplete() {
-            const statusEl = document.getElementById('complete-status');
-            statusEl.className = 'status loading';
-            statusEl.textContent = 'Executando setup completo...';
-            
-            try {
-                // 1. Criar organização
-                await createOrganization();
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // 2. Verificar se foi criada
-                await verifyOrganization();
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // 3. Listar todas
-                await listOrganizations();
-                
-                statusEl.className = 'status success';
-                statusEl.textContent = '🎉 Setup completo! Organização ALSHAM pronta para uso!';
-                
-            } catch (error) {
-                statusEl.className = 'status error';
-                statusEl.textContent = `❌ Erro durante setup: ${error.message}`;
-            }
-        }
-        
-        console.log('🏢 Página de criação de organização carregada');
-        console.log('Default Org ID:', DEFAULT_ORG_ID);
-    </script>
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = `❌ Erro: ${err.message}`;
+      }
+    };
+
+    window.listOrganizations = async function listOrganizations() {
+      const status = document.getElementById('list-status');
+      const dataEl = document.getElementById('list-data');
+
+      status.className = 'status loading';
+      status.textContent = 'Listando...';
+
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        status.className = 'status success';
+        status.textContent = `✅ ${data.length} encontradas`;
+        dataEl.classList.remove('hidden');
+        dataEl.innerHTML = data.map(org => `
+          <strong>${org.name}</strong> (${org.id})
+          <br>Criada: ${new Date(org.created_at).toLocaleString('pt-BR')}
+          <hr>
+        `).join('');
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = `❌ Erro: ${err.message}`;
+      }
+    };
+
+    window.setupComplete = async function setupComplete() {
+      const status = document.getElementById('complete-status');
+      status.className = 'status loading';
+      status.textContent = 'Executando setup...';
+
+      try {
+        await createOrganization();
+        await verifyOrganization();
+        await listOrganizations();
+        status.className = 'status success';
+        status.textContent = '🎉 Setup completo!';
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = `❌ Erro: ${err.message}`;
+      }
+    };
+  </script>
 </body>
 </html>
