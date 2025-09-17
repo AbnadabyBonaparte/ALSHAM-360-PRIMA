@@ -14,12 +14,12 @@
   <!-- Segurança -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://apis.google.com https://*.posthog.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    img-src 'self' data: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com;
+    img-src 'self' data: blob: https://*.supabase.co https://*.posthog.com;
+    font-src 'self' https://fonts.gstatic.com data:;
     frame-src 'self' https://apis.google.com;
-    font-src 'self' https://fonts.gstatic.com;
   ">
 
   <!-- Favicons -->
@@ -33,7 +33,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/src/style.css" />
 
   <style>
     .font-inter { font-family: 'Inter', system-ui, sans-serif; }
@@ -96,6 +96,7 @@
               <input id="password" name="password" type="password" required autocomplete="current-password"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
               <button type="button" id="toggle-password"
+                aria-label="Mostrar senha" aria-pressed="false"
                 class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">👁️</button>
             </div>
           </div>
@@ -115,10 +116,13 @@
         Não tem uma conta? <a href="register.html" class="font-semibold text-indigo-600">Crie uma agora</a>
       </p>
     </div>
+
+    <!-- Avisos extras -->
+    <div id="offline-notice" class="hidden mt-4 text-sm text-center"></div>
   </main>
 
   <!-- Script principal -->
-  <script type="module" src="/js/login.js"></script>
+  <script type="module" src="/src/js/login.js"></script>
 
   <!-- Fallback -->
   <script>
