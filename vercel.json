@@ -1,25 +1,35 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": null,
-  "rewrites": [
-    { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/leads", "destination": "/leads.html" },
-    { "source": "/leads-real", "destination": "/leads-real.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/register", "destination": "/register.html" },
-    { "source": "/automacoes", "destination": "/automacoes.html" },
-    { "source": "/gamificacao", "destination": "/gamificacao.html" },
-    { "source": "/relatorios", "destination": "/relatorios.html" },
-    { "source": "/configuracoes", "destination": "/configuracoes.html" },
-    { "source": "/create-org", "destination": "/create-org.html" },
-    { "source": "/test-supabase", "destination": "/test-supabase.html" },
-    { "source": "/", "destination": "/index.html" }
-  ],
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/**",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-eval' https://*.supabase.co https://*.vercel.app; connect-src 'self' https://*.supabase.co ws://*.supabase.co; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self';"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/assets/**",
       "headers": [
         {
           "key": "Cache-Control",
@@ -28,15 +38,52 @@
       ]
     },
     {
-      "source": "/(.*).html",
+      "source": "/sw.js",
       "headers": [
         {
-          "key": "Cache-Control", 
-          "value": "public, max-age=3600"
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
         }
       ]
     }
   ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  "rewrites": [
+    {
+      "source": "/leads",
+      "destination": "/leads.html"
+    },
+    {
+      "source": "/gamificacao",
+      "destination": "/gamificacao.html"
+    },
+    {
+      "source": "/automacoes",
+      "destination": "/automacoes.html"
+    },
+    {
+      "source": "/relatorios",
+      "destination": "/relatorios.html"
+    },
+    {
+      "source": "/configuracoes",
+      "destination": "/configuracoes.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/register.html"
+    }
+  ]
 }
