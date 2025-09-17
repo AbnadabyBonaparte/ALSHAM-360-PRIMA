@@ -1,67 +1,76 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Crie sua conta no ALSHAM 360° PRIMA CRM. Cadastro rápido, seguro, com validação avançada, proteção de dados e conformidade LGPD.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Conta - ALSHAM 360° PRIMA</title>
+
+  <meta name="description" content="Crie sua conta no ALSHAM 360° PRIMA CRM. Cadastro rápido, seguro e em conformidade com a LGPD.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#3B82F6">
 
-  <title>Criar Conta - ALSHAM 360° PRIMA</title>
-
-  <!-- Ícones -->
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <!-- Favicons -->
+  <link rel="icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- CSP (Supabase, Google, PostHog) -->
+  <!-- CSP -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://*.posthog.com https://apis.google.com;
+    script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://apis.google.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    connect-src 'self' https://*.supabase.co ws://*.supabase.co https://*.posthog.com;
-    img-src 'self' data: blob: https://*.supabase.co;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    img-src 'self' data: https://*.supabase.co;
     frame-src 'self' https://apis.google.com;
-    font-src 'self' data: https://fonts.gstatic.com;
+    font-src 'self' https://fonts.gstatic.com;
   ">
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="/style.css" />
 
   <style>
     body { font-family: 'Inter', sans-serif; }
     .btn-primary {
-      @apply w-full flex justify-center items-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm
-             hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
-             focus-visible:outline-indigo-600 transition-all duration-300 transform hover:-translate-y-0.5;
+      width: 100%; display: flex; justify-content: center; align-items: center;
+      border-radius: 0.5rem; background-color: #4f46e5;
+      padding: 0.625rem 1rem; font-size: 0.875rem;
+      font-weight: 600; color: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
     }
+    .btn-primary:hover { background-color: #4338ca; transform: translateY(-2px); }
     .btn-secondary {
-      @apply w-full flex justify-center items-center rounded-lg bg-white px-4 py-2.5 border border-gray-300 text-sm font-medium text-gray-700 shadow-sm
-             hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+      width: 100%; display: flex; justify-content: center; align-items: center;
+      border-radius: 0.5rem; background: #fff;
+      border: 1px solid #d1d5db; padding: 0.625rem 1rem;
+      font-size: 0.875rem; font-weight: 500; color: #374151;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
+    .btn-secondary:hover { background: #f9fafb; }
     .input-premium {
-      @apply w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400
-             focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors;
+      width: 100%; padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db; border-radius: 0.5rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-premium:focus {
+      border-color: #4f46e5; outline: none;
+      box-shadow: 0 0 0 2px rgba(79,70,229,0.3);
     }
     #loading-overlay {
-      position: fixed; inset: 0; background: rgba(255, 255, 255, 0.85); display: none;
-      align-items: center; justify-content: center; z-index: 50;
+      position: fixed; inset: 0; background: rgba(255,255,255,0.85);
+      display: none; align-items: center; justify-content: center; z-index: 50;
     }
   </style>
 </head>
-<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen relative">
 
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
-    Pular para o conteúdo principal
-  </a>
-
+<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
   <main id="main-content" class="flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-lg bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 relative">
+    <div class="w-full max-w-lg bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8">
 
       <!-- Header -->
       <div class="text-center mb-6">
@@ -73,35 +82,29 @@
       </div>
 
       <!-- Feedback -->
-      <div id="error-message" class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm" role="alert" aria-live="assertive"></div>
-      <div id="success-message" class="hidden mb-4 p-3 rounded-lg bg-green-100 text-green-700 text-sm" role="alert" aria-live="polite"></div>
+      <div id="error-message" class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm"></div>
+      <div id="success-message" class="hidden mb-4 p-3 rounded-lg bg-green-100 text-green-700 text-sm"></div>
 
       <!-- Form -->
       <form id="register-form" class="space-y-5" novalidate>
         <input id="fullName" name="fullName" type="text" placeholder="Nome Completo *" required class="input-premium">
         <input id="email" name="email" type="email" placeholder="E-mail *" required class="input-premium">
         
-        <!-- Password -->
         <div class="relative">
           <input id="password" name="password" type="password" placeholder="Senha *" required minlength="8" class="input-premium pr-12">
-          <button type="button" id="toggle-password"
-            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600"
-            aria-label="Mostrar senha" aria-pressed="false">👁️</button>
-          <div id="password-strength" class="text-xs text-gray-500 mt-1" aria-live="polite"></div>
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-600">👁️</button>
+          <div id="password-strength" class="text-xs text-gray-500 mt-1"></div>
         </div>
 
         <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirmar Senha *" required class="input-premium">
-
         <input id="company" name="company" type="text" placeholder="Empresa (opcional)" class="input-premium">
         <input id="phone" name="phone" type="tel" placeholder="Telefone (opcional)" class="input-premium">
 
-        <!-- Terms -->
         <label class="flex items-start space-x-2 text-sm text-gray-700">
-          <input id="terms" type="checkbox" required class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+          <input id="terms" type="checkbox" required class="h-4 w-4 rounded border-gray-300 text-indigo-600">
           <span>Concordo com os <a href="#" class="text-blue-600">Termos</a> e <a href="#" class="text-blue-600">Política de Privacidade</a></span>
         </label>
 
-        <!-- Submit -->
         <button id="register-btn" type="submit" class="btn-primary">
           <span id="register-btn-text">Criar Conta</span>
           <span id="register-spinner" class="hidden animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></span>
@@ -110,19 +113,15 @@
 
       <!-- OAuth -->
       <div class="mt-8">
-        <div class="relative flex justify-center text-sm text-gray-500 mb-4">
-          <span class="px-2 bg-white">Ou cadastre-se com</span>
-        </div>
+        <p class="text-sm text-gray-500 text-center mb-4">Ou cadastre-se com</p>
         <div class="grid grid-cols-2 gap-3">
           <button id="google-register" class="btn-secondary">Google</button>
           <button id="microsoft-register" class="btn-secondary">Microsoft</button>
         </div>
       </div>
 
-      <!-- Link login -->
       <p class="mt-6 text-center text-sm text-gray-500">
-        Já tem uma conta?
-        <a href="login.html" class="text-indigo-600 hover:text-indigo-500 font-semibold">Faça login</a>
+        Já tem uma conta? <a href="login.html" class="text-indigo-600 font-semibold">Faça login</a>
       </p>
     </div>
   </main>
@@ -130,14 +129,14 @@
   <div id="loading-overlay"><div class="loader">🔄 Processando...</div></div>
 
   <!-- Scripts -->
-  <script type="module" src="/src/js/register.js"></script>
+  <script type="module" src="/js/register.js"></script>
 
-  <!-- Fallback seguro -->
+  <!-- Fallback -->
   <script>
-    window.addEventListener('error', function(e) {
+    window.addEventListener('error', (e) => {
       if (e.target.tagName === 'SCRIPT' && e.target.src.includes('register.js')) {
         const errBox = document.getElementById('error-message');
-        errBox.textContent = "⚠️ Modo Demo: register.js não carregou. Configure Supabase para cadastro real.";
+        errBox.textContent = "⚠️ Register.js não carregou. Configure Supabase.";
         errBox.classList.remove('hidden');
       }
     });
