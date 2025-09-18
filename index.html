@@ -7,31 +7,30 @@
   <!-- Content Security Policy - CORRIGE BLOQUEIOS DE SCRIPT -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-      us-assets.i.posthog.com 
-      apis.google.com 
-      cdn.jsdelivr.net 
-      cdnjs.cloudflare.com
-      cdn.tailwindcss.com
-      *.supabase.co;
-    style-src 'self' 'unsafe-inline' 
-      fonts.googleapis.com 
-      fonts.gstatic.com
-      cdn.jsdelivr.net
-      cdnjs.cloudflare.com
-      cdn.tailwindcss.com;
-    font-src 'self' 
-      fonts.gstatic.com 
-      fonts.googleapis.com
-      cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      https://us-assets.i.posthog.com
+      https://apis.google.com
+      https://cdn.jsdelivr.net
+      https://cdnjs.cloudflare.com
+      https://cdn.tailwindcss.com
+      https://*.supabase.co;
+    style-src 'self' 'unsafe-inline'
+      https://fonts.googleapis.com
+      https://fonts.gstatic.com
+      https://cdn.jsdelivr.net
+      https://cdnjs.cloudflare.com
+      https://cdn.tailwindcss.com;
+    font-src 'self'
+      https://fonts.gstatic.com
+      https://fonts.googleapis.com
+      https://cdn.jsdelivr.net;
     img-src 'self' data: blob: https:;
-    connect-src 'self' 
-      *.supabase.co 
-      *.posthog.com
-      apis.google.com
-      cdn.jsdelivr.net;
-    frame-src 'self' 
-      *.google.com;
+    connect-src 'self'
+      https://*.supabase.co
+      https://*.posthog.com
+      https://apis.google.com
+      https://cdn.jsdelivr.net;
+    frame-src 'self' https://*.google.com;
     worker-src 'self' blob:;
   ">
   
@@ -47,8 +46,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -127,7 +129,7 @@
     <p>&copy; 2025 ALSHAM 360° PRIMA. Sistema com dados reais do Supabase.</p>
   </footer>
 
-  <!-- Scripts principais - IMPORTANTE: Supabase já carregado acima via CDN -->
+  <!-- Scripts principais -->
   <script type="module">
     window.logout = async () => {
       try {
@@ -142,15 +144,20 @@
 
     const script = document.createElement('script');
     script.type = 'module';
-    script.src = '/js/dashboard.js';
+    script.src = '/lib/supabase.js';   <!-- usa agora o supabase.js -->
     script.onload = () => {
       console.log('✅ Sistema real carregado!');
       document.getElementById('loading-indicator').style.display = 'none';
     };
     script.onerror = () => {
-      console.error('❌ Erro ao carregar dashboard.js - fallback ativado');
+      console.error('❌ Erro ao carregar supabase.js');
     };
     document.head.appendChild(script);
+
+    const dash = document.createElement('script');
+    dash.type = 'module';
+    dash.src = '/js/dashboard.js';
+    document.head.appendChild(dash);
   </script>
 </body>
 </html>
