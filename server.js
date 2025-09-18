@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// ✅ Env vars (fail-fast se não tiver)
+// ✅ Env vars
 const {
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
@@ -29,12 +29,13 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   process.exit(1);
 }
 
-// ✅ Supabase client (service_role para backend seguro, anon só em frontend)
-const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE || SUPABASE_ANON_KEY,
-  { auth: { persistSession: false } }
-);
+// ✅ Clients
+const supabaseAnon = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: false },
+});
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE || SUPABASE_ANON_KEY, {
+  auth: { persistSession: false },
+});
 
 const app = express();
 
@@ -63,7 +64,7 @@ const authMiddleware = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No token provided' });
 
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const { data: { user }, error } = await supabaseAnon.auth.getUser(token);
     if (error || !user) return res.status(401).json({ error: 'Invalid token' });
 
     req.user = user;
@@ -84,10 +85,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ✅ Endpoints de API
+// ✅ Endpoints
 app.get('/api/leads', authMiddleware, async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads_crm')
       .select('*')
       .limit(100);
@@ -101,7 +102,7 @@ app.get('/api/leads', authMiddleware, async (req, res) => {
 
 app.post('/api/leads', authMiddleware, async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads_crm')
       .insert(req.body)
       .select();
@@ -115,9 +116,9 @@ app.post('/api/leads', authMiddleware, async (req, res) => {
 
 app.get('/api/relatorios', authMiddleware, async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads_crm')
-      .select('status, count(*)')
+      .select('status, count:count(*)')
       .group('status');
     if (error) throw error;
     res.json(data);
@@ -127,10 +128,10 @@ app.get('/api/relatorios', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Servir arquivos estáticos (somente dist)
+// ✅ Servir estáticos (Railway)
 app.use(express.static(join(__dirname, 'dist'), { extensions: ['html'], maxAge: '1d' }));
 
-// ✅ SPA/Multi-page fallback
+// ✅ SPA/MPA fallback
 app.get('*', (req, res) => {
   try {
     const indexPath = join(__dirname, 'dist', 'index.html');
