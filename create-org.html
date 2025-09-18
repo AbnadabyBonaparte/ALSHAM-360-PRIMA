@@ -5,10 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Criar Organização - ALSHAM 360° PRIMA</title>
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-6 font-inter">
 
@@ -58,20 +62,20 @@
     </div>
   </div>
 
-  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
+  <!-- Scripts -->
   <script type="module">
-    // Usar Supabase do CDN ao invés de ES6 import
+    // Usar Supabase do CDN
     const { createClient } = window.supabase;
-    
-    // Configurar cliente Supabase (usar as mesmas variáveis do arquivo principal)
-    const SUPABASE_URL = import.meta?.env?.VITE_SUPABASE_URL || window.__VITE_SUPABASE_URL__;
-    const SUPABASE_ANON_KEY = import.meta?.env?.VITE_SUPABASE_ANON_KEY || window.__VITE_SUPABASE_ANON_KEY__;
-    
+
+    // Pegar variáveis do env.js
+    const SUPABASE_URL = window.__VITE_SUPABASE_URL__;
+    const SUPABASE_ANON_KEY = window.__VITE_SUPABASE_ANON_KEY__;
+
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       console.error('🚨 Variáveis de ambiente do Supabase não configuradas!');
       alert('Configure as variáveis VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel');
     }
-    
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
 
