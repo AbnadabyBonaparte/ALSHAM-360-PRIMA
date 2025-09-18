@@ -16,6 +16,7 @@
 // ✅ [FIXED] Full exports, added real-time helpers, performance limits
 // ✅ [NEW] Integrated Sentry-like logging (console for now; extend to tool)
 // ✅ [BROWSER-FIXED] Removido ES6 imports - usa CDN via window.supabase
+// ✅ [CRITICAL-FIX] Adicionada função genericSelect que estava faltando
 // =========================================================================
 
 // IMPORTANTE: Adicione este script no HTML ANTES de carregar este arquivo:
@@ -154,9 +155,46 @@ export async function updateUserProfile(userId, orgId, updates) {
   }
 }
 
+// =========================================================================
+// 🔥 FUNÇÃO GENERICSELECT - CORRIGIDA E EXPORTADA
+// =========================================================================
+// Função genérica para consultas no Supabase - EXPORTADA para corrigir o erro
+export async function genericSelect(table, filters = {}, options = {}) {
+  try {
+    let query = supabase.from(table).select(options.select || '*');
+    
+    // Aplicar filtros
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        query = query.eq(key, value);
+      }
+    });
+    
+    // Aplicar ordenação se especificada
+    if (options.order) {
+      query = query.order(options.order.column, { 
+        ascending: options.order.ascending || false 
+      });
+    }
+    
+    // Aplicar limite se especificado
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('Erro no genericSelect:', error);
+    return { data: null, error };
+  }
+}
+
 // 📊 GENÉRICO CRUD PARA 55 TABELAS (EXEMPLOS; EXPANDA PARA TODAS)
 // Função genérica para SELECT com org_id e limit default (performance)
-async function genericSelect(table, filters = {}, orgId, limit = 100) {
+async function genericSelectWithOrg(table, filters = {}, orgId, limit = 100) {
   try {
     let query = supabase.from(table).select('*').eq('org_id', orgId);
     Object.entries(filters).forEach(([key, value]) => query = query.eq(key, value));
@@ -199,7 +237,7 @@ async function genericDelete(table, id, orgId) {
 
 // Exemplos Específicos (para tabelas chave; repita para as 55)
 export async function getLeads(orgId, filters = {}) {
-  return genericSelect('leads_crm', filters, orgId);
+  return genericSelectWithOrg('leads_crm', filters, orgId);
 }
 
 export async function createLead(data, orgId) {
@@ -325,6 +363,7 @@ if (typeof window !== 'undefined') {
     updateUserProfile,
     getLeads,
     createLead,
+    genericSelect, // ADICIONADO AQUI TAMBÉM
     subscribeToTable,
     formatDateBR,
     formatTimeAgo,
