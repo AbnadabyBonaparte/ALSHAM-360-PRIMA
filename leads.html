@@ -25,11 +25,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 via-green-50 to-blue-50 min-h-screen antialiased">
@@ -75,11 +78,12 @@
   <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-md"></div>
 
-  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/leads.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <script type="module" src="/js/leads.js" defer></script>
+  <script type="module" src="/js/navigation.js" defer></script>
+  <script type="module" src="/js/main.js" defer></script>
+  <script type="module" src="/js/auth.js" defer></script>
 </body>
 </html>
