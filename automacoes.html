@@ -21,6 +21,7 @@
   <meta property="twitter:description" content="Workflows avançados e triggers inteligentes para maximizar produtividade" />
   <meta property="twitter:image" content="/og-image.png" />
 
+  <!-- Segurança -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
@@ -38,14 +39,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Tailwind (usado apenas localmente) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- CSS global -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+  <!-- Tailwind (dev/testes rápidos) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Estilos inline -->
   <style>
@@ -146,10 +150,11 @@
     <p>&copy; 2025 ALSHAM 360° PRIMA. Automações integradas com Supabase e N8N.</p>
   </footer>
 
-  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/automacoes.js"></script>
+  <!-- Scripts -->
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <script type="module" src="/js/navigation.js" defer></script>
+  <script type="module" src="/js/auth.js" defer></script>
+  <script type="module" src="/js/automacoes.js" defer></script>
 
   <noscript>
     <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
