@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="Dashboards avançados e relatórios inteligentes para maximizar resultados" />
   <meta name="twitter:image" content="/og-image.png" />
 
+  <!-- Segurança -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
@@ -36,11 +37,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen font-inter">
@@ -50,12 +54,13 @@
 
   <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
-  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/relatorios.js"></script>
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <script type="module" src="/js/navigation.js" defer></script>
+  <script type="module" src="/js/main.js" defer></script>
+  <script type="module" src="/js/auth.js" defer></script>
+  <script type="module" src="/js/relatorios.js" defer></script>
 
   <script type="module">
     console.log('📊 Inicializando sistema de relatórios enterprise...');
