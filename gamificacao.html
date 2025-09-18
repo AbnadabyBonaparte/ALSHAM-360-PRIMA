@@ -47,6 +47,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
+  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
 </head>
@@ -96,7 +99,7 @@
   <!-- Notificações -->
   <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" aria-live="polite"></div>
 
-  <!-- Scripts -->
+  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="/js/navigation.js"></script>
   <script type="module" src="/js/main.js"></script>
