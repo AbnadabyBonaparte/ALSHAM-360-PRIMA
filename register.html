@@ -19,11 +19,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis e Supabase -->
+  <script src="/env.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
   <style>
     body { font-family: 'Inter', sans-serif; }
@@ -121,8 +122,9 @@
   <div id="loading-overlay"><div class="loader">🔄 Processando...</div></div>
   <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
-  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
-  <script type="module" src="/js/register.js"></script>
+  <!-- Scripts -->
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <script type="module" src="/js/register.js" defer></script>
 
   <!-- Fallback -->
   <script>
