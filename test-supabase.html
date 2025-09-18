@@ -16,6 +16,9 @@
     frame-src 'self' https://apis.google.com;
   " />
 
+  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -147,11 +150,139 @@
 
   <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
+  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
   <script type="module">
-    import { supabase, DEFAULT_ORG_ID, getOrganization } from '/js/supabase.js';
-
-    // As funções como testConnection, testAuth, etc. devem estar disponíveis em /js/supabase.js
-    // Este script importa e utiliza a lógica desses testes diretamente
+    // Configurar cliente Supabase usando CDN
+    const { createClient } = window.supabase;
+    
+    const SUPABASE_URL = import.meta?.env?.VITE_SUPABASE_URL || window.__VITE_SUPABASE_URL__;
+    const SUPABASE_ANON_KEY = import.meta?.env?.VITE_SUPABASE_ANON_KEY || window.__VITE_SUPABASE_ANON_KEY__;
+    const DEFAULT_ORG_ID = 'default-org-id';
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      console.error('🚨 Variáveis de ambiente do Supabase não configuradas!');
+      updateStatus('connection-status', 'error', '❌ Variáveis de ambiente não configuradas');
+      return;
+    }
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    function updateStatus(elementId, className, message) {
+      const element = document.getElementById(elementId);
+      element.className = `status ${className}`;
+      element.textContent = message;
+    }
+    
+    function showData(elementId, data) {
+      const element = document.getElementById(elementId);
+      element.style.display = 'block';
+      element.innerHTML = JSON.stringify(data, null, 2);
+    }
+    
+    window.testConnection = async function() {
+      updateStatus('connection-status', 'loading', 'Testando conexão...');
+      
+      try {
+        const { data, error } = await supabase.from('organizations').select('count').limit(1);
+        if (error) throw error;
+        
+        updateStatus('connection-status', 'success', '✅ Conexão funcionando!');
+      } catch (err) {
+        updateStatus('connection-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+    
+    window.testAuth = async function() {
+      updateStatus('auth-status', 'loading', 'Verificando autenticação...');
+      
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        
+        if (session) {
+          updateStatus('auth-status', 'success', '✅ Usuário autenticado');
+        } else {
+          updateStatus('auth-status', 'loading', '⚠️ Nenhum usuário logado (normal para teste)');
+        }
+      } catch (err) {
+        updateStatus('auth-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+    
+    window.testTables = async function() {
+      updateStatus('tables-status', 'loading', 'Verificando acesso às tabelas...');
+      
+      try {
+        const tables = ['organizations', 'user_profiles', 'leads_crm'];
+        const results = {};
+        
+        for (const table of tables) {
+          try {
+            const { data, error } = await supabase.from(table).select('*').limit(1);
+            results[table] = error ? `Erro: ${error.message}` : `OK (${data?.length || 0} registros)`;
+          } catch (err) {
+            results[table] = `Erro: ${err.message}`;
+          }
+        }
+        
+        updateStatus('tables-status', 'success', '✅ Verificação de tabelas concluída');
+        showData('tables-data', results);
+      } catch (err) {
+        updateStatus('tables-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+    
+    window.testOrganization = async function() {
+      updateStatus('org-status', 'loading', 'Verificando organização padrão...');
+      
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .limit(5);
+        
+        if (error) throw error;
+        
+        updateStatus('org-status', 'success', `✅ ${data.length} organizações encontradas`);
+        showData('org-data', data);
+      } catch (err) {
+        updateStatus('org-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+    
+    window.testLeads = async function() {
+      updateStatus('leads-status', 'loading', 'Verificando leads CRM...');
+      
+      try {
+        const { data, error } = await supabase
+          .from('leads_crm')
+          .select('*')
+          .limit(5);
+        
+        if (error) throw error;
+        
+        updateStatus('leads-status', 'success', `✅ ${data.length} leads encontrados`);
+        showData('leads-data', data);
+      } catch (err) {
+        updateStatus('leads-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+    
+    window.runAllTests = async function() {
+      updateStatus('complete-status', 'loading', 'Executando todos os testes...');
+      
+      try {
+        await testConnection();
+        await testAuth();
+        await testTables();
+        await testOrganization();
+        await testLeads();
+        
+        updateStatus('complete-status', 'success', '🎉 Todos os testes concluídos!');
+      } catch (err) {
+        updateStatus('complete-status', 'error', `❌ Erro durante os testes: ${err.message}`);
+      }
+    };
   </script>
 
   <script>
