@@ -3,6 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Content Security Policy - CORRIGE BLOQUEIOS DE SCRIPT -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
+      us-assets.i.posthog.com 
+      apis.google.com 
+      cdn.jsdelivr.net 
+      cdnjs.cloudflare.com
+      cdn.tailwindcss.com
+      *.supabase.co;
+    style-src 'self' 'unsafe-inline' 
+      fonts.googleapis.com 
+      fonts.gstatic.com
+      cdn.jsdelivr.net
+      cdnjs.cloudflare.com
+      cdn.tailwindcss.com;
+    font-src 'self' 
+      fonts.gstatic.com 
+      fonts.googleapis.com
+      cdn.jsdelivr.net;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' 
+      *.supabase.co 
+      *.posthog.com
+      apis.google.com
+      cdn.jsdelivr.net;
+    frame-src 'self' 
+      *.google.com;
+    worker-src 'self' blob:;
+  ">
+  
   <title>ALSHAM 360° PRIMA - Dashboard</title>
   <meta name="description" content="ALSHAM 360° PRIMA - CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas." />
   <meta name="keywords" content="CRM, IA, Automação, Leads, Vendas, Dashboard, Analytics, Gamificação" />
