@@ -11,7 +11,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#059669" />
 
-  <!-- Segurança (mantendo apenas headers não-CSP) -->
+  <!-- Segurança -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
@@ -26,8 +26,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- CSS Global -->
+  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 via-green-50 to-blue-50 min-h-screen antialiased">
@@ -83,9 +89,10 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/leads-real.js"></script>
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <script type="module" src="/js/navigation.js" defer></script>
+  <script type="module" src="/js/main.js" defer></script>
+  <script type="module" src="/js/auth.js" defer></script>
+  <script type="module" src="/js/leads-real.js" defer></script>
 </body>
 </html>
