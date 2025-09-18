@@ -23,6 +23,7 @@
   <meta name="twitter:description" content="Sistema de pontos, badges e leaderboards para motivar sua equipe" />
   <meta name="twitter:image" content="/og-gamificacao.png" />
 
+  <!-- Segurança -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
@@ -37,11 +38,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Variáveis do Supabase -->
+  <script src="/env.js" defer></script>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 
 <body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
@@ -89,12 +93,13 @@
   <!-- Notificações -->
   <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" aria-live="polite"></div>
 
-  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/js/navigation.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/gamificacao.js"></script>
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <script type="module" src="/js/navigation.js" defer></script>
+  <script type="module" src="/js/main.js" defer></script>
+  <script type="module" src="/js/auth.js" defer></script>
+  <script type="module" src="/js/gamificacao.js" defer></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
