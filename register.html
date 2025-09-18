@@ -30,6 +30,9 @@
     frame-src 'self' https://apis.google.com;
   " />
 
+  <!-- CRITICAL: Supabase CDN - DEVE ser carregado ANTES dos outros scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
 
@@ -129,7 +132,7 @@
   <div id="loading-overlay"><div class="loader">🔄 Processando...</div></div>
   <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
 
-  <!-- Scripts -->
+  <!-- Scripts - IMPORTANTE: Supabase já carregado acima via CDN -->
   <script type="module" src="/js/register.js"></script>
 
   <!-- Fallback -->
