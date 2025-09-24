@@ -46,12 +46,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- Variáveis do Supabase -->
-  <script src="/env.js" defer></script>
-
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -121,7 +115,11 @@
 
   <!-- Conteúdo principal -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- KPIs, Funil, Gráficos... -->
+    <div class="text-center py-12">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Dashboard ALSHAM 360° PRIMA</h2>
+      <p class="text-gray-600 mb-8">Sistema carregando... Aguarde.</p>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+    </div>
   </main>
 
   <!-- Rodapé -->
@@ -129,11 +127,14 @@
     <p>&copy; 2025 ALSHAM 360° PRIMA. Sistema com dados reais do Supabase.</p>
   </footer>
 
-  <!-- Scripts principais -->
-  <script type="module">
+  <!-- Scripts - ORDEM CORRIGIDA -->
+  <script>
+    // Função de logout global
     window.logout = async () => {
       try {
-        if (window.dashboardApp?.auth) await window.dashboardApp.auth.signOut();
+        if (window.AlshamSupabase?.signOut) {
+          await window.AlshamSupabase.signOut();
+        }
       } catch (err) {
         console.error("Erro no logout:", err);
       }
@@ -142,22 +143,29 @@
       location.href = '/login.html';
     };
 
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = '/lib/supabase.js';   <!-- usa agora o supabase.js -->
-    script.onload = () => {
-      console.log('✅ Sistema real carregado!');
-      document.getElementById('loading-indicator').style.display = 'none';
-    };
-    script.onerror = () => {
-      console.error('❌ Erro ao carregar supabase.js');
-    };
-    document.head.appendChild(script);
+    // Função para carregar scripts em sequência
+    function loadScript(src, callback) {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = callback;
+      script.onerror = () => console.error(`Erro ao carregar ${src}`);
+      document.head.appendChild(script);
+    }
 
-    const dash = document.createElement('script');
-    dash.type = 'module';
-    dash.src = '/js/dashboard.js';
-    document.head.appendChild(dash);
+    // Carregar scripts na ordem correta
+    loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
+      console.log('✅ Supabase CDN carregado');
+      
+      loadScript('/lib/supabase.js', () => {
+        console.log('✅ Supabase configurado');
+        document.getElementById('loading-indicator').style.display = 'none';
+        
+        // Carregar o dashboard após o supabase
+        loadScript('/js/dashboard.js', () => {
+          console.log('✅ Dashboard carregado');
+        });
+      });
+    });
   </script>
 </body>
 </html>
