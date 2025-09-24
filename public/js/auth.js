@@ -29,8 +29,8 @@
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
 
-// ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
-import {
+// ===== CORRIGIDO: IMPORTS AGORA SÃO GLOBAIS PELO window.AlshamSupabase =====
+const {
   getCurrentSession,
   onAuthStateChange,
   signOut,
@@ -38,7 +38,7 @@ import {
   updateUserProfile,
   createAuditLog,
   genericSelect // usado para getUserOrganizations e getUserBadges
-} from "../lib/supabase.js";
+} = window.AlshamSupabase;
 
 /**
  * 🔔 Sistema de Notificação
