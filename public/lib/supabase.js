@@ -95,11 +95,17 @@ function onAuthStateChange(callback) {
   });
 }
 
+// ===== CORREÇÃO PRINCIPAL: UUID VÁLIDO =====
+function getDefaultOrgId() {
+  // Retorne sempre um UUID válido para Supabase
+  return '00000000-0000-0000-0000-000000000001';
+}
+
 // ORG FUNCTIONS
 async function getCurrentOrgId() {
   try {
     const session = await getCurrentSession();
-    if (!session?.user) return null;
+    if (!session?.user) return getDefaultOrgId();
     
     const { data, error } = await supabase
       .from('user_profiles')
@@ -109,14 +115,34 @@ async function getCurrentOrgId() {
     
     if (error) {
       console.warn('Usuário sem org_id, usando default:', error);
-      return 'default-org-id';
+      return getDefaultOrgId();
     }
     
-    return data?.org_id || 'default-org-id';
+    // Se não existe org_id ou é inválido, retorna UUID fixo
+    if (!data?.org_id || !isValidUUID(data.org_id)) {
+      return getDefaultOrgId();
+    }
+    
+    return data.org_id;
   } catch (err) {
     console.warn('Erro ao obter org_id, usando default:', err);
-    return 'default-org-id';
+    return getDefaultOrgId();
   }
+}
+
+// ===== Função para validar UUID =====
+function isValidUUID(uuid) {
+  // Regex para UUID v4
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
+}
+
+// ===== Gerador de UUID (opcional para uso futuro) =====
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 // CRUD FUNCTIONS
@@ -211,7 +237,7 @@ async function createAuditLog(action, details, orgId, userId) {
 }
 
 // ORGANIZATION FUNCTIONS
-const DEFAULT_ORG_ID = 'default-org-id';
+const DEFAULT_ORG_ID = getDefaultOrgId();
 
 async function getOrganization(orgId) {
   try {
@@ -399,6 +425,9 @@ if (typeof window !== 'undefined') {
     getCurrentOrgId,
     getOrganization,
     DEFAULT_ORG_ID,
+    getDefaultOrgId,
+    isValidUUID,
+    generateUUID,
     
     // CRUD
     genericSelect,
@@ -441,6 +470,9 @@ if (typeof module !== 'undefined' && module.exports) {
     getCurrentOrgId,
     getOrganization,
     DEFAULT_ORG_ID,
+    getDefaultOrgId,
+    isValidUUID,
+    generateUUID,
     genericSelect,
     genericInsert,
     genericUpdate,
