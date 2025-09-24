@@ -49,6 +49,7 @@ const {
     subscribeToTable,
     healthCheck
 } = window.AlshamSupabase;
+
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
  * Validates and returns external library dependency
