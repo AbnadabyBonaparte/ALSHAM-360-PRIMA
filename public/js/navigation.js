@@ -7,6 +7,20 @@
  * @license MIT
  */
 
+// ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
+/**
+ * Integração global com funções Supabase (se necessário)
+ * Use destructuring do window.AlshamSupabase para acessar métodos
+ */
+const {
+    getCurrentSession,
+    getUserProfile,
+    genericSelect,
+    subscribeToTable,
+    createAuditLog,
+    healthCheck
+} = window.AlshamSupabase;
+
 /**
  * Configuração central do sistema de navegação
  * @namespace NavigationConfig
