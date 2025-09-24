@@ -121,7 +121,13 @@ const alshamLeadsState = {
     
     // Real-time
     subscriptions: [],
-    lastUpdate: null
+    lastUpdate: null,
+    
+    // Ordenação
+    sorting: {
+        field: 'created_at',
+        direction: 'desc'
+    }
 };
 
 // ===== INICIALIZAÇÃO COMPLETA DO SISTEMA =====
@@ -318,12 +324,7 @@ async function loadLeadsData() {
             'leads_crm',
             { org_id: alshamLeadsState.orgId },
             { 
-                order: { column: 'created_at', ascending: false },
-                select: `
-                    *,
-                    lead_interactions(count),
-                    sales_opportunities(count)
-                `
+                order: { column: 'created_at', ascending: false }
             }
         );
         
@@ -334,8 +335,8 @@ async function loadLeadsData() {
         // Enriquecer dados dos leads com informações calculadas
         const enrichedLeads = leads?.map(lead => ({
             ...lead,
-            interactions_count: lead.lead_interactions?.[0]?.count || 0,
-            opportunities_count: lead.sales_opportunities?.[0]?.count || 0,
+            interactions_count: 0, // Será carregado separadamente se necessário
+            opportunities_count: 0, // Será carregado separadamente se necessário
             days_since_created: Math.floor((new Date() - new Date(lead.created_at)) / (1000 * 60 * 60 * 24)),
             temperature_score: calculateTemperatureScore(lead)
         })) || [];
@@ -430,6 +431,41 @@ function calculateManualKPIs() {
     return kpis;
 }
 
+// ===== FUNÇÕES AUXILIARES DE CÁLCULO =====
+function calculateTemperatureScore(lead) {
+    const config = ALSHAM_LEADS_CONFIG.temperaturaOptions.find(t => t.value === lead.temperatura);
+    const baseScore = lead.score_ia || 50;
+    const multiplier = config?.multiplier || 1;
+    return Math.round(baseScore * multiplier);
+}
+
+function calculateLeadsByOrigin(leads) {
+    const origins = {};
+    ALSHAM_LEADS_CONFIG.origemOptions.forEach(origem => {
+        origins[origem] = leads.filter(lead => lead.origem === origem).length;
+    });
+    return origins;
+}
+
+function calculateDailyTrend(leads, days) {
+    const trend = [];
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const count = leads.filter(lead => 
+            lead.created_at.startsWith(dateStr)
+        ).length;
+        
+        trend.push({
+            date: dateStr,
+            count: count
+        });
+    }
+    return trend;
+}
+
 // ===== CARREGAMENTO DE GAMIFICAÇÃO =====
 async function loadGamificationData() {
     try {
@@ -508,6 +544,20 @@ async function loadAnalyticsData() {
         console.error('❌ Erro ao carregar analytics:', error);
         return { events: [], metrics: [], summary: {} };
     }
+}
+
+function processAnalyticsSummary(events) {
+    const summary = {
+        totalEvents: events.length,
+        eventsByType: {},
+        recentActivity: events.slice(0, 10)
+    };
+    
+    events.forEach(event => {
+        summary.eventsByType[event.event_name] = (summary.eventsByType[event.event_name] || 0) + 1;
+    });
+    
+    return summary;
 }
 
 // ===== CARREGAMENTO DE AUTOMAÇÕES =====
@@ -796,12 +846,95 @@ function renderFiltersSection() {
     container.innerHTML = filtersHTML;
 }
 
-// ===== RENDERIZAÇÃO DA TABELA DE LEADS COMPLETA =====
+// ===== APLICAÇÃO DE FILTROS AVANÇADOS (COMPLETA) =====
+function applyFiltersAdvanced() {
+    let filtered = [...alshamLeadsState.leads];
+    
+    // Filtro de busca (nome, email, empresa, telefone)
+    if (alshamLeadsState.filters.search) {
+        const search = alshamLeadsState.filters.search.toLowerCase();
+        filtered = filtered.filter(lead =>
+            (lead.nome && lead.nome.toLowerCase().includes(search)) ||
+            (lead.email && lead.email.toLowerCase().includes(search)) ||
+            (lead.empresa && lead.empresa.toLowerCase().includes(search)) ||
+            (lead.telefone && lead.telefone.includes(search)) ||
+            (lead.cargo && lead.cargo.toLowerCase().includes(search))
+        );
+    }
+    
+    // Filtro de status
+    if (alshamLeadsState.filters.status) {
+        filtered = filtered.filter(lead => lead.status === alshamLeadsState.filters.status);
+    }
+    
+    // Filtro de temperatura
+    if (alshamLeadsState.filters.temperatura) {
+        filtered = filtered.filter(lead => lead.temperatura === alshamLeadsState.filters.temperatura);
+    }
+    
+    // Filtro de origem
+    if (alshamLeadsState.filters.origem) {
+        filtered = filtered.filter(lead => lead.origem === alshamLeadsState.filters.origem);
+    }
+    
+    // Filtro de score IA
+    const [minScore, maxScore] = alshamLeadsState.filters.scoreRange;
+    if (minScore > 0 || maxScore < 100) {
+        filtered = filtered.filter(lead => {
+            const score = lead.score_ia || 0;
+            return score >= minScore && score <= maxScore;
+        });
+    }
+    
+    // Filtro de data personalizada
+    if (alshamLeadsState.filters.dateRange) {
+        const [startDate, endDate] = alshamLeadsState.filters.dateRange.split(' - ');
+        if (startDate && endDate) {
+            filtered = filtered.filter(lead => {
+                const leadDate = new Date(lead.created_at);
+                return leadDate >= new Date(startDate) && leadDate <= new Date(endDate);
+            });
+        }
+    }
+    
+    // Aplicar ordenação
+    filtered.sort((a, b) => {
+        const field = alshamLeadsState.sorting.field;
+        const direction = alshamLeadsState.sorting.direction === 'asc' ? 1 : -1;
+        
+        let aValue = a[field];
+        let bValue = b[field];
+        
+        // Tratamento especial para datas
+        if (field.includes('_at') || field === 'created_at' || field === 'updated_at') {
+            aValue = new Date(aValue);
+            bValue = new Date(bValue);
+        }
+        
+        // Tratamento para strings
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+            return aValue.localeCompare(bValue) * direction;
+        }
+        
+        // Tratamento para números
+        if (aValue < bValue) return -1 * direction;
+        if (aValue > bValue) return 1 * direction;
+        return 0;
+    });
+    
+    alshamLeadsState.filteredLeads = filtered;
+    alshamLeadsState.pagination.total = filtered.length;
+    alshamLeadsState.pagination.totalPages = Math.ceil(filtered.length / alshamLeadsState.pagination.perPage);
+    
+    console.log(`🔍 Filtros aplicados - ${filtered.length} resultados de ${alshamLeadsState.leads.length} leads`);
+}
+
+// ===== RENDERIZAÇÃO DA TABELA DE LEADS =====
 function renderLeadsTable() {
     const container = document.getElementById('leads-container');
     if (!container) return;
     
-    applyFiltersAdvanced(); // Aplicar todos os filtros
+    applyFiltersAdvanced();
     
     if (alshamLeadsState.filteredLeads.length === 0) {
         renderEmptyState(container);
@@ -1258,128 +1391,3 @@ function renderDailyChart() {
                 easing: 'easeInOutQuart'
             }
         }
-    });
-}
-
-function renderOriginChart() {
-    const canvas = document.getElementById('origin-chart');
-    if (!canvas) return;
-    
-    const originData = {};
-    const originColors = [
-        '#3B82F6', '#EF4444', '#10B981', '#F59E0B', 
-        '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'
-    ];
-    
-    ALSHAM_LEADS_CONFIG.origemOptions.forEach((origem, index) => {
-        const count = alshamLeadsState.leads.filter(lead => lead.origem === origem).length;
-        if (count > 0) {
-            originData[origem.charAt(0).toUpperCase() + origem.slice(1).replace('_', ' ')] = {
-                count,
-                color: originColors[index % originColors.length]
-            };
-        }
-    });
-    
-    if (alshamLeadsState.charts.origin) {
-        alshamLeadsState.charts.origin.destroy();
-    }
-    
-    if (Object.keys(originData).length === 0) {
-        canvas.parentElement.innerHTML = `
-            <div class="flex items-center justify-center h-64 text-gray-500">
-                <div class="text-center">
-                    <span class="text-4xl mb-2 block">📊</span>
-                    <p>Sem dados de origem suficientes</p>
-                </div>
-            </div>
-        `;
-        return;
-    }
-    
-    alshamLeadsState.charts.origin = new Chart(canvas, {
-        type: 'polarArea',
-        data: {
-            labels: Object.keys(originData),
-            datasets: [{
-                data: Object.values(originData).map(o => o.count),
-                backgroundColor: Object.values(originData).map(o => o.color + '80'),
-                borderColor: Object.values(originData).map(o => o.color),
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true
-                    }
-                }
-            },
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
-    });
-}
-
-// ===== FUNÇÕES AUXILIARES PARA CORES =====
-function getStatusColor(colorName) {
-    const colorMap = {
-        'blue': '#3B82F6',
-        'green': '#10B981', 
-        'yellow': '#F59E0B',
-        'red': '#EF4444',
-        'purple': '#8B5CF6',
-        'orange': '#F97316',
-        'gray': '#6B7280'
-    };
-    return colorMap[colorName] || '#6B7280';
-}
-
-// ===== APLICAÇÃO DE FILTROS AVANÇADOS =====
-function applyFiltersAdvanced() {
-    let filtered = [...alshamLeadsState.leads];
-    
-    // Filtro de busca (nome, email, empresa, telefone)
-    if (alshamLeadsState.filters.search) {
-        const search = alshamLeadsState.filters.search.toLowerCase();
-        filtered = filtered.filter(lead =>
-            (lead.nome && lead.nome.toLowerCase().includes(search)) ||
-            (lead.email && lead.email.toLowerCase().includes(search)) ||
-            (lead.empresa && lead.empresa.toLowerCase().includes(search)) ||
-            (lead.telefone && lead.telefone.includes(search)) ||
-            (lead.cargo && lead.cargo.toLowerCase().includes(search))
-        );
-    }
-    
-    // Filtro de status
-    if (alshamLeadsState.filters.status) {
-        filtered = filtered.filter(lead => lead.status === alshamLeadsState.filters.status);
-    }
-    
-    // Filtro de temperatura
-    if (alshamLeadsState.filters.temperatura) {
-        filtered = filtered.filter(lead => lead.temperatura === alshamLeadsState.filters.temperatura);
-    }
-    
-    // Filtro de origem
-    if (alshamLeadsState.filters.origem) {
-        filtered = filtered.filter(lead => lead.origem === alshamLeadsState.filters.origem);
-    }
-    
-    // Filtro de score IA
-    const [minScore, maxScore] = alshamLeadsState.filters.scoreRange;
-    if (minScore > 0 || maxScore < 100) {
-        filtered = filtered.filter(lead => {
-            const score = lead.score_ia || 0;
-            return score >= minScore && score <= maxScore;
