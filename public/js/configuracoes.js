@@ -29,12 +29,12 @@
  * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
-// ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
+// ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
 /**
  * Real data integration with Supabase Enterprise
- * Using standardized relative path imports for Vite compatibility
+ * Agora usando destructuring do window.AlshamSupabase para compatibilidade browser/global
  */
-import {
+const {
     // Core authentication and user functions
     getCurrentSession,
     getUserProfile,
@@ -47,7 +47,7 @@ import {
    
     // Health monitoring
     healthCheck
-} from '../lib/supabase.js';
+} = window.AlshamSupabase;
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
  * Validates and returns external library dependency
