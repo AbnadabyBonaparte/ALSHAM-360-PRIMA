@@ -23,8 +23,6 @@
 
   <!-- Segurança -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="DENY" />
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
 
   <title>Automações - ALSHAM 360° PRIMA</title>
@@ -152,6 +150,8 @@
 
   <!-- Scripts -->
   <script type="module" src="/lib/supabase.js" defer></script>
+  <!-- Fix-imports.js adicionado após supabase.js -->
+  <script src="/js/fix-imports.js" defer></script>
   <script type="module" src="/js/navigation.js" defer></script>
   <script type="module" src="/js/auth.js" defer></script>
   <script type="module" src="/js/automacoes.js" defer></script>
