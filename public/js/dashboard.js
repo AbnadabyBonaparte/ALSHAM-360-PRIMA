@@ -28,12 +28,12 @@
  * 🔧 PATH CONSISTENCY: All paths follow project structure standards
  */
 
-// ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
+// ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
 /**
  * Real data integration with Supabase Enterprise
- * Using standardized relative path imports for Vite compatibility
+ * Agora usando destructuring do window.AlshamSupabase para compatibilidade browser/global
  */
-import { 
+const { 
     getCurrentUser,
     getLeads,
     getSalesOpportunities,
@@ -48,8 +48,7 @@ import {
     createAuditLog,
     subscribeToTable,
     healthCheck
-} from '../lib/supabase.js';
-
+} = window.AlshamSupabase;
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
  * Validates and returns external library dependency
