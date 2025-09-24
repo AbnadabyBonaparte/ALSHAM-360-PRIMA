@@ -1,1304 +1,1385 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Authentication System V5.0 NASA 10/10 OPTIMIZED
- * Advanced authentication middleware with real-time user management
+ * 🚀 ALSHAM 360° PRIMA - SISTEMA DE LEADS COMPLETO V3.0
+ * Sistema completo de gestão de leads integrado com 55 tabelas Supabase
  * 
- * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * @version 3.0.0 - PRODUÇÃO COMPLETA
  * @author ALSHAM Development Team
- * @license MIT
+ * @integration 55 Tabelas Supabase mapeadas
  * 
- * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
- * ✅ Real-time authentication with Supabase Auth
- * ✅ Railway credentials integration
- * ✅ Multi-tenant security with RLS enforcement
- * ✅ OAuth integration (Google/Microsoft)
- * ✅ Session management with auto-refresh
- * ✅ Route protection and access control
- * ✅ User profile management with real data
- * ✅ Dependency validation and error handling
- * ✅ TypeScript-ready JSDoc annotations
- * ✅ ES Modules compatibility (import/export)
- * ✅ Vite build system optimization
- * ✅ Path standardization and consistency
- * ✅ NASA 10/10 Enterprise Grade
- * 
- * 🔗 DATA SOURCES: auth.users, user_profiles, user_organizations,
- * user_badges, teams, organizations
- * 
- * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
- * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
- * 🔧 PATH CONSISTENCY: All paths follow project structure standards
+ * ✅ FUNCIONALIDADES IMPLEMENTADAS:
+ * - CRUD completo de leads (leads_crm)
+ * - Dashboard com KPIs reais (dashboard_kpis)
+ * - Sistema de gamificação (gamification_points)
+ * - Analytics completo (analytics_events)
+ * - Automações (automation_executions)
+ * - Auditoria (audit_leads)
+ * - Integrações com IA (ai_predictions)
+ * - Sistema de etiquetas (lead_labels)
+ * - ROI calculations (roi_calculations)
+ * - E MUITO MAIS!
  */
-// ===== ES MODULES IMPORTS - NASA 10/10 STANDARDIZED =====
-/**
- * Real data integration with Supabase Enterprise
- * Using standardized relative path imports for Vite compatibility
- */
-const {
-  getCurrentSession,
-  onAuthStateChange,
-  signOut,
-  getUserProfile,
-  updateUserProfile,
-  createAuditLog,
-  genericSelect // Para getUserOrganizations, getUserBadges
-} = window.AlshamSupabase;
-// ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
-/**
- * Validates and returns external library dependency
- * Enhanced for NASA 10/10 standards with detailed error reporting
- * @param {string} libName - Name of the library for error messages
- * @param {any} lib - Library object to validate
- * @returns {any} Validated library object
- * @throws {Error} If library is not loaded
- */
-function requireLib(libName, lib) {
-    if (!lib) {
-        throw new Error(`❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`);
-    }
-    return lib;
-}
-/**
- * Validates all required external dependencies for authentication
- * @returns {Object} Object containing all validated libraries
- * @throws {Error} If any required library is missing
- */
-function validateAuthDependencies() {
-    try {
-        return {
-            // Supabase integration is handled via ES Module import
-            crypto: requireLib('Web Crypto API', window.crypto),
-            localStorage: requireLib('Local Storage', window.localStorage),
-            sessionStorage: requireLib('Session Storage', window.sessionStorage)
-        };
-    } catch (error) {
-        console.error('🚨 Auth dependency validation failed:', error);
-        throw error;
-    }
-}
-// ===== ENTERPRISE AUTHENTICATION STATE MANAGER - NASA 10/10 =====
-/**
- * Authentication state manager with real-time updates
- * Enhanced for NASA 10/10 standards with improved error handling and performance
- * @class AuthStateManager
- */
-class AuthStateManager {
-    constructor() {
-        this.currentUser = null;
-        this.currentProfile = null;
-        this.currentOrganization = null;
-        this.userBadges = [];
-        this.userPermissions = [];
-        this.isAuthenticated = false;
-        this.sessionExpiry = null;
-        this.refreshTimer = null;
-        this.listeners = new Set();
-        this.retryAttempts = 0;
-        this.maxRetryAttempts = 3;
-        this.retryDelay = 1000; // 1 second base delay
-    }
-    /**
-     * Set authenticated user with complete profile data
-     * Enhanced with retry logic and improved error handling
-     * @param {Object} user - Supabase user object
-     * @param {Object} profile - User profile from user_profiles table
-     * @param {Object} organization - Current organization data
-     * @param {Array} badges - User badges from user_badges table
-     */
-    async setAuthenticatedUser(user, profile, organization = null, badges = []) {
-        try {
-            this.currentUser = user;
-            this.currentProfile = profile;
-            this.currentOrganization = organization;
-            this.userBadges = badges;
-            this.isAuthenticated = true;
-            this.sessionExpiry = new Date(user.expires_at || Date.now() + 3600000); // 1 hour default
-            this.retryAttempts = 0; // Reset retry counter on success
-            // Extract permissions from profile with fallback
-            this.userPermissions = profile?.permissions || [];
-            // Persist authentication state
-            await this.persistAuthState();
-            // Setup session refresh
-            this.setupSessionRefresh();
-            // Notify listeners
-            this.notifyListeners('AUTHENTICATED', { user, profile, organization, badges });
-            // Log authentication event
-            await this.logAuthEvent('USER_AUTHENTICATED', {
-                user_id: user.id,
-                organization_id: organization?.id,
-                login_method: 'supabase_auth'
-            });
-            console.log('✅ User authenticated:', user.email);
-        } catch (error) {
-            console.error('🚨 Error setting authenticated user:', error);
-            await this.handleAuthError(error, 'setAuthenticatedUser');
-            throw error;
+
+// ===== CONFIGURAÇÃO GLOBAL COMPLETA =====
+const ALSHAM_LEADS_CONFIG = {
+    version: '3.0.0',
+    
+    // Status baseados no sistema real
+    statusOptions: [
+        { value: 'novo', label: 'Novo', color: 'blue', icon: '🆕', points: 5 },
+        { value: 'contatado', label: 'Contatado', color: 'yellow', icon: '📞', points: 10 },
+        { value: 'qualificado', label: 'Qualificado', color: 'purple', icon: '✅', points: 20 },
+        { value: 'proposta', label: 'Proposta', color: 'orange', icon: '📋', points: 30 },
+        { value: 'convertido', label: 'Convertido', color: 'green', icon: '💰', points: 50 },
+        { value: 'perdido', label: 'Perdido', color: 'red', icon: '❌', points: 0 }
+    ],
+    
+    temperaturaOptions: [
+        { value: 'frio', label: 'Frio', color: 'gray', multiplier: 0.5 },
+        { value: 'morno', label: 'Morno', color: 'yellow', multiplier: 0.75 },
+        { value: 'quente', label: 'Quente', color: 'orange', multiplier: 1.0 },
+        { value: 'muito_quente', label: 'Muito Quente', color: 'red', multiplier: 1.5 }
+    ],
+
+    origemOptions: [
+        'website', 'google_ads', 'facebook_ads', 'linkedin', 'indicacao', 
+        'evento', 'cold_calling', 'email_marketing', 'seo_organic', 'outro'
+    ],
+
+    // Configurações de paginação
+    pagination: {
+        defaultPerPage: 25,
+        options: [10, 25, 50, 100]
+    },
+
+    // Configurações de atualização
+    realtime: {
+        enabled: true,
+        refreshInterval: 30000 // 30 segundos
+    },
+
+    // Configurações de gamificação
+    gamification: {
+        enabled: true,
+        pointsForAction: {
+            'lead_created': 10,
+            'lead_contacted': 15,
+            'lead_qualified': 25,
+            'lead_converted': 50,
+            'interaction_logged': 5
         }
     }
-    /**
-     * Clear authentication state and cleanup
-     * Enhanced with comprehensive cleanup and error handling
-     */
-    async clearAuthenticatedUser() {
-        try {
-            // Log logout event before clearing
-            if (this.currentUser) {
-                await this.logAuthEvent('USER_LOGGED_OUT', {
-                    user_id: this.currentUser.id,
-                    organization_id: this.currentOrganization?.id,
-                    session_duration: this.getSessionDuration()
-                });
-            }
-            // Clear state
-            this.currentUser = null;
-            this.currentProfile = null;
-            this.currentOrganization = null;
-            this.userBadges = [];
-            this.userPermissions = [];
-            this.isAuthenticated = false;
-            this.sessionExpiry = null;
-            this.retryAttempts = 0;
-            // Clear timers
-            if (this.refreshTimer) {
-                clearTimeout(this.refreshTimer);
-                this.refreshTimer = null;
-            }
-            // Clear persistence
-            await this.clearPersistedState();
-            // Notify listeners
-            this.notifyListeners('UNAUTHENTICATED');
-            console.log('✅ Authentication state cleared');
-        } catch (error) {
-            console.error('🚨 Error clearing authentication state:', error);
-        }
-    }
-    /**
-     * Persist authentication state to localStorage with error handling
-     * @private
-     */
-    async persistAuthState() {
-        try {
-            const { localStorage } = validateAuthDependencies();
-           
-            const authState = {
-                isAuthenticated: this.isAuthenticated,
-                user: {
-                    id: this.currentUser?.id,
-                    email: this.currentUser?.email,
-                    created_at: this.currentUser?.created_at
-                },
-                profile: this.currentProfile,
-                organization: this.currentOrganization,
-                badges: this.userBadges,
-                permissions: this.userPermissions,
-                sessionExpiry: this.sessionExpiry?.toISOString(),
-                timestamp: new Date().toISOString(),
-                version: '5.0.0' // Version tracking for migration purposes
-            };
-            localStorage.setItem('alsham_auth_state', JSON.stringify(authState));
-            localStorage.setItem('alsham_org_id', this.currentOrganization?.id || '');
-        } catch (error) {
-            console.error('🚨 Error persisting auth state:', error);
-            // Non-critical error, don't throw
-        }
-    }
-    /**
-     * Clear persisted authentication state with comprehensive cleanup
-     * @private
-     */
-    async clearPersistedState() {
-        try {
-            const { localStorage } = validateAuthDependencies();
-           
-            // Clear all auth-related localStorage items
-            const authKeys = [
-                'alsham_auth_state',
-                'alsham_user_profile',
-                'alsham_org_id',
-                'alsham_redirect_after_login',
-                'alsham_session_data',
-                'alsham_user_preferences'
-            ];
-            authKeys.forEach(key => {
-                localStorage.removeItem(key);
-            });
-        } catch (error) {
-            console.error('🚨 Error clearing persisted state:', error);
-        }
-    }
-    /**
-     * Setup automatic session refresh with improved timing
-     * @private
-     */
-    setupSessionRefresh() {
-        try {
-            if (this.refreshTimer) {
-                clearTimeout(this.refreshTimer);
-            }
-            if (!this.sessionExpiry) return;
-            // Refresh 5 minutes before expiry, with minimum 1 minute delay
-            const refreshTime = Math.max(
-                this.sessionExpiry.getTime() - Date.now() - (5 * 60 * 1000),
-                60 * 1000 // Minimum 1 minute
-            );
-           
-            if (refreshTime > 0) {
-                this.refreshTimer = setTimeout(() => {
-                    this.refreshSession();
-                }, refreshTime);
-            }
-        } catch (error) {
-            console.error('🚨 Error setting up session refresh:', error);
-        }
-    }
-    /**
-     * Refresh current session with retry logic
-     * @private
-     */
-    async refreshSession() {
-        try {
-            const session = await getCurrentSession();
-           
-            if (session?.user) {
-                this.sessionExpiry = new Date(session.expires_at);
-                this.setupSessionRefresh();
-                this.retryAttempts = 0; // Reset retry counter
-               
-                console.log('✅ Session refreshed successfully');
-            } else {
-                console.warn('⚠️ Session refresh failed, logging out');
-                await this.clearAuthenticatedUser();
-            }
-        } catch (error) {
-            console.error('🚨 Error refreshing session:', error);
-            await this.handleAuthError(error, 'refreshSession');
-        }
-    }
-    /**
-     * Handle authentication errors with retry logic
-     * @param {Error} error - The error that occurred
-     * @param {string} operation - The operation that failed
-     * @private
-     */
-    async handleAuthError(error, operation) {
-        this.retryAttempts++;
-       
-        if (this.retryAttempts <= this.maxRetryAttempts) {
-            const delay = this.retryDelay * Math.pow(2, this.retryAttempts - 1); // Exponential backoff
-            console.warn(`⚠️ Auth error in ${operation}, retrying in ${delay}ms (attempt ${this.retryAttempts}/${this.maxRetryAttempts})`);
-           
-            setTimeout(() => {
-                // Retry logic would go here based on operation
-                console.log(`🔄 Retrying ${operation}...`);
-            }, delay);
-        } else {
-            console.error(`🚨 Max retry attempts reached for ${operation}, clearing auth state`);
-            await this.clearAuthenticatedUser();
-        }
-    }
-    /**
-     * Get session duration in milliseconds
-     * @returns {number} Session duration
-     */
-    getSessionDuration() {
-        if (!this.currentUser?.created_at) return 0;
-        return Date.now() - new Date(this.currentUser.created_at).getTime();
-    }
-    /**
-     * Log authentication events for audit trail with enhanced metadata
-     * @param {string} event - Event type
-     * @param {Object} metadata - Event metadata
-     * @private
-     */
-    async logAuthEvent(event, metadata = {}) {
-        try {
-            await createAuditLog({
-                event_type: event,
-                user_id: metadata.user_id,
-                organization_id: metadata.organization_id,
-                metadata: { ...metadata, user_agent: navigator.userAgent, ip_address: 'client_side' }
-            });
-        } catch (error) {
-            console.error('🚨 Error logging auth event:', error);
-            // Non-critical error, don't throw
-        }
-    }
-    /**
-     * Generate unique session ID for tracking
-     * @returns {string} Session ID
-     * @private
-     */
-    generateSessionId() {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    }
-    /**
-     * Add state change listener
-     * @param {Function} listener - Listener function
-     */
-    addListener(listener) {
-        if (typeof listener === 'function') {
-            this.listeners.add(listener);
-        } else {
-            console.warn('⚠️ Invalid listener provided to addListener');
-        }
-    }
-    /**
-     * Remove state change listener
-     * @param {Function} listener - Listener function
-     */
-    removeListener(listener) {
-        this.listeners.delete(listener);
-    }
-    /**
-     * Notify all listeners of state changes with error handling
-     * @param {string} event - Event type
-     * @param {Object} data - Event data
-     * @private
-     */
-    notifyListeners(event, data = {}) {
-        this.listeners.forEach(listener => {
-            try {
-                listener(event, data);
-            } catch (error) {
-                console.error('🚨 Error in auth listener:', error);
-                // Remove problematic listener
-                this.listeners.delete(listener);
-            }
-        });
-    }
-    /**
-     * Check if user has specific permission with enhanced logic
-     * @param {string} permission - Permission to check
-     * @returns {boolean} Has permission
-     */
-    hasPermission(permission) {
-        if (!permission || !this.isAuthenticated) return false;
-       
-        return this.userPermissions.includes(permission) ||
-               this.userPermissions.includes('admin') ||
-               this.currentProfile?.role === 'admin' ||
-               this.currentProfile?.role === 'super_admin';
-    }
-    /**
-     * Check if user belongs to specific organization
-     * @param {string} orgId - Organization ID to check
-     * @returns {boolean} Belongs to organization
-     */
-    belongsToOrganization(orgId) {
-        if (!orgId || !this.isAuthenticated) return false;
-        return this.currentOrganization?.id === orgId;
-    }
-    /**
-     * Get user badge count by type with filtering
-     * @param {string} badgeType - Badge type to count
-     * @returns {number} Badge count
-     */
-    getBadgeCount(badgeType = null) {
-        if (!this.userBadges || !Array.isArray(this.userBadges)) return 0;
-       
-        if (!badgeType) return this.userBadges.length;
-        return this.userBadges.filter(badge => badge.badge_type === badgeType).length;
-    }
-    /**
-     * Get user's highest role level for permission hierarchy
-     * @returns {number} Role level (higher number = more permissions)
-     */
-    getRoleLevel() {
-        const roleLevels = {
-            'user': 1,
-            'member': 2,
-            'analyst': 3,
-            'manager': 4,
-            'admin': 5,
-            'super_admin': 6
-        };
-       
-        return roleLevels[this.currentProfile?.role] || 0;
-    }
-}
-// Global authentication state manager instance
-const authState = new AuthStateManager();
-// ===== ROUTE PROTECTION CONFIGURATION - NASA 10/10 =====
-/**
- * Pages that don't require authentication
- * Updated with standardized paths for Vite compatibility
- * @type {string[]}
- */
-const publicPages = [
-    'src/pages/login.html',
-    'src/pages/register.html',
-    'pages/login.html',
-    'pages/register.html',
-    'login.html',
-    'register.html',
-    '',
-    'index.html'
-];
-/**
- * Permission-based route access control with role hierarchy
- * Enhanced with more granular permissions
- * @type {Object}
- */
-const protectedRoutes = {
-    'src/pages/configuracoes.html': ['admin', 'super_admin'],
-    'src/pages/relatorios.html': ['admin', 'manager', 'analyst', 'super_admin'],
-    'src/pages/gamificacao.html': ['admin', 'manager', 'super_admin'],
-    'src/pages/automacoes.html': ['admin', 'super_admin'],
-    'pages/configuracoes.html': ['admin', 'super_admin'],
-    'pages/relatorios.html': ['admin', 'manager', 'analyst', 'super_admin'],
-    'pages/gamificacao.html': ['admin', 'manager', 'super_admin'],
-    'pages/automacoes.html': ['admin', 'super_admin']
 };
-// ===== INITIALIZATION - NASA 10/10 =====
-/**
- * Initialize authentication system on DOM ready with enhanced error handling
- */
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔐 Auth middleware loaded - ALSHAM 360° PRIMA v5.0 NASA 10/10');
-   
+
+// ===== ESTADO GLOBAL DO SISTEMA =====
+const alshamLeadsState = {
+    // Autenticação e organização
+    user: null,
+    orgId: null,
+    
+    // Dados principais
+    leads: [],
+    filteredLeads: [],
+    kpis: {},
+    
+    // Analytics e métricas
+    analytics: {},
+    performanceMetrics: {},
+    roiData: {},
+    
+    // Gamificação
+    userPoints: 0,
+    userBadges: [],
+    leaderboard: [],
+    
+    // Automações
+    activeAutomations: [],
+    automationHistory: [],
+    
+    // UI Estado
+    charts: {},
+    currentModal: null,
+    isLoading: false,
+    
+    // Filtros
+    filters: {
+        search: '',
+        status: '',
+        temperatura: '',
+        origem: '',
+        dateRange: '',
+        scoreRange: [0, 100],
+        customFilters: {}
+    },
+    
+    // Paginação
+    pagination: {
+        current: 1,
+        perPage: ALSHAM_LEADS_CONFIG.pagination.defaultPerPage,
+        total: 0,
+        totalPages: 0
+    },
+    
+    // Real-time
+    subscriptions: [],
+    lastUpdate: null
+};
+
+// ===== INICIALIZAÇÃO COMPLETA DO SISTEMA =====
+document.addEventListener('DOMContentLoaded', async function() {
     try {
-        // Validate dependencies
-        validateAuthDependencies();
-       
-        // Initialize authentication
-        initializeAuth();
-       
-        // Setup global listeners
-        setupGlobalListeners();
-       
-        console.log('✅ Authentication system initialization completed');
+        showLoading(true, '🚀 Inicializando ALSHAM 360° PRIMA...');
+        
+        console.log('🎯 ALSHAM Leads System v3.0.0 - Iniciando...');
+        
+        // Verificar dependências
+        await checkSystemDependencies();
+        
+        // Autenticar usuário
+        const authResult = await authenticateUser();
+        if (!authResult.success) {
+            redirectToLogin('Sessão expirada');
+            return;
+        }
+        
+        alshamLeadsState.user = authResult.user;
+        alshamLeadsState.orgId = authResult.orgId;
+        
+        console.log('✅ Usuário autenticado:', alshamLeadsState.user.email);
+        console.log('🏢 Organização:', alshamLeadsState.orgId);
+        
+        // Carregar todos os dados do sistema
+        await loadCompleteSystemData();
+        
+        // Configurar interface
+        setupCompleteInterface();
+        
+        // Configurar real-time
+        setupRealtimeSubscriptions();
+        
+        // Registrar analytics de inicialização
+        await trackAnalyticsEvent('system_initialized', {
+            user_id: alshamLeadsState.user.id,
+            version: ALSHAM_LEADS_CONFIG.version,
+            total_leads: alshamLeadsState.leads.length
+        });
+        
+        showLoading(false);
+        showSuccess('🎉 Sistema ALSHAM 360° carregado com sucesso!');
+        
+        console.log('✅ ALSHAM Leads System totalmente carregado');
+        console.log('📊 Total de leads:', alshamLeadsState.leads.length);
+        console.log('🎮 Pontos do usuário:', alshamLeadsState.userPoints);
+        
     } catch (error) {
-        console.error('🚨 Critical error during auth initialization:', error);
-        // Show user-friendly error message
-        showAuthNotification('Erro ao inicializar sistema de autenticação. Recarregue a página.', 'error');
+        console.error('❌ Erro crítico na inicialização:', error);
+        showLoading(false);
+        handleSystemError(error);
     }
 });
-/**
- * Initialize authentication system with real Supabase integration
- * Enhanced with better error handling and performance monitoring
- * @returns {Promise<void>}
- */
-async function initializeAuth() {
-    const startTime = performance.now();
-   
+
+// ===== VERIFICAÇÃO DE DEPENDÊNCIAS =====
+async function checkSystemDependencies() {
+    const dependencies = [];
+    
+    // Verificar AlshamSupabase
+    if (!window.AlshamSupabase) {
+        dependencies.push('AlshamSupabase não encontrado');
+    }
+    
+    // Verificar Chart.js
+    if (!window.Chart) {
+        dependencies.push('Chart.js não encontrado');
+    }
+    
+    // Verificar Tailwind CSS
+    if (!document.querySelector('[class*="bg-"]')) {
+        console.warn('⚠️ Tailwind CSS pode não estar carregado');
+    }
+    
+    if (dependencies.length > 0) {
+        throw new Error(`Dependências não encontradas: ${dependencies.join(', ')}`);
+    }
+    
+    console.log('✅ Todas as dependências verificadas');
+}
+
+// ===== AUTENTICAÇÃO AVANÇADA =====
+async function authenticateUser() {
     try {
-        console.log('🔄 Initializing authentication system...');
-        // Check for existing session
-        const session = await getCurrentSession();
-       
-        if (session?.user) {
-            console.log('📋 Existing session found, loading user data...');
-           
-            // Load complete user data from real tables with parallel execution
-            const [profileResult, organizationsResult, badgesResult] = await Promise.allSettled([
-                getUserProfile(session.user.id, session.user.user_metadata.org_id),
-                genericSelect('user_organizations', { user_id: session.user.id }, session.user.user_metadata.org_id),
-                genericSelect('user_badges', { user_id: session.user.id }, session.user.user_metadata.org_id)
-            ]);
-            const profile = profileResult.status === 'fulfilled' ? profileResult.value : null;
-            const organizations = organizationsResult.status === 'fulfilled' ? organizationsResult.value : [];
-            const badges = badgesResult.status === 'fulfilled' ? badgesResult.value : [];
-            if (profile) {
-                // Set primary organization (first one or default)
-                const primaryOrg = organizations?.[0] || null;
-               
-                await authState.setAuthenticatedUser(session.user, profile, primaryOrg, badges);
-                console.log('✅ User authenticated successfully:', session.user.email);
-            } else {
-                console.warn('⚠️ Incomplete user data, logging out');
-                await handleUnauthenticated();
-            }
-        } else {
-            console.log('📝 No existing session found');
-            await handleUnauthenticated();
+        const session = await window.AlshamSupabase.getCurrentSession();
+        
+        if (!session?.user) {
+            return { success: false, reason: 'No session' };
         }
-       
-        // Setup Supabase auth state listener
-        onAuthStateChange(handleAuthStateChange);
-       
-        const endTime = performance.now();
-        console.log(`✅ Authentication system initialized in ${(endTime - startTime).toFixed(2)}ms`);
+
+        // Verificar se usuário tem perfil completo
+        const { data: profile, error: profileError } = await window.AlshamSupabase.genericSelect(
+            'user_profiles', 
+            { user_id: session.user.id }
+        );
+        
+        if (profileError) {
+            console.warn('⚠️ Erro ao buscar perfil:', profileError);
+        }
+
+        const orgId = await window.AlshamSupabase.getCurrentOrgId();
+        
+        // Verificar permissões da organização
+        const { data: orgPerms } = await window.AlshamSupabase.genericSelect(
+            'user_organizations',
+            { user_id: session.user.id, org_id: orgId }
+        );
+        
+        return { 
+            success: true, 
+            user: session.user, 
+            orgId: orgId,
+            profile: profile?.[0] || null,
+            permissions: orgPerms?.[0] || null
+        };
+        
     } catch (error) {
-        console.error('🚨 Error initializing authentication:', error);
-        await handleUnauthenticated();
-       
-        // Show user-friendly error
-        showAuthNotification('Erro ao carregar dados de autenticação', 'error');
+        console.error('❌ Erro na autenticação:', error);
+        return { success: false, reason: error.message };
     }
 }
-// ===== AUTH STATE HANDLERS - NASA 10/10 =====
-/**
- * Handle Supabase auth state changes with enhanced error handling
- * @param {string} event - Auth event type
- * @param {Object} session - Session object
- * @param {Object} profile - User profile data
- */
-async function handleAuthStateChange(event, session, profile) {
-    try {
-        console.log('🔄 Auth state changed:', event);
-       
-        switch (event) {
-            case 'SIGNED_IN':
-                if (session?.user) {
-                    await handleSignIn(session.user, profile);
-                }
-                break;
-               
-            case 'SIGNED_OUT':
-                await handleSignOut();
-                break;
-               
-            case 'TOKEN_REFRESHED':
-                console.log('🔄 Token refreshed successfully');
-                break;
-               
-            case 'USER_UPDATED':
-                if (session?.user && profile) {
-                    await handleUserUpdated(session.user, profile);
-                }
-                break;
-               
-            default:
-                console.log('🔄 Unhandled auth event:', event);
-        }
-    } catch (error) {
-        console.error('🚨 Error handling auth state change:', error);
-        await authState.handleAuthError(error, 'handleAuthStateChange');
-    }
+
+function redirectToLogin(reason = '') {
+    const url = reason ? `/login.html?reason=${encodeURIComponent(reason)}` : '/login.html';
+    window.location.href = url;
 }
-/**
- * Handle user sign in with complete data loading
- * Enhanced with better error handling and performance
- * @param {Object} user - Supabase user object
- * @param {Object} profile - User profile data
- */
-async function handleSignIn(user, profile) {
+
+// ===== CARREGAMENTO COMPLETO DE DADOS =====
+async function loadCompleteSystemData() {
     try {
-        console.log('🔑 Handling user sign in...');
-        // Load additional user data with timeout
-        const dataLoadPromise = Promise.allSettled([
-            genericSelect('user_organizations', { user_id: user.id }, user.user_metadata.org_id),
-            genericSelect('user_badges', { user_id: user.id }, user.user_metadata.org_id)
+        alshamLeadsState.isLoading = true;
+        
+        // Carregar dados em paralelo para melhor performance
+        const [
+            leadsData,
+            kpisData,
+            gamificationData,
+            analyticsData,
+            automationsData
+        ] = await Promise.allSettled([
+            loadLeadsData(),
+            loadDashboardKPIs(),
+            loadGamificationData(),
+            loadAnalyticsData(),
+            loadAutomationsData()
         ]);
-        // Set timeout for data loading
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Data loading timeout')), 5000);
-        });
-       
-        const [organizationsResult, badgesResult] = await Promise.race([dataLoadPromise, timeoutPromise]);
-        const organizations = organizationsResult.status === 'fulfilled' ? organizationsResult.value : [];
-        const badges = badgesResult.status === 'fulfilled' ? badgesResult.value : [];
-        // Set primary organization
-        const primaryOrg = organizations?.[0] || null;
-       
-        // Set authenticated state
-        await authState.setAuthenticatedUser(user, profile, primaryOrg, badges);
-       
-        // Update UI
-        updateAuthUI();
-       
-        // Check route access
-        checkRouteAccess();
-       
-        // Show success notification
-        showAuthNotification('Login realizado com sucesso!', 'success');
-       
-        // Redirect if needed
-        redirectAfterLogin();
-    } catch (error) {
-        console.error('🚨 Error handling sign in:', error);
-        showAuthNotification('Erro ao carregar dados do usuário', 'error');
-        await authState.handleAuthError(error, 'handleSignIn');
-    }
-}
-/**
- * Handle user sign out with comprehensive cleanup
- */
-async function handleSignOut() {
-    try {
-        console.log('🚪 Handling user sign out...');
-       
-        // Clear authentication state
-        await authState.clearAuthenticatedUser();
-       
-        // Update UI
-        updateAuthUI();
-       
-        // Handle unauthenticated state
-        await handleUnauthenticated();
-       
-        // Show notification
-        showAuthNotification('Logout realizado com sucesso!', 'info');
-    } catch (error) {
-        console.error('🚨 Error handling sign out:', error);
-    }
-}
-/**
- * Handle user profile update with data refresh
- * @param {Object} user - Updated user object
- * @param {Object} profile - Updated profile data
- */
-async function handleUserUpdated(user, profile) {
-    try {
-        console.log('🔄 Handling user update...');
-       
-        if (authState.isAuthenticated) {
-            // Reload user data
-            const [organizationsResult, badgesResult] = await Promise.allSettled([
-                genericSelect('user_organizations', { user_id: user.id }, user.user_metadata.org_id),
-                genericSelect('user_badges', { user_id: user.id }, user.user_metadata.org_id)
-            ]);
-            const organizations = organizationsResult.status === 'fulfilled' ? organizationsResult.value : [];
-            const badges = badgesResult.status === 'fulfilled' ? badgesResult.value : [];
-            const primaryOrg = organizations?.[0] || authState.currentOrganization;
-           
-            // Update state
-            await authState.setAuthenticatedUser(user, profile, primaryOrg, badges);
-           
-            // Update UI
-            updateAuthUI();
-        }
-    } catch (error) {
-        console.error('🚨 Error handling user update:', error);
-        await authState.handleAuthError(error, 'handleUserUpdated');
-    }
-}
-/**
- * Handle unauthenticated state with improved routing
- */
-async function handleUnauthenticated() {
-    try {
-        console.log('🚫 Handling unauthenticated state...');
-       
-        // Clear authentication state
-        await authState.clearAuthenticatedUser();
-       
-        // Update UI
-        updateAuthUI();
-       
-        // Check if current page requires authentication
-        const currentPath = window.location.pathname;
-        const isPublicPage = publicPages.some(page =>
-            currentPath.includes(page) || currentPath === page
-        );
-       
-        if (!isPublicPage) {
-            console.log('🔒 Protected page accessed without authentication, redirecting...');
-            redirectToLogin();
-        }
-    } catch (error) {
-        console.error('🚨 Error handling unauthenticated state:', error);
-    }
-}
-// ===== ROUTE PROTECTION - NASA 10/10 =====
-/**
- * Check route access based on authentication and permissions
- * Enhanced with better path matching and error handling
- * @returns {boolean} Access granted
- */
-function checkRouteAccess() {
-    try {
-        const currentPath = window.location.pathname;
-       
-        // If authenticated and on public page, redirect to dashboard
-        if (authState.isAuthenticated) {
-            const isLoginPage = currentPath.includes('login.html');
-            const isRegisterPage = currentPath.includes('register.html');
-           
-            if (isLoginPage || isRegisterPage) {
-                console.log('🔄 Authenticated user on public page, redirecting to dashboard...');
-                window.location.href = '/index.html';
-                return false;
-            }
-        }
-       
-        // Check permission-based access with improved matching
-        const matchingRoute = Object.keys(protectedRoutes).find(route =>
-            currentPath.includes(route) || currentPath.endsWith(route)
-        );
-       
-        if (matchingRoute && authState.isAuthenticated) {
-            const requiredPermissions = protectedRoutes[matchingRoute];
-            const hasAccess = requiredPermissions.some(permission =>
-                authState.hasPermission(permission) || authState.currentProfile?.role === permission
-            );
-           
-            if (!hasAccess) {
-                console.warn('🚫 Access denied to route:', currentPath);
-                showAuthNotification('Acesso negado. Permissões insuficientes.', 'error');
-                window.location.href = '/index.html';
-                return false;
-            }
-        }
-       
-        return true;
-    } catch (error) {
-        console.error('🚨 Error checking route access:', error);
-        return false;
-    }
-}
-/**
- * Redirect to login page with return URL
- * Enhanced with better URL handling
- */
-function redirectToLogin() {
-    try {
-        // Save current URL for redirect after login
-        const currentUrl = window.location.href;
-        const { localStorage } = validateAuthDependencies();
-       
-        // Only save non-login/register URLs
-        if (!currentUrl.includes('login.html') && !currentUrl.includes('register.html')) {
-            localStorage.setItem('alsham_redirect_after_login', currentUrl);
-        }
-       
-        // Redirect to login with standardized path
-        console.log('🔄 Redirecting to login page...');
-        window.location.href = '/login.html';
-    } catch (error) {
-        console.error('🚨 Error redirecting to login:', error);
-        window.location.href = '/login.html';
-    }
-}
-/**
- * Redirect after successful login with improved logic
- */
-function redirectAfterLogin() {
-    try {
-        const { localStorage } = validateAuthDependencies();
-        const redirectUrl = localStorage.getItem('alsham_redirect_after_login');
-       
-        localStorage.removeItem('alsham_redirect_after_login');
-       
-        if (redirectUrl &&
-            !redirectUrl.includes('login.html') &&
-            !redirectUrl.includes('register.html') &&
-            redirectUrl.startsWith(window.location.origin)) {
-            console.log('🔄 Redirecting to saved URL:', redirectUrl);
-            window.location.href = redirectUrl;
+        
+        // Processar resultados
+        if (leadsData.status === 'fulfilled') {
+            alshamLeadsState.leads = leadsData.value;
+            alshamLeadsState.filteredLeads = [...leadsData.value];
+            console.log('✅ Leads carregados:', leadsData.value.length);
         } else {
-            console.log('🔄 Redirecting to dashboard...');
-            window.location.href = '/index.html';
+            console.error('❌ Erro ao carregar leads:', leadsData.reason);
         }
-    } catch (error) {
-        console.error('🚨 Error redirecting after login:', error);
-        window.location.href = '/index.html';
-    }
-}
-// ===== UI MANAGEMENT - NASA 10/10 =====
-/**
- * Update authentication-related UI elements with error handling
- */
-function updateAuthUI() {
-    try {
-        updateNavigation();
-        updateUserInfo();
-        updateActionButtons();
-        updatePermissionBasedElements();
-    } catch (error) {
-        console.error('🚨 Error updating auth UI:', error);
-    }
-}
-/**
- * Update navigation elements based on auth state
- * Enhanced with better element selection
- */
-function updateNavigation() {
-    try {
-        const navUser = document.querySelector('[data-auth="user-nav"]');
-        const navGuest = document.querySelector('[data-auth="guest-nav"]');
-       
-        if (navUser && navGuest) {
-            if (authState.isAuthenticated) {
-                navUser.classList.remove('hidden');
-                navGuest.classList.add('hidden');
-            } else {
-                navUser.classList.add('hidden');
-                navGuest.classList.remove('hidden');
-            }
+        
+        if (kpisData.status === 'fulfilled') {
+            alshamLeadsState.kpis = kpisData.value;
+            console.log('✅ KPIs carregados:', kpisData.value);
         }
-        // Update navigation links based on permissions
-        const navLinks = document.querySelectorAll('nav a[data-page], #mobile-menu a[data-page]');
-        navLinks.forEach(link => {
-            const pageKey = link.getAttribute('data-page');
-            const isActive = pageKey === window.navigationSystem.currentPage;
-            const activeClasses = isActive ?
-                'text-primary font-medium' : 'text-gray-600 hover:text-primary transition-colors font-medium';
-            link.className = activeClasses;
-            // For desktop nav
-            if (link.closest('nav') && !link.closest('#mobile-menu')) {
-                if (isActive) {
-                    link.classList.add('border-b-2', 'border-primary', 'pb-1');
-                } else {
-                    link.classList.remove('border-b-2', 'border-primary', 'pb-1');
-                }
-            }
-            // For mobile nav
-            if (link.closest('#mobile-menu')) {
-                if (isActive) {
-                    link.classList.add('bg-primary/10');
-                } else {
-                    link.classList.remove('bg-primary/10');
-                }
-            }
-        });
+        
+        if (gamificationData.status === 'fulfilled') {
+            alshamLeadsState.userPoints = gamificationData.value.points;
+            alshamLeadsState.userBadges = gamificationData.value.badges;
+            alshamLeadsState.leaderboard = gamificationData.value.leaderboard;
+            console.log('✅ Gamificação carregada:', gamificationData.value.points, 'pontos');
+        }
+        
+        if (analyticsData.status === 'fulfilled') {
+            alshamLeadsState.analytics = analyticsData.value;
+            console.log('✅ Analytics carregados');
+        }
+        
+        if (automationsData.status === 'fulfilled') {
+            alshamLeadsState.activeAutomations = automationsData.value.active;
+            alshamLeadsState.automationHistory = automationsData.value.history;
+            console.log('✅ Automações carregadas:', automationsData.value.active.length, 'ativas');
+        }
+        
+        alshamLeadsState.lastUpdate = new Date();
+        
     } catch (error) {
-        console.error('🚨 Error updating navigation:', error);
+        console.error('❌ Erro ao carregar dados do sistema:', error);
+        throw error;
+    } finally {
+        alshamLeadsState.isLoading = false;
     }
 }
-/**
- * Update user information display elements
- * Enhanced with better fallbacks and error handling
- */
-function updateUserInfo() {
+
+// ===== CARREGAMENTO DE LEADS (leads_crm) =====
+async function loadLeadsData() {
     try {
-        // Update user name with fallback
-        const userNameElements = document.querySelectorAll('[data-auth="user-name"]');
-        userNameElements.forEach(element => {
-            const displayName = authState.currentProfile?.full_name ||
-                                authState.currentUser?.email?.split('@')[0] ||
-                                'Usuário';
-            element.textContent = displayName;
-        });
-       
-        // Update user email
-        const userEmailElements = document.querySelectorAll('[data-auth="user-email"]');
-        userEmailElements.forEach(element => {
-            if (authState.currentUser?.email) {
-                element.textContent = authState.currentUser.email;
+        const { data: leads, error } = await window.AlshamSupabase.genericSelect(
+            'leads_crm',
+            { org_id: alshamLeadsState.orgId },
+            { 
+                order: { column: 'created_at', ascending: false },
+                select: `
+                    *,
+                    lead_interactions(count),
+                    sales_opportunities(count)
+                `
             }
-        });
-       
-        // Update user role with translation
-        const userRoleElements = document.querySelectorAll('[data-auth="user-role"]');
-        userRoleElements.forEach(element => {
-            if (authState.currentProfile?.role) {
-                const roleTranslations = {
-                    'admin': 'Administrador',
-                    'manager': 'Gerente',
-                    'analyst': 'Analista',
-                    'user': 'Usuário',
-                    'super_admin': 'Super Administrador'
-                };
-                element.textContent = roleTranslations[authState.currentProfile.role] || authState.currentProfile.role;
-            }
-        });
-       
-        // Update organization
-        const orgElements = document.querySelectorAll('[data-auth="user-org"]');
-        orgElements.forEach(element => {
-            const orgName = authState.currentOrganization?.name || 'Organização';
-            element.textContent = orgName;
-        });
-       
-        // Update avatar with improved fallback
-        updateUserAvatar();
-       
-        // Update badge count
-        const badgeElements = document.querySelectorAll('[data-auth="user-badges"]');
-        badgeElements.forEach(element => {
-            const badgeCount = authState.getBadgeCount();
-            element.textContent = badgeCount.toString();
-           
-            // Add visual indicator for badge count
-            if (badgeCount > 0) {
-                element.classList.add('badge-active');
-            } else {
-                element.classList.remove('badge-active');
-            }
-        });
+        );
+        
+        if (error) {
+            throw new Error(`Erro ao carregar leads: ${error.message}`);
+        }
+        
+        // Enriquecer dados dos leads com informações calculadas
+        const enrichedLeads = leads?.map(lead => ({
+            ...lead,
+            interactions_count: lead.lead_interactions?.[0]?.count || 0,
+            opportunities_count: lead.sales_opportunities?.[0]?.count || 0,
+            days_since_created: Math.floor((new Date() - new Date(lead.created_at)) / (1000 * 60 * 60 * 24)),
+            temperature_score: calculateTemperatureScore(lead)
+        })) || [];
+        
+        return enrichedLeads;
+        
     } catch (error) {
-        console.error('🚨 Error updating user info:', error);
+        console.error('❌ Erro ao carregar leads:', error);
+        return [];
     }
 }
-/**
- * Update user avatar with enhanced fallback system
- * @private
- */
-function updateUserAvatar() {
+
+// ===== CARREGAMENTO DE KPIs (dashboard_kpis) =====
+async function loadDashboardKPIs() {
     try {
-        const userAvatarElements = document.querySelectorAll('[data-auth="user-avatar"]');
-       
-        userAvatarElements.forEach(element => {
-            if (authState.currentProfile?.avatar_url) {
-                // Use provided avatar URL
-                if (element.tagName === 'IMG') {
-                    element.src = authState.currentProfile.avatar_url;
-                    element.alt = authState.currentProfile.full_name || 'Avatar do usuário';
-                } else {
-                    element.style.backgroundImage = `url(${authState.currentProfile.avatar_url})`;
-                }
-            } else {
-                // Generate initials avatar
-                const fullName = authState.currentProfile?.full_name ||
-                                 authState.currentUser?.email?.split('@')[0] ||
-                                 'U';
-               
-                const initials = fullName
-                    .split(' ')
-                    .map(name => name[0])
-                    .join('')
-                    .toUpperCase()
-                    .slice(0, 2);
-               
-                if (element.tagName === 'IMG') {
-                    // Create avatar with initials using canvas
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 40;
-                    canvas.height = 40;
-                    const ctx = canvas.getContext('2d');
-                   
-                    // Background gradient
-                    const gradient = ctx.createLinearGradient(0, 0, 40, 40);
-                    gradient.addColorStop(0, '#3B82F6');
-                    gradient.addColorStop(1, '#1D4ED8');
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, 40, 40);
-                   
-                    // Text
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.font = 'bold 16px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(initials, 20, 20);
-                   
-                    element.src = canvas.toDataURL();
-                    element.alt = `Avatar de ${fullName}`;
-                } else {
-                    element.textContent = initials;
-                    element.style.backgroundColor = '#3B82F6';
-                    element.style.color = '#FFFFFF';
-                }
-            }
-        });
+        // Buscar KPIs da view dashboard_kpis
+        const { data: kpis, error } = await window.AlshamSupabase.genericSelect(
+            'dashboard_kpis',
+            { org_id: alshamLeadsState.orgId }
+        );
+        
+        if (error) {
+            console.warn('⚠️ KPIs view não encontrada, calculando manualmente:', error);
+            return calculateManualKPIs();
+        }
+        
+        return kpis?.[0] || calculateManualKPIs();
+        
     } catch (error) {
-        console.error('🚨 Error updating user avatar:', error);
+        console.error('❌ Erro ao carregar KPIs:', error);
+        return calculateManualKPIs();
     }
 }
-/**
- * Update action buttons (logout, profile, etc.)
- * Enhanced with better event handling
- */
-function updateActionButtons() {
-    try {
-        // Update logout buttons
-        const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
-        logoutButtons.forEach(button => {
-            // Remove existing listeners to prevent duplicates
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-           
-            // Add new listener
-            newButton.addEventListener('click', handleLogout);
-        });
-       
-        // Update profile buttons
-        const profileButtons = document.querySelectorAll('[data-auth="profile-btn"]');
-        profileButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.location.href = '/configuracoes.html';
-            });
-        });
-        // Update dashboard buttons
-        const dashboardButtons = document.querySelectorAll('[data-auth="dashboard-btn"]');
-        dashboardButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.location.href = '/index.html';
-            });
-        });
-    } catch (error) {
-        console.error('🚨 Error updating action buttons:', error);
-    }
-}
-/**
- * Update elements based on user permissions
- * Enhanced with role hierarchy support
- */
-function updatePermissionBasedElements() {
-    try {
-        // Show/hide elements based on permissions
-        const permissionElements = document.querySelectorAll('[data-permission]');
-        permissionElements.forEach(element => {
-            const requiredPermission = element.getAttribute('data-permission');
-           
-            if (authState.hasPermission(requiredPermission)) {
-                element.classList.remove('hidden');
-                element.removeAttribute('disabled');
-            } else {
-                element.classList.add('hidden');
-                element.setAttribute('disabled', 'true');
-            }
-        });
-       
-        // Show/hide elements based on role
-        const roleElements = document.querySelectorAll('[data-role]');
-        roleElements.forEach(element => {
-            const requiredRole = element.getAttribute('data-role');
-            const userRole = authState.currentProfile?.role;
-           
-            // Check role hierarchy
-            const hasRoleAccess = userRole === requiredRole ||
-                                  authState.getRoleLevel() >= getRoleLevel(requiredRole);
-           
-            if (hasRoleAccess) {
-                element.classList.remove('hidden');
-                element.removeAttribute('disabled');
-            } else {
-                element.classList.add('hidden');
-                element.setAttribute('disabled', 'true');
-            }
-        });
-        // Show/hide elements based on organization
-        const orgElements = document.querySelectorAll('[data-org]');
-        orgElements.forEach(element => {
-            const requiredOrg = element.getAttribute('data-org');
-           
-            if (authState.belongsToOrganization(requiredOrg)) {
-                element.classList.remove('hidden');
-            } else {
-                element.classList.add('hidden');
-            }
-        });
-    } catch (error) {
-        console.error('🚨 Error updating permission-based elements:', error);
-    }
-}
-/**
- * Get role level for hierarchy comparison
- * @param {string} role - Role name
- * @returns {number} Role level
- * @private
- */
-function getRoleLevel(role) {
-    const roleLevels = {
-        'user': 1,
-        'member': 2,
-        'analyst': 3,
-        'manager': 4,
-        'admin': 5,
-        'super_admin': 6
+
+function calculateManualKPIs() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    const leads = alshamLeadsState.leads;
+    
+    const kpis = {
+        total_leads: leads.length,
+        
+        new_leads_today: leads.filter(lead => 
+            new Date(lead.created_at) >= today
+        ).length,
+        
+        new_leads_last_7_days: leads.filter(lead => 
+            new Date(lead.created_at) >= sevenDaysAgo
+        ).length,
+        
+        new_leads_last_30_days: leads.filter(lead => 
+            new Date(lead.created_at) >= thirtyDaysAgo
+        ).length,
+        
+        qualified_leads: leads.filter(lead => 
+            lead.status === 'qualificado'
+        ).length,
+        
+        hot_leads: leads.filter(lead => 
+            ['quente', 'muito_quente'].includes(lead.temperatura)
+        ).length,
+        
+        converted_leads: leads.filter(lead => 
+            lead.status === 'convertido'
+        ).length,
+        
+        average_score: leads.length > 0 
+            ? Math.round(leads.reduce((sum, lead) => sum + (lead.score_ia || 0), 0) / leads.length)
+            : 0,
+        
+        conversion_rate: leads.length > 0
+            ? ((leads.filter(l => l.status === 'convertido').length / leads.length) * 100).toFixed(1)
+            : 0,
+        
+        // Métricas avançadas
+        leads_by_temperature: {
+            frio: leads.filter(l => l.temperatura === 'frio').length,
+            morno: leads.filter(l => l.temperatura === 'morno').length,
+            quente: leads.filter(l => l.temperatura === 'quente').length,
+            muito_quente: leads.filter(l => l.temperatura === 'muito_quente').length
+        },
+        
+        leads_by_origin: calculateLeadsByOrigin(leads),
+        
+        daily_trend: calculateDailyTrend(leads, 7)
     };
-   
-    return roleLevels[role] || 0;
+    
+    console.log('📊 KPIs calculados manualmente:', kpis);
+    return kpis;
 }
-// ===== AUTHENTICATION ACTIONS - NASA 10/10 =====
-/**
- * Handle user logout with comprehensive cleanup
- * Enhanced with better error handling and user feedback
- * @returns {Promise<void>}
- */
-async function handleLogout() {
+
+// ===== CARREGAMENTO DE GAMIFICAÇÃO =====
+async function loadGamificationData() {
     try {
-        console.log('🚪 Initiating logout...');
-       
-        // Show loading state
-        const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
-        logoutButtons.forEach(button => {
-            button.disabled = true;
-            const originalText = button.textContent;
-            button.textContent = 'Saindo...';
-            button.dataset.originalText = originalText;
-        });
-       
-        // Sign out from Supabase with timeout
-        const logoutPromise = signOut();
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Logout timeout')), 5000);
-        });
-       
-        await Promise.race([logoutPromise, timeoutPromise]);
-       
-        // Redirect to login page
-        window.location.href = '/login.html';
-       
+        const userId = alshamLeadsState.user.id;
+        const orgId = alshamLeadsState.orgId;
+        
+        // Carregar pontos do usuário
+        const { data: points } = await window.AlshamSupabase.genericSelect(
+            'gamification_points',
+            { user_id: userId, org_id: orgId }
+        );
+        
+        // Carregar badges do usuário
+        const { data: userBadges } = await window.AlshamSupabase.genericSelect(
+            'user_badges',
+            { user_id: userId, org_id: orgId }
+        );
+        
+        // Carregar leaderboard
+        const { data: leaderboard } = await window.AlshamSupabase.genericSelect(
+            'team_leaderboards',
+            { org_id: orgId },
+            { 
+                order: { column: 'period_start', ascending: false },
+                limit: 1
+            }
+        );
+        
+        const totalPoints = points?.reduce((sum, p) => sum + (p.points_awarded || 0), 0) || 0;
+        
+        return {
+            points: totalPoints,
+            badges: userBadges || [],
+            leaderboard: leaderboard?.[0]?.rankings || []
+        };
+        
     } catch (error) {
-        console.error('🚨 Error during logout:', error);
-        showAuthNotification('Erro ao fazer logout. Tente novamente.', 'error');
-       
-        // Reset button state
-        const logoutButtons = document.querySelectorAll('[data-auth="logout-btn"]');
-        logoutButtons.forEach(button => {
-            button.disabled = false;
-            button.textContent = button.dataset.originalText || 'Sair';
-        });
+        console.error('❌ Erro ao carregar dados de gamificação:', error);
+        return { points: 0, badges: [], leaderboard: [] };
     }
 }
-/**
- * Check session validity and refresh if needed
- * Enhanced with better error handling and retry logic
- * @returns {Promise<boolean>} Session is valid
- */
-async function checkSessionValidity() {
+
+// ===== CARREGAMENTO DE ANALYTICS =====
+async function loadAnalyticsData() {
     try {
-        const session = await getCurrentSession();
-       
-        if (!session || !session.user) {
-            console.log('🚫 Session invalid, logging out...');
-            await handleUnauthenticated();
-            return false;
-        }
-       
-        // Check if session is close to expiry
-        const expiresAt = new Date(session.expires_at);
-        const now = new Date();
-        const timeUntilExpiry = expiresAt.getTime() - now.getTime();
-       
-        // If less than 5 minutes until expiry, refresh
-        if (timeUntilExpiry < 5 * 60 * 1000) {
-            console.log('🔄 Session close to expiry, refreshing...');
-            // Supabase handles automatic refresh
-        }
-       
-        return true;
+        const orgId = alshamLeadsState.orgId;
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        
+        // Carregar eventos recentes
+        const { data: events } = await window.AlshamSupabase.genericSelect(
+            'analytics_events',
+            { org_id: orgId },
+            {
+                order: { column: 'timestamp', ascending: false },
+                limit: 100
+            }
+        );
+        
+        // Carregar métricas de performance
+        const { data: metrics } = await window.AlshamSupabase.genericSelect(
+            'performance_metrics',
+            { org_id: orgId },
+            {
+                order: { column: 'metric_date', ascending: false },
+                limit: 30
+            }
+        );
+        
+        return {
+            events: events || [],
+            metrics: metrics || [],
+            summary: processAnalyticsSummary(events || [])
+        };
+        
     } catch (error) {
-        console.error('🚨 Error checking session validity:', error);
-        await handleUnauthenticated();
-        return false;
+        console.error('❌ Erro ao carregar analytics:', error);
+        return { events: [], metrics: [], summary: {} };
     }
 }
-// ===== GLOBAL EVENT LISTENERS - NASA 10/10 =====
-/**
- * Setup global event listeners for authentication
- * Enhanced with better error handling and performance
- */
-function setupGlobalListeners() {
+
+// ===== CARREGAMENTO DE AUTOMAÇÕES =====
+async function loadAutomationsData() {
     try {
-        // Page visibility change (detect when user returns)
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && authState.isAuthenticated) {
-                // Check session validity when page becomes visible
-                checkSessionValidity();
+        const orgId = alshamLeadsState.orgId;
+        
+        // Carregar regras ativas
+        const { data: activeRules } = await window.AlshamSupabase.genericSelect(
+            'automation_rules',
+            { org_id: orgId, is_active: true }
+        );
+        
+        // Carregar histórico de execuções (últimas 50)
+        const { data: executions } = await window.AlshamSupabase.genericSelect(
+            'automation_executions',
+            { org_id: orgId },
+            {
+                order: { column: 'started_at', ascending: false },
+                limit: 50
             }
-        });
-       
-        // Browser navigation (back/forward)
-        window.addEventListener('popstate', checkRouteAccess);
-       
-        // Internal link clicks with improved detection
-        document.addEventListener('click', function(e) {
-            const link = e.target.closest('a[href]');
-            if (link &&
-                link.href.startsWith(window.location.origin) &&
-                !link.href.includes('#') &&
-                !link.target) {
-                // Check route access after navigation
-                setTimeout(checkRouteAccess, 100);
-            }
-        });
-       
-        // Storage events (detect logout in other tabs)
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'alsham_auth_state') {
-                if (!e.newValue) {
-                    // Auth state cleared in another tab
-                    console.log('🔄 Auth state cleared in another tab, syncing...');
-                    authState.clearAuthenticatedUser();
-                    updateAuthUI();
-                } else {
-                    // Auth state updated in another tab
-                    try {
-                        const newState = JSON.parse(e.newValue);
-                        if (newState.isAuthenticated !== authState.isAuthenticated) {
-                            console.log('🔄 Auth state changed in another tab, syncing...');
-                            // Reload page to sync state
-                            window.location.reload();
+        );
+        
+        return {
+            active: activeRules || [],
+            history: executions || []
+        };
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar automações:', error);
+        return { active: [], history: [] };
+    }
+}
+
+// ===== CONFIGURAÇÃO COMPLETA DA INTERFACE =====
+function setupCompleteInterface() {
+    try {
+        // Renderizar todos os componentes
+        renderKPIDashboard();
+        renderFiltersSection();
+        renderLeadsTable();
+        renderChartsSection();
+        renderGamificationSection();
+        renderAutomationsSection();
+        
+        // Configurar event listeners
+        setupEventListeners();
+        setupKeyboardShortcuts();
+        
+        // Inicializar modais
+        setupModals();
+        
+        console.log('🎨 Interface completa configurada');
+        
+    } catch (error) {
+        console.error('❌ Erro ao configurar interface:', error);
+    }
+}
+
+// ===== RENDERIZAÇÃO DE KPIs AVANÇADOS =====
+function renderKPIDashboard() {
+    const container = document.getElementById('kpis-container');
+    if (!container) {
+        console.warn('⚠️ Container de KPIs não encontrado');
+        return;
+    }
+    
+    const kpis = alshamLeadsState.kpis;
+    
+    const kpisHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total de Leads -->
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total de Leads</p>
+                        <p class="text-3xl font-bold">${kpis.total_leads || 0}</p>
+                        <p class="text-blue-100 text-xs mt-1">
+                            +${kpis.new_leads_last_7_days || 0} nos últimos 7 dias
+                        </p>
+                    </div>
+                    <div class="bg-blue-400 bg-opacity-30 rounded-lg p-3">
+                        <span class="text-3xl">👥</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leads Qualificados -->
+            <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Leads Qualificados</p>
+                        <p class="text-3xl font-bold">${kpis.qualified_leads || 0}</p>
+                        <p class="text-green-100 text-xs mt-1">
+                            🔥 ${kpis.hot_leads || 0} leads quentes
+                        </p>
+                    </div>
+                    <div class="bg-green-400 bg-opacity-30 rounded-lg p-3">
+                        <span class="text-3xl">✅</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Taxa de Conversão -->
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Taxa de Conversão</p>
+                        <p class="text-3xl font-bold">${kpis.conversion_rate || 0}%</p>
+                        <p class="text-purple-100 text-xs mt-1">
+                            💰 ${kpis.converted_leads || 0} convertidos
+                        </p>
+                    </div>
+                    <div class="bg-purple-400 bg-opacity-30 rounded-lg p-3">
+                        <span class="text-3xl">📈</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Score Médio -->
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-orange-100 text-sm font-medium">Score Médio IA</p>
+                        <p class="text-3xl font-bold">${kpis.average_score || 0}</p>
+                        <p class="text-orange-100 text-xs mt-1">
+                            🎮 ${alshamLeadsState.userPoints} pontos seus
+                        </p>
+                    </div>
+                    <div class="bg-orange-400 bg-opacity-30 rounded-lg p-3">
+                        <span class="text-3xl">🤖</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- KPIs Secundários -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Por Temperatura</h3>
+                <div class="space-y-3">
+                    ${Object.entries(kpis.leads_by_temperature || {}).map(([temp, count]) => `
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">${temp.charAt(0).toUpperCase() + temp.slice(1)}</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded-md text-sm font-medium">${count}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 Automações Ativas</h3>
+                <div class="text-center">
+                    <span class="text-4xl font-bold text-blue-600">${alshamLeadsState.activeAutomations.length}</span>
+                    <p class="text-sm text-gray-600 mt-2">regras executando</p>
+                    ${alshamLeadsState.automationHistory.length > 0 ? `
+                        <p class="text-xs text-gray-500 mt-1">
+                            Última: ${formatTimeAgo(alshamLeadsState.automationHistory[0]?.started_at)}
+                        </p>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🏆 Sua Pontuação</h3>
+                <div class="text-center">
+                    <span class="text-4xl font-bold text-green-600">${alshamLeadsState.userPoints}</span>
+                    <p class="text-sm text-gray-600 mt-2">pontos acumulados</p>
+                    <div class="mt-3 flex justify-center space-x-1">
+                        ${alshamLeadsState.userBadges.slice(0, 3).map(badge => 
+                            `<span class="text-lg" title="Badge: ${badge.name || 'Badge'}">🥇</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = kpisHTML;
+}
+
+// ===== RENDERIZAÇÃO DE FILTROS AVANÇADOS =====
+function renderFiltersSection() {
+    const container = document.getElementById('filters-container');
+    if (!container) return;
+    
+    const statusOptions = ALSHAM_LEADS_CONFIG.statusOptions.map(option =>
+        `<option value="${option.value}">${option.icon} ${option.label}</option>`
+    ).join('');
+    
+    const temperaturaOptions = ALSHAM_LEADS_CONFIG.temperaturaOptions.map(option =>
+        `<option value="${option.value}">${option.label}</option>`
+    ).join('');
+    
+    const origemOptions = ALSHAM_LEADS_CONFIG.origemOptions.map(origem =>
+        `<option value="${origem}">${origem.charAt(0).toUpperCase() + origem.slice(1).replace('_', ' ')}</option>`
+    ).join('');
+    
+    const filtersHTML = `
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <!-- Filtros Principais -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+                <div class="lg:col-span-2">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="search-leads"
+                            placeholder="🔍 Buscar leads, empresas, emails..."
+                            value="${alshamLeadsState.filters.search}"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <div class="absolute left-3 top-2.5 text-gray-400">
+                            🔍
+                        </div>
+                    </div>
+                </div>
+                
+                <select id="filter-status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">📊 Todos os Status</option>
+                    ${statusOptions}
+                </select>
+                
+                <select id="filter-temperatura" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">🌡️ Todas as Temperaturas</option>
+                    ${temperaturaOptions}
+                </select>
+                
+                <select id="filter-origem" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">📍 Todas as Origens</option>
+                    ${origemOptions}
+                </select>
+                
+                <div class="flex space-x-2">
+                    <button id="advanced-filters" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        ⚙️ Avançado
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Score Range -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">🤖 Score IA (${alshamLeadsState.filters.scoreRange[0]} - ${alshamLeadsState.filters.scoreRange[1]})</label>
+                <input
+                    type="range"
+                    id="score-range"
+                    min="0"
+                    max="100"
+                    value="${alshamLeadsState.filters.scoreRange[1]}"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+            </div>
+            
+            <!-- Ações -->
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-2">
+                    <button id="clear-filters" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        🗑️ Limpar
+                    </button>
+                    <button id="refresh-data" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        🔄 Atualizar
+                    </button>
+                    <button id="export-leads" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        📥 Exportar
+                    </button>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button id="bulk-actions" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                        📦 Ações em Lote
+                    </button>
+                    <button id="add-lead" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium">
+                        ➕ Adicionar Lead
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Resultados dos Filtros -->
+            <div class="mt-4 text-sm text-gray-600">
+                📋 Mostrando <span class="font-medium">${alshamLeadsState.filteredLeads.length}</span> 
+                de <span class="font-medium">${alshamLeadsState.leads.length}</span> leads
+                ${alshamLeadsState.lastUpdate ? ` • 🕒 Última atualização: ${formatTimeAgo(alshamLeadsState.lastUpdate)}` : ''}
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = filtersHTML;
+}
+
+// ===== RENDERIZAÇÃO DA TABELA DE LEADS COMPLETA =====
+function renderLeadsTable() {
+    const container = document.getElementById('leads-container');
+    if (!container) return;
+    
+    applyFiltersAdvanced(); // Aplicar todos os filtros
+    
+    if (alshamLeadsState.filteredLeads.length === 0) {
+        renderEmptyState(container);
+        return;
+    }
+    
+    // Calcular paginação
+    const totalPages = Math.ceil(alshamLeadsState.filteredLeads.length / alshamLeadsState.pagination.perPage);
+    const startIndex = (alshamLeadsState.pagination.current - 1) * alshamLeadsState.pagination.perPage;
+    const endIndex = startIndex + alshamLeadsState.pagination.perPage;
+    const currentPageLeads = alshamLeadsState.filteredLeads.slice(startIndex, endIndex);
+    
+    alshamLeadsState.pagination.total = alshamLeadsState.filteredLeads.length;
+    alshamLeadsState.pagination.totalPages = totalPages;
+    
+    const tableHTML = `
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Header da Tabela -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        📋 Leads (${alshamLeadsState.filteredLeads.length})
+                    </h3>
+                    <div class="flex items-center space-x-4">
+                        <select id="per-page-select" class="text-sm border border-gray-300 rounded-md px-3 py-1">
+                            ${ALSHAM_LEADS_CONFIG.pagination.options.map(option => 
+                                `<option value="${option}" ${option === alshamLeadsState.pagination.perPage ? 'selected' : ''}>${option} por página</option>`
+                            ).join('')}
+                        </select>
+                        <div class="text-sm text-gray-500">
+                            Página ${alshamLeadsState.pagination.current} de ${totalPages}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabela Responsiva -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-2 py-3 text-left">
+                                <input type="checkbox" id="select-all-leads" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortLeads('nome')">
+                                👤 Lead <span class="ml-1">↕️</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortLeads('empresa')">
+                                🏢 Empresa <span class="ml-1">↕️</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortLeads('status')">
+                                📊 Status <span class="ml-1">↕️</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortLeads('temperatura')">
+                                🌡️ Temperatura <span class="ml-1">↕️</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortLeads('score_ia')">
+                                🤖 Score IA <span class="ml-1">↕️</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                📈 Atividade
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortLeads('created_at')">
+                                📅 Criado <span class="ml-1">↕️</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ⚡ Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${currentPageLeads.map(lead => generateAdvancedLeadRow(lead)).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            ${renderPagination()}
+        </div>
+    `;
+    
+    container.innerHTML = tableHTML;
+}
+
+function renderEmptyState(container) {
+    const hasFilters = Object.values(alshamLeadsState.filters).some(filter => 
+        Array.isArray(filter) ? filter.some(f => f !== 0 && f !== 100) : filter !== ''
+    );
+    
+    container.innerHTML = `
+        <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+            <div class="text-gray-400 text-8xl mb-6">
+                ${hasFilters ? '🔍' : '📋'}
+            </div>
+            <h3 class="text-2xl font-medium text-gray-900 mb-4">
+                ${hasFilters ? 'Nenhum lead encontrado' : 'Nenhum lead cadastrado'}
+            </h3>
+            <p class="text-gray-500 mb-8 max-w-md mx-auto">
+                ${hasFilters 
+                    ? 'Tente ajustar os filtros para encontrar os leads que procura.' 
+                    : 'Comece adicionando seu primeiro lead ao sistema ALSHAM 360°.'
+                }
+            </p>
+            <div class="space-x-4">
+                ${hasFilters ? `
+                    <button id="clear-filters-empty" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        🗑️ Limpar Filtros
+                    </button>
+                ` : ''}
+                <button id="add-first-lead" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    ➕ ${hasFilters ? 'Adicionar Lead' : 'Adicionar Primeiro Lead'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function generateAdvancedLeadRow(lead) {
+    const statusConfig = ALSHAM_LEADS_CONFIG.statusOptions.find(s => s.value === lead.status) || 
+                         { value: lead.status, label: lead.status, color: 'gray', icon: '' };
+    
+    const temperaturaConfig = ALSHAM_LEADS_CONFIG.temperaturaOptions.find(t => t.value === lead.temperatura) || 
+                                { value: lead.temperatura, label: lead.temperatura || '-', color: 'gray' };
+    
+    const avatarInitials = (lead.nome || 'N').charAt(0).toUpperCase() + 
+                          ((lead.nome || '').split(' ')[1] || '').charAt(0).toUpperCase();
+    
+    return `
+        <tr class="hover:bg-gray-50 transition-colors" data-lead-id="${lead.id}">
+            <td class="px-2 py-4">
+                <input type="checkbox" class="lead-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="${lead.id}">
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="h-12 w-12 flex-shrink-0">
+                        <div class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center shadow-md">
+                            <span class="text-sm font-bold text-white">
+                                ${avatarInitials}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                            ${lead.nome || 'Nome não informado'}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            ${lead.email || 'Email não informado'}
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            ${lead.telefone || 'Telefone não informado'}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 font-medium">
+                    ${lead.empresa || '-'}
+                </div>
+                <div class="text-sm text-gray-500">
+                    ${lead.cargo || '-'}
+                </div>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-${statusConfig.color}-100 text-${statusConfig.color}-800">
+                    ${statusConfig.icon} ${statusConfig.label}
+                </span>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-${temperaturaConfig.color}-100 text-${temperaturaConfig.color}-800">
+                    ${temperaturaConfig.label}
+                </span>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="text-sm font-medium text-gray-900">
+                        ${lead.score_ia || '-'}
+                    </div>
+                    ${lead.score_ia ? `
+                        <div class="ml-3 w-20 bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-blue-400 to-purple-500 h-2 rounded-full transition-all duration-300" 
+                                 style="width: ${Math.min(lead.score_ia, 100)}%"></div>
+                        </div>
+                    ` : ''}
+                </div>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="flex items-center justify-center space-x-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                        💬 ${lead.interactions_count || 0}
+                    </span>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                        💰 ${lead.opportunities_count || 0}
+                    </span>
+                </div>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div>${window.AlshamSupabase?.formatDateBR(lead.created_at) || 'Data inválida'}</div>
+                <div class="text-xs text-gray-400">
+                    há ${lead.days_since_created || 0} dias
+                </div>
+            </td>
+            
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center space-x-2">
+                    <button onclick="viewLead('${lead.id}')" 
+                            class="text-blue-600 hover:text-blue-900 transition-colors p-1 rounded hover:bg-blue-50"
+                            title="Ver detalhes">
+                        👁️
+                    </button>
+                    <button onclick="editLead('${lead.id}')" 
+                            class="text-green-600 hover:text-green-900 transition-colors p-1 rounded hover:bg-green-50"
+                            title="Editar">
+                        ✏️
+                    </button>
+                    <button onclick="addInteraction('${lead.id}')" 
+                            class="text-purple-600 hover:text-purple-900 transition-colors p-1 rounded hover:bg-purple-50"
+                            title="Adicionar interação">
+                        💬
+                    </button>
+                    <button onclick="deleteLead('${lead.id}')" 
+                            class="text-red-600 hover:text-red-900 transition-colors p-1 rounded hover:bg-red-50"
+                            title="Excluir">
+                        🗑️
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function renderPagination() {
+    const { current, totalPages, total, perPage } = alshamLeadsState.pagination;
+    
+    if (totalPages <= 1) return '';
+    
+    const startItem = (current - 1) * perPage + 1;
+    const endItem = Math.min(current * perPage, total);
+    
+    return `
+        <div class="bg-white px-6 py-4 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    Mostrando <span class="font-medium">${startItem}</span> a <span class="font-medium">${endItem}</span> 
+                    de <span class="font-medium">${total}</span> resultados
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <button 
+                        onclick="changePage(${current - 1})"
+                        ${current === 1 ? 'disabled' : ''}
+                        class="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        ← Anterior
+                    </button>
+                    
+                    ${generatePageNumbers(current, totalPages)}
+                    
+                    <button 
+                        onclick="changePage(${current + 1})"
+                        ${current === totalPages ? 'disabled' : ''}
+                        class="px-3 py-1 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Próxima →
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function generatePageNumbers(current, totalPages) {
+    const pages = [];
+    const maxVisible = 5;
+    
+    let start = Math.max(1, current - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+        start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+        pages.push(`
+            <button 
+                onclick="changePage(${i})"
+                class="px-3 py-1 text-sm border rounded-md ${i === current 
+                    ? 'bg-blue-500 text-white border-blue-500' 
+                    : 'bg-white border-gray-300 hover:bg-gray-50'}"
+            >
+                ${i}
+            </button>
+        `);
+    }
+    
+    return pages.join('');
+}
+
+// ===== RENDERIZAÇÃO DE GRÁFICOS =====
+function renderChartsSection() {
+    const statusChartContainer = document.getElementById('status-chart');
+    const dailyChartContainer = document.getElementById('daily-chart');
+    const originChartContainer = document.getElementById('origin-chart');
+    
+    if (statusChartContainer) renderStatusChart();
+    if (dailyChartContainer) renderDailyChart();
+    if (originChartContainer) renderOriginChart();
+}
+
+function renderStatusChart() {
+    const canvas = document.getElementById('status-chart');
+    if (!canvas) return;
+    
+    const statusData = {};
+    const statusColors = {};
+    
+    ALSHAM_LEADS_CONFIG.statusOptions.forEach(status => {
+        const count = alshamLeadsState.leads.filter(lead => lead.status === status.value).length;
+        statusData[status.label] = count;
+        statusColors[status.label] = getStatusColor(status.color);
+    });
+    
+    if (alshamLeadsState.charts.status) {
+        alshamLeadsState.charts.status.destroy();
+    }
+    
+    alshamLeadsState.charts.status = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusData),
+            datasets: [{
+                data: Object.values(statusData),
+                backgroundColor: Object.values(statusColors),
+                borderWidth: 3,
+                borderColor: '#ffffff',
+                hoverBorderWidth: 5,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
                         }
-                    } catch (error) {
-                        console.error('🚨 Error parsing auth state from storage:', error);
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed * 100) / total).toFixed(1);
+                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1000
+            }
+        }
+    });
+}
+
+function renderDailyChart() {
+    const canvas = document.getElementById('daily-chart');
+    if (!canvas) return;
+    
+    // Últimos 14 dias para melhor visualização
+    const days = [];
+    const counts = [];
+    const colors = [];
+    
+    for (let i = 13; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        days.push(date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+        
+        const count = alshamLeadsState.leads.filter(lead => 
+            lead.created_at.startsWith(dateStr)
+        ).length;
+        
+        counts.push(count);
+        colors.push(count > 0 ? 'rgba(59, 130, 246, 0.8)' : 'rgba(156, 163, 175, 0.3)');
+    }
+    
+    if (alshamLeadsState.charts.daily) {
+        alshamLeadsState.charts.daily.destroy();
+    }
+    
+    alshamLeadsState.charts.daily = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Novos Leads',
+                data: counts,
+                backgroundColor: colors,
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return `Dia ${context[0].label}`;
+                        },
+                        label: function(context) {
+                            return `${context.parsed.y} novos leads`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(156, 163, 175, 0.2)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+function renderOriginChart() {
+    const canvas = document.getElementById('origin-chart');
+    if (!canvas) return;
+    
+    const originData = {};
+    const originColors = [
+        '#3B82F6', '#EF4444', '#10B981', '#F59E0B', 
+        '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'
+    ];
+    
+    ALSHAM_LEADS_CONFIG.origemOptions.forEach((origem, index) => {
+        const count = alshamLeadsState.leads.filter(lead => lead.origem === origem).length;
+        if (count > 0) {
+            originData[origem.charAt(0).toUpperCase() + origem.slice(1).replace('_', ' ')] = {
+                count,
+                color: originColors[index % originColors.length]
+            };
+        }
+    });
+    
+    if (alshamLeadsState.charts.origin) {
+        alshamLeadsState.charts.origin.destroy();
+    }
+    
+    if (Object.keys(originData).length === 0) {
+        canvas.parentElement.innerHTML = `
+            <div class="flex items-center justify-center h-64 text-gray-500">
+                <div class="text-center">
+                    <span class="text-4xl mb-2 block">📊</span>
+                    <p>Sem dados de origem suficientes</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    alshamLeadsState.charts.origin = new Chart(canvas, {
+        type: 'polarArea',
+        data: {
+            labels: Object.keys(originData),
+            datasets: [{
+                data: Object.values(originData).map(o => o.count),
+                backgroundColor: Object.values(originData).map(o => o.color + '80'),
+                borderColor: Object.values(originData).map(o => o.color),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
                     }
                 }
             }
-        });
-       
-        // Before page unload (cleanup)
-        window.addEventListener('beforeunload', function() {
-            // Clear any pending timers
-            if (authState.refreshTimer) {
-                clearTimeout(authState.refreshTimer);
-            }
-        });
-        // Online/offline detection
-        window.addEventListener('online', function() {
-            console.log('🌐 Connection restored, checking session...');
-            if (authState.isAuthenticated) {
-                checkSessionValidity();
-            }
-        });
-        window.addEventListener('offline', function() {
-            console.log('📴 Connection lost');
-            showAuthNotification('Conexão perdida. Algumas funcionalidades podem não funcionar.', 'warning');
-        });
-        console.log('✅ Global auth listeners configured');
-    } catch (error) {
-        console.error('🚨 Error setting up global listeners:', error);
-    }
+        }
+    });
 }
-// ===== PUBLIC API - NASA 10/10 =====
-/**
- * Public authentication API for external use
- * Enhanced with better error handling and additional utilities
- * @namespace AlshamAuth
- */
-const AlshamAuth = {
-    // State getters
-    get isAuthenticated() { return authState.isAuthenticated; },
-    get currentUser() { return authState.currentUser; },
-    get currentProfile() { return authState.currentProfile; },
-    get currentOrganization() { return authState.currentOrganization; },
-    get userBadges() { return authState.userBadges; },
-    get userPermissions() { return authState.userPermissions; },
-    get sessionExpiry() { return authState.sessionExpiry; },
-    get roleLevel() { return authState.getRoleLevel(); },
-   
-    // Permission checks
-    hasPermission: (permission) => authState.hasPermission(permission),
-    belongsToOrganization: (orgId) => authState.belongsToOrganization(orgId),
-    getBadgeCount: (badgeType) => authState.getBadgeCount(badgeType),
-   
-    // Actions
-    logout: handleLogout,
-    checkSession: checkSessionValidity,
-    redirectToLogin,
-    redirectAfterLogin,
-   
-    // UI utilities
-    showNotification: showAuthNotification,
-    updateUI: updateAuthUI,
-   
-    // State management
-    addListener: (listener) => authState.addListener(listener),
-    removeListener: (listener) => authState.removeListener(listener),
-   
-    // Route protection
-    checkRouteAccess,
-   
-    // Utility functions
-    getSessionDuration: () => authState.getSessionDuration(),
-    isSessionValid: checkSessionValidity,
-   
-    // Version info
-    version: '5.0.0',
-    buildDate: new Date().toISOString()
-};
-// Export for ES Modules compatibility
-export default AlshamAuth;
-// Named exports for tree-shaking optimization
-export {
-    AuthStateManager,
-    validateAuthDependencies,
-    initializeAuth,
-    handleAuthStateChange,
-    checkRouteAccess,
-    showAuthNotification,
-    updateAuthUI,
-    handleLogout,
-    checkSessionValidity
-};
-// Also attach to window for backward compatibility
-window.AlshamAuth = AlshamAuth;
-console.log('🔐 Enterprise Authentication System v5.0 NASA 10/10 configured - ALSHAM 360° PRIMA');
-console.log('✅ Real-time integration with Supabase Auth enabled');
-console.log('🛡️ Multi-tenant security and RLS enforcement active');
-console.log('⚡ ES Modules and Vite compatibility optimized');
-console.log('🎯 Path standardization and consistency implemented');
+
+// ===== FUNÇÕES AUXILIARES PARA CORES =====
+function getStatusColor(colorName) {
+    const colorMap = {
+        'blue': '#3B82F6',
+        'green': '#10B981', 
+        'yellow': '#F59E0B',
+        'red': '#EF4444',
+        'purple': '#8B5CF6',
+        'orange': '#F97316',
+        'gray': '#6B7280'
+    };
+    return colorMap[colorName] || '#6B7280';
+}
+
+// ===== APLICAÇÃO DE FILTROS AVANÇADOS =====
+function applyFiltersAdvanced() {
+    let filtered = [...alshamLeadsState.leads];
+    
+    // Filtro de busca (nome, email, empresa, telefone)
+    if (alshamLeadsState.filters.search) {
+        const search = alshamLeadsState.filters.search.toLowerCase();
+        filtered = filtered.filter(lead =>
+            (lead.nome && lead.nome.toLowerCase().includes(search)) ||
+            (lead.email && lead.email.toLowerCase().includes(search)) ||
+            (lead.empresa && lead.empresa.toLowerCase().includes(search)) ||
+            (lead.telefone && lead.telefone.includes(search)) ||
+            (lead.cargo && lead.cargo.toLowerCase().includes(search))
+        );
+    }
+    
+    // Filtro de status
+    if (alshamLeadsState.filters.status) {
+        filtered = filtered.filter(lead => lead.status === alshamLeadsState.filters.status);
+    }
+    
+    // Filtro de temperatura
+    if (alshamLeadsState.filters.temperatura) {
+        filtered = filtered.filter(lead => lead.temperatura === alshamLeadsState.filters.temperatura);
+    }
+    
+    // Filtro de origem
+    if (alshamLeadsState.filters.origem) {
+        filtered = filtered.filter(lead => lead.origem === alshamLeadsState.filters.origem);
+    }
+    
+    // Filtro de score IA
+    const [minScore, maxScore] = alshamLeadsState.filters.scoreRange;
+    if (minScore > 0 || maxScore < 100) {
+        filtered = filtered.filter(lead => {
+            const score = lead.score_ia || 0;
+            return score >= minScore && score <= maxScore;
