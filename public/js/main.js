@@ -10,12 +10,13 @@
  */
 // ===== IMPORTS CORRIGIDOS - ES MODULES PADRONIZADOS =====
 import Chart from 'chart.js/auto';
-import {
+// ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
+const {
     getCurrentSession,  // Para auth real
     genericSelect,      // Para getLeads e getDashboardKPIs reais
     createAuditLog,
     subscribeToTable    // Para real-time
-} from '/src/lib/supabase.js';
+} = window.AlshamSupabase;
 // ===== VARIÁVEIS GLOBAIS PARA MÓDULOS =====
 let supabaseModule = null;
 let isModulesLoaded = false;
