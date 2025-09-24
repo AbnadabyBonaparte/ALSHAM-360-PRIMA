@@ -1,16 +1,38 @@
 /**
- * ALSHAM 360° PRIMA - Sistema de Navegação Simples V1.0
- * Sistema de navegação funcional e compatível com o ambiente atual
+ * ALSHAM 360° PRIMA - Sistema de Navegação Otimizado V1.1
+ * Sistema de navegação funcional e compatível com fix-imports.js
  * 
- * @version 1.0.0 - FUNCIONAL
+ * @version 1.1.0 - OTIMIZADO
  * @author ALSHAM Development Team
  * 
  * ✅ FUNCIONALIDADES:
  * - Navegação entre páginas
- * - Verificação de acesso
+ * - Verificação de acesso integrada com fix-imports
  * - Menu mobile responsivo
- * - Sem exports/imports problemáticos
+ * - Sem conflitos com funções globais
  */
+
+// ===== AGUARDAR FIX-IMPORTS ESTAR PRONTO =====
+function waitForFixImports(callback) {
+    if (window.checkRouteAccess && window.showAuthNotification) {
+        console.log('✅ Fix-imports já carregado, inicializando navegação');
+        callback();
+    } else {
+        console.log('⏳ Aguardando fix-imports...');
+        
+        // Escutar evento do fix-imports
+        window.addEventListener('fix-imports-ready', () => {
+            console.log('✅ Fix-imports pronto, inicializando navegação');
+            callback();
+        });
+        
+        // Fallback com timeout
+        setTimeout(() => {
+            console.log('⚠️ Timeout aguardando fix-imports, inicializando mesmo assim');
+            callback();
+        }, 3000);
+    }
+}
 
 // ===== CONFIGURAÇÃO DE ROTAS =====
 const ROUTES = {
@@ -20,29 +42,36 @@ const ROUTES = {
     relatorios: '/relatorios.html',
     gamificacao: '/gamificacao.html',
     configuracoes: '/configuracoes.html',
-    login: '/login.html'
+    login: '/login.html',
+    register: '/register.html'
 };
 
 // ===== ESTADO DA NAVEGAÇÃO =====
 const navigationState = {
     currentPage: null,
     isAuthenticated: false,
-    isInitialized: false
+    isInitialized: false,
+    mobileMenuOpen: false
 };
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
-    try {
-        initializeNavigation();
-        console.log('✅ Sistema de navegação inicializado');
-    } catch (error) {
-        console.error('❌ Erro ao inicializar navegação:', error);
-    }
+    waitForFixImports(() => {
+        try {
+            initializeNavigation();
+            console.log('✅ Sistema de navegação inicializado');
+        } catch (error) {
+            console.error('❌ Erro ao inicializar navegação:', error);
+        }
+    });
 });
 
 function initializeNavigation() {
     // Detectar página atual
     detectCurrentPage();
+    
+    // Verificar autenticação
+    checkAuthentication();
     
     // Configurar menu mobile
     setupMobileMenu();
@@ -54,6 +83,11 @@ function initializeNavigation() {
     updateNavigationState();
     
     navigationState.isInitialized = true;
+    
+    // Disparar evento de navegação pronta
+    window.dispatchEvent(new CustomEvent('navigation-ready', {
+        detail: { currentPage: navigationState.currentPage }
+    }));
 }
 
 // ===== DETECÇÃO DE PÁGINA =====
@@ -73,39 +107,42 @@ function detectCurrentPage() {
         navigationState.currentPage = 'configuracoes';
     } else if (currentPath.includes('login')) {
         navigationState.currentPage = 'login';
+    } else if (currentPath.includes('register')) {
+        navigationState.currentPage = 'register';
     } else {
         navigationState.currentPage = 'dashboard';
     }
     
     console.log('📍 Página atual detectada:', navigationState.currentPage);
+    
+    // Atualizar título da página
+    updatePageTitle();
 }
 
-// ===== VERIFICAÇÃO DE ACESSO =====
-function checkRouteAccess(route) {
-    console.log(`🛡️ Verificando acesso à rota: ${route || 'undefined'}`);
-    
-    // Rotas públicas
-    const publicRoutes = ['/login.html', '/register.html'];
-    if (publicRoutes.some(publicRoute => route?.includes(publicRoute))) {
-        return true;
-    }
-    
-    // Para outras rotas, verificar autenticação básica
+// ===== VERIFICAÇÃO DE AUTENTICAÇÃO =====
+function checkAuthentication() {
     try {
-        // Verificar se há sessão armazenada
-        const hasSession = localStorage.getItem('supabase.auth.token') || 
-                          sessionStorage.getItem('supabase.auth.token') ||
-                          window.AlshamSupabase;
+        // Usar função do fix-imports se disponível
+        if (window.checkRouteAccess) {
+            const currentRoute = ROUTES[navigationState.currentPage] || window.location.pathname;
+            navigationState.isAuthenticated = window.checkRouteAccess(currentRoute);
+        } else {
+            // Fallback básico
+            const hasToken = localStorage.getItem('supabase.auth.token') || 
+                           sessionStorage.getItem('supabase.auth.token');
+            navigationState.isAuthenticated = !!hasToken;
+        }
         
-        return !!hasSession;
+        console.log('🔐 Status autenticação:', navigationState.isAuthenticated ? 'Autenticado' : 'Não autenticado');
+        
     } catch (error) {
-        console.warn('Erro ao verificar sessão:', error);
-        return true; // Permitir por padrão para evitar bloqueios
+        console.warn('⚠️ Erro ao verificar autenticação:', error);
+        navigationState.isAuthenticated = true; // Fallback permissivo
     }
 }
 
-// ===== NAVEGAÇÃO =====
-function navigateTo(pageKey, options = {}) {
+// ===== NAVEGAÇÃO MELHORADA =====
+function navigateToPage(pageKey, options = {}) {
     try {
         console.log(`🔄 Navegando para: ${pageKey}`);
         
@@ -113,15 +150,20 @@ function navigateTo(pageKey, options = {}) {
         const route = ROUTES[pageKey];
         if (!route) {
             console.error('❌ Rota não encontrada:', pageKey);
+            window.showToast?.('Página não encontrada', 'error');
             return false;
         }
         
-        // Verificar acesso
-        if (!checkRouteAccess(route)) {
+        // Verificar acesso usando função do fix-imports
+        if (window.checkRouteAccess && !window.checkRouteAccess(route)) {
             console.warn('⚠️ Acesso negado à rota:', route);
-            navigateTo('login');
+            window.showAuthNotification?.('Acesso não autorizado. Redirecionando...', 'warning');
+            setTimeout(() => navigateToPage('login'), 1500);
             return false;
         }
+        
+        // Fechar menu mobile se aberto
+        closeMobileMenu();
         
         // Executar navegação
         if (options.external) {
@@ -129,6 +171,10 @@ function navigateTo(pageKey, options = {}) {
         } else if (options.replace) {
             window.location.replace(route);
         } else {
+            // Adicionar loading antes da navegação
+            if (options.showLoading !== false) {
+                showNavigationLoading();
+            }
             window.location.href = route;
         }
         
@@ -136,40 +182,81 @@ function navigateTo(pageKey, options = {}) {
         
     } catch (error) {
         console.error('❌ Erro na navegação:', error);
+        window.showToast?.('Erro na navegação', 'error');
         return false;
     }
 }
 
-// ===== MENU MOBILE =====
+// ===== LOADING DE NAVEGAÇÃO =====
+function showNavigationLoading() {
+    const existingLoader = document.getElementById('navigation-loader');
+    if (existingLoader) return;
+    
+    const loader = document.createElement('div');
+    loader.id = 'navigation-loader';
+    loader.className = 'fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50';
+    loader.innerHTML = `
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Carregando página...</p>
+        </div>
+    `;
+    
+    document.body.appendChild(loader);
+    
+    // Remover loader após timeout de segurança
+    setTimeout(() => {
+        if (loader.parentNode) {
+            loader.parentNode.removeChild(loader);
+        }
+    }, 5000);
+}
+
+// ===== ATUALIZAÇÃO DE TÍTULO =====
+function updatePageTitle() {
+    const pageTitles = {
+        dashboard: 'Dashboard - ALSHAM 360°',
+        leads: 'Gestão de Leads - ALSHAM 360°',
+        automacoes: 'Automações - ALSHAM 360°',
+        relatorios: 'Relatórios - ALSHAM 360°',
+        gamificacao: 'Gamificação - ALSHAM 360°',
+        configuracoes: 'Configurações - ALSHAM 360°',
+        login: 'Login - ALSHAM 360°',
+        register: 'Cadastro - ALSHAM 360°'
+    };
+    
+    const newTitle = pageTitles[navigationState.currentPage] || 'ALSHAM 360° PRIMA';
+    if (document.title !== newTitle) {
+        document.title = newTitle;
+    }
+}
+
+// ===== MENU MOBILE OTIMIZADO =====
 function setupMobileMenu() {
     try {
-        // Encontrar ou criar botão do menu mobile
-        let mobileButton = document.querySelector('[data-mobile-menu-button]');
+        // Verificar se já existe menu mobile
+        const existingMenu = document.getElementById('mobile-menu');
+        if (existingMenu) {
+            console.log('📱 Menu mobile já existe, configurando eventos');
+            setupMobileMenuEvents();
+            return;
+        }
+        
+        // Encontrar elementos necessários
+        const mobileButton = document.querySelector('[data-mobile-menu-button]') || 
+                           document.querySelector('.mobile-menu-button') ||
+                           createMobileMenuButton();
         
         if (!mobileButton) {
-            mobileButton = createMobileMenuButton();
+            console.warn('⚠️ Botão do menu mobile não encontrado');
+            return;
         }
         
-        // Encontrar ou criar menu mobile
-        let mobileMenu = document.getElementById('mobile-menu');
+        // Criar menu mobile
+        createMobileMenuStructure();
         
-        if (!mobileMenu) {
-            mobileMenu = createMobileMenu();
-        }
-        
-        // Configurar event listeners
-        if (mobileButton) {
-            mobileButton.addEventListener('click', toggleMobileMenu);
-        }
-        
-        // Fechar menu ao clicar fora
-        document.addEventListener('click', function(e) {
-            if (mobileMenu && 
-                !mobileMenu.contains(e.target) && 
-                !mobileButton?.contains(e.target)) {
-                closeMobileMenu();
-            }
-        });
+        // Configurar eventos
+        setupMobileMenuEvents();
         
         console.log('📱 Menu mobile configurado');
         
@@ -179,73 +266,125 @@ function setupMobileMenu() {
 }
 
 function createMobileMenuButton() {
-    const nav = document.querySelector('nav');
-    if (!nav) return null;
+    const header = document.querySelector('header') || document.querySelector('nav')?.parentElement;
+    if (!header) return null;
     
     const button = document.createElement('button');
-    button.className = 'md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors';
+    button.className = 'md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors';
     button.setAttribute('data-mobile-menu-button', '');
     button.setAttribute('aria-label', 'Menu de navegação');
+    button.setAttribute('aria-expanded', 'false');
     button.innerHTML = `
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
     `;
     
-    nav.parentNode.insertBefore(button, nav);
+    header.appendChild(button);
     return button;
 }
 
-function createMobileMenu() {
+function createMobileMenuStructure() {
     const header = document.querySelector('header');
     if (!header) return null;
     
     const menu = document.createElement('div');
     menu.id = 'mobile-menu';
-    menu.className = 'hidden md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-40';
+    menu.className = 'hidden md:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 max-h-screen overflow-y-auto';
     
     const menuItems = [
-        { key: 'dashboard', label: 'Dashboard', icon: '📊' },
-        { key: 'leads', label: 'Leads', icon: '👥' },
-        { key: 'automacoes', label: 'Automações', icon: '🤖' },
-        { key: 'relatorios', label: 'Relatórios', icon: '📈' },
-        { key: 'gamificacao', label: 'Gamificação', icon: '🎮' },
-        { key: 'configuracoes', label: 'Configurações', icon: '⚙️' }
+        { key: 'dashboard', label: 'Dashboard', icon: '📊', description: 'Visão geral do sistema' },
+        { key: 'leads', label: 'Leads', icon: '👥', description: 'Gestão de prospects' },
+        { key: 'automacoes', label: 'Automações', icon: '🤖', description: 'Fluxos automatizados' },
+        { key: 'relatorios', label: 'Relatórios', icon: '📈', description: 'Análises e métricas' },
+        { key: 'gamificacao', label: 'Gamificação', icon: '🎮', description: 'Sistema de pontuação' },
+        { key: 'configuracoes', label: 'Configurações', icon: '⚙️', description: 'Ajustes do sistema' }
     ];
     
     const menuHTML = menuItems.map(item => {
         const route = ROUTES[item.key];
         const isActive = navigationState.currentPage === item.key;
-        const activeClass = isActive ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50';
+        const activeClass = isActive ? 
+            'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 
+            'text-gray-700 hover:text-blue-600 hover:bg-gray-50 border-l-4 border-transparent';
         
         return `
             <a href="${route}" 
-               class="block px-4 py-3 transition-colors ${activeClass}"
-               data-page="${item.key}">
-                <span class="mr-3">${item.icon}</span>
-                ${item.label}
+               class="block px-4 py-3 transition-all duration-200 ${activeClass}"
+               data-page="${item.key}"
+               onclick="closeMobileMenu()">
+                <div class="flex items-center">
+                    <span class="text-xl mr-3">${item.icon}</span>
+                    <div>
+                        <div class="font-medium">${item.label}</div>
+                        <div class="text-sm text-gray-500">${item.description}</div>
+                    </div>
+                </div>
             </a>
         `;
     }).join('');
     
-    menu.innerHTML = `<div class="py-2">${menuHTML}</div>`;
+    // Adicionar seção de logout se autenticado
+    const logoutSection = navigationState.isAuthenticated ? `
+        <hr class="my-2 border-gray-200">
+        <button onclick="handleLogout()" 
+                class="w-full text-left block px-4 py-3 text-red-600 hover:bg-red-50 transition-colors">
+            <div class="flex items-center">
+                <span class="text-xl mr-3">🚪</span>
+                <div>
+                    <div class="font-medium">Sair do Sistema</div>
+                    <div class="text-sm text-red-500">Encerrar sessão</div>
+                </div>
+            </div>
+        </button>
+    ` : '';
     
-    header.appendChild(menu);
+    menu.innerHTML = `<div class="py-2">${menuHTML}${logoutSection}</div>`;
+    
+    // Inserir após o header
+    header.parentNode.insertBefore(menu, header.nextSibling);
     return menu;
+}
+
+function setupMobileMenuEvents() {
+    const button = document.querySelector('[data-mobile-menu-button]');
+    const menu = document.getElementById('mobile-menu');
+    
+    if (!button || !menu) return;
+    
+    // Evento do botão
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
+    });
+    
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (navigationState.mobileMenuOpen && 
+            !menu.contains(e.target) && 
+            !button.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+    
+    // Fechar menu com tecla Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navigationState.mobileMenuOpen) {
+            closeMobileMenu();
+        }
+    });
 }
 
 function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     const button = document.querySelector('[data-mobile-menu-button]');
     
-    if (!menu || !button) return;
+    if (!menu) return;
     
-    const isHidden = menu.classList.contains('hidden');
-    
-    if (isHidden) {
-        openMobileMenu();
-    } else {
+    if (navigationState.mobileMenuOpen) {
         closeMobileMenu();
+    } else {
+        openMobileMenu();
     }
 }
 
@@ -256,6 +395,19 @@ function openMobileMenu() {
     if (menu) {
         menu.classList.remove('hidden');
         button?.setAttribute('aria-expanded', 'true');
+        navigationState.mobileMenuOpen = true;
+        
+        // Animar entrada
+        requestAnimationFrame(() => {
+            menu.style.opacity = '0';
+            menu.style.transform = 'translateY(-10px)';
+            menu.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            
+            requestAnimationFrame(() => {
+                menu.style.opacity = '1';
+                menu.style.transform = 'translateY(0)';
+            });
+        });
     }
 }
 
@@ -263,35 +415,49 @@ function closeMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     const button = document.querySelector('[data-mobile-menu-button]');
     
-    if (menu) {
-        menu.classList.add('hidden');
+    if (menu && navigationState.mobileMenuOpen) {
+        // Animar saída
+        menu.style.opacity = '0';
+        menu.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+            menu.classList.add('hidden');
+            menu.style.opacity = '';
+            menu.style.transform = '';
+            menu.style.transition = '';
+        }, 200);
+        
         button?.setAttribute('aria-expanded', 'false');
+        navigationState.mobileMenuOpen = false;
     }
 }
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-    // Atalhos de teclado básicos
+    // Atalhos de teclado
     document.addEventListener('keydown', function(e) {
-        // Esc para fechar menu mobile
-        if (e.key === 'Escape') {
-            closeMobileMenu();
-        }
-        
-        // Atalhos com Ctrl
-        if (e.ctrlKey) {
+        // Atalhos com Ctrl/Cmd
+        if (e.ctrlKey || e.metaKey) {
             switch (e.key) {
                 case '1':
                     e.preventDefault();
-                    navigateTo('dashboard');
+                    navigateToPage('dashboard');
                     break;
                 case '2':
                     e.preventDefault();
-                    navigateTo('leads');
+                    navigateToPage('leads');
                     break;
                 case '3':
                     e.preventDefault();
-                    navigateTo('automacoes');
+                    navigateToPage('automacoes');
+                    break;
+                case '4':
+                    e.preventDefault();
+                    navigateToPage('relatorios');
+                    break;
+                case '5':
+                    e.preventDefault();
+                    navigateToPage('gamificacao');
                     break;
             }
         }
@@ -303,9 +469,6 @@ function setupEventListeners() {
         if (link) {
             const pageKey = link.getAttribute('data-page');
             console.log(`📊 Clique na navegação: ${pageKey}`);
-            
-            // Fechar menu mobile se estiver aberto
-            closeMobileMenu();
         }
     });
 }
@@ -313,7 +476,7 @@ function setupEventListeners() {
 // ===== ATUALIZAÇÃO DE ESTADO =====
 function updateNavigationState() {
     try {
-        // Atualizar links ativos na navegação principal
+        // Atualizar links ativos
         const navLinks = document.querySelectorAll('nav a, #mobile-menu a');
         
         navLinks.forEach(link => {
@@ -323,9 +486,11 @@ function updateNavigationState() {
             const isActive = (navigationState.currentPage === 'dashboard' && href.includes('index.html')) ||
                             href.includes(navigationState.currentPage);
             
+            // Remover classes ativas anteriores
+            link.classList.remove('text-blue-600', 'font-medium', 'border-b-2', 'border-blue-600', 'bg-blue-50', 'border-l-4');
+            
             if (isActive) {
                 link.classList.add('text-blue-600', 'font-medium');
-                link.classList.remove('text-gray-600', 'text-gray-700');
                 
                 // Para navegação desktop
                 if (!link.closest('#mobile-menu')) {
@@ -334,13 +499,11 @@ function updateNavigationState() {
                 
                 // Para navegação mobile
                 if (link.closest('#mobile-menu')) {
-                    link.classList.add('bg-blue-50');
+                    link.classList.add('bg-blue-50', 'border-l-4', 'border-blue-600');
                 }
             } else {
-                link.classList.remove('text-blue-600', 'font-medium', 'border-b-2', 'border-blue-600', 'bg-blue-50');
-                
                 if (link.closest('#mobile-menu')) {
-                    link.classList.add('text-gray-700');
+                    link.classList.add('text-gray-700', 'border-l-4', 'border-transparent');
                 } else {
                     link.classList.add('text-gray-600');
                 }
@@ -349,6 +512,22 @@ function updateNavigationState() {
         
     } catch (error) {
         console.error('❌ Erro ao atualizar estado da navegação:', error);
+    }
+}
+
+// ===== LOGOUT =====
+function handleLogout() {
+    if (window.signOut) {
+        window.signOut().then(() => {
+            window.showAuthNotification?.('Logout realizado com sucesso', 'success');
+            navigateToPage('login', { replace: true });
+        });
+    } else {
+        // Fallback logout
+        localStorage.clear();
+        sessionStorage.clear();
+        window.showAuthNotification?.('Sessão encerrada', 'info');
+        navigateToPage('login', { replace: true });
     }
 }
 
@@ -365,23 +544,35 @@ function getRoutes() {
     return { ...ROUTES };
 }
 
-// ===== EXPORTAR PARA USO GLOBAL =====
-window.navigateTo = navigateTo;
-window.checkRouteAccess = checkRouteAccess;
-window.getCurrentPage = getCurrentPage;
-window.toggleMobileMenu = toggleMobileMenu;
-window.closeMobileMenu = closeMobileMenu;
+function getNavigationState() {
+    return { ...navigationState };
+}
 
-// Sistema de navegação disponível globalmente
+// ===== EXPORTAR PARA USO GLOBAL (EVITANDO CONFLITOS) =====
+// Só exportar se não existirem no fix-imports
+if (!window.navigateTo) {
+    window.navigateTo = navigateToPage;
+}
+
+// Funções específicas de navegação sempre disponíveis
 window.NavigationSystem = {
-    navigateTo,
-    checkRouteAccess,
+    navigateTo: navigateToPage,
     getCurrentPage,
     isInitialized: isNavigationInitialized,
     getRoutes,
+    getState: getNavigationState,
     toggleMobileMenu,
     closeMobileMenu,
+    openMobileMenu,
+    handleLogout,
+    updateState: updateNavigationState,
     state: navigationState
 };
 
-console.log('🧭 Sistema de navegação simples carregado!');
+// Aliases para compatibilidade
+window.getCurrentPage = getCurrentPage;
+window.toggleMobileMenu = toggleMobileMenu;
+window.closeMobileMenu = closeMobileMenu;
+window.handleLogout = handleLogout;
+
+console.log('🧭 Sistema de navegação otimizado carregado!');
