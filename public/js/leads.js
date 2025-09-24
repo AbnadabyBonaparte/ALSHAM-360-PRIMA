@@ -33,15 +33,15 @@
  * Real data integration with Supabase Enterprise
  * Using standardized relative path imports for Vite compatibility
  */
-import {
-    getCurrentSession,
-    onAuthStateChange,
-    signOut,
-    getUserProfile,
-    updateUserProfile,
-    createAuditLog,
-    genericSelect  // Para getUserOrganizations, getUserBadges
-} from '../lib/supabase.js';
+const {
+  getCurrentSession,
+  onAuthStateChange,
+  signOut,
+  getUserProfile,
+  updateUserProfile,
+  createAuditLog,
+  genericSelect // Para getUserOrganizations, getUserBadges
+} = window.AlshamSupabase;
 // ===== DEPENDENCY VALIDATION SYSTEM - NASA 10/10 =====
 /**
  * Validates and returns external library dependency
