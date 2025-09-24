@@ -13,7 +13,7 @@
  * - Performance otimizada
  */
 // ===== IMPORTAÇÃO DO CLIENTE SUPABASE UNIFICADO =====
-import { supabase, getCurrentSession, genericSelect, genericInsert, subscribeToTable } from '../lib/supabase.js';
+const { supabase, getCurrentSession, genericSelect, genericInsert, subscribeToTable } = window.AlshamSupabase;
 // ===== CONFIGURAÇÃO =====
 const LEADS_CONFIG = {
     statusOptions: [
