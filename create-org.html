@@ -63,6 +63,9 @@
   </div>
 
   <!-- Scripts -->
+  <script type="module" src="/lib/supabase.js" defer></script>
+  <!-- Fix-imports.js adicionado após supabase.js -->
+  <script src="/js/fix-imports.js" defer></script>
   <script type="module">
     // Usar Supabase do CDN
     const { createClient } = window.supabase;
