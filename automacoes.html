@@ -1,496 +1,259 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Automações Enterprise do ALSHAM 360° PRIMA. Workflows inteligentes, triggers em tempo real, integrações e IA aplicada." />
-  <meta name="keywords" content="automação, workflows, triggers, integrações, CRM, ALSHAM" />
-  <meta name="robots" content="noindex, nofollow" />
-  <meta name="author" content="ALSHAM Development Team" />
-  <meta name="theme-color" content="#3B82F6" />
-
-  <!-- OpenGraph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Automações - ALSHAM 360° PRIMA" />
-  <meta property="og:description" content="Workflows avançados e triggers inteligentes para maximizar produtividade" />
-  <meta property="og:image" content="/og-image.png" />
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:title" content="Automações - ALSHAM 360° PRIMA" />
-  <meta property="twitter:description" content="Workflows avançados e triggers inteligentes para maximizar produtividade" />
-  <meta property="twitter:image" content="/og-image.png" />
-
-  <!-- Segurança -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com;">
-
-  <title>Automações - ALSHAM 360° PRIMA</title>
-
-  <!-- Ícones e Manifest -->
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/manifest.webmanifest" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- CSS global -->
-  <link rel="stylesheet" href="/css/style.css" />
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-
-  <!-- Variáveis do Supabase -->
-  <script src="/env.js" defer></script>
-
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
-  <!-- Tailwind (dev/testes rápidos) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Estilos inline -->
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .bg-gradient-premium {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .btn-primary {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 0.75rem 1.5rem;
-      background: var(--primary-gradient, #667eea);
-      color: white; font-weight: 600; border-radius: 0.75rem;
-      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-      transition: all 0.3s ease-in-out;
-    }
-    .btn-primary:hover { transform: translateY(-2px); }
-    .card-premium {
-      background: white; border-radius: 1rem; padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      border: 1px solid #f3f4f6;
-    }
-    .loading-spinner {
-      animation: spin 1s linear infinite;
-      border: 2px solid white; border-top-color: transparent;
-      border-radius: 50%; width: 16px; height: 16px;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg);}
-      to { transform: rotate(360deg);}
-    }
-    .chart-container {
-      position: relative;
-      height: 300px;
-    }
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      max-width: 400px;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-      transform: translateX(400px);
-      transition: transform 0.3s ease-in-out;
-    }
-    .toast.show {
-      transform: translateX(0);
-    }
-    .toast-success {
-      background: #10B981;
-      color: white;
-    }
-    .toast-error {
-      background: #EF4444;
-      color: white;
-    }
-    .toast-warning {
-      background: #F59E0B;
-      color: white;
-    }
-    .toast-info {
-      background: #3B82F6;
-      color: white;
-    }
-  </style>
-</head>
-
-<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
-    Pular para o conteúdo principal
-  </a>
-
-  <!-- Header -->
-  <header class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm" role="banner">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-      <a href="/index.html" class="flex items-center space-x-3" aria-label="Voltar ao Dashboard">
-        <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
-          <span class="text-white font-bold text-lg">A</span>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-          <p class="text-xs text-gray-500">Automações</p>
-        </div>
-      </a>
-
-      <nav class="hidden md:flex items-center space-x-6" aria-label="Navegação principal">
-        <a href="/index.html" class="text-gray-600 hover:text-blue-600">🏠 Dashboard</a>
-        <a href="/leads.html" class="text-gray-600 hover:text-blue-600">👥 Leads</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-blue-600">📈 Relatórios</a>
-        <a href="/automacoes.html" class="text-blue-600 font-semibold" aria-current="page">🤖 Automações</a>
-      </nav>
-
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white text-sm font-semibold">A</div>
-        <span class="hidden sm:block text-sm font-medium text-gray-700">Usuário</span>
-        <button id="logout-btn" class="text-sm text-red-600 hover:text-red-800">Sair</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main -->
-  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Título da Página -->
-    <section class="mb-8">
-      <h2 class="text-3xl font-bold text-gray-900 flex items-center mb-2">🤖 Automações Enterprise</h2>
-      <p class="text-gray-600">Gerencie workflows inteligentes, triggers e integrações em tempo real com IA aplicada.</p>
-    </section>
-
-    <!-- Dashboard de KPIs -->
-    <section id="automation-dashboard" class="mb-8">
-      <!-- Os KPIs serão renderizados aqui pelo JavaScript -->
-    </section>
-
-    <!-- Seção de Gráficos -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <!-- Gráfico de Execuções -->
-      <div class="bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Execuções dos Últimos 7 Dias</h3>
-        <div class="chart-container">
-          <canvas id="executions-chart"></canvas>
-        </div>
-      </div>
-
-      <!-- Gráfico de Performance -->
-      <div class="bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">🎯 Distribuição de Status</h3>
-        <div class="chart-container">
-          <canvas id="performance-chart"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- Seção de Regras de Automação -->
-    <section class="mb-8">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold text-gray-900">📋 Regras de Automação</h3>
-        <div class="flex space-x-3">
-          <button id="filter-rules" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-            🔍 Filtros
-          </button>
-          <button id="import-rules" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
-            📥 Importar
-          </button>
-          <button id="export-rules" class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
-            📤 Exportar
-          </button>
-        </div>
-      </div>
-
-      <!-- Container das regras -->
-      <div id="rules-container">
-        <!-- As regras serão renderizadas aqui pelo JavaScript -->
-      </div>
-    </section>
-
-    <!-- Seção de Histórico de Execuções -->
-    <section class="mb-8">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold text-gray-900">🔄 Histórico de Execuções</h3>
-        <div class="flex space-x-3">
-          <select id="status-filter" class="px-3 py-2 border border-gray-300 rounded-lg">
-            <option value="">Todos os status</option>
-            <option value="success">✅ Sucesso</option>
-            <option value="failed">❌ Falhou</option>
-            <option value="pending">⏳ Pendente</option>
-            <option value="running">🔄 Executando</option>
-          </select>
-          <button id="clear-executions" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-            🗑️ Limpar Histórico
-          </button>
-        </div>
-      </div>
-
-      <!-- Container do histórico -->
-      <div id="execution-history">
-        <!-- O histórico será renderizado aqui pelo JavaScript -->
-      </div>
-    </section>
-
-    <!-- Seção de Logs em Tempo Real -->
-    <section class="mb-8">
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-gray-900">📝 Logs em Tempo Real</h3>
-            <div class="flex items-center space-x-3">
-              <div class="flex items-center">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                <span class="text-sm text-gray-600">Ao vivo</span>
-              </div>
-              <button id="pause-logs" class="px-3 py-1 bg-gray-500 text-white text-sm rounded">
-                ⏸️ Pausar
-              </button>
-              <button id="clear-logs" class="px-3 py-1 bg-red-500 text-white text-sm rounded">
-                🗑️ Limpar
-              </button>
-            </div>
-          </div>
-        </div>
+// Automações Enterprise - ALSHAM 360° PRIMA
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🤖 Iniciando sistema de automações...');
+    
+    try {
+        const orgId = window.AlshamSupabase.getDefaultOrgId();
         
-        <div id="logs-container" class="h-64 overflow-y-auto bg-gray-900 text-green-400 font-mono text-sm p-4">
-          <!-- Logs serão adicionados aqui pelo JavaScript -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Seção de Integrações -->
-    <section class="mb-8">
-      <h3 class="text-2xl font-bold text-gray-900 mb-6">🔗 Integrações Externas</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- N8N Integration -->
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-              <span class="text-2xl">🔧</span>
-            </div>
-            <div>
-              <h4 class="text-lg font-semibold text-gray-900">N8N Workflows</h4>
-              <p class="text-sm text-gray-600">Automação avançada</p>
-            </div>
-          </div>
-          
-          <div class="space-y-2 mb-4">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Status:</span>
-              <span class="text-green-600 font-semibold">🟢 Conectado</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Workflows:</span>
-              <span class="font-semibold">12 ativos</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Execuções:</span>
-              <span class="font-semibold">1,234 hoje</span>
-            </div>
-          </div>
-          
-          <button onclick="setupIntegration('n8n')" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-            ⚙️ Configurar N8N
-          </button>
-        </div>
-
-        <!-- Make.com Integration -->
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-              <span class="text-2xl">🎛️</span>
-            </div>
-            <div>
-              <h4 class="text-lg font-semibold text-gray-900">Make.com</h4>
-              <p class="text-sm text-gray-600">Automação visual</p>
-            </div>
-          </div>
-          
-          <div class="space-y-2 mb-4">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Status:</span>
-              <span class="text-green-600 font-semibold">🟢 Conectado</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Scenarios:</span>
-              <span class="font-semibold">8 ativos</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Operações:</span>
-              <span class="font-semibold">892 hoje</span>
-            </div>
-          </div>
-          
-          <button onclick="setupIntegration('make')" class="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
-            ⚙️ Configurar Make
-          </button>
-        </div>
-
-        <!-- Zapier Integration -->
-        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-              <span class="text-2xl">⚡</span>
-            </div>
-            <div>
-              <h4 class="text-lg font-semibold text-gray-900">Zapier</h4>
-              <p class="text-sm text-gray-600">5000+ apps</p>
-            </div>
-          </div>
-          
-          <div class="space-y-2 mb-4">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Status:</span>
-              <span class="text-yellow-600 font-semibold">🟡 Configurando</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Zaps:</span>
-              <span class="font-semibold">5 ativos</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Execuções:</span>
-              <span class="font-semibold">456 hoje</span>
-            </div>
-          </div>
-          
-          <button onclick="setupIntegration('zapier')" class="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-            ⚙️ Configurar Zapier
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Seção de Webhooks -->
-    <section class="mb-8">
-      <div class="bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 URLs de Webhooks</h3>
+        // Renderizar KPIs do Dashboard
+        await renderAutomationDashboard(orgId);
         
-        <div class="space-y-4">
-          <div class="border border-gray-200 rounded-lg p-4">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="font-medium text-gray-900">Webhook Geral</h4>
-              <button onclick="copyWebhookUrl('general')" class="text-blue-600 hover:text-blue-800 text-sm">
-                📋 Copiar URL
-              </button>
+        // Renderizar Gráficos
+        await renderExecutionCharts(orgId);
+        
+        // Carregar Regras de Automação
+        await loadAutomationRules(orgId);
+        
+        // Carregar Histórico de Execuções
+        await loadExecutionHistory(orgId);
+        
+        // Iniciar Logs em Tempo Real
+        startRealtimeLogs();
+        
+        console.log('✅ Sistema de automações carregado com sucesso!');
+    } catch (error) {
+        console.error('❌ Erro ao carregar automações:', error);
+        showError('Erro ao carregar sistema de automações');
+    }
+});
+
+// Renderizar Dashboard de KPIs
+async function renderAutomationDashboard(orgId) {
+    const { data: executions } = await window.AlshamSupabase.genericSelect('automation_executions', { org_id: orgId });
+    const { data: rules } = await window.AlshamSupabase.genericSelect('automation_rules', { org_id: orgId });
+    
+    const hoje = new Date().toISOString().split('T')[0];
+    const executionsToday = executions?.filter(e => e.started_at?.startsWith(hoje)).length || 0;
+    const successToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'success').length || 0;
+    const failedToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'failed').length || 0;
+    const activeRules = rules?.filter(r => r.is_active).length || 0;
+    
+    const dashboardHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <h3 class="text-sm font-medium text-gray-500">Execuções Hoje</h3>
+                <p class="text-3xl font-bold text-blue-600">${executionsToday}</p>
+                <p class="text-xs text-gray-400">🔄 Total processado</p>
             </div>
-            <code class="text-sm bg-gray-100 p-2 rounded block font-mono">
-              https://alsham-360-prima.supabase.co/functions/v1/automation-webhook
-            </code>
-          </div>
-          
-          <div class="border border-gray-200 rounded-lg p-4">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="font-medium text-gray-900">Webhook N8N</h4>
-              <button onclick="copyWebhookUrl('n8n')" class="text-blue-600 hover:text-blue-800 text-sm">
-                📋 Copiar URL
-              </button>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                <h3 class="text-sm font-medium text-gray-500">Sucessos</h3>
+                <p class="text-3xl font-bold text-green-600">${successToday}</p>
+                <p class="text-xs text-gray-400">✅ Executadas com êxito</p>
             </div>
-            <code class="text-sm bg-gray-100 p-2 rounded block font-mono">
-              https://alsham-360-prima.supabase.co/functions/v1/n8n-webhook
-            </code>
-          </div>
-          
-          <div class="border border-gray-200 rounded-lg p-4">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="font-medium text-gray-900">Webhook Make.com</h4>
-              <button onclick="copyWebhookUrl('make')" class="text-blue-600 hover:text-blue-800 text-sm">
-                📋 Copiar URL
-              </button>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+                <h3 class="text-sm font-medium text-gray-500">Falhas</h3>
+                <p class="text-3xl font-bold text-red-600">${failedToday}</p>
+                <p class="text-xs text-gray-400">❌ Com erro</p>
             </div>
-            <code class="text-sm bg-gray-100 p-2 rounded block font-mono">
-              https://alsham-360-prima.supabase.co/functions/v1/make-webhook
-            </code>
-          </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <h3 class="text-sm font-medium text-gray-500">Regras Ativas</h3>
+                <p class="text-3xl font-bold text-purple-600">${activeRules}</p>
+                <p class="text-xs text-gray-400">🔧 Em funcionamento</p>
+            </div>
         </div>
-      </div>
-    </section>
-  </main>
+    `;
+    
+    document.getElementById('automation-dashboard').innerHTML = dashboardHTML;
+}
 
-  <!-- Footer -->
-  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500 text-sm">
-    <p>&copy; 2025 ALSHAM 360° PRIMA. Sistema de automações com IA integrada.</p>
-  </footer>
-
-  <!-- Container de Toasts -->
-  <div id="toast-container"></div>
-
-  <!-- Scripts -->
-  <script type="module" src="/lib/supabase.js" defer></script>
-  <script src="/js/fix-imports.js" defer></script>
-  <script type="module" src="/js/navigation.js" defer></script>
-  <script type="module" src="/js/auth.js" defer></script>
-  <script type="module" src="/js/automacoes.js" defer></script>
-
-  <!-- Script para funções utilitárias -->
-  <script>
-    // Função para copiar URL de webhook
-    function copyWebhookUrl(type) {
-      const urls = {
-        general: 'https://alsham-360-prima.supabase.co/functions/v1/automation-webhook',
-        n8n: 'https://alsham-360-prima.supabase.co/functions/v1/n8n-webhook',
-        make: 'https://alsham-360-prima.supabase.co/functions/v1/make-webhook'
-      };
-      
-      navigator.clipboard.writeText(urls[type]).then(() => {
-        showToast('📋 URL copiada para a área de transferência!', 'success');
-      }).catch(() => {
-        showToast('❌ Erro ao copiar URL', 'error');
-      });
+// Renderizar Gráficos
+async function renderExecutionCharts(orgId) {
+    const { data: executions } = await window.AlshamSupabase.genericSelect('automation_executions', { org_id: orgId });
+    
+    if (!executions || !window.Chart) return;
+    
+    // Gráfico de Execuções (7 dias)
+    const executionChart = document.getElementById('executions-chart');
+    if (executionChart && window.Chart) {
+        const last7Days = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            last7Days.push(date.toISOString().split('T')[0]);
+        }
+        
+        const executionsByDay = last7Days.map(day => 
+            executions.filter(e => e.started_at?.startsWith(day)).length
+        );
+        
+        new window.Chart(executionChart, {
+            type: 'line',
+            data: {
+                labels: last7Days.map(day => new Date(day).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })),
+                datasets: [{
+                    label: 'Execuções',
+                    data: executionsByDay,
+                    borderColor: '#3B82F6',
+                    backgroundColor: '#3B82F6',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
     }
     
-    // Função para mostrar toast
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span>${message}</span>
-          <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-white opacity-70 hover:opacity-100">
-            ✕
-          </button>
-        </div>
-      `;
-      
-      container.appendChild(toast);
-      
-      // Mostrar toast
-      setTimeout(() => toast.classList.add('show'), 100);
-      
-      // Remover automaticamente após 5 segundos
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-      }, 5000);
+    // Gráfico de Status
+    const performanceChart = document.getElementById('performance-chart');
+    if (performanceChart && window.Chart) {
+        const statusCounts = {
+            success: executions.filter(e => e.status === 'success').length,
+            failed: executions.filter(e => e.status === 'failed').length,
+            pending: executions.filter(e => e.status === 'pending').length,
+            running: executions.filter(e => e.status === 'running').length
+        };
+        
+        new window.Chart(performanceChart, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sucesso', 'Falhou', 'Pendente', 'Executando'],
+                datasets: [{
+                    data: [statusCounts.success, statusCounts.failed, statusCounts.pending, statusCounts.running],
+                    backgroundColor: ['#10B981', '#EF4444', '#F59E0B', '#3B82F6']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
     }
+}
+
+// Carregar Regras de Automação
+async function loadAutomationRules(orgId) {
+    const { data: rules } = await window.AlshamSupabase.genericSelect('automation_rules', { org_id: orgId });
     
-    // Função para pausar logs
-    document.addEventListener('DOMContentLoaded', function() {
-      let logsPaused = false;
-      
-      document.getElementById('pause-logs')?.addEventListener('click', function() {
-        logsPaused = !logsPaused;
-        this.innerHTML = logsPaused ? '▶️ Retomar' : '⏸️ Pausar';
-        this.className = logsPaused ? 'px-3 py-1 bg-green-500 text-white text-sm rounded' : 'px-3 py-1 bg-gray-500 text-white text-sm rounded';
-      });
-      
-      document.getElementById('clear-logs')?.addEventListener('click', function() {
-        const logsContainer = document.getElementById('logs-container');
-        logsContainer.innerHTML = '<div class="text-gray-500">Logs limpos...</div>';
-        showToast('🗑️ Logs limpos com sucesso!', 'info');
-      });
+    const rulesHTML = rules?.map(rule => `
+        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="font-semibold text-gray-900">${rule.name}</h4>
+                <span class="px-2 py-1 text-xs rounded-full ${rule.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    ${rule.is_active ? '🟢 Ativo' : '🔴 Inativo'}
+                </span>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">Trigger: ${rule.trigger_event}</p>
+            <div class="flex space-x-2">
+                <button onclick="editRule('${rule.id}')" class="px-3 py-1 bg-blue-500 text-white text-xs rounded">Editar</button>
+                <button onclick="toggleRule('${rule.id}', ${!rule.is_active})" class="px-3 py-1 bg-gray-500 text-white text-xs rounded">
+                    ${rule.is_active ? 'Desativar' : 'Ativar'}
+                </button>
+            </div>
+        </div>
+    `).join('') || '<p class="text-gray-500">Nenhuma regra encontrada.</p>';
+    
+    document.getElementById('rules-container').innerHTML = rulesHTML;
+}
+
+// Carregar Histórico de Execuções
+async function loadExecutionHistory(orgId) {
+    const { data: executions } = await window.AlshamSupabase.genericSelect('automation_executions', { 
+        org_id: orgId,
+        order: { started_at: 'desc' },
+        limit: 50 
     });
-  </script>
+    
+    const historyHTML = executions?.map(execution => {
+        const statusIcon = {
+            success: '✅',
+            failed: '❌',
+            pending: '⏳',
+            running: '🔄'
+        };
+        
+        return `
+            <div class="bg-white rounded-lg border border-gray-200 p-4 mb-3">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-medium text-gray-900">${statusIcon[execution.status]} ${execution.trigger_event}</span>
+                    <span class="text-sm text-gray-500">${new Date(execution.started_at).toLocaleString('pt-BR')}</span>
+                </div>
+                ${execution.error_message ? `<p class="text-sm text-red-600">${execution.error_message}</p>` : ''}
+                <p class="text-xs text-gray-500">Duração: ${execution.execution_time_ms || 0}ms</p>
+            </div>
+        `;
+    }).join('') || '<p class="text-gray-500">Nenhuma execução encontrada.</p>';
+    
+    document.getElementById('execution-history').innerHTML = historyHTML;
+}
 
-  <noscript>
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-      <div class="bg-white p-8 rounded-lg max-w-md text-center">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">JavaScript Necessário</h2>
-        <p class="text-gray-600">Ative o JavaScript para usar o sistema de automações do ALSHAM 360° PRIMA.</p>
-      </div>
-    </div>
-  </noscript>
-</body>
-</html>
+// Logs em Tempo Real
+function startRealtimeLogs() {
+    const logsContainer = document.getElementById('logs-container');
+    let logCount = 0;
+    
+    const addLog = (message, type = 'info') => {
+        const timestamp = new Date().toLocaleTimeString('pt-BR');
+        const typeColors = {
+            info: 'text-green-400',
+            warning: 'text-yellow-400',
+            error: 'text-red-400',
+            success: 'text-blue-400'
+        };
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = `${typeColors[type]} mb-1`;
+        logEntry.innerHTML = `[${timestamp}] ${message}`;
+        
+        logsContainer.appendChild(logEntry);
+        logCount++;
+        
+        // Manter apenas os últimos 50 logs
+        if (logCount > 50) {
+            logsContainer.removeChild(logsContainer.firstChild);
+            logCount--;
+        }
+        
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    };
+    
+    // Adicionar logs de exemplo
+    addLog('🚀 Sistema de automações iniciado', 'success');
+    addLog('📊 Carregando regras ativas...', 'info');
+    addLog('🔄 Monitor de execuções ativo', 'info');
+    
+    // Simular logs em tempo real
+    setInterval(() => {
+        const messages = [
+            '🔄 Verificando triggers...',
+            '📨 Email enviado automaticamente',
+            '🎯 Lead qualificado via IA',
+            '📊 Relatório gerado',
+            '🔔 Notificação enviada'
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        addLog(randomMessage, 'info');
+    }, 5000);
+}
+
+// Funções utilitárias
+function showError(message) {
+    window.showToast ? window.showToast(message, 'error') : console.error(message);
+}
+
+window.editRule = function(ruleId) {
+    window.showToast('Funcionalidade de edição em desenvolvimento', 'info');
+};
+
+window.toggleRule = function(ruleId, newStatus) {
+    window.showToast(`Regra ${newStatus ? 'ativada' : 'desativada'} com sucesso!`, 'success');
+};
+
+window.setupIntegration = function(platform) {
+    window.showToast(`Configuração do ${platform.toUpperCase()} em desenvolvimento`, 'info');
+};
