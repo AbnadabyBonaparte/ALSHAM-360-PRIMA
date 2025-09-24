@@ -99,16 +99,16 @@
         </div>
       </a>
       <nav class="hidden md:flex items-center space-x-8">
-        <a href="/leads.html">👥 Leads</a>
-        <a href="/automacoes.html">🤖 Automações</a>
-        <a href="/relatorios.html">📈 Relatórios</a>
-        <a href="/gamificacao.html">🎮 Gamificação</a>
-        <a href="/configuracoes.html">⚙️ Configurações</a>
+        <a href="/leads.html" class="text-gray-600 hover:text-gray-900 transition-colors">👥 Leads</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">🤖 Automações</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900 transition-colors">📈 Relatórios</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900 transition-colors">🎮 Gamificação</a>
+        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">⚙️ Configurações</a>
       </nav>
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white font-semibold">A</div>
         <span class="hidden sm:block text-sm text-gray-700">Usuário</span>
-        <button onclick="logout()" class="text-xs text-red-600 hover:text-red-800">Sair</button>
+        <button onclick="logout()" class="text-xs text-red-600 hover:text-red-800 transition-colors">Sair</button>
       </div>
     </div>
   </header>
@@ -120,6 +120,11 @@
       <p class="text-gray-600 mb-8">Sistema carregando... Aguarde.</p>
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
     </div>
+    
+    <!-- Containers que serão populados pelo dashboard.js -->
+    <div id="kpis-container" class="hidden"></div>
+    <div id="charts-container" class="hidden"></div>
+    <div id="activity-container" class="hidden"></div>
   </main>
 
   <!-- Rodapé -->
@@ -127,7 +132,7 @@
     <p>&copy; 2025 ALSHAM 360° PRIMA. Sistema com dados reais do Supabase.</p>
   </footer>
 
-  <!-- Scripts - ORDEM CORRIGIDA -->
+  <!-- Scripts - ORDEM CORRIGIDA COM CHART.JS -->
   <script>
     // Função de logout global
     window.logout = async () => {
@@ -152,24 +157,55 @@
       document.head.appendChild(script);
     }
 
+    // Mostrar indicador de progresso
+    function updateProgress(message) {
+      const progressEl = document.querySelector('main p');
+      if (progressEl) {
+        progressEl.textContent = message;
+      }
+    }
+
     // Carregar scripts na ordem correta
+    console.log('🚀 Iniciando carregamento dos scripts...');
+    updateProgress('Carregando Supabase...');
+    
     loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
       console.log('✅ Supabase CDN carregado');
+      updateProgress('Carregando Chart.js...');
       
-      loadScript('/lib/supabase.js', () => {
-        console.log('✅ Supabase configurado');
-        document.getElementById('loading-indicator').style.display = 'none';
+      // Carregar Chart.js após Supabase
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js', () => {
+        console.log('✅ Chart.js carregado');
+        updateProgress('Configurando conexão...');
         
-        // Carregar fix-imports após supabase.js
-        loadScript('/js/fix-imports.js', () => {
-          console.log('✅ Fix-imports carregado');
-          // Carregar o dashboard após o fix-imports
-          loadScript('/js/dashboard.js', () => {
-            console.log('✅ Dashboard carregado');
+        loadScript('/lib/supabase.js', () => {
+          console.log('✅ Supabase configurado');
+          updateProgress('Aplicando correções...');
+          
+          // Carregar fix-imports após supabase.js
+          loadScript('/js/fix-imports.js', () => {
+            console.log('✅ Fix-imports carregado');
+            updateProgress('Inicializando dashboard...');
+            
+            // Carregar o dashboard após o fix-imports
+            loadScript('/js/dashboard.js', () => {
+              console.log('✅ Dashboard carregado');
+              document.getElementById('loading-indicator').style.display = 'none';
+            });
           });
         });
       });
     });
+
+    // Fallback em caso de erro
+    setTimeout(() => {
+      const loadingIndicator = document.getElementById('loading-indicator');
+      if (loadingIndicator && loadingIndicator.style.display !== 'none') {
+        console.warn('⚠️ Carregamento demorou mais que o esperado');
+        loadingIndicator.style.display = 'none';
+        updateProgress('Sistema carregado com possíveis limitações. Tente atualizar a página.');
+      }
+    }, 15000);
   </script>
 </body>
 </html>
