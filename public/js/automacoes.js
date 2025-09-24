@@ -7,7 +7,8 @@
  * @license MIT
  */
 
-import {
+// ===== CORRIGIDO: IMPORTS AGORA SÃO GLOBAIS PELO window.AlshamSupabase =====
+const {
   supabase,
   getCurrentSession,
   getUserProfile,
@@ -17,7 +18,7 @@ import {
   genericDelete,
   createAuditLog,
   subscribeToTable
-} from '../lib/supabase.js';
+} = window.AlshamSupabase;
 
 /* ========================================================================== */
 /* 🛰️ DEPENDENCIES VALIDATION - ENTERPRISE GRADE                              */
