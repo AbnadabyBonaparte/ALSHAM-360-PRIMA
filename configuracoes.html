@@ -7,8 +7,6 @@
   <meta name="robots" content="noindex, nofollow" />
   
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="DENY" />
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
 
   <title>Configurações Enterprise - ALSHAM 360° PRIMA</title>
@@ -84,6 +82,8 @@
 
   <!-- Scripts -->
   <script type="module" src="/lib/supabase.js" defer></script>
+  <!-- Fix-imports.js adicionado após supabase.js -->
+  <script src="/js/fix-imports.js" defer></script>
   <script type="module" src="/js/navigation.js" defer></script>
   <script type="module" src="/js/auth.js" defer></script>
   <script type="module" src="/js/configuracoes.js" defer></script>
