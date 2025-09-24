@@ -160,9 +160,13 @@
         console.log('✅ Supabase configurado');
         document.getElementById('loading-indicator').style.display = 'none';
         
-        // Carregar o dashboard após o supabase
-        loadScript('/js/dashboard.js', () => {
-          console.log('✅ Dashboard carregado');
+        // Carregar fix-imports após supabase.js
+        loadScript('/js/fix-imports.js', () => {
+          console.log('✅ Fix-imports carregado');
+          // Carregar o dashboard após o fix-imports
+          loadScript('/js/dashboard.js', () => {
+            console.log('✅ Dashboard carregado');
+          });
         });
       });
     });
