@@ -15,8 +15,8 @@
     "fresh-install": "npm run clean && npm install",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "crm",
@@ -29,12 +29,13 @@
     "gamificacao",
     "supabase",
     "n8n",
-    "enterprise"
+    "enterprise",
+    "pwa"
   ],
   "author": "ALSHAM Team",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=18.20.0 <21",
     "npm": ">=9.0.0"
   },
   "dependencies": {
