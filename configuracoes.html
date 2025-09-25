@@ -1,175 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; style-src 'self' 'unsafe-inline';">
-    <title>Configurações - ALSHAM 360° PRIMA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações - ALSHAM 360° PRIMA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center">
-                    <img src="assets/logo.png" alt="ALSHAM 360°" class="h-8 w-8 mr-3">
-                    <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
-                </div>
-                <nav class="flex space-x-4">
-                    <a href="index.html" class="text-gray-600 hover:text-gray-900">📊 Dashboard</a>
-                    <a href="leads.html" class="text-gray-600 hover:text-gray-900">🎯 Leads</a>
-                    <a href="automacoes.html" class="text-gray-600 hover:text-gray-900">⚡ Automações</a>
-                    <a href="configuracoes.html" class="text-blue-600 font-medium">⚙️ Configurações</a>
-                </nav>
-            </div>
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center">
+          <img src="assets/logo.png" alt="ALSHAM 360°" class="h-8 w-8 mr-3">
+          <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
         </div>
-    </header>
+        <nav class="flex space-x-4">
+          <a href="index.html" class="text-gray-600 hover:text-gray-900">📊 Dashboard</a>
+          <a href="leads-real.html" class="text-gray-600 hover:text-gray-900">🎯 Leads</a>
+          <a href="automacoes.html" class="text-gray-600 hover:text-gray-900">⚡ Automações</a>
+          <a href="configuracoes.html" class="text-blue-600 font-medium">⚙️ Configurações</a>
+        </nav>
+      </div>
+    </div>
+  </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Sidebar -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-6">⚙️ Configurações</h2>
-                    <nav class="space-y-2">
-                        <button class="nav-item" data-section="profile">👤 Perfil</button>
-                        <button class="nav-item" data-section="organization">🏢 Organização</button>
-                        <button class="nav-item" data-section="notifications">🔔 Notificações</button>
-                        <button class="nav-item" data-section="security">🔒 Segurança</button>
-                        <button class="nav-item" data-section="billing">💳 Faturamento</button>
-                        <button class="nav-item" data-section="analytics">📊 Analytics</button>
-                    </nav>
-                </div>
-            </div>
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar -->
+      <aside id="config-sidebar" class="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <!-- JS vai renderizar os botões -->
+      </aside>
 
-            <!-- Content Area -->
-            <div class="lg:col-span-3">
-                <div id="content-area" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                    <!-- Dinâmico -->
-                    <div class="text-center py-8">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                        <p class="mt-4 text-gray-600">Carregando configurações...</p>
-                    </div>
-                </div>
-            </div>
+      <!-- Content -->
+      <section class="lg:col-span-3">
+        <div id="config-header" class="mb-6"></div>
+        <div id="config-content" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Carregando configurações...</p>
+          </div>
         </div>
-    </main>
+      </section>
+    </div>
+  </main>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    <!-- CSS Inline -->
-    <style>
-        .nav-item { display:flex; align-items:center; width:100%; text-align:left; padding:12px 16px; border-radius:8px; border:none; background:transparent; font-weight:500; color:#374151; transition:0.2s; cursor:pointer; }
-        .nav-item:hover { background-color:#f3f4f6; color:#1f2937; }
-        .nav-item.active { background-color:#dbeafe; color:#1d4ed8; font-weight:600; }
-        .toast { padding:16px 24px; border-radius:8px; color:white; font-weight:500; max-width:400px; margin-bottom:8px; opacity:0; transform:translateX(100%); transition:all 0.3s ease; }
-        .toast.show { opacity:1; transform:translateX(0); }
-        .toast.success { background:#10b981; } .toast.error { background:#ef4444; }
-        .toast.warning { background:#f59e0b; } .toast.info { background:#3b82f6; }
-    </style>
-
-    <!-- Scripts -->
-    <script type="module">
-        import { supabase, getCurrentUser, genericSelect, getDefaultOrgId } from '/src/lib/supabase.js';
-
-        // Toast
-        window.showToast = (msg, type='info') => {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = `toast ${type}`; t.textContent = msg;
-            c.appendChild(t); setTimeout(()=>t.classList.add('show'),100);
-            setTimeout(()=>{t.classList.remove('show');setTimeout(()=>c.removeChild(t),300)},4000);
-        };
-
-        // Navegação
-        document.addEventListener('DOMContentLoaded', async () => {
-            setupSectionNavigation();
-            await loadSection('profile');
-        });
-
-        function setupSectionNavigation() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', async function() {
-                    navItems.forEach(n => n.classList.remove('active'));
-                    this.classList.add('active');
-                    await loadSection(this.dataset.section);
-                });
-            });
-        }
-
-        async function loadSection(section) {
-            const area = document.getElementById('content-area');
-            area.innerHTML = '<div class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-gray-600">Carregando...</p></div>';
-            let html = '';
-            if (section==='profile') html = await renderProfile();
-            if (section==='organization') html = await renderOrganization();
-            if (section==='notifications') html = await renderNotifications();
-            if (section==='security') html = '<p class="text-gray-500">🚧 Em desenvolvimento</p>';
-            if (section==='billing') html = '<p class="text-gray-500">🚧 Em desenvolvimento</p>';
-            if (section==='analytics') html = '<p class="text-gray-500">🚧 Em desenvolvimento</p>';
-            area.innerHTML = html;
-        }
-
-        // 🔹 Perfil
-        async function renderProfile() {
-            const user = await getCurrentUser() || {};
-            return `
-                <h2 class="text-2xl font-bold mb-6">👤 Perfil</h2>
-                <label>Nome Completo</label>
-                <input id="full-name" value="${user.user_metadata?.full_name||''}" class="w-full border rounded p-2 mb-2">
-                <label>Email</label>
-                <input value="${user.email||''}" disabled class="w-full border rounded p-2 mb-2 bg-gray-100">
-                <button onclick="saveProfile()" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>`;
-        }
-
-        // 🔹 Organização
-        async function renderOrganization() {
-            const orgId = getDefaultOrgId();
-            const { data } = await genericSelect('organizations',{id:orgId});
-            const org = data?.[0] || {};
-            return `
-                <h2 class="text-2xl font-bold mb-6">🏢 Organização</h2>
-                <label>Nome</label>
-                <input id="org-name" value="${org.name||''}" class="w-full border rounded p-2 mb-2">
-                <button onclick="saveOrganization()" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>`;
-        }
-
-        // 🔹 Notificações
-        async function renderNotifications() {
-            const user = await getCurrentUser()||{};
-            const { data } = await genericSelect('notifications',{user_id:user.id});
-            const n = data?.[0]||{};
-            return `
-                <h2 class="text-2xl font-bold mb-6">🔔 Notificações</h2>
-                <label><input type="checkbox" id="email-new-leads" ${n.email_new_leads?'checked':''}> 📧 Novos Leads</label><br>
-                <label><input type="checkbox" id="email-converted" ${n.email_converted?'checked':''}> 🎯 Leads Convertidos</label><br>
-                <button onclick="saveNotifications()" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>`;
-        }
-
-        // 🔹 Funções de salvar
-        window.saveProfile = async () => {
-            const u = await getCurrentUser(); const full = document.getElementById('full-name').value;
-            const { error } = await supabase.from('user_profiles').update({full_name:full}).eq('user_id',u.id);
-            error?window.showToast('❌ Erro ao salvar','error'):window.showToast('✅ Perfil salvo','success');
-        };
-
-        window.saveOrganization = async () => {
-            const name = document.getElementById('org-name').value; const orgId = getDefaultOrgId();
-            const { error } = await supabase.from('organizations').upsert({id:orgId,name});
-            error?window.showToast('❌ Erro ao salvar','error'):window.showToast('✅ Organização salva','success');
-        };
-
-        window.saveNotifications = async () => {
-            const u=await getCurrentUser(); const emailNew=document.getElementById('email-new-leads').checked;
-            const converted=document.getElementById('email-converted').checked;
-            const { error } = await supabase.from('notifications').upsert({user_id:u.id,email_new_leads:emailNew,email_converted:converted});
-            error?window.showToast('❌ Erro','error'):window.showToast('✅ Notificações salvas','success');
-        };
-    </script>
+  <!-- Scripts -->
+  <script src="public/js/fix-imports.js"></script>
+  <script src="public/js/configuracoes.js" type="module"></script>
 </body>
 </html>
