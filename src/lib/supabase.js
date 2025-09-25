@@ -1,8 +1,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
 
-// Configuração do Supabase
+// ⚠️ Recomendo mover esses valores para variáveis de ambiente (.env)
 const supabaseUrl = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-const supabaseKey = 'SUA_CHAVE_PUBLICA_AQUI'; // ⚠️ Recomendo mover para .env
+const supabaseKey = 'SUA_CHAVE_PUBLICA_AQUI';
 
 // Criar cliente Supabase
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -108,44 +108,91 @@ class AlshamSupabase {
         }
     }
 
-    // 🔹 Função extra: observar mudanças de autenticação
+    // 🔹 Extra: observar mudanças de autenticação
     onAuthStateChange(callback) {
         return this.client.auth.onAuthStateChange(callback);
     }
 
-    // 🔹 Função extra: obter Org ID atual
+    // 🔹 Extra: obter Org ID atual
     async getCurrentOrgId() {
         return this.orgId;
     }
 
-    // 🔹 Função extra: formatar data
+    // 🔹 Extra: formatar data
     formatDateBR(dateString) {
         if (!dateString) return '';
         const d = new Date(dateString);
-        return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return d.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
     }
 
-    // 🔹 Função extra: notificações simples
+    // 🔹 Extra: sistema de notificação
     showNotification(message, type = 'info') {
-        console.log(`🔔 [${type.toUpperCase()}] ${message}`);
-        alert(message); // simples, pode ser substituído por toast
+        // Se o showToast do index.html existir, usa ele
+        if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+            window.showToast(message, type);
+        } else {
+            // Fallback
+            console.log(`🔔 [${type.toUpperCase()}] ${message}`);
+            alert(message);
+        }
     }
 }
 
+// Instância global
 const alshamSupabase = new AlshamSupabase();
 
+// Funções individuais (para import no index.html)
+function getCurrentSession() {
+  return alshamSupabase.getCurrentSession();
+}
+
+function getCurrentUser() {
+  return alshamSupabase.getCurrentUser();
+}
+
+function getDashboardKPIs() {
+  return alshamSupabase.getDashboardKPIs();
+}
+
+function getLeads(limit) {
+  return alshamSupabase.getLeads(limit);
+}
+
+function signOut() {
+  return alshamSupabase.signOut();
+}
+
+function onAuthStateChange(callback) {
+  return alshamSupabase.onAuthStateChange(callback);
+}
+
+function getCurrentOrgId() {
+  return alshamSupabase.getCurrentOrgId();
+}
+
+function formatDateBR(date) {
+  return alshamSupabase.formatDateBR(date);
+}
+
+function showNotification(message, type) {
+  return alshamSupabase.showNotification(message, type);
+}
+
+// ✅ Exportações finais
 export {
-    supabase,
-    alshamSupabase,
-    // Funções individuais
-    supabase as client,
-    () => alshamSupabase.getCurrentSession() as getCurrentSession,
-    () => alshamSupabase.getCurrentUser() as getCurrentUser,
-    () => alshamSupabase.getDashboardKPIs() as getDashboardKPIs,
-    (limit) => alshamSupabase.getLeads(limit) as getLeads,
-    () => alshamSupabase.signOut() as signOut,
-    (cb) => alshamSupabase.onAuthStateChange(cb) as onAuthStateChange,
-    () => alshamSupabase.getCurrentOrgId() as getCurrentOrgId,
-    (date) => alshamSupabase.formatDateBR(date) as formatDateBR,
-    (msg, type) => alshamSupabase.showNotification(msg, type) as showNotification
+  supabase,
+  alshamSupabase,
+  getCurrentSession,
+  getCurrentUser,
+  getDashboardKPIs,
+  getLeads,
+  signOut,
+  onAuthStateChange,
+  getCurrentOrgId,
+  formatDateBR,
+  showNotification
 };
