@@ -1,12 +1,19 @@
-// vite.config.js - CONFIGURAÇÃO CORRIGIDA E COMPLETA
+// vite.config.js - CONFIGURAÇÃO FINAL BLINDADA
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
-  
+
+  // ===== Variáveis de ambiente blindadas =====
+  const SUPABASE_URL =
+    process.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL || '';
+  const SUPABASE_ANON_KEY =
+    process.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
   return {
     base: '/',
+
     server: {
       port: 5173,
       open: true,
@@ -39,29 +46,35 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         input: {
-          index:        'index.html',
-          dashboard:    'dashboard.html',
-          leads:        'leads-real.html',
-          gamificacao:  'gamificacao.html',
-          automacoes:   'automacoes.html',
-          relatorios:   'relatorios.html',
-          configuracoes:'configuracoes.html',
-          login:        'login.html',
-          register:     'register.html',
-          createOrg:    'create-org.html',
+          index: 'index.html',
+          dashboard: 'dashboard.html',
+          leads: 'leads-real.html',
+          gamificacao: 'gamificacao.html',
+          automacoes: 'automacoes.html',
+          relatorios: 'relatorios.html',
+          configuracoes: 'configuracoes.html',
+          login: 'login.html',
+          register: 'register.html',
+          createOrg: 'create-org.html',
           'test-supabase': 'test-supabase.html' // opcional
         },
         output: {
-          entryFileNames: isProduction ? 'assets/[name]-[hash].js' : 'assets/[name].js',
-          chunkFileNames: isProduction ? 'assets/[name]-[hash].js' : 'assets/[name].js',
-          assetFileNames: isProduction ? 'assets/[name]-[hash].[ext]' : 'assets/[name].[ext]',
+          entryFileNames: isProduction
+            ? 'assets/[name]-[hash].js'
+            : 'assets/[name].js',
+          chunkFileNames: isProduction
+            ? 'assets/[name]-[hash].js'
+            : 'assets/[name].js',
+          assetFileNames: isProduction
+            ? 'assets/[name]-[hash].[ext]'
+            : 'assets/[name].[ext]',
           manualChunks: {
             vendor: ['@supabase/supabase-js'],
             charts: ['chart.js'],
             utils: ['papaparse', 'xlsx', 'jspdf']
           }
-        },
-      },
+        }
+      }
     },
 
     optimizeDeps: {
@@ -88,42 +101,56 @@ export default defineConfig(({ mode }) => {
         workbox: {
           clientsClaim: true,
           skipWaiting: true,
-          globPatterns: ['**/*.{js,css,html,png,svg,webp,woff2,ico}'],
+          globPatterns: [
+            '**/*.{js,css,html,png,svg,webp,woff2,ico}'
+          ],
           globDirectory: 'dist/',
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/rgvnbtuqtxvfxhrdnkjg\.supabase\.co\/.*/i,
+              urlPattern: /^https:\/\/[a-z0-9-]+\.supabase\.co\/.*/i,
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'supabase-api-cache',
-                expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 2 },
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 2
+                },
                 networkTimeoutSeconds: 10,
                 cacheableResponse: { statuses: [0, 200] }
-              },
+              }
             },
             {
               urlPattern: /^https:\/\/cdn\.(jsdelivr\.net|cdnjs\.cloudflare\.com)\/.*/i,
               handler: 'CacheFirst',
               options: {
                 cacheName: 'cdn-cache',
-                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 }
-              },
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 7
+                }
+              }
             },
             {
               urlPattern: ({ request }) =>
-                ['style', 'script', 'image', 'font'].includes(request.destination),
+                ['style', 'script', 'image', 'font'].includes(
+                  request.destination
+                ),
               handler: 'StaleWhileRevalidate',
               options: {
                 cacheName: 'static-assets',
-                expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              },
-            },
-          ],
+                expiration: {
+                  maxEntries: 200,
+                  maxAgeSeconds: 60 * 60 * 24 * 30
+                }
+              }
+            }
+          ]
         },
         manifest: {
           name: 'ALSHAM 360° PRIMA',
           short_name: 'PRIMA CRM',
-          description: 'Enterprise CRM system with leads, gamification, automations, and real-time data via Supabase.',
+          description:
+            'Enterprise CRM system with leads, gamification, automations, and real-time data via Supabase.',
           theme_color: '#3B82F6',
           background_color: '#ffffff',
           display: 'standalone',
@@ -131,31 +158,45 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           orientation: 'portrait',
           icons: [
-            { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-            { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
-            { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
-          ],
-        },
-      }),
+            {
+              src: '/icons/icon-192x192.png',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: '/icons/icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png'
+            },
+            {
+              src: '/icons/icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any maskable'
+            }
+          ]
+        }
+      })
     ],
 
     resolve: {
       alias: {
         '@': new URL('./src', import.meta.url).pathname,
         '@lib': new URL('./src/lib', import.meta.url).pathname,
-        '@js': new URL('./js', import.meta.url).pathname,
-      },
+        '@js': new URL('./public/js', import.meta.url).pathname
+      }
     },
 
     define: {
-      __SUPABASE_URL__: JSON.stringify(import.meta.env.VITE_SUPABASE_URL),
-      __VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
+      __SUPABASE_URL__: JSON.stringify(SUPABASE_URL),
+      __SUPABASE_ANON_KEY__: JSON.stringify(SUPABASE_ANON_KEY),
+      __VERSION__: JSON.stringify(
+        process.env.npm_package_version || '2.0.0'
+      ),
       __BUILD_TIME__: JSON.stringify(new Date().toISOString())
     },
 
-    css: {
-      postcss: { plugins: [] }
-    },
+    css: { postcss: { plugins: [] } },
 
     preview: {
       port: 4173,
