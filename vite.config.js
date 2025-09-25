@@ -1,4 +1,4 @@
-// vite.config.js - CONFIGURAÇÃO CORRIGIDA
+// vite.config.js - CONFIGURAÇÃO CORRIGIDA E COMPLETA
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -39,14 +39,17 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         input: {
-          main: 'index.html',
-          gamificacao: 'gamificacao.html',
-          automacoes: 'automacoes.html',
-          relatorios: 'relatorios.html',
-          configuracoes: 'configuracoes.html',
-          login: 'login.html',
-          register: 'register.html',
-          'test-supabase': 'test-supabase.html' // 👉 se quiser expor o test
+          index:        'index.html',
+          dashboard:    'dashboard.html',
+          leads:        'leads-real.html',
+          gamificacao:  'gamificacao.html',
+          automacoes:   'automacoes.html',
+          relatorios:   'relatorios.html',
+          configuracoes:'configuracoes.html',
+          login:        'login.html',
+          register:     'register.html',
+          createOrg:    'create-org.html',
+          'test-supabase': 'test-supabase.html' // opcional
         },
         output: {
           entryFileNames: isProduction ? 'assets/[name]-[hash].js' : 'assets/[name].js',
@@ -145,7 +148,7 @@ export default defineConfig(({ mode }) => {
     },
 
     define: {
-      __SUPABASE_URL__: JSON.stringify('https://rgvnbtuqtxvfxhrdnkjg.supabase.co'),
+      __SUPABASE_URL__: JSON.stringify(import.meta.env.VITE_SUPABASE_URL),
       __VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
       __BUILD_TIME__: JSON.stringify(new Date().toISOString())
     },
