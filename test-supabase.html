@@ -2,284 +2,307 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Teste Supabase - ALSHAM 360° PRIMA</title>
 
-  <!-- Fonts -->
+  <!-- Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- CSS inline -->
   <style>
+    :root {
+      --blue: #2563eb;
+      --violet: #8b5cf6;
+      --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 20px;
+      margin: 0; padding: 24px; min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg); display: grid; place-items: center;
     }
-    .container {
-      background: white;
-      border-radius: 16px;
-      padding: 40px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      max-width: 750px;
-      width: 100%;
+    .card {
+      width: 100%; max-width: 820px; background: #fff; border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.12); padding: 28px;
     }
-    h1 {
-      color: #2563eb;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .env-summary {
+    h1 { margin: 0 0 8px; color: var(--blue); text-align: center; }
+    p.subtitle { margin: 0 0 20px; color: #6b7280; text-align: center; }
+
+    .env {
+      display: grid; gap: 8px; margin-bottom: 16px;
+      background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px;
       font-size: 13px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
     }
-    .env-summary strong { color: #111827; }
-    .test-section {
-      margin: 20px 0;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
+    .env b { color: #111827; }
+    .env .warn { color: #b45309; }
+    .row {
+      border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 14px 0;
     }
-    .status {
-      padding: 10px;
-      border-radius: 6px;
-      margin: 10px 0;
-      font-weight: 500;
-    }
-    .success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    .error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-    .loading { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .row h3 { margin: 0 0 10px; font-size: 16px; }
     button {
-      background: linear-gradient(135deg, #2563eb, #8b5cf6);
-      color: white; border: none; padding: 12px 24px; border-radius: 8px;
-      cursor: pointer; font-weight: 500; margin: 10px 5px;
+      appearance: none; border: 0; cursor: pointer; border-radius: 10px;
+      padding: 10px 16px; font-weight: 600; color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      transition: transform .12s ease, box-shadow .12s ease;
+      margin: 6px 6px 10px 0;
     }
-    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
-    .data-display {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 15px;
-      margin: 10px 0;
-      font-family: monospace;
-      font-size: 14px;
-      max-height: 200px;
-      overflow-y: auto;
+    button.secondary {
+      background: #111827; color: #fff;
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+
+    .status {
+      display: inline-block; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 6px;
+      border: 1px solid;
+    }
+    .success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .error   { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .loading { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+    .warning { background: #fff7ed; color: #b45309; border-color: #fed7aa; }
+
+    .data {
+      display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+      padding: 12px; margin-top: 10px; max-height: 220px; overflow: auto; font: 12px/1.4 ui-monospace, Menlo, monospace;
+    }
+
+    .footer {
+      margin-top: 18px; font-size: 12px; color: #6b7280; text-align: center;
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
+  <div class="card">
     <h1>🔐 Teste de Conexão Supabase</h1>
-    <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Painel de Debug</p>
+    <p class="subtitle">ALSHAM 360° PRIMA • Painel de Debug</p>
 
-    <!-- Resumo das variáveis -->
-    <div class="env-summary">
-      <p><strong>SUPABASE_URL:</strong> <span id="env-url">?</span></p>
-      <p><strong>SUPABASE_ANON_KEY:</strong> <span id="env-key">?</span></p>
+    <!-- Resumo/env -->
+    <div class="env" id="env-summary">
+      <div><b>SUPABASE_URL:</b> <span id="env-url">–</span></div>
+      <div><b>SUPABASE_ANON_KEY:</b> <span id="env-key">–</span></div>
+      <div><b>Build:</b> <span id="env-build">–</span></div>
+      <div id="env-warning" class="warn"></div>
     </div>
 
-    <!-- Test Sections -->
-    <div class="test-section">
-      <h3>1. Teste de Conexão Básica</h3>
+    <!-- Seções de teste -->
+    <div class="row">
+      <h3>1) Conexão básica</h3>
       <button onclick="testConnection()">Testar Conexão</button>
-      <div id="connection-status" class="status loading">Aguardando teste...</div>
+      <span id="connection-status" class="status loading">Aguardando…</span>
     </div>
 
-    <div class="test-section">
-      <h3>2. Teste de Autenticação</h3>
+    <div class="row">
+      <h3>2) Autenticação</h3>
       <button onclick="testAuth()">Verificar Auth</button>
-      <div id="auth-status" class="status loading">Aguardando teste...</div>
+      <span id="auth-status" class="status loading">Aguardando…</span>
     </div>
 
-    <div class="test-section">
-      <h3>3. Teste de Acesso às Tabelas</h3>
+    <div class="row">
+      <h3>3) Acesso às tabelas</h3>
       <button onclick="testTables()">Verificar Tabelas</button>
-      <div id="tables-status" class="status loading">Aguardando teste...</div>
-      <div id="tables-data" class="data-display" style="display: none;"></div>
+      <span id="tables-status" class="status loading">Aguardando…</span>
+      <div id="tables-data" class="data"></div>
     </div>
 
-    <div class="test-section">
-      <h3>4. Teste da Organização Padrão</h3>
+    <div class="row">
+      <h3>4) Organização padrão</h3>
       <button onclick="testOrganization()">Verificar Organização</button>
-      <div id="org-status" class="status loading">Aguardando teste...</div>
-      <div id="org-data" class="data-display" style="display: none;"></div>
+      <span id="org-status" class="status loading">Aguardando…</span>
+      <div id="org-data" class="data"></div>
     </div>
 
-    <div class="test-section">
-      <h3>5. Teste de Leads CRM</h3>
+    <div class="row">
+      <h3>5) Leads CRM</h3>
       <button onclick="testLeads()">Verificar Leads</button>
-      <div id="leads-status" class="status loading">Aguardando teste...</div>
-      <div id="leads-data" class="data-display" style="display: none;"></div>
+      <span id="leads-status" class="status loading">Aguardando…</span>
+      <div id="leads-data" class="data"></div>
     </div>
 
-    <div class="test-section">
-      <h3>6. Teste de Escrita (Tabela Sandbox)</h3>
+    <div class="row">
+      <h3>6) Escrita (sandbox)</h3>
       <button onclick="testWrite()">Testar Escrita</button>
-      <div id="write-status" class="status loading">Aguardando teste...</div>
+      <span id="write-status" class="status loading">Aguardando…</span>
     </div>
 
-    <div class="test-section">
-      <h3>7. Benchmark de Performance</h3>
+    <div class="row">
+      <h3>7) Benchmark de latência</h3>
       <button onclick="testPerformance()">Testar Latência</button>
-      <div id="perf-status" class="status loading">Aguardando teste...</div>
+      <span id="perf-status" class="status loading">Aguardando…</span>
     </div>
 
-    <div class="test-section">
-      <h3>8. Teste de RLS (Row-Level Security)</h3>
+    <div class="row">
+      <h3>8) RLS (Row-Level Security)</h3>
       <button onclick="testRLS()">Testar RLS</button>
-      <div id="rls-status" class="status loading">Aguardando teste...</div>
-      <div id="rls-data" class="data-display" style="display: none;"></div>
+      <span id="rls-status" class="status loading">Aguardando…</span>
+      <div id="rls-data" class="data"></div>
     </div>
 
-    <div class="test-section">
+    <div class="row">
       <h3>🚀 Teste Completo</h3>
-      <button onclick="runAllTests()" style="background: linear-gradient(135deg, #10b981, #059669);">Executar Todos os Testes</button>
-      <div id="complete-status" class="status loading">Pronto para executar...</div>
+      <button class="secondary" onclick="runAllTests()">Executar Todos</button>
+      <span id="complete-status" class="status loading">Pronto…</span>
     </div>
+
+    <div id="offline" class="footer"></div>
   </div>
 
-  <!-- Supabase -->
+  <!-- Supabase v2 (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script type="module">
-    // Variáveis injetadas pelo Vite
-    const url = typeof __SUPABASE_URL__ !== "undefined" ? __SUPABASE_URL__ : import.meta.env.VITE_SUPABASE_URL;
-    const key = typeof __SUPABASE_ANON_KEY__ !== "undefined" ? __SUPABASE_ANON_KEY__ : import.meta.env.VITE_SUPABASE_ANON_KEY;
+    // =========================================================
+    // Vars injetadas pelo Vite (fallback para import.meta.env)
+    // =========================================================
+    const SB_URL =
+      (typeof __SUPABASE_URL__ !== 'undefined' && __SUPABASE_URL__) ||
+      (import.meta.env && import.meta.env.VITE_SUPABASE_URL) ||
+      '';
 
-    // Fallback para demo
-    const supabaseUrl = url || "https://demo.supabase.co";
-    const supabaseKey = key || "demo-anon-key";
+    const SB_ANON_KEY =
+      (typeof __SUPABASE_ANON_KEY__ !== 'undefined' && __SUPABASE_ANON_KEY__) ||
+      (import.meta.env && import.meta.env.VITE_SUPABASE_ANON_KEY) ||
+      '';
 
-    // Exibir no resumo
-    document.getElementById("env-url").textContent = supabaseUrl;
-    document.getElementById("env-key").textContent = supabaseKey ? "(definido)" : "(NÃO definido)";
+    const VERSION =
+      (typeof __VERSION__ !== 'undefined' && __VERSION__) ||
+      (import.meta.env && import.meta.env.npm_package_version) ||
+      'dev';
 
-    // Cliente
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const BUILD_TIME =
+      (typeof __BUILD_TIME__ !== 'undefined' && __BUILD_TIME__) ||
+      new Date().toISOString();
 
-    // Utils
-    function updateStatus(id, cls, msg) {
+    // Mostrar resumo (sem vazar a key)
+    const mask = (s) => !s ? '(não definido)' : s.length <= 12 ? '(definido)' : `${s.slice(0,6)}…${s.slice(-4)}`;
+    document.getElementById('env-url').textContent = SB_URL || '(não definido)';
+    document.getElementById('env-key').textContent = mask(SB_ANON_KEY);
+    document.getElementById('env-build').textContent = `${VERSION} • ${BUILD_TIME}`;
+    if (!SB_URL || !SB_ANON_KEY) {
+      document.getElementById('env-warning').textContent =
+        '⚠️ Atenção: VITE_SUPABASE_URL e/ou VITE_SUPABASE_ANON_KEY não foram injetadas. Confira Environment Variables do Vercel e o define() no vite.config.js.';
+    }
+
+    // Cliente (sem persistir sessão — página de debug)
+    const supabase = window.supabase.createClient(SB_URL, SB_ANON_KEY, {
+      auth: { persistSession: false }
+    });
+
+    // Helpers UI
+    function setStatus(id, type, msg) {
       const el = document.getElementById(id);
-      el.className = `status ${cls}`;
+      el.className = `status ${type}`;
       el.textContent = msg;
     }
     function showData(id, data) {
       const el = document.getElementById(id);
-      el.style.display = "block";
-      el.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      el.style.display = 'block';
+      el.innerHTML = `<pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
     }
 
-    // Testes
+    // ------------------ TESTES ------------------
     window.testConnection = async () => {
-      updateStatus("connection-status", "loading", "Testando conexão...");
+      setStatus('connection-status', 'loading', 'Testando conexão…');
       try {
-        const { error } = await supabase.from("organizations").select("id").limit(1);
+        const { error } = await supabase.from('organizations').select('id').limit(1);
         if (error) throw error;
-        updateStatus("connection-status", "success", "✅ Conexão funcionando!");
+        setStatus('connection-status', 'success', '✅ Conexão OK');
       } catch (err) {
-        updateStatus("connection-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('connection-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.testAuth = async () => {
-      updateStatus("auth-status", "loading", "Verificando autenticação...");
+      setStatus('auth-status', 'loading', 'Verificando sessão…');
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        updateStatus("auth-status", session ? "success" : "warning", session ? "✅ Usuário autenticado" : "⚠️ Nenhum usuário logado");
+        setStatus('auth-status', session ? 'success' : 'warning', session ? '✅ Usuário autenticado' : '⚠️ Nenhum usuário logado');
       } catch (err) {
-        updateStatus("auth-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('auth-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.testTables = async () => {
-      updateStatus("tables-status", "loading", "Verificando tabelas...");
-      const tables = ["organizations", "user_profiles", "leads_crm"];
+      setStatus('tables-status', 'loading', 'Consultando tabelas…');
+      const tables = ['organizations', 'user_profiles', 'leads_crm'];
       const results = {};
-      for (const table of tables) {
+      for (const t of tables) {
         try {
-          const { data, error } = await supabase.from(table).select("*").limit(1);
-          results[table] = error ? `Erro: ${error.message}` : `OK (${data?.length || 0} registros)`;
-        } catch (err) {
-          results[table] = `Erro: ${err.message}`;
+          const { data, error } = await supabase.from(t).select('*').limit(1);
+          results[t] = error ? `Erro: ${error.message}` : `OK (${data?.length || 0})`;
+        } catch (e) {
+          results[t] = `Erro: ${e.message || e}`;
         }
       }
-      updateStatus("tables-status", "success", "✅ Verificação concluída");
-      showData("tables-data", results);
+      setStatus('tables-status', 'success', '✅ Verificação concluída');
+      showData('tables-data', results);
     };
 
     window.testOrganization = async () => {
-      updateStatus("org-status", "loading", "Verificando organização...");
+      setStatus('org-status', 'loading', 'Carregando organizações…');
       try {
-        const { data, error } = await supabase.from("organizations").select("*").limit(5);
+        const { data, error } = await supabase.from('organizations').select('*').limit(5);
         if (error) throw error;
-        updateStatus("org-status", "success", `✅ ${data.length} org(s) encontradas`);
-        showData("org-data", data);
+        setStatus('org-status', 'success', `✅ ${data.length} org(s)`);
+        showData('org-data', data);
       } catch (err) {
-        updateStatus("org-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('org-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.testLeads = async () => {
-      updateStatus("leads-status", "loading", "Verificando leads...");
+      setStatus('leads-status', 'loading', 'Buscando leads…');
       try {
-        const { data, error } = await supabase.from("leads_crm").select("*").limit(5);
+        const { data, error } = await supabase.from('leads_crm').select('*').limit(5);
         if (error) throw error;
-        updateStatus("leads-status", "success", `✅ ${data.length} leads encontrados`);
-        showData("leads-data", data);
+        setStatus('leads-status', 'success', `✅ ${data.length} lead(s)`);
+        showData('leads-data', data);
       } catch (err) {
-        updateStatus("leads-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('leads-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.testWrite = async () => {
-      updateStatus("write-status", "loading", "Testando escrita...");
+      setStatus('write-status', 'loading', 'Inserindo em test_logs…');
       try {
-        const { error } = await supabase.from("test_logs").insert([{ message: "Teste ALSHAM " + new Date().toISOString() }]);
+        const { error } = await supabase.from('test_logs').insert([{ message: 'Teste ALSHAM ' + new Date().toISOString() }]);
         if (error) throw error;
-        updateStatus("write-status", "success", "✅ Escrita OK em test_logs");
+        setStatus('write-status', 'success', '✅ Escrita OK em test_logs');
       } catch (err) {
-        updateStatus("write-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('write-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.testPerformance = async () => {
-      updateStatus("perf-status", "loading", "Testando latência...");
+      setStatus('perf-status', 'loading', 'Calculando latência…');
       try {
-        const start = performance.now();
-        await supabase.from("leads_crm").select("*").limit(1);
-        const elapsed = (performance.now() - start).toFixed(2);
-        updateStatus("perf-status", "success", `✅ Latência: ${elapsed}ms`);
+        const t0 = performance.now();
+        const { error } = await supabase.from('leads_crm').select('id').limit(1);
+        if (error) throw error;
+        const ms = (performance.now() - t0).toFixed(2);
+        setStatus('perf-status', 'success', `✅ ${ms} ms`);
       } catch (err) {
-        updateStatus("perf-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('perf-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.testRLS = async () => {
-      updateStatus("rls-status", "loading", "Testando RLS...");
+      setStatus('rls-status', 'loading', 'Filtrando por org_id=ORG_TEST…');
       try {
-        const { data, error } = await supabase.from("leads_crm").select("*").eq("org_id", "ORG_TEST").limit(5);
+        const { data, error } = await supabase.from('leads_crm').select('*').eq('org_id', 'ORG_TEST').limit(5);
         if (error) throw error;
-        updateStatus("rls-status", "success", `✅ ${data.length} registros visíveis para ORG_TEST`);
-        showData("rls-data", data);
+        setStatus('rls-status', 'success', `✅ ${data.length} registro(s) visíveis`);
+        showData('rls-data', data);
       } catch (err) {
-        updateStatus("rls-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+        setStatus('rls-status', 'error', `❌ ${err.message || err}`);
       }
     };
 
     window.runAllTests = async () => {
-      updateStatus("complete-status", "loading", "Executando todos os testes...");
+      setStatus('complete-status', 'loading', 'Executando…');
       await testConnection();
       await testAuth();
       await testTables();
@@ -288,8 +311,17 @@
       await testWrite();
       await testPerformance();
       await testRLS();
-      updateStatus("complete-status", "success", "🎉 Todos os testes concluídos!");
+      setStatus('complete-status', 'success', '🎉 Concluído!');
     };
+
+    // Offline/online hint
+    function updateNet() {
+      const el = document.getElementById('offline');
+      el.textContent = navigator.onLine ? '' : '⚠️ Você está offline — os testes podem falhar.';
+    }
+    window.addEventListener('online', updateNet);
+    window.addEventListener('offline', updateNet);
+    updateNet();
   </script>
 </body>
 </html>
