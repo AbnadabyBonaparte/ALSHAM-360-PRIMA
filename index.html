@@ -22,7 +22,6 @@
   <!-- Estilo Global -->
   <link rel="stylesheet" href="/css/style.css" />
 
-  <!-- Estilos customizados -->
   <style>
     .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .bg-gradient-premium { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
@@ -38,8 +37,7 @@
       100% { background-position: -200% 0; }
     }
     #loading-indicator {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 4px;
+      position: fixed; top: 0; left: 0; width: 100%; height: 4px;
       background: linear-gradient(90deg, #3B82F6, #8B5CF6, #06B6D4);
       background-size: 200% 100%;
       animation: loading 2s linear infinite;
@@ -50,25 +48,12 @@
       100% { background-position: -200% 0; }
     }
     .hidden { display: none; }
-    .kpi-card {
-      transition: all 0.3s ease;
-    }
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    .kpi-card { transition: all 0.3s ease; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
   </style>
 </head>
 
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen" data-page="dashboard">
-  <!-- Indicador de carregamento -->
   <div id="loading-indicator"></div>
 
   <!-- Header -->
@@ -84,500 +69,117 @@
         </div>
       </a>
       <nav class="hidden md:flex items-center space-x-8">
-        <a href="/leads.html" class="text-gray-600 hover:text-gray-900 transition-colors">👥 Leads</a>
-        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">🤖 Automações</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900 transition-colors">📈 Relatórios</a>
-        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900 transition-colors">🎮 Gamificação</a>
-        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">⚙️ Configurações</a>
+        <a href="/leads.html">👥 Leads</a>
+        <a href="/automacoes.html">🤖 Automações</a>
+        <a href="/relatorios.html">📈 Relatórios</a>
+        <a href="/gamificacao.html">🎮 Gamificação</a>
+        <a href="/configuracoes.html">⚙️ Configurações</a>
       </nav>
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-gradient-premium rounded-full flex items-center justify-center text-white font-semibold">A</div>
         <span class="hidden sm:block text-sm text-gray-700" id="user-name">Usuário</span>
-        <button id="logout-btn" class="text-xs text-red-600 hover:text-red-800 transition-colors">Sair</button>
+        <button id="logout-btn" class="text-xs text-red-600 hover:text-red-800">Sair</button>
       </div>
     </div>
   </header>
 
-  <!-- Conteúdo principal -->
+  <!-- Main -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Status de carregamento inicial -->
     <div id="loading-status" class="text-center py-12">
       <h2 class="text-3xl font-bold text-gray-900 mb-4">Dashboard ALSHAM 360° PRIMA</h2>
       <p class="text-gray-600 mb-8">Sistema inicializando...</p>
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
     </div>
-    
-    <!-- Dashboard real - inicialmente oculto -->
+
     <div id="dashboard-content" class="hidden">
       <!-- KPIs -->
       <section class="mb-8">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Indicadores Principais</h2>
-        <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <!-- KPIs serão renderizados aqui -->
-        </div>
+        <div id="dashboard-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
       </section>
 
       <!-- Charts -->
       <section class="mb-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Gráfico de Performance -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance dos Últimos 7 Dias</h3>
-            <div class="h-64 relative">
-              <canvas id="performanceChart" class="w-full h-full"></canvas>
-            </div>
+          <div class="bg-white rounded-xl p-6 shadow-sm border">
+            <h3 class="text-lg font-semibold mb-4">Performance (últimos 7 dias)</h3>
+            <div class="h-64 relative"><canvas id="performanceChart"></canvas></div>
           </div>
-
-          <!-- Funil de Conversão -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Funil de Conversão</h3>
-            <div id="conversion-funnel" class="space-y-3">
-              <!-- Funil será renderizado aqui -->
-            </div>
+          <div class="bg-white rounded-xl p-6 shadow-sm border">
+            <h3 class="text-lg font-semibold mb-4">Funil de Conversão</h3>
+            <div id="conversion-funnel" class="space-y-3"></div>
           </div>
         </div>
       </section>
 
-      <!-- Leads Recentes -->
+      <!-- Leads -->
       <section class="mb-8">
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div class="bg-white rounded-xl p-6 shadow-sm border">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Leads Recentes</h3>
-            <a href="/leads.html" class="text-sm text-blue-600 hover:text-blue-800">Ver todos</a>
+            <h3 class="text-lg font-semibold">Leads Recentes</h3>
+            <a href="/leads.html" class="text-sm text-blue-600">Ver todos</a>
           </div>
-          <div id="leads-table">
-            <!-- Tabela de leads será renderizada aqui -->
-          </div>
-        </div>
-      </section>
-
-      <!-- Insights de IA -->
-      <section class="mb-8">
-        <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border border-purple-100">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">🤖 Insights de IA</h3>
-          <div id="ai-insights" class="space-y-3">
-            <!-- Insights serão renderizados aqui -->
-          </div>
+          <div id="leads-table"></div>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- Rodapé -->
-  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500 text-sm">
-    <p>&copy; 2025 ALSHAM 360° PRIMA. Sistema com dados reais do Supabase.</p>
-  </footer>
-
-  <!-- Toast Container -->
+  <!-- Toast -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  <!-- SCRIPTS ES6 MODULES -->
+  <!-- Scripts -->
   <script type="module">
-    // Importar funções do Supabase
     import { 
-      supabase, 
-      getCurrentSession, 
-      getCurrentUser,
-      signOut,
-      onAuthStateChange,
-      getCurrentOrgId,
-      getLeads,
-      getDashboardKPIs,
-      formatDateBR,
-      showNotification
+      supabase, getCurrentSession, getCurrentUser, signOut, getCurrentOrgId,
+      getLeads, getDashboardKPIs
     } from '/src/lib/supabase.js';
 
-    // Estado da aplicação
-    let appState = {
-      user: null,
-      session: null,
-      orgId: null,
-      isLoading: true,
-      isDemo: false
-    };
+    let appState = { user:null, session:null, orgId:null, isDemo:false };
 
-    // Função para mostrar toast notifications
-    function showToast(message, type = 'info', duration = 3000) {
-      const toastContainer = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      
-      const bgColor = type === 'error' ? 'bg-red-500' : 
-                      type === 'success' ? 'bg-green-500' : 
-                      type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
-      
-      toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
-      toast.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-medium">${message}</span>
-          <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-white hover:text-gray-200">
-            ×
-          </button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      
-      // Animar entrada
-      setTimeout(() => toast.classList.remove('translate-x-full'), 100);
-      
-      // Auto remover
-      setTimeout(() => {
-        toast.classList.add('translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-      }, duration);
-    }
+    function showToast(msg,type='info'){const c=document.getElementById('toast-container');const t=document.createElement('div');t.className=`px-4 py-2 rounded-lg text-white shadow-lg transform translate-x-full opacity-0 transition-all ${type==='error'?'bg-red-500':type==='success'?'bg-green-500':type==='warning'?'bg-yellow-500 text-black':'bg-blue-500'}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.classList.remove('translate-x-full','opacity-0'),100);setTimeout(()=>{t.classList.add('translate-x-full','opacity-0');setTimeout(()=>t.remove(),300)},4000)}
 
-    // Disponibilizar globalmente
-    window.showToast = showToast;
-
-    // Função para mostrar status de carregamento
-    function updateLoadingStatus(message) {
-      const statusElement = document.querySelector('#loading-status p');
-      if (statusElement) {
-        statusElement.textContent = message;
-      }
-    }
-
-    // Função para inicializar o dashboard
-    async function initDashboard() {
-      try {
-        updateLoadingStatus('Verificando autenticação...');
-        
-        // Verificar sessão
-        const session = await getCurrentSession();
-        const user = await getCurrentUser();
-        
-        if (!user) {
-          // Usuário não autenticado - modo demo
-          console.log('👤 Usuário não autenticado - iniciando modo demo');
-          appState.isDemo = true;
-          document.getElementById('user-name').textContent = 'Demo User';
-        } else {
-          // Usuário autenticado
-          appState.user = user;
-          appState.session = session;
-          appState.orgId = await getCurrentOrgId();
-          document.getElementById('user-name').textContent = user.email?.split('@')[0] || 'Usuário';
-        }
-
-        updateLoadingStatus('Carregando dados...');
-        
-        // Carregar dados do dashboard
-        await Promise.all([
-          renderKPIs(),
-          renderLeadsTable(),
-          renderChart(),
-          renderFunnel(),
-          renderAIInsights()
-        ]);
-
-        // Mostrar dashboard
+    async function initDashboard(){
+      try{
+        const session=await getCurrentSession();const user=await getCurrentUser();
+        if(!user){appState.isDemo=true;document.getElementById('user-name').textContent='Demo User';}
+        else{appState.user=user;appState.session=session;appState.orgId=await getCurrentOrgId();document.getElementById('user-name').textContent=user.email?.split('@')[0]||'Usuário';}
+        await Promise.all([renderKPIs(),renderLeadsTable(),renderChart(),renderFunnel()]);
         document.getElementById('loading-status').classList.add('hidden');
         document.getElementById('dashboard-content').classList.remove('hidden');
-        document.getElementById('loading-indicator').style.display = 'none';
-        
-        showToast('Dashboard carregado com sucesso!', 'success');
-        
-        console.log('✅ Dashboard inicializado com sucesso');
-        
-      } catch (error) {
-        console.error('❌ Erro ao inicializar dashboard:', error);
-        
-        // Mostrar erro e modo demo
-        appState.isDemo = true;
-        await renderDemoData();
-        
-        document.getElementById('loading-status').classList.add('hidden');
-        document.getElementById('dashboard-content').classList.remove('hidden');
-        document.getElementById('loading-indicator').style.display = 'none';
-        
-        showToast('Carregando em modo demonstração', 'warning');
-      }
+        document.getElementById('loading-indicator').style.display='none';
+        showToast('Dashboard carregado','success');
+      }catch(e){console.error(e);appState.isDemo=true;await renderDemoData()}
     }
 
-    // Renderizar KPIs
-    async function renderKPIs() {
-      const container = document.getElementById('dashboard-kpis');
-      
-      try {
-        let data = {};
-        
-        if (appState.isDemo) {
-          data = {
-            total_leads: 1234,
-            leads_semana: 89,
-            leads_qualificados: 756,
-            leads_quentes: 123,
-            taxa_qualificacao: 85
-          };
-        } else {
-          data = await getDashboardKPIs(appState.orgId);
-        }
+    async function renderKPIs(){const c=document.getElementById('dashboard-kpis');let d={};d=appState.isDemo?{total_leads:1234,leads_qualificados:456,leads_quentes:123,taxa_qualificacao:72}:await getDashboardKPIs(appState.orgId);
+      const kpis=[{icon:'👥',title:'Total de Leads',value:d.total_leads||0,color:'blue'},
+                  {icon:'⚡',title:'Leads Qualificados',value:d.leads_qualificados||0,color:'green'},
+                  {icon:'🔥',title:'Leads Quentes',value:d.leads_quentes||0,color:'red'},
+                  {icon:'📈',title:'Taxa de Qualificação',value:`${d.taxa_qualificacao||0}%`,color:'purple'}];
+      c.innerHTML=kpis.map(k=>`<div class="bg-white rounded-xl p-6 shadow kpi-card">
+        <div class="flex justify-between mb-4"><div class="w-12 h-12 bg-${k.color}-100 rounded flex items-center justify-center text-2xl">${k.icon}</div></div>
+        <h3 class="text-2xl font-bold">${k.value}</h3><p class="text-gray-600">${k.title}</p></div>`).join('')}
 
-        const kpis = [
-          {
-            icon: '👥',
-            title: 'Total de Leads',
-            value: (data.total_leads || 0).toLocaleString(),
-            change: '+12%',
-            color: 'blue'
-          },
-          {
-            icon: '⚡',
-            title: 'Leads Qualificados', 
-            value: (data.leads_qualificados || 0).toLocaleString(),
-            change: '+23%',
-            color: 'green'
-          },
-          {
-            icon: '🔥',
-            title: 'Leads Quentes',
-            value: (data.leads_quentes || 0).toLocaleString(),
-            change: '+8%', 
-            color: 'red'
-          },
-          {
-            icon: '📈',
-            title: 'Taxa de Qualificação',
-            value: `${data.taxa_qualificacao || 0}%`,
-            change: '+5%',
-            color: 'purple'
-          }
-        ];
+    async function renderFunnel(){const c=document.getElementById('conversion-funnel');if(appState.isDemo){c.innerHTML='<p class="text-gray-500">Dados demo</p>';return;}
+      const {data:leads}=await supabase.from('leads_crm').select('status, count:id',{count:'exact'}).eq('org_id',appState.orgId).group('status');
+      const total=leads.reduce((a,b)=>a+b.count,0);
+      c.innerHTML=leads.map(l=>{const pct=(l.count/total)*100;return`<div><div class="flex justify-between text-sm"><span>${l.status}</span><span>${l.count}</span></div><div class="w-full bg-gray-200 h-3 rounded"><div class="bg-blue-500 h-3 rounded" style="width:${pct}%"></div></div></div>`}).join('')}
 
-        container.innerHTML = kpis.map((kpi, index) => `
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 kpi-card">
-            <div class="flex items-center justify-between mb-4">
-              <div class="w-12 h-12 bg-${kpi.color}-100 rounded-xl flex items-center justify-center">
-                <span class="text-2xl">${kpi.icon}</span>
-              </div>
-              <span class="text-green-600 text-sm font-semibold bg-green-100 px-2 py-1 rounded-full">
-                ${kpi.change}
-              </span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900">${kpi.value}</h3>
-            <p class="text-gray-600 font-medium">${kpi.title}</p>
-          </div>
-        `).join('');
-        
-      } catch (error) {
-        console.error('Erro ao renderizar KPIs:', error);
-        container.innerHTML = '<div class="col-span-full text-center text-red-500">Erro ao carregar KPIs</div>';
-      }
-    }
+    async function renderChart(){const ctx=document.getElementById('performanceChart').getContext('2d');if(appState.isDemo){ctx.fillText('Demo chart',50,50);return;}
+      const {data:leads}=await supabase.from('leads_crm').select('created_at').eq('org_id',appState.orgId);
+      const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-i);return d.toISOString().split('T')[0]}).reverse();
+      const counts=days.map(d=>leads.filter(l=>l.created_at.startsWith(d)).length);
+      ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+      ctx.beginPath();ctx.strokeStyle='#3B82F6';counts.forEach((v,i)=>{ctx.lineTo(50+i*50,200-v*5)});ctx.stroke()}
 
-    // Renderizar tabela de leads
-    async function renderLeadsTable() {
-      const container = document.getElementById('leads-table');
-      
-      try {
-        let leads = [];
-        
-        if (appState.isDemo) {
-          leads = [
-            { id: 1, nome: 'João Silva', empresa: 'Tech Corp', status: 'novo', score_ia: 85 },
-            { id: 2, nome: 'Maria Santos', empresa: 'Inovação Ltda', status: 'qualificado', score_ia: 92 },
-            { id: 3, nome: 'Pedro Costa', empresa: 'Digital Solutions', status: 'proposta', score_ia: 78 }
-          ];
-        } else {
-          const result = await getLeads(appState.orgId, { limit: 5 });
-          leads = result.data || [];
-        }
+    async function renderLeadsTable(){const c=document.getElementById('leads-table');let leads=[];if(appState.isDemo){leads=[{nome:'João',empresa:'Tech',status:'novo',score_ia:80}]}else{const r=await getLeads(appState.orgId,{limit:5});leads=r.data||[];}
+      c.innerHTML=leads.map(l=>`<div class="flex justify-between p-2 border-b"><div><strong>${l.nome||'N/A'}</strong><br><span class="text-sm">${l.empresa||''}</span></div><div class="text-sm">${l.status} • Score: ${l.score_ia||0}</div></div>`).join('')}
 
-        if (leads.length === 0) {
-          container.innerHTML = '<div class="text-center text-gray-500">Nenhum lead encontrado</div>';
-          return;
-        }
+    async function renderDemoData(){await Promise.all([renderKPIs(),renderLeadsTable(),renderChart(),renderFunnel()])}
 
-        container.innerHTML = leads.map(lead => `
-          <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span class="text-sm font-semibold text-blue-600">${(lead.nome || 'N').charAt(0)}</span>
-              </div>
-              <div>
-                <h4 class="font-medium text-gray-900">${lead.nome || 'Nome não informado'}</h4>
-                <p class="text-sm text-gray-600">${lead.empresa || 'Empresa não informada'}</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <span class="px-2 py-1 text-xs rounded-full ${getStatusColor(lead.status)}">
-                ${getStatusLabel(lead.status)}
-              </span>
-              <span class="text-sm text-gray-500">Score: ${lead.score_ia || 'N/A'}</span>
-            </div>
-          </div>
-        `).join('');
-        
-      } catch (error) {
-        console.error('Erro ao renderizar leads:', error);
-        container.innerHTML = '<div class="text-center text-red-500">Erro ao carregar leads</div>';
-      }
-    }
-
-    // Funções auxiliares
-    function getStatusColor(status) {
-      const colors = {
-        'novo': 'bg-blue-100 text-blue-800',
-        'qualificado': 'bg-yellow-100 text-yellow-800',
-        'proposta': 'bg-purple-100 text-purple-800',
-        'convertido': 'bg-green-100 text-green-800'
-      };
-      return colors[status] || 'bg-gray-100 text-gray-800';
-    }
-
-    function getStatusLabel(status) {
-      const labels = {
-        'novo': 'Novo',
-        'qualificado': 'Qualificado', 
-        'proposta': 'Proposta',
-        'convertido': 'Convertido'
-      };
-      return labels[status] || status;
-    }
-
-    // Renderizar gráfico simples
-    function renderChart() {
-      const canvas = document.getElementById('performanceChart');
-      const ctx = canvas.getContext('2d');
-      
-      // Limpar canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Dados demo
-      const data = [20, 45, 30, 65, 50, 80, 75];
-      const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-      
-      // Configurar canvas
-      canvas.width = canvas.offsetWidth * 2;
-      canvas.height = canvas.offsetHeight * 2;
-      ctx.scale(2, 2);
-      
-      const width = canvas.offsetWidth;
-      const height = canvas.offsetHeight;
-      const padding = 40;
-      
-      // Desenhar eixos
-      ctx.strokeStyle = '#e5e7eb';
-      ctx.lineWidth = 1;
-      
-      // Eixo Y
-      ctx.beginPath();
-      ctx.moveTo(padding, padding);
-      ctx.lineTo(padding, height - padding);
-      ctx.stroke();
-      
-      // Eixo X  
-      ctx.beginPath();
-      ctx.moveTo(padding, height - padding);
-      ctx.lineTo(width - padding, height - padding);
-      ctx.stroke();
-      
-      // Desenhar linha do gráfico
-      ctx.strokeStyle = '#8b5cf6';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      
-      data.forEach((value, index) => {
-        const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-        const y = height - padding - (value / 100) * (height - 2 * padding);
-        
-        if (index === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      });
-      
-      ctx.stroke();
-      
-      // Desenhar pontos
-      ctx.fillStyle = '#8b5cf6';
-      data.forEach((value, index) => {
-        const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-        const y = height - padding - (value / 100) * (height - 2 * padding);
-        
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, 2 * Math.PI);
-        ctx.fill();
-      });
-    }
-
-    // Renderizar funil
-    function renderFunnel() {
-      const container = document.getElementById('conversion-funnel');
-      const stages = [
-        { name: 'Leads Capturados', value: 1000, color: 'bg-blue-500' },
-        { name: 'Leads Qualificados', value: 750, color: 'bg-green-500' },
-        { name: 'Propostas Enviadas', value: 400, color: 'bg-yellow-500' },
-        { name: 'Vendas Fechadas', value: 150, color: 'bg-purple-500' }
-      ];
-
-      container.innerHTML = stages.map((stage, index) => {
-        const percentage = (stage.value / stages[0].value) * 100;
-        return `
-          <div class="relative">
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-sm font-medium text-gray-700">${stage.name}</span>
-              <span class="text-sm text-gray-500">${stage.value.toLocaleString()}</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-3">
-              <div class="${stage.color} h-3 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Renderizar insights de IA
-    function renderAIInsights() {
-      const container = document.getElementById('ai-insights');
-      const insights = [
-        '💡 Melhor hora para contato: Terças-feiras às 14h',
-        '🎯 Leads do setor "Tecnologia" têm 40% mais chance de conversão',
-        '📈 Seu desempenho está 23% acima da média mensal'
-      ];
-
-      container.innerHTML = insights.map(insight => `
-        <div class="bg-white/50 rounded-lg p-3 text-sm text-gray-700">
-          ${insight}
-        </div>
-      `).join('');
-    }
-
-    // Renderizar dados demo em caso de erro
-    async function renderDemoData() {
-      await Promise.all([
-        renderKPIs(),
-        renderLeadsTable(),
-        renderChart(),
-        renderFunnel(),
-        renderAIInsights()
-      ]);
-    }
-
-    // Event listeners
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-      try {
-        await signOut();
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = '/login.html';
-      } catch (error) {
-        console.error('Erro no logout:', error);
-        showToast('Erro ao fazer logout', 'error');
-      }
-    });
-
-    // Inicializar quando a página carregar
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🚀 Iniciando ALSHAM 360° PRIMA Dashboard');
-      initDashboard();
-    });
-
-    // Disponibilizar funções globalmente se necessário
-    window.appState = appState;
-    window.initDashboard = initDashboard;
+    document.getElementById('logout-btn').addEventListener('click',async()=>{await signOut();localStorage.clear();sessionStorage.clear();location.href='/login.html'});
+    document.addEventListener('DOMContentLoaded',()=>initDashboard());
   </script>
 </body>
 </html>
