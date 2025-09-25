@@ -27,39 +27,43 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
 
-  <!-- Favicons -->
+  <!-- Favicons & PWA -->
   <link rel="icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
 
-  <!-- Variáveis do Supabase -->
-  <script src="/env.js" defer></script>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
 
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <!-- Supabase via módulo (centralizado) -->
+  <script type="module" src="/src/lib/supabase.js"></script>
+
+  <style>
+    .loading-spinner { @apply w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin; }
+    .header-premium { @apply bg-white/80 backdrop-blur-md border-b border-gray-200; }
+    .bg-gradient-premium { @apply bg-gradient-to-r from-blue-600 to-indigo-600; }
+  </style>
 </head>
 
-<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md">Pular para o conteúdo principal</a>
+<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen font-inter">
+  <a href="#main-content" class="sr-only focus:not-sr-only absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md">Pular para o conteúdo</a>
 
   <!-- Loader -->
-  <div id="gamification-loader" class="fixed top-0 left-0 right-0 z-50" role="status" aria-live="polite">
+  <div id="gamification-loader" class="fixed top-0 left-0 right-0 z-50">
     <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium flex items-center justify-center space-x-2">
-      <div class="loading-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      <div class="loading-spinner"></div>
       <span>Carregando gamificação...</span>
     </div>
   </div>
 
   <!-- Header -->
-  <header class="header-premium" role="banner">
+  <header class="header-premium">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
       <a href="/index.html" class="flex items-center space-x-3">
         <div class="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center">
@@ -78,35 +82,81 @@
         <a href="/gamificacao.html" aria-current="page" class="text-primary font-bold">Gamificação</a>
       </nav>
       <div class="flex items-center space-x-3">
-        <button id="btn-refresh" class="p-2 text-gray-400 hover:text-gray-600" title="Atualizar gamificação">🔄</button>
-        <button data-auth="logout-btn" class="p-2 text-gray-400 hover:text-gray-600" title="Sair">🚪</button>
+        <button id="btn-refresh" class="p-2 text-gray-400 hover:text-gray-600" title="Atualizar">🔄</button>
+        <button id="btn-logout" class="p-2 text-gray-400 hover:text-gray-600" title="Sair">🚪</button>
       </div>
     </div>
   </header>
 
-  <!-- Conteúdo principal -->
+  <!-- Conteúdo -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- KPIs, Gráficos, Insights... -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="font-bold text-gray-900 mb-4">🏆 Leaderboard</h2>
+        <ul id="leaderboard" class="space-y-2 text-sm text-gray-700"></ul>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="font-bold text-gray-900 mb-4">🎖️ Badges</h2>
+        <div id="badges" class="flex flex-wrap gap-3"></div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="font-bold text-gray-900 mb-4">📊 Pontos</h2>
+        <canvas id="points-chart" height="200"></canvas>
+      </div>
+    </section>
   </main>
 
   <!-- Notificações -->
-  <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md" aria-live="polite"></div>
+  <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md"></div>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="/lib/supabase.js" defer></script>
-  <!-- Fix-imports.js adicionado após supabase.js -->
-  <script src="/js/fix-imports.js" defer></script>
-  <script type="module" src="/js/navigation.js" defer></script>
-  <script type="module" src="/js/main.js" defer></script>
-  <script type="module" src="/js/auth.js" defer></script>
-  <script type="module" src="/js/gamificacao.js" defer></script>
+  <script type="module">
+    import { supabase } from "/src/lib/supabase.js";
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🎮 Gamificação enterprise inicializada');
-      document.getElementById('gamification-loader').style.display = 'none';
+    let pointsChart=null;
+
+    document.addEventListener("DOMContentLoaded", async ()=>{
+      document.getElementById("gamification-loader").style.display="none";
+      console.log("🎮 Gamificação ALSHAM carregada");
+
+      try {
+        await loadGamificationData();
+        document.getElementById("btn-refresh").addEventListener("click", loadGamificationData);
+      } catch(e){
+        console.error("Erro:",e);
+        notify("Erro ao carregar gamificação","error");
+      }
     });
+
+    async function loadGamificationData(){
+      const orgId="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe";
+      
+      const {data:users,error}=await supabase.from("users").select("id,name,points").eq("org_id",orgId).order("points",{ascending:false}).limit(10);
+      if(error) throw error;
+
+      const leaderboard=document.getElementById("leaderboard");
+      leaderboard.innerHTML=users.map((u,i)=>`
+        <li class="flex justify-between"><span>${i+1}. ${u.name}</span><span class="font-bold">${u.points} pts</span></li>
+      `).join("");
+
+      // Gráfico de pontos
+      const ctx=document.getElementById("points-chart");
+      if(pointsChart) pointsChart.destroy();
+      pointsChart=new Chart(ctx,{type:"bar",data:{
+        labels:users.map(u=>u.name),
+        datasets:[{label:"Pontos",data:users.map(u=>u.points),backgroundColor:"#3B82F6"}]
+      },options:{plugins:{legend:{display:false}}}});
+    }
+
+    function notify(msg,type="info"){
+      const c=document.getElementById("gamification-notifications");
+      const n=document.createElement("div");
+      const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
+      n.className=`${colors[type]} text-white px-4 py-2 rounded shadow`;n.textContent=msg;
+      c.appendChild(n);setTimeout(()=>c.removeChild(n),4000);
+    }
   </script>
 </body>
 </html>
