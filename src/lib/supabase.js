@@ -1,20 +1,25 @@
+// -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase unified client v2.0
-// Single source of truth for Supabase usage across the app
-// Works as ESM import and exposes window.AlshamSupabase for legacy pages.
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.0
+// Fonte única da verdade para toda integração com Supabase no sistema.
+// Funciona como ES Module (import/export) e também expõe window.AlshamSupabase
+// para compatibilidade com páginas HTML antigas.
+// -----------------------------------------------------------------------------
 
+// Import oficial do Supabase (via ESM, compatível com Vite e browsers modernos)
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
 
-// --------------------------- Configuration ---------------------------
+// -----------------------------------------------------------------------------
+// Configuração (URL e chave Anon) 
+// Busca primeiro variáveis de ambiente, depois fallback no window, depois valor fixo.
+// -----------------------------------------------------------------------------
 const SUPABASE_URL = (() => {
   try {
     return import.meta?.env?.VITE_SUPABASE_URL
       || (typeof window !== 'undefined' && window.__VITE_SUPABASE_URL__)
-      || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+      || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co'; // fallback seguro
   } catch {
-    return typeof window !== 'undefined'
-      ? window.__VITE_SUPABASE_URL__
-      : 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_URL__ : 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
   }
 })();
 
@@ -22,36 +27,41 @@ const SUPABASE_ANON_KEY = (() => {
   try {
     return import.meta?.env?.VITE_SUPABASE_ANON_KEY
       || (typeof window !== 'undefined' && window.__VITE_SUPABASE_ANON_KEY__)
-      || 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
+      || 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY'; // fallback rotacionável
   } catch {
-    return typeof window !== 'undefined'
-      ? window.__VITE_SUPABASE_ANON_KEY__
-      : 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
+    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_ANON_KEY__ : 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
   }
 })();
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Supabase URL or Key not set. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in env.');
+  console.warn('⚠️ Supabase URL ou Key não configuradas.');
 }
 
-// --------------------------- Create client ---------------------------
+// -----------------------------------------------------------------------------
+// Inicialização do cliente Supabase
+// Inclui: autenticação, headers globais, realtime otimizado
+// -----------------------------------------------------------------------------
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
+    autoRefreshToken: true,  // mantém sessão ativa
+    persistSession: true,    // guarda no storage do navegador
+    detectSessionInUrl: true, // necessário para OAuth
+    flowType: 'pkce'         // segurança OAuth2 PKCE
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-2.0',
+      'X-Client-Info': 'alsham-360-prima@unified-1.0',
       'X-Environment': (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
   },
-  realtime: { params: { eventsPerSecond: 10 } }
+  realtime: {
+    params: { eventsPerSecond: 10 } // otimização para não sobrecarregar
+  }
 });
 
-// --------------------------- Error helper ---------------------------
+// -----------------------------------------------------------------------------
+// Helpers de erro e utilidades
+// -----------------------------------------------------------------------------
 function handleError(err, context = 'supabase_operation') {
   if (!err) return { message: 'unknown error', context };
   const normalized = {
@@ -65,7 +75,6 @@ function handleError(err, context = 'supabase_operation') {
   return normalized;
 }
 
-// --------------------------- Utilities ---------------------------
 function isValidUUID(uuid) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
 }
@@ -93,11 +102,10 @@ function formatTimeAgo(date) {
   const now = new Date();
   const s = Math.floor((now - d) / 1000);
   if (s < 60) return 'agora mesmo';
-  if (s < 3600) return `${Math.floor(s / 60)} minuto${Math.floor(s / 60) > 1 ? 's' : ''} atrás`;
-  if (s < 86400) return `${Math.floor(s / 3600)} hora${Math.floor(s / 3600) > 1 ? 's' : ''} atrás`;
-  if (s < 2592000) return `${Math.floor(s / 86400)} dia${Math.floor(s / 86400) > 1 ? 's' : ''} atrás`;
-  if (s < 31536000) return `${Math.floor(s / 2592000)} mês${Math.floor(s / 2592000) > 1 ? 'es' : ''} atrás`;
-  return `${Math.floor(s / 31536000)} ano${Math.floor(s / 31536000) > 1 ? 's' : ''} atrás`;
+  if (s < 3600) return `${Math.floor(s / 60)} min atrás`;
+  if (s < 86400) return `${Math.floor(s / 3600)} h atrás`;
+  if (s < 2592000) return `${Math.floor(s / 86400)} dias atrás`;
+  return `${Math.floor(s / 2592000)} meses atrás`;
 }
 
 function sanitizeInput(input, opts = {}) {
@@ -107,20 +115,12 @@ function sanitizeInput(input, opts = {}) {
   if (opts.maxLength && v.length > opts.maxLength) v = v.substring(0, opts.maxLength);
   if (opts.removeSpecialChars) v = v.replace(/[^\w\s@.-]/g, '');
   if (opts.toLowerCase) v = v.toLowerCase();
-  if (opts.removeExtraSpaces) v = v.replace(/\s+/g, ' ');
   return v;
 }
 
-function checkBoutcesses() {
-  console.log('✅ checkBoutcesses ok');
-  return { success: true, message: 'All systems operational' };
-}
-
-// --------------------------- Default Org ID ---------------------------
-const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
-function getDefaultOrgId() { return DEFAULT_ORG_ID; }
-
-// --------------------------- AUTH / SESSION ---------------------------
+// -----------------------------------------------------------------------------
+// Autenticação e Sessão
+// -----------------------------------------------------------------------------
 async function getCurrentSession() {
   try {
     const { data, error } = await supabase.auth.getSession();
@@ -159,7 +159,12 @@ function onAuthStateChange(callback) {
   });
 }
 
-// --------------------------- ORG helpers ---------------------------
+// -----------------------------------------------------------------------------
+// Organização (org_id)
+// -----------------------------------------------------------------------------
+const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
+function getDefaultOrgId() { return DEFAULT_ORG_ID; }
+
 async function getCurrentOrgId() {
   try {
     const session = await getCurrentSession();
@@ -172,28 +177,26 @@ async function getCurrentOrgId() {
       .limit(1)
       .maybeSingle();
     if (error) return getDefaultOrgId();
-    const orgId = data?.org_id;
-    if (!orgId || !isValidUUID(orgId)) return getDefaultOrgId();
-    return orgId;
+    return isValidUUID(data?.org_id) ? data.org_id : getDefaultOrgId();
   } catch {
     return getDefaultOrgId();
   }
 }
 
-// --------------------------- GENERIC CRUD ---------------------------
+// -----------------------------------------------------------------------------
+// CRUD Genérico
+// -----------------------------------------------------------------------------
 async function genericSelect(table, filters = {}, options = {}) {
   try {
     let q = supabase.from(table).select(options.select || '*');
-    Object.entries(filters || {}).forEach(([k, v]) => {
-      if (v !== undefined && v !== null) q = q.eq(k, v);
-    });
+    Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); });
     if (options.order) q = q.order(options.order.column, { ascending: !!options.order.ascending });
     if (options.limit) q = q.limit(options.limit);
     const { data, error } = await q;
     if (error) throw error;
-    return { data, error: null };
+    return { data };
   } catch (err) {
-    return { data: null, error: handleError(err, `genericSelect:${table}`) };
+    return { data: null, error: handleError(err, `select:${table}`) };
   }
 }
 
@@ -204,7 +207,7 @@ async function genericInsert(table, payload, orgId = null) {
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
-    return { success: false, error: handleError(err, `genericInsert:${table}`) };
+    return { success: false, error: handleError(err, `insert:${table}`) };
   }
 }
 
@@ -216,7 +219,7 @@ async function genericUpdate(table, id, updates, orgId = null) {
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
-    return { success: false, error: handleError(err, `genericUpdate:${table}`) };
+    return { success: false, error: handleError(err, `update:${table}`) };
   }
 }
 
@@ -228,12 +231,13 @@ async function genericDelete(table, id, orgId = null) {
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
-    return { success: false, error: handleError(err, `genericDelete:${table}`) };
+    return { success: false, error: handleError(err, `delete:${table}`) };
   }
 }
 
-// --------------------------- Domain-specific helpers ---------------------------
-// KPIs
+// -----------------------------------------------------------------------------
+// Domínios específicos ALSHAM
+// -----------------------------------------------------------------------------
 async function getDashboardKPIs(orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
@@ -244,13 +248,12 @@ async function getDashboardKPIs(orgIdParam = null) {
       .order('updated_at', { ascending: false })
       .limit(1);
     if (error) throw error;
-    return (data && data.length) ? data[0] : null;
+    return data?.[0] || null;
   } catch (err) {
     return { error: handleError(err, 'getDashboardKPIs') };
   }
 }
 
-// Leads CRM
 async function getLeads(limit = 50, orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
@@ -271,34 +274,6 @@ async function createLead(payload, orgIdParam = null) {
   return genericInsert('leads_crm', payload, orgIdParam || await getCurrentOrgId());
 }
 
-// Automação
-async function getAutomationRules(orgIdParam = null) {
-  return genericSelect('automation_rules', { org_id: orgIdParam || await getCurrentOrgId() });
-}
-async function getAutomationExecutions(orgIdParam = null) {
-  return genericSelect('automation_executions', { org_id: orgIdParam || await getCurrentOrgId() }, { order: { column: 'started_at', ascending: false }, limit: 100 });
-}
-
-// Gamificação
-async function getGamificationPoints(orgIdParam = null) {
-  return genericSelect('gamification_points', { org_id: orgIdParam || await getCurrentOrgId() });
-}
-async function getLeaderboards(orgIdParam = null) {
-  return genericSelect('leaderboard', { org_id: orgIdParam || await getCurrentOrgId() });
-}
-async function getBadges(orgIdParam = null) {
-  return genericSelect('gamification_badges', { org_id: orgIdParam || await getCurrentOrgId() });
-}
-
-// Relatórios
-async function getReports(orgIdParam = null) {
-  return genericSelect('reports', { org_id: orgIdParam || await getCurrentOrgId() });
-}
-async function getAnalytics(orgIdParam = null) {
-  return genericSelect('analytics_kpis', { org_id: orgIdParam || await getCurrentOrgId() });
-}
-
-// Auditoria
 async function createAuditLog(action, details, userId = null, orgIdParam = null) {
   try {
     const org_id = orgIdParam || await getCurrentOrgId();
@@ -308,20 +283,14 @@ async function createAuditLog(action, details, userId = null, orgIdParam = null)
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
-    return { success: false, error: handleError(err, 'createAuditLog') };
+    return { success: false, error: handleError(err, 'auditLog') };
   }
 }
 
-// User Profile
 async function getUserProfile(userId, orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .maybeSingle();
+    const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', userId).eq('org_id', orgId).maybeSingle();
     if (error) throw error;
     return { data };
   } catch (err) {
@@ -332,12 +301,7 @@ async function getUserProfile(userId, orgIdParam = null) {
 async function updateUserProfile(userId, updates, orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .update(updates)
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .select();
+    const { data, error } = await supabase.from('user_profiles').update(updates).eq('user_id', userId).eq('org_id', orgId).select();
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
@@ -345,7 +309,9 @@ async function updateUserProfile(userId, updates, orgIdParam = null) {
   }
 }
 
-// --------------------------- Realtime subscribe ---------------------------
+// -----------------------------------------------------------------------------
+// Realtime
+// -----------------------------------------------------------------------------
 function subscribeToTable(table, orgId, callback) {
   try {
     return supabase.channel(`realtime:${table}`)
@@ -356,74 +322,100 @@ function subscribeToTable(table, orgId, callback) {
   }
 }
 
-// --------------------------- UI / Notifications ---------------------------
+// -----------------------------------------------------------------------------
+// Notificações / UI
+// -----------------------------------------------------------------------------
 function showNotification(message, type = 'info') {
   if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
     window.showToast(message, type);
     return { success: true };
   }
-  try {
-    if (typeof window !== 'undefined' && window.alert && type === 'error') {
-      window.alert(message);
-      return { success: true };
-    }
-  } catch (e) { /* ignore */ }
   console.log(`[${type.toUpperCase()}] ${message}`);
   return { success: true };
 }
 
-// --------------------------- Expose on window ---------------------------
+// -----------------------------------------------------------------------------
+// Exposição no Window (para páginas antigas)
+// -----------------------------------------------------------------------------
 if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
   window.AlshamSupabase = {
     supabase,
-    // auth/session
-    getCurrentSession, getCurrentUser, signOut, onAuthStateChange,
+    // auth
+    getCurrentSession,
+    getCurrentUser,
+    signOut,
+    onAuthStateChange,
     // org
-    getCurrentOrgId, getDefaultOrgId, DEFAULT_ORG_ID,
-    // generic
-    genericSelect, genericInsert, genericUpdate, genericDelete,
+    getCurrentOrgId,
+    getDefaultOrgId,
+    DEFAULT_ORG_ID,
+    // CRUD
+    genericSelect,
+    genericInsert,
+    genericUpdate,
+    genericDelete,
     // domain
     getDashboardKPIs,
-    getLeads, createLead,
-    getAutomationRules, getAutomationExecutions,
-    getGamificationPoints, getLeaderboards, getBadges,
-    getReports, getAnalytics,
+    getLeads,
+    createLead,
     // user
-    getUserProfile, updateUserProfile,
+    getUserProfile,
+    updateUserProfile,
     // audit
     createAuditLog,
     // realtime
     subscribeToTable,
     // utils
-    formatDateBR, formatTimeAgo, sanitizeInput, isValidUUID, generateUUID, checkBoutcesses, showNotification, handleError
+    formatDateBR,
+    formatTimeAgo,
+    sanitizeInput,
+    isValidUUID,
+    generateUUID,
+    showNotification,
+    handleError
   };
   console.log('✅ window.AlshamSupabase disponível:', Object.keys(window.AlshamSupabase));
 }
 
-// --------------------------- Exports ---------------------------
+// -----------------------------------------------------------------------------
+// Export moderno (ESM)
+// -----------------------------------------------------------------------------
 export {
   supabase,
-  // auth/session
-  getCurrentSession, getCurrentUser, signOut, onAuthStateChange,
+  // auth
+  getCurrentSession,
+  getCurrentUser,
+  signOut,
+  onAuthStateChange,
   // org
-  getCurrentOrgId, getDefaultOrgId, DEFAULT_ORG_ID,
-  // generic
-  genericSelect, genericInsert, genericUpdate, genericDelete,
-  // domain-specific
+  getCurrentOrgId,
+  getDefaultOrgId,
+  DEFAULT_ORG_ID,
+  // CRUD
+  genericSelect,
+  genericInsert,
+  genericUpdate,
+  genericDelete,
+  // domain
   getDashboardKPIs,
-  getLeads, createLead,
-  getAutomationRules, getAutomationExecutions,
-  getGamificationPoints, getLeaderboards, getBadges,
-  getReports, getAnalytics,
+  getLeads,
+  createLead,
   // user
-  getUserProfile, updateUserProfile,
+  getUserProfile,
+  updateUserProfile,
   // audit
   createAuditLog,
   // realtime
   subscribeToTable,
   // utils
-  formatDateBR, formatTimeAgo, sanitizeInput, isValidUUID, generateUUID, checkBoutcesses, showNotification, handleError
+  formatDateBR,
+  formatTimeAgo,
+  sanitizeInput,
+  isValidUUID,
+  generateUUID,
+  showNotification,
+  handleError
 };
 
 export default supabase;
