@@ -1,20 +1,20 @@
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase unified client v1.0
+// ALSHAM 360° PRIMA - Supabase unified client v2.0
 // Single source of truth for Supabase usage across the app
 // Works as ESM import and exposes window.AlshamSupabase for legacy pages.
 
-// Use ESM browser import of Supabase (works with Vite & modern browsers)
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
 
 // --------------------------- Configuration ---------------------------
 const SUPABASE_URL = (() => {
-  // prefer Vite env, then window override, then hardcoded fallback (project URL)
   try {
     return import.meta?.env?.VITE_SUPABASE_URL
       || (typeof window !== 'undefined' && window.__VITE_SUPABASE_URL__)
       || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
   } catch {
-    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_URL__ : 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+    return typeof window !== 'undefined'
+      ? window.__VITE_SUPABASE_URL__
+      : 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
   }
 })();
 
@@ -22,15 +22,15 @@ const SUPABASE_ANON_KEY = (() => {
   try {
     return import.meta?.env?.VITE_SUPABASE_ANON_KEY
       || (typeof window !== 'undefined' && window.__VITE_SUPABASE_ANON_KEY__)
-      // safe publishable fallback (rotate in dashboard if needed)
       || 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
   } catch {
-    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_ANON_KEY__ : 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
+    return typeof window !== 'undefined'
+      ? window.__VITE_SUPABASE_ANON_KEY__
+      : 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
   }
 })();
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  // In development, better to fail loudly
   console.warn('⚠️ Supabase URL or Key not set. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in env.');
 }
 
@@ -44,13 +44,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.0',
+      'X-Client-Info': 'alsham-360-prima@unified-2.0',
       'X-Environment': (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
   },
-  realtime: {
-    params: { eventsPerSecond: 10 }
-  }
+  realtime: { params: { eventsPerSecond: 10 } }
 });
 
 // --------------------------- Error helper ---------------------------
@@ -119,8 +117,6 @@ function checkBoutcesses() {
 }
 
 // --------------------------- Default Org ID ---------------------------
-// Use a stable fallback org id if user has no org configured.
-// You can change this to a real organization ID if desired.
 const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
 function getDefaultOrgId() { return DEFAULT_ORG_ID; }
 
@@ -175,15 +171,11 @@ async function getCurrentOrgId() {
       .eq('user_id', userId)
       .limit(1)
       .maybeSingle();
-    if (error) {
-      console.warn('getCurrentOrgId warning:', error);
-      return getDefaultOrgId();
-    }
+    if (error) return getDefaultOrgId();
     const orgId = data?.org_id;
     if (!orgId || !isValidUUID(orgId)) return getDefaultOrgId();
     return orgId;
-  } catch (err) {
-    console.warn('getCurrentOrgId fallback to default', err);
+  } catch {
     return getDefaultOrgId();
   }
 }
@@ -192,7 +184,6 @@ async function getCurrentOrgId() {
 async function genericSelect(table, filters = {}, options = {}) {
   try {
     let q = supabase.from(table).select(options.select || '*');
-    // simple equality filters
     Object.entries(filters || {}).forEach(([k, v]) => {
       if (v !== undefined && v !== null) q = q.eq(k, v);
     });
@@ -242,6 +233,7 @@ async function genericDelete(table, id, orgId = null) {
 }
 
 // --------------------------- Domain-specific helpers ---------------------------
+// KPIs
 async function getDashboardKPIs(orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
@@ -258,6 +250,7 @@ async function getDashboardKPIs(orgIdParam = null) {
   }
 }
 
+// Leads CRM
 async function getLeads(limit = 50, orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
@@ -278,7 +271,34 @@ async function createLead(payload, orgIdParam = null) {
   return genericInsert('leads_crm', payload, orgIdParam || await getCurrentOrgId());
 }
 
-// audit log
+// Automação
+async function getAutomationRules(orgIdParam = null) {
+  return genericSelect('automation_rules', { org_id: orgIdParam || await getCurrentOrgId() });
+}
+async function getAutomationExecutions(orgIdParam = null) {
+  return genericSelect('automation_executions', { org_id: orgIdParam || await getCurrentOrgId() }, { order: { column: 'started_at', ascending: false }, limit: 100 });
+}
+
+// Gamificação
+async function getGamificationPoints(orgIdParam = null) {
+  return genericSelect('gamification_points', { org_id: orgIdParam || await getCurrentOrgId() });
+}
+async function getLeaderboards(orgIdParam = null) {
+  return genericSelect('leaderboard', { org_id: orgIdParam || await getCurrentOrgId() });
+}
+async function getBadges(orgIdParam = null) {
+  return genericSelect('gamification_badges', { org_id: orgIdParam || await getCurrentOrgId() });
+}
+
+// Relatórios
+async function getReports(orgIdParam = null) {
+  return genericSelect('reports', { org_id: orgIdParam || await getCurrentOrgId() });
+}
+async function getAnalytics(orgIdParam = null) {
+  return genericSelect('analytics_kpis', { org_id: orgIdParam || await getCurrentOrgId() });
+}
+
+// Auditoria
 async function createAuditLog(action, details, userId = null, orgIdParam = null) {
   try {
     const org_id = orgIdParam || await getCurrentOrgId();
@@ -292,11 +312,16 @@ async function createAuditLog(action, details, userId = null, orgIdParam = null)
   }
 }
 
-// user profile
+// User Profile
 async function getUserProfile(userId, orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', userId).eq('org_id', orgId).maybeSingle();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('org_id', orgId)
+      .maybeSingle();
     if (error) throw error;
     return { data };
   } catch (err) {
@@ -307,7 +332,12 @@ async function getUserProfile(userId, orgIdParam = null) {
 async function updateUserProfile(userId, updates, orgIdParam = null) {
   try {
     const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase.from('user_profiles').update(updates).eq('user_id', userId).eq('org_id', orgId).select();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update(updates)
+      .eq('user_id', userId)
+      .eq('org_id', orgId)
+      .select();
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
@@ -332,7 +362,6 @@ function showNotification(message, type = 'info') {
     window.showToast(message, type);
     return { success: true };
   }
-  // fallback
   try {
     if (typeof window !== 'undefined' && window.alert && type === 'error') {
       window.alert(message);
@@ -343,86 +372,58 @@ function showNotification(message, type = 'info') {
   return { success: true };
 }
 
-// --------------------------- Expose on window for legacy pages ---------------------------
+// --------------------------- Expose on window ---------------------------
 if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
   window.AlshamSupabase = {
     supabase,
     // auth/session
-    getCurrentSession,
-    getCurrentUser,
-    signOut,
-    onAuthStateChange,
+    getCurrentSession, getCurrentUser, signOut, onAuthStateChange,
     // org
-    getCurrentOrgId,
-    getDefaultOrgId,
-    DEFAULT_ORG_ID,
-    // generic CRUD
-    genericSelect,
-    genericInsert,
-    genericUpdate,
-    genericDelete,
+    getCurrentOrgId, getDefaultOrgId, DEFAULT_ORG_ID,
+    // generic
+    genericSelect, genericInsert, genericUpdate, genericDelete,
     // domain
     getDashboardKPIs,
-    getLeads,
-    createLead,
+    getLeads, createLead,
+    getAutomationRules, getAutomationExecutions,
+    getGamificationPoints, getLeaderboards, getBadges,
+    getReports, getAnalytics,
     // user
-    getUserProfile,
-    updateUserProfile,
+    getUserProfile, updateUserProfile,
     // audit
     createAuditLog,
     // realtime
     subscribeToTable,
     // utils
-    formatDateBR,
-    formatTimeAgo,
-    sanitizeInput,
-    isValidUUID,
-    generateUUID,
-    checkBoutcesses,
-    showNotification,
-    handleError
+    formatDateBR, formatTimeAgo, sanitizeInput, isValidUUID, generateUUID, checkBoutcesses, showNotification, handleError
   };
-  console.log('✅ window.AlshamSupabase available with functions:', Object.keys(window.AlshamSupabase));
+  console.log('✅ window.AlshamSupabase disponível:', Object.keys(window.AlshamSupabase));
 }
 
-// --------------------------- Named exports (ESM) ---------------------------
+// --------------------------- Exports ---------------------------
 export {
   supabase,
   // auth/session
-  getCurrentSession,
-  getCurrentUser,
-  signOut,
-  onAuthStateChange,
+  getCurrentSession, getCurrentUser, signOut, onAuthStateChange,
   // org
-  getCurrentOrgId,
-  getDefaultOrgId,
-  DEFAULT_ORG_ID,
+  getCurrentOrgId, getDefaultOrgId, DEFAULT_ORG_ID,
   // generic
-  genericSelect,
-  genericInsert,
-  genericUpdate,
-  genericDelete,
+  genericSelect, genericInsert, genericUpdate, genericDelete,
   // domain-specific
   getDashboardKPIs,
-  getLeads,
-  createLead,
+  getLeads, createLead,
+  getAutomationRules, getAutomationExecutions,
+  getGamificationPoints, getLeaderboards, getBadges,
+  getReports, getAnalytics,
   // user
-  getUserProfile,
-  updateUserProfile,
+  getUserProfile, updateUserProfile,
   // audit
   createAuditLog,
   // realtime
   subscribeToTable,
   // utils
-  formatDateBR,
-  formatTimeAgo,
-  sanitizeInput,
-  isValidUUID,
-  generateUUID,
-  checkBoutcesses,
-  showNotification,
-  handleError
+  formatDateBR, formatTimeAgo, sanitizeInput, isValidUUID, generateUUID, checkBoutcesses, showNotification, handleError
 };
 
 export default supabase;
