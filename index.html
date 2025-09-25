@@ -3,13 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="refresh" content="0; url=/dashboard.html" />
+  <title>Redirecionando...</title>
   <script>
     // Redirecionamento de segurança via JS
-    window.location.href = "/dashboard.html";
+    window.location.replace("/dashboard.html");
   </script>
-  <title>Redirecionando...</title>
 </head>
 <body>
   <p>Redirecionando para o <a href="/dashboard.html">Dashboard</a>...</p>
+
+  <!-- PWA Service Worker (registrado apenas aqui) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/registerSW.js')
+          .then(() => console.log('✅ Service Worker registrado com sucesso'))
+          .catch(err => console.error('⚠️ Erro ao registrar Service Worker:', err));
+      });
+    }
+  </script>
 </body>
 </html>
