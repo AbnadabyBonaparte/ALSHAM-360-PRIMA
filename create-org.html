@@ -5,515 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Criar Organização - ALSHAM 360° PRIMA</title>
 
-  <!-- Corrigir CSP para permitir CDN -->
+  <!-- CSP -->
   <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none';">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
-  
-  <!-- Tailwind CSS para garantir estilos -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+  <link rel="icon" href="assets/favicon.ico">
+
+  <!-- Estilos -->
   <style>
-    .form-input {
-      @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors;
-    }
-    
-    .btn-primary {
-      @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
-    }
-    
-    .btn-success {
-      @apply bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
-    }
-    
-    .status {
-      @apply text-sm font-medium px-3 py-2 rounded-lg;
-    }
-    
-    .status.loading {
-      @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
-    }
-    
-    .status.success {
-      @apply bg-green-100 text-green-800 border border-green-200;
-    }
-    
-    .status.error {
-      @apply bg-red-100 text-red-800 border border-red-200;
-    }
-    
-    .data-display {
-      @apply mt-3 p-3 bg-gray-50 rounded-lg border text-sm;
-    }
-    
-    .loading-spinner {
-      @apply inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin;
-    }
+    .form-input { @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500; }
+    .btn { @apply w-full flex items-center justify-center font-semibold py-2 px-4 rounded-lg transition-colors; }
+    .btn-primary { @apply bg-blue-600 hover:bg-blue-700 text-white; }
+    .btn-success { @apply bg-green-600 hover:bg-green-700 text-white; }
+    .status { @apply text-sm font-medium px-3 py-2 rounded-lg mt-2; }
+    .status.loading { @apply bg-yellow-100 text-yellow-800 border border-yellow-200; }
+    .status.success { @apply bg-green-100 text-green-800 border border-green-200; }
+    .status.error { @apply bg-red-100 text-red-800 border border-red-200; }
+    .data-display { @apply mt-3 p-3 bg-gray-50 rounded-lg border text-sm; }
+    .loading-spinner { @apply hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2; }
   </style>
 
-  <!-- Variáveis do Supabase -->
-  <script src="/env.js" defer></script>
+  <!-- Supabase -->
+  <script type="module">
+    import { supabase } from "/src/lib/supabase.js";
 
-  <!-- Supabase CDN - Versão específica para estabilidade -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.38.4/supabase.min.js" integrity="sha512-..." crossorigin="anonymous" defer></script>
-</head>
-<body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-6 font-sans">
-
-  <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-blue-600 mb-2">🏢 Criar Organização ALSHAM</h1>
-      <p class="text-gray-500">Setup inicial da sua organização no ALSHAM 360° PRIMA</p>
-      <p class="text-xs text-gray-400 mt-2">Sistema com 55 tabelas/views completas</p>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
-    <!-- Formulário -->
-    <div class="space-y-8">
-      <!-- Dados da Organização -->
-      <section class="bg-gray-50 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
-          Dados da Organização
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="org-name" class="block text-sm font-medium text-gray-700 mb-2">Nome da Organização:</label>
-            <input 
-              id="org-name" 
-              class="form-input" 
-              value="ALSHAM Global Default"
-              placeholder="Digite o nome da organização" 
-            />
-          </div>
-          
-          <div>
-            <label for="org-id" class="block text-sm font-medium text-gray-700 mb-2">ID (UUID):</label>
-            <input 
-              id="org-id" 
-              class="form-input" 
-              value="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe"
-              placeholder="UUID único da organização"
-            />
-            <button 
-              onclick="generateNewUUID()" 
-              class="text-xs text-blue-600 hover:text-blue-800 mt-1"
-            >
-              🔄 Gerar novo UUID
-            </button>
-          </div>
-        </div>
-
-        <button 
-          onclick="createOrganization()" 
-          class="btn-primary mt-4 w-full flex items-center justify-center" 
-          aria-label="Criar Organização"
-        >
-          <span class="loading-spinner hidden mr-2"></span>
-          🏢 Criar Organização
-        </button>
-        <div id="create-status" class="status loading mt-3">Pronto para criar organização...</div>
-      </section>
-
-      <!-- Verificar Organização -->
-      <section class="bg-gray-50 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <span class="bg-green-100 text-green-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
-          Verificar Organização
-        </h2>
-        
-        <button 
-          onclick="verifyOrganization()" 
-          class="btn-primary w-full flex items-center justify-center" 
-          aria-label="Verificar Organização"
-        >
-          <span class="loading-spinner hidden mr-2"></span>
-          🔍 Verificar Existência
-        </button>
-        <div id="verify-status" class="status loading mt-3">Aguardando verificação...</div>
-        <div id="verify-data" class="data-display hidden"></div>
-      </section>
-
-      <!-- Listar Organizações -->
-      <section class="bg-gray-50 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <span class="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
-          Listar Organizações
-        </h2>
-        
-        <button 
-          onclick="listOrganizations()" 
-          class="btn-primary w-full flex items-center justify-center" 
-          aria-label="Listar Organizações"
-        >
-          <span class="loading-spinner hidden mr-2"></span>
-          📋 Listar Todas
-        </button>
-        <div id="list-status" class="status loading mt-3">Aguardando listagem...</div>
-        <div id="list-data" class="data-display hidden max-h-64 overflow-y-auto"></div>
-      </section>
-
-      <!-- Setup Completo -->
-      <section class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-200">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <span class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">🚀</span>
-          Processo Completo
-        </h2>
-        
-        <p class="text-sm text-gray-600 mb-4">
-          Executa todo o processo: criar → verificar → listar organizações
-        </p>
-        
-        <button 
-          onclick="setupComplete()" 
-          class="btn-success w-full flex items-center justify-center" 
-          aria-label="Executar Setup Completo"
-        >
-          <span class="loading-spinner hidden mr-2"></span>
-          🎯 Setup Completo do Sistema
-        </button>
-        <div id="complete-status" class="status loading mt-3">Pronto para executar processo completo...</div>
-      </section>
-
-      <!-- Informações do Sistema -->
-      <section class="bg-blue-50 rounded-lg p-4 border border-blue-200">
-        <h3 class="text-sm font-semibold text-blue-900 mb-2">📊 Informações do Sistema</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-blue-700">
-          <div>
-            <strong>55 Tabelas/Views</strong><br>
-            Sistema completo
-          </div>
-          <div>
-            <strong>CRM + IA + Automação</strong><br>
-            Funcionalidades enterprise
-          </div>
-          <div>
-            <strong>Gamificação + Analytics</strong><br>
-            ROI em tempo real
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script>
-    // Aguardar carregamento completo
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 ALSHAM 360° PRIMA - Sistema de Organizações Iniciado');
-      
-      // Verificar se Supabase está disponível
-      if (typeof window.supabase === 'undefined') {
-        console.error('❌ Supabase não carregado');
-        showToast('Erro: Supabase não disponível', 'error');
-        return;
-      }
-      
-      console.log('✅ Supabase carregado com sucesso');
-      initializeSystem();
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("🚀 ALSHAM - Criar Organização Iniciado");
+      window.supabaseClient = supabase;
+      window.showToast("Sistema pronto", "success");
     });
 
-    // Sistema de notificações toast
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      
-      const colors = {
-        success: 'bg-green-500 text-white',
-        error: 'bg-red-500 text-white',
-        warning: 'bg-yellow-500 text-black',
-        info: 'bg-blue-500 text-white'
-      };
-      
-      toast.className = `${colors[type]} px-4 py-2 rounded-lg shadow-lg transform translate-x-full opacity-0 transition-all duration-300`;
-      toast.textContent = message;
-      
-      container.appendChild(toast);
-      
-      // Animar entrada
-      setTimeout(() => {
-        toast.classList.remove('translate-x-full', 'opacity-0');
-      }, 100);
-      
-      // Remover após 5 segundos
-      setTimeout(() => {
-        toast.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => {
-          container.removeChild(toast);
-        }, 300);
-      }, 5000);
-    }
-
-    // Configuração inicial do sistema
-    function initializeSystem() {
-      try {
-        // Verificar variáveis de ambiente
-        if (!window.__VITE_SUPABASE_URL__ || !window.__VITE_SUPABASE_ANON_KEY__) {
-          throw new Error('Variáveis de ambiente do Supabase não configuradas');
-        }
-        
-        // Inicializar cliente Supabase
-        const { createClient } = window.supabase;
-        window.supabaseClient = createClient(
-          window.__VITE_SUPABASE_URL__, 
-          window.__VITE_SUPABASE_ANON_KEY__
-        );
-        
-        console.log('✅ Cliente Supabase inicializado');
-        showToast('Sistema inicializado com sucesso', 'success');
-        
-      } catch (error) {
-        console.error('❌ Erro na inicialização:', error);
-        showToast(`Erro na inicialização: ${error.message}`, 'error');
-      }
-    }
-
-    // Gerar novo UUID
-    function generateNewUUID() {
-      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-      document.getElementById('org-id').value = uuid;
-      showToast('Novo UUID gerado', 'info');
-    }
-
-    // Utilitário para mostrar loading
-    function setLoading(buttonSelector, statusId, isLoading, message = '') {
-      const button = document.querySelector(buttonSelector);
-      const status = document.getElementById(statusId);
-      const spinner = button?.querySelector('.loading-spinner');
-      
-      if (button) {
-        button.disabled = isLoading;
-        if (spinner) {
-          spinner.classList.toggle('hidden', !isLoading);
-        }
-      }
-      
-      if (status && message) {
-        status.className = `status ${isLoading ? 'loading' : 'success'}`;
-        status.textContent = message;
-      }
-    }
-
-    // Criar organização
-    window.createOrganization = async function() {
-      const name = document.getElementById('org-name').value.trim();
-      const id = document.getElementById('org-id').value.trim();
-      const status = document.getElementById('create-status');
-      
-      if (!name || !id) {
-        showToast('Preencha todos os campos', 'warning');
-        return;
-      }
-      
-      // Validar UUID
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(id)) {
-        showToast('UUID inválido', 'error');
-        return;
-      }
-      
-      setLoading('button[onclick="createOrganization()"]', 'create-status', true, '🔄 Criando organização...');
-      
-      try {
-        const { data, error } = await window.supabaseClient
-          .from('organizations')
-          .insert([{ 
-            id, 
-            name, 
-            created_at: new Date().toISOString() 
-          }])
-          .select();
-
-        if (error) {
-          if (error.code === '23505') { // Duplicate key
-            status.className = 'status success';
-            status.textContent = '✅ Organização já existe no sistema';
-            showToast('Organização já cadastrada', 'info');
-          } else {
-            throw error;
-          }
-        } else {
-          status.className = 'status success';
-          status.textContent = `✅ Organização "${name}" criada com sucesso`;
-          showToast('Organização criada com sucesso!', 'success');
-        }
-        
-      } catch (error) {
-        console.error('Erro ao criar organização:', error);
-        status.className = 'status error';
-        status.textContent = `❌ Erro: ${error.message}`;
-        showToast(`Erro ao criar organização: ${error.message}`, 'error');
-      } finally {
-        setLoading('button[onclick="createOrganization()"]', '', false);
-      }
+    // Toast
+    window.showToast = (msg, type="info") => {
+      const c=document.getElementById("toast-container"); const t=document.createElement("div");
+      const colors={success:"bg-green-500 text-white",error:"bg-red-500 text-white",warning:"bg-yellow-500 text-black",info:"bg-blue-500 text-white"};
+      t.className=`${colors[type]} px-4 py-2 rounded-lg shadow transform translate-x-full opacity-0 transition-all`; t.textContent=msg;
+      c.appendChild(t); setTimeout(()=>t.classList.remove("translate-x-full","opacity-0"),100);
+      setTimeout(()=>{t.classList.add("translate-x-full","opacity-0");setTimeout(()=>c.removeChild(t),300)},4000);
     };
 
-    // Verificar organização
-    window.verifyOrganization = async function() {
-      const id = document.getElementById('org-id').value.trim();
-      const status = document.getElementById('verify-status');
-      const dataEl = document.getElementById('verify-data');
-      
-      if (!id) {
-        showToast('Digite um ID para verificar', 'warning');
-        return;
-      }
-      
-      setLoading('button[onclick="verifyOrganization()"]', 'verify-status', true, '🔍 Verificando organização...');
-      
-      try {
-        const { data, error } = await window.supabaseClient
-          .from('organizations')
-          .select('*')
-          .eq('id', id)
-          .single();
+    // UUID
+    window.generateNewUUID=()=>{const uuid="xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==="x"?r:(r&0x3|0x8);return v.toString(16)});document.getElementById("org-id").value=uuid;showToast("Novo UUID gerado","info")};
 
-        if (error) {
-          if (error.code === 'PGRST116') { // Not found
-            status.className = 'status error';
-            status.textContent = '❌ Organização não encontrada';
-            showToast('Organização não encontrada', 'warning');
-            dataEl.classList.add('hidden');
-          } else {
-            throw error;
-          }
-        } else {
-          status.className = 'status success';
-          status.textContent = `✅ Organização encontrada: ${data.name}`;
-          showToast('Organização encontrada!', 'success');
-          
-          dataEl.classList.remove('hidden');
-          dataEl.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <strong class="text-gray-700">ID:</strong><br>
-                <code class="bg-gray-100 px-2 py-1 rounded text-xs">${data.id}</code>
-              </div>
-              <div>
-                <strong class="text-gray-700">Nome:</strong><br>
-                <span class="text-gray-900">${data.name}</span>
-              </div>
-              <div class="md:col-span-2">
-                <strong class="text-gray-700">Criada em:</strong><br>
-                <span class="text-gray-600">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
-              </div>
-            </div>
-          `;
-        }
-        
-      } catch (error) {
-        console.error('Erro ao verificar organização:', error);
-        status.className = 'status error';
-        status.textContent = `❌ Erro: ${error.message}`;
-        showToast(`Erro ao verificar: ${error.message}`, 'error');
-      } finally {
-        setLoading('button[onclick="verifyOrganization()"]', '', false);
-      }
+    // Criar
+    window.createOrganization=async()=>{
+      const id=document.getElementById("org-id").value.trim();const name=document.getElementById("org-name").value.trim();const s=document.getElementById("create-status");
+      if(!id||!name){return showToast("Preencha todos os campos","warning");}
+      s.className="status loading";s.textContent="🔄 Criando...";
+      try{const{data,error}=await supabase.from("organizations").insert([{id,name,created_at:new Date().toISOString()}]).select();
+        if(error){if(error.code==="23505"){s.className="status success";s.textContent="✅ Já existe";showToast("Organização já cadastrada","info");}else throw error;}
+        else{s.className="status success";s.textContent=`✅ Criada: ${name}`;showToast("Organização criada!","success");}}
+      catch(e){console.error(e);s.className="status error";s.textContent=`❌ Erro: ${e.message}`;showToast("Erro ao criar","error");}
     };
 
-    // Listar organizações
-    window.listOrganizations = async function() {
-      const status = document.getElementById('list-status');
-      const dataEl = document.getElementById('list-data');
-      
-      setLoading('button[onclick="listOrganizations()"]', 'list-status', true, '📋 Listando organizações...');
-      
-      try {
-        const { data, error } = await window.supabaseClient
-          .from('organizations')
-          .select('*')
-          .order('created_at', { ascending: false });
+    // Verificar
+    window.verifyOrganization=async()=>{
+      const id=document.getElementById("org-id").value.trim();const s=document.getElementById("verify-status");const d=document.getElementById("verify-data");
+      if(!id){return showToast("Digite um UUID","warning");}
+      s.className="status loading";s.textContent="🔍 Verificando...";
+      try{const{data,error}=await supabase.from("organizations").select("*").eq("id",id).single();
+        if(error){s.className="status error";s.textContent="❌ Não encontrada";d.classList.add("hidden");}
+        else{s.className="status success";s.textContent=`✅ Encontrada: ${data.name}`;d.classList.remove("hidden");d.innerHTML=`<p><b>ID:</b> ${data.id}</p><p><b>Nome:</b> ${data.name}</p>`;}}
+      catch(e){console.error(e);s.className="status error";s.textContent=`❌ Erro: ${e.message}`;showToast("Erro ao verificar","error");}
+    };
 
-        if (error) throw error;
-
-        status.className = 'status success';
-        status.textContent = `✅ ${data.length} organização(ões) encontrada(s)`;
-        showToast(`${data.length} organizações listadas`, 'success');
-        
-        if (data.length === 0) {
-          dataEl.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma organização encontrada</p>';
-        } else {
-          dataEl.innerHTML = data.map((org, index) => `
-            <div class="border-b border-gray-200 pb-3 mb-3 ${index === data.length - 1 ? 'border-b-0 mb-0 pb-0' : ''}">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="font-semibold text-gray-900">${org.name}</h4>
-                  <p class="text-xs text-gray-500">ID: <code class="bg-gray-100 px-1 rounded">${org.id}</code></p>
-                </div>
-                <span class="text-xs text-gray-400">
-                  ${new Date(org.created_at).toLocaleDateString('pt-BR')}
-                </span>
-              </div>
-            </div>
-          `).join('');
-        }
-        
-        dataEl.classList.remove('hidden');
-        
-      } catch (error) {
-        console.error('Erro ao listar organizações:', error);
-        status.className = 'status error';
-        status.textContent = `❌ Erro: ${error.message}`;
-        showToast(`Erro ao listar: ${error.message}`, 'error');
-      } finally {
-        setLoading('button[onclick="listOrganizations()"]', '', false);
-      }
+    // Listar
+    window.listOrganizations=async()=>{
+      const s=document.getElementById("list-status");const d=document.getElementById("list-data");
+      s.className="status loading";s.textContent="📋 Listando...";
+      try{const{data,error}=await supabase.from("organizations").select("*").order("created_at",{ascending:false});
+        if(error)throw error;s.className="status success";s.textContent=`✅ ${data.length} encontrada(s)`;
+        d.innerHTML=data.map(org=>`<div class="border-b py-2"><b>${org.name}</b><br><code>${org.id}</code></div>`).join("")||"<p>Nenhuma</p>";d.classList.remove("hidden");}
+      catch(e){console.error(e);s.className="status error";s.textContent=`❌ Erro: ${e.message}`;showToast("Erro ao listar","error");}
     };
 
     // Setup completo
-    window.setupComplete = async function() {
-      const status = document.getElementById('complete-status');
-      
-      setLoading('button[onclick="setupComplete()"]', 'complete-status', true, '🚀 Executando setup completo...');
-      
-      try {
-        showToast('Iniciando setup completo do sistema...', 'info');
-        
-        // Executar todas as funções em sequência
-        await createOrganization();
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Pequeno delay
-        
-        await verifyOrganization();
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        await listOrganizations();
-        
-        status.className = 'status success';
-        status.textContent = '🎉 Setup completo executado com sucesso!';
-        showToast('🎉 Setup completo finalizado!', 'success');
-        
-        // Adicionar confetes visuais
-        setTimeout(() => {
-          showToast('Sistema ALSHAM 360° PRIMA pronto para uso!', 'success');
-        }, 1500);
-        
-      } catch (error) {
-        console.error('Erro no setup completo:', error);
-        status.className = 'status error';
-        status.textContent = `❌ Erro no setup: ${error.message}`;
-        showToast(`Erro no setup completo: ${error.message}`, 'error');
-      } finally {
-        setLoading('button[onclick="setupComplete()"]', '', false);
-      }
+    window.setupComplete=async()=>{
+      const s=document.getElementById("complete-status");
+      s.className="status loading";s.textContent="🚀 Executando...";
+      try{await createOrganization();await verifyOrganization();await listOrganizations();
+        s.className="status success";s.textContent="🎉 Setup completo!";showToast("🎉 Setup completo finalizado!","success");}
+      catch(e){console.error(e);s.className="status error";s.textContent=`❌ Erro: ${e.message}`;showToast("Erro no setup","error");}
     };
   </script>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-6 font-sans">
+  <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8">
+    <h1 class="text-2xl font-bold text-blue-600 mb-6 text-center">🏢 Criar Organização ALSHAM</h1>
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  <!-- Fallback noscript -->
-  <noscript>
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-      <div class="bg-white p-8 rounded-lg max-w-md text-center">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">⚠️ JavaScript Necessário</h2>
-        <p class="text-gray-600 mb-4">O sistema ALSHAM 360° PRIMA requer JavaScript para funcionar.</p>
-        <p class="text-sm text-gray-500">Ative o JavaScript no seu navegador para continuar.</p>
-      </div>
-    </div>
-  </noscript>
+    <!-- Organização -->
+    <section class="mb-6">
+      <label>Nome</label>
+      <input id="org-name" class="form-input mb-2" placeholder="Nome da organização" value="ALSHAM Global Default">
+      <label>UUID</label>
+      <input id="org-id" class="form-input" value="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe">
+      <button onclick="generateNewUUID()" class="text-xs text-blue-600 mt-1">🔄 Gerar novo</button>
+      <button onclick="createOrganization()" class="btn btn-primary mt-3"><span class="loading-spinner"></span> Criar</button>
+      <div id="create-status" class="status">Pronto</div>
+    </section>
+
+    <!-- Verificar -->
+    <section class="mb-6">
+      <button onclick="verifyOrganization()" class="btn btn-primary"><span class="loading-spinner"></span> Verificar</button>
+      <div id="verify-status" class="status">Aguardando</div>
+      <div id="verify-data" class="data-display hidden"></div>
+    </section>
+
+    <!-- Listar -->
+    <section class="mb-6">
+      <button onclick="listOrganizations()" class="btn btn-primary"><span class="loading-spinner"></span> Listar</button>
+      <div id="list-status" class="status">Aguardando</div>
+      <div id="list-data" class="data-display hidden max-h-48 overflow-y-auto"></div>
+    </section>
+
+    <!-- Setup -->
+    <section>
+      <button onclick="setupComplete()" class="btn btn-success"><span class="loading-spinner"></span> Setup Completo</button>
+      <div id="complete-status" class="status">Pronto</div>
+    </section>
+  </div>
 </body>
 </html>
