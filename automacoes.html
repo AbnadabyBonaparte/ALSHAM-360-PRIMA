@@ -3,22 +3,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🤖 Iniciando sistema de automações...');
     
     try {
-        const orgId = window.AlshamSupabase.getDefaultOrgId();
+        const orgId = await window.AlshamSupabase.getCurrentOrgId();
         
-        // Renderizar KPIs do Dashboard
+        // Renderizar KPIs
         await renderAutomationDashboard(orgId);
         
         // Renderizar Gráficos
         await renderExecutionCharts(orgId);
         
-        // Carregar Regras de Automação
+        // Carregar Regras
         await loadAutomationRules(orgId);
         
-        // Carregar Histórico de Execuções
+        // Carregar Histórico
         await loadExecutionHistory(orgId);
         
-        // Iniciar Logs em Tempo Real
-        startRealtimeLogs();
+        // Logs em Tempo Real (via Supabase)
+        startRealtimeLogs(orgId);
         
         console.log('✅ Sistema de automações carregado com sucesso!');
     } catch (error) {
@@ -27,233 +27,89 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
-// Renderizar Dashboard de KPIs
+// =============================
+// 🔹 DASHBOARD DE KPIs
+// =============================
 async function renderAutomationDashboard(orgId) {
     const { data: executions } = await window.AlshamSupabase.genericSelect('automation_executions', { org_id: orgId });
     const { data: rules } = await window.AlshamSupabase.genericSelect('automation_rules', { org_id: orgId });
-    
+
     const hoje = new Date().toISOString().split('T')[0];
     const executionsToday = executions?.filter(e => e.started_at?.startsWith(hoje)).length || 0;
     const successToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'success').length || 0;
     const failedToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'failed').length || 0;
     const activeRules = rules?.filter(r => r.is_active).length || 0;
-    
-    const dashboardHTML = `
+
+    document.getElementById('automation-dashboard').innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
-                <h3 class="text-sm font-medium text-gray-500">Execuções Hoje</h3>
-                <p class="text-3xl font-bold text-blue-600">${executionsToday}</p>
-                <p class="text-xs text-gray-400">🔄 Total processado</p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
-                <h3 class="text-sm font-medium text-gray-500">Sucessos</h3>
-                <p class="text-3xl font-bold text-green-600">${successToday}</p>
-                <p class="text-xs text-gray-400">✅ Executadas com êxito</p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
-                <h3 class="text-sm font-medium text-gray-500">Falhas</h3>
-                <p class="text-3xl font-bold text-red-600">${failedToday}</p>
-                <p class="text-xs text-gray-400">❌ Com erro</p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-                <h3 class="text-sm font-medium text-gray-500">Regras Ativas</h3>
-                <p class="text-3xl font-bold text-purple-600">${activeRules}</p>
-                <p class="text-xs text-gray-400">🔧 Em funcionamento</p>
-            </div>
+            <div class="kpi-card border-blue-500">Execuções Hoje <p>${executionsToday}</p></div>
+            <div class="kpi-card border-green-500">Sucessos <p>${successToday}</p></div>
+            <div class="kpi-card border-red-500">Falhas <p>${failedToday}</p></div>
+            <div class="kpi-card border-purple-500">Regras Ativas <p>${activeRules}</p></div>
         </div>
     `;
-    
-    document.getElementById('automation-dashboard').innerHTML = dashboardHTML;
 }
 
-// Renderizar Gráficos
-async function renderExecutionCharts(orgId) {
-    const { data: executions } = await window.AlshamSupabase.genericSelect('automation_executions', { org_id: orgId });
-    
-    if (!executions || !window.Chart) return;
-    
-    // Gráfico de Execuções (7 dias)
-    const executionChart = document.getElementById('executions-chart');
-    if (executionChart && window.Chart) {
-        const last7Days = [];
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            last7Days.push(date.toISOString().split('T')[0]);
-        }
-        
-        const executionsByDay = last7Days.map(day => 
-            executions.filter(e => e.started_at?.startsWith(day)).length
-        );
-        
-        new window.Chart(executionChart, {
-            type: 'line',
-            data: {
-                labels: last7Days.map(day => new Date(day).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })),
-                datasets: [{
-                    label: 'Execuções',
-                    data: executionsByDay,
-                    borderColor: '#3B82F6',
-                    backgroundColor: '#3B82F6',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    }
-    
-    // Gráfico de Status
-    const performanceChart = document.getElementById('performance-chart');
-    if (performanceChart && window.Chart) {
-        const statusCounts = {
-            success: executions.filter(e => e.status === 'success').length,
-            failed: executions.filter(e => e.status === 'failed').length,
-            pending: executions.filter(e => e.status === 'pending').length,
-            running: executions.filter(e => e.status === 'running').length
-        };
-        
-        new window.Chart(performanceChart, {
-            type: 'doughnut',
-            data: {
-                labels: ['Sucesso', 'Falhou', 'Pendente', 'Executando'],
-                datasets: [{
-                    data: [statusCounts.success, statusCounts.failed, statusCounts.pending, statusCounts.running],
-                    backgroundColor: ['#10B981', '#EF4444', '#F59E0B', '#3B82F6']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    }
-}
-
-// Carregar Regras de Automação
+// =============================
+// 🔹 REGRAS DE AUTOMAÇÃO
+// =============================
 async function loadAutomationRules(orgId) {
     const { data: rules } = await window.AlshamSupabase.genericSelect('automation_rules', { org_id: orgId });
-    
+
     const rulesHTML = rules?.map(rule => `
-        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-            <div class="flex justify-between items-center mb-2">
-                <h4 class="font-semibold text-gray-900">${rule.name}</h4>
-                <span class="px-2 py-1 text-xs rounded-full ${rule.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                    ${rule.is_active ? '🟢 Ativo' : '🔴 Inativo'}
-                </span>
-            </div>
-            <p class="text-sm text-gray-600 mb-2">Trigger: ${rule.trigger_event}</p>
-            <div class="flex space-x-2">
-                <button onclick="editRule('${rule.id}')" class="px-3 py-1 bg-blue-500 text-white text-xs rounded">Editar</button>
-                <button onclick="toggleRule('${rule.id}', ${!rule.is_active})" class="px-3 py-1 bg-gray-500 text-white text-xs rounded">
-                    ${rule.is_active ? 'Desativar' : 'Ativar'}
-                </button>
-            </div>
+        <div class="rule-card">
+            <h4>${rule.name}</h4>
+            <span class="status ${rule.is_active ? 'active' : 'inactive'}">
+                ${rule.is_active ? '🟢 Ativo' : '🔴 Inativo'}
+            </span>
+            <p>Trigger: ${rule.trigger_event}</p>
+            <button onclick="toggleRule('${rule.id}', ${!rule.is_active})">
+                ${rule.is_active ? 'Desativar' : 'Ativar'}
+            </button>
         </div>
     `).join('') || '<p class="text-gray-500">Nenhuma regra encontrada.</p>';
-    
+
     document.getElementById('rules-container').innerHTML = rulesHTML;
 }
 
-// Carregar Histórico de Execuções
-async function loadExecutionHistory(orgId) {
-    const { data: executions } = await window.AlshamSupabase.genericSelect('automation_executions', { 
-        org_id: orgId,
-        order: { started_at: 'desc' },
-        limit: 50 
-    });
-    
-    const historyHTML = executions?.map(execution => {
-        const statusIcon = {
-            success: '✅',
-            failed: '❌',
-            pending: '⏳',
-            running: '🔄'
-        };
-        
-        return `
-            <div class="bg-white rounded-lg border border-gray-200 p-4 mb-3">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-medium text-gray-900">${statusIcon[execution.status]} ${execution.trigger_event}</span>
-                    <span class="text-sm text-gray-500">${new Date(execution.started_at).toLocaleString('pt-BR')}</span>
-                </div>
-                ${execution.error_message ? `<p class="text-sm text-red-600">${execution.error_message}</p>` : ''}
-                <p class="text-xs text-gray-500">Duração: ${execution.execution_time_ms || 0}ms</p>
-            </div>
-        `;
-    }).join('') || '<p class="text-gray-500">Nenhuma execução encontrada.</p>';
-    
-    document.getElementById('execution-history').innerHTML = historyHTML;
-}
+// Função para ativar/desativar regra
+window.toggleRule = async function(ruleId, newStatus) {
+    try {
+        const { error } = await window.AlshamSupabase.genericUpdate(
+            'automation_rules',
+            ruleId,
+            { is_active: newStatus }
+        );
+        if (error) throw error;
+        window.showToast(`Regra ${newStatus ? 'ativada' : 'desativada'} com sucesso!`, 'success');
+        await loadAutomationRules(await window.AlshamSupabase.getCurrentOrgId());
+    } catch (err) {
+        console.error('Erro ao atualizar regra:', err);
+        window.showToast('Erro ao atualizar regra', 'error');
+    }
+};
 
-// Logs em Tempo Real
-function startRealtimeLogs() {
+// =============================
+// 🔹 LOGS EM TEMPO REAL
+// =============================
+function startRealtimeLogs(orgId) {
     const logsContainer = document.getElementById('logs-container');
     let logCount = 0;
-    
-    const addLog = (message, type = 'info') => {
-        const timestamp = new Date().toLocaleTimeString('pt-BR');
-        const typeColors = {
-            info: 'text-green-400',
-            warning: 'text-yellow-400',
-            error: 'text-red-400',
-            success: 'text-blue-400'
-        };
-        
+
+    window.AlshamSupabase.subscribeToTable('automation_executions', orgId, (payload) => {
         const logEntry = document.createElement('div');
-        logEntry.className = `${typeColors[type]} mb-1`;
-        logEntry.innerHTML = `[${timestamp}] ${message}`;
-        
+        logEntry.className = "text-blue-400 mb-1";
+        logEntry.innerHTML = `[${new Date().toLocaleTimeString('pt-BR')}] Execução ${payload.eventType}: ${payload.new?.status}`;
         logsContainer.appendChild(logEntry);
         logCount++;
-        
-        // Manter apenas os últimos 50 logs
-        if (logCount > 50) {
-            logsContainer.removeChild(logsContainer.firstChild);
-            logCount--;
-        }
-        
+        if (logCount > 50) logsContainer.removeChild(logsContainer.firstChild);
         logsContainer.scrollTop = logsContainer.scrollHeight;
-    };
-    
-    // Adicionar logs de exemplo
-    addLog('🚀 Sistema de automações iniciado', 'success');
-    addLog('📊 Carregando regras ativas...', 'info');
-    addLog('🔄 Monitor de execuções ativo', 'info');
-    
-    // Simular logs em tempo real
-    setInterval(() => {
-        const messages = [
-            '🔄 Verificando triggers...',
-            '📨 Email enviado automaticamente',
-            '🎯 Lead qualificado via IA',
-            '📊 Relatório gerado',
-            '🔔 Notificação enviada'
-        ];
-        
-        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-        addLog(randomMessage, 'info');
-    }, 5000);
+    });
 }
 
-// Funções utilitárias
+// =============================
+// 🔹 ERROS
+// =============================
 function showError(message) {
     window.showToast ? window.showToast(message, 'error') : console.error(message);
 }
-
-window.editRule = function(ruleId) {
-    window.showToast('Funcionalidade de edição em desenvolvimento', 'info');
-};
-
-window.toggleRule = function(ruleId, newStatus) {
-    window.showToast(`Regra ${newStatus ? 'ativada' : 'desativada'} com sucesso!`, 'success');
-};
-
-window.setupIntegration = function(platform) {
-    window.showToast(`Configuração do ${platform.toUpperCase()} em desenvolvimento`, 'info');
-};
