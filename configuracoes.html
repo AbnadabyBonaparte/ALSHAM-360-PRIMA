@@ -76,9 +76,6 @@
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    <!-- Scripts -->
-    <script src="js/supabase.js"></script>
-
     <!-- CSS Inline -->
     <style>
         .nav-item {
@@ -155,8 +152,22 @@
         }
     </style>
 
-    <!-- JavaScript COMPLETO - TODAS as 363+ linhas originais -->
-    <script>
+    <!-- Scripts - CORRIGIDO PARA ES6 MODULES -->
+    <script type="module">
+        // Importações ES6 do Supabase
+        import { 
+            getCurrentUser, 
+            genericSelect,
+            getDefaultOrgId 
+        } from '/lib/supabase.js';
+
+        // Disponibilizar globalmente para compatibilidade com código existente
+        window.AlshamSupabase = {
+            getCurrentUser,
+            genericSelect, 
+            getDefaultOrgId
+        };
+
         // Função global para exibir toast
         window.showToast = function(message, type = 'info') {
             const container = document.getElementById('toast-container');
@@ -262,7 +273,7 @@
 
         // Renderizar seção de perfil
         async function renderProfileSection() {
-            const user = await window.AlshamSupabase?.getCurrentUser() || {};
+            const user = await getCurrentUser() || {};
             
             return `
                 <div>
@@ -326,9 +337,9 @@
 
         // Renderizar seção de organização
         async function renderOrganizationSection() {
-            const orgId = window.AlshamSupabase?.getDefaultOrgId();
-            const org = await window.AlshamSupabase?.genericSelect('organizations', { id: orgId }) || { data: [] };
-            const settings = await window.AlshamSupabase?.genericSelect('org_settings', { org_id: orgId }) || { data: [] };
+            const orgId = getDefaultOrgId();
+            const org = await genericSelect('organizations', { id: orgId }) || { data: [] };
+            const settings = await genericSelect('org_settings', { org_id: orgId }) || { data: [] };
             
             const organization = org?.data?.[0];
             const orgSettings = settings?.data?.[0];
@@ -403,8 +414,8 @@
         }
 
         async function renderNotificationsSection() {
-            const user = await window.AlshamSupabase?.getCurrentUser() || {};
-            const notifications = await window.AlshamSupabase?.genericSelect('notifications', { user_id: user?.id }) || { data: [] };
+            const user = await getCurrentUser() || {};
+            const notifications = await genericSelect('notifications', { user_id: user?.id }) || { data: [] };
             const userNotifications = notifications?.data?.[0] || {};
             
             return `
