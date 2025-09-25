@@ -27,14 +27,23 @@
       border-radius: 16px;
       padding: 40px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      max-width: 650px;
+      max-width: 750px;
       width: 100%;
     }
     h1 {
       color: #2563eb;
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
+    .env-summary {
+      font-size: 13px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .env-summary strong { color: #111827; }
     .test-section {
       margin: 20px 0;
       padding: 20px;
@@ -73,8 +82,15 @@
 <body>
   <div class="container">
     <h1>🔐 Teste de Conexão Supabase</h1>
-    <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Verificação Completa</p>
+    <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Painel de Debug</p>
 
+    <!-- Resumo das variáveis -->
+    <div class="env-summary">
+      <p><strong>SUPABASE_URL:</strong> <span id="env-url">?</span></p>
+      <p><strong>SUPABASE_ANON_KEY:</strong> <span id="env-key">?</span></p>
+    </div>
+
+    <!-- Test Sections -->
     <div class="test-section">
       <h3>1. Teste de Conexão Básica</h3>
       <button onclick="testConnection()">Testar Conexão</button>
@@ -134,163 +150,145 @@
     </div>
   </div>
 
-  <div id="offline-notice" class="hidden text-sm text-center mt-4"></div>
-
-  <!-- Variáveis e Supabase -->
-  <script src="/env.js"></script>
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/lib/supabase.js"></script>
-  <!-- Fix-imports.js adicionado após supabase.js -->
-  <script src="/js/fix-imports.js"></script>
-
-  <!-- Script de Testes -->
   <script type="module">
-    import { supabase } from '/lib/supabase.js';
+    // Variáveis injetadas pelo Vite
+    const url = typeof __SUPABASE_URL__ !== "undefined" ? __SUPABASE_URL__ : import.meta.env.VITE_SUPABASE_URL;
+    const key = typeof __SUPABASE_ANON_KEY__ !== "undefined" ? __SUPABASE_ANON_KEY__ : import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-    function updateStatus(elementId, className, message) {
-      const element = document.getElementById(elementId);
-      element.className = `status ${className}`;
-      element.textContent = message;
+    // Fallback para demo
+    const supabaseUrl = url || "https://demo.supabase.co";
+    const supabaseKey = key || "demo-anon-key";
+
+    // Exibir no resumo
+    document.getElementById("env-url").textContent = supabaseUrl;
+    document.getElementById("env-key").textContent = supabaseKey ? "(definido)" : "(NÃO definido)";
+
+    // Cliente
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Utils
+    function updateStatus(id, cls, msg) {
+      const el = document.getElementById(id);
+      el.className = `status ${cls}`;
+      el.textContent = msg;
+    }
+    function showData(id, data) {
+      const el = document.getElementById(id);
+      el.style.display = "block";
+      el.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
     }
 
-    function showData(elementId, data) {
-      const element = document.getElementById(elementId);
-      element.style.display = 'block';
-      element.innerHTML = JSON.stringify(data, null, 2);
-    }
-
-    // 1. Teste de Conexão
-    window.testConnection = async function() {
-      updateStatus('connection-status', 'loading', 'Testando conexão...');
+    // Testes
+    window.testConnection = async () => {
+      updateStatus("connection-status", "loading", "Testando conexão...");
       try {
-        const { error } = await supabase.from('organizations').select('id').limit(1);
+        const { error } = await supabase.from("organizations").select("id").limit(1);
         if (error) throw error;
-        updateStatus('connection-status', 'success', '✅ Conexão funcionando!');
+        updateStatus("connection-status", "success", "✅ Conexão funcionando!");
       } catch (err) {
-        updateStatus('connection-status', 'error', `❌ Erro: ${err.message}`);
+        updateStatus("connection-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
       }
     };
 
-    // 2. Teste de Auth
-    window.testAuth = async function() {
-      updateStatus('auth-status', 'loading', 'Verificando autenticação...');
+    window.testAuth = async () => {
+      updateStatus("auth-status", "loading", "Verificando autenticação...");
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        if (session) {
-          updateStatus('auth-status', 'success', '✅ Usuário autenticado');
-        } else {
-          updateStatus('auth-status', 'loading', '⚠️ Nenhum usuário logado (normal em teste)');
+        updateStatus("auth-status", session ? "success" : "warning", session ? "✅ Usuário autenticado" : "⚠️ Nenhum usuário logado");
+      } catch (err) {
+        updateStatus("auth-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
+      }
+    };
+
+    window.testTables = async () => {
+      updateStatus("tables-status", "loading", "Verificando tabelas...");
+      const tables = ["organizations", "user_profiles", "leads_crm"];
+      const results = {};
+      for (const table of tables) {
+        try {
+          const { data, error } = await supabase.from(table).select("*").limit(1);
+          results[table] = error ? `Erro: ${error.message}` : `OK (${data?.length || 0} registros)`;
+        } catch (err) {
+          results[table] = `Erro: ${err.message}`;
         }
-      } catch (err) {
-        updateStatus('auth-status', 'error', `❌ Erro: ${err.message}`);
       }
+      updateStatus("tables-status", "success", "✅ Verificação concluída");
+      showData("tables-data", results);
     };
 
-    // 3. Teste de Tabelas
-    window.testTables = async function() {
-      updateStatus('tables-status', 'loading', 'Verificando acesso às tabelas...');
+    window.testOrganization = async () => {
+      updateStatus("org-status", "loading", "Verificando organização...");
       try {
-        const tables = ['organizations', 'user_profiles', 'leads_crm'];
-        const results = {};
-        for (const table of tables) {
-          try {
-            const { data, error } = await supabase.from(table).select('*').limit(1);
-            results[table] = error ? `Erro: ${error.message}` : `OK (${data?.length || 0} registros)`;
-          } catch (err) {
-            results[table] = `Erro: ${err.message}`;
-          }
-        }
-        updateStatus('tables-status', 'success', '✅ Verificação concluída');
-        showData('tables-data', results);
-      } catch (err) {
-        updateStatus('tables-status', 'error', `❌ Erro: ${err.message}`);
-      }
-    };
-
-    // 4. Organização
-    window.testOrganization = async function() {
-      updateStatus('org-status', 'loading', 'Verificando organização...');
-      try {
-        const { data, error } = await supabase.from('organizations').select('*').limit(5);
+        const { data, error } = await supabase.from("organizations").select("*").limit(5);
         if (error) throw error;
-        updateStatus('org-status', 'success', `✅ ${data.length} organizações encontradas`);
-        showData('org-data', data);
+        updateStatus("org-status", "success", `✅ ${data.length} org(s) encontradas`);
+        showData("org-data", data);
       } catch (err) {
-        updateStatus('org-status', 'error', `❌ Erro: ${err.message}`);
+        updateStatus("org-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
       }
     };
 
-    // 5. Leads
-    window.testLeads = async function() {
-      updateStatus('leads-status', 'loading', 'Verificando leads CRM...');
+    window.testLeads = async () => {
+      updateStatus("leads-status", "loading", "Verificando leads...");
       try {
-        const { data, error } = await supabase.from('leads_crm').select('*').limit(5);
+        const { data, error } = await supabase.from("leads_crm").select("*").limit(5);
         if (error) throw error;
-        updateStatus('leads-status', 'success', `✅ ${data.length} leads encontrados`);
-        showData('leads-data', data);
+        updateStatus("leads-status", "success", `✅ ${data.length} leads encontrados`);
+        showData("leads-data", data);
       } catch (err) {
-        updateStatus('leads-status', 'error', `❌ Erro: ${err.message}`);
+        updateStatus("leads-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
       }
     };
 
-    // 6. Escrita
-    window.testWrite = async function() {
-      updateStatus('write-status', 'loading', 'Testando escrita em test_logs...');
+    window.testWrite = async () => {
+      updateStatus("write-status", "loading", "Testando escrita...");
       try {
-        const { error } = await supabase.from('test_logs').insert([
-          { message: 'Teste ALSHAM ' + new Date().toISOString() }
-        ]);
+        const { error } = await supabase.from("test_logs").insert([{ message: "Teste ALSHAM " + new Date().toISOString() }]);
         if (error) throw error;
-        updateStatus('write-status', 'success', '✅ Escrita OK em test_logs');
+        updateStatus("write-status", "success", "✅ Escrita OK em test_logs");
       } catch (err) {
-        updateStatus('write-status', 'error', `❌ Erro: ${err.message}`);
+        updateStatus("write-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
       }
     };
 
-    // 7. Performance
-    window.testPerformance = async function() {
-      updateStatus('perf-status', 'loading', 'Testando latência...');
+    window.testPerformance = async () => {
+      updateStatus("perf-status", "loading", "Testando latência...");
       try {
         const start = performance.now();
-        const { data, error } = await supabase.from('leads_crm').select('*').limit(1);
-        if (error) throw error;
+        await supabase.from("leads_crm").select("*").limit(1);
         const elapsed = (performance.now() - start).toFixed(2);
-        updateStatus('perf-status', 'success', `✅ Latência: ${elapsed}ms`);
+        updateStatus("perf-status", "success", `✅ Latência: ${elapsed}ms`);
       } catch (err) {
-        updateStatus('perf-status', 'error', `❌ Erro: ${err.message}`);
+        updateStatus("perf-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
       }
     };
 
-    // 8. Teste de RLS
-    window.testRLS = async function() {
-      updateStatus('rls-status', 'loading', 'Testando RLS (org_id)...');
+    window.testRLS = async () => {
+      updateStatus("rls-status", "loading", "Testando RLS...");
       try {
-        const { data, error } = await supabase.from('leads_crm').select('*').eq('org_id', 'ORG_TEST').limit(5);
+        const { data, error } = await supabase.from("leads_crm").select("*").eq("org_id", "ORG_TEST").limit(5);
         if (error) throw error;
-        updateStatus('rls-status', 'success', `✅ ${data.length} registros visíveis para ORG_TEST`);
-        showData('rls-data', data);
+        updateStatus("rls-status", "success", `✅ ${data.length} registros visíveis para ORG_TEST`);
+        showData("rls-data", data);
       } catch (err) {
-        updateStatus('rls-status', 'error', `❌ Erro: ${err.message}`);
+        updateStatus("rls-status", "error", `❌ Erro: ${JSON.stringify(err)}`);
       }
     };
 
-    // Run all
-    window.runAllTests = async function() {
-      updateStatus('complete-status', 'loading', 'Executando todos os testes...');
-      try {
-        await testConnection();
-        await testAuth();
-        await testTables();
-        await testOrganization();
-        await testLeads();
-        await testWrite();
-        await testPerformance();
-        await testRLS();
-        updateStatus('complete-status', 'success', '🎉 Todos os testes concluídos!');
-      } catch (err) {
-        updateStatus('complete-status', 'error', `❌ Erro nos testes: ${err.message}`);
-      }
+    window.runAllTests = async () => {
+      updateStatus("complete-status", "loading", "Executando todos os testes...");
+      await testConnection();
+      await testAuth();
+      await testTables();
+      await testOrganization();
+      await testLeads();
+      await testWrite();
+      await testPerformance();
+      await testRLS();
+      updateStatus("complete-status", "success", "🎉 Todos os testes concluídos!");
     };
   </script>
 </body>
