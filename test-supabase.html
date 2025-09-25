@@ -27,7 +27,7 @@
       border-radius: 16px;
       padding: 40px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
+      max-width: 650px;
       width: 100%;
     }
     h1 {
@@ -73,7 +73,7 @@
 <body>
   <div class="container">
     <h1>🔐 Teste de Conexão Supabase</h1>
-    <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Verificação de Integração</p>
+    <p style="text-align: center; color: #6b7280;">ALSHAM 360° PRIMA - Verificação Completa</p>
 
     <div class="test-section">
       <h3>1. Teste de Conexão Básica</h3>
@@ -109,6 +109,25 @@
     </div>
 
     <div class="test-section">
+      <h3>6. Teste de Escrita (Tabela Sandbox)</h3>
+      <button onclick="testWrite()">Testar Escrita</button>
+      <div id="write-status" class="status loading">Aguardando teste...</div>
+    </div>
+
+    <div class="test-section">
+      <h3>7. Benchmark de Performance</h3>
+      <button onclick="testPerformance()">Testar Latência</button>
+      <div id="perf-status" class="status loading">Aguardando teste...</div>
+    </div>
+
+    <div class="test-section">
+      <h3>8. Teste de RLS (Row-Level Security)</h3>
+      <button onclick="testRLS()">Testar RLS</button>
+      <div id="rls-status" class="status loading">Aguardando teste...</div>
+      <div id="rls-data" class="data-display" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
       <h3>🚀 Teste Completo</h3>
       <button onclick="runAllTests()" style="background: linear-gradient(135deg, #10b981, #059669);">Executar Todos os Testes</button>
       <div id="complete-status" class="status loading">Pronto para executar...</div>
@@ -140,10 +159,11 @@
       element.innerHTML = JSON.stringify(data, null, 2);
     }
 
+    // 1. Teste de Conexão
     window.testConnection = async function() {
       updateStatus('connection-status', 'loading', 'Testando conexão...');
       try {
-        const { error } = await supabase.from('organizations').select('count').limit(1);
+        const { error } = await supabase.from('organizations').select('id').limit(1);
         if (error) throw error;
         updateStatus('connection-status', 'success', '✅ Conexão funcionando!');
       } catch (err) {
@@ -151,6 +171,7 @@
       }
     };
 
+    // 2. Teste de Auth
     window.testAuth = async function() {
       updateStatus('auth-status', 'loading', 'Verificando autenticação...');
       try {
@@ -159,13 +180,14 @@
         if (session) {
           updateStatus('auth-status', 'success', '✅ Usuário autenticado');
         } else {
-          updateStatus('auth-status', 'loading', '⚠️ Nenhum usuário logado (normal para teste)');
+          updateStatus('auth-status', 'loading', '⚠️ Nenhum usuário logado (normal em teste)');
         }
       } catch (err) {
         updateStatus('auth-status', 'error', `❌ Erro: ${err.message}`);
       }
     };
 
+    // 3. Teste de Tabelas
     window.testTables = async function() {
       updateStatus('tables-status', 'loading', 'Verificando acesso às tabelas...');
       try {
@@ -179,15 +201,16 @@
             results[table] = `Erro: ${err.message}`;
           }
         }
-        updateStatus('tables-status', 'success', '✅ Verificação de tabelas concluída');
+        updateStatus('tables-status', 'success', '✅ Verificação concluída');
         showData('tables-data', results);
       } catch (err) {
         updateStatus('tables-status', 'error', `❌ Erro: ${err.message}`);
       }
     };
 
+    // 4. Organização
     window.testOrganization = async function() {
-      updateStatus('org-status', 'loading', 'Verificando organização padrão...');
+      updateStatus('org-status', 'loading', 'Verificando organização...');
       try {
         const { data, error } = await supabase.from('organizations').select('*').limit(5);
         if (error) throw error;
@@ -198,6 +221,7 @@
       }
     };
 
+    // 5. Leads
     window.testLeads = async function() {
       updateStatus('leads-status', 'loading', 'Verificando leads CRM...');
       try {
@@ -210,6 +234,48 @@
       }
     };
 
+    // 6. Escrita
+    window.testWrite = async function() {
+      updateStatus('write-status', 'loading', 'Testando escrita em test_logs...');
+      try {
+        const { error } = await supabase.from('test_logs').insert([
+          { message: 'Teste ALSHAM ' + new Date().toISOString() }
+        ]);
+        if (error) throw error;
+        updateStatus('write-status', 'success', '✅ Escrita OK em test_logs');
+      } catch (err) {
+        updateStatus('write-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+
+    // 7. Performance
+    window.testPerformance = async function() {
+      updateStatus('perf-status', 'loading', 'Testando latência...');
+      try {
+        const start = performance.now();
+        const { data, error } = await supabase.from('leads_crm').select('*').limit(1);
+        if (error) throw error;
+        const elapsed = (performance.now() - start).toFixed(2);
+        updateStatus('perf-status', 'success', `✅ Latência: ${elapsed}ms`);
+      } catch (err) {
+        updateStatus('perf-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+
+    // 8. Teste de RLS
+    window.testRLS = async function() {
+      updateStatus('rls-status', 'loading', 'Testando RLS (org_id)...');
+      try {
+        const { data, error } = await supabase.from('leads_crm').select('*').eq('org_id', 'ORG_TEST').limit(5);
+        if (error) throw error;
+        updateStatus('rls-status', 'success', `✅ ${data.length} registros visíveis para ORG_TEST`);
+        showData('rls-data', data);
+      } catch (err) {
+        updateStatus('rls-status', 'error', `❌ Erro: ${err.message}`);
+      }
+    };
+
+    // Run all
     window.runAllTests = async function() {
       updateStatus('complete-status', 'loading', 'Executando todos os testes...');
       try {
@@ -218,9 +284,12 @@
         await testTables();
         await testOrganization();
         await testLeads();
+        await testWrite();
+        await testPerformance();
+        await testRLS();
         updateStatus('complete-status', 'success', '🎉 Todos os testes concluídos!');
       } catch (err) {
-        updateStatus('complete-status', 'error', `❌ Erro durante os testes: ${err.message}`);
+        updateStatus('complete-status', 'error', `❌ Erro nos testes: ${err.message}`);
       }
     };
   </script>
