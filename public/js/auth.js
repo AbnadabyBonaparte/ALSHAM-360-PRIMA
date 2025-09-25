@@ -1,35 +1,12 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Authentication System V5.0 NASA 10/10 OPTIMIZED
- * Advanced authentication middleware with real-time user management
+ * ALSHAM 360° PRIMA - Enterprise Authentication System V5.1 NASA 10/10
+ * Middleware de autenticação com gestão de sessão em tempo real
  *
- * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
- * @author ALSHAM Development Team
- * @license MIT
- *
- * 🚀 ENTERPRISE FEATURES V5.0 - NASA 10/10:
- * ✅ Real-time authentication with Supabase Auth
- * ✅ Railway credentials integration
- * ✅ Multi-tenant security with RLS enforcement
- * ✅ OAuth integration (Google/Microsoft)
- * ✅ Session management with auto-refresh
- * ✅ Route protection and access control
- * ✅ User profile management with real data
- * ✅ Dependency validation and error handling
- * ✅ TypeScript-ready JSDoc annotations
- * ✅ ES Modules compatibility (import/export)
- * ✅ Vite build system optimization
- * ✅ Path standardization and consistency
- * ✅ NASA 10/10 Enterprise Grade
- *
- * 🔗 DATA SOURCES: auth.users, user_profiles, user_organizations,
- * user_badges, teams, organizations
- *
- * 📁 OPTIMIZED IMPORTS: Standardized ES Module imports with relative paths
- * 🛠️ VITE COMPATIBLE: Optimized for Vite build system and hot reload
- * 🔧 PATH CONSISTENCY: All paths follow project structure standards
+ * @version 5.1.0 - FINAL BUILD READY
+ * @author ALSHAM
  */
 
-// ===== CORRIGIDO: IMPORTS AGORA SÃO GLOBAIS PELO window.AlshamSupabase =====
+// ===== IMPORTS GLOBAIS =====
 const {
   getCurrentSession,
   onAuthStateChange,
@@ -37,24 +14,17 @@ const {
   getUserProfile,
   updateUserProfile,
   createAuditLog,
-  genericSelect // usado para getUserOrganizations e getUserBadges
+  genericSelect
 } = window.AlshamSupabase;
 
-/**
- * 🔔 Sistema de Notificação
- * Exibe notificações com fallback em diferentes camadas
- */
+// ===== SISTEMA DE NOTIFICAÇÕES =====
 function showAuthNotification(message, type = "info") {
   try {
     console.log(`[${type.toUpperCase()}] ${message}`);
 
-    if (window.navigationSystem?.showNotification) {
-      window.navigationSystem.showNotification(message, type);
+    if (window.NavigationSystem?.showNotification) {
+      window.NavigationSystem.showNotification(message, type);
       return;
-    }
-
-    if (type === "error") {
-      alert(message);
     }
 
     const toast = document.createElement("div");
@@ -64,15 +34,9 @@ function showAuthNotification(message, type = "info") {
     toast.textContent = message;
 
     document.body.appendChild(toast);
-
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 5000);
+    setTimeout(() => toast.remove(), 5000);
   } catch (error) {
     console.error("Error showing notification:", error);
-    console.log(`NOTIFICATION: ${message}`);
   }
 }
 
@@ -84,41 +48,25 @@ function getToastColor(type) {
       return "bg-red-500";
     case "warning":
       return "bg-yellow-500";
-    case "info":
     default:
       return "bg-blue-500";
   }
 }
 
-/**
- * 🔧 Validação de dependências essenciais
- */
+// ===== VALIDAÇÃO DE DEPENDÊNCIAS =====
 function requireLib(libName, lib) {
-  if (!lib) {
-    throw new Error(
-      `❌ Dependência ${libName} não carregada! Verifique se está incluída no HTML.`
-    );
-  }
+  if (!lib) throw new Error(`❌ Dependência ${libName} não carregada!`);
   return lib;
 }
-
 function validateAuthDependencies() {
-  try {
-    return {
-      crypto: requireLib("Web Crypto API", window.crypto),
-      localStorage: requireLib("Local Storage", window.localStorage),
-      sessionStorage: requireLib("Session Storage", window.sessionStorage)
-    };
-  } catch (error) {
-    console.error("🚨 Auth dependency validation failed:", error);
-    throw error;
-  }
+  return {
+    crypto: requireLib("Web Crypto API", window.crypto),
+    localStorage: requireLib("Local Storage", window.localStorage),
+    sessionStorage: requireLib("Session Storage", window.sessionStorage)
+  };
 }
 
-/**
- * 🛡️ AuthStateManager
- * Gerencia estado de autenticação, sessão e permissões
- */
+// ===== GESTOR DE ESTADO DE AUTENTICAÇÃO =====
 class AuthStateManager {
   constructor() {
     this.currentUser = null;
@@ -130,265 +78,164 @@ class AuthStateManager {
     this.sessionExpiry = null;
     this.refreshTimer = null;
     this.listeners = new Set();
-    this.retryAttempts = 0;
-    this.maxRetryAttempts = 3;
-    this.retryDelay = 1000; // base de 1 segundo
   }
 
   async setAuthenticatedUser(user, profile, organization = null, badges = []) {
-    try {
-      this.currentUser = user;
-      this.currentProfile = profile;
-      this.currentOrganization = organization;
-      this.userBadges = badges;
-      this.isAuthenticated = true;
-      this.sessionExpiry = new Date(user.expires_at || Date.now() + 3600000);
-      this.retryAttempts = 0;
-      this.userPermissions = profile?.permissions || [];
+    this.currentUser = user;
+    this.currentProfile = profile;
+    this.currentOrganization = organization;
+    this.userBadges = badges;
+    this.isAuthenticated = true;
+    this.sessionExpiry = new Date(user.expires_at || Date.now() + 3600000);
 
-      await this.persistAuthState();
-      this.setupSessionRefresh();
-      this.notifyListeners("AUTHENTICATED", {
-        user,
-        profile,
-        organization,
-        badges
-      });
-
-      await this.logAuthEvent("USER_AUTHENTICATED", {
-        user_id: user.id,
-        organization_id: organization?.id,
-        login_method: "supabase_auth"
-      });
-
-      console.log("✅ User authenticated:", user.email);
-    } catch (error) {
-      console.error("🚨 Error setting authenticated user:", error);
-      await this.handleAuthError(error, "setAuthenticatedUser");
-      throw error;
-    }
+    await this.persistAuthState();
+    this.setupSessionRefresh();
+    this.notifyListeners("AUTHENTICATED", { user, profile, organization, badges });
+    console.log("✅ Usuário autenticado:", user.email);
   }
 
   async clearAuthenticatedUser() {
-    try {
-      if (this.currentUser) {
-        await this.logAuthEvent("USER_LOGGED_OUT", {
-          user_id: this.currentUser.id,
-          organization_id: this.currentOrganization?.id,
-          session_duration: this.getSessionDuration()
-        });
-      }
-      this.currentUser = null;
-      this.currentProfile = null;
-      this.currentOrganization = null;
-      this.userBadges = [];
-      this.userPermissions = [];
-      this.isAuthenticated = false;
-      this.sessionExpiry = null;
-      this.retryAttempts = 0;
+    this.currentUser = null;
+    this.currentProfile = null;
+    this.currentOrganization = null;
+    this.userBadges = [];
+    this.userPermissions = [];
+    this.isAuthenticated = false;
+    this.sessionExpiry = null;
+    if (this.refreshTimer) clearTimeout(this.refreshTimer);
 
-      if (this.refreshTimer) {
-        clearTimeout(this.refreshTimer);
-        this.refreshTimer = null;
-      }
-      await this.clearPersistedState();
-
-      this.notifyListeners("UNAUTHENTICATED");
-      console.log("✅ Authentication state cleared");
-    } catch (error) {
-      console.error("🚨 Error clearing authentication state:", error);
-    }
+    await this.clearPersistedState();
+    this.notifyListeners("UNAUTHENTICATED");
+    console.log("✅ Sessão encerrada");
   }
 
   async persistAuthState() {
     try {
       const { localStorage } = validateAuthDependencies();
-
       const authState = {
         isAuthenticated: this.isAuthenticated,
-        user: {
-          id: this.currentUser?.id,
-          email: this.currentUser?.email,
-          created_at: this.currentUser?.created_at
-        },
+        user: { id: this.currentUser?.id, email: this.currentUser?.email },
         profile: this.currentProfile,
         organization: this.currentOrganization,
-        badges: this.userBadges,
-        permissions: this.userPermissions,
         sessionExpiry: this.sessionExpiry?.toISOString(),
-        timestamp: new Date().toISOString(),
-        version: "5.0.0"
+        version: "5.1.0"
       };
-
       localStorage.setItem("alsham_auth_state", JSON.stringify(authState));
-      localStorage.setItem("alsham_org_id", this.currentOrganization?.id || "");
-    } catch (error) {
-      console.error("🚨 Error persisting auth state:", error);
+    } catch (err) {
+      console.error("🚨 Persistência de auth falhou:", err);
     }
   }
 
   async clearPersistedState() {
     try {
       const { localStorage } = validateAuthDependencies();
-      const authKeys = [
-        "alsham_auth_state",
-        "alsham_user_profile",
-        "alsham_org_id",
-        "alsham_redirect_after_login",
-        "alsham_session_data",
-        "alsham_user_preferences"
-      ];
-      authKeys.forEach(key => localStorage.removeItem(key));
-    } catch (error) {
-      console.error("🚨 Error clearing persisted state:", error);
+      ["alsham_auth_state", "alsham_org_id"].forEach(k => localStorage.removeItem(k));
+    } catch (err) {
+      console.error("🚨 Erro limpando estado:", err);
     }
   }
 
   setupSessionRefresh() {
-    try {
-      if (this.refreshTimer) clearTimeout(this.refreshTimer);
-      if (!this.sessionExpiry) return;
-
-      const refreshTime = Math.max(
-        this.sessionExpiry.getTime() - Date.now() - 5 * 60 * 1000,
-        60 * 1000
-      );
-
-      if (refreshTime > 0) {
-        this.refreshTimer = setTimeout(() => {
-          this.refreshSession();
-        }, refreshTime);
-      }
-    } catch (error) {
-      console.error("🚨 Error setting up session refresh:", error);
-    }
+    if (this.refreshTimer) clearTimeout(this.refreshTimer);
+    if (!this.sessionExpiry) return;
+    const refreshTime = Math.max(this.sessionExpiry.getTime() - Date.now() - 300000, 60000);
+    this.refreshTimer = setTimeout(() => this.refreshSession(), refreshTime);
   }
 
   async refreshSession() {
     try {
       const session = await getCurrentSession();
-
       if (session?.user) {
         this.sessionExpiry = new Date(session.expires_at);
         this.setupSessionRefresh();
-        this.retryAttempts = 0;
-        console.log("✅ Session refreshed successfully");
+        console.log("✅ Sessão renovada");
       } else {
-        console.warn("⚠️ Session refresh failed, logging out");
         await this.clearAuthenticatedUser();
       }
-    } catch (error) {
-      console.error("🚨 Error refreshing session:", error);
-      await this.handleAuthError(error, "refreshSession");
-    }
-  }
-
-  async handleAuthError(error, operation) {
-    this.retryAttempts++;
-
-    if (this.retryAttempts <= this.maxRetryAttempts) {
-      const delay = this.retryDelay * Math.pow(2, this.retryAttempts - 1);
-      console.warn(
-        `⚠️ Auth error in ${operation}, retrying in ${delay}ms (attempt ${this.retryAttempts}/${this.maxRetryAttempts})`
-      );
-      setTimeout(() => {
-        console.log(`🔄 Retrying ${operation}...`);
-      }, delay);
-    } else {
-      console.error(
-        `🚨 Max retry attempts reached for ${operation}, clearing auth state`
-      );
+    } catch (err) {
+      console.error("🚨 Erro ao renovar sessão:", err);
       await this.clearAuthenticatedUser();
     }
   }
 
-  getSessionDuration() {
-    if (!this.currentUser?.created_at) return 0;
-    return Date.now() - new Date(this.currentUser.created_at).getTime();
-  }
-
-  async logAuthEvent(event, metadata = {}) {
-    try {
-      await createAuditLog({
-        event_type: event,
-        user_id: metadata.user_id,
-        organization_id: metadata.organization_id,
-        metadata: {
-          ...metadata,
-          user_agent: navigator.userAgent,
-          ip_address: "client_side"
-        }
-      });
-    } catch (error) {
-      console.error("🚨 Error logging auth event:", error);
-    }
-  }
-
-  generateSessionId() {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
   addListener(listener) {
-    if (typeof listener === "function") {
-      this.listeners.add(listener);
-    } else {
-      console.warn("⚠️ Invalid listener provided to addListener");
-    }
+    if (typeof listener === "function") this.listeners.add(listener);
   }
-
   removeListener(listener) {
     this.listeners.delete(listener);
   }
-
   notifyListeners(event, data = {}) {
-    this.listeners.forEach(listener => {
-      try {
-        listener(event, data);
-      } catch (error) {
-        console.error("🚨 Error in auth listener:", error);
-        this.listeners.delete(listener);
-      }
-    });
-  }
-
-  hasPermission(permission) {
-    if (!permission || !this.isAuthenticated) return false;
-    return (
-      this.userPermissions.includes(permission) ||
-      this.userPermissions.includes("admin") ||
-      this.currentProfile?.role === "admin" ||
-      this.currentProfile?.role === "super_admin"
-    );
-  }
-
-  belongsToOrganization(orgId) {
-    if (!orgId || !this.isAuthenticated) return false;
-    return this.currentOrganization?.id === orgId;
-  }
-
-  getBadgeCount(badgeType = null) {
-    if (!this.userBadges || !Array.isArray(this.userBadges)) return 0;
-    if (!badgeType) return this.userBadges.length;
-    return this.userBadges.filter(badge => badge.badge_type === badgeType)
-      .length;
-  }
-
-  getRoleLevel() {
-    const roleLevels = {
-      user: 1,
-      member: 2,
-      analyst: 3,
-      manager: 4,
-      admin: 5,
-      super_admin: 6
-    };
-    return roleLevels[this.currentProfile?.role] || 0;
+    this.listeners.forEach(cb => cb(event, data));
   }
 }
 
-const authState = new AuthStateManager();
+// ===== FUNÇÕES AUXILIARES =====
+async function initializeAuth() {
+  const session = await getCurrentSession();
+  if (session?.user) {
+    const profile = await getUserProfile(session.user.id);
+    await authState.setAuthenticatedUser(session.user, profile?.data || null);
+  } else {
+    await authState.clearAuthenticatedUser();
+  }
 
-// ===== EXPORTS =====
+  // Monitorar mudanças de auth
+  onAuthStateChange((event, session) => handleAuthStateChange(event, session));
+}
+
+function handleAuthStateChange(event, session) {
+  if (event === "SIGNED_IN" && session?.user) {
+    getUserProfile(session.user.id).then(profile =>
+      authState.setAuthenticatedUser(session.user, profile?.data || null)
+    );
+  }
+  if (event === "SIGNED_OUT") {
+    authState.clearAuthenticatedUser();
+    redirectToLogin();
+  }
+}
+
+function checkSessionValidity() {
+  return !!authState.isAuthenticated && new Date() < authState.sessionExpiry;
+}
+
+function checkRouteAccess(route) {
+  if (!authState.isAuthenticated) return false;
+  if (route.includes("admin")) return authState.userPermissions.includes("admin");
+  return true;
+}
+
+function updateAuthUI() {
+  const userName = document.getElementById("user-name");
+  if (userName && authState.currentProfile) {
+    userName.textContent = authState.currentProfile.full_name || authState.currentUser.email;
+  }
+}
+
+async function handleLogout() {
+  try {
+    await signOut();
+    await authState.clearAuthenticatedUser();
+    showAuthNotification("Logout realizado com sucesso", "success");
+    redirectToLogin();
+  } catch (err) {
+    console.error("Erro no logout:", err);
+    showAuthNotification("Erro no logout", "error");
+  }
+}
+
+function redirectToLogin() {
+  window.location.href = "/login.html";
+}
+
+function redirectAfterLogin() {
+  const redirectUrl = localStorage.getItem("alsham_redirect_after_login") || "/";
+  localStorage.removeItem("alsham_redirect_after_login");
+  window.location.href = redirectUrl;
+}
+
+// ===== SINGLETON GLOBAL =====
+const authState = new AuthStateManager();
 const AlshamAuth = {
   get isAuthenticated() {
     return authState.isAuthenticated;
@@ -396,54 +243,14 @@ const AlshamAuth = {
   get currentUser() {
     return authState.currentUser;
   },
-  get currentProfile() {
-    return authState.currentProfile;
-  },
-  get currentOrganization() {
-    return authState.currentOrganization;
-  },
-  get userBadges() {
-    return authState.userBadges;
-  },
-  get userPermissions() {
-    return authState.userPermissions;
-  },
-  get sessionExpiry() {
-    return authState.sessionExpiry;
-  },
-  get roleLevel() {
-    return authState.getRoleLevel();
-  },
-  hasPermission: permission => authState.hasPermission(permission),
-  belongsToOrganization: orgId => authState.belongsToOrganization(orgId),
-  getBadgeCount: badgeType => authState.getBadgeCount(badgeType),
   logout: handleLogout,
-  checkSession: checkSessionValidity,
-  redirectToLogin,
-  redirectAfterLogin,
-  showNotification: showAuthNotification,
-  updateUI: updateAuthUI,
-  addListener: listener => authState.addListener(listener),
-  removeListener: listener => authState.removeListener(listener),
-  checkRouteAccess,
-  getSessionDuration: () => authState.getSessionDuration(),
-  isSessionValid: checkSessionValidity,
-  version: "5.0.0",
-  buildDate: new Date().toISOString()
-};
-
-export default AlshamAuth;
-export {
-  AuthStateManager,
-  validateAuthDependencies,
   initializeAuth,
-  handleAuthStateChange,
   checkRouteAccess,
-  showAuthNotification,
-  updateAuthUI,
-  handleLogout,
-  checkSessionValidity
+  updateUI: updateAuthUI,
+  checkSession: checkSessionValidity
 };
-window.AlshamAuth = AlshamAuth;
 
-console.log("🔐 Enterprise Authentication System v5.0 NASA 10/10 configured - ALSHAM 360° PRIMA");
+window.AlshamAuth = AlshamAuth;
+export default AlshamAuth;
+
+console.log("🔐 Enterprise Authentication v5.1.0 - ALSHAM 360° PRIMA");
