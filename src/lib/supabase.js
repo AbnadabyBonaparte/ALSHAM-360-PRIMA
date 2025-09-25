@@ -1,25 +1,24 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.0
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.1
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Funciona como ES Module (import/export) e também expõe window.AlshamSupabase
 // para compatibilidade com páginas HTML antigas.
 // -----------------------------------------------------------------------------
 
-// Import oficial do Supabase (via ESM, compatível com Vite e browsers modernos)
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
+import { createClient } from '@supabase/supabase-js';
 
 // -----------------------------------------------------------------------------
-// Configuração (URL e chave Anon) 
+// Configuração (URL e chave Anon)
 // Busca primeiro variáveis de ambiente, depois fallback no window, depois valor fixo.
 // -----------------------------------------------------------------------------
 const SUPABASE_URL = (() => {
   try {
     return import.meta?.env?.VITE_SUPABASE_URL
       || (typeof window !== 'undefined' && window.__VITE_SUPABASE_URL__)
-      || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co'; // fallback seguro
+      || '';
   } catch {
-    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_URL__ : 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_URL__ : '';
   }
 })();
 
@@ -27,35 +26,34 @@ const SUPABASE_ANON_KEY = (() => {
   try {
     return import.meta?.env?.VITE_SUPABASE_ANON_KEY
       || (typeof window !== 'undefined' && window.__VITE_SUPABASE_ANON_KEY__)
-      || 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY'; // fallback rotacionável
+      || '';
   } catch {
-    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_ANON_KEY__ : 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
+    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_ANON_KEY__ : '';
   }
 })();
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Supabase URL ou Key não configuradas.');
+  console.warn('⚠️ Supabase URL ou Key não configuradas — verifique variáveis no Vercel.');
 }
 
 // -----------------------------------------------------------------------------
 // Inicialização do cliente Supabase
-// Inclui: autenticação, headers globais, realtime otimizado
 // -----------------------------------------------------------------------------
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    autoRefreshToken: true,  // mantém sessão ativa
-    persistSession: true,    // guarda no storage do navegador
-    detectSessionInUrl: true, // necessário para OAuth
-    flowType: 'pkce'         // segurança OAuth2 PKCE
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.0',
+      'X-Client-Info': 'alsham-360-prima@unified-1.1',
       'X-Environment': (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
   },
   realtime: {
-    params: { eventsPerSecond: 10 } // otimização para não sobrecarregar
+    params: { eventsPerSecond: 10 }
   }
 });
 
@@ -383,32 +381,24 @@ if (typeof window !== 'undefined') {
 // -----------------------------------------------------------------------------
 export {
   supabase,
-  // auth
   getCurrentSession,
   getCurrentUser,
   signOut,
   onAuthStateChange,
-  // org
   getCurrentOrgId,
   getDefaultOrgId,
   DEFAULT_ORG_ID,
-  // CRUD
   genericSelect,
   genericInsert,
   genericUpdate,
   genericDelete,
-  // domain
   getDashboardKPIs,
   getLeads,
   createLead,
-  // user
   getUserProfile,
   updateUserProfile,
-  // audit
   createAuditLog,
-  // realtime
   subscribeToTable,
-  // utils
   formatDateBR,
   formatTimeAgo,
   sanitizeInput,
