@@ -35,27 +35,12 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-6">⚙️ Configurações</h2>
                     <nav class="space-y-2">
-                        <button class="nav-item" data-section="profile">
-                            <span class="mr-3">👤</span>Perfil
-                        </button>
-                        <button class="nav-item" data-section="organization">
-                            <span class="mr-3">🏢</span>Organização
-                        </button>
-                        <button class="nav-item" data-section="team">
-                            <span class="mr-3">👥</span>Equipe
-                        </button>
-                        <button class="nav-item" data-section="notifications">
-                            <span class="mr-3">🔔</span>Notificações
-                        </button>
-                        <button class="nav-item" data-section="security">
-                            <span class="mr-3">🔒</span>Segurança
-                        </button>
-                        <button class="nav-item" data-section="billing">
-                            <span class="mr-3">💳</span>Faturamento
-                        </button>
-                        <button class="nav-item" data-section="analytics">
-                            <span class="mr-3">📊</span>Analytics
-                        </button>
+                        <button class="nav-item" data-section="profile">👤 Perfil</button>
+                        <button class="nav-item" data-section="organization">🏢 Organização</button>
+                        <button class="nav-item" data-section="notifications">🔔 Notificações</button>
+                        <button class="nav-item" data-section="security">🔒 Segurança</button>
+                        <button class="nav-item" data-section="billing">💳 Faturamento</button>
+                        <button class="nav-item" data-section="analytics">📊 Analytics</button>
                     </nav>
                 </div>
             </div>
@@ -63,7 +48,7 @@
             <!-- Content Area -->
             <div class="lg:col-span-3">
                 <div id="content-area" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                    <!-- Conteúdo dinâmico será carregado aqui -->
+                    <!-- Dinâmico -->
                     <div class="text-center py-8">
                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                         <p class="mt-4 text-gray-600">Carregando configurações...</p>
@@ -78,477 +63,112 @@
 
     <!-- CSS Inline -->
     <style>
-        .nav-item {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            text-align: left;
-            padding: 12px 16px;
-            border-radius: 8px;
-            background: transparent;
-            border: none;
-            color: #374151;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .nav-item:hover {
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-        
-        .nav-item.active {
-            background-color: #dbeafe;
-            color: #1d4ed8;
-            font-weight: 600;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .toast {
-            padding: 16px 24px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            max-width: 400px;
-            margin-bottom: 8px;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-        }
-        
-        .toast.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        
-        .toast.success {
-            background-color: #10b981;
-        }
-        
-        .toast.error {
-            background-color: #ef4444;
-        }
-        
-        .toast.warning {
-            background-color: #f59e0b;
-        }
-        
-        .toast.info {
-            background-color: #3b82f6;
-        }
+        .nav-item { display:flex; align-items:center; width:100%; text-align:left; padding:12px 16px; border-radius:8px; border:none; background:transparent; font-weight:500; color:#374151; transition:0.2s; cursor:pointer; }
+        .nav-item:hover { background-color:#f3f4f6; color:#1f2937; }
+        .nav-item.active { background-color:#dbeafe; color:#1d4ed8; font-weight:600; }
+        .toast { padding:16px 24px; border-radius:8px; color:white; font-weight:500; max-width:400px; margin-bottom:8px; opacity:0; transform:translateX(100%); transition:all 0.3s ease; }
+        .toast.show { opacity:1; transform:translateX(0); }
+        .toast.success { background:#10b981; } .toast.error { background:#ef4444; }
+        .toast.warning { background:#f59e0b; } .toast.info { background:#3b82f6; }
     </style>
 
-    <!-- Scripts - CORRIGIDO PARA ES6 MODULES -->
+    <!-- Scripts -->
     <script type="module">
-        // Importações ES6 do Supabase
-        import { 
-            getCurrentUser, 
-            genericSelect,
-            getDefaultOrgId 
-        } from '/src/lib/supabase.js';
+        import { supabase, getCurrentUser, genericSelect, getDefaultOrgId } from '/src/lib/supabase.js';
 
-        // Disponibilizar globalmente para compatibilidade com código existente
-        window.AlshamSupabase = {
-            getCurrentUser,
-            genericSelect, 
-            getDefaultOrgId
+        // Toast
+        window.showToast = (msg, type='info') => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`; t.textContent = msg;
+            c.appendChild(t); setTimeout(()=>t.classList.add('show'),100);
+            setTimeout(()=>{t.classList.remove('show');setTimeout(()=>c.removeChild(t),300)},4000);
         };
 
-        // Função global para exibir toast
-        window.showToast = function(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            
-            container.appendChild(toast);
-            
-            // Mostrar toast
-            setTimeout(() => toast.classList.add('show'), 100);
-            
-            // Remover toast após 4 segundos
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => container.removeChild(toast), 300);
-            }, 4000);
-        };
-
-        // Configurações Enterprise - ALSHAM 360° PRIMA
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('⚙️ Iniciando sistema de configurações...');
-            
-            try {
-                // Configurar navegação entre seções
-                setupSectionNavigation();
-                
-                // Carregar seção inicial (perfil)
-                await loadSection('profile');
-                
-                console.log('✅ Sistema de configurações carregado!');
-            } catch (error) {
-                console.error('❌ Erro ao carregar configurações:', error);
-            }
+        // Navegação
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupSectionNavigation();
+            await loadSection('profile');
         });
 
-        // Configurar navegação entre seções
         function setupSectionNavigation() {
             const navItems = document.querySelectorAll('.nav-item');
-            const contentSection = document.getElementById('content-area');
-            
             navItems.forEach(item => {
-                item.className = 'nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors';
-                
                 item.addEventListener('click', async function() {
-                    // Remover active de todos
-                    navItems.forEach(nav => nav.classList.remove('active', 'bg-blue-100', 'text-blue-700'));
-                    
-                    // Adicionar active ao clicado
-                    this.classList.add('active', 'bg-blue-100', 'text-blue-700');
-                    
-                    // Carregar seção
-                    const section = this.dataset.section;
-                    await loadSection(section);
+                    navItems.forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+                    await loadSection(this.dataset.section);
                 });
             });
         }
 
-        // Carregar seção específica
-        async function loadSection(sectionName) {
-            const contentSection = document.getElementById('content-area');
-            contentSection.innerHTML = '<div class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-gray-600">Carregando...</p></div>';
-            
-            try {
-                let content = '';
-                
-                switch (sectionName) {
-                    case 'profile':
-                        content = await renderProfileSection();
-                        break;
-                    case 'organization':
-                        content = await renderOrganizationSection();
-                        break;
-                    case 'team':
-                        content = await renderTeamSection();
-                        break;
-                    case 'notifications':
-                        content = await renderNotificationsSection();
-                        break;
-                    case 'security':
-                        content = await renderSecuritySection();
-                        break;
-                    case 'billing':
-                        content = await renderBillingSection();
-                        break;
-                    case 'analytics':
-                        content = await renderAnalyticsSection();
-                        break;
-                    default:
-                        content = '<p class="text-gray-600">Seção não encontrada.</p>';
-                }
-                
-                contentSection.innerHTML = content;
-                
-                // Configurar eventos da seção carregada
-                setupSectionEvents(sectionName);
-                
-            } catch (error) {
-                console.error(`Erro ao carregar seção ${sectionName}:`, error);
-                contentSection.innerHTML = '<div class="text-red-600">Erro ao carregar configurações. Tente novamente.</div>';
-            }
+        async function loadSection(section) {
+            const area = document.getElementById('content-area');
+            area.innerHTML = '<div class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-gray-600">Carregando...</p></div>';
+            let html = '';
+            if (section==='profile') html = await renderProfile();
+            if (section==='organization') html = await renderOrganization();
+            if (section==='notifications') html = await renderNotifications();
+            if (section==='security') html = '<p class="text-gray-500">🚧 Em desenvolvimento</p>';
+            if (section==='billing') html = '<p class="text-gray-500">🚧 Em desenvolvimento</p>';
+            if (section==='analytics') html = '<p class="text-gray-500">🚧 Em desenvolvimento</p>';
+            area.innerHTML = html;
         }
 
-        // Renderizar seção de perfil
-        async function renderProfileSection() {
+        // 🔹 Perfil
+        async function renderProfile() {
             const user = await getCurrentUser() || {};
-            
             return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">👤 Perfil do Usuário</h2>
-                    
-                    <div class="space-y-6">
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações Pessoais</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
-                                    <input type="text" id="full-name" value="${user?.user_metadata?.full_name || ''}" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                    <input type="email" value="${user?.email || ''}" disabled
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
-                                    <input type="tel" id="phone" placeholder="(11) 99999-9999"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
-                                    <input type="text" id="job-title" placeholder="Sua função na empresa"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6">
-                                <button onclick="saveProfile()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                    💾 Salvar Perfil
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Foto do Perfil</h3>
-                            <div class="flex items-center space-x-6">
-                                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                                    ${user?.user_metadata?.full_name?.charAt(0) || 'U'}
-                                </div>
-                                <div>
-                                    <button class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                                        📁 Alterar Foto
-                                    </button>
-                                    <p class="text-sm text-gray-500 mt-2">JPG, PNG até 5MB</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+                <h2 class="text-2xl font-bold mb-6">👤 Perfil</h2>
+                <label>Nome Completo</label>
+                <input id="full-name" value="${user.user_metadata?.full_name||''}" class="w-full border rounded p-2 mb-2">
+                <label>Email</label>
+                <input value="${user.email||''}" disabled class="w-full border rounded p-2 mb-2 bg-gray-100">
+                <button onclick="saveProfile()" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>`;
         }
 
-        // Renderizar seção de organização
-        async function renderOrganizationSection() {
+        // 🔹 Organização
+        async function renderOrganization() {
             const orgId = getDefaultOrgId();
-            const org = await genericSelect('organizations', { id: orgId }) || { data: [] };
-            const settings = await genericSelect('org_settings', { org_id: orgId }) || { data: [] };
-            
-            const organization = org?.data?.[0];
-            const orgSettings = settings?.data?.[0];
-            
+            const { data } = await genericSelect('organizations',{id:orgId});
+            const org = data?.[0] || {};
             return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">🏢 Configurações da Organização</h2>
-                    
-                    <div class="space-y-6">
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações da Empresa</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome da Organização</label>
-                                    <input type="text" id="org-name" value="${organization?.name || ''}"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">CNPJ</label>
-                                    <input type="text" id="org-cnpj" placeholder="00.000.000/0000-00"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Endereço</label>
-                                    <input type="text" id="org-address" placeholder="Endereço completo"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Configurações de Leads</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Limite para Lead Quente (Score)</label>
-                                    <input type="number" id="hot-threshold" value="${orgSettings?.hot_threshold || 80}" min="0" max="100"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Limite para Lead Morno (Score)</label>
-                                    <input type="number" id="warm-threshold" value="${orgSettings?.warm_threshold || 50}" min="0" max="100"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-4">
-                            <button onclick="saveOrganization()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                💾 Salvar Configurações
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+                <h2 class="text-2xl font-bold mb-6">🏢 Organização</h2>
+                <label>Nome</label>
+                <input id="org-name" value="${org.name||''}" class="w-full border rounded p-2 mb-2">
+                <button onclick="saveOrganization()" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>`;
         }
 
-        // Renderizar outras seções
-        async function renderTeamSection() {
+        // 🔹 Notificações
+        async function renderNotifications() {
+            const user = await getCurrentUser()||{};
+            const { data } = await genericSelect('notifications',{user_id:user.id});
+            const n = data?.[0]||{};
             return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">👥 Gestão de Equipe</h2>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p class="text-yellow-800">🚧 Funcionalidade em desenvolvimento</p>
-                    </div>
-                </div>
-            `;
+                <h2 class="text-2xl font-bold mb-6">🔔 Notificações</h2>
+                <label><input type="checkbox" id="email-new-leads" ${n.email_new_leads?'checked':''}> 📧 Novos Leads</label><br>
+                <label><input type="checkbox" id="email-converted" ${n.email_converted?'checked':''}> 🎯 Leads Convertidos</label><br>
+                <button onclick="saveNotifications()" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>`;
         }
 
-        async function renderNotificationsSection() {
-            const user = await getCurrentUser() || {};
-            const notifications = await genericSelect('notifications', { user_id: user?.id }) || { data: [] };
-            const userNotifications = notifications?.data?.[0] || {};
-            
-            return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">🔔 Configurações de Notificação</h2>
-                    
-                    <div class="space-y-6">
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Notificações por Email</h3>
-                            
-                            <div class="space-y-4">
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="email-new-leads" ${userNotifications.email_new_leads ? 'checked' : ''} class="mr-3">
-                                    <span>📧 Novos leads capturados</span>
-                                </label>
-                                
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="email-converted" ${userNotifications.email_converted ? 'checked' : ''} class="mr-3">
-                                    <span>🎯 Leads convertidos</span>
-                                </label>
-                                
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="email-weekly" ${userNotifications.email_weekly ? 'checked' : ''} class="mr-3">
-                                    <span>📊 Relatório semanal</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Notificações Push</h3>
-                            
-                            <div class="space-y-4">
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="push-new-leads" ${userNotifications.push_new_leads ? 'checked' : ''} class="mr-3">
-                                    <span>🔔 Novos leads</span>
-                                </label>
-                                
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="push-reminders" ${userNotifications.push_reminders ? 'checked' : ''} class="mr-3">
-                                    <span>⏰ Lembretes de follow-up</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button onclick="saveNotifications()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            💾 Salvar Notificações
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function renderSecuritySection() {
-            return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">🔒 Segurança</h2>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p class="text-yellow-800">🚧 Funcionalidade em desenvolvimento</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function renderBillingSection() {
-            return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">💳 Faturamento</h2>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p class="text-yellow-800">🚧 Funcionalidade em desenvolvimento</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function renderAnalyticsSection() {
-            return `
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">📊 Analytics</h2>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p class="text-yellow-800">🚧 Funcionalidade em desenvolvimento</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Configurar eventos específicos de cada seção
-        function setupSectionEvents(sectionName) {
-            // Eventos serão configurados conforme necessário para cada seção
-        }
-
-        // Funções de salvamento
-        window.saveProfile = async function() {
-            const fullName = document.getElementById('full-name')?.value;
-            const phone = document.getElementById('phone')?.value;
-            const jobTitle = document.getElementById('job-title')?.value;
-            
-            try {
-                // Aqui você salvaria no Supabase
-                window.showToast('✅ Perfil salvo com sucesso!', 'success');
-            } catch (error) {
-                console.error('Erro ao salvar perfil:', error);
-                window.showToast('❌ Erro ao salvar perfil', 'error');
-            }
+        // 🔹 Funções de salvar
+        window.saveProfile = async () => {
+            const u = await getCurrentUser(); const full = document.getElementById('full-name').value;
+            const { error } = await supabase.from('user_profiles').update({full_name:full}).eq('user_id',u.id);
+            error?window.showToast('❌ Erro ao salvar','error'):window.showToast('✅ Perfil salvo','success');
         };
 
-        window.saveOrganization = async function() {
-            const orgName = document.getElementById('org-name')?.value;
-            const hotThreshold = document.getElementById('hot-threshold')?.value;
-            const warmThreshold = document.getElementById('warm-threshold')?.value;
-            
-            try {
-                // Aqui você salvaria no Supabase
-                window.showToast('✅ Configurações da organização salvas!', 'success');
-            } catch (error) {
-                console.error('Erro ao salvar organização:', error);
-                window.showToast('❌ Erro ao salvar configurações', 'error');
-            }
+        window.saveOrganization = async () => {
+            const name = document.getElementById('org-name').value; const orgId = getDefaultOrgId();
+            const { error } = await supabase.from('organizations').upsert({id:orgId,name});
+            error?window.showToast('❌ Erro ao salvar','error'):window.showToast('✅ Organização salva','success');
         };
 
-        window.saveNotifications = async function() {
-            const emailNewLeads = document.getElementById('email-new-leads')?.checked;
-            const emailConverted = document.getElementById('email-converted')?.checked;
-            const emailWeekly = document.getElementById('email-weekly')?.checked;
-            const pushNewLeads = document.getElementById('push-new-leads')?.checked;
-            const pushReminders = document.getElementById('push-reminders')?.checked;
-            
-            try {
-                // Aqui você salvaria no Supabase
-                window.showToast('✅ Configurações de notificação salvas!', 'success');
-            } catch (error) {
-                console.error('Erro ao salvar notificações:', error);
-                window.showToast('❌ Erro ao salvar notificações', 'error');
-            }
+        window.saveNotifications = async () => {
+            const u=await getCurrentUser(); const emailNew=document.getElementById('email-new-leads').checked;
+            const converted=document.getElementById('email-converted').checked;
+            const { error } = await supabase.from('notifications').upsert({user_id:u.id,email_new_leads:emailNew,email_converted:converted});
+            error?window.showToast('❌ Erro','error'):window.showToast('✅ Notificações salvas','success');
         };
     </script>
 </body>
