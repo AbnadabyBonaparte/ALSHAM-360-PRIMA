@@ -13,17 +13,13 @@ class AlshamSupabase {
         this.client = supabase;
         this.currentUser = null;
         this.orgId = 'alsham-default-org-2024';
-        
-        // Inicializar sistema
         this.init();
     }
 
     async init() {
         console.log('🏁 Iniciando sistema de automações...');
         try {
-            // Verificar sessão atual
             const { data: { session } } = await this.client.auth.getSession();
-            
             if (session?.user) {
                 this.currentUser = session.user;
                 console.log('✅ Usuário autenticado:', session.user.email);
@@ -31,9 +27,7 @@ class AlshamSupabase {
                 console.log('👤 Usuário não autenticado - iniciando modo demo');
                 await this.createMockUser();
             }
-            
             console.log('🎯 Sistema de automações carregado com sucesso!');
-            
         } catch (error) {
             console.error('❌ Erro ao carregar sistema de automações:', error);
             await this.createMockUser();
@@ -49,43 +43,36 @@ class AlshamSupabase {
         console.log('🎭 Criando mock do AlshamSupabase');
     }
 
-    // Função para obter usuário atual
-    async getCurrentUser() {
+    // 🔹 Nova função para compatibilidade
+    async getCurrentSession() {
         try {
-            const { data: { user }, error } = await this.client.auth.getUser();
-            
+            const { data: { session }, error } = await this.client.auth.getSession();
             if (error) throw error;
-            
-            if (user) {
-                this.currentUser = user;
-                return {
-                    success: true,
-                    user: user,
-                    message: 'Usuário autenticado'
-                };
-            }
-            
-            return {
-                success: false,
-                user: this.currentUser, // Retorna mock user
-                message: 'Usuário não autenticado - usando modo demo'
-            };
-            
+            return session;
         } catch (error) {
-            console.error('Erro ao buscar usuário:', error);
-            return {
-                success: false,
-                user: this.currentUser,
-                message: 'Erro ao buscar usuário: ' + error.message
-            };
+            console.error('Erro ao obter sessão:', error);
+            return null;
         }
     }
 
-    // Função para obter KPIs do dashboard
+    async getCurrentUser() {
+        try {
+            const { data: { user }, error } = await this.client.auth.getUser();
+            if (error) throw error;
+            if (user) {
+                this.currentUser = user;
+                return { success: true, user, message: 'Usuário autenticado' };
+            }
+            return { success: false, user: this.currentUser, message: 'Usuário não autenticado - usando modo demo' };
+        } catch (error) {
+            console.error('Erro ao buscar usuário:', error);
+            return { success: false, user: this.currentUser, message: 'Erro ao buscar usuário: ' + error.message };
+        }
+    }
+
     async getDashboardKPIs() {
         try {
             console.log('🔄 Carregando KPIs do Dashboard...');
-            
             const { data, error } = await this.client
                 .from('dashboard_summary')
                 .select(`
@@ -104,13 +91,9 @@ class AlshamSupabase {
 
             if (data && data.length > 0) {
                 console.log('✅ KPIs carregados do Supabase:', data[0]);
-                return {
-                    success: true,
-                    data: data[0]
-                };
+                return { success: true, data: data[0] };
             }
 
-            // Retornar dados mock se não houver dados
             const mockData = {
                 total_leads: 1250,
                 leads_convertidos: 340,
@@ -121,16 +104,9 @@ class AlshamSupabase {
             };
 
             console.log('🎭 Usando dados mock para KPIs:', mockData);
-            return {
-                success: true,
-                data: mockData,
-                mock: true
-            };
-
+            return { success: true, data: mockData, mock: true };
         } catch (error) {
             console.error('Erro ao carregar KPIs:', error);
-            
-            // Dados de fallback
             return {
                 success: false,
                 error: error.message,
@@ -146,136 +122,77 @@ class AlshamSupabase {
         }
     }
 
-    // Função para obter leads
     async getLeads(limit = 50) {
         try {
             console.log('🔄 Carregando leads...');
-            
             const { data, error } = await this.client
                 .from('leads_crm')
                 .select(`
-                    id,
-                    nome,
-                    email,
-                    telefone,
-                    status,
-                    fonte,
-                    valor_potencial,
-                    created_at,
-                    updated_at
+                    id, nome, email, telefone, status, fonte, valor_potencial, created_at, updated_at
                 `)
                 .eq('org_id', this.orgId)
                 .order('created_at', { ascending: false })
                 .limit(limit);
 
             if (error) throw error;
-
             console.log('✅ Leads carregados:', data?.length || 0);
-            return {
-                success: true,
-                data: data || [],
-                count: data?.length || 0
-            };
-
+            return { success: true, data: data || [], count: data?.length || 0 };
         } catch (error) {
             console.error('Erro ao carregar leads:', error);
-            return {
-                success: false,
-                error: error.message,
-                data: [],
-                count: 0
-            };
+            return { success: false, error: error.message, data: [], count: 0 };
         }
     }
 
-    // Função para obter automações
     async getAutomations() {
         try {
             console.log('🔄 Carregando automações...');
-            
             const { data, error } = await this.client
                 .from('automation_rules')
                 .select(`
-                    id,
-                    name,
-                    description,
-                    trigger_event,
-                    conditions,
-                    actions,
-                    is_active,
-                    execution_count,
-                    last_execution,
-                    created_at
+                    id, name, description, trigger_event, conditions, actions, is_active, execution_count, last_execution, created_at
                 `)
                 .eq('org_id', this.orgId)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-
             console.log('✅ Automações carregadas:', data?.length || 0);
-            return {
-                success: true,
-                data: data || [],
-                count: data?.length || 0
-            };
-
+            return { success: true, data: data || [], count: data?.length || 0 };
         } catch (error) {
             console.error('Erro ao carregar automações:', error);
-            return {
-                success: false,
-                error: error.message,
-                data: [],
-                count: 0
-            };
+            return { success: false, error: error.message, data: [], count: 0 };
         }
     }
 
-    // Função para salvar configurações
     async saveSettings(settings) {
         try {
             console.log('💾 Salvando configurações...');
-            
-            const { data, error } = await this.client
+            const { error } = await this.client
                 .from('organization_settings')
                 .upsert({
                     org_id: this.orgId,
-                    settings: settings,
+                    settings,
                     updated_at: new Date().toISOString()
-                })
-                .select();
-
+                });
             if (error) throw error;
-
             console.log('✅ Configurações salvas');
-            return {
-                success: true,
-                message: 'Configurações salvas com sucesso'
-            };
-
+            return { success: true, message: 'Configurações salvas com sucesso' };
         } catch (error) {
             console.error('Erro ao salvar configurações:', error);
-            return {
-                success: false,
-                error: error.message
-            };
+            return { success: false, error: error.message };
         }
     }
 
-    // Expor cliente Supabase nativo para funções avançadas
     get supabase() {
         return this.client;
     }
 
-    // Função de logout
     async signOut() {
         try {
             const { error } = await this.client.auth.signOut();
             if (error) throw error;
-            
             this.currentUser = null;
             console.log('👋 Usuário deslogado');
             return { success: true };
-            
         } catch (error) {
             console.error('Erro ao fazer logout:', error);
             return { success: false, error: error.message };
@@ -289,20 +206,21 @@ const alshamSupabase = new AlshamSupabase();
 // Expor no window para compatibilidade
 window.AlshamSupabase = alshamSupabase;
 
-// Também expor funções individuais para facilidade de uso
+// 🔹 Expor funções globais
+window.getCurrentSession = () => alshamSupabase.getCurrentSession();
 window.getCurrentUser = () => alshamSupabase.getCurrentUser();
 window.getDashboardKPIs = () => alshamSupabase.getDashboardKPIs();
 window.getLeads = (limit) => alshamSupabase.getLeads(limit);
 window.getAutomations = () => alshamSupabase.getAutomations();
 
-// Log de inicialização
 console.log('🚀 AlshamSupabase v9.3 disponível globalmente!');
 console.log('📋 Funções disponíveis:', {
+    'getCurrentSession()': 'Buscar sessão atual',
     'getCurrentUser()': 'Buscar usuário atual',
-    'getDashboardKPIs()': 'Buscar KPIs do dashboard', 
+    'getDashboardKPIs()': 'Buscar KPIs do dashboard',
     'getLeads()': 'Buscar leads',
     'getAutomations()': 'Buscar automações',
     'AlshamSupabase': 'Objeto principal com todas as funções'
 });
 
-export default alshamSupabase;
+export { supabase, alshamSupabase, supabase as client, alshamSupabase as AlshamSupabase };
