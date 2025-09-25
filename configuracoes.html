@@ -1,26 +1,54 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configurações - ALSHAM 360° PRIMA</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurações — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Gerencie as configurações do ALSHAM 360° PRIMA: preferências, segurança, notificações e personalização avançada." />
+
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
+    }
+  </script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen font-inter">
   <!-- Header -->
   <header class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center">
-          <img src="assets/logo.png" alt="ALSHAM 360°" class="h-8 w-8 mr-3">
+          <img src="/assets/logo.png" alt="ALSHAM 360°" class="h-8 w-8 mr-3">
           <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
         </div>
         <nav class="flex space-x-4">
-          <a href="index.html" class="text-gray-600 hover:text-gray-900">📊 Dashboard</a>
-          <a href="leads-real.html" class="text-gray-600 hover:text-gray-900">🎯 Leads</a>
-          <a href="automacoes.html" class="text-gray-600 hover:text-gray-900">⚡ Automações</a>
-          <a href="configuracoes.html" class="text-blue-600 font-medium">⚙️ Configurações</a>
+          <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">📊 Dashboard</a>
+          <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">🎯 Leads</a>
+          <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">⚡ Automações</a>
+          <a href="/configuracoes.html" class="text-blue-600 font-medium">⚙️ Configurações</a>
         </nav>
       </div>
     </div>
@@ -31,7 +59,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
       <!-- Sidebar -->
       <aside id="config-sidebar" class="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <!-- JS vai renderizar os botões -->
+        <!-- JS renderiza os botões -->
       </aside>
 
       <!-- Content -->
@@ -47,11 +75,16 @@
     </div>
   </main>
 
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
+
   <!-- Toast Container -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
   <!-- Scripts -->
-  <script src="public/js/fix-imports.js"></script>
-  <script src="public/js/configuracoes.js" type="module"></script>
+  <script src="/js/fix-imports.js"></script>
+  <script type="module" src="/js/configuracoes.js"></script>
 </body>
 </html>
