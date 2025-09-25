@@ -96,6 +96,39 @@ class AlshamSupabase {
         }
     }
 
+    async getAutomations() {
+        try {
+            const { data, error } = await this.client
+                .from('automation_rules')
+                .select('*')
+                .eq('org_id', this.orgId)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Erro ao carregar automações:', error);
+            return [];
+        }
+    }
+
+    async saveSettings(settings) {
+        try {
+            const { error } = await this.client
+                .from('organization_settings')
+                .upsert({
+                    org_id: this.orgId,
+                    settings,
+                    updated_at: new Date().toISOString()
+                });
+            if (error) throw error;
+            return { success: true, message: 'Configurações salvas com sucesso' };
+        } catch (error) {
+            console.error('Erro ao salvar configurações:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     async signOut() {
         try {
             const { error } = await this.client.auth.signOut();
@@ -118,6 +151,26 @@ class AlshamSupabase {
         return this.orgId;
     }
 
+    getDefaultOrgId() {
+        return this.orgId;
+    }
+
+    // 🔹 Extra: consulta genérica
+    async genericSelect(table, filters = {}) {
+        try {
+            let query = this.client.from(table).select('*');
+            for (const [key, value] of Object.entries(filters)) {
+                query = query.eq(key, value);
+            }
+            const { data, error } = await query;
+            if (error) throw error;
+            return { data };
+        } catch (error) {
+            console.error(`Erro no genericSelect (${table}):`, error);
+            return { data: [] };
+        }
+    }
+
     // 🔹 Extra: formatar data
     formatDateBR(dateString) {
         if (!dateString) return '';
@@ -131,11 +184,9 @@ class AlshamSupabase {
 
     // 🔹 Extra: sistema de notificação
     showNotification(message, type = 'info') {
-        // Se o showToast do index.html existir, usa ele
         if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
             window.showToast(message, type);
         } else {
-            // Fallback
             console.log(`🔔 [${type.toUpperCase()}] ${message}`);
             alert(message);
         }
@@ -145,42 +196,20 @@ class AlshamSupabase {
 // Instância global
 const alshamSupabase = new AlshamSupabase();
 
-// Funções individuais (para import no index.html)
-function getCurrentSession() {
-  return alshamSupabase.getCurrentSession();
-}
-
-function getCurrentUser() {
-  return alshamSupabase.getCurrentUser();
-}
-
-function getDashboardKPIs() {
-  return alshamSupabase.getDashboardKPIs();
-}
-
-function getLeads(limit) {
-  return alshamSupabase.getLeads(limit);
-}
-
-function signOut() {
-  return alshamSupabase.signOut();
-}
-
-function onAuthStateChange(callback) {
-  return alshamSupabase.onAuthStateChange(callback);
-}
-
-function getCurrentOrgId() {
-  return alshamSupabase.getCurrentOrgId();
-}
-
-function formatDateBR(date) {
-  return alshamSupabase.formatDateBR(date);
-}
-
-function showNotification(message, type) {
-  return alshamSupabase.showNotification(message, type);
-}
+// Funções individuais
+function getCurrentSession() { return alshamSupabase.getCurrentSession(); }
+function getCurrentUser() { return alshamSupabase.getCurrentUser(); }
+function getDashboardKPIs() { return alshamSupabase.getDashboardKPIs(); }
+function getLeads(limit) { return alshamSupabase.getLeads(limit); }
+function getAutomations() { return alshamSupabase.getAutomations(); }
+function saveSettings(settings) { return alshamSupabase.saveSettings(settings); }
+function signOut() { return alshamSupabase.signOut(); }
+function onAuthStateChange(callback) { return alshamSupabase.onAuthStateChange(callback); }
+function getCurrentOrgId() { return alshamSupabase.getCurrentOrgId(); }
+function getDefaultOrgId() { return alshamSupabase.getDefaultOrgId(); }
+function genericSelect(table, filters) { return alshamSupabase.genericSelect(table, filters); }
+function formatDateBR(date) { return alshamSupabase.formatDateBR(date); }
+function showNotification(message, type) { return alshamSupabase.showNotification(message, type); }
 
 // ✅ Exportações finais
 export {
@@ -190,9 +219,13 @@ export {
   getCurrentUser,
   getDashboardKPIs,
   getLeads,
+  getAutomations,
+  saveSettings,
   signOut,
   onAuthStateChange,
   getCurrentOrgId,
+  getDefaultOrgId,
+  genericSelect,
   formatDateBR,
   showNotification
 };
