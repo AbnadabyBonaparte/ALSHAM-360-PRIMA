@@ -1,8 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Authentication System V5.1 NASA 10/10
+ * ALSHAM 360° PRIMA - Enterprise Authentication System V5.2 NASA 10/10
  * Middleware de autenticação com gestão de sessão em tempo real
  *
- * @version 5.1.0 - FINAL BUILD READY
+ * @version 5.2.0 - FINAL BUILD READY
  * @author ALSHAM
  */
 
@@ -118,12 +118,36 @@ class AuthStateManager {
         profile: this.currentProfile,
         organization: this.currentOrganization,
         sessionExpiry: this.sessionExpiry?.toISOString(),
-        version: "5.1.0"
+        version: "5.2.0"
       };
       localStorage.setItem("alsham_auth_state", JSON.stringify(authState));
     } catch (err) {
       console.error("🚨 Persistência de auth falhou:", err);
     }
+  }
+
+  async restorePersistedState() {
+    try {
+      const { localStorage } = validateAuthDependencies();
+      const raw = localStorage.getItem("alsham_auth_state");
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (parsed.isAuthenticated && parsed.user) {
+        this.currentUser = parsed.user;
+        this.currentProfile = parsed.profile;
+        this.currentOrganization = parsed.organization;
+        this.isAuthenticated = true;
+        this.sessionExpiry = parsed.sessionExpiry
+          ? new Date(parsed.sessionExpiry)
+          : new Date(Date.now() + 3600000);
+        this.setupSessionRefresh();
+        console.log("♻️ Sessão restaurada do localStorage");
+        return true;
+      }
+    } catch (err) {
+      console.error("🚨 Falha restaurando estado persistido:", err);
+    }
+    return false;
   }
 
   async clearPersistedState() {
@@ -146,7 +170,7 @@ class AuthStateManager {
     try {
       const session = await getCurrentSession();
       if (session?.user) {
-        this.sessionExpiry = new Date(session.expires_at);
+        this.sessionExpiry = new Date(session.expires_at || Date.now() + 3600000);
         this.setupSessionRefresh();
         console.log("✅ Sessão renovada");
       } else {
@@ -171,12 +195,17 @@ class AuthStateManager {
 
 // ===== FUNÇÕES AUXILIARES =====
 async function initializeAuth() {
-  const session = await getCurrentSession();
-  if (session?.user) {
-    const profile = await getUserProfile(session.user.id);
-    await authState.setAuthenticatedUser(session.user, profile?.data || null);
-  } else {
-    await authState.clearAuthenticatedUser();
+  // Primeiro tenta restaurar sessão persistida
+  const restored = await authState.restorePersistedState();
+
+  if (!restored) {
+    const session = await getCurrentSession();
+    if (session?.user) {
+      const profile = await getUserProfile(session.user.id);
+      await authState.setAuthenticatedUser(session.user, profile?.data || null);
+    } else {
+      await authState.clearAuthenticatedUser();
+    }
   }
 
   // Monitorar mudanças de auth
@@ -251,6 +280,11 @@ const AlshamAuth = {
 };
 
 window.AlshamAuth = AlshamAuth;
+export {
+  AlshamAuth,
+  checkRouteAccess,   // agora pode importar isolado
+  initializeAuth      // também disponível para bootstrap
+};
 export default AlshamAuth;
 
-console.log("🔐 Enterprise Authentication v5.1.0 - ALSHAM 360° PRIMA");
+console.log("🔐 Enterprise Authentication v5.2.0 - ALSHAM 360° PRIMA");
