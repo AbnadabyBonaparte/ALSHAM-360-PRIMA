@@ -6,8 +6,17 @@
   <title>Dashboard — ALSHAM 360° PRIMA | CRM Enterprise</title>
   <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA: KPIs em tempo real, analytics avançados, leads inteligentes e automações empresariais." />
 
-  <!-- CSP corrigido -->
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; object-src 'none';">
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -28,14 +37,14 @@
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
 
-  <!-- Supabase via módulo -->
+  <!-- Supabase -->
   <script type="module" src="/src/lib/supabase.js"></script>
 
   <style>
-    .loading-spinner { @apply inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin; }
+    .loading-spinner {
+      @apply inline-block w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin;
+    }
     .card { @apply bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300; }
-    .stat-card { @apply relative overflow-hidden; }
-    .chart-container { position: relative; height: 400px; width: 100%; }
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -44,7 +53,7 @@
     <div class="text-center">
       <div class="loading-spinner w-16 h-16 mb-4"></div>
       <p class="text-gray-600 font-medium">Carregando dashboard...</p>
-      <p class="text-sm text-gray-500 mt-2">Conectando com 55 tabelas...</p>
+      <p class="text-sm text-gray-500 mt-2">Conectando ao Supabase...</p>
     </div>
   </div>
 
@@ -92,14 +101,14 @@
 
   <!-- Footer -->
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema com 55 tabelas enterprise
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
 
   <!-- Script -->
   <script type="module">
     import { supabase } from "/src/lib/supabase.js";
 
-    let statusChart=null,timelineChart=null;
+    let statusChart=null, timelineChart=null;
 
     document.addEventListener("DOMContentLoaded", async ()=>{
       try {
@@ -107,7 +116,7 @@
         if(typeof Chart==="undefined") throw new Error("Chart.js não disponível");
 
         await loadDashboardData();
-        setInterval(loadDashboardData,30000);
+        setInterval(loadDashboardData,30000); // auto-refresh
         document.getElementById("loading-indicator").style.display="none";
       } catch(e){
         console.error(e);
@@ -117,9 +126,9 @@
     });
 
     async function loadDashboardData(){
-      const orgId="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe";
+      const orgId="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe"; // 🔹 substituir pelo orgId real
       const {data:leads,error}=await supabase.from("leads_crm").select("*").eq("org_id",orgId);
-      if(error){console.error(error);return;}
+      if(error){console.error(error);showToast("Erro ao carregar dados","error");return;}
 
       // KPIs
       document.getElementById("total-leads").textContent=leads.length;
@@ -154,20 +163,33 @@
           last7.push(d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}));
           counts.push(leads.filter(l=>l.created_at.startsWith(key)).length);
         }
-        timelineChart=new Chart(ctx2,{type:"line",data:{labels:last7,datasets:[{data:counts,borderColor:"#3B82F6",fill:true}]},options:{plugins:{legend:{display:false}}}});
+        timelineChart=new Chart(ctx2,{
+          type:"line",
+          data:{labels:last7,datasets:[{data:counts,borderColor:"#3B82F6",fill:true}]},
+          options:{plugins:{legend:{display:false}}}
+        });
       }
 
       // Leads recentes
       const tbody=document.getElementById("recent-leads-table");
       tbody.innerHTML=leads.slice(0,5).map(l=>`
-        <tr class="border-b"><td>${l.nome||"N/A"}</td><td>${l.empresa||""}</td><td>${l.status}</td><td>${l.score_ia||0}</td><td>${new Date(l.created_at).toLocaleDateString("pt-BR")}</td></tr>
+        <tr class="border-b">
+          <td>${l.nome||"N/A"}</td>
+          <td>${l.empresa||""}</td>
+          <td>${l.status}</td>
+          <td>${l.score_ia||0}</td>
+          <td>${new Date(l.created_at).toLocaleDateString("pt-BR")}</td>
+        </tr>
       `).join("");
     }
 
     function showToast(msg,type="info"){
-      const c=document.getElementById("toast-container");const t=document.createElement("div");
+      const c=document.getElementById("toast-container");
+      const t=document.createElement("div");
       const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
-      t.className=`${colors[type]} text-white px-4 py-2 rounded shadow mb-2`;t.textContent=msg;c.appendChild(t);
+      t.className=`${colors[type]||"bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2`;
+      t.textContent=msg;
+      c.appendChild(t);
       setTimeout(()=>c.removeChild(t),4000);
     }
   </script>
