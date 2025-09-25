@@ -1,6 +1,7 @@
 // vite.config.js
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { resolve } from 'path';
 
 // Pegar env com fallback
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
@@ -18,6 +19,21 @@ export default defineConfig(({ mode }) => {
       minify: isProduction ? 'esbuild' : false,
       sourcemap: !isProduction,
       target: 'esnext',
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'index.html'),
+          dashboard: resolve(__dirname, 'dashboard.html'),
+          leads: resolve(__dirname, 'leads.html'),
+          leadsReal: resolve(__dirname, 'leads-real.html'),
+          automacoes: resolve(__dirname, 'automacoes.html'),
+          relatorios: resolve(__dirname, 'relatorios.html'),
+          gamificacao: resolve(__dirname, 'gamificacao.html'),
+          configuracoes: resolve(__dirname, 'configuracoes.html'),
+          login: resolve(__dirname, 'login.html'),
+          register: resolve(__dirname, 'register.html'),
+          createOrg: resolve(__dirname, 'create-org.html'),
+        },
+      },
     },
 
     plugins: [
