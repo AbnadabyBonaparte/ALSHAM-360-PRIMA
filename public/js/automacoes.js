@@ -1,8 +1,8 @@
 /**
- * 🤖 ALSHAM 360° PRIMA - Sistema de Automações V2.1
+ * 🤖 ALSHAM 360° PRIMA - Sistema de Automações V2.2
  * Produção final alinhada com supabase.js + auth.js
  *
- * @version 2.1.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
+ * @version 2.2.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
  * @author
  *   ALSHAM Development Team
  */
@@ -18,7 +18,7 @@ import {
 // CONFIGURAÇÃO GLOBAL
 // ==============================
 const ALSHAM_AUTOMATION_CONFIG = {
-  version: "2.1.0",
+  version: "2.2.0",
   triggerTypes: [
     { value: "lead_created", label: "👤 Lead Criado", icon: "🆕", category: "leads" },
     { value: "lead_status_changed", label: "📊 Status do Lead Alterado", icon: "🔄", category: "leads" },
@@ -104,9 +104,16 @@ async function authenticateUser() {
   try {
     const session = await getCurrentSession();
     if (!session?.user) return { success: false };
-    const orgId = await getCurrentOrgId();
+
+    let orgId = await getCurrentOrgId();
+    if (!orgId) {
+      orgId = localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
+    }
+    localStorage.setItem("alsham_org_id", orgId);
+
     return { success: true, user: session.user, orgId };
   } catch (e) {
+    console.error("Erro na autenticação:", e);
     return { success: false, error: e };
   }
 }
@@ -132,7 +139,7 @@ async function loadAutomationData() {
     alshamAutomationState.logs = logs.value?.data || [];
     alshamAutomationState.lastUpdate = new Date();
 
-    console.log("✅ Dados de automações carregados do Supabase");
+    console.log("✅ Dados de automações carregados do Supabase | Org:", alshamAutomationState.orgId);
   } catch (e) {
     console.error("❌ Erro ao carregar automações:", e);
     loadDemoData();
@@ -164,9 +171,11 @@ function loadDemoData() {
 function setupRealtimeSubscriptions() {
   if (!ALSHAM_AUTOMATION_CONFIG.realtime.enabled) return;
 
+  const orgId = alshamAutomationState.orgId || "DEFAULT_ORG_ID";
+
   if (typeof subscribeToTable === "function") {
-    subscribeToTable("automation_rules", alshamAutomationState.orgId, () => loadAutomationData());
-    subscribeToTable("automation_executions", alshamAutomationState.orgId, () => loadAutomationData());
+    subscribeToTable("automation_rules", orgId, () => loadAutomationData());
+    subscribeToTable("automation_executions", orgId, () => loadAutomationData());
   } else {
     setInterval(() => {
       if (!document.hidden && !alshamAutomationState.isLoading) loadAutomationData();
@@ -269,4 +278,4 @@ window.AutomationSystem = {
   version: ALSHAM_AUTOMATION_CONFIG.version
 };
 
-console.log("🤖 Automations V2.1 carregado - multi-tenant Supabase");
+console.log("🤖 Automations V2.2 carregado - multi-tenant Supabase");
