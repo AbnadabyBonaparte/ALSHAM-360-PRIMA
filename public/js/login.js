@@ -1,8 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Login System V5.2.0 NASA 10/10 FINAL
+ * ALSHAM 360° PRIMA - Enterprise Login System V5.2.1 NASA 10/10 FINAL
  * Autenticação enterprise com multi-provider, biometria e UX premium
  *
- * @version 5.2.0 - NASA 10/10 FINAL BUILD
+ * @version 5.2.1 - NASA 10/10 FINAL BUILD (redirect ajustado)
  * @author
  *   ALSHAM Development Team
  */
@@ -139,29 +139,17 @@ function showLoading(show, text = "Carregando...") {
 }
 function showError(msg) {
   const box = domElements.get("errorMessage");
-  const text = domElements.get("errorText");
-  if (box && text) {
-    text.textContent = msg;
-    box.style.display = "block";
+  if (box) {
+    box.textContent = msg;
+    box.classList.remove("hidden");
   }
 }
 function showSuccess(msg) {
   const box = domElements.get("successMessage");
-  const text = domElements.get("successText");
-  if (box && text) {
-    text.textContent = msg;
-    box.style.display = "block";
+  if (box) {
+    box.textContent = msg;
+    box.classList.remove("hidden");
   }
-}
-function announceToScreenReader(msg) {
-  let announcer = document.getElementById("sr-announcer");
-  if (!announcer) {
-    announcer = document.createElement("div");
-    announcer.id = "sr-announcer";
-    announcer.className = "sr-only";
-    document.body.appendChild(announcer);
-  }
-  announcer.textContent = msg;
 }
 
 // ===== VALIDATIONS =====
@@ -195,7 +183,7 @@ async function checkAuthStatus() {
     loginState.setState({ isAuthenticated: true, user: session.user });
     showSuccess("Sessão ativa detectada. Redirecionando...");
     await createAuditLog("LOGIN_SESSION_ACTIVE", { user_id: session.user.id });
-    setTimeout(() => (window.location.href = "/index.html"), 1000);
+    setTimeout(() => (window.location.href = "/dashboard.html"), 1000);
   }
 }
 
@@ -225,7 +213,7 @@ async function handleFormSubmit(e) {
     await createAuditLog("LOGIN_SUCCESS", { user_id: data.user.id, email });
 
     showSuccess("Login realizado com sucesso!");
-    setTimeout(() => (window.location.href = "/index.html"), 1000);
+    setTimeout(() => (window.location.href = "/dashboard.html"), 1000);
   } catch (err) {
     showError("Erro no login: " + err.message);
     incrementFailedAttempts();
@@ -260,7 +248,7 @@ async function handleOAuthLogin(providerId) {
 
     await createAuditLog("OAUTH_LOGIN", { provider: providerId });
     showSuccess(`Login com ${provider.name} realizado!`);
-    setTimeout(() => (window.location.href = "/index.html"), 1000);
+    setTimeout(() => (window.location.href = "/dashboard.html"), 1000);
   } catch (err) {
     showError("Erro no login OAuth: " + err.message);
     await createAuditLog("OAUTH_FAILURE", { provider: providerId, reason: err.message });
@@ -278,11 +266,10 @@ async function handleBiometricLogin() {
       throw new Error("WebAuthn não suportado neste navegador");
     }
     showLoading(true, "Autenticando biometria...");
-    // Mock de autenticação biométrica → substituir por integração real com WebAuthn
     await new Promise(resolve => setTimeout(resolve, 1500));
     await createAuditLog("BIOMETRIC_LOGIN", { user: "mock" });
     showSuccess("Login biométrico realizado!");
-    setTimeout(() => (window.location.href = "/index.html"), 1000);
+    setTimeout(() => (window.location.href = "/dashboard.html"), 1000);
   } catch (err) {
     showError("Erro no login biométrico: " + err.message);
     await createAuditLog("BIOMETRIC_FAILURE", { reason: err.message });
@@ -317,9 +304,9 @@ const LoginSystem = {
   forgotPassword: handleForgotPassword,
   validateEmail,
   validatePassword,
-  version: "5.2.0"
+  version: "5.2.1"
 };
 window.LoginSystem = LoginSystem;
 export default LoginSystem;
 
-console.log("✅ Enterprise Login v5.2.0 - ALSHAM 360° PRIMA READY");
+console.log("✅ Enterprise Login v5.2.1 - ALSHAM 360° PRIMA READY");
