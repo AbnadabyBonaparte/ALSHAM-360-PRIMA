@@ -1,14 +1,15 @@
 /**
- * 🚀 ALSHAM 360° PRIMA - LEADS REAIS (UNIFICADO) V4.1
+ * 🚀 ALSHAM 360° PRIMA - LEADS REAIS (UNIFICADO) V4.2
  * Sistema oficial de Leads em produção - 100% funcional
  *
- * @version 4.1.0 - PRODUÇÃO FINAL NASA 10/10
+ * @version 4.2.0 - PRODUÇÃO FINAL NASA 10/10
  * @author
  *   ALSHAM Development Team
  */
 
 const {
   getCurrentSession,
+  getCurrentOrgId,
   genericSelect,
   subscribeToTable
 } = window.AlshamSupabase || {};
@@ -90,11 +91,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function authenticateUser() {
   try {
     if (window.AlshamAuth?.isAuthenticated) {
-      return { success: true, user: window.AlshamAuth.currentUser, orgId: "default-org" };
+      return { success: true, user: window.AlshamAuth.currentUser, orgId: await getCurrentOrgId() };
     }
     const session = await getCurrentSession?.();
     if (!session?.user) return { success: false };
-    return { success: true, user: session.user, orgId: session.user.user_metadata?.org_id || "default-org" };
+    return { success: true, user: session.user, orgId: await getCurrentOrgId() };
   } catch {
     return { success: false };
   }
@@ -178,5 +179,8 @@ function showSuccess(m) { showNotification(m, "success"); }
 function showError(m) { showNotification(m, "error"); }
 
 // ===== EXPORT =====
-export default { init: () => loadSystemData(), state: leadsState };
-console.log("📋 Leads-Real.js carregado em produção V4.1");
+window.LeadsSystem = {
+  init: () => loadSystemData(),
+  state: leadsState
+};
+console.log("📋 Leads-Real.js carregado em produção V4.2");
