@@ -28,9 +28,7 @@ function showAuthNotification(message, type = "info") {
     }
 
     const toast = document.createElement("div");
-    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white max-w-sm ${getToastColor(
-      type
-    )}`;
+    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white max-w-sm ${getToastColor(type)}`;
     toast.textContent = message;
 
     document.body.appendChild(toast);
@@ -42,14 +40,10 @@ function showAuthNotification(message, type = "info") {
 
 function getToastColor(type) {
   switch (type) {
-    case "success":
-      return "bg-green-500";
-    case "error":
-      return "bg-red-500";
-    case "warning":
-      return "bg-yellow-500";
-    default:
-      return "bg-blue-500";
+    case "success": return "bg-green-500";
+    case "error": return "bg-red-500";
+    case "warning": return "bg-yellow-500";
+    default: return "bg-blue-500";
   }
 }
 
@@ -195,7 +189,6 @@ class AuthStateManager {
 
 // ===== FUNÇÕES AUXILIARES =====
 async function initializeAuth() {
-  // Primeiro tenta restaurar sessão persistida
   const restored = await authState.restorePersistedState();
 
   if (!restored) {
@@ -208,7 +201,6 @@ async function initializeAuth() {
     }
   }
 
-  // Monitorar mudanças de auth
   onAuthStateChange((event, session) => handleAuthStateChange(event, session));
 }
 
@@ -266,12 +258,8 @@ function redirectAfterLogin() {
 // ===== SINGLETON GLOBAL =====
 const authState = new AuthStateManager();
 const AlshamAuth = {
-  get isAuthenticated() {
-    return authState.isAuthenticated;
-  },
-  get currentUser() {
-    return authState.currentUser;
-  },
+  get isAuthenticated() { return authState.isAuthenticated; },
+  get currentUser() { return authState.currentUser; },
   logout: handleLogout,
   initializeAuth,
   checkRouteAccess,
@@ -282,8 +270,8 @@ const AlshamAuth = {
 window.AlshamAuth = AlshamAuth;
 export {
   AlshamAuth,
-  checkRouteAccess,   // agora pode importar isolado
-  initializeAuth      // também disponível para bootstrap
+  checkRouteAccess,
+  initializeAuth
 };
 export default AlshamAuth;
 
