@@ -53,12 +53,14 @@
     }
   ],
   "rewrites": [
-    { "source": "/leads", "destination": "/leads.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/leads", "destination": "/leads-real.html" },
     { "source": "/gamificacao", "destination": "/gamificacao.html" },
     { "source": "/automacoes", "destination": "/automacoes.html" },
     { "source": "/relatorios", "destination": "/relatorios.html" },
     { "source": "/configuracoes", "destination": "/configuracoes.html" },
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/register", "destination": "/register.html" }
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/create-org", "destination": "/create-org.html" }
   ]
 }
