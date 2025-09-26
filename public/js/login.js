@@ -1,9 +1,10 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Login System V5.1.1 NASA 10/10 FINAL
+ * ALSHAM 360° PRIMA - Enterprise Login System V5.2.0 NASA 10/10 FINAL
  * Autenticação enterprise com multi-provider, biometria e UX premium
  *
- * @version 5.1.1 - NASA 10/10 FINAL BUILD
- * @author ALSHAM
+ * @version 5.2.0 - NASA 10/10 FINAL BUILD
+ * @author
+ *   ALSHAM Development Team
  */
 
 // ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
@@ -39,7 +40,7 @@ function validateDependencies() {
 const LOGIN_CONFIG = Object.freeze({
   SECURITY: {
     MAX_ATTEMPTS: 5,
-    LOCKOUT_DURATION: 300000,
+    LOCKOUT_DURATION: 300000, // 5 min
     SESSION_TIMEOUT: 3600000,
     PASSWORD_MIN_LENGTH: 8,
     PASSWORD_REQUIRE_UPPERCASE: true,
@@ -51,16 +52,6 @@ const LOGIN_CONFIG = Object.freeze({
     BRUTE_FORCE_PROTECTION: true,
     TWO_FACTOR_ENABLED: true,
     BIOMETRIC_ENABLED: true
-  },
-  PERFORMANCE: {
-    ANIMATION_DURATION: 600,
-    AUTO_REDIRECT_DELAY: 1500,
-    OFFLINE_CHECK_INTERVAL: 5000,
-    SECURITY_CHECK_INTERVAL: 60000,
-    DEBOUNCE_DELAY: 300,
-    TIMEOUT: 10000,
-    RETRY_ATTEMPTS: 3,
-    CACHE_TTL: 300000
   },
   VALIDATION: {
     EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -203,6 +194,7 @@ async function checkAuthStatus() {
   if (session?.user) {
     loginState.setState({ isAuthenticated: true, user: session.user });
     showSuccess("Sessão ativa detectada. Redirecionando...");
+    await createAuditLog("LOGIN_SESSION_ACTIVE", { user_id: session.user.id });
     setTimeout(() => (window.location.href = "/index.html"), 1000);
   }
 }
@@ -210,23 +202,50 @@ async function checkAuthStatus() {
 // ===== FORM HANDLING =====
 async function handleFormSubmit(e) {
   e.preventDefault();
+
+  if (loginState.state.isLocked) {
+    const remaining = Math.ceil((loginState.state.lockoutEndTime - Date.now()) / 1000);
+    showError(`Conta bloqueada. Tente novamente em ${remaining}s.`);
+    return;
+  }
+
   showLoading(true, "Entrando...");
   try {
     const email = domElements.get("email")?.value.trim();
     const password = domElements.get("password")?.value;
     if (!validateEmail() || !validatePassword()) {
       showError("Credenciais inválidas.");
+      incrementFailedAttempts();
       return;
     }
     const { data, error } = await genericSignIn(email, password);
     if (error) throw error;
-    loginState.setState({ isAuthenticated: true, user: data.user });
+
+    loginState.setState({ isAuthenticated: true, user: data.user, attemptCount: 0 });
+    await createAuditLog("LOGIN_SUCCESS", { user_id: data.user.id, email });
+
     showSuccess("Login realizado com sucesso!");
     setTimeout(() => (window.location.href = "/index.html"), 1000);
   } catch (err) {
     showError("Erro no login: " + err.message);
+    incrementFailedAttempts();
+    await createAuditLog("LOGIN_FAILURE", { email, reason: err.message });
   } finally {
     showLoading(false);
+  }
+}
+
+// ===== ATTEMPT CONTROL =====
+function incrementFailedAttempts() {
+  loginState.state.attemptCount++;
+  if (loginState.state.attemptCount >= LOGIN_CONFIG.SECURITY.MAX_ATTEMPTS) {
+    loginState.state.isLocked = true;
+    loginState.state.lockoutEndTime = Date.now() + LOGIN_CONFIG.SECURITY.LOCKOUT_DURATION;
+    showError("Muitas tentativas falhas. Conta bloqueada por 5 minutos.");
+    setTimeout(() => {
+      loginState.state.isLocked = false;
+      loginState.state.attemptCount = 0;
+    }, LOGIN_CONFIG.SECURITY.LOCKOUT_DURATION);
   }
 }
 
@@ -238,10 +257,13 @@ async function handleOAuthLogin(providerId) {
     showLoading(true, `Entrando com ${provider.name}...`);
     const { error } = await signInWithOAuth(providerId);
     if (error) throw error;
+
+    await createAuditLog("OAUTH_LOGIN", { provider: providerId });
     showSuccess(`Login com ${provider.name} realizado!`);
     setTimeout(() => (window.location.href = "/index.html"), 1000);
   } catch (err) {
     showError("Erro no login OAuth: " + err.message);
+    await createAuditLog("OAUTH_FAILURE", { provider: providerId, reason: err.message });
   } finally {
     showLoading(false);
   }
@@ -258,10 +280,12 @@ async function handleBiometricLogin() {
     showLoading(true, "Autenticando biometria...");
     // Mock de autenticação biométrica → substituir por integração real com WebAuthn
     await new Promise(resolve => setTimeout(resolve, 1500));
+    await createAuditLog("BIOMETRIC_LOGIN", { user: "mock" });
     showSuccess("Login biométrico realizado!");
     setTimeout(() => (window.location.href = "/index.html"), 1000);
   } catch (err) {
     showError("Erro no login biométrico: " + err.message);
+    await createAuditLog("BIOMETRIC_FAILURE", { reason: err.message });
   } finally {
     showLoading(false);
   }
@@ -275,9 +299,11 @@ async function handleForgotPassword(email) {
     showLoading(true, "Enviando link de redefinição...");
     const { error } = await resetPassword(email);
     if (error) throw error;
+    await createAuditLog("PASSWORD_RESET_REQUEST", { email });
     showSuccess("Link de redefinição enviado para seu e-mail!");
   } catch (err) {
     showError("Erro ao redefinir senha: " + err.message);
+    await createAuditLog("PASSWORD_RESET_FAILURE", { email, reason: err.message });
   } finally {
     showLoading(false);
   }
@@ -291,9 +317,9 @@ const LoginSystem = {
   forgotPassword: handleForgotPassword,
   validateEmail,
   validatePassword,
-  version: "5.1.1"
+  version: "5.2.0"
 };
 window.LoginSystem = LoginSystem;
 export default LoginSystem;
 
-console.log("✅ Enterprise Login v5.1.1 - ALSHAM 360° PRIMA READY");
+console.log("✅ Enterprise Login v5.2.0 - ALSHAM 360° PRIMA READY");
