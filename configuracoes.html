@@ -12,7 +12,7 @@
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
+    img-src 'self' data: blob: https:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
@@ -36,21 +36,21 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="bg-gray-100 min-h-screen font-inter">
-  <!-- Header -->
-  <header class="bg-white shadow-sm border-b border-gray-200">
+  <!-- Navbar -->
+  <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center">
           <img src="/assets/logo.png" alt="ALSHAM 360°" class="h-8 w-8 mr-3">
           <h1 class="text-xl font-bold text-gray-900">ALSHAM 360° PRIMA</h1>
         </div>
-        <nav class="flex space-x-4">
+        <nav class="hidden md:flex space-x-6">
           <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">📊 Dashboard</a>
           <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">🎯 Leads</a>
           <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">⚡ Automações</a>
           <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">🎮 Gamificação</a>
           <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">📑 Relatórios</a>
-          <a href="/configuracoes.html" aria-current="page" class="text-blue-600 font-medium">⚙️ Configurações</a>
+          <a href="/configuracoes.html" aria-current="page" class="text-primary font-medium">⚙️ Configurações</a>
         </nav>
       </div>
     </div>
@@ -61,7 +61,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
       <!-- Sidebar -->
       <aside id="config-sidebar" class="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <!-- JS renderiza os botões -->
+        <!-- Sidebar renderizado via configuracoes.js -->
       </aside>
 
       <!-- Content -->
