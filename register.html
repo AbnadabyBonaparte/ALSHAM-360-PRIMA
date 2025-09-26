@@ -33,6 +33,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col justify-center">
 
@@ -48,15 +49,15 @@
       <!-- Step 1 -->
       <div class="step" data-step="0">
         <div>
-          <label class="block text-sm font-medium mb-1" for="first-name">Nome</label>
+          <label for="first-name" class="block text-sm font-medium mb-1">Nome</label>
           <input id="first-name" type="text" class="w-full border rounded-lg p-2" placeholder="Seu nome" required />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1" for="last-name">Sobrenome</label>
+          <label for="last-name" class="block text-sm font-medium mb-1">Sobrenome</label>
           <input id="last-name" type="text" class="w-full border rounded-lg p-2" placeholder="Seu sobrenome" required />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1" for="email">E-mail</label>
+          <label for="email" class="block text-sm font-medium mb-1">E-mail</label>
           <input id="email" type="email" class="w-full border rounded-lg p-2" placeholder="seu@email.com" required />
         </div>
       </div>
@@ -64,12 +65,12 @@
       <!-- Step 2 -->
       <div class="step hidden" data-step="1">
         <div>
-          <label class="block text-sm font-medium mb-1" for="password">Senha</label>
-          <input id="password" type="password" class="w-full border rounded-lg p-2" placeholder="••••••••" required />
+          <label for="password" class="block text-sm font-medium mb-1">Senha</label>
+          <input id="password" type="password" class="w-full border rounded-lg p-2" placeholder="••••••••" required minlength="8" />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1" for="confirm-password">Confirmar Senha</label>
-          <input id="confirm-password" type="password" class="w-full border rounded-lg p-2" placeholder="••••••••" required />
+          <label for="confirm-password" class="block text-sm font-medium mb-1">Confirmar Senha</label>
+          <input id="confirm-password" type="password" class="w-full border rounded-lg p-2" placeholder="••••••••" required minlength="8" />
         </div>
       </div>
 
@@ -81,7 +82,7 @@
 
       <!-- Step 4 -->
       <div class="step hidden" data-step="3">
-        <label class="block text-sm font-medium mb-1" for="verification-code">Código de Verificação</label>
+        <label for="verification-code" class="block text-sm font-medium mb-1">Código de Verificação</label>
         <input id="verification-code" type="text" maxlength="6" class="w-full border rounded-lg p-2" placeholder="000000" />
       </div>
 
