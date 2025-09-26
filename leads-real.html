@@ -6,7 +6,7 @@
   <title>Leads CRM — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, scroll infinito e integração com IA." />
 
-  <!-- ✅ CSP revisado -->
+  <!-- ✅ CSP revisada e segura -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
@@ -59,8 +59,9 @@
     <h1 class="text-3xl font-bold text-gray-900 mb-6">Gestão de Leads</h1>
 
     <!-- Loader -->
-    <div id="leads-loader" class="hidden justify-center py-6">
+    <div id="leads-loader" class="hidden flex justify-center py-6" role="status" aria-live="polite">
       <div class="inline-block w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      <span class="sr-only">Carregando leads...</span>
     </div>
 
     <!-- Container de Leads -->
