@@ -1,213 +1,103 @@
-// /js/register.js
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Crie sua conta no ALSHAM 360° PRIMA. Sistema de registro enterprise com multi-step, segurança avançada e integração Supabase." />
 
-import { supabase } from "/lib/supabase.js";
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
 
-// Seletores
-const form = document.getElementById("register-form");
-const registerBtn = document.getElementById("register-btn");
-const registerBtnText = document.getElementById("register-btn-text");
-const registerSpinner = document.getElementById("register-spinner");
-
-const fullNameInput = document.getElementById("fullName");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const confirmPasswordInput = document.getElementById("confirmPassword");
-const companyInput = document.getElementById("company");
-const phoneInput = document.getElementById("phone");
-const termsInput = document.getElementById("terms");
-
-const togglePasswordBtn = document.getElementById("toggle-password");
-const passwordStrength = document.getElementById("password-strength");
-
-const errorMessage = document.getElementById("error-message");
-const successMessage = document.getElementById("success-message");
-
-const googleRegisterBtn = document.getElementById("google-register");
-const microsoftRegisterBtn = document.getElementById("microsoft-register");
-
-// ========================
-// Utils
-// ========================
-function showError(msg) {
-  errorMessage.textContent = msg;
-  errorMessage.classList.remove("hidden");
-  successMessage.classList.add("hidden");
-}
-
-function showSuccess(msg) {
-  successMessage.textContent = msg;
-  successMessage.classList.remove("hidden");
-  errorMessage.classList.add("hidden");
-}
-
-function clearMessages() {
-  errorMessage.classList.add("hidden");
-  successMessage.classList.add("hidden");
-}
-
-function setLoading(isLoading) {
-  registerBtn.disabled = isLoading;
-  registerBtnText.textContent = isLoading ? "Criando..." : "Criar Conta";
-  registerSpinner.classList.toggle("hidden", !isLoading);
-}
-
-// ========================
-// Força da senha
-// ========================
-if (passwordInput) {
-  passwordInput.addEventListener("input", () => {
-    const value = passwordInput.value;
-    let strength = "Fraca ❌";
-    let color = "text-red-600";
-
-    if (value.length >= 12 && /[A-Z]/.test(value) && /\d/.test(value) && /[^A-Za-z0-9]/.test(value)) {
-      strength = "Muito Forte ✅";
-      color = "text-green-600";
-    } else if (value.length >= 8 && /[A-Z]/.test(value) && /\d/.test(value)) {
-      strength = "Forte 👍";
-      color = "text-blue-600";
-    } else if (value.length >= 6) {
-      strength = "Média ⚠️";
-      color = "text-yellow-600";
-    }
-
-    passwordStrength.textContent = strength;
-    passwordStrength.className = `text-xs mt-1 ${color}`;
-  });
-}
-
-// ========================
-// Mostrar/Ocultar senha
-// ========================
-if (togglePasswordBtn) {
-  togglePasswordBtn.addEventListener("click", () => {
-    const isHidden = passwordInput.type === "password";
-    passwordInput.type = isHidden ? "text" : "password";
-    togglePasswordBtn.setAttribute("aria-pressed", isHidden ? "true" : "false");
-  });
-}
-
-// ========================
-// Cadastro Email/Senha
-// ========================
-if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearMessages();
-
-    const fullName = fullNameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    const confirmPassword = confirmPasswordInput.value.trim();
-    const company = companyInput.value.trim();
-    const phone = phoneInput.value.trim();
-
-    if (!fullName || !email || !password || !confirmPassword) {
-      showError("Preencha todos os campos obrigatórios.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      showError("As senhas não coincidem.");
-      return;
-    }
-
-    if (!termsInput.checked) {
-      showError("Você precisa aceitar os Termos e a Política de Privacidade.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Criar conta no Supabase
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            company,
-            phone,
-          },
-          emailRedirectTo: `${window.location.origin}/index.html`,
-        },
-      });
-
-      if (error) throw error;
-
-      // Salvar perfil em tabela "profiles"
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            id: data.user.id,
-            full_name: fullName,
-            company,
-            phone,
-            email,
-            created_at: new Date(),
-          });
-
-        if (profileError) console.warn("Erro ao salvar perfil:", profileError);
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
       }
-
-      showSuccess("✅ Conta criada com sucesso! Verifique seu e-mail para confirmar.");
-      setTimeout(() => {
-        window.location.href = "/index.html";
-      }, 1200);
-    } catch (err) {
-      console.error("Erro no registro:", err);
-      showError(err.message || "Erro ao criar conta. Tente novamente.");
-    } finally {
-      setLoading(false);
     }
-  });
-}
+  </script>
 
-// ========================
-// Cadastro com Google
-// ========================
-if (googleRegisterBtn) {
-  googleRegisterBtn.addEventListener("click", async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: `${window.location.origin}/index.html` },
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error("Erro Google OAuth:", err);
-      showError("Erro ao cadastrar com Google.");
-    }
-  });
-}
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col justify-center">
 
-// ========================
-// Cadastro com Microsoft (Azure)
-// ========================
-if (microsoftRegisterBtn) {
-  microsoftRegisterBtn.addEventListener("click", async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "azure",
-        options: { redirectTo: `${window.location.origin}/index.html` },
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error("Erro Microsoft OAuth:", err);
-      showError("Erro ao cadastrar com Microsoft.");
-    }
-  });
-}
+  <!-- Toasts -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-// ========================
-// Verificar sessão existente
-// ========================
-document.addEventListener("DOMContentLoaded", async () => {
-  const { data } = await supabase.auth.getSession();
-  if (data?.session) {
-    console.log("Usuário já logado, redirecionando...");
-    window.location.href = "/index.html";
-  }
-});
+  <!-- Card -->
+  <main class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-md w-full">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">Criar Conta</h1>
+
+    <!-- Form -->
+    <form id="registration-form" class="space-y-6">
+      <!-- Step 1 -->
+      <div class="step" data-step="0">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="first-name">Nome</label>
+          <input id="first-name" type="text" class="w-full border rounded-lg p-2" placeholder="Seu nome" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="last-name">Sobrenome</label>
+          <input id="last-name" type="text" class="w-full border rounded-lg p-2" placeholder="Seu sobrenome" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="email">E-mail</label>
+          <input id="email" type="email" class="w-full border rounded-lg p-2" placeholder="seu@email.com" required />
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step hidden" data-step="1">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="password">Senha</label>
+          <input id="password" type="password" class="w-full border rounded-lg p-2" placeholder="••••••••" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="confirm-password">Confirmar Senha</label>
+          <input id="confirm-password" type="password" class="w-full border rounded-lg p-2" placeholder="••••••••" required />
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step hidden" data-step="2">
+        <p class="text-gray-600">Criação de organização é opcional neste momento.</p>
+        <p class="text-sm text-gray-500">Você poderá configurar sua organização depois nas configurações.</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step hidden" data-step="3">
+        <label class="block text-sm font-medium mb-1" for="verification-code">Código de Verificação</label>
+        <input id="verification-code" type="text" maxlength="6" class="w-full border rounded-lg p-2" placeholder="000000" />
+      </div>
+
+      <!-- Submit -->
+      <button id="submit-button" type="submit" class="w-full bg-primary hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg">
+        Criar conta
+      </button>
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-8 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
+
+  <!-- Script -->
+  <script type="module" src="/js/register.js"></script>
+</body>
+</html>
