@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Redirecionando... | ALSHAM 360° PRIMA</title>
+  <title>ALSHAM 360° PRIMA — Loading</title>
   <meta name="description" content="ALSHAM 360° PRIMA — Sistema Enterprise de CRM, Relatórios, Automações e Agentes Digitais." />
   <meta name="theme-color" content="#1E40AF" />
 
@@ -23,21 +23,40 @@
   <link rel="icon" href="/assets/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
+
+  <!-- Tailwind (opcional para loader estilizado) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 font-sans flex flex-col items-center justify-center min-h-screen">
+  <!-- Loader -->
   <main class="text-center p-6">
-    <h1 class="text-xl font-bold text-gray-800">Redirecionando...</h1>
-    <p class="text-gray-600 mt-2">
-      Você será levado ao <a href="/dashboard.html" class="text-blue-600 underline">Dashboard</a>.
-    </p>
+    <div class="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+    <h1 class="text-xl font-bold text-gray-800">Carregando...</h1>
+    <p class="text-gray-600 mt-2">Verificando sua sessão</p>
     <noscript>
-      <p class="text-red-600 mt-4">⚠️ O sistema requer JavaScript habilitado para funcionar corretamente.</p>
+      <p class="text-red-600 mt-4">⚠️ O sistema requer JavaScript habilitado.</p>
     </noscript>
   </main>
 
-  <!-- 🚀 Redirecionamento central -->
-  <script>
-    window.location.replace("/dashboard.html");
+  <!-- 🚀 Roteamento central -->
+  <script type="module">
+    import { getCurrentSession } from "/src/lib/supabase.js";
+
+    async function routeUser() {
+      try {
+        const session = await getCurrentSession();
+        if (session?.user) {
+          window.location.replace("/dashboard.html");
+        } else {
+          window.location.replace("/login.html");
+        }
+      } catch (err) {
+        console.error("Erro ao verificar sessão:", err);
+        window.location.replace("/login.html");
+      }
+    }
+
+    routeUser();
   </script>
 
   <!-- 🔒 PWA Service Worker -->
