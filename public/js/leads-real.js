@@ -1,8 +1,8 @@
 /**
- * 🚀 ALSHAM 360° PRIMA - LEADS REAIS (UNIFICADO) V4.2
+ * 🚀 ALSHAM 360° PRIMA - LEADS REAIS (UNIFICADO) V5.0
  * Sistema oficial de Leads em produção - 100% funcional
  *
- * @version 4.2.0 - PRODUÇÃO FINAL NASA 10/10
+ * @version 5.0.0 - PRODUÇÃO FINAL NASA 10/10
  * @author
  *   ALSHAM Development Team
  */
@@ -59,7 +59,8 @@ const leadsState = {
   pagination: { current: 1, perPage: LEADS_CONFIG.pagination.defaultPerPage, total: 0, totalPages: 0 },
   sorting: { field: "created_at", direction: "desc" },
   isLoading: false,
-  lastUpdate: null
+  lastUpdate: null,
+  charts: {}
 };
 
 // ===== INICIALIZAÇÃO =====
@@ -115,7 +116,7 @@ async function loadSystemData() {
     if (kpis.status === "fulfilled") leadsState.kpis = kpis.value;
     if (gamification.status === "fulfilled") leadsState.gamification = gamification.value;
     if (automations.status === "fulfilled") leadsState.automations = automations.value;
-    leadsState.filteredLeads = [...leadsState.leads];
+    applyFilters();
     leadsState.lastUpdate = new Date();
   } finally {
     leadsState.isLoading = false;
@@ -146,6 +147,21 @@ async function loadAutomations() {
   return { active: data || [] };
 }
 
+// ===== FILTROS E PAGINAÇÃO =====
+function applyFilters() {
+  leadsState.filteredLeads = leadsState.leads.filter(l => {
+    if (leadsState.filters.search && !l.name?.toLowerCase().includes(leadsState.filters.search.toLowerCase())) return false;
+    if (leadsState.filters.status && l.status !== leadsState.filters.status) return false;
+    if (leadsState.filters.prioridade && l.prioridade !== leadsState.filters.prioridade) return false;
+    if (leadsState.filters.temperatura && l.temperatura !== leadsState.filters.temperatura) return false;
+    if (leadsState.filters.origem && l.origem !== leadsState.filters.origem) return false;
+    return true;
+  });
+
+  leadsState.pagination.total = leadsState.filteredLeads.length;
+  leadsState.pagination.totalPages = Math.ceil(leadsState.pagination.total / leadsState.pagination.perPage);
+}
+
 // ===== INTERFACE =====
 function setupInterface() {
   renderKPIs();
@@ -153,10 +169,101 @@ function setupInterface() {
   renderTable();
   renderCharts();
 }
-function renderKPIs() { console.log("📊 Render KPIs", leadsState.kpis); }
-function renderFilters() { console.log("🎛️ Render Filters"); }
-function renderTable() { console.log("📋 Render Leads Table", leadsState.filteredLeads.length); }
-function renderCharts() { console.log("📈 Render Charts"); }
+
+function renderKPIs() {
+  const container = document.getElementById("leads-kpis");
+  if (!container) return;
+  const kpis = leadsState.kpis;
+  container.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded shadow"><p>Total Leads</p><h2 class="text-xl font-bold">${kpis.total_leads || 0}</h2></div>
+      <div class="bg-white p-4 rounded shadow"><p>Convertidos</p><h2 class="text-xl font-bold">${kpis.convertidos || 0}</h2></div>
+      <div class="bg-white p-4 rounded shadow"><p>Taxa Conversão</p><h2 class="text-xl font-bold">${kpis.conversao || 0}%</h2></div>
+      <div class="bg-white p-4 rounded shadow"><p>Pontos Gamificação</p><h2 class="text-xl font-bold">${leadsState.gamification.points || 0}</h2></div>
+    </div>
+  `;
+}
+
+function renderFilters() {
+  const container = document.getElementById("leads-filters");
+  if (!container) return;
+  container.innerHTML = `
+    <input type="text" id="filter-search" placeholder="🔍 Buscar..." class="border p-2 rounded w-full mb-2">
+    <select id="filter-status" class="border p-2 rounded w-full mb-2">
+      <option value="">Todos Status</option>
+      ${LEADS_CONFIG.statusOptions.map(s => `<option value="${s.value}">${s.icon} ${s.label}</option>`).join("")}
+    </select>
+  `;
+  document.getElementById("filter-search").addEventListener("input", e => {
+    leadsState.filters.search = e.target.value;
+    applyFilters();
+    renderTable();
+    renderCharts();
+  });
+  document.getElementById("filter-status").addEventListener("change", e => {
+    leadsState.filters.status = e.target.value;
+    applyFilters();
+    renderTable();
+    renderCharts();
+  });
+}
+
+function renderTable() {
+  const container = document.getElementById("leads-table");
+  if (!container) return;
+  const start = (leadsState.pagination.current - 1) * leadsState.pagination.perPage;
+  const end = start + leadsState.pagination.perPage;
+  const rows = leadsState.filteredLeads.slice(start, end);
+  container.innerHTML = `
+    <table class="w-full border">
+      <thead><tr class="bg-gray-100"><th>Nome</th><th>Status</th><th>Prioridade</th><th>Origem</th><th>Data</th></tr></thead>
+      <tbody>
+        ${rows.map(l => `
+          <tr class="border-b">
+            <td class="p-2">${l.name || "-"}</td>
+            <td class="p-2">${l.status || "-"}</td>
+            <td class="p-2">${l.prioridade || "-"}</td>
+            <td class="p-2">${l.origem || "-"}</td>
+            <td class="p-2">${new Date(l.created_at).toLocaleDateString("pt-BR")}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+    <p class="text-sm text-gray-500 mt-2">Página ${leadsState.pagination.current} de ${leadsState.pagination.totalPages}</p>
+  `;
+}
+
+function renderCharts() {
+  const statusCanvas = document.getElementById("leads-status-chart");
+  const dailyCanvas = document.getElementById("leads-daily-chart");
+  if (!statusCanvas || !dailyCanvas || !window.Chart) return;
+
+  // Status Chart
+  if (leadsState.charts.statusChart) leadsState.charts.statusChart.destroy();
+  const statusCounts = LEADS_CONFIG.statusOptions.map(s => leadsState.filteredLeads.filter(l => l.status === s.value).length);
+  leadsState.charts.statusChart = new Chart(statusCanvas.getContext("2d"), {
+    type: "doughnut",
+    data: {
+      labels: LEADS_CONFIG.statusOptions.map(s => s.label),
+      datasets: [{ data: statusCounts, backgroundColor: ["#3B82F6","#F59E0B","#8B5CF6","#F97316","#22C55E","#EF4444"] }]
+    },
+    options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+  });
+
+  // Daily Chart
+  if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
+  const days = [], counts = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}));
+    counts.push(leadsState.filteredLeads.filter(l => l.created_at?.startsWith(d.toISOString().split("T")[0])).length);
+  }
+  leadsState.charts.dailyChart = new Chart(dailyCanvas.getContext("2d"), {
+    type: "line",
+    data: { labels: days, datasets: [{ label:"Novos Leads", data: counts, borderColor:"#3B82F6", fill:true }] },
+    options: { responsive: true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+  });
+}
 
 // ===== REALTIME =====
 function setupRealtime() {
@@ -170,7 +277,22 @@ function setupRealtime() {
 
 // ===== NOTIFICAÇÕES / LOADING =====
 function showLoading(show, msg = "Carregando...") {
-  console.log(show ? "⏳ " + msg : "✅ pronto");
+  let el = document.getElementById("leads-loading");
+  if (show) {
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "leads-loading";
+      el.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+      el.innerHTML = `
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <span class="text-gray-700">${msg}</span>
+        </div>`;
+      document.body.appendChild(el);
+    }
+  } else {
+    el?.remove();
+  }
 }
 function showNotification(m, t = "info") {
   window.showToast?.(m, t) || console.log(`[${t.toUpperCase()}] ${m}`);
@@ -180,7 +302,8 @@ function showError(m) { showNotification(m, "error"); }
 
 // ===== EXPORT =====
 window.LeadsSystem = {
-  init: () => loadSystemData(),
+  init: () => loadSystemData().then(setupInterface),
+  refresh: () => loadSystemData().then(setupInterface),
   state: leadsState
 };
-console.log("📋 Leads-Real.js carregado em produção V4.2");
+console.log("📋 Leads-Real.js carregado em produção V5.0");
