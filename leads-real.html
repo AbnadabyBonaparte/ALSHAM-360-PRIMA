@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leads CRM — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, scroll infinito e integração com IA." />
+  <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, dashboards e integração com IA." />
 
-  <!-- ✅ CSP revisada e segura -->
+  <!-- ✅ CSP revisada -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
@@ -55,17 +55,35 @@
   </nav>
 
   <!-- Conteúdo -->
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Gestão de Leads</h1>
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold text-gray-900">Gestão de Leads</h1>
 
-    <!-- Loader -->
-    <div id="leads-loader" class="hidden flex justify-center py-6" role="status" aria-live="polite">
+    <!-- Loader unificado -->
+    <div id="leads-loading" class="hidden flex justify-center py-6" role="status" aria-live="polite">
       <div class="inline-block w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
       <span class="sr-only">Carregando leads...</span>
     </div>
 
-    <!-- Container de Leads -->
-    <div id="leads-container" class="space-y-4"></div>
+    <!-- KPIs -->
+    <section id="leads-kpis"></section>
+
+    <!-- Filtros -->
+    <section id="leads-filters" class="bg-white rounded-lg shadow p-4"></section>
+
+    <!-- Tabela -->
+    <section id="leads-table" class="bg-white rounded-lg shadow p-4"></section>
+
+    <!-- Gráficos -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-lg shadow p-4">
+        <h2 class="font-bold mb-2">Distribuição por Status</h2>
+        <canvas id="leads-status-chart"></canvas>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <h2 class="font-bold mb-2">Leads por Dia (Últimos 7 dias)</h2>
+        <canvas id="leads-daily-chart"></canvas>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
