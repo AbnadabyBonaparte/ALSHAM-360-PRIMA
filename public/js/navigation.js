@@ -2,17 +2,18 @@
  * ALSHAM 360° PRIMA - Sistema de Navegação Otimizado V2.0
  * Navegação integrada com auth.js (v5.2) e fix-imports.js
  *
- * @version 2.0.0 - NASA 10/10 FINAL BUILD
- * @autor ALSHAM
+ * @version 2.0.1 - NASA 10/10 FINAL BUILD
+ * @author ALSHAM
  *
  * ✅ FUNCIONALIDADES:
  * - Navegação entre páginas
  * - Verificação de acesso via AlshamAuth
+ * - Exceção para rotas públicas (login/register)
  * - Menu mobile responsivo
  * - Eventos globais: navigation-ready
  */
 
-import { AlshamAuth, checkRouteAccess } from "./auth.js";
+import { AlshamAuth, checkRouteAccess } from "/js/auth.js";
 
 // ===== CONFIGURAÇÃO DE ROTAS =====
 const ROUTES = {
@@ -107,7 +108,8 @@ function detectCurrentPage() {
 function checkAuthentication() {
   navigationState.isAuthenticated = AlshamAuth.isAuthenticated;
 
-  if (!navigationState.isAuthenticated) {
+  // Exceção: login e registro são públicos
+  if (!navigationState.isAuthenticated && !["login", "register"].includes(navigationState.currentPage)) {
     console.warn("⚠️ Usuário não autenticado. Redirecionando para login...");
     window.location.href = ROUTES.login;
     return false;
@@ -133,6 +135,7 @@ function setupMobileMenu() {
   menuBtn.addEventListener("click", () => {
     navigationState.mobileMenuOpen = !navigationState.mobileMenuOpen;
     menu.classList.toggle("hidden", !navigationState.mobileMenuOpen);
+    menuBtn.setAttribute("aria-expanded", navigationState.mobileMenuOpen);
   });
 }
 
