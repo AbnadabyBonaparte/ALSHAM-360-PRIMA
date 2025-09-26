@@ -5,9 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard — ALSHAM 360° PRIMA | CRM Enterprise</title>
   <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA: KPIs em tempo real, analytics avançados, leads inteligentes e automações empresariais." />
+  <meta name="theme-color" content="#3B82F6" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 
   <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com" defer></script>
   <script>
     tailwind.config = {
       theme: {
@@ -35,16 +39,14 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .card { background:white; border-radius:0.75rem; box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:1.5rem; transition:0.3s; }
     .card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
   <!-- Loading -->
-  <div id="loading-indicator" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+  <div id="loading-indicator" role="status" aria-live="polite" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
       <p class="text-gray-600 font-medium">Carregando dashboard...</p>
@@ -60,12 +62,24 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
       <div class="hidden md:flex space-x-6">
-        <a href="/dashboard.html" class="text-primary font-medium">Dashboard</a>
-        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
-        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
-        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+        <a href="/dashboard.html" class="text-primary font-medium" aria-label="Ir para o Dashboard">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900" aria-label="Ir para Leads">Leads</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900" aria-label="Ir para Automações">Automações</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900" aria-label="Ir para Gamificação">Gamificação</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900" aria-label="Ir para Relatórios">Relatórios</a>
       </div>
+
+      <!-- Mobile -->
+      <button id="menu-toggle" class="md:hidden text-gray-600" aria-label="Abrir menu">
+        ☰
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+      <a href="/dashboard.html" class="block px-4 py-2">Dashboard</a>
+      <a href="/leads-real.html" class="block px-4 py-2">Leads</a>
+      <a href="/automacoes.html" class="block px-4 py-2">Automações</a>
+      <a href="/gamificacao.html" class="block px-4 py-2">Gamificação</a>
+      <a href="/relatorios.html" class="block px-4 py-2">Relatórios</a>
     </div>
   </nav>
 
@@ -74,7 +88,7 @@
     <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard Executivo</h1>
 
     <!-- KPIs -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="kpis-container">
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="dashboard-kpis">
       <div class="card"><p>Total de Leads</p><p id="total-leads">--</p></div>
       <div class="card"><p>Novos Hoje</p><p id="novos-hoje">--</p></div>
       <div class="card"><p>Qualificados</p><p id="qualificados">--</p></div>
@@ -84,13 +98,24 @@
     <!-- Charts -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="card"><canvas id="status-chart"></canvas></div>
-      <div class="card"><canvas id="timeline-chart"></canvas></div>
+      <div class="card"><canvas id="performanceChart"></canvas></div>
     </section>
 
     <!-- Leads Recentes -->
     <section class="card">
       <h3 class="text-lg font-semibold mb-4">Leads Recentes</h3>
-      <table class="w-full"><tbody id="recent-leads-table"></tbody></table>
+      <table class="w-full">
+        <thead class="text-left">
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Empresa</th>
+            <th scope="col">Status</th>
+            <th scope="col">Score</th>
+            <th scope="col">Criado em</th>
+          </tr>
+        </thead>
+        <tbody id="leads-table"></tbody>
+      </table>
     </section>
   </main>
 
@@ -100,10 +125,10 @@
   </footer>
 
   <!-- Script -->
-  <script type="module">
+  <script type="module" defer>
     import { getCurrentOrgId, getLeads } from "/src/lib/supabase.js";
 
-    let statusChart=null, timelineChart=null;
+    let statusChart=null, performanceChart=null;
 
     document.addEventListener("DOMContentLoaded", async ()=>{
       try {
@@ -143,9 +168,9 @@
           ],backgroundColor:["#3B82F6","#F59E0B","#10B981","#8B5CF6"]}]}})
       }
 
-      const ctx2=document.getElementById("timeline-chart");
+      const ctx2=document.getElementById("performanceChart");
       if(ctx2){
-        if(timelineChart) timelineChart.destroy();
+        if(performanceChart) performanceChart.destroy();
         const last7=[],counts=[];
         for(let i=6;i>=0;i--){
           const d=new Date();d.setDate(d.getDate()-i);
@@ -153,14 +178,14 @@
           last7.push(d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}));
           counts.push(leads.filter(l=>l.created_at.startsWith(key)).length);
         }
-        timelineChart=new Chart(ctx2,{
+        performanceChart=new Chart(ctx2,{
           type:"line",
           data:{labels:last7,datasets:[{data:counts,borderColor:"#3B82F6",fill:true}]},
           options:{plugins:{legend:{display:false}}}
         });
       }
 
-      const tbody=document.getElementById("recent-leads-table");
+      const tbody=document.getElementById("leads-table");
       tbody.innerHTML=leads.slice(0,5).map(l=>`
         <tr class="border-b">
           <td>${l.nome||"N/A"}</td>
@@ -177,6 +202,7 @@
       const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
       t.className=`${colors[type]||"bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2`;
       t.textContent=msg;
+      t.setAttribute("role","alert");
       c.appendChild(t);
       setTimeout(()=>c.removeChild(t),4000);
     }
