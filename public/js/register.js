@@ -1,21 +1,17 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Registration System V5.0 NASA 10/10 OPTIMIZED
+ * ALSHAM 360° PRIMA - Enterprise Registration System V5.0
  * Advanced user registration with enterprise security + UX premium
  *
- * @version 5.0.0 - NASA 10/10 FINAL BUILD
- * @license MIT
+ * @version 5.0.1 - NASA 10/10 FINAL BUILD
+ * @author ALSHAM
  */
 
 // ===== SUPABASE GLOBAL IMPORT =====
 const {
   signUpWithEmail,
-  getCurrentUser,
-  onAuthStateChange,
   createUserProfile,
-  createOrganization,
-  checkEmailExists,
-  supabase
-} = window.AlshamSupabase;
+  checkEmailExists
+} = window.AlshamSupabase || {};
 
 // ===== DEPENDENCY VALIDATION =====
 function requireLib(libName, lib) {
@@ -67,20 +63,14 @@ class RegistrationState {
       errors: []
     };
   }
-  setState(upd) {
-    Object.assign(this.state, upd);
-  }
-  getState(key) {
-    return key ? this.state[key] : this.state;
-  }
+  setState(upd) { Object.assign(this.state, upd); }
+  getState(key) { return key ? this.state[key] : this.state; }
 }
 const registrationState = new RegistrationState();
 
 // ===== DOM =====
 class DOMManager {
-  constructor() {
-    this.elements = {};
-  }
+  constructor() { this.elements = {}; }
   initialize() {
     const selectors = {
       form: "#registration-form",
@@ -96,9 +86,7 @@ class DOMManager {
       this.elements[k] = document.querySelector(s);
     });
   }
-  get(key) {
-    return this.elements[key];
-  }
+  get(key) { return this.elements[key]; }
 }
 const dom = new DOMManager();
 
@@ -106,25 +94,22 @@ const dom = new DOMManager();
 function showLoading(show, msg = "Carregando...") {
   const btn = dom.get("submitButton");
   if (!btn) return;
-  if (show) {
-    btn.disabled = true;
-    btn.textContent = msg;
-  } else {
-    btn.disabled = false;
-    btn.textContent = "Criar conta";
-  }
+  btn.disabled = show;
+  btn.textContent = show ? msg : "Criar conta";
 }
 function showNotification(message, type = "info") {
   console.log(`[${type}] ${message}`);
   const div = document.createElement("div");
-  div.className = `fixed top-4 right-4 p-3 rounded shadow-lg bg-${
-    type === "error" ? "red" : type === "success" ? "green" : "blue"
-  }-500 text-white`;
+  div.className = `fixed top-4 right-4 p-3 rounded shadow-lg text-white z-50 ${
+    type === "error" ? "bg-red-600" :
+    type === "success" ? "bg-green-600" :
+    type === "warning" ? "bg-yellow-500" : "bg-blue-600"
+  }`;
   div.textContent = message;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 4000);
 }
-const showError = (m) => showNotification(m, "error");
+const showError   = (m) => showNotification(m, "error");
 const showSuccess = (m) => showNotification(m, "success");
 const showWarning = (m) => showNotification(m, "warning");
 
@@ -142,21 +127,16 @@ function announceToScreenReader(msg) {
 // ===== VALIDATION =====
 function validateField(name) {
   const val = dom.get(name)?.value?.trim() || "";
-  if (["firstName", "lastName"].includes(name)) {
+  if (["firstName", "lastName"].includes(name))
     return REGISTRATION_CONFIG.VALIDATION.NAME_REGEX.test(val);
-  }
-  if (name === "email") {
+  if (name === "email")
     return REGISTRATION_CONFIG.VALIDATION.EMAIL_REGEX.test(val);
-  }
-  if (name === "password") {
+  if (name === "password")
     return REGISTRATION_CONFIG.VALIDATION.PASSWORD_REGEX.test(val);
-  }
-  if (name === "confirmPassword") {
+  if (name === "confirmPassword")
     return val === dom.get("password")?.value;
-  }
-  if (name === "verificationCode") {
+  if (name === "verificationCode")
     return /^\d{6}$/.test(val);
-  }
   return true;
 }
 async function validateStep(stepIndex) {
@@ -181,9 +161,7 @@ async function handleFormSubmit(e) {
   e.preventDefault();
   const stepIndex = registrationState.getState("currentStep");
   const valid = await validateStep(stepIndex);
-  if (!valid) {
-    return showError("Por favor, corrija os campos obrigatórios.");
-  }
+  if (!valid) return showError("Por favor, corrija os campos obrigatórios.");
   if (stepIndex < REGISTRATION_CONFIG.STEPS.length - 1) {
     registrationState.setState({ currentStep: stepIndex + 1 });
     announceToScreenReader(`Avançou para etapa ${stepIndex + 2}`);
@@ -201,16 +179,26 @@ async function submitRegistration() {
       firstName: dom.get("firstName")?.value,
       lastName: dom.get("lastName")?.value
     };
+
+    // Checa se email já existe
+    if (await checkEmailExists?.(formData.email)) {
+      showWarning("E-mail já cadastrado");
+      showLoading(false);
+      return;
+    }
+
     const { data, error } = await signUpWithEmail(formData.email, formData.password);
     if (error) throw error;
+
     await createUserProfile({
       user_id: data.user.id,
       first_name: formData.firstName,
       last_name: formData.lastName,
       email: formData.email
     });
+
     showSuccess("Conta criada! Verifique seu email.");
-    setTimeout(() => (window.location.href = "login.html"), 2000);
+    setTimeout(() => (window.location.href = "/login.html"), 2000);
   } catch (err) {
     showError("Erro ao registrar: " + err.message);
   } finally {
@@ -226,9 +214,9 @@ const RegistrationSystem = {
     registrationState.setState({ currentStep: Math.max(0, registrationState.getState("currentStep") - 1) }),
   submit: submitRegistration,
   validateField,
-  version: "5.0.0"
+  version: "5.0.1"
 };
 window.RegistrationSystem = RegistrationSystem;
 export default RegistrationSystem;
 
-console.log("✅ Registration System V5.0 ready - ALSHAM 360° PRIMA");
+console.log("✅ Registration System V5.0.1 pronto - ALSHAM 360° PRIMA");
