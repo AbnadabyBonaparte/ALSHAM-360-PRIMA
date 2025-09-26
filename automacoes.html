@@ -75,13 +75,13 @@
     <!-- Regras -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Regras de Automação</h2>
-      <div id="rules-container" class="space-y-4"></div>
+      <div id="automation-rules" class="space-y-4"></div>
     </section>
 
     <!-- Logs -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Logs em Tempo Real</h2>
-      <div id="logs-container" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
+      <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
     </section>
   </main>
 
@@ -91,115 +91,6 @@
   </footer>
 
   <!-- Script Automações -->
-  <script type="module">
-    import { 
-      getCurrentOrgId, 
-      genericSelect, 
-      genericUpdate, 
-      subscribeToTable 
-    } from "/src/lib/supabase.js";
-
-    document.addEventListener('DOMContentLoaded', async function() {
-      console.log('🤖 Iniciando sistema de automações...');
-      try {
-        const orgId = await getCurrentOrgId();
-        if(!orgId) throw new Error("Org ID não encontrado");
-
-        await renderAutomationDashboard(orgId);
-        await loadAutomationRules(orgId);
-        startRealtimeLogs(orgId);
-
-        console.log('✅ Sistema de automações carregado com sucesso!');
-      } catch (error) {
-        console.error('❌ Erro ao carregar automações:', error);
-        showError('Erro ao carregar sistema de automações');
-      }
-    });
-
-    async function renderAutomationDashboard(orgId) {
-      const { data: executions } = await genericSelect('automation_executions', { org_id: orgId });
-      const { data: rules } = await genericSelect('automation_rules', { org_id: orgId });
-
-      const hoje = new Date().toISOString().split('T')[0];
-      const executionsToday = executions?.filter(e => e.started_at?.startsWith(hoje)).length || 0;
-      const successToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'success').length || 0;
-      const failedToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'failed').length || 0;
-      const activeRules = rules?.filter(r => r.is_active).length || 0;
-
-      document.getElementById('automation-dashboard').innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div class="kpi-card border-blue-500">Execuções Hoje <p>${executionsToday}</p></div>
-          <div class="kpi-card border-green-500">Sucessos <p>${successToday}</p></div>
-          <div class="kpi-card border-red-500">Falhas <p>${failedToday}</p></div>
-          <div class="kpi-card border-purple-500">Regras Ativas <p>${activeRules}</p></div>
-        </div>
-      `;
-    }
-
-    async function loadAutomationRules(orgId) {
-      const { data: rules } = await genericSelect('automation_rules', { org_id: orgId });
-
-      const rulesHTML = rules?.map(rule => `
-        <div class="rule-card">
-          <div>
-            <h4 class="font-semibold">${rule.name}</h4>
-            <p class="text-sm text-gray-500">Trigger: ${rule.trigger_event}</p>
-          </div>
-          <div class="flex items-center space-x-3">
-            <span class="status ${rule.is_active ? 'active' : 'inactive'}">
-              ${rule.is_active ? '🟢 Ativo' : '🔴 Inativo'}
-            </span>
-            <button onclick="toggleRule('${rule.id}', ${!rule.is_active})"
-              class="px-3 py-1 text-sm rounded text-white ${rule.is_active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}">
-              ${rule.is_active ? 'Desativar' : 'Ativar'}
-            </button>
-          </div>
-        </div>
-      `).join('') || '<p class="text-gray-500">Nenhuma regra encontrada.</p>';
-
-      document.getElementById('rules-container').innerHTML = rulesHTML;
-    }
-
-    window.toggleRule = async function(ruleId, newStatus) {
-      try {
-        const { error } = await genericUpdate('automation_rules', ruleId, { is_active: newStatus });
-        if (error) throw error;
-        showToast(`Regra ${newStatus ? 'ativada' : 'desativada'} com sucesso!`, 'success');
-        await loadAutomationRules(await getCurrentOrgId());
-      } catch (err) {
-        console.error('Erro ao atualizar regra:', err);
-        showToast('Erro ao atualizar regra', 'error');
-      }
-    };
-
-    function startRealtimeLogs(orgId) {
-      const logsContainer = document.getElementById('logs-container');
-      let logCount = 0;
-
-      subscribeToTable('automation_executions', orgId, (payload) => {
-        const logEntry = document.createElement('div');
-        logEntry.className = "text-blue-400 mb-1";
-        logEntry.innerHTML = \`[\${new Date().toLocaleTimeString('pt-BR')}] Execução \${payload.eventType}: \${payload.new?.status}\`;
-        logsContainer.appendChild(logEntry);
-        logCount++;
-        if (logCount > 50) logsContainer.removeChild(logsContainer.firstChild);
-        logsContainer.scrollTop = logsContainer.scrollHeight;
-      });
-    }
-
-    function showToast(msg, type="info") {
-      const c=document.getElementById("toast-container");
-      const t=document.createElement("div");
-      const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
-      t.className=\`\${colors[type]||"bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2\`;
-      t.textContent=msg;
-      c.appendChild(t);
-      setTimeout(()=>c.removeChild(t),4000);
-    }
-
-    function showError(message) {
-      showToast(message, 'error');
-    }
-  </script>
+  <script type="module" src="/js/automacoes.js"></script>
 </body>
 </html>
