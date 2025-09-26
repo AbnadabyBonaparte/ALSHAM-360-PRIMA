@@ -1,24 +1,74 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gamificação Enterprise - ALSHAM 360° PRIMA</title>
+  <title>Gamificação — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema de Gamificação Enterprise do ALSHAM 360° PRIMA. Pontos, badges, leaderboards e progressão em tempo real com integração Supabase." />
+
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
+    }
+  </script>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+
+  <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
 </head>
 
-<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen font-inter">
+<body class="font-inter bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
   <!-- Loader -->
-  <div id="gamification-loader" class="fixed top-0 left-0 right-0 z-50">
-    <div class="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium flex items-center justify-center space-x-2">
-      <span>Carregando gamificação...</span>
+  <div id="gamification-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+      <p class="text-gray-600 font-medium">Carregando gamificação...</p>
     </div>
   </div>
 
+  <!-- Toasts -->
+  <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md"></div>
+
+  <!-- Navbar -->
+  <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+      <div class="hidden md:flex space-x-6">
+        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
+        <a href="/gamificacao.html" class="text-primary font-medium">Gamificação</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
+      </div>
+    </div>
+  </nav>
+
   <!-- Conteúdo -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Sistema de Gamificação</h1>
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="bg-white rounded-xl shadow p-6">
         <h2 class="font-bold text-gray-900 mb-4">🏆 Leaderboard</h2>
@@ -37,76 +87,88 @@
     </section>
   </main>
 
-  <!-- Notificações -->
-  <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md"></div>
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
 
   <!-- Scripts -->
   <script type="module">
     import { getCurrentOrgId, supabase } from "/src/lib/supabase.js";
 
-    let pointsChart=null;
+    let pointsChart = null;
 
-    document.addEventListener("DOMContentLoaded", async ()=>{
+    document.addEventListener("DOMContentLoaded", async () => {
       try {
-        document.getElementById("gamification-loader").style.display="none";
         const orgId = await getCurrentOrgId();
-        if(!orgId) throw new Error("Org ID não encontrado");
+        if (!orgId) throw new Error("Org ID não encontrado");
 
         await loadGamificationData(orgId);
-        document.getElementById("btn-refresh")?.addEventListener("click", ()=>loadGamificationData(orgId));
-      } catch(e){
-        console.error("Erro:",e);
-        notify("Erro ao carregar gamificação","error");
+        document.getElementById("gamification-loader").style.display = "none";
+      } catch (e) {
+        console.error("Erro:", e);
+        notify("Erro ao carregar gamificação", "error");
+        document.getElementById("gamification-loader").style.display = "none";
       }
     });
 
-    async function loadGamificationData(orgId){
-      // Leaderboard via pontos
+    async function loadGamificationData(orgId) {
+      // Leaderboard
       const { data: points, error: pointsError } = await supabase
         .from("gamification_points")
         .select("user_id, user_name, total_points")
-        .eq("org_id",orgId)
-        .order("total_points",{ascending:false})
+        .eq("org_id", orgId)
+        .order("total_points", { ascending: false })
         .limit(10);
-      if(pointsError) throw pointsError;
+      if (pointsError) throw pointsError;
 
-      const leaderboard=document.getElementById("leaderboard");
-      leaderboard.innerHTML=points.map((u,i)=>`
+      const leaderboard = document.getElementById("leaderboard");
+      leaderboard.innerHTML = points.map((u, i) => `
         <li class="flex justify-between">
-          <span>${i+1}. ${u.user_name}</span>
+          <span>${i + 1}. ${u.user_name}</span>
           <span class="font-bold">${u.total_points} pts</span>
         </li>`).join("");
 
       // Gráfico de pontos
-      const ctx=document.getElementById("points-chart");
-      if(pointsChart) pointsChart.destroy();
-      pointsChart=new Chart(ctx,{type:"bar",data:{
-        labels:points.map(u=>u.user_name),
-        datasets:[{label:"Pontos",data:points.map(u=>u.total_points),backgroundColor:"#3B82F6"}]
-      },options:{plugins:{legend:{display:false}}}});
+      const ctx = document.getElementById("points-chart");
+      if (pointsChart) pointsChart.destroy();
+      pointsChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: points.map(u => u.user_name),
+          datasets: [{
+            label: "Pontos",
+            data: points.map(u => u.total_points),
+            backgroundColor: "#3B82F6"
+          }]
+        },
+        options: { plugins: { legend: { display: false } } }
+      });
 
       // Badges
       const { data: badges, error: badgesError } = await supabase
         .from("gamification_badges")
         .select("user_name, badge_name, badge_icon")
-        .eq("org_id",orgId)
+        .eq("org_id", orgId)
         .limit(20);
-      if(badgesError) throw badgesError;
+      if (badgesError) throw badgesError;
 
-      const badgesContainer=document.getElementById("badges");
-      badgesContainer.innerHTML = badges.map(b=>`
+      const badgesContainer = document.getElementById("badges");
+      badgesContainer.innerHTML = badges.map(b => `
         <div class="flex items-center space-x-2 bg-gray-100 rounded px-2 py-1">
-          <span>${b.badge_icon||"🏅"}</span>
+          <span>${b.badge_icon || "🏅"}</span>
           <span class="text-sm">${b.user_name}: ${b.badge_name}</span>
         </div>`).join("");
     }
 
-    function notify(msg,type="info"){
-      const c=document.getElementById("gamification-notifications");
-      const n=document.createElement("div");
-      const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
-      n.className=`${colors[type]} text-white px-4 py-2 rounded shadow`;n.textContent=msg;
-      c.appendChild(n);setTimeout(()=>c.removeChild(n),4000);
+    function notify(msg, type = "info") {
+      const c = document.getElementById("gamification-notifications");
+      const n = document.createElement("div");
+      const colors = { success: "bg-green-500", error: "bg-red-500", info: "bg-blue-500" };
+      n.className = `${colors[type]} text-white px-4 py-2 rounded shadow`;
+      n.textContent = msg;
+      c.appendChild(n);
+      setTimeout(() => c.removeChild(n), 4000);
     }
   </script>
 </body>
