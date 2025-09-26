@@ -1,25 +1,28 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Token Refresh V5.0 NASA 10/10 OPTIMIZED
- * Mantém a sessão ativa em background com renovação automática
+ * ALSHAM 360° PRIMA - Enterprise Token Refresh V5.1 NASA 10/10 OPTIMIZED
+ * Mantém a sessão ativa em background com renovação proativa + auditoria
  *
- * @version 5.0.0 - NASA 10/10 FINAL BUILD
+ * @version 5.1.0 - NASA 10/10 FINAL BUILD
  * @license MIT
  */
 
 // ===== IMPORTS GLOBAIS =====
-const { getCurrentSession } = window.AlshamSupabase;
+const { getCurrentSession, createAuditLog } = window.AlshamSupabase;
 const { clearAuthenticatedUser } = window.AlshamAuth || {};
 
 // ===== CONFIGURAÇÃO =====
 const TOKEN_REFRESH_CONFIG = {
   intervalMs: 5 * 60 * 1000, // a cada 5 min
-  warningThreshold: 10 * 60, // 10 min antes da expiração
+  warningThreshold: 15 * 60, // 15 min antes da expiração
+  redirectOnFail: "/login.html",
+  auditEnabled: true,
   debug: true
 };
 
 // ===== ESTADO =====
 let refreshInterval = null;
 let lastSessionCheck = null;
+let lastUserId = null;
 
 // ===== UI HELPERS =====
 function showRefreshNotification(message, type = "info") {
@@ -46,6 +49,7 @@ async function checkAndRefreshToken() {
     if (!session?.user) {
       showRefreshNotification("⚠️ Nenhuma sessão ativa encontrada.", "error");
       clearAuthenticatedUser?.();
+      handleSessionExpired("NO_SESSION");
       return;
     }
 
@@ -65,23 +69,48 @@ async function checkAndRefreshToken() {
       console.log("⏳ Tempo restante sessão:", secondsLeft, "segundos");
     }
 
+    // 🔄 Renovar se abaixo do limite
     if (secondsLeft <= TOKEN_REFRESH_CONFIG.warningThreshold) {
       showRefreshNotification("🔄 Renovando sessão...", "info");
 
-      // Chamando getCurrentSession força o supabase-js a renovar
-      const refreshed = await getCurrentSession();
-
+      const refreshed = await getCurrentSession(); // força refresh via supabase-js
       if (refreshed?.user) {
+        if (TOKEN_REFRESH_CONFIG.auditEnabled && refreshed.user.id !== lastUserId) {
+          await createAuditLog?.("SESSION_REFRESHED", {
+            user: refreshed.user.id,
+            email: refreshed.user.email,
+            timestamp: new Date().toISOString()
+          });
+          lastUserId = refreshed.user.id;
+        }
         showRefreshNotification("✅ Sessão renovada com sucesso.", "success");
       } else {
-        showRefreshNotification("⚠️ Sessão inválida, faça login novamente.", "error");
-        clearAuthenticatedUser?.();
-        window.location.replace("/login.html");
+        handleSessionExpired("REFRESH_FAILED");
       }
     }
   } catch (err) {
     console.error("❌ Erro no refresh automático:", err);
     showRefreshNotification("Erro ao renovar sessão", "error");
+    handleSessionExpired("ERROR", err.message);
+  }
+}
+
+// ===== TRATAMENTO DE EXPIRAÇÃO =====
+async function handleSessionExpired(reason = "EXPIRED", details = "") {
+  try {
+    if (TOKEN_REFRESH_CONFIG.auditEnabled && lastUserId) {
+      await createAuditLog?.("SESSION_EXPIRED", {
+        user: lastUserId,
+        reason,
+        details,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } finally {
+    clearAuthenticatedUser?.();
+    setTimeout(() => {
+      window.location.replace(TOKEN_REFRESH_CONFIG.redirectOnFail);
+    }, 1500);
   }
 }
 
@@ -109,4 +138,4 @@ document.addEventListener("DOMContentLoaded", () => {
   startTokenRefresh();
 });
 
-console.log("🔄 Token Refresh v5.0 NASA 10/10 carregado - ALSHAM 360° PRIMA");
+console.log("🔄 Token Refresh v5.1 carregado - ALSHAM 360° PRIMA com auditoria");
