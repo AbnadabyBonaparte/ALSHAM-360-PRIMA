@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Logout — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Encerramento seguro de sessão no ALSHAM 360° PRIMA com auditoria, logs e autenticação enterprise." />
+  <meta name="theme-color" content="#1E40AF" />
 
   <!-- ✅ CSP revisado -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
+    img-src 'self' data:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
@@ -40,7 +41,7 @@
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col items-center justify-center">
 
   <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite"></div>
 
   <!-- Card -->
   <main class="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
