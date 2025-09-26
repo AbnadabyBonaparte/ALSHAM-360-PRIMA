@@ -1,13 +1,10 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Logout System V5.2.0 NASA 10/10 FINAL
- * Handles secure logout with audit logging, fallback resilience and
- * complete session termination across storage layers.
+ * ALSHAM 360° PRIMA - Enterprise Logout System V5.3.0
+ * Secure logout with audit, full storage cleanup and redirect to index.
  *
- * @version 5.2.0 - FINAL BUILD READY
- * @license MIT
+ * @version 5.3.0 - ENTERPRISE FINAL BUILD
  */
 
-// ===== IMPORTAÇÕES GLOBAIS =====
 const {
   signOut,
   createAuditLog,
@@ -15,7 +12,7 @@ const {
   getCurrentSession
 } = window.AlshamSupabase || {};
 
-// ===== UI HELPERS =====
+// ==== UI HELPERS ====
 function showNotification(message, type = "info") {
   console.log(`[${type.toUpperCase()}] ${message}`);
   const div = document.createElement("div");
@@ -29,14 +26,14 @@ function showNotification(message, type = "info") {
       : "bg-blue-600"
   }`;
   div.textContent = message;
-  document.body.appendChild(div);
+  document.getElementById("toast-container").appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
 const showError = (m) => showNotification(m, "error");
 const showSuccess = (m) => showNotification(m, "success");
 
-// ===== CORE LOGOUT HANDLER =====
-async function handleLogout(redirect = "/login.html") {
+// ==== CORE LOGOUT HANDLER ====
+async function handleLogout(redirect = "/index.html") {
   try {
     console.log("🔐 Logout iniciado...");
     let user = null;
@@ -51,13 +48,12 @@ async function handleLogout(redirect = "/login.html") {
       console.warn("⚠️ Não foi possível obter usuário antes do logout:", e);
     }
 
-    // Executa signOut no Supabase
-    let result = null;
+    // Tenta logout oficial Supabase
     try {
-      result = await signOut?.();
+      const result = await signOut?.();
       if (result?.error) throw result.error;
     } catch (e) {
-      console.warn("⚠️ signOut falhou, prosseguindo com fallback:", e.message);
+      console.warn("⚠️ signOut falhou, fallback local:", e.message);
     }
 
     // Auditoria
@@ -65,11 +61,11 @@ async function handleLogout(redirect = "/login.html") {
       await createAuditLog?.("USER_LOGGED_OUT", {
         user_id: user.id,
         timestamp: new Date().toISOString(),
-        details: "User signed out via logout.js v5.2.0"
+        details: "Logout realizado via logout.js v5.3.0"
       });
     }
 
-    // Limpeza de dados locais (profunda)
+    // Limpeza profunda de sessão
     const keysToClear = [
       "alsham_auth_state",
       "alsham_org_id",
@@ -80,15 +76,13 @@ async function handleLogout(redirect = "/login.html") {
     keysToClear.forEach((k) => localStorage.removeItem(k));
     sessionStorage.clear();
 
-    // Feedback
+    // Feedback + redirect
     showSuccess("Você saiu da sua conta com segurança.");
-
-    // Redirecionamento
     setTimeout(() => {
       window.location.href = redirect;
     }, 1200);
 
-    console.log("✅ Logout concluído com sucesso");
+    console.log("✅ Logout concluído");
   } catch (err) {
     console.error("❌ Erro no logout:", err);
     showError("Erro ao sair: " + (err.message || "desconhecido"));
@@ -96,11 +90,22 @@ async function handleLogout(redirect = "/login.html") {
       reason: err.message || "unknown",
       timestamp: new Date().toISOString()
     });
+    // Redireciona mesmo em falha
+    setTimeout(() => {
+      window.location.href = redirect;
+    }, 2000);
   }
 }
 
-// ===== INICIALIZAÇÃO =====
-document.addEventListener("DOMContentLoaded", () => {
+// ==== INIT ====
+document.addEventListener("DOMContentLoaded", async () => {
+  const session = await getCurrentSession?.();
+  if (!session?.user) {
+    // Se não há sessão, redireciona direto
+    window.location.href = "/login.html";
+    return;
+  }
+
   const btn = document.querySelector("#logout-button");
   if (btn) {
     btn.addEventListener("click", (e) => {
@@ -108,9 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
       handleLogout();
     });
   }
-  console.log("🚀 Logout System V5.2.0 pronto - ALSHAM 360° PRIMA");
+  console.log("🚀 Logout System V5.3.0 pronto - ALSHAM 360° PRIMA");
 });
 
-// ===== EXPORT =====
+// ==== EXPORT ====
 export default handleLogout;
 window.AlshamLogout = handleLogout;
