@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teste Supabase — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Painel de diagnóstico Supabase do ALSHAM 360° PRIMA. Testa sessões, usuários, registros e funções extendidas.">
+
+  <!-- ✅ CSP segura -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
+    }
+  </script>
+
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+</head>
+<body class="font-inter bg-gray-50 min-h-screen flex flex-col">
+
+  <main class="flex-1 max-w-4xl mx-auto px-6 py-10 space-y-8">
+    <h1 class="text-3xl font-bold text-primary">🧪 Diagnóstico Supabase</h1>
+    <p class="text-gray-600">Teste todas as funções integradas no <code>supabase.js</code>.</p>
+
+    <!-- Sessão -->
+    <section class="bg-white rounded-xl shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold">Sessão / Usuário</h2>
+      <button id="check-session" class="px-4 py-2 bg-primary text-white rounded-lg">Ver Sessão</button>
+      <pre id="session-result" class="bg-gray-100 p-3 rounded text-sm overflow-x-auto"></pre>
+    </section>
+
+    <!-- Registro -->
+    <section class="bg-white rounded-xl shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold">Registro / Email</h2>
+      <input id="test-email" type="email" placeholder="teste@email.com" class="w-full border p-2 rounded" />
+      <input id="test-password" type="password" placeholder="SenhaTeste@123" class="w-full border p-2 rounded" />
+      <div class="flex space-x-3">
+        <button id="check-email" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Verificar Email</button>
+        <button id="sign-up" class="px-4 py-2 bg-green-600 text-white rounded-lg">Registrar</button>
+        <button id="reset-password" class="px-4 py-2 bg-yellow-500 text-white rounded-lg">Enviar Reset</button>
+      </div>
+      <pre id="register-result" class="bg-gray-100 p-3 rounded text-sm overflow-x-auto"></pre>
+    </section>
+
+    <!-- Perfil -->
+    <section class="bg-white rounded-xl shadow p-6 space-y-4">
+      <h2 class="text-xl font-semibold">Perfil</h2>
+      <button id="create-profile" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Criar Perfil Demo</button>
+      <pre id="profile-result" class="bg-gray-100 p-3 rounded text-sm overflow-x-auto"></pre>
+    </section>
+  </main>
+
+  <footer class="text-center text-sm text-gray-500 py-6">
+    © 2025 ALSHAM 360° PRIMA — Teste Supabase v1.3
+  </footer>
+
+  <script type="module">
+    import {
+      getCurrentSession,
+      getCurrentUser,
+      signUpWithEmail,
+      resetPassword,
+      checkEmailExists,
+      createUserProfile
+    } from "/src/lib/supabase.js";
+
+    // Helpers
+    function showResult(id, data) {
+      document.getElementById(id).textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Sessão
+    document.getElementById("check-session").addEventListener("click", async () => {
+      const session = await getCurrentSession();
+      const user = await getCurrentUser();
+      showResult("session-result", { session, user });
+    });
+
+    // Email / Registro
+    document.getElementById("check-email").addEventListener("click", async () => {
+      const email = document.getElementById("test-email").value.trim();
+      const exists = await checkEmailExists(email);
+      showResult("register-result", { exists });
+    });
+
+    document.getElementById("sign-up").addEventListener("click", async () => {
+      const email = document.getElementById("test-email").value.trim();
+      const pass = document.getElementById("test-password").value.trim();
+      const result = await signUpWithEmail(email, pass);
+      showResult("register-result", result);
+    });
+
+    document.getElementById("reset-password").addEventListener("click", async () => {
+      const email = document.getElementById("test-email").value.trim();
+      const result = await resetPassword(email);
+      showResult("register-result", result);
+    });
+
+    // Perfil
+    document.getElementById("create-profile").addEventListener("click", async () => {
+      const demoProfile = {
+        user_id: "demo-user-id",
+        first_name: "Teste",
+        last_name: "Demo",
+        email: "demo@alsham.com"
+      };
+      const result = await createUserProfile(demoProfile);
+      showResult("profile-result", result);
+    });
+  </script>
+</body>
+</html>
