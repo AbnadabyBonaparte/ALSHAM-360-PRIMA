@@ -1,36 +1,29 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.1
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.2 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
-// Funciona como ES Module (import/export) e também expõe window.AlshamSupabase
-// para compatibilidade com páginas HTML antigas.
+// Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
 // -----------------------------------------------------------------------------
 
 import { createClient } from '@supabase/supabase-js';
 
 // -----------------------------------------------------------------------------
-// Configuração (URL e chave Anon)
-// Busca primeiro variáveis de ambiente, depois fallback no window, depois valor fixo.
+// Configuração (URL, Key e Org Padrão)
 // -----------------------------------------------------------------------------
-const SUPABASE_URL = (() => {
-  try {
-    return import.meta?.env?.VITE_SUPABASE_URL
-      || (typeof window !== 'undefined' && window.__VITE_SUPABASE_URL__)
-      || '';
-  } catch {
-    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_URL__ : '';
-  }
-})();
+const SUPABASE_URL =
+  typeof __SUPABASE_URL__ !== 'undefined'
+    ? __SUPABASE_URL__
+    : import.meta?.env?.VITE_SUPABASE_URL || '';
 
-const SUPABASE_ANON_KEY = (() => {
-  try {
-    return import.meta?.env?.VITE_SUPABASE_ANON_KEY
-      || (typeof window !== 'undefined' && window.__VITE_SUPABASE_ANON_KEY__)
-      || '';
-  } catch {
-    return typeof window !== 'undefined' ? window.__VITE_SUPABASE_ANON_KEY__ : '';
-  }
-})();
+const SUPABASE_ANON_KEY =
+  typeof __SUPABASE_ANON_KEY__ !== 'undefined'
+    ? __SUPABASE_ANON_KEY__
+    : import.meta?.env?.VITE_SUPABASE_ANON_KEY || '';
+
+const DEFAULT_ORG_ID =
+  typeof __DEFAULT_ORG_ID__ !== 'undefined'
+    ? __DEFAULT_ORG_ID__
+    : import.meta?.env?.VITE_DEFAULT_ORG_ID || null;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.warn('⚠️ Supabase URL ou Key não configuradas — verifique variáveis no Vercel.');
@@ -48,8 +41,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.1',
-      'X-Environment': (typeof window !== 'undefined' && window.location?.hostname) || 'server'
+      'X-Client-Info': 'alsham-360-prima@unified-1.2',
+      'X-Environment':
+        (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
   },
   realtime: {
@@ -74,28 +68,35 @@ function handleError(err, context = 'supabase_operation') {
 }
 
 function isValidUUID(uuid) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    uuid
+  );
 }
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
 
 function formatDateBR(date, options = {}) {
   if (!date) return '';
-  const d = (typeof date === 'string') ? new Date(date) : date;
+  const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return 'Data inválida';
-  const defaultOptions = { year: 'numeric', month: '2-digit', day: '2-digit', ...options };
+  const defaultOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...options
+  };
   return d.toLocaleDateString('pt-BR', defaultOptions);
 }
 
 function formatTimeAgo(date) {
   if (!date) return '';
-  const d = (typeof date === 'string') ? new Date(date) : date;
+  const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return 'Data inválida';
   const now = new Date();
   const s = Math.floor((now - d) / 1000);
@@ -108,8 +109,12 @@ function formatTimeAgo(date) {
 
 function sanitizeInput(input, opts = {}) {
   if (input === null || input === undefined) return opts.allowNull ? null : '';
-  let v = (typeof input === 'string') ? input : String(input);
-  v = v.replace(/[<>]/g, '').replace(/javascript:/gi, '').replace(/on\w+=/gi, '').trim();
+  let v = typeof input === 'string' ? input : String(input);
+  v = v
+    .replace(/[<>]/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .trim();
   if (opts.maxLength && v.length > opts.maxLength) v = v.substring(0, opts.maxLength);
   if (opts.removeSpecialChars) v = v.replace(/[^\w\s@.-]/g, '');
   if (opts.toLowerCase) v = v.toLowerCase();
@@ -153,15 +158,20 @@ async function signOut() {
 
 function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange((event, session) => {
-    try { callback(event, session); } catch (e) { console.error('onAuth callback error', e); }
+    try {
+      callback(event, session);
+    } catch (e) {
+      console.error('onAuth callback error', e);
+    }
   });
 }
 
 // -----------------------------------------------------------------------------
 // Organização (org_id)
 // -----------------------------------------------------------------------------
-const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
-function getDefaultOrgId() { return DEFAULT_ORG_ID; }
+function getDefaultOrgId() {
+  return DEFAULT_ORG_ID;
+}
 
 async function getCurrentOrgId() {
   try {
@@ -187,7 +197,9 @@ async function getCurrentOrgId() {
 async function genericSelect(table, filters = {}, options = {}) {
   try {
     let q = supabase.from(table).select(options.select || '*');
-    Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); });
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v) q = q.eq(k, v);
+    });
     if (options.order) q = q.order(options.order.column, { ascending: !!options.order.ascending });
     if (options.limit) q = q.limit(options.limit);
     const { data, error } = await q;
@@ -238,7 +250,7 @@ async function genericDelete(table, id, orgId = null) {
 // -----------------------------------------------------------------------------
 async function getDashboardKPIs(orgIdParam = null) {
   try {
-    const orgId = orgIdParam || await getCurrentOrgId();
+    const orgId = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase
       .from('dashboard_summary')
       .select('*')
@@ -246,7 +258,15 @@ async function getDashboardKPIs(orgIdParam = null) {
       .order('updated_at', { ascending: false })
       .limit(1);
     if (error) throw error;
-    return data?.[0] || null;
+    if (!data || data.length === 0) {
+      return {
+        leads_total: 0,
+        leads_novos: 0,
+        leads_qualificados: 0,
+        taxa_conversao: 0
+      };
+    }
+    return data[0];
   } catch (err) {
     return { error: handleError(err, 'getDashboardKPIs') };
   }
@@ -254,7 +274,7 @@ async function getDashboardKPIs(orgIdParam = null) {
 
 async function getLeads(limit = 50, orgIdParam = null) {
   try {
-    const orgId = orgIdParam || await getCurrentOrgId();
+    const orgId = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase
       .from('leads_crm')
       .select('*')
@@ -269,15 +289,22 @@ async function getLeads(limit = 50, orgIdParam = null) {
 }
 
 async function createLead(payload, orgIdParam = null) {
-  return genericInsert('leads_crm', payload, orgIdParam || await getCurrentOrgId());
+  return genericInsert('leads_crm', payload, orgIdParam || (await getCurrentOrgId()));
 }
 
 async function createAuditLog(action, details, userId = null, orgIdParam = null) {
   try {
-    const org_id = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase.from('audit_log').insert({
-      action, details, user_id: userId, org_id, created_at: new Date().toISOString()
-    }).select();
+    const org_id = orgIdParam || (await getCurrentOrgId());
+    const { data, error } = await supabase
+      .from('audit_log')
+      .insert({
+        action,
+        details,
+        user_id: userId,
+        org_id,
+        created_at: new Date().toISOString()
+      })
+      .select();
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
@@ -287,8 +314,13 @@ async function createAuditLog(action, details, userId = null, orgIdParam = null)
 
 async function getUserProfile(userId, orgIdParam = null) {
   try {
-    const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', userId).eq('org_id', orgId).maybeSingle();
+    const orgId = orgIdParam || (await getCurrentOrgId());
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('org_id', orgId)
+      .maybeSingle();
     if (error) throw error;
     return { data };
   } catch (err) {
@@ -298,8 +330,13 @@ async function getUserProfile(userId, orgIdParam = null) {
 
 async function updateUserProfile(userId, updates, orgIdParam = null) {
   try {
-    const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase.from('user_profiles').update(updates).eq('user_id', userId).eq('org_id', orgId).select();
+    const orgId = orgIdParam || (await getCurrentOrgId());
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update(updates)
+      .eq('user_id', userId)
+      .eq('org_id', orgId)
+      .select();
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
@@ -312,8 +349,13 @@ async function updateUserProfile(userId, updates, orgIdParam = null) {
 // -----------------------------------------------------------------------------
 function subscribeToTable(table, orgId, callback) {
   try {
-    return supabase.channel(`realtime:${table}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table, filter: `org_id=eq.${orgId}` }, payload => callback(payload))
+    return supabase
+      .channel(`realtime:${table}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table, filter: `org_id=eq.${orgId}` },
+        payload => callback(payload)
+      )
       .subscribe();
   } catch (err) {
     return { error: handleError(err, 'subscribeToTable') };
@@ -339,32 +381,24 @@ if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
   window.AlshamSupabase = {
     supabase,
-    // auth
     getCurrentSession,
     getCurrentUser,
     signOut,
     onAuthStateChange,
-    // org
     getCurrentOrgId,
     getDefaultOrgId,
     DEFAULT_ORG_ID,
-    // CRUD
     genericSelect,
     genericInsert,
     genericUpdate,
     genericDelete,
-    // domain
     getDashboardKPIs,
     getLeads,
     createLead,
-    // user
     getUserProfile,
     updateUserProfile,
-    // audit
     createAuditLog,
-    // realtime
     subscribeToTable,
-    // utils
     formatDateBR,
     formatTimeAgo,
     sanitizeInput,
