@@ -1,13 +1,14 @@
 /**
- * ALSHAM 360° PRIMA - Create Organization System V1.0
- * Criação, verificação e listagem de organizações no Supabase
+ * ALSHAM 360° PRIMA - Create Organization System V2.0
+ * Criação, verificação e listagem de organizações no Supabase (Produção Ready)
  *
- * @version 1.0.0 - NASA 10/10 FINAL BUILD
- * @author ALSHAM
+ * @version 2.0.0 - NASA 10/10 FINAL BUILD (Multi-tenant + Audit + Persistência)
+ * @author
+ *   ALSHAM Development Team
  */
 
 // ===== IMPORTS GLOBAIS =====
-const { supabase } = window.AlshamSupabase || {};
+const { supabase, createAuditLog } = window.AlshamSupabase || {};
 
 // ===== TOAST SYSTEM =====
 function showToast(msg, type = "info") {
@@ -44,6 +45,7 @@ function generateNewUUID() {
   const input = document.getElementById("org-id");
   if (input) input.value = uuid;
   showToast("Novo UUID gerado", "info");
+  return uuid;
 }
 
 // ===== AÇÕES =====
@@ -59,22 +61,36 @@ async function createOrganization() {
 
   statusEl.textContent = "🔄 Criando...";
   try {
+    // Verificar se já existe
+    const { data: existing } = await supabase
+      .from("organizations")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (existing) {
+      statusEl.textContent = "✅ Organização já existe";
+      showToast("Organização já cadastrada", "info");
+      localStorage.setItem("alsham_org_id", id);
+      return;
+    }
+
+    // Criar nova org
     const { data, error } = await supabase
       .from("organizations")
       .insert([{ id, name, created_at: new Date().toISOString() }])
       .select();
 
-    if (error) {
-      if (error.code === "23505") {
-        statusEl.textContent = "✅ Organização já existe";
-        showToast("Organização já cadastrada", "info");
-      } else {
-        throw error;
-      }
-    } else {
-      statusEl.textContent = `✅ Criada: ${name}`;
-      showToast("Organização criada com sucesso", "success");
-    }
+    if (error) throw error;
+
+    // Persistir no localStorage
+    localStorage.setItem("alsham_org_id", id);
+
+    // Registrar auditoria
+    await createAuditLog("ORG_CREATED", { org_id: id, name }, "system", id);
+
+    statusEl.textContent = `✅ Criada: ${name}`;
+    showToast("Organização criada com sucesso", "success");
   } catch (e) {
     console.error("Erro criar organização:", e);
     statusEl.textContent = `❌ Erro: ${e.message}`;
@@ -174,4 +190,4 @@ window.OrganizationSystem = {
   setupComplete,
 };
 
-console.log("🏢 Create Organization System v1.0 pronto - ALSHAM 360° PRIMA");
+console.log("🏢 Create Organization System v2.0 pronto - ALSHAM 360° PRIMA");
