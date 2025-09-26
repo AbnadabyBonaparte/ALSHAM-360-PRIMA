@@ -1,9 +1,10 @@
 /**
- * ALSHAM 360° PRIMA - Sistema de Relatórios V2.2
- * Integrado com supabase.js (multi-tenant) + fix-imports.js
+ * 📊 ALSHAM 360° PRIMA - Sistema de Relatórios V3.0
+ * Produção final alinhada com supabase.js + auth.js
  *
- * @version 2.2.0 - NASA 10/10 FINAL BUILD
- * @author ALSHAM
+ * @version 3.0.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
+ * @author
+ *   ALSHAM Development Team
  */
 
 import {
@@ -12,14 +13,9 @@ import {
   genericSelect
 } from "/src/lib/supabase.js";
 
-function initializeReportsSystem() {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeReports);
-  } else {
-    initializeReports();
-  }
-}
-
+// ==============================
+// CONFIGURAÇÃO GLOBAL
+// ==============================
 const REPORTS_CONFIG = {
   PERIODS: {
     "7": { label: "Últimos 7 dias", days: 7 },
@@ -45,6 +41,9 @@ const REPORTS_CONFIG = {
   }
 };
 
+// ==============================
+// ESTADO GLOBAL
+// ==============================
 const reportsState = {
   user: null,
   orgId: null,
@@ -56,20 +55,23 @@ const reportsState = {
   lastUpdate: null
 };
 
-// ==========================
-// Inicialização
-// ==========================
+// ==============================
+// INICIALIZAÇÃO
+// ==============================
+document.addEventListener("DOMContentLoaded", initializeReports);
+
 async function initializeReports() {
   try {
     console.log("📊 Inicializando sistema de relatórios...");
     showLoading(true);
 
-    const authResult = await checkAuthentication();
+    const authResult = await authenticateUser();
     if (!authResult.success) {
       showError("Usuário não autenticado");
       redirectToLogin();
       return;
     }
+
     reportsState.user = authResult.user;
     reportsState.orgId = authResult.orgId;
 
@@ -82,35 +84,30 @@ async function initializeReports() {
   } catch (error) {
     console.error("❌ Erro ao inicializar relatórios:", error);
     showLoading(false);
-    showError("Erro ao inicializar relatórios");
+    handleError(error);
   }
 }
 
-// ==========================
-// Autenticação
-// ==========================
-async function checkAuthentication() {
+// ==============================
+// AUTENTICAÇÃO
+// ==============================
+async function authenticateUser() {
   try {
     const session = await getCurrentSession();
-    if (session?.user) {
-      const orgId = await getCurrentOrgId();
-      return { success: true, user: session.user, orgId };
-    }
-    return { success: false };
+    if (!session?.user) return { success: false };
+    const orgId = await getCurrentOrgId();
+    return { success: true, user: session.user, orgId };
   } catch (error) {
-    console.warn("⚠️ Erro na autenticação:", error);
     return { success: false, error };
   }
 }
 function redirectToLogin() {
-  setTimeout(() => {
-    window.location.href = "/login.html";
-  }, 1500);
+  window.location.href = "/login.html";
 }
 
-// ==========================
-// Carregar Dados
-// ==========================
+// ==============================
+// CARREGAR DADOS
+// ==============================
 async function loadReportsData() {
   try {
     reportsState.isLoading = true;
@@ -138,9 +135,9 @@ async function loadReportsData() {
   }
 }
 
-// ==========================
-// Processamento
-// ==========================
+// ==============================
+// PROCESSAMENTO DE DADOS
+// ==============================
 function processReportsData() {
   try {
     const leads = reportsState.rawData.leads;
@@ -160,14 +157,14 @@ function processReportsData() {
       total_revenue: totalRevenue,
       avg_deal_size: avgDealSize,
       active_opportunities: opportunities.filter(o => !["closed_won", "ganho", "perdido"].includes(o.stage || o.status)).length,
-      monthly_growth: 5.2 // simulado por enquanto
+      monthly_growth: 5.2 // simulado até termos cálculo real
     };
+
     processChartData();
   } catch (err) {
     console.error("❌ Erro processando dados:", err);
   }
 }
-
 function processChartData() {
   reportsState.processedData.chartData = {
     leads: { labels: ["Jan", "Fev", "Mar"], datasets: [{ label: "Leads", data: [3, 7, 5], borderColor: REPORTS_CONFIG.CHART_COLORS.primary }] },
@@ -177,14 +174,13 @@ function processChartData() {
   };
 }
 
-// ==========================
-// Renderização
-// ==========================
+// ==============================
+// INTERFACE
+// ==============================
 function renderReportsInterface() {
   renderKPICards();
   renderCharts();
 }
-
 function renderKPICards() {
   const container = document.getElementById("kpi-cards");
   if (!container) return;
@@ -196,7 +192,6 @@ function renderKPICards() {
             </div>`;
   }).join("");
 }
-
 function renderCharts() {
   const canvas = document.getElementById("leads-chart");
   if (!canvas || !window.Chart) return;
@@ -205,9 +200,9 @@ function renderCharts() {
   reportsState.chartInstances.leads = new Chart(ctx, { type: "line", data: reportsState.processedData.chartData.leads });
 }
 
-// ==========================
-// Fallback Demo
-// ==========================
+// ==============================
+// DEMO
+// ==============================
 function loadDemoData() {
   reportsState.rawData = {
     leads: [{ id: 1, status: "novo" }, { id: 2, status: "convertido" }],
@@ -217,15 +212,14 @@ function loadDemoData() {
   processReportsData();
 }
 
-// ==========================
-// Helpers
-// ==========================
+// ==============================
+// HELPERS
+// ==============================
 function formatValue(value, format) {
   if (format === "currency") return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   if (format === "percentage") return value.toFixed(1) + "%";
   return value;
 }
-
 function showLoading(show, message = "Carregando...") {
   console.log(show ? "⏳ " + message : "✅ pronto");
 }
@@ -233,11 +227,13 @@ function showError(msg) {
   window.showToast?.(msg, "error") || alert(msg);
 }
 
-// ==========================
-// Export
-// ==========================
-window.ReportsSystem = { refresh: loadReportsData, getState: () => reportsState };
-console.log("📊 Sistema de Relatórios V2.2 pronto - multi-tenant, Supabase OK");
+// ==============================
+// EXPORT GLOBAL
+// ==============================
+window.ReportsSystem = {
+  refresh: loadReportsData,
+  getState: () => reportsState,
+  version: REPORTS_CONFIG.version || "3.0.0"
+};
 
-// Init
-initializeReportsSystem();
+console.log("📊 Sistema de Relatórios V3.0 carregado - multi-tenant Supabase");
