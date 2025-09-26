@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gamificação — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Sistema de Gamificação Enterprise do ALSHAM 360° PRIMA. Pontos, badges, leaderboards e progressão em tempo real com integração Supabase." />
+  <meta name="description" content="Sistema de Gamificação Enterprise do ALSHAM 360° PRIMA. Pontos, níveis, badges, leaderboards e atividades em tempo real com Supabase." />
 
   <!-- ✅ CSP revisado -->
   <meta http-equiv="Content-Security-Policy" content="
@@ -67,23 +67,32 @@
   </nav>
 
   <!-- Conteúdo -->
-  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Sistema de Gamificação</h1>
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="font-bold text-gray-900 mb-4">🏆 Leaderboard</h2>
-        <ul id="leaderboard" class="space-y-2 text-sm text-gray-700"></ul>
-      </div>
+  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- Header -->
+    <div id="gamification-header"></div>
 
-      <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="font-bold text-gray-900 mb-4">🎖️ Badges</h2>
-        <div id="badges" class="flex flex-wrap gap-3"></div>
-      </div>
+    <!-- KPIs / Stats -->
+    <div id="gamification-stats"></div>
 
-      <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="font-bold text-gray-900 mb-4">📊 Pontos</h2>
-        <canvas id="points-chart" height="200"></canvas>
-      </div>
+    <!-- Progress -->
+    <div id="gamification-progress"></div>
+
+    <!-- Badges -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">🎖️ Badges</h2>
+      <div id="gamification-badges" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">🏆 Leaderboard</h2>
+      <div id="gamification-leaderboard" class="bg-white rounded-xl shadow p-4"></div>
+    </section>
+
+    <!-- Atividades Recentes -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">📜 Atividades Recentes</h2>
+      <div id="gamification-activities" class="bg-white rounded-xl shadow p-4"></div>
     </section>
   </main>
 
@@ -92,84 +101,7 @@
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
 
-  <!-- Scripts -->
-  <script type="module">
-    import { getCurrentOrgId, supabase } from "/src/lib/supabase.js";
-
-    let pointsChart = null;
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const orgId = await getCurrentOrgId();
-        if (!orgId) throw new Error("Org ID não encontrado");
-
-        await loadGamificationData(orgId);
-        document.getElementById("gamification-loader").style.display = "none";
-      } catch (e) {
-        console.error("Erro:", e);
-        notify("Erro ao carregar gamificação", "error");
-        document.getElementById("gamification-loader").style.display = "none";
-      }
-    });
-
-    async function loadGamificationData(orgId) {
-      // Leaderboard
-      const { data: points, error: pointsError } = await supabase
-        .from("gamification_points")
-        .select("user_id, user_name, total_points")
-        .eq("org_id", orgId)
-        .order("total_points", { ascending: false })
-        .limit(10);
-      if (pointsError) throw pointsError;
-
-      const leaderboard = document.getElementById("leaderboard");
-      leaderboard.innerHTML = points.map((u, i) => `
-        <li class="flex justify-between">
-          <span>${i + 1}. ${u.user_name}</span>
-          <span class="font-bold">${u.total_points} pts</span>
-        </li>`).join("");
-
-      // Gráfico de pontos
-      const ctx = document.getElementById("points-chart");
-      if (pointsChart) pointsChart.destroy();
-      pointsChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: points.map(u => u.user_name),
-          datasets: [{
-            label: "Pontos",
-            data: points.map(u => u.total_points),
-            backgroundColor: "#3B82F6"
-          }]
-        },
-        options: { plugins: { legend: { display: false } } }
-      });
-
-      // Badges
-      const { data: badges, error: badgesError } = await supabase
-        .from("gamification_badges")
-        .select("user_name, badge_name, badge_icon")
-        .eq("org_id", orgId)
-        .limit(20);
-      if (badgesError) throw badgesError;
-
-      const badgesContainer = document.getElementById("badges");
-      badgesContainer.innerHTML = badges.map(b => `
-        <div class="flex items-center space-x-2 bg-gray-100 rounded px-2 py-1">
-          <span>${b.badge_icon || "🏅"}</span>
-          <span class="text-sm">${b.user_name}: ${b.badge_name}</span>
-        </div>`).join("");
-    }
-
-    function notify(msg, type = "info") {
-      const c = document.getElementById("gamification-notifications");
-      const n = document.createElement("div");
-      const colors = { success: "bg-green-500", error: "bg-red-500", info: "bg-blue-500" };
-      n.className = `${colors[type]} text-white px-4 py-2 rounded shadow`;
-      n.textContent = msg;
-      c.appendChild(n);
-      setTimeout(() => c.removeChild(n), 4000);
-    }
-  </script>
+  <!-- Script -->
+  <script type="module" src="/js/gamificacao.js"></script>
 </body>
 </html>
