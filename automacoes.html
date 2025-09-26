@@ -1,138 +1,205 @@
-<!-- automacoes.html -->
-<script type="module">
-  import { 
-    getCurrentOrgId, 
-    genericSelect, 
-    genericUpdate, 
-    subscribeToTable 
-  } from "/src/lib/supabase.js";
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Automações — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Gestão de Automações empresariais no ALSHAM 360° PRIMA: KPIs em tempo real, regras inteligentes e logs de execução.">
 
-  document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🤖 Iniciando sistema de automações...');
-    
-    try {
-      const orgId = await getCurrentOrgId();
-      if(!orgId) throw new Error("Org ID não encontrado");
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
 
-      // Renderizar KPIs
-      await renderAutomationDashboard(orgId);
-      
-      // Renderizar Regras
-      await loadAutomationRules(orgId);
-      
-      // Carregar Histórico (TODO)
-      // await loadExecutionHistory(orgId);
-
-      // Logs em Tempo Real
-      startRealtimeLogs(orgId);
-      
-      console.log('✅ Sistema de automações carregado com sucesso!');
-    } catch (error) {
-      console.error('❌ Erro ao carregar automações:', error);
-      showError('Erro ao carregar sistema de automações');
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
     }
-  });
+  </script>
 
-  // =============================
-  // 🔹 DASHBOARD DE KPIs
-  // =============================
-  async function renderAutomationDashboard(orgId) {
-    const { data: executions } = await genericSelect('automation_executions', { org_id: orgId });
-    const { data: rules } = await genericSelect('automation_rules', { org_id: orgId });
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 
-    const hoje = new Date().toISOString().split('T')[0];
-    const executionsToday = executions?.filter(e => e.started_at?.startsWith(hoje)).length || 0;
-    const successToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'success').length || 0;
-    const failedToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'failed').length || 0;
-    const activeRules = rules?.filter(r => r.is_active).length || 0;
-
-    document.getElementById('automation-dashboard').innerHTML = `
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="kpi-card border-blue-500">Execuções Hoje <p>${executionsToday}</p></div>
-        <div class="kpi-card border-green-500">Sucessos <p>${successToday}</p></div>
-        <div class="kpi-card border-red-500">Falhas <p>${failedToday}</p></div>
-        <div class="kpi-card border-purple-500">Regras Ativas <p>${activeRules}</p></div>
-      </div>
-    `;
-  }
-
-  // =============================
-  // 🔹 REGRAS DE AUTOMAÇÃO
-  // =============================
-  async function loadAutomationRules(orgId) {
-    const { data: rules } = await genericSelect('automation_rules', { org_id: orgId });
-
-    const rulesHTML = rules?.map(rule => `
-      <div class="rule-card">
-        <h4>${rule.name}</h4>
-        <span class="status ${rule.is_active ? 'active' : 'inactive'}">
-          ${rule.is_active ? '🟢 Ativo' : '🔴 Inativo'}
-        </span>
-        <p>Trigger: ${rule.trigger_event}</p>
-        <button onclick="toggleRule('${rule.id}', ${!rule.is_active})">
-          ${rule.is_active ? 'Desativar' : 'Ativar'}
-        </button>
-      </div>
-    `).join('') || '<p class="text-gray-500">Nenhuma regra encontrada.</p>';
-
-    document.getElementById('rules-container').innerHTML = rulesHTML;
-  }
-
-  // Função para ativar/desativar regra
-  window.toggleRule = async function(ruleId, newStatus) {
-    try {
-      const { error } = await genericUpdate(
-        'automation_rules',
-        ruleId,
-        { is_active: newStatus }
-      );
-      if (error) throw error;
-      showToast(`Regra ${newStatus ? 'ativada' : 'desativada'} com sucesso!`, 'success');
-      await loadAutomationRules(await getCurrentOrgId());
-    } catch (err) {
-      console.error('Erro ao atualizar regra:', err);
-      showToast('Erro ao atualizar regra', 'error');
+  <style>
+    .kpi-card {
+      @apply p-4 bg-white rounded-lg shadow border-t-4 text-center font-semibold;
     }
-  };
+    .rule-card {
+      @apply bg-white shadow p-4 rounded-lg border border-gray-200 flex justify-between items-center;
+    }
+    .status.active { @apply text-green-600 font-bold; }
+    .status.inactive { @apply text-red-600 font-bold; }
+  </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+  <!-- Toasts -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  // =============================
-  // 🔹 LOGS EM TEMPO REAL
-  // =============================
-  function startRealtimeLogs(orgId) {
-    const logsContainer = document.getElementById('logs-container');
-    let logCount = 0;
+  <!-- Navbar -->
+  <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+      <div class="hidden md:flex space-x-6">
+        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
+        <a href="/automacoes.html" class="text-primary font-medium">Automações</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
+      </div>
+    </div>
+  </nav>
 
-    subscribeToTable('automation_executions', orgId, (payload) => {
-      const logEntry = document.createElement('div');
-      logEntry.className = "text-blue-400 mb-1";
-      logEntry.innerHTML = `[${new Date().toLocaleTimeString('pt-BR')}] Execução ${payload.eventType}: ${payload.new?.status}`;
-      logsContainer.appendChild(logEntry);
-      logCount++;
-      if (logCount > 50) logsContainer.removeChild(logsContainer.firstChild);
-      logsContainer.scrollTop = logsContainer.scrollHeight;
+  <!-- Conteúdo -->
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold text-gray-900">Automações Empresariais</h1>
+
+    <!-- KPIs -->
+    <section id="automation-dashboard"></section>
+
+    <!-- Regras -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Regras de Automação</h2>
+      <div id="rules-container" class="space-y-4"></div>
+    </section>
+
+    <!-- Logs -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Logs em Tempo Real</h2>
+      <div id="logs-container" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
+
+  <!-- Script Automações -->
+  <script type="module">
+    import { 
+      getCurrentOrgId, 
+      genericSelect, 
+      genericUpdate, 
+      subscribeToTable 
+    } from "/src/lib/supabase.js";
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log('🤖 Iniciando sistema de automações...');
+      try {
+        const orgId = await getCurrentOrgId();
+        if(!orgId) throw new Error("Org ID não encontrado");
+
+        await renderAutomationDashboard(orgId);
+        await loadAutomationRules(orgId);
+        startRealtimeLogs(orgId);
+
+        console.log('✅ Sistema de automações carregado com sucesso!');
+      } catch (error) {
+        console.error('❌ Erro ao carregar automações:', error);
+        showError('Erro ao carregar sistema de automações');
+      }
     });
-  }
 
-  // =============================
-  // 🔹 TOASTS & ERROS
-  // =============================
-  function showToast(msg, type="info") {
-    const c=document.getElementById("toast-container") || (() => {
-      const d=document.createElement("div");
-      d.id="toast-container";
-      d.className="fixed top-4 right-4 z-50 space-y-2";
-      document.body.appendChild(d);
-      return d;
-    })();
-    const t=document.createElement("div");
-    const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
-    t.className=`${colors[type]||"bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2`;
-    t.textContent=msg;
-    c.appendChild(t);
-    setTimeout(()=>c.removeChild(t),4000);
-  }
+    async function renderAutomationDashboard(orgId) {
+      const { data: executions } = await genericSelect('automation_executions', { org_id: orgId });
+      const { data: rules } = await genericSelect('automation_rules', { org_id: orgId });
 
-  function showError(message) {
-    showToast(message, 'error');
-  }
-</script>
+      const hoje = new Date().toISOString().split('T')[0];
+      const executionsToday = executions?.filter(e => e.started_at?.startsWith(hoje)).length || 0;
+      const successToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'success').length || 0;
+      const failedToday = executions?.filter(e => e.started_at?.startsWith(hoje) && e.status === 'failed').length || 0;
+      const activeRules = rules?.filter(r => r.is_active).length || 0;
+
+      document.getElementById('automation-dashboard').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="kpi-card border-blue-500">Execuções Hoje <p>${executionsToday}</p></div>
+          <div class="kpi-card border-green-500">Sucessos <p>${successToday}</p></div>
+          <div class="kpi-card border-red-500">Falhas <p>${failedToday}</p></div>
+          <div class="kpi-card border-purple-500">Regras Ativas <p>${activeRules}</p></div>
+        </div>
+      `;
+    }
+
+    async function loadAutomationRules(orgId) {
+      const { data: rules } = await genericSelect('automation_rules', { org_id: orgId });
+
+      const rulesHTML = rules?.map(rule => `
+        <div class="rule-card">
+          <div>
+            <h4 class="font-semibold">${rule.name}</h4>
+            <p class="text-sm text-gray-500">Trigger: ${rule.trigger_event}</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="status ${rule.is_active ? 'active' : 'inactive'}">
+              ${rule.is_active ? '🟢 Ativo' : '🔴 Inativo'}
+            </span>
+            <button onclick="toggleRule('${rule.id}', ${!rule.is_active})"
+              class="px-3 py-1 text-sm rounded text-white ${rule.is_active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}">
+              ${rule.is_active ? 'Desativar' : 'Ativar'}
+            </button>
+          </div>
+        </div>
+      `).join('') || '<p class="text-gray-500">Nenhuma regra encontrada.</p>';
+
+      document.getElementById('rules-container').innerHTML = rulesHTML;
+    }
+
+    window.toggleRule = async function(ruleId, newStatus) {
+      try {
+        const { error } = await genericUpdate('automation_rules', ruleId, { is_active: newStatus });
+        if (error) throw error;
+        showToast(`Regra ${newStatus ? 'ativada' : 'desativada'} com sucesso!`, 'success');
+        await loadAutomationRules(await getCurrentOrgId());
+      } catch (err) {
+        console.error('Erro ao atualizar regra:', err);
+        showToast('Erro ao atualizar regra', 'error');
+      }
+    };
+
+    function startRealtimeLogs(orgId) {
+      const logsContainer = document.getElementById('logs-container');
+      let logCount = 0;
+
+      subscribeToTable('automation_executions', orgId, (payload) => {
+        const logEntry = document.createElement('div');
+        logEntry.className = "text-blue-400 mb-1";
+        logEntry.innerHTML = \`[\${new Date().toLocaleTimeString('pt-BR')}] Execução \${payload.eventType}: \${payload.new?.status}\`;
+        logsContainer.appendChild(logEntry);
+        logCount++;
+        if (logCount > 50) logsContainer.removeChild(logsContainer.firstChild);
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+      });
+    }
+
+    function showToast(msg, type="info") {
+      const c=document.getElementById("toast-container");
+      const t=document.createElement("div");
+      const colors={success:"bg-green-500",error:"bg-red-500",info:"bg-blue-500"};
+      t.className=\`\${colors[type]||"bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2\`;
+      t.textContent=msg;
+      c.appendChild(t);
+      setTimeout(()=>c.removeChild(t),4000);
+    }
+
+    function showError(message) {
+      showToast(message, 'error');
+    }
+  </script>
+</body>
+</html>
