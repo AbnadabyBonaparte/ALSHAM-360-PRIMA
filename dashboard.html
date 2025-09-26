@@ -101,17 +101,17 @@
 
   <!-- Script -->
   <script type="module">
-    import { supabase } from "/src/lib/supabase.js";
+    import { getCurrentOrgId, getLeads } from "/src/lib/supabase.js";
 
     let statusChart=null, timelineChart=null;
 
     document.addEventListener("DOMContentLoaded", async ()=>{
       try {
-        if(!supabase) throw new Error("Supabase não disponível");
-        if(typeof Chart==="undefined") throw new Error("Chart.js não disponível");
+        const orgId = await getCurrentOrgId();
+        if(!orgId) throw new Error("Org ID não encontrado");
 
-        await loadDashboardData();
-        setInterval(loadDashboardData,30000);
+        await loadDashboardData(orgId);
+        setInterval(()=>loadDashboardData(orgId),30000);
         document.getElementById("loading-indicator").style.display="none";
       } catch(e){
         console.error(e);
@@ -120,9 +120,8 @@
       }
     });
 
-    async function loadDashboardData(){
-      const orgId="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe"; // TODO: trocar por orgId real dinâmico
-      const {data:leads,error}=await supabase.from("leads_crm").select("*").eq("org_id",orgId);
+    async function loadDashboardData(orgId){
+      const { data: leads, error } = await getLeads(50, orgId);
       if(error){console.error(error);showToast("Erro ao carregar dados","error");return;}
 
       document.getElementById("total-leads").textContent=leads.length;
@@ -141,7 +140,7 @@
             leads.filter(l=>l.status==="contatado").length,
             leads.filter(l=>l.status==="qualificado").length,
             leads.filter(l=>l.status==="convertido").length
-          ],backgroundColor:["#3B82F6","#F59E0B","#10B981","#8B5CF6"]}]}});
+          ],backgroundColor:["#3B82F6","#F59E0B","#10B981","#8B5CF6"]}]}})
       }
 
       const ctx2=document.getElementById("timeline-chart");
