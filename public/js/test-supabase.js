@@ -1,88 +1,67 @@
-/**
- * ALSHAM 360° PRIMA - Supabase Test Panel v1.3
- * Diagnóstico completo de sessão, usuário, registro, reset, email e perfil.
- *
- * @version 1.3.0 - NASA 10/10 FINAL BUILD
- */
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diagnóstico Supabase — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Ferramenta de diagnóstico do Supabase no ALSHAM 360° PRIMA. Testa conexão, autenticação, consultas e variáveis de ambiente." />
 
-import {
-  getCurrentSession,
-  getCurrentUser,
-  signUpWithEmail,
-  resetPassword,
-  checkEmailExists,
-  createUserProfile
-} from "/src/lib/supabase.js";
+  <!-- ✅ CSP revisada -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
 
-// ===== Helpers =====
-function showResult(id, data) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = JSON.stringify(data, null, 2);
-}
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
+    }
+  </script>
 
-// ===== Sessão =====
-document.getElementById("check-session")?.addEventListener("click", async () => {
-  try {
-    const session = await getCurrentSession();
-    const user = await getCurrentUser();
-    showResult("session-result", { session, user });
-  } catch (err) {
-    showResult("session-result", { error: err.message });
-  }
-});
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col">
 
-// ===== Email / Registro =====
-document.getElementById("check-email")?.addEventListener("click", async () => {
-  const email = document.getElementById("test-email").value.trim();
-  if (!email) return showResult("register-result", { error: "Digite um e-mail válido" });
-  try {
-    const exists = await checkEmailExists(email);
-    showResult("register-result", { exists });
-  } catch (err) {
-    showResult("register-result", { error: err.message });
-  }
-});
+  <!-- Toasts -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-document.getElementById("sign-up")?.addEventListener("click", async () => {
-  const email = document.getElementById("test-email").value.trim();
-  const pass = document.getElementById("test-password").value.trim();
-  if (!email || !pass) return showResult("register-result", { error: "Informe e-mail e senha" });
+  <!-- Conteúdo -->
+  <main class="flex-1 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl w-full">
+      <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">🔍 Diagnóstico Supabase</h1>
 
-  try {
-    const result = await signUpWithEmail(email, pass);
-    showResult("register-result", result);
-  } catch (err) {
-    showResult("register-result", { error: err.message });
-  }
-});
+      <div class="space-y-4">
+        <button id="btn-check-env" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Verificar Variáveis</button>
+        <button id="btn-check-connection" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Testar Conexão</button>
+        <button id="btn-check-auth" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Testar Sessão</button>
+        <button id="btn-check-query" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Testar Consulta</button>
+      </div>
 
-document.getElementById("reset-password")?.addEventListener("click", async () => {
-  const email = document.getElementById("test-email").value.trim();
-  if (!email) return showResult("register-result", { error: "Informe o e-mail" });
+      <div id="diagnostic-output" class="mt-6 bg-gray-900 text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
+    </div>
+  </main>
 
-  try {
-    const result = await resetPassword(email);
-    showResult("register-result", result);
-  } catch (err) {
-    showResult("register-result", { error: err.message });
-  }
-});
+  <!-- Footer -->
+  <footer class="py-6 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
 
-// ===== Perfil =====
-document.getElementById("create-profile")?.addEventListener("click", async () => {
-  try {
-    const demoProfile = {
-      user_id: "demo-user-id",
-      first_name: "Teste",
-      last_name: "Demo",
-      email: "demo@alsham.com"
-    };
-    const result = await createUserProfile(demoProfile);
-    showResult("profile-result", result);
-  } catch (err) {
-    showResult("profile-result", { error: err.message });
-  }
-});
-
-console.log("🧪 Test-Supabase.js v1.3 carregado - ALSHAM 360° PRIMA");
+  <!-- Script externo -->
+  <script type="module" src="/js/test-supabase.js"></script>
+</body>
+</html>
