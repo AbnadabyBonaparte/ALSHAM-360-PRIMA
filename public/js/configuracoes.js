@@ -1,13 +1,12 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Configuration System V5.1 NASA 10/10 OPTIMIZED
+ * ALSHAM 360° PRIMA - Enterprise Configuration System V5.2 NASA 10/10 OPTIMIZED
  * Advanced configuration platform with real-time data integration and enterprise features
  *
- * @version 5.1.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * @version 5.2.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
  * @author ALSHAM
  * @license MIT
  */
 
-// ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
 import {
   getCurrentSession,
   getCurrentOrgId,
@@ -116,9 +115,16 @@ async function authenticateUser() {
   try {
     const session = await getCurrentSession();
     if (!session?.user) return { success: false };
-    const orgId = await getCurrentOrgId();
+
+    let orgId = await getCurrentOrgId();
+    if (!orgId) {
+      orgId = localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
+    }
+    localStorage.setItem("alsham_org_id", orgId);
+
     return { success: true, user: session.user, orgId };
-  } catch {
+  } catch (e) {
+    console.error("Erro autenticação configurações:", e);
     return { success: false };
   }
 }
@@ -128,7 +134,7 @@ function redirectToLogin() { window.location.href = "/login.html"; }
 async function loadConfigurationDataWithCache() {
   try {
     const [profile, org, team] = await Promise.all([
-      genericSelect("user_profiles",{ user_id: configurationState.user.id }),
+      genericSelect("user_profiles",{ user_id: configurationState.user.id, org_id: configurationState.orgId }),
       genericSelect("organizations",{ id: configurationState.orgId }),
       genericSelect("team_members",{ org_id: configurationState.orgId })
     ]);
@@ -145,8 +151,9 @@ async function loadConfigurationDataWithCache() {
 
 // ===== REALTIME =====
 function setupRealTimeSubscriptions() {
-  subscribeToTable("user_profiles", configurationState.orgId, handleRealTimeUpdate);
-  subscribeToTable("organizations", configurationState.orgId, handleRealTimeUpdate);
+  const orgId = configurationState.orgId || "DEFAULT_ORG_ID";
+  subscribeToTable("user_profiles", orgId, handleRealTimeUpdate);
+  subscribeToTable("organizations", orgId, handleRealTimeUpdate);
 }
 function handleRealTimeUpdate(payload) {
   console.log("🔄 Realtime update:", payload);
@@ -226,7 +233,7 @@ window.AlshamConfiguration = {
   saveAll: saveAllConfiguration,
   switchSection,
   notify: showNotification,
-  version: "5.1.0",
+  version: "5.2.0",
   buildDate: new Date().toISOString()
 };
-console.log("⚙️ Enterprise Configuration System v5.1 pronto - ALSHAM 360° PRIMA");
+console.log("⚙️ Enterprise Configuration System v5.2 pronto - ALSHAM 360° PRIMA");
