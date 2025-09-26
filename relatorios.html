@@ -1,266 +1,83 @@
-// -----------------------------------------------------------------------------
-// /js/relatorios.js
-// ALSHAM 360° PRIMA - Relatórios Multi-tenant
-// -----------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatórios — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Sistema de Relatórios multi-tenant do ALSHAM 360° PRIMA: KPIs, gráficos e exportações inteligentes." />
 
-import { getCurrentOrgId, getLeads } from "/src/lib/supabase.js";
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
 
-// Seletores
-const mainContent = document.getElementById("main-content");
-
-// Estado global
-let appState = {
-  orgId: null,
-  charts: {},
-};
-
-// ========================
-// Utils
-// ========================
-function showToast(message, type = "info", duration = 4000) {
-  const container = document.getElementById("toast-container") || (() => {
-    const div = document.createElement("div");
-    div.id = "toast-container";
-    div.className = "fixed top-4 right-4 z-50 space-y-2";
-    document.body.appendChild(div);
-    return div;
-  })();
-
-  const toast = document.createElement("div");
-  toast.className = `px-4 py-2 rounded-lg shadow-lg text-white transition transform translate-x-full opacity-0 ${
-    type === "error" ? "bg-red-500" :
-    type === "success" ? "bg-green-500" :
-    type === "warning" ? "bg-yellow-500 text-black" :
-    "bg-blue-500"
-  }`;
-
-  toast.textContent = message;
-  container.appendChild(toast);
-
-  setTimeout(() => toast.classList.remove("translate-x-full", "opacity-0"), 100);
-
-  setTimeout(() => {
-    toast.classList.add("translate-x-full", "opacity-0");
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-}
-
-function exportCSV(data, filename = "relatorio.csv") {
-  if (!data || !data.length) {
-    showToast("Nenhum dado para exportar", "error");
-    return;
-  }
-  const csv = [
-    Object.keys(data[0]).join(","),
-    ...data.map(row => Object.values(row).map(val => `"${val}"`).join(","))
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
-}
-
-function exportPDF() {
-  showToast("📄 Exportação para PDF será implementada em breve!", "warning");
-}
-
-// ========================
-// Inicializar Relatórios
-// ========================
-async function initRelatorios() {
-  try {
-    console.log("📊 Iniciando relatórios...");
-
-    // Recuperar orgId real
-    appState.orgId = await getCurrentOrgId();
-    if (!appState.orgId) throw new Error("OrgId não encontrado");
-
-    // Renderizar UI
-    renderRelatoriosLayout();
-
-    // Carregar dados reais
-    await loadRelatorios();
-
-    showToast("✅ Relatórios carregados com sucesso!", "success");
-  } catch (err) {
-    console.error("Erro ao inicializar relatórios:", err);
-    renderRelatoriosLayout();
-    document.getElementById("relatorio-tabela").innerHTML =
-      `<p class="text-red-500 text-center py-4">Erro ao carregar relatórios</p>`;
-    showToast("⚠️ Falha ao carregar relatórios", "error");
-  }
-}
-
-// ========================
-// Layout Dinâmico
-// ========================
-function renderRelatoriosLayout() {
-  mainContent.innerHTML = `
-    <section class="mb-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">KPIs Principais</h2>
-      <div id="kpis-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-    </section>
-
-    <section class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Receita Mensal</h3>
-        <canvas id="revenueChart" class="w-full h-64"></canvas>
-      </div>
-      <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Distribuição de Leads</h3>
-        <canvas id="leadsChart" class="w-full h-64"></canvas>
-      </div>
-    </section>
-
-    <section class="mb-8">
-      <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Exportações</h3>
-          <div class="space-x-2">
-            <button id="btn-export-csv" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Exportar CSV</button>
-            <button id="btn-export-pdf" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Exportar PDF</button>
-          </div>
-        </div>
-        <div id="relatorio-tabela" class="overflow-x-auto"></div>
-      </div>
-    </section>
-  `;
-
-  document.getElementById("btn-export-csv").addEventListener("click", () => {
-    if (window.__relatorioData) {
-      exportCSV(window.__relatorioData);
-    } else {
-      showToast("Nenhum dado para exportar", "error");
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
     }
-  });
+  </script>
 
-  document.getElementById("btn-export-pdf").addEventListener("click", exportPDF);
-}
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 
-// ========================
-// Carregar Relatórios
-// ========================
-async function loadRelatorios() {
-  try {
-    const { data: leads, error } = await getLeads(100, appState.orgId);
-    if (error) throw error;
-
-    renderKPIs(leads);
-    renderCharts(leads);
-    renderTabela(leads);
-
-    window.__relatorioData = leads;
-  } catch (err) {
-    console.error("Erro ao carregar relatórios:", err);
-    document.getElementById("relatorio-tabela").innerHTML =
-      `<p class="text-red-500 text-center py-4">Erro ao carregar dados</p>`;
-  }
-}
-
-// ========================
-// Renderização
-// ========================
-function renderKPIs(leads) {
-  const container = document.getElementById("kpis-container");
-  const total = leads.length;
-  const qualificados = leads.filter(l => l.status === "qualificado").length;
-  const convertidos = leads.filter(l => l.status === "convertido").length;
-  const receita = convertidos * 500; // TODO: substituir por métrica real
-
-  const kpis = [
-    { title: "Total de Leads", value: total, color: "blue" },
-    { title: "Leads Qualificados", value: qualificados, color: "yellow" },
-    { title: "Convertidos", value: convertidos, color: "green" },
-    { title: "Receita Estimada", value: `R$ ${receita.toLocaleString()}`, color: "purple" },
-  ];
-
-  container.innerHTML = kpis.map(kpi => `
-    <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
-      <p class="text-sm font-medium text-gray-600">${kpi.title}</p>
-      <p class="text-2xl font-bold text-${kpi.color}-600">${kpi.value}</p>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+  <!-- Loader -->
+  <div id="relatorios-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+      <p class="text-gray-600 font-medium">Carregando relatórios...</p>
     </div>
-  `).join("");
-}
+  </div>
 
-function renderCharts(leads) {
-  // Receita mensal (mock por enquanto)
-  const revenueCtx = document.getElementById("revenueChart").getContext("2d");
-  if (appState.charts.revenue) appState.charts.revenue.destroy();
-  appState.charts.revenue = new Chart(revenueCtx, {
-    type: "line",
-    data: {
-      labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-      datasets: [{
-        label: "Receita",
-        data: [1000, 2500, 3000, 4000, 4500, 6000],
-        borderColor: "#3B82F6",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
-        fill: true,
-        tension: 0.4,
-      }],
-    },
-    options: { responsive: true, plugins: { legend: { display: false } } },
-  });
+  <!-- Toasts -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  // Distribuição de Leads
-  const leadsCtx = document.getElementById("leadsChart").getContext("2d");
-  if (appState.charts.leads) appState.charts.leads.destroy();
-  const statusCounts = {
-    novo: leads.filter(l => l.status === "novo").length,
-    contatado: leads.filter(l => l.status === "contatado").length,
-    qualificado: leads.filter(l => l.status === "qualificado").length,
-    convertido: leads.filter(l => l.status === "convertido").length,
-  };
-  appState.charts.leads = new Chart(leadsCtx, {
-    type: "doughnut",
-    data: {
-      labels: ["Novos", "Contatados", "Qualificados", "Convertidos"],
-      datasets: [{
-        data: Object.values(statusCounts),
-        backgroundColor: ["#3B82F6", "#F59E0B", "#10B981", "#8B5CF6"],
-      }],
-    },
-    options: { responsive: true, plugins: { legend: { position: "bottom" } } },
-  });
-}
+  <!-- Navbar -->
+  <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+      <div class="hidden md:flex space-x-6">
+        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
+        <a href="/relatorios.html" class="text-primary font-medium">Relatórios</a>
+        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
+      </div>
+    </div>
+  </nav>
 
-function renderTabela(leads) {
-  const container = document.getElementById("relatorio-tabela");
+  <!-- Conteúdo -->
+  <main id="main-content" class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Relatórios</h1>
 
-  if (!leads.length) {
-    container.innerHTML = `<p class="text-gray-500 text-center py-4">Nenhum dado encontrado</p>`;
-    return;
-  }
+    <!-- Layout dinâmico é renderizado via relatorios.js -->
+  </main>
 
-  container.innerHTML = `
-    <table class="w-full border-collapse text-sm">
-      <thead>
-        <tr class="bg-gray-100 text-left">
-          <th class="px-3 py-2">Nome</th>
-          <th class="px-3 py-2">Empresa</th>
-          <th class="px-3 py-2">Status</th>
-          <th class="px-3 py-2">Score</th>
-          <th class="px-3 py-2">Data</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${leads.map(l => `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="px-3 py-2">${l.nome || "N/A"}</td>
-            <td class="px-3 py-2">${l.empresa || "N/A"}</td>
-            <td class="px-3 py-2">${l.status || "N/A"}</td>
-            <td class="px-3 py-2">${l.score_ia || "0"}</td>
-            <td class="px-3 py-2">${l.created_at ? new Date(l.created_at).toLocaleDateString("pt-BR") : "N/A"}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
-}
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
 
-// ========================
-// Inicializar ao carregar
-// ========================
-document.addEventListener("DOMContentLoaded", initRelatorios);
+  <!-- Script Relatórios -->
+  <script type="module" src="/js/relatorios.js"></script>
+</body>
+</html>
