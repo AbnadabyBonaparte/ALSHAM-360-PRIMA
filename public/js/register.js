@@ -1,16 +1,18 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Registration System V5.0
- * Advanced user registration with enterprise security + UX premium
+ * ALSHAM 360° PRIMA - Enterprise Registration System V5.1 NASA 10/10 FINAL
+ * Advanced user registration with enterprise-grade security + UX premium
  *
- * @version 5.0.1 - NASA 10/10 FINAL BUILD
- * @author ALSHAM
+ * @version 5.1.0 - NASA 10/10 FINAL BUILD
+ * @author
+ *   ALSHAM Development Team
  */
 
 // ===== SUPABASE GLOBAL IMPORT =====
 const {
   signUpWithEmail,
   createUserProfile,
-  checkEmailExists
+  checkEmailExists,
+  createAuditLog
 } = window.AlshamSupabase || {};
 
 // ===== DEPENDENCY VALIDATION =====
@@ -38,7 +40,8 @@ const REGISTRATION_CONFIG = Object.freeze({
     REQUIRE_LOWERCASE: true,
     REQUIRE_NUMBERS: true,
     REQUIRE_SYMBOLS: true,
-    EMAIL_VERIFICATION_REQUIRED: true
+    EMAIL_VERIFICATION_REQUIRED: true,
+    AUDIT_ENABLED: true
   },
   VALIDATION: {
     EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -151,7 +154,7 @@ async function initializeRegistration() {
   try {
     validateDependencies();
     dom.initialize();
-    console.log("📝 Registration ready");
+    console.log("📝 Registration ready v5.1.0");
   } catch (e) {
     showError("Erro ao inicializar registro");
   }
@@ -197,6 +200,15 @@ async function submitRegistration() {
       email: formData.email
     });
 
+    // Log de auditoria
+    if (REGISTRATION_CONFIG.SECURITY.AUDIT_ENABLED) {
+      await createAuditLog("USER_REGISTERED", {
+        user_id: data.user.id,
+        email: formData.email,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     showSuccess("Conta criada! Verifique seu email.");
     setTimeout(() => (window.location.href = "/login.html"), 2000);
   } catch (err) {
@@ -214,9 +226,9 @@ const RegistrationSystem = {
     registrationState.setState({ currentStep: Math.max(0, registrationState.getState("currentStep") - 1) }),
   submit: submitRegistration,
   validateField,
-  version: "5.0.1"
+  version: "5.1.0"
 };
 window.RegistrationSystem = RegistrationSystem;
 export default RegistrationSystem;
 
-console.log("✅ Registration System V5.0.1 pronto - ALSHAM 360° PRIMA");
+console.log("✅ Registration System V5.1.0 pronto - ALSHAM 360° PRIMA");
