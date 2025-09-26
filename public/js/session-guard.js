@@ -1,20 +1,21 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Session Guard V5.0 NASA 10/10 OPTIMIZED
- * Middleware de proteção de rotas com verificação em tempo real
+ * ALSHAM 360° PRIMA - Enterprise Session Guard V5.1 NASA 10/10 OPTIMIZED
+ * Middleware de proteção de rotas com auditoria + verificação em tempo real
  *
- * @version 5.0.0 - NASA 10/10 FINAL BUILD
+ * @version 5.1.0 - NASA 10/10 FINAL BUILD
  * @license MIT
  */
 
 // ===== IMPORTS GLOBAIS =====
-const { getCurrentSession, onAuthStateChange } = window.AlshamSupabase;
+const { getCurrentSession, onAuthStateChange, createAuditLog } = window.AlshamSupabase;
 const { checkRouteAccess } = window.AlshamAuth || {};
 
 // ===== CONFIGURAÇÃO =====
 const SESSION_GUARD_CONFIG = {
   loginPage: "/login.html",
   publicRoutes: ["/login.html", "/register.html", "/index.html"],
-  redirectDelay: 1000,
+  redirectDelay: 1200,
+  auditEnabled: true,
   debug: true
 };
 
@@ -40,7 +41,7 @@ async function enforceSessionGuard() {
     const path = window.location.pathname;
     if (SESSION_GUARD_CONFIG.publicRoutes.includes(path)) {
       if (SESSION_GUARD_CONFIG.debug) console.log("🌍 Public route, guard not enforced.");
-      return;
+      return true;
     }
 
     const session = await getCurrentSession();
@@ -54,16 +55,38 @@ async function enforceSessionGuard() {
 
     if (!isAuthenticated || !routeAllowed) {
       showGuardNotification("⚠️ Acesso negado. Redirecionando para login...", "error");
+
+      if (SESSION_GUARD_CONFIG.auditEnabled) {
+        await createAuditLog?.("UNAUTHORIZED_ACCESS", {
+          route: path,
+          user: session?.user?.id || "anonymous",
+          timestamp: new Date().toISOString()
+        });
+      }
+
       setTimeout(() => {
         window.location.replace(SESSION_GUARD_CONFIG.loginPage);
       }, SESSION_GUARD_CONFIG.redirectDelay);
+
       throw new Error("Sessão inválida ou rota não autorizada");
     }
 
     showGuardNotification("🔒 Sessão válida. Acesso permitido.", "success");
+
+    if (SESSION_GUARD_CONFIG.auditEnabled && session?.user) {
+      await createAuditLog?.("AUTHORIZED_ACCESS", {
+        route: path,
+        user: session.user.id,
+        email: session.user.email,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     if (SESSION_GUARD_CONFIG.debug) console.log("✅ Session guard passed:", session.user.email);
+    return true;
   } catch (err) {
     console.error("❌ Session guard error:", err);
+    return false;
   }
 }
 
@@ -82,4 +105,4 @@ document.addEventListener("DOMContentLoaded", () => {
 export default enforceSessionGuard;
 window.AlshamSessionGuard = enforceSessionGuard;
 
-console.log("🛡️ Session Guard v5.0 NASA 10/10 carregado - ALSHAM 360° PRIMA");
+console.log("🛡️ Session Guard v5.1 carregado - ALSHAM 360° PRIMA com auditoria");
