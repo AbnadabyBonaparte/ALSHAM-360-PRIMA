@@ -1,32 +1,32 @@
 /**
- * 🎮 ALSHAM 360° PRIMA - Sistema de Gamificação V2.1
- * Produção final alinhada com fix-imports + auth.js
+ * 🎮 ALSHAM 360° PRIMA - Sistema de Gamificação V2.2
+ * Produção final alinhada com supabase.js + auth.js
  *
- * @version 2.1.0 - PRODUÇÃO NASA 10/10
+ * @version 2.2.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
  * @author
  *   ALSHAM Development Team
  */
 
-// ===== AGUARDAR DEPENDÊNCIAS =====
+import {
+  getCurrentSession,
+  getCurrentOrgId,
+  genericSelect
+} from "/src/lib/supabase.js";
+
+// ==============================
+// AGUARDAR DEPENDÊNCIAS
+// ==============================
 function initializeGamificationSystem() {
-  if (typeof window.waitFor !== "function") {
-    console.log("⏳ Aguardando dependências...");
-    setTimeout(initializeGamificationSystem, 500);
-    return;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeGamification);
+  } else {
+    initializeGamification();
   }
-  window.waitFor(
-    () => window.AlshamSupabase && window.showAuthNotification,
-    initializeGamification,
-    { description: "AlshamSupabase e fix-imports", timeout: 10000 }
-  );
-}
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeGamificationSystem);
-} else {
-  initializeGamificationSystem();
 }
 
-// ===== CONFIGURAÇÕES =====
+// ==============================
+// CONFIGURAÇÕES
+// ==============================
 const GAMIFICATION_CONFIG = {
   LEVELS: [
     { level: 1, name: "Iniciante", minPoints: 0, maxPoints: 499, color: "gray", icon: "🥚", multiplier: 1.0 },
@@ -61,7 +61,9 @@ const GAMIFICATION_CONFIG = {
   }
 };
 
-// ===== ESTADO GLOBAL =====
+// ==============================
+// ESTADO GLOBAL
+// ==============================
 const gamificationState = {
   user: null,
   orgId: null,
@@ -75,7 +77,9 @@ const gamificationState = {
   lastUpdate: null
 };
 
-// ===== INICIALIZAÇÃO PRINCIPAL =====
+// ==============================
+// INICIALIZAÇÃO PRINCIPAL
+// ==============================
 async function initializeGamification() {
   try {
     console.log("🎮 Inicializando sistema de gamificação...");
@@ -105,15 +109,14 @@ async function initializeGamification() {
   }
 }
 
-// ===== AUTENTICAÇÃO =====
+// ==============================
+// AUTENTICAÇÃO
+// ==============================
 async function checkAuthentication() {
   try {
-    if (window.AlshamAuth?.isAuthenticated) {
-      return { success: true, user: window.AlshamAuth.currentUser, orgId: "default-org" };
-    }
-    const session = await window.getCurrentSession?.();
+    const session = await getCurrentSession();
     if (!session?.user) return { success: false };
-    const orgId = window.getDefaultOrgId ? window.getDefaultOrgId() : "default-org";
+    const orgId = await getCurrentOrgId();
     return { success: true, user: session.user, orgId };
   } catch (error) {
     console.warn("⚠️ Erro na autenticação:", error);
@@ -121,43 +124,40 @@ async function checkAuthentication() {
   }
 }
 function redirectToLogin() {
-  window.navigateTo?.("login") || (window.location.href = "/login.html");
+  window.location.href = "/login.html";
 }
 
-// ===== CARREGAMENTO DE DADOS =====
+// ==============================
+// CARREGAMENTO DE DADOS
+// ==============================
 async function loadGamificationData() {
   try {
     gamificationState.isLoading = true;
-    if (!window.genericSelect) {
-      console.warn("⚠️ genericSelect ausente, carregando demo...");
-      loadDemoData();
-      return;
-    }
 
-    const orgId = gamificationState.orgId;
     const userId = gamificationState.user?.id;
+    const orgId = gamificationState.orgId;
     if (!userId || !orgId) throw new Error("Usuário ou organização não definidos");
 
     const [pointsResult, badgesResult, availableBadgesResult, leaderboardResult] = await Promise.allSettled([
-      window.genericSelect("gamification_points", { user_id: userId }),
-      window.genericSelect("user_badges", { user_id: userId }),
-      window.genericSelect("gamification_badges", {}),
-      window.genericSelect("team_leaderboards", {})
+      genericSelect("gamification_points", { user_id: userId, org_id: orgId }),
+      genericSelect("user_badges", { user_id: userId, org_id: orgId }),
+      genericSelect("gamification_badges", { org_id: orgId }),
+      genericSelect("team_leaderboards", { org_id: orgId })
     ]);
 
-    const pointsData = pointsResult.status === "fulfilled" ? pointsResult.value : { data: [] };
-    const badgesData = badgesResult.status === "fulfilled" ? badgesResult.value : { data: [] };
-    const availableBadgesData = availableBadgesResult.status === "fulfilled" ? availableBadgesResult.value : { data: [] };
-    const leaderboardData = leaderboardResult.status === "fulfilled" ? leaderboardResult.value : { data: [] };
+    const pointsData = pointsResult.value?.data || [];
+    const badgesData = badgesResult.value?.data || [];
+    const availableBadgesData = availableBadgesResult.value?.data || [];
+    const leaderboardData = leaderboardResult.value?.data || [];
 
-    const totalPoints = pointsData.data?.reduce((sum, p) => sum + (p.points_awarded || 0), 0) || 0;
+    const totalPoints = pointsData.reduce((sum, p) => sum + (p.points_awarded || 0), 0);
 
     gamificationState.userPoints = totalPoints;
     gamificationState.userLevel = calculateUserLevel(totalPoints);
-    gamificationState.userBadges = badgesData.data || [];
-    gamificationState.availableBadges = availableBadgesData.data || [];
-    gamificationState.leaderboard = processLeaderboard(leaderboardData.data || []);
-    gamificationState.recentActivities = processRecentActivities(pointsData.data || []);
+    gamificationState.userBadges = badgesData;
+    gamificationState.availableBadges = availableBadgesData;
+    gamificationState.leaderboard = processLeaderboard(leaderboardData);
+    gamificationState.recentActivities = processRecentActivities(pointsData);
     gamificationState.lastUpdate = new Date();
 
     console.log("✅ Dados de gamificação carregados do Supabase");
@@ -169,7 +169,9 @@ async function loadGamificationData() {
   }
 }
 
-// ===== FUNÇÕES DE CÁLCULO =====
+// ==============================
+// FUNÇÕES DE CÁLCULO
+// ==============================
 function calculateUserLevel(points) {
   for (const level of GAMIFICATION_CONFIG.LEVELS) {
     if (points >= level.minPoints && points <= level.maxPoints) return level;
@@ -210,7 +212,9 @@ function formatTimeAgo(dateString) {
   }
 }
 
-// ===== DEMO =====
+// ==============================
+// DEMO
+// ==============================
 function loadDemoData() {
   console.log("📋 Carregando dados demo gamificação...");
   gamificationState.userPoints = 1250;
@@ -230,7 +234,9 @@ function loadDemoData() {
   window.showToast?.("Usando dados demo", "warning");
 }
 
-// ===== INTERFACE =====
+// ==============================
+// INTERFACE
+// ==============================
 function renderGamificationInterface() {
   try {
     renderHeader();
@@ -245,9 +251,11 @@ function renderGamificationInterface() {
     showError("Erro render interface");
   }
 }
-// (Funções renderHeader, renderStats, renderProgress, renderBadges, renderLeaderboard, renderRecentActivities iguais à versão anterior — apenas preservadas)
+// (Funções renderHeader, renderStats, renderProgress, renderBadges, renderLeaderboard, renderRecentActivities devem estar no mesmo arquivo ou importadas)
 
-// ===== AUTO-REFRESH =====
+// ==============================
+// AUTO-REFRESH
+// ==============================
 function setupAutoRefresh() {
   setInterval(() => {
     if (!document.hidden && !gamificationState.isLoading) refreshGamificationData();
@@ -257,13 +265,15 @@ function setupAutoRefresh() {
   });
 }
 
-// ===== PUBLIC API =====
+// ==============================
+// PUBLIC API
+// ==============================
 async function refreshGamificationData() {
   try {
     console.log("🔄 Atualizando gamificação...");
     await loadGamificationData();
     renderGamificationInterface();
-    showSuccess("Gamificação atualizada!");
+    window.showToast?.("Gamificação atualizada!", "success");
   } catch (error) {
     console.error("Erro refresh:", error);
     showError("Erro atualizar gamificação");
@@ -276,12 +286,17 @@ function handleError(error) {
   showError("Carregando demo");
 }
 
-// ===== EXPORT GLOBAL =====
+// ==============================
+// EXPORT
+// ==============================
 window.GamificationSystem = {
   refresh: refreshGamificationData,
   getState: () => ({ ...gamificationState }),
-  version: "2.1.0"
+  version: "2.2.0"
 };
 window.refreshGamificationData = refreshGamificationData;
 
-console.log("🎮 Gamificação V2.1 carregada - compatível fix-imports");
+console.log("🎮 Gamificação V2.2 carregada - multi-tenant Supabase");
+
+// Init
+initializeGamificationSystem();
