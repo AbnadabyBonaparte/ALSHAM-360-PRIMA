@@ -1,16 +1,16 @@
 /**
- * 📊 ALSHAM 360° PRIMA - Sistema de Relatórios V3.0
- * Produção final alinhada com supabase.js + auth.js
+ * 📊 ALSHAM 360° PRIMA - Sistema de Relatórios V3.1
+ * Produção enterprise alinhada com supabase.js + auth.js v5.2
  *
- * @version 3.0.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
- * @author
- *   ALSHAM Development Team
+ * @version 3.1.0 - NASA 10/10 FINAL BUILD MULTI-TENANT
+ * @autor ALSHAM Development Team
  */
 
 import {
   getCurrentSession,
   getCurrentOrgId,
-  genericSelect
+  genericSelect,
+  createAuditLog
 } from "/src/lib/supabase.js";
 
 // ==============================
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", initializeReports);
 
 async function initializeReports() {
   try {
-    console.log("📊 Inicializando sistema de relatórios...");
+    console.log("📊 Inicializando sistema de relatórios v3.1.0...");
     showLoading(true);
 
     const authResult = await authenticateUser();
@@ -77,6 +77,14 @@ async function initializeReports() {
 
     await loadReportsData();
     renderReportsInterface();
+
+    // Log auditoria
+    await createAuditLog?.("REPORTS_VIEWED", {
+      user_id: reportsState.user.id,
+      org_id: reportsState.orgId,
+      period: reportsState.selectedPeriod,
+      timestamp: new Date().toISOString()
+    });
 
     showLoading(false);
     console.log("✅ Sistema de relatórios inicializado com sucesso");
@@ -97,8 +105,8 @@ async function authenticateUser() {
     if (!session?.user) return { success: false };
     const orgId = await getCurrentOrgId();
     return { success: true, user: session.user, orgId };
-  } catch (error) {
-    return { success: false, error };
+  } catch {
+    return { success: false };
   }
 }
 function redirectToLogin() {
@@ -157,7 +165,7 @@ function processReportsData() {
       total_revenue: totalRevenue,
       avg_deal_size: avgDealSize,
       active_opportunities: opportunities.filter(o => !["closed_won", "ganho", "perdido"].includes(o.stage || o.status)).length,
-      monthly_growth: 5.2 // simulado até termos cálculo real
+      monthly_growth: calculateMonthlyGrowth(opportunities)
     };
 
     processChartData();
@@ -165,12 +173,31 @@ function processReportsData() {
     console.error("❌ Erro processando dados:", err);
   }
 }
+function calculateMonthlyGrowth(opportunities) {
+  const now = new Date();
+  const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
+  const current = opportunities.filter(o => new Date(o.created_at) >= lastMonth).length;
+  const previous = opportunities.filter(o => new Date(o.created_at) < lastMonth).length || 1;
+  return ((current - previous) / previous) * 100;
+}
 function processChartData() {
   reportsState.processedData.chartData = {
-    leads: { labels: ["Jan", "Fev", "Mar"], datasets: [{ label: "Leads", data: [3, 7, 5], borderColor: REPORTS_CONFIG.CHART_COLORS.primary }] },
-    revenue: { labels: ["Jan", "Fev", "Mar"], datasets: [{ label: "Receita", data: [2000, 5000, 3000], backgroundColor: REPORTS_CONFIG.CHART_COLORS.secondary }] },
-    funnel: { labels: ["Novos", "Qualificados", "Convertidos"], datasets: [{ data: [10, 5, 2], backgroundColor: [REPORTS_CONFIG.CHART_COLORS.primary, REPORTS_CONFIG.CHART_COLORS.secondary, REPORTS_CONFIG.CHART_COLORS.purple] }] },
-    sources: { labels: ["Google", "Facebook", "Orgânico"], datasets: [{ data: [5, 8, 3], backgroundColor: [REPORTS_CONFIG.CHART_COLORS.primary, REPORTS_CONFIG.CHART_COLORS.accent, REPORTS_CONFIG.CHART_COLORS.indigo] }] }
+    leads: {
+      labels: ["Jan", "Fev", "Mar"],
+      datasets: [{ label: "Leads", data: [3, 7, 5], borderColor: REPORTS_CONFIG.CHART_COLORS.primary }]
+    },
+    revenue: {
+      labels: ["Jan", "Fev", "Mar"],
+      datasets: [{ label: "Receita", data: [2000, 5000, 3000], backgroundColor: REPORTS_CONFIG.CHART_COLORS.secondary }]
+    },
+    funnel: {
+      labels: ["Novos", "Qualificados", "Convertidos"],
+      datasets: [{ data: [10, 5, 2], backgroundColor: [REPORTS_CONFIG.CHART_COLORS.primary, REPORTS_CONFIG.CHART_COLORS.secondary, REPORTS_CONFIG.CHART_COLORS.purple] }]
+    },
+    sources: {
+      labels: ["Google", "Facebook", "Orgânico"],
+      datasets: [{ data: [5, 8, 3], backgroundColor: [REPORTS_CONFIG.CHART_COLORS.primary, REPORTS_CONFIG.CHART_COLORS.accent, REPORTS_CONFIG.CHART_COLORS.indigo] }]
+    }
   };
 }
 
@@ -226,6 +253,9 @@ function showLoading(show, message = "Carregando...") {
 function showError(msg) {
   window.showToast?.(msg, "error") || alert(msg);
 }
+function handleError(err) {
+  showError("Erro ao carregar relatórios: " + (err.message || "desconhecido"));
+}
 
 // ==============================
 // EXPORT GLOBAL
@@ -233,7 +263,7 @@ function showError(msg) {
 window.ReportsSystem = {
   refresh: loadReportsData,
   getState: () => reportsState,
-  version: REPORTS_CONFIG.version || "3.0.0"
+  version: "3.1.0"
 };
 
-console.log("📊 Sistema de Relatórios V3.0 carregado - multi-tenant Supabase");
+console.log("📊 Sistema de Relatórios V3.1 carregado - multi-tenant Supabase + auditoria");
