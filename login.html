@@ -6,6 +6,18 @@
   <title>Login — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Acesse o ALSHAM 360° PRIMA com segurança empresarial: login com email, senha ou provedores (Google, Microsoft, Apple)." />
 
+  <!-- ✅ CSP revisado -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    object-src 'none';
+    frame-src 'self';
+    worker-src 'self' blob:;">
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -21,8 +33,12 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center">
+
+  <!-- Toasts -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
   <!-- Container -->
   <main class="w-full max-w-md bg-white rounded-lg shadow p-8">
@@ -31,17 +47,17 @@
     <!-- Formulário -->
     <form id="login-form" class="space-y-4">
       <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input id="email" type="email" class="mt-1 w-full border rounded px-3 py-2" required />
+        <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+        <input id="email" type="email" class="mt-1 w-full border rounded-lg p-2" placeholder="seu@email.com" required />
       </div>
       <div>
         <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
         <div class="relative">
-          <input id="password" type="password" class="mt-1 w-full border rounded px-3 py-2 pr-10" required />
+          <input id="password" type="password" class="mt-1 w-full border rounded-lg p-2 pr-10" placeholder="••••••••" required minlength="8" />
           <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">👁️</button>
         </div>
       </div>
-      <button id="login-btn" type="submit" class="w-full bg-primary text-white py-2 rounded hover:bg-blue-700">
+      <button id="login-btn" type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700 flex justify-center items-center">
         <span id="login-btn-text">Entrar</span>
         <span id="login-spinner" class="hidden animate-spin ml-2">⏳</span>
       </button>
@@ -53,8 +69,8 @@
 
     <!-- Providers -->
     <div class="mt-6 space-y-2">
-      <button id="google-login" class="w-full border rounded py-2 hover:bg-gray-50">🔍 Entrar com Google</button>
-      <button id="microsoft-login" class="w-full border rounded py-2 hover:bg-gray-50">🪟 Entrar com Microsoft</button>
+      <button id="google-login" class="w-full border rounded-lg py-2 hover:bg-gray-50">🔍 Entrar com Google</button>
+      <button id="microsoft-login" class="w-full border rounded-lg py-2 hover:bg-gray-50">🪟 Entrar com Microsoft</button>
     </div>
 
     <!-- Esqueci senha -->
@@ -62,6 +78,11 @@
       <a href="/reset-password.html" class="text-sm text-primary hover:underline">Esqueci minha senha</a>
     </div>
   </main>
+
+  <!-- Footer -->
+  <footer class="mt-8 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
 
   <!-- Script oficial de login -->
   <script type="module" src="/js/login.js"></script>
