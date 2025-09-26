@@ -1,6 +1,9 @@
+// -----------------------------------------------------------------------------
 // /js/relatorios.js
+// ALSHAM 360° PRIMA - Relatórios Multi-tenant
+// -----------------------------------------------------------------------------
 
-import { supabase } from "/lib/supabase.js";
+import { getCurrentOrgId, getLeads } from "/src/lib/supabase.js";
 
 // Seletores
 const mainContent = document.getElementById("main-content");
@@ -8,7 +11,6 @@ const mainContent = document.getElementById("main-content");
 // Estado global
 let appState = {
   orgId: null,
-  isDemo: false,
   charts: {},
 };
 
@@ -44,6 +46,10 @@ function showToast(message, type = "info", duration = 4000) {
 }
 
 function exportCSV(data, filename = "relatorio.csv") {
+  if (!data || !data.length) {
+    showToast("Nenhum dado para exportar", "error");
+    return;
+  }
   const csv = [
     Object.keys(data[0]).join(","),
     ...data.map(row => Object.values(row).map(val => `"${val}"`).join(","))
@@ -67,28 +73,23 @@ async function initRelatorios() {
   try {
     console.log("📊 Iniciando relatórios...");
 
-    // Verificar sessão
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData?.session) {
-      console.warn("Usuário não autenticado. Entrando em modo demo.");
-      appState.isDemo = true;
-    } else {
-      appState.orgId = sessionData.session.user.id;
-    }
+    // Recuperar orgId real
+    appState.orgId = await getCurrentOrgId();
+    if (!appState.orgId) throw new Error("OrgId não encontrado");
 
     // Renderizar UI
     renderRelatoriosLayout();
 
-    // Carregar dados
+    // Carregar dados reais
     await loadRelatorios();
 
     showToast("✅ Relatórios carregados com sucesso!", "success");
   } catch (err) {
     console.error("Erro ao inicializar relatórios:", err);
-    appState.isDemo = true;
     renderRelatoriosLayout();
-    loadMockRelatorios();
-    showToast("⚠️ Relatórios em modo demonstração", "warning");
+    document.getElementById("relatorio-tabela").innerHTML =
+      `<p class="text-red-500 text-center py-4">Erro ao carregar relatórios</p>`;
+    showToast("⚠️ Falha ao carregar relatórios", "error");
   }
 }
 
@@ -142,16 +143,9 @@ function renderRelatoriosLayout() {
 // Carregar Relatórios
 // ========================
 async function loadRelatorios() {
-  if (appState.isDemo) return loadMockRelatorios();
-
   try {
-    const { data: leads, error: leadsError } = await supabase
-      .from("leads_crm")
-      .select("*")
-      .eq("org_id", appState.orgId)
-      .limit(50);
-
-    if (leadsError) throw leadsError;
+    const { data: leads, error } = await getLeads(100, appState.orgId);
+    if (error) throw error;
 
     renderKPIs(leads);
     renderCharts(leads);
@@ -160,7 +154,8 @@ async function loadRelatorios() {
     window.__relatorioData = leads;
   } catch (err) {
     console.error("Erro ao carregar relatórios:", err);
-    loadMockRelatorios();
+    document.getElementById("relatorio-tabela").innerHTML =
+      `<p class="text-red-500 text-center py-4">Erro ao carregar dados</p>`;
   }
 }
 
@@ -172,7 +167,7 @@ function renderKPIs(leads) {
   const total = leads.length;
   const qualificados = leads.filter(l => l.status === "qualificado").length;
   const convertidos = leads.filter(l => l.status === "convertido").length;
-  const receita = convertidos * 500; // Exemplo: cada conversão vale 500
+  const receita = convertidos * 500; // TODO: substituir por métrica real
 
   const kpis = [
     { title: "Total de Leads", value: total, color: "blue" },
@@ -190,7 +185,7 @@ function renderKPIs(leads) {
 }
 
 function renderCharts(leads) {
-  // Receita mensal (mock de datas)
+  // Receita mensal (mock por enquanto)
   const revenueCtx = document.getElementById("revenueChart").getContext("2d");
   if (appState.charts.revenue) appState.charts.revenue.destroy();
   appState.charts.revenue = new Chart(revenueCtx, {
@@ -263,23 +258,6 @@ function renderTabela(leads) {
       </tbody>
     </table>
   `;
-}
-
-// ========================
-// Mock Fallback
-// ========================
-function loadMockRelatorios() {
-  const mockLeads = [
-    { nome: "João Silva", empresa: "Tech Ltda", status: "novo", score_ia: 75, created_at: "2025-09-01" },
-    { nome: "Maria Oliveira", empresa: "Inova Corp", status: "qualificado", score_ia: 90, created_at: "2025-09-05" },
-    { nome: "Pedro Costa", empresa: "Digital SA", status: "convertido", score_ia: 88, created_at: "2025-09-07" },
-  ];
-
-  renderKPIs(mockLeads);
-  renderCharts(mockLeads);
-  renderTabela(mockLeads);
-
-  window.__relatorioData = mockLeads;
 }
 
 // ========================
