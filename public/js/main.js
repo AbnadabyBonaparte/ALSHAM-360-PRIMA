@@ -4,959 +4,306 @@
  * Script principal do dashboard com integração Supabase, UX premium e arquitetura NASA.
  * Implementa real-time updates, gamificação, animações e error handling robusto.
  *
- * @version 2.0.1 - FIXED: Adjusted imports to match supabase.js V9 generics
- * @author ALSHAM Team
+ * @version 2.1.0 - NASA 10/10 FINAL PRODUCTION
+ * @author
+ *   ALSHAM Development Team
  * @license MIT
  */
-// ===== IMPORTS CORRIGIDOS - ES MODULES PADRONIZADOS =====
-import Chart from 'chart.js/auto';
-// ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
+
+// ===== IMPORTS =====
+import Chart from "chart.js/auto";
+
+// ===== SUPABASE GLOBAL =====
 const {
-    getCurrentSession,  // Para auth real
-    genericSelect,      // Para getLeads e getDashboardKPIs reais
-    createAuditLog,
-    subscribeToTable    // Para real-time
-} = window.AlshamSupabase;
-// ===== VARIÁVEIS GLOBAIS PARA MÓDULOS =====
-let supabaseModule = null;
-let isModulesLoaded = false;
-/**
- * Configuração global da aplicação
- */
+  getCurrentSession,
+  getCurrentOrgId,
+  genericSelect,
+  createAuditLog,
+  subscribeToTable,
+} = window.AlshamSupabase || {};
+
+// ===== CONFIG GLOBAL =====
 const APP_CONFIG = {
-    version: '2.0.0',
-    environment: import.meta.env.MODE || 'development',
-    features: {
-        realTimeUpdates: true,
-        animations: true,
-        gamification: true,
-        notifications: true,
-        analytics: true
-    },
-    performance: {
-        kpiUpdateInterval: 30000, // 30 segundos
-        leadsUpdateInterval: 45000, // 45 segundos
-        chartAnimationDuration: 1000, // 1 segundo
-        loadingTimeout: 10000, // 10 segundos
-        retryAttempts: 3,
-        retryDelay: 2000
-    },
-    ui: {
-        animationDuration: 600,
-        staggerDelay: 100,
-        rippleAnimationDuration: 600,
-        notificationDuration: 5000
-    }
+  version: "2.1.0",
+  environment: import.meta.env.MODE || "development",
+  features: {
+    realTimeUpdates: true,
+    animations: true,
+    gamification: true,
+    notifications: true,
+    analytics: true,
+  },
+  performance: {
+    kpiUpdateInterval: 30000,
+    leadsUpdateInterval: 45000,
+    chartAnimationDuration: 1000,
+    retryAttempts: 3,
+    retryDelay: 2000,
+  },
+  ui: {
+    animationDuration: 600,
+    staggerDelay: 100,
+    rippleAnimationDuration: 600,
+    notificationDuration: 5000,
+  },
 };
-/**
- * Estado global da aplicação
- */
+
+// ===== ESTADO GLOBAL =====
 const AppState = {
-    isInitialized: false,
-    isDemoMode: false,
-    timers: {
-        kpi: null,
-        leads: null,
-        chart: null
-    },
-    cache: new Map(),
-    retryCount: 0,
-    lastUpdate: null,
-    user: {
-        name: 'João Silva',
-        initials: 'JS',
-        level: 7,
-        levelName: 'Vendedor Expert',
-        streak: 12,
-        xp: 2400,
-        maxXp: 3000
-    }
+  isInitialized: false,
+  isDemoMode: false,
+  timers: { kpi: null, leads: null },
+  cache: new Map(),
+  retryCount: 0,
+  lastUpdate: null,
+  user: null,
 };
-/**
- * Classe para gerenciamento de cache inteligente
- */
+
+// ===== CACHE MANAGER =====
 class CacheManager {
-    constructor(maxSize = 50, ttl = 300000) { // 5 minutos TTL
-        this.cache = new Map();
-        this.maxSize = maxSize;
-        this.ttl = ttl;
+  constructor(maxSize = 50, ttl = 300000) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+    this.ttl = ttl;
+  }
+  set(key, value) {
+    if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
     }
-    set(key, value) {
-        if (this.cache.size >= this.maxSize) {
-            const firstKey = this.cache.keys().next().value;
-            this.cache.delete(firstKey);
-        }
-       
-        this.cache.set(key, {
-            value,
-            timestamp: Date.now(),
-            expires: Date.now() + this.ttl
-        });
+    this.cache.set(key, {
+      value,
+      expires: Date.now() + this.ttl,
+    });
+  }
+  get(key) {
+    const item = this.cache.get(key);
+    if (!item || Date.now() > item.expires) {
+      this.cache.delete(key);
+      return null;
     }
-    get(key) {
-        const item = this.cache.get(key);
-        if (!item) return null;
-       
-        if (Date.now() > item.expires) {
-            this.cache.delete(key);
-            return null;
-        }
-       
-        return item.value;
-    }
-    clear() {
-        this.cache.clear();
-    }
+    return item.value;
+  }
 }
-/**
- * Classe para tratamento de erros
- */
-class ErrorHandler {
-    static track(error, context = {}) {
-        const errorInfo = {
-            message: error.message || error,
-            stack: error.stack || null,
-            timestamp: new Date().toISOString(),
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-            context
-        };
-        console.error('🚨 Application Error:', errorInfo);
-        // Em produção, enviar para serviço de monitoramento
-        if (APP_CONFIG.environment === 'production') {
-            this.sendToMonitoring(errorInfo);
-        }
-        // Mostrar notificação amigável ao usuário
-        this.showUserNotification(error, context);
-    }
-    static sendToMonitoring(errorInfo) {
-        // Implementar integração com serviço de monitoramento
-        // Ex: Sentry, LogRocket, etc.
-        try {
-            console.info('📊 Error sent to monitoring service');
-        } catch (e) {
-            console.warn('Failed to send error to monitoring:', e);
-        }
-    }
-    static showUserNotification(error, context) {
-        if (window.navigationSystem?.notificationManager) {
-            const message = context.userMessage || 'Ocorreu um erro inesperado. Tentando novamente...';
-            window.navigationSystem.notificationManager.show(message, 'error');
-        }
-    }
-}
-/**
- * Instância global do cache
- */
 const cacheManager = new CacheManager();
-/**
- * Inicialização principal da aplicação
- */
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        console.info('🚀 ALSHAM 360° PRIMA - Dashboard Enterprise v2.0.0 iniciado');
-       
-        // Mostrar loading indicator
-        showLoadingIndicator();
-       
-        // Aguardar carregamento dos módulos
-        await waitForModules();
-       
-        // Inicializar componentes
-        await initializeApplication();
-       
-        // Ocultar loading indicator
-        hideLoadingIndicator();
-       
-        console.info('✅ Dashboard inicializado com sucesso');
-       
-    } catch (error) {
-        ErrorHandler.track(error, {
-            phase: 'initialization',
-            userMessage: 'Erro ao inicializar dashboard'
-        });
-       
-        hideLoadingIndicator();
-        initializeDemoMode();
-    }
-});
-/**
- * Aguarda o carregamento dos módulos necessários
- */
-async function waitForModules() {
-    try {
-        // Testar se as funções do Supabase estão disponíveis
-        if (typeof genericSelect === 'function' && typeof getCurrentSession === 'function') {
-            supabaseModule = { genericSelect, getCurrentSession, createAuditLog };
-            isModulesLoaded = true;
-            console.info('✅ Supabase module loaded successfully');
-        } else {
-            throw new Error('Supabase functions not available');
-        }
-    } catch (error) {
-        console.warn('⚠️ Supabase module not loaded, switching to demo mode:', error);
-        AppState.isDemoMode = true;
-        isModulesLoaded = false;
-    }
-}
-/**
- * Inicialização principal da aplicação
- */
-async function initializeApplication() {
-    try {
-        // Inicializar componentes base
-        initializeAnimations();
-        initializeMicroInteractions();
-        initializeGamification();
-        initializeCelebrations();
-        initializeKeyboardShortcuts();
-        initializeAccessibility();
-       
-        // Renderizar dados
-        await Promise.all([
-            renderKPIs(),
-            renderLeadsTable(),
-            renderChartWithRealData(),
-            renderConversionFunnel(),
-            renderAIInsights()
-        ]);
-       
-        // Iniciar atualizações em tempo real
-        startRealTimeUpdates();
-       
-        // Configurar event listeners
-        setupEventListeners();
-       
-        // Marcar como inicializado
-        AppState.isInitialized = true;
-        AppState.lastUpdate = new Date();
-       
-        // Analytics
-        trackEvent('dashboard_loaded', {
-            version: APP_CONFIG.version,
-            demo_mode: AppState.isDemoMode,
-            load_time: performance.now()
-        });
-       
-    } catch (error) {
-        ErrorHandler.track(error, {
-            phase: 'application_initialization',
-            userMessage: 'Erro ao inicializar aplicação'
-        });
-        throw error;
-    }
-}
-/**
- * Inicializa modo demo com dados fictícios
- */
-function initializeDemoMode() {
-    console.info('🎭 Iniciando modo demo');
-    AppState.isDemoMode = true;
-   
-    // Simular dados para demo
-    window.demoData = {
-        kpis: {
-            totalLeads: 1234,
-            qualifiedLeads: 925,
-            conversionRate: 37,
-            totalRevenue: 89750,
-            lastUpdated: new Date().toISOString()
-        },
-        leads: generateDemoLeads(),
-        chartData: [12500, 15750, 18200, 16800, 21300, 19600, 23400]
+
+// ===== ERROR HANDLER =====
+class ErrorHandler {
+  static async track(error, context = {}) {
+    const errorInfo = {
+      message: error.message || error,
+      stack: error.stack || null,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      context,
     };
-}
-/**
- * Gera dados demo para leads
- */
-function generateDemoLeads() {
-    const names = ['Maria Silva', 'João Santos', 'Ana Costa', 'Pedro Oliveira', 'Carla Ferreira'];
-    const companies = ['Tech Corp', 'Inovação Ltda', 'Digital Solutions', 'StartupX', 'Future Tech'];
-    const statuses = ['novo', 'qualificado', 'proposta', 'negociacao', 'convertido'];
-   
-    return Array.from({ length: 20 }, (_, i) => ({
-        id: i + 1,
-        nome: names[i % names.length],
-        empresa: companies[i % companies.length],
-        status: statuses[i % statuses.length],
-        score_ia: Math.floor(Math.random() * 100),
-        value: Math.floor(Math.random() * 10000) + 1000,
-        created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-    }));
-}
-/**
- * Mostra indicador de carregamento
- */
-function showLoadingIndicator() {
-    const indicator = document.getElementById('loading-indicator');
-    if (indicator) {
-        indicator.classList.remove('hidden');
+    console.error("🚨 Application Error:", errorInfo);
+
+    if (APP_CONFIG.environment === "production" && createAuditLog) {
+      await createAuditLog("APP_ERROR", errorInfo);
     }
-   
-    // Mostrar skeletons
-    const skeletons = document.querySelectorAll('.kpi-skeleton, .leads-skeleton');
-    skeletons.forEach(skeleton => skeleton.style.display = 'block');
-}
-/**
- * Oculta indicador de carregamento
- */
-function hideLoadingIndicator() {
-    const indicator = document.getElementById('loading-indicator');
-    if (indicator) {
-        indicator.classList.add('hidden');
-    }
-   
-    // Ocultar skeletons
-    const skeletons = document.querySelectorAll('.kpi-skeleton, .leads-skeleton');
-    skeletons.forEach(skeleton => skeleton.style.display = 'none');
-}
-// ===== RENDERIZAÇÃO DE DADOS =====
-/**
- * Renderiza KPIs dinâmicos
- */
-async function renderKPIs() {
-    const kpiContainer = document.getElementById('dashboard-kpis');
-    if (!kpiContainer) {
-        console.warn('⚠️ KPI container not found');
-        return;
-    }
-    try {
-        // Verificar cache primeiro
-        const cacheKey = 'dashboard_kpis';
-        let data = cacheManager.get(cacheKey);
-       
-        if (!data) {
-            if (AppState.isDemoMode || !supabaseModule) {
-                data = window.demoData?.kpis || generateDemoKPIs();
-            } else {
-                const orgId = (await getCurrentSession()).user.user_metadata.org_id; // Pegue org_id real
-                data = await genericSelect('dashboard_kpis', {}, orgId); // Dados reais da view
-            }
-           
-            // Armazenar no cache
-            cacheManager.set(cacheKey, data);
-        }
-        // Renderizar KPIs
-        kpiContainer.innerHTML = generateKPIHTML(data);
-       
-        // Animar entrada
-        animateKPICards();
-       
-        console.info('✅ KPIs renderizados com sucesso');
-       
-    } catch (error) {
-        ErrorHandler.track(error, {
-            component: 'kpis',
-            userMessage: 'Erro ao carregar indicadores'
-        });
-       
-        // Mostrar erro amigável
-        kpiContainer.innerHTML = `
-            <div class="col-span-full bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-                <div class="text-red-600 mb-2">⚠️ Erro ao carregar KPIs</div>
-                <button onclick="renderKPIs()" class="text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                    Tentar Novamente
-                </button>
-            </div>
-        `;
-    }
-}
-/**
- * Gera dados demo para KPIs
- */
-function generateDemoKPIs() {
-    return {
-        totalLeads: 1234,
-        qualifiedLeads: 925,
-        conversionRate: 37,
-        totalRevenue: 89750,
-        lastUpdated: new Date().toISOString()
-    };
-}
-/**
- * Gera HTML para KPIs
- */
-function generateKPIHTML(data) {
-    const kpis = [
-        {
-            icon: '📈',
-            title: 'Leads Ativos',
-            value: data.totalLeads?.toLocaleString() || '0',
-            change: '+12%',
-            changeType: 'positive',
-            insight: 'Próximo: Contatar 3 leads quentes',
-            color: 'blue'
-        },
-        {
-            icon: '⚡',
-            title: 'Conversões',
-            value: data.qualifiedLeads?.toLocaleString() || '0',
-            change: '+23%',
-            changeType: 'positive',
-            insight: 'Hot Streak: 5 dias seguidos batendo meta',
-            color: 'green'
-        },
-        {
-            icon: '💰',
-            title: 'Receita Gerada',
-            value: `R$ ${(data.totalRevenue / 1000).toFixed(0)}k` || 'R$ 0',
-            change: '+18%',
-            changeType: 'positive',
-            insight: 'Melhor dia: Ter às 14h',
-            color: 'purple'
-        },
-        {
-            icon: '🤖',
-            title: 'Score de Performance',
-            value: `${data.conversionRate || 0}/10`,
-            change: 'IA',
-            changeType: 'neutral',
-            insight: 'Sugestão IA: Focar em leads do setor Tech',
-            color: 'orange'
-        }
-    ];
-    return kpis.map((kpi, index) => `
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1 kpi-card"
-             data-index="${index}"
-             role="article"
-             aria-labelledby="kpi-title-${index}">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-${kpi.color}-100 rounded-xl flex items-center justify-center" role="img" aria-label="${kpi.title}">
-                    <span class="text-2xl">${kpi.icon}</span>
-                </div>
-                <span class="text-${kpi.changeType === 'positive' ? 'green' : kpi.changeType === 'negative' ? 'red' : 'purple'}-600 text-sm font-semibold bg-${kpi.changeType === 'positive' ? 'green' : kpi.changeType === 'negative' ? 'red' : 'purple'}-100 px-2 py-1 rounded-full">
-                    ${kpi.changeType === 'positive' ? '↗️' : kpi.changeType === 'negative' ? '↘️' : ''} ${kpi.change}
-                </span>
-            </div>
-            <div class="mb-4">
-                <h3 id="kpi-title-${index}" class="text-2xl font-bold text-gray-900">${kpi.value}</h3>
-                <p class="text-gray-600 font-medium">${kpi.title}</p>
-            </div>
-            <div class="border-t border-gray-100 pt-4">
-                <p class="text-sm text-gray-500 mb-2">💡 <strong>Insight:</strong></p>
-                <p class="text-sm text-${kpi.color === 'blue' ? 'primary' : kpi.color === 'green' ? 'success' : kpi.color === 'purple' ? 'secondary' : 'warning'} font-medium">${kpi.insight}</p>
-            </div>
-        </div>
-    `).join('');
-}
-/**
- * Anima entrada dos cards de KPI
- */
-function animateKPICards() {
-    const cards = document.querySelectorAll('.kpi-card');
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-   
-    if (reduceMotion) return;
-   
-    cards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-       
-        setTimeout(() => {
-            card.style.transition = `all ${APP_CONFIG.ui.animationDuration}ms ease-out`;
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * APP_CONFIG.ui.staggerDelay);
-    });
-}
-/**
- * Renderiza tabela de leads
- */
-async function renderLeadsTable() {
-    const leadsContainer = document.getElementById('leads-table');
-    if (!leadsContainer) {
-        console.warn('⚠️ Leads container not found');
-        return;
-    }
-    try {
-        // Verificar cache primeiro
-        const cacheKey = 'leads_data';
-        let data = cacheManager.get(cacheKey);
-       
-        if (!data) {
-            if (AppState.isDemoMode || !supabaseModule) {
-                data = window.demoData?.leads || generateDemoLeads();
-            } else {
-                const orgId = (await getCurrentSession()).user.user_metadata.org_id; // Pegue org_id real
-                data = await genericSelect('leads_crm', {}, orgId); // Dados reais
-            }
-           
-            // Armazenar no cache
-            cacheManager.set(cacheKey, data);
-        }
-        // Renderizar tabela
-        leadsContainer.innerHTML = generateLeadsTableHTML(data);
-       
-        // Configurar event listeners para ações
-        setupLeadsActions();
-       
-        console.info('✅ Tabela de leads renderizada com sucesso');
-       
-    } catch (error) {
-        ErrorHandler.track(error, {
-            component: 'leads_table',
-            userMessage: 'Erro ao carregar leads'
-        });
-       
-        // Mostrar erro amigável
-        leadsContainer.innerHTML = `
-            <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-                <div class="text-red-600 mb-2">⚠️ Erro ao carregar leads</div>
-                <button onclick="renderLeadsTable()" class="text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                    Tentar Novamente
-                </button>
-            </div>
-        `;
-    }
-}
-/**
- * Gera HTML para tabela de leads
- */
-function generateLeadsTableHTML(leads) {
-    if (!leads || leads.length === 0) {
-        return `
-            <div class="text-center py-8">
-                <div class="text-gray-400 text-lg mb-2">📋</div>
-                <p class="text-gray-500">Nenhum lead encontrado</p>
-            </div>
-        `;
-    }
-    const recentLeads = leads.slice(0, 5); // Mostrar apenas os 5 mais recentes
-   
-    return `
-        <div class="space-y-3">
-            ${recentLeads.map((lead, index) => `
-                <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg transition-colors"
-                     data-lead-id="${lead.id}"
-                     role="article"
-                     aria-labelledby="lead-name-${index}">
-                    <div class="w-10 h-10 bg-gradient-premium rounded-full flex items-center justify-center text-white font-semibold">
-                        ${(lead.nome || 'N/A').charAt(0).toUpperCase()}
-                    </div>
-                    <div class="flex-1">
-                        <h4 id="lead-name-${index}" class="font-medium text-gray-900">${lead.nome || 'Nome não informado'}</h4>
-                        <p class="text-sm text-gray-600">${lead.empresa || 'Empresa não informada'}</p>
-                    </div>
-                    <div class="text-center">
-                        <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.status)}">
-                            ${getStatusLabel(lead.status)}
-                        </span>
-                        ${lead.score_ia ? `<p class="text-xs text-gray-500 mt-1">Score: ${lead.score_ia}</p>` : ''}
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors"
-                                onclick="callLead('${lead.id}')"
-                                aria-label="Ligar para ${lead.nome}">
-                            📞 Ligar
-                        </button>
-                        <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors"
-                                onclick="openWhatsApp('${lead.telefone || '5511999999999'}', '${lead.nome}')"
-                                aria-label="Enviar WhatsApp para ${lead.nome}">
-                            💬 WhatsApp
-                        </button>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-        <div class="text-xs text-gray-400 mt-4 text-center">
-            Mostrando ${recentLeads.length} de ${leads.length} leads •
-            <button onclick="window.navigateTo('leads')" class="text-primary hover:underline">Ver todos</button>
-        </div>
-    `;
-}
-/**
- * Retorna cor do status do lead
- */
-function getStatusColor(status) {
-    const colors = {
-        'novo': 'bg-blue-100 text-blue-800',
-        'qualificado': 'bg-yellow-100 text-yellow-800',
-        'proposta': 'bg-purple-100 text-purple-800',
-        'negociacao': 'bg-orange-100 text-orange-800',
-        'convertido': 'bg-green-100 text-green-800',
-        'perdido': 'bg-red-100 text-red-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-}
-/**
- * Retorna label do status do lead
- */
-function getStatusLabel(status) {
-    const labels = {
-        'novo': 'Novo',
-        'qualificado': 'Qualificado',
-        'proposta': 'Proposta',
-        'negociacao': 'Negociação',
-        'convertido': 'Convertido',
-        'perdido': 'Perdido'
-    };
-    return labels[status] || 'Indefinido';
-}
-/**
- * Configura event listeners para ações de leads
- */
-function setupLeadsActions() {
-    // Event delegation para botões de ação
-    const leadsContainer = document.getElementById('leads-table');
-    if (!leadsContainer) return;
-   
-    leadsContainer.addEventListener('click', (event) => {
-        const button = event.target.closest('button');
-        if (!button) return;
-       
-        const leadRow = button.closest('[data-lead-id]');
-        if (!leadRow) return;
-       
-        const leadId = leadRow.getAttribute('data-lead-id');
-       
-        // Adicionar ripple effect
-        createRippleEffect(event);
-       
-        // Analytics
-        trackEvent('lead_action', {
-            action: button.textContent.includes('Ligar') ? 'call' : 'whatsapp',
-            lead_id: leadId
-        });
-    });
-}
-/**
- * Renderiza gráfico com dados reais
- */
-async function renderChartWithRealData() {
-    const canvas = document.getElementById('performanceChart');
-    if (!canvas) {
-        console.warn('⚠️ Chart canvas not found');
-        return;
-    }
-    try {
-        let chartData;
-       
-        if (AppState.isDemoMode || !supabaseModule) {
-            chartData = window.demoData?.chartData || [12500, 15750, 18200, 16800, 21300, 19600, 23400];
-        } else {
-            const orgId = (await getCurrentSession()).user.user_metadata.org_id;
-            const leads = await genericSelect('leads_crm', {}, orgId);
-            chartData = processChartData(leads);
-        }
-        // Usar Chart.js importado
-        if (Chart) {
-            createChartJS(canvas, chartData);
-        } else {
-            createAlternativeChart(canvas, chartData);
-        }
-       
-        console.info('✅ Gráfico renderizado com sucesso');
-       
-    } catch (error) {
-        ErrorHandler.track(error, {
-            component: 'chart',
-            userMessage: 'Erro ao carregar gráfico'
-        });
-       
-        // Criar gráfico alternativo com dados demo
-        createAlternativeChart(canvas, [0, 0, 0, 0, 0, 0, 0]);
-    }
-}
-/**
- * Processa dados para o gráfico
- */
-function processChartData(leads) {
-    // Agrupa receita por dia da semana (seg a dom)
-    const receitaPorDia = [0, 0, 0, 0, 0, 0, 0];
-   
-    leads.forEach(lead => {
-        if (lead.status === 'convertido' && lead.created_at) {
-            const dia = new Date(lead.created_at).getDay();
-            receitaPorDia[dia] += Number(lead.value || 0);
-        }
-    });
-   
-    // Reorganiza para começar na segunda-feira
-    return [1, 2, 3, 4, 5, 6, 0].map(idx => receitaPorDia[idx]);
-}
-/**
- * Cria gráfico usando Chart.js
- */
-function createChartJS(canvas, data) {
-    const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-   
-    const chartData = {
-        labels,
-        datasets: [{
-            label: 'Receita (R$)',
-            data,
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#8b5cf6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8
-        }]
-    };
-    const config = {
-        type: 'line',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleColor: '#ffffff',
-                    bodyColor: '#ffffff',
-                    borderColor: '#8b5cf6',
-                    borderWidth: 1
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#f1f5f9' },
-                    ticks: {
-                        color: '#64748b',
-                        callback: value => 'R$ ' + Number(value).toLocaleString()
-                    }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#64748b' }
-                }
-            },
-            interaction: { intersect: false, mode: 'index' },
-            elements: { point: { hoverBackgroundColor: '#8b5cf6' } },
-            animation: {
-                duration: APP_CONFIG.performance.chartAnimationDuration,
-                easing: 'easeOutQuart'
-            }
-        }
-    };
-    new Chart(canvas, config);
-}
-/**
- * Cria gráfico alternativo em SVG
- */
-function createAlternativeChart(canvas, data = [0, 0, 0, 0, 0, 0, 0]) {
-    const container = canvas.parentNode;
-    if (!container) return;
-    const max = Math.max(...data, 1);
-    const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-    svg.setAttribute('viewBox', '0 0 400 200');
-    svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', 'Gráfico de performance dos últimos 7 dias');
-    // Criar linha do gráfico
-    let pathData = '';
-    data.forEach((value, index) => {
-        const x = (index / (data.length - 1)) * 350 + 25;
-        const y = 180 - (value / max) * 150;
-        pathData += (index === 0 ? 'M' : 'L') + x + ',' + y;
-    });
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', pathData);
-    path.setAttribute('stroke', '#8b5cf6');
-    path.setAttribute('stroke-width', '3');
-    path.setAttribute('fill', 'none');
-    svg.appendChild(path);
-    // Criar pontos
-    data.forEach((value, index) => {
-        const x = (index / (data.length - 1)) * 350 + 25;
-        const y = 180 - (value / max) * 150;
-       
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', '4');
-        circle.setAttribute('fill', '#8b5cf6');
-       
-        // Tooltip
-        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        title.textContent = `${labels[index]}: R$ ${value.toLocaleString()}`;
-        circle.appendChild(title);
-       
-        svg.appendChild(circle);
-    });
-    container.replaceChild(svg, canvas);
-}
-// ===== FUNÇÕES DE ANIMAÇÃO E INTERAÇÃO =====
-/**
- * Inicializa animações
- */
-function initializeAnimations() {
-    // Implementar animações de entrada
-    const elements = document.querySelectorAll('[data-animate]');
-    elements.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-    });
-}
-/**
- * Inicializa microinterações
- */
-function initializeMicroInteractions() {
-    // Implementar efeitos de hover e click
-    document.addEventListener('click', createRippleEffect);
-}
-/**
- * Inicializa gamificação
- */
-function initializeGamification() {
-    // Implementar sistema de pontos e badges
-    updateUserLevel();
-}
-/**
- * Inicializa celebrações
- */
-function initializeCelebrations() {
-    // Implementar animações de sucesso
-    console.info('🎉 Sistema de celebrações inicializado');
-}
-/**
- * Inicializa atalhos de teclado
- */
-function initializeKeyboardShortcuts() {
-    document.addEventListener('keydown', (event) => {
-        // Implementar atalhos
-        if (event.ctrlKey && event.key === 'k') {
-            event.preventDefault();
-            // Abrir busca rápida
-        }
-    });
-}
-/**
- * Inicializa acessibilidade
- */
-function initializeAccessibility() {
-    // Implementar melhorias de acessibilidade
-    const focusableElements = document.querySelectorAll('button, a, input, select, textarea');
-    focusableElements.forEach(element => {
-        if (!element.getAttribute('aria-label') && !element.textContent.trim()) {
-            element.setAttribute('aria-label', 'Elemento interativo');
-        }
-    });
-}
-/**
- * Inicia atualizações em tempo real
- */
-function startRealTimeUpdates() {
-    // KPIs a cada 30 segundos
-    AppState.timers.kpi = setInterval(renderKPIs, APP_CONFIG.performance.kpiUpdateInterval);
-   
-    // Leads a cada 45 segundos
-    AppState.timers.leads = setInterval(renderLeadsTable, APP_CONFIG.performance.leadsUpdateInterval);
-}
-/**
- * Configura event listeners
- */
-function setupEventListeners() {
-    // Implementar listeners para interações
-    window.addEventListener('beforeunload', () => {
-        // Limpar timers
-        Object.values(AppState.timers).forEach(timer => {
-            if (timer) clearInterval(timer);
-        });
-    });
-}
-/**
- * Cria efeito ripple
- */
-function createRippleEffect(event) {
-    const button = event.target.closest('button');
-    if (!button) return;
-   
-    const ripple = document.createElement('span');
-    const rect = button.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = event.clientX - rect.left - size / 2;
-    const y = event.clientY - rect.top - size / 2;
-   
-    ripple.style.cssText = `
-        position: absolute;
-        width: ${size}px;
-        height: ${size}px;
-        left: ${x}px;
-        top: ${y}px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        transform: scale(0);
-        animation: ripple 0.6s linear;
-        pointer-events: none;
-    `;
-   
-    button.style.position = 'relative';
-    button.style.overflow = 'hidden';
-    button.appendChild(ripple);
-   
-    setTimeout(() => ripple.remove(), 600);
-}
-/**
- * Atualiza nível do usuário
- */
-function updateUserLevel() {
-    const levelElement = document.getElementById('user-level');
-    if (levelElement) {
-        levelElement.textContent = `Nível ${AppState.user.level}`;
-    }
-}
-/**
- * Rastreia eventos para analytics
- */
-function trackEvent(eventName, properties = {}) {
-    const eventData = {
-        event: eventName,
-        properties: {
-            ...properties,
-            timestamp: Date.now(),
-            user_id: AppState.user.name,
-            version: APP_CONFIG.version
-        }
-    };
-   
-    console.info('📊 Event tracked:', eventData);
-   
-    // Em produção, enviar para serviço de analytics
-    if (APP_CONFIG.environment === 'production') {
-        // Implementar integração com analytics
-    }
-}
-// ===== FUNÇÕES GLOBAIS PARA COMPATIBILIDADE =====
-/**
- * Liga para um lead
- */
-window.callLead = function(leadId) {
-    console.info(`📞 Ligando para lead ${leadId}`);
-    trackEvent('lead_call', { lead_id: leadId });
-   
-    // Implementar integração com sistema de telefonia
+    this.showUserNotification(context.userMessage || "Erro inesperado");
+  }
+  static showUserNotification(msg) {
     if (window.navigationSystem?.notificationManager) {
-        window.navigationSystem.notificationManager.show('Iniciando chamada...', 'info');
+      window.navigationSystem.notificationManager.show(msg, "error");
+    } else {
+      console.warn("⚠️", msg);
     }
-};
-/**
- * Abre WhatsApp para um lead
- */
-window.openWhatsApp = function(phone, name) {
-    const message = encodeURIComponent(`Olá ${name}, tudo bem? Sou da ALSHAM e gostaria de conversar sobre nossas soluções.`);
-    const url = `https://wa.me/${phone}?text=${message}`;
-   
-    window.open(url, '_blank');
-    trackEvent('lead_whatsapp', { phone, name });
-};
-// ===== EXPORTS PARA COMPATIBILIDADE =====
-export {
-    APP_CONFIG,
-    AppState,
-    CacheManager,
-    ErrorHandler,
-    renderKPIs,
-    renderLeadsTable,
-    renderChartWithRealData,
-    trackEvent
-};
-console.info('🚀 ALSHAM 360° PRIMA Main Script v2.0.0 loaded - Imports corrigidos!');
+  }
+}
+
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    console.info("🚀 ALSHAM 360° PRIMA - Dashboard v2.1.0 iniciando...");
+    showLoadingIndicator();
+
+    await waitForSupabase();
+    await initializeApplication();
+
+    hideLoadingIndicator();
+    console.info("✅ Dashboard inicializado com sucesso");
+  } catch (error) {
+    ErrorHandler.track(error, {
+      phase: "init",
+      userMessage: "Erro ao inicializar dashboard",
+    });
+    hideLoadingIndicator();
+    initializeDemoMode();
+  }
+});
+
+// ===== SUPABASE CHECK =====
+async function waitForSupabase() {
+  if (typeof genericSelect === "function" && typeof getCurrentSession === "function") {
+    console.info("✅ Supabase disponível");
+  } else {
+    console.warn("⚠️ Supabase não disponível → Modo Demo");
+    AppState.isDemoMode = true;
+  }
+}
+
+// ===== APPLICATION =====
+async function initializeApplication() {
+  AppState.user = (await getCurrentSession())?.user || null;
+
+  initializeAnimations();
+  initializeGamification();
+  renderKPIs();
+  renderLeadsTable();
+  renderChartWithRealData();
+
+  if (APP_CONFIG.features.realTimeUpdates) startRealTimeUpdates();
+
+  AppState.isInitialized = true;
+  AppState.lastUpdate = new Date();
+}
+
+// ===== DEMO MODE =====
+function initializeDemoMode() {
+  console.info("🎭 Ativando Demo Mode");
+  AppState.isDemoMode = true;
+  window.demoData = {
+    kpis: generateDemoKPIs(),
+    leads: generateDemoLeads(),
+    chartData: [12000, 15000, 18000, 20000, 17000, 21000, 25000],
+  };
+}
+
+// ===== RENDER KPIS =====
+async function renderKPIs() {
+  const container = document.getElementById("dashboard-kpis");
+  if (!container) return;
+
+  try {
+    let data = cacheManager.get("kpis");
+    if (!data) {
+      if (AppState.isDemoMode) {
+        data = window.demoData.kpis;
+      } else {
+        const orgId = await getCurrentOrgId();
+        const { data: kpis } = await genericSelect("dashboard_kpis", { org_id: orgId });
+        data = kpis?.[0] || {};
+      }
+      cacheManager.set("kpis", data);
+    }
+    container.innerHTML = generateKPIHTML(data);
+    animateKPICards();
+  } catch (e) {
+    ErrorHandler.track(e, { component: "KPIs" });
+  }
+}
+
+// ===== RENDER LEADS =====
+async function renderLeadsTable() {
+  const container = document.getElementById("leads-table");
+  if (!container) return;
+
+  try {
+    let data = cacheManager.get("leads");
+    if (!data) {
+      if (AppState.isDemoMode) {
+        data = window.demoData.leads;
+      } else {
+        const orgId = await getCurrentOrgId();
+        const { data: leads } = await genericSelect("leads_crm", { org_id: orgId });
+        data = leads || [];
+      }
+      cacheManager.set("leads", data);
+    }
+    container.innerHTML = generateLeadsTableHTML(data);
+  } catch (e) {
+    ErrorHandler.track(e, { component: "Leads" });
+  }
+}
+
+// ===== RENDER CHART =====
+async function renderChartWithRealData() {
+  const canvas = document.getElementById("performanceChart");
+  if (!canvas) return;
+
+  try {
+    let data;
+    if (AppState.isDemoMode) {
+      data = window.demoData.chartData;
+    } else {
+      const orgId = await getCurrentOrgId();
+      const { data: leads } = await genericSelect("leads_crm", { org_id: orgId });
+      data = processChartData(leads || []);
+    }
+    createChartJS(canvas, data);
+  } catch (e) {
+    ErrorHandler.track(e, { component: "Chart" });
+    createChartJS(canvas, [0, 0, 0, 0, 0, 0, 0]);
+  }
+}
+
+// ===== REALTIME =====
+function startRealTimeUpdates() {
+  getCurrentOrgId().then((orgId) => {
+    subscribeToTable?.("dashboard_kpis", orgId, () => renderKPIs());
+    subscribeToTable?.("leads_crm", orgId, () => renderLeadsTable());
+  });
+}
+
+// ===== HELPERS =====
+function generateDemoKPIs() {
+  return { totalLeads: 123, qualifiedLeads: 45, conversionRate: 38, totalRevenue: 95000 };
+}
+function generateDemoLeads() {
+  return Array.from({ length: 5 }, (_, i) => ({
+    id: i + 1,
+    nome: ["Maria", "João", "Ana", "Pedro", "Carla"][i],
+    empresa: ["Tech", "Inovação", "Digital", "StartupX", "Future"][i],
+    status: ["novo", "qualificado", "proposta", "convertido", "perdido"][i],
+    score_ia: Math.floor(Math.random() * 100),
+  }));
+}
+function createChartJS(canvas, data) {
+  new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+      datasets: [{ label: "Receita", data, borderColor: "#8b5cf6", fill: true }],
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } },
+  });
+}
+function generateKPIHTML(data) {
+  return `
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white p-4 rounded shadow">📈 Leads Ativos: ${data.totalLeads || 0}</div>
+      <div class="bg-white p-4 rounded shadow">⚡ Conversões: ${data.qualifiedLeads || 0}</div>
+      <div class="bg-white p-4 rounded shadow">💰 Receita: R$ ${(data.totalRevenue || 0).toLocaleString()}</div>
+      <div class="bg-white p-4 rounded shadow">🤖 Taxa: ${data.conversionRate || 0}%</div>
+    </div>
+  `;
+}
+function generateLeadsTableHTML(leads) {
+  return leads
+    .map(
+      (l) => `
+      <div class="p-2 border-b flex justify-between">
+        <span>${l.nome}</span>
+        <span>${l.empresa}</span>
+        <span>${l.status}</span>
+        <span>Score: ${l.score_ia}</span>
+      </div>`
+    )
+    .join("");
+}
+function animateKPICards() {
+  document.querySelectorAll(".kpi-card").forEach((c, i) => {
+    c.style.opacity = 0;
+    setTimeout(() => {
+      c.style.opacity = 1;
+      c.style.transform = "translateY(0)";
+    }, i * APP_CONFIG.ui.staggerDelay);
+  });
+}
+
+// ===== EXPORT =====
+export { APP_CONFIG, AppState, renderKPIs, renderLeadsTable, renderChartWithRealData };
+console.info("🚀 ALSHAM 360° PRIMA Main Script v2.1.0 READY");
