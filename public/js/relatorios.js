@@ -1,27 +1,23 @@
 /**
- * ALSHAM 360° PRIMA - Sistema de Relatórios V2.1
- * Integrado com fix-imports.js e auth.js v5.2
+ * ALSHAM 360° PRIMA - Sistema de Relatórios V2.2
+ * Integrado com supabase.js (multi-tenant) + fix-imports.js
  *
- * @version 2.1.0 - NASA 10/10 FINAL BUILD
+ * @version 2.2.0 - NASA 10/10 FINAL BUILD
  * @author ALSHAM
  */
 
+import {
+  getCurrentSession,
+  getCurrentOrgId,
+  genericSelect
+} from "/src/lib/supabase.js";
+
 function initializeReportsSystem() {
-  if (typeof window.waitFor !== "function") {
-    console.log("⏳ Aguardando dependências...");
-    setTimeout(initializeReportsSystem, 500);
-    return;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeReports);
+  } else {
+    initializeReports();
   }
-  window.waitFor(
-    () => window.AlshamSupabase && window.showAuthNotification,
-    initializeReports,
-    { description: "AlshamSupabase e fix-imports", timeout: 10000 }
-  );
-}
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeReportsSystem);
-} else {
-  initializeReportsSystem();
 }
 
 const REPORTS_CONFIG = {
@@ -60,6 +56,9 @@ const reportsState = {
   lastUpdate: null
 };
 
+// ==========================
+// Inicialização
+// ==========================
 async function initializeReports() {
   try {
     console.log("📊 Inicializando sistema de relatórios...");
@@ -76,7 +75,6 @@ async function initializeReports() {
 
     await loadReportsData();
     renderReportsInterface();
-    setupEventListeners();
 
     showLoading(false);
     console.log("✅ Sistema de relatórios inicializado com sucesso");
@@ -84,18 +82,19 @@ async function initializeReports() {
   } catch (error) {
     console.error("❌ Erro ao inicializar relatórios:", error);
     showLoading(false);
-    handleError(error);
+    showError("Erro ao inicializar relatórios");
   }
 }
 
+// ==========================
+// Autenticação
+// ==========================
 async function checkAuthentication() {
   try {
-    if (window.AlshamAuth?.isAuthenticated) {
-      return { success: true, user: window.AlshamAuth.currentUser, orgId: "default-org" };
-    }
-    const session = await window.getCurrentSession?.();
+    const session = await getCurrentSession();
     if (session?.user) {
-      return { success: true, user: session.user, orgId: window.getDefaultOrgId?.() || "default-org" };
+      const orgId = await getCurrentOrgId();
+      return { success: true, user: session.user, orgId };
     }
     return { success: false };
   } catch (error) {
@@ -105,28 +104,29 @@ async function checkAuthentication() {
 }
 function redirectToLogin() {
   setTimeout(() => {
-    window.navigateTo?.("/login.html") || (window.location.href = "/login.html");
+    window.location.href = "/login.html";
   }, 1500);
 }
 
+// ==========================
+// Carregar Dados
+// ==========================
 async function loadReportsData() {
   try {
     reportsState.isLoading = true;
-    if (!window.genericSelect) {
-      console.warn("⚠️ genericSelect não disponível → usando dados demo");
-      loadDemoData();
-      return;
-    }
+
     const [leadsResult, oppsResult, activitiesResult] = await Promise.allSettled([
-      window.genericSelect("leads_crm", {}),
-      window.genericSelect("sales_opportunities", {}),
-      window.genericSelect("analytics_events", {})
+      genericSelect("leads_crm", { org_id: reportsState.orgId }),
+      genericSelect("sales_opportunities", { org_id: reportsState.orgId }),
+      genericSelect("analytics_events", { org_id: reportsState.orgId })
     ]);
+
     reportsState.rawData = {
       leads: leadsResult.value?.data || [],
       opportunities: oppsResult.value?.data || [],
       activities: activitiesResult.value?.data || []
     };
+
     processReportsData();
     console.log("✅ Dados de relatórios carregados do Supabase");
   } catch (error) {
@@ -138,6 +138,9 @@ async function loadReportsData() {
   }
 }
 
+// ==========================
+// Processamento
+// ==========================
 function processReportsData() {
   try {
     const leads = reportsState.rawData.leads;
@@ -157,7 +160,7 @@ function processReportsData() {
       total_revenue: totalRevenue,
       avg_deal_size: avgDealSize,
       active_opportunities: opportunities.filter(o => !["closed_won", "ganho", "perdido"].includes(o.stage || o.status)).length,
-      monthly_growth: 5.2 // simulado
+      monthly_growth: 5.2 // simulado por enquanto
     };
     processChartData();
   } catch (err) {
@@ -174,6 +177,9 @@ function processChartData() {
   };
 }
 
+// ==========================
+// Renderização
+// ==========================
 function renderReportsInterface() {
   renderKPICards();
   renderCharts();
@@ -199,6 +205,9 @@ function renderCharts() {
   reportsState.chartInstances.leads = new Chart(ctx, { type: "line", data: reportsState.processedData.chartData.leads });
 }
 
+// ==========================
+// Fallback Demo
+// ==========================
 function loadDemoData() {
   reportsState.rawData = {
     leads: [{ id: 1, status: "novo" }, { id: 2, status: "convertido" }],
@@ -208,6 +217,9 @@ function loadDemoData() {
   processReportsData();
 }
 
+// ==========================
+// Helpers
+// ==========================
 function formatValue(value, format) {
   if (format === "currency") return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   if (format === "percentage") return value.toFixed(1) + "%";
@@ -221,5 +233,11 @@ function showError(msg) {
   window.showToast?.(msg, "error") || alert(msg);
 }
 
+// ==========================
+// Export
+// ==========================
 window.ReportsSystem = { refresh: loadReportsData, getState: () => reportsState };
-console.log("📊 Sistema de Relatórios V2.1 pronto - alinhado com fix-imports");
+console.log("📊 Sistema de Relatórios V2.2 pronto - multi-tenant, Supabase OK");
+
+// Init
+initializeReportsSystem();
