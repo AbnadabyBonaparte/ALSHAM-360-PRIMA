@@ -1,150 +1,69 @@
-// /js/login.js
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Acesse o ALSHAM 360° PRIMA com segurança empresarial: login com email, senha ou provedores (Google, Microsoft, Apple)." />
 
-import {
-  supabase,
-  signInWithEmail,
-  signInWithProvider,
-  getCurrentSession,
-} from "/lib/supabase.js";
-
-// Seletores
-const form = document.getElementById("login-form");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginBtn = document.getElementById("login-btn");
-const errorMessage = document.getElementById("error-message");
-const successMessage = document.getElementById("success-message");
-
-const googleBtn = document.getElementById("google-login");
-const microsoftBtn = document.getElementById("microsoft-login");
-const togglePasswordBtn = document.getElementById("toggle-password");
-
-// ========================
-// Utilitários de mensagens
-// ========================
-function showError(msg) {
-  errorMessage.textContent = msg;
-  errorMessage.classList.remove("hidden");
-  successMessage.classList.add("hidden");
-}
-
-function showSuccess(msg) {
-  successMessage.textContent = msg;
-  successMessage.classList.remove("hidden");
-  errorMessage.classList.add("hidden");
-}
-
-function clearMessages() {
-  errorMessage.classList.add("hidden");
-  successMessage.classList.add("hidden");
-}
-
-// ========================
-// Toggle senha 👁️
-// ========================
-if (togglePasswordBtn) {
-  togglePasswordBtn.addEventListener("click", () => {
-    const isHidden = passwordInput.type === "password";
-    passwordInput.type = isHidden ? "text" : "password";
-    togglePasswordBtn.setAttribute("aria-pressed", isHidden ? "true" : "false");
-  });
-}
-
-// ========================
-// Login com Email/Senha
-// ========================
-if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearMessages();
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) {
-      showError("Preencha todos os campos.");
-      return;
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
+        }
+      }
     }
+  </script>
 
-    loginBtn.disabled = true;
-    loginBtn.textContent = "🔄 Entrando...";
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center">
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+  <!-- Container -->
+  <main class="w-full max-w-md bg-white rounded-lg shadow p-8">
+    <h1 class="text-2xl font-bold text-center text-primary mb-6">ALSHAM 360° — Login</h1>
 
-      if (error) throw error;
+    <!-- Formulário -->
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input id="email" type="email" class="mt-1 w-full border rounded px-3 py-2" required />
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+        <div class="relative">
+          <input id="password" type="password" class="mt-1 w-full border rounded px-3 py-2 pr-10" required />
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">👁️</button>
+        </div>
+      </div>
+      <button id="login-btn" type="submit" class="w-full bg-primary text-white py-2 rounded hover:bg-blue-700">
+        <span id="login-btn-text">Entrar</span>
+        <span id="login-spinner" class="hidden animate-spin ml-2">⏳</span>
+      </button>
+    </form>
 
-      showSuccess("✅ Login realizado com sucesso!");
-      localStorage.setItem("supabaseSession", JSON.stringify(data.session));
+    <!-- Feedback -->
+    <p id="error-message" class="hidden mt-4 text-sm text-red-600"></p>
+    <p id="success-message" class="hidden mt-4 text-sm text-green-600"></p>
 
-      // Redirecionar para dashboard
-      setTimeout(() => {
-        window.location.href = "/index.html";
-      }, 800);
-    } catch (err) {
-      console.error("Erro no login:", err);
-      showError(err.message || "Erro ao fazer login. Tente novamente.");
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = "Entrar";
-    }
-  });
-}
+    <!-- Providers -->
+    <div class="mt-6 space-y-2">
+      <button id="google-login" class="w-full border rounded py-2 hover:bg-gray-50">🔍 Entrar com Google</button>
+      <button id="microsoft-login" class="w-full border rounded py-2 hover:bg-gray-50">🪟 Entrar com Microsoft</button>
+    </div>
 
-// ========================
-// Login com Google
-// ========================
-if (googleBtn) {
-  googleBtn.addEventListener("click", async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/index.html`,
-        },
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error("Erro no login Google:", err);
-      showError("Erro ao conectar com Google.");
-    }
-  });
-}
+    <!-- Esqueci senha -->
+    <div class="mt-4 text-center">
+      <a href="/reset-password.html" class="text-sm text-primary hover:underline">Esqueci minha senha</a>
+    </div>
+  </main>
 
-// ========================
-// Login com Microsoft (Azure)
-// ========================
-if (microsoftBtn) {
-  microsoftBtn.addEventListener("click", async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "azure",
-        options: {
-          redirectTo: `${window.location.origin}/index.html`,
-        },
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error("Erro no login Microsoft:", err);
-      showError("Erro ao conectar com Microsoft.");
-    }
-  });
-}
-
-// ========================
-// Verificar sessão já existente
-// ========================
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const session = await getCurrentSession();
-    if (session) {
-      console.log("✅ Sessão existente encontrada, redirecionando...");
-      window.location.href = "/index.html";
-    }
-  } catch (err) {
-    console.warn("Nenhuma sessão ativa:", err.message);
-  }
-});
+  <!-- Script oficial de login -->
+  <script type="module" src="/js/login.js"></script>
+</body>
+</html>
