@@ -31,8 +31,11 @@
     }
   </script>
 
-  <!-- CSS -->
+  <!-- CSS & Favicons -->
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col items-center justify-center">
 
@@ -43,7 +46,10 @@
   <div class="bg-white p-8 rounded-xl shadow-md text-center max-w-md">
     <h1 class="text-2xl font-bold text-gray-900 mb-4">Encerrar Sessão</h1>
     <p class="text-gray-600 mb-6">Deseja realmente sair da sua conta?</p>
-    <button id="logout-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg">
+    <button 
+      id="logout-button" 
+      aria-label="Encerrar sessão com segurança"
+      class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg">
       🚪 Sair com segurança
     </button>
   </div>
