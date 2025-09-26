@@ -2,7 +2,7 @@
  * 📊 ALSHAM 360° PRIMA - Dashboard Unificado (KPIs + Gráficos + Realtime)
  * Produção final multi-tenant com supabase.js
  *
- * @version 7.1.0 - PRODUÇÃO NASA 10/10
+ * @version 7.2.0 - PRODUÇÃO NASA 10/10
  * @author
  *   ALSHAM Development Team
  */
@@ -23,6 +23,7 @@ class AuthManager {
     this.currentUser = null;
     this.currentProfile = null;
     this.isAuthenticated = false;
+    this.orgId = null;
   }
 
   async checkAuth() {
@@ -33,13 +34,20 @@ class AuthManager {
       this.currentUser = session.user;
       this.isAuthenticated = true;
 
-      const orgId = await getCurrentOrgId();
+      // 🔥 Garantir orgId sempre
+      let orgId = await getCurrentOrgId();
+      if (!orgId) {
+        orgId = localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
+      }
+      this.orgId = orgId;
+      localStorage.setItem("alsham_org_id", orgId);
+
       const { data } = await genericSelect("user_profiles", { user_id: session.user.id, org_id: orgId });
       this.currentProfile = data?.[0] || null;
 
       return { authenticated: true, user: this.currentUser, profile: this.currentProfile, orgId };
     } catch (error) {
-      console.error("Erro crítico na autenticação:", error);
+      console.error("🚨 Erro crítico na autenticação:", error);
       return { authenticated: false, error: error.message };
     }
   }
@@ -51,6 +59,8 @@ class AuthManager {
       this.currentUser = null;
       this.currentProfile = null;
       this.isAuthenticated = false;
+      this.orgId = null;
+      localStorage.removeItem("alsham_org_id");
       window.location.href = "/login.html";
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
@@ -67,14 +77,22 @@ class DataManager {
   }
 
   async getLeads(limit = 100) {
-    const orgId = this.auth.currentProfile?.org_id || (await getCurrentOrgId());
-    const { data } = await genericSelect("leads_crm", { org_id: orgId }, { limit });
+    const orgId = this.auth.orgId || "DEFAULT_ORG_ID";
+    const { data, error } = await genericSelect("leads_crm", { org_id: orgId }, { limit });
+    if (error) {
+      console.error("Erro ao carregar leads:", error.message);
+      return { success: false, data: [] };
+    }
     return { success: true, data: data || [] };
   }
 
   async getSalesOpportunities() {
-    const orgId = this.auth.currentProfile?.org_id || (await getCurrentOrgId());
-    const { data } = await genericSelect("sales_opportunities", { org_id: orgId });
+    const orgId = this.auth.orgId || "DEFAULT_ORG_ID";
+    const { data, error } = await genericSelect("sales_opportunities", { org_id: orgId });
+    if (error) {
+      console.error("Erro ao carregar oportunidades:", error.message);
+      return { success: false, data: [] };
+    }
     return { success: true, data: data || [] };
   }
 }
@@ -122,9 +140,7 @@ class DashboardApp {
   }
 
   setupRealtime() {
-    const orgId = this.auth.currentProfile?.org_id;
-    if (!orgId) return;
-
+    const orgId = this.auth.orgId || "DEFAULT_ORG_ID";
     subscribeToTable("leads_crm", orgId, () => this.refresh());
     subscribeToTable("sales_opportunities", orgId, () => this.refresh());
   }
