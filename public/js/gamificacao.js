@@ -1,8 +1,8 @@
 /**
- * 🎮 ALSHAM 360° PRIMA - Sistema de Gamificação V2.2
+ * 🎮 ALSHAM 360° PRIMA - Sistema de Gamificação V3.0
  * Produção final alinhada com supabase.js + auth.js
  *
- * @version 2.2.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
+ * @version 3.0.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
  * @author
  *   ALSHAM Development Team
  */
@@ -163,7 +163,7 @@ async function loadGamificationData() {
     console.log("✅ Dados de gamificação carregados do Supabase");
   } catch (error) {
     console.error("❌ Erro ao carregar gamificação:", error);
-    loadDemoData();
+    showError("Erro ao carregar dados de gamificação");
   } finally {
     gamificationState.isLoading = false;
   }
@@ -213,45 +213,112 @@ function formatTimeAgo(dateString) {
 }
 
 // ==============================
-// DEMO
-// ==============================
-function loadDemoData() {
-  console.log("📋 Carregando dados demo gamificação...");
-  gamificationState.userPoints = 1250;
-  gamificationState.userLevel = calculateUserLevel(1250);
-  gamificationState.userBadges = [{ id: 1, badge_id: 1, earned_at: new Date().toISOString() }];
-  gamificationState.availableBadges = [
-    { id: 1, name: "Primeiro Lead", description: "Criou seu primeiro lead", tier: "bronze", points_required: 10 },
-    { id: 2, name: "Vendedor Ativo", description: "Fez 10 ligações", tier: "silver", points_required: 50 }
-  ];
-  gamificationState.leaderboard = [
-    { user_id: "demo1", user_name: "João Silva", total_points: 2500 },
-    { user_id: "current", user_name: "Você", total_points: 1250 }
-  ];
-  gamificationState.recentActivities = [
-    { id: 1, action: "lead_created", points_awarded: 10, created_at: new Date(Date.now() - 3600000).toISOString(), actionConfig: GAMIFICATION_CONFIG.POINT_ACTIONS.lead_created, timeAgo: "1h atrás" }
-  ];
-  window.showToast?.("Usando dados demo", "warning");
-}
-
-// ==============================
 // INTERFACE
 // ==============================
 function renderGamificationInterface() {
-  try {
-    renderHeader();
-    renderStats();
-    renderProgress();
-    renderBadges();
-    renderLeaderboard();
-    renderRecentActivities();
-    console.log("🎨 Interface gamificação renderizada");
-  } catch (error) {
-    console.error("❌ Erro render interface:", error);
-    showError("Erro render interface");
-  }
+  renderHeader();
+  renderStats();
+  renderProgress();
+  renderBadges();
+  renderLeaderboard();
+  renderRecentActivities();
+  console.log("🎨 Interface gamificação renderizada");
 }
-// (Funções renderHeader, renderStats, renderProgress, renderBadges, renderLeaderboard, renderRecentActivities devem estar no mesmo arquivo ou importadas)
+
+function renderHeader() {
+  const container = document.getElementById("gamification-header");
+  if (!container) return;
+  container.innerHTML = `
+    <h1 class="text-2xl font-bold">🎮 Gamificação</h1>
+    <p class="text-sm text-gray-600">Acompanhe seu progresso e conquistas</p>
+  `;
+}
+
+function renderStats() {
+  const container = document.getElementById("gamification-stats");
+  if (!container) return;
+  container.innerHTML = `
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded shadow">
+        <p>Pontos Totais</p>
+        <h2 class="text-xl font-bold">${gamificationState.userPoints}</h2>
+      </div>
+      <div class="bg-white p-4 rounded shadow">
+        <p>Nível Atual</p>
+        <h2 class="text-xl font-bold">${gamificationState.userLevel.name} ${gamificationState.userLevel.icon}</h2>
+      </div>
+      <div class="bg-white p-4 rounded shadow">
+        <p>Última Atualização</p>
+        <h2 class="text-xl">${gamificationState.lastUpdate?.toLocaleTimeString("pt-BR") || "-"}</h2>
+      </div>
+    </div>
+  `;
+}
+
+function renderProgress() {
+  const container = document.getElementById("gamification-progress");
+  if (!container) return;
+  const level = gamificationState.userLevel;
+  const nextLevel = GAMIFICATION_CONFIG.LEVELS.find(l => l.level === level.level + 1);
+  const progress = nextLevel
+    ? Math.min(100, ((gamificationState.userPoints - level.minPoints) / (nextLevel.minPoints - level.minPoints)) * 100)
+    : 100;
+  container.innerHTML = `
+    <div class="bg-white p-4 rounded shadow">
+      <p>Progresso para o próximo nível</p>
+      <div class="w-full bg-gray-200 rounded h-4 mt-2">
+        <div class="bg-blue-500 h-4 rounded" style="width: ${progress}%"></div>
+      </div>
+      <p class="text-sm mt-1">${progress.toFixed(1)}%</p>
+    </div>
+  `;
+}
+
+function renderBadges() {
+  const container = document.getElementById("gamification-badges");
+  if (!container) return;
+  if (!gamificationState.availableBadges.length) {
+    container.innerHTML = `<p class="text-gray-500">Nenhuma badge disponível</p>`;
+    return;
+  }
+  container.innerHTML = gamificationState.availableBadges.map(badge => `
+    <div class="p-3 border rounded shadow bg-white">
+      <p class="font-bold">${badge.name} ${GAMIFICATION_CONFIG.BADGE_TIERS[badge.tier]?.icon || ""}</p>
+      <p class="text-sm text-gray-600">${badge.description}</p>
+      <p class="text-xs text-gray-500">Requer ${badge.points_required} pontos</p>
+    </div>
+  `).join("");
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById("gamification-leaderboard");
+  if (!container) return;
+  if (!gamificationState.leaderboard.length) {
+    container.innerHTML = `<p class="text-gray-500">Nenhum ranking disponível</p>`;
+    return;
+  }
+  container.innerHTML = gamificationState.leaderboard.map((entry, idx) => `
+    <div class="flex justify-between p-2 border-b">
+      <span>#${idx + 1} ${entry.user_name}</span>
+      <span>${entry.total_points} pts</span>
+    </div>
+  `).join("");
+}
+
+function renderRecentActivities() {
+  const container = document.getElementById("gamification-activities");
+  if (!container) return;
+  if (!gamificationState.recentActivities.length) {
+    container.innerHTML = `<p class="text-gray-500">Nenhuma atividade registrada</p>`;
+    return;
+  }
+  container.innerHTML = gamificationState.recentActivities.map(act => `
+    <div class="p-2 border-b text-sm">
+      <span>${act.actionConfig.description} (+${act.actionConfig.points})</span>
+      <span class="text-gray-500 ml-2">${act.timeAgo}</span>
+    </div>
+  `).join("");
+}
 
 // ==============================
 // AUTO-REFRESH
@@ -281,9 +348,32 @@ async function refreshGamificationData() {
 }
 function handleError(error) {
   console.error("Erro sistema gamificação:", error);
-  loadDemoData();
-  renderGamificationInterface();
-  showError("Carregando demo");
+  showError("Erro no sistema de gamificação");
+}
+
+// ==============================
+// FEEDBACK
+// ==============================
+function showLoading(show) {
+  let el = document.getElementById("gamification-loading");
+  if (show) {
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "gamification-loading";
+      el.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+      el.innerHTML = `
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <span class="text-gray-700">Carregando...</span>
+        </div>`;
+      document.body.appendChild(el);
+    }
+  } else {
+    el?.remove();
+  }
+}
+function showError(msg) {
+  window.showToast?.(msg, "error") || alert(msg);
 }
 
 // ==============================
@@ -292,11 +382,11 @@ function handleError(error) {
 window.GamificationSystem = {
   refresh: refreshGamificationData,
   getState: () => ({ ...gamificationState }),
-  version: "2.2.0"
+  version: "3.0.0"
 };
 window.refreshGamificationData = refreshGamificationData;
 
-console.log("🎮 Gamificação V2.2 carregada - multi-tenant Supabase");
+console.log("🎮 Gamificação V3.0 carregada - multi-tenant Supabase");
 
 // Init
 initializeGamificationSystem();
