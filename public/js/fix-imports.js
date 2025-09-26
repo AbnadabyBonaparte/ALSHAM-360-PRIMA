@@ -1,12 +1,12 @@
 /**
  * fix-imports.js - Correção para problemas de imports/exports
- * Alinhado com auth.js v5.2 e navigation.js v2.0
+ * Alinhado com auth.js v5.3, dashboard.js v7.2 e navigation.js v2.0
  *
- * @version 2.2.0 - FINAL INTEGRADO
- * @author ALSHAM
+ * @version 2.3.0 - FINAL PRODUÇÃO READY
+ * @autor ALSHAM Development Team
  */
 
-function waitForAlshamSupabase(callback, maxAttempts = 50) {
+function waitForAlshamSupabase(callback, maxAttempts = 25) {
   let attempts = 0;
   function check() {
     attempts++;
@@ -25,7 +25,10 @@ function waitForAlshamSupabase(callback, maxAttempts = 50) {
 }
 
 function createMockAlshamSupabase() {
-  console.warn("⚠️ Criando mock do AlshamSupabase");
+  console.warn("⚠️ Criando mock do AlshamSupabase (fallback)");
+
+  const fallbackOrgId = localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
+
   window.AlshamSupabase = {
     client: {
       auth: {
@@ -34,11 +37,18 @@ function createMockAlshamSupabase() {
       }
     },
     getCurrentSession: async () => ({ user: null }),
-    getCurrentOrgId: async () => "00000000-0000-0000-0000-000000000001",
-    getDefaultOrgId: () => "00000000-0000-0000-0000-000000000001",
+    getCurrentOrgId: async () => fallbackOrgId,
+    getDefaultOrgId: () => "DEFAULT_ORG_ID",
     getLeads: async () => ({ data: [], error: null }),
     signOut: async () => ({ error: null })
   };
+
+  // Registrar auditoria local
+  localStorage.setItem("alsham_fiximports_log", JSON.stringify({
+    createdAt: new Date().toISOString(),
+    reason: "Mock criado por timeout no carregamento do AlshamSupabase",
+    fallbackOrgId
+  }));
 }
 
 waitForAlshamSupabase(() => {
@@ -109,10 +119,10 @@ waitForAlshamSupabase(() => {
     }
 
     // ===== LOG =====
-    console.log("🔧 Fix-imports V2.2 aplicado com sucesso!");
+    console.log("🔧 Fix-imports V2.3 aplicado com sucesso!");
     window.dispatchEvent(
       new CustomEvent("fix-imports-ready", {
-        detail: { version: "2.2.0", timestamp: new Date().toISOString() }
+        detail: { version: "2.3.0", timestamp: new Date().toISOString() }
       })
     );
   } catch (error) {
@@ -121,4 +131,4 @@ waitForAlshamSupabase(() => {
   }
 });
 
-console.log("🔧 Fix-imports V2.2 FINAL carregado - aguardando AlshamSupabase...");
+console.log("🔧 Fix-imports V2.3 FINAL carregado - aguardando AlshamSupabase...");
