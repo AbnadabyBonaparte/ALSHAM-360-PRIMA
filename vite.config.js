@@ -23,7 +23,6 @@ export default defineConfig(({ mode }) => {
         input: {
           index: resolve(__dirname, 'index.html'),
           dashboard: resolve(__dirname, 'dashboard.html'),
-          leads: resolve(__dirname, 'leads.html'),
           leadsReal: resolve(__dirname, 'leads-real.html'),
           automacoes: resolve(__dirname, 'automacoes.html'),
           relatorios: resolve(__dirname, 'relatorios.html'),
