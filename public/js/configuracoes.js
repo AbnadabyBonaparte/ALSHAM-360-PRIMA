@@ -1,22 +1,22 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Configuration System V5.0 NASA 10/10 OPTIMIZED
+ * ALSHAM 360° PRIMA - Enterprise Configuration System V5.1 NASA 10/10 OPTIMIZED
  * Advanced configuration platform with real-time data integration and enterprise features
  *
- * @version 5.0.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
+ * @version 5.1.0 - NASA 10/10 OPTIMIZED (ES Modules + Vite Compatible)
  * @author ALSHAM
  * @license MIT
  */
 
 // ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
-const {
+import {
   getCurrentSession,
+  getCurrentOrgId,
   getUserProfile,
   genericUpdate,
   genericSelect,
   subscribeToTable,
-  createAuditLog,
-  healthCheck
-} = window.AlshamSupabase;
+  createAuditLog
+} from "/src/lib/supabase.js";
 
 // ===== DEPENDENCY VALIDATION SYSTEM =====
 function requireLib(libName, lib) {
@@ -93,14 +93,17 @@ document.addEventListener("DOMContentLoaded", initializeConfiguration);
 async function initializeConfiguration() {
   try {
     showNotification("⚙️ Carregando configurações...", "info");
+
     const auth = await authenticateUser();
     if (!auth.success) return redirectToLogin();
+
     configurationState.user = auth.user;
     configurationState.orgId = auth.orgId;
-    await healthCheckWithRetry();
+
     await loadConfigurationDataWithCache();
     renderConfigurationInterface();
     setupRealTimeSubscriptions();
+
     showNotification("✅ Configurações carregadas!", "success");
   } catch (e) {
     console.error("Erro init config:", e);
@@ -113,20 +116,13 @@ async function authenticateUser() {
   try {
     const session = await getCurrentSession();
     if (!session?.user) return { success: false };
-    return { success: true, user: session.user, orgId: session.user.user_metadata?.org_id || "default-org" };
-  } catch { return { success: false }; }
+    const orgId = await getCurrentOrgId();
+    return { success: true, user: session.user, orgId };
+  } catch {
+    return { success: false };
+  }
 }
 function redirectToLogin() { window.location.href = "/login.html"; }
-
-// ===== HEALTH CHECK =====
-async function healthCheckWithRetry(retries=3) {
-  for (let i=0; i<retries; i++) {
-    const ok = await healthCheck();
-    if (ok?.success) return true;
-    await new Promise(r => setTimeout(r, 1000));
-  }
-  throw new Error("HealthCheck falhou");
-}
 
 // ===== DATA LOAD =====
 async function loadConfigurationDataWithCache() {
@@ -201,11 +197,12 @@ function switchSection(section) { renderContent(section); }
 async function saveProfileData() {
   try {
     const name = document.getElementById("profile-name").value;
-    await genericUpdate("user_profiles", configurationState.user.id, { full_name: name });
-    await createAuditLog("PROFILE_UPDATED", { user_id: configurationState.user.id });
+    await genericUpdate("user_profiles", configurationState.user.id, { full_name: name }, configurationState.orgId);
+    await createAuditLog("PROFILE_UPDATED", { user_id: configurationState.user.id }, configurationState.user.id, configurationState.orgId);
     showNotification("Perfil atualizado com sucesso", "success");
     await loadConfigurationDataWithCache();
   } catch (e) {
+    console.error("Erro salvar perfil:", e);
     showNotification("Erro ao salvar perfil", "error");
   }
 }
@@ -229,7 +226,7 @@ window.AlshamConfiguration = {
   saveAll: saveAllConfiguration,
   switchSection,
   notify: showNotification,
-  version: "5.0.0",
+  version: "5.1.0",
   buildDate: new Date().toISOString()
 };
-console.log("⚙️ Enterprise Configuration System v5.0 pronto - ALSHAM 360° PRIMA");
+console.log("⚙️ Enterprise Configuration System v5.1 pronto - ALSHAM 360° PRIMA");
