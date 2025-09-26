@@ -1,22 +1,23 @@
 /**
- * ALSHAM 360° PRIMA - Sistema de Navegação Otimizado V2.0
- * Navegação integrada com auth.js (v5.2) e fix-imports.js
+ * ALSHAM 360° PRIMA - Sistema de Navegação Enterprise V2.1
+ * Integração com auth.js (v5.2) + fix-imports.js (v2.2)
  *
- * @version 2.0.1 - NASA 10/10 FINAL BUILD
- * @author ALSHAM
+ * @version 2.1.0 - NASA 10/10 FINAL PRODUCTION
+ * @author
+ *   ALSHAM Development Team
  *
  * ✅ FUNCIONALIDADES:
- * - Navegação entre páginas
- * - Verificação de acesso via AlshamAuth
- * - Exceção para rotas públicas (login/register)
- * - Menu mobile responsivo
- * - Eventos globais: navigation-ready
+ * - Navegação entre páginas com verificação de rota
+ * - Integração com AlshamAuth.initializeAuth()
+ * - Redirecionamento seguro (login/register públicos)
+ * - Menu mobile responsivo (Esc + clique fora)
+ * - Eventos globais: navigation-ready + navigation-change
  */
 
-import { AlshamAuth, checkRouteAccess } from "/js/auth.js";
+import { AlshamAuth, checkRouteAccess, initializeAuth } from "/js/auth.js";
 
 // ===== CONFIGURAÇÃO DE ROTAS =====
-const ROUTES = {
+const ROUTES = Object.freeze({
   dashboard: "/index.html",
   leads: "/leads-real.html",
   automacoes: "/automacoes.html",
@@ -24,105 +25,94 @@ const ROUTES = {
   gamificacao: "/gamificacao.html",
   configuracoes: "/configuracoes.html",
   login: "/login.html",
-  register: "/register.html"
-};
+  register: "/register.html",
+});
 
-// ===== ESTADO DA NAVEGAÇÃO =====
+// ===== ESTADO =====
 const navigationState = {
   currentPage: null,
   isAuthenticated: false,
   isInitialized: false,
-  mobileMenuOpen: false
+  mobileMenuOpen: false,
 };
 
 // ===== AGUARDAR DEPENDÊNCIAS =====
-function waitForFixImports(callback) {
+function waitForDependencies(callback) {
   if (window.AlshamAuth?.checkRouteAccess) {
-    console.log("✅ Fix-imports + Auth já carregados, inicializando navegação");
+    console.log("✅ Auth + Fix-imports carregados, iniciando navegação");
     callback();
   } else {
-    console.log("⏳ Aguardando fix-imports/auth...");
-    window.addEventListener("fix-imports-ready", () => {
-      console.log("✅ Fix-imports pronto, inicializando navegação");
-      callback();
-    });
+    console.log("⏳ Aguardando auth/fix-imports...");
+    window.addEventListener("fix-imports-ready", () => callback());
     setTimeout(() => {
-      console.log("⚠️ Timeout aguardando fix-imports, inicializando mesmo assim");
+      console.warn("⚠️ Timeout aguardando auth, inicializando mesmo assim");
       callback();
-    }, 3000);
+    }, 5000);
   }
 }
 
-// ===== INICIALIZAÇÃO =====
+// ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
-  waitForFixImports(() => {
+  waitForDependencies(async () => {
     try {
+      await initializeAuth();
       initializeNavigation();
-      console.log("✅ Sistema de navegação inicializado");
-    } catch (error) {
-      console.error("❌ Erro ao inicializar navegação:", error);
+      console.log("✅ Navigation System v2.1 inicializado");
+    } catch (err) {
+      console.error("❌ Erro na inicialização da navegação:", err);
     }
   });
 });
 
 function initializeNavigation() {
   detectCurrentPage();
-  checkAuthentication();
+  if (!checkAuthentication()) return;
+
   setupMobileMenu();
   setupEventListeners();
   updateNavigationState();
-  navigationState.isInitialized = true;
 
-  window.dispatchEvent(
-    new CustomEvent("navigation-ready", {
-      detail: { currentPage: navigationState.currentPage }
-    })
-  );
+  navigationState.isInitialized = true;
+  window.dispatchEvent(new CustomEvent("navigation-ready", {
+    detail: { currentPage: navigationState.currentPage },
+  }));
 }
 
-// ===== DETECÇÃO DE PÁGINA =====
+// ===== DETECTA PÁGINA =====
 function detectCurrentPage() {
   const currentPath = window.location.pathname;
-  if (currentPath.includes("leads-real")) {
-    navigationState.currentPage = "leads";
-  } else if (currentPath.includes("automacoes")) {
-    navigationState.currentPage = "automacoes";
-  } else if (currentPath.includes("relatorios")) {
-    navigationState.currentPage = "relatorios";
-  } else if (currentPath.includes("gamificacao")) {
-    navigationState.currentPage = "gamificacao";
-  } else if (currentPath.includes("configuracoes")) {
-    navigationState.currentPage = "configuracoes";
-  } else if (currentPath.includes("login")) {
-    navigationState.currentPage = "login";
-  } else if (currentPath.includes("register")) {
-    navigationState.currentPage = "register";
-  } else {
-    navigationState.currentPage = "dashboard";
-  }
-  console.log("📍 Página atual detectada:", navigationState.currentPage);
+  navigationState.currentPage =
+    Object.keys(ROUTES).find((key) =>
+      currentPath.includes(key.replace("dashboard", "index"))
+    ) || "dashboard";
+
+  console.log("📍 Página atual:", navigationState.currentPage);
   updatePageTitle();
 }
 
-// ===== VERIFICAÇÃO DE AUTENTICAÇÃO =====
+// ===== AUTH =====
 function checkAuthentication() {
   navigationState.isAuthenticated = AlshamAuth.isAuthenticated;
 
-  // Exceção: login e registro são públicos
-  if (!navigationState.isAuthenticated && !["login", "register"].includes(navigationState.currentPage)) {
-    console.warn("⚠️ Usuário não autenticado. Redirecionando para login...");
+  // Login e registro são públicos
+  if (
+    !navigationState.isAuthenticated &&
+    !["login", "register"].includes(navigationState.currentPage)
+  ) {
+    console.warn("⚠️ Usuário não autenticado → login");
     window.location.href = ROUTES.login;
     return false;
   }
 
-  // Verifica acesso da rota atual
+  // Verificar acesso
   if (!checkRouteAccess(navigationState.currentPage)) {
     console.warn("🚫 Acesso negado à rota:", navigationState.currentPage);
+    showAuthNotification?.("Acesso negado", "error");
     window.location.href = ROUTES.dashboard;
     return false;
   }
 
-  console.log("✅ Acesso liberado à rota:", navigationState.currentPage);
+  console.log("✅ Acesso liberado:", navigationState.currentPage);
   return true;
 }
 
@@ -132,22 +122,42 @@ function setupMobileMenu() {
   const menu = document.querySelector("#mobile-menu");
   if (!menuBtn || !menu) return;
 
-  menuBtn.addEventListener("click", () => {
-    navigationState.mobileMenuOpen = !navigationState.mobileMenuOpen;
-    menu.classList.toggle("hidden", !navigationState.mobileMenuOpen);
-    menuBtn.setAttribute("aria-expanded", navigationState.mobileMenuOpen);
+  menuBtn.addEventListener("click", () => toggleMobileMenu(menu, menuBtn));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && navigationState.mobileMenuOpen) {
+      toggleMobileMenu(menu, menuBtn, false);
+    }
+  });
+  document.addEventListener("click", (e) => {
+    if (
+      navigationState.mobileMenuOpen &&
+      !menu.contains(e.target) &&
+      !menuBtn.contains(e.target)
+    ) {
+      toggleMobileMenu(menu, menuBtn, false);
+    }
   });
 }
 
-// ===== LISTENERS =====
+function toggleMobileMenu(menu, btn, force) {
+  navigationState.mobileMenuOpen =
+    force ?? !navigationState.mobileMenuOpen;
+  menu.classList.toggle("hidden", !navigationState.mobileMenuOpen);
+  btn.setAttribute("aria-expanded", navigationState.mobileMenuOpen);
+}
+
+// ===== EVENTOS =====
 function setupEventListeners() {
   const navLinks = document.querySelectorAll("[data-route]");
-  navLinks.forEach(link => {
-    link.addEventListener("click", e => {
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
       e.preventDefault();
       const route = link.getAttribute("data-route");
       if (ROUTES[route]) {
         window.location.href = ROUTES[route];
+        window.dispatchEvent(new CustomEvent("navigation-change", {
+          detail: { from: navigationState.currentPage, to: route },
+        }));
       }
     });
   });
@@ -157,13 +167,13 @@ function setupEventListeners() {
 function updateNavigationState() {
   const userName = document.getElementById("user-name");
   if (userName && AlshamAuth.currentUser) {
-    userName.textContent = AlshamAuth.currentUser.email;
+    userName.textContent =
+      AlshamAuth.currentUser.email || AlshamAuth.currentUser.id;
   }
 }
-
 function updatePageTitle() {
   document.title = `ALSHAM 360° PRIMA - ${navigationState.currentPage}`;
 }
 
 // ===== EXPORT =====
-export { initializeNavigation, navigationState };
+export { initializeNavigation, navigationState, ROUTES };
