@@ -1,15 +1,24 @@
 /**
- * 🤖 ALSHAM 360° PRIMA - Sistema de Automações V2.0
- * Produção final alinhada com fix-imports + auth.js
+ * 🤖 ALSHAM 360° PRIMA - Sistema de Automações V2.1
+ * Produção final alinhada com supabase.js + auth.js
  *
- * @version 2.0.0 - PRODUÇÃO NASA 10/10
+ * @version 2.1.0 - PRODUÇÃO NASA 10/10 MULTI-TENANT
  * @author
  *   ALSHAM Development Team
  */
 
-// ===== CONFIGURAÇÃO GLOBAL =====
+import {
+  getCurrentSession,
+  getCurrentOrgId,
+  genericSelect,
+  subscribeToTable
+} from "/src/lib/supabase.js";
+
+// ==============================
+// CONFIGURAÇÃO GLOBAL
+// ==============================
 const ALSHAM_AUTOMATION_CONFIG = {
-  version: "2.0.0",
+  version: "2.1.0",
   triggerTypes: [
     { value: "lead_created", label: "👤 Lead Criado", icon: "🆕", category: "leads" },
     { value: "lead_status_changed", label: "📊 Status do Lead Alterado", icon: "🔄", category: "leads" },
@@ -47,25 +56,22 @@ const ALSHAM_AUTOMATION_CONFIG = {
   realtime: { enabled: true, refreshInterval: 10000 }
 };
 
-// ===== ESTADO GLOBAL =====
+// ==============================
+// ESTADO GLOBAL
+// ==============================
 const alshamAutomationState = {
   user: null,
   orgId: null,
   automationRules: [],
   executionHistory: [],
   logs: [],
-  executionStats: {},
-  performanceMetrics: {},
-  charts: {},
-  currentModal: null,
-  isLoading: false,
-  filters: { status: "", category: "", dateRange: "", search: "" },
-  pagination: { current: 1, perPage: 20, total: 0 },
-  subscriptions: [],
-  lastUpdate: null
+  lastUpdate: null,
+  isLoading: false
 };
 
-// ===== INICIALIZAÇÃO =====
+// ==============================
+// INICIALIZAÇÃO
+// ==============================
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     showLoading(true, "🤖 Carregando Sistema de Automações...");
@@ -74,6 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       redirectToLogin();
       return;
     }
+
     alshamAutomationState.user = authResult.user;
     alshamAutomationState.orgId = authResult.orgId;
 
@@ -90,38 +97,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ===== AUTENTICAÇÃO =====
+// ==============================
+// AUTENTICAÇÃO
+// ==============================
 async function authenticateUser() {
   try {
-    if (window.AlshamAuth?.isAuthenticated) {
-      return { success: true, user: window.AlshamAuth.currentUser, orgId: "default-org" };
-    }
-    const session = await window.getCurrentSession?.();
+    const session = await getCurrentSession();
     if (!session?.user) return { success: false };
-    const orgId = window.getDefaultOrgId ? window.getDefaultOrgId() : "default-org";
+    const orgId = await getCurrentOrgId();
     return { success: true, user: session.user, orgId };
   } catch (e) {
     return { success: false, error: e };
   }
 }
 function redirectToLogin() {
-  window.navigateTo?.("login") || (window.location.href = "/login.html");
+  window.location.href = "/login.html";
 }
 
-// ===== CARREGAR DADOS =====
+// ==============================
+// CARREGAR DADOS
+// ==============================
 async function loadAutomationData() {
   try {
     alshamAutomationState.isLoading = true;
-    if (!window.genericSelect) {
-      console.warn("⚠️ genericSelect ausente, carregando demo...");
-      loadDemoData();
-      return;
-    }
 
     const [rules, executions, logs] = await Promise.allSettled([
-      window.genericSelect("automation_rules", { org_id: alshamAutomationState.orgId }),
-      window.genericSelect("automation_executions", { org_id: alshamAutomationState.orgId }),
-      window.genericSelect("logs_automacao", { org_id: alshamAutomationState.orgId })
+      genericSelect("automation_rules", { org_id: alshamAutomationState.orgId }),
+      genericSelect("automation_executions", { org_id: alshamAutomationState.orgId }),
+      genericSelect("logs_automacao", { org_id: alshamAutomationState.orgId })
     ]);
 
     alshamAutomationState.automationRules = rules.value?.data || [];
@@ -138,7 +141,9 @@ async function loadAutomationData() {
   }
 }
 
-// ===== DEMO =====
+// ==============================
+// DEMO
+// ==============================
 function loadDemoData() {
   console.log("📋 Carregando dados demo automações...");
   alshamAutomationState.automationRules = [
@@ -153,9 +158,12 @@ function loadDemoData() {
   window.showToast?.("Usando dados demo automações", "warning");
 }
 
-// ===== REALTIME =====
+// ==============================
+// REALTIME
+// ==============================
 function setupRealtimeSubscriptions() {
   if (!ALSHAM_AUTOMATION_CONFIG.realtime.enabled) return;
+
   if (typeof subscribeToTable === "function") {
     subscribeToTable("automation_rules", alshamAutomationState.orgId, () => loadAutomationData());
     subscribeToTable("automation_executions", alshamAutomationState.orgId, () => loadAutomationData());
@@ -166,7 +174,9 @@ function setupRealtimeSubscriptions() {
   }
 }
 
-// ===== INTERFACE =====
+// ==============================
+// INTERFACE
+// ==============================
 function setupAutomationInterface() {
   renderRulesTable();
   renderExecutions();
@@ -209,7 +219,9 @@ function renderLogs() {
   `).join("") || `<p class="text-gray-500">Nenhum log encontrado</p>`;
 }
 
-// ===== OPERAÇÕES =====
+// ==============================
+// OPERAÇÕES
+// ==============================
 function toggleRule(ruleId) {
   const rule = alshamAutomationState.automationRules.find(r => r.id === ruleId);
   if (!rule) return;
@@ -219,7 +231,9 @@ function toggleRule(ruleId) {
 }
 function refreshData() { loadAutomationData(); }
 
-// ===== FEEDBACK =====
+// ==============================
+// FEEDBACK
+// ==============================
 function showLoading(show, message = "Carregando...") {
   let el = document.getElementById("automation-loading");
   if (show) {
@@ -244,15 +258,15 @@ function showLoading(show, message = "Carregando...") {
 function showSuccess(m) { window.showToast?.(m, "success") || alert(m); }
 function showError(m) { window.showToast?.(m, "error") || alert(m); }
 
-// ===== EXPORT GLOBAL =====
+// ==============================
+// EXPORT GLOBAL
+// ==============================
 window.AutomationSystem = {
   getState: () => ({ ...alshamAutomationState }),
   refresh: refreshData,
-  createRule: () => alert("Criar regra em desenvolvimento"),
-  deleteRule: () => alert("Deletar regra em desenvolvimento"),
   toggleRule,
   integrations: ALSHAM_AUTOMATION_CONFIG.integrations,
   version: ALSHAM_AUTOMATION_CONFIG.version
 };
 
-console.log("🤖 Automations V2.0 carregado - compatível fix-imports");
+console.log("🤖 Automations V2.1 carregado - multi-tenant Supabase");
