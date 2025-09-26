@@ -66,10 +66,30 @@
   </nav>
 
   <!-- Conteúdo -->
-  <main id="main-content" class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Relatórios</h1>
+  <main id="main-content" class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold text-gray-900">📊 Relatórios</h1>
 
-    <!-- Layout dinâmico é renderizado via relatorios.js -->
+    <!-- KPIs -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Indicadores</h2>
+      <div id="kpi-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- Gráficos -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Evolução de Leads</h2>
+      <div class="bg-white rounded-xl shadow p-6">
+        <canvas id="leads-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- Futuras seções (Receita, Funil, Fontes) serão renderizadas dinamicamente pelo JS -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Outros Gráficos</h2>
+      <div id="extra-charts" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Placeholder para renderização dinâmica -->
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
