@@ -1,81 +1,100 @@
 /**
- * ALSHAM 360° PRIMA - Reset Password System V1.0
- * Fluxo seguro de redefinição de senha integrado ao Supabase
+ * 🔒 ALSHAM 360° PRIMA - Reset Password System v1.0.0
+ * Sistema enterprise para redefinição de senha via Supabase
  *
- * @version 1.0.0 - Produção Ready
+ * @version 1.0.0 - NASA 10/10 READY
  * @author
  *   ALSHAM Development Team
  */
 
 import { resetPassword } from "/src/lib/supabase.js";
 
-// ===== STATE =====
+// ==============================
+// STATE
+// ==============================
 const resetState = {
-  email: "",
   isLoading: false,
   lastRequest: null
 };
 
-// ===== UI HELPERS =====
-function showMessage(msg, type = "success") {
-  const msgBox = document.getElementById("reset-message");
-  const errBox = document.getElementById("reset-error");
-  msgBox.classList.add("hidden");
-  errBox.classList.add("hidden");
-
-  if (type === "success") {
-    msgBox.textContent = msg;
-    msgBox.classList.remove("hidden");
-  } else {
-    errBox.textContent = msg;
-    errBox.classList.remove("hidden");
-  }
+// ==============================
+// HELPERS
+// ==============================
+function showMessage(msg, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const toast = document.createElement("div");
+  const colors = {
+    success: "bg-green-500",
+    error: "bg-red-500",
+    info: "bg-blue-500"
+  };
+  toast.className = `${colors[type] || "bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
 }
+
 function showLoading(show) {
+  resetState.isLoading = show;
   const btn = document.querySelector("#reset-form button[type='submit']");
-  if (!btn) return;
-  btn.disabled = show;
-  btn.textContent = show ? "⏳ Enviando..." : "Enviar link de redefinição";
+  if (btn) btn.disabled = show;
 }
 
-// ===== CORE =====
-async function handleReset(e) {
+// ==============================
+// HANDLER
+// ==============================
+async function handleResetPassword(e) {
   e.preventDefault();
-  const emailInput = document.getElementById("email");
-  if (!emailInput) return;
 
-  resetState.email = emailInput.value.trim();
-  if (!resetState.email) {
-    showMessage("⚠️ Digite um e-mail válido.", "error");
+  const email = document.getElementById("email")?.value.trim();
+  const msg = document.getElementById("reset-message");
+  const err = document.getElementById("reset-error");
+
+  msg.classList.add("hidden");
+  err.classList.add("hidden");
+
+  if (!email) {
+    err.textContent = "⚠️ Por favor, insira um e-mail válido.";
+    err.classList.remove("hidden");
     return;
   }
 
-  showLoading(true);
   try {
-    const { error } = await resetPassword(resetState.email);
+    showLoading(true);
+    const { error } = await resetPassword(email);
     if (error) throw error;
 
+    msg.textContent = "✅ Um link de redefinição foi enviado para seu e-mail.";
+    msg.classList.remove("hidden");
+    showMessage("Link enviado para o e-mail informado", "success");
     resetState.lastRequest = new Date();
-    showMessage("✅ Um link de redefinição foi enviado para seu e-mail.", "success");
-  } catch (err) {
-    console.error("❌ Erro redefinição:", err);
-    showMessage("⚠️ Erro ao enviar link: " + (err.message || "desconhecido"), "error");
+  } catch (ex) {
+    console.error("❌ Erro reset-password:", ex);
+    err.textContent = "⚠️ Erro ao enviar link: " + (ex.message || "desconhecido");
+    err.classList.remove("hidden");
+    showMessage("Erro ao enviar link de redefinição", "error");
   } finally {
     showLoading(false);
   }
 }
 
-// ===== INIT =====
+// ==============================
+// INIT
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("reset-form");
   if (form) {
-    form.addEventListener("submit", handleReset);
+    form.addEventListener("submit", handleResetPassword);
   }
-  console.log("🔒 Reset-Password.js carregado v1.0");
+  console.log("🔒 Reset Password System v1.0.0 pronto - ALSHAM 360° PRIMA");
 });
 
-// ===== EXPORT =====
+// ==============================
+// EXPORT
+// ==============================
 window.ResetPasswordSystem = {
+  submit: handleResetPassword,
   state: resetState,
-  reset: handleReset
+  version: "1.0.0"
 };
