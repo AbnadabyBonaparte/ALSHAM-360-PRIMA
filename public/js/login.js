@@ -162,9 +162,6 @@ function showSuccess(msg) {
     box.style.display = "block";
   }
 }
-function showWarning(msg) {
-  console.warn("⚠️", msg);
-}
 function announceToScreenReader(msg) {
   let announcer = document.getElementById("sr-announcer");
   if (!announcer) {
@@ -239,7 +236,7 @@ async function handleOAuthLogin(providerId) {
     const provider = LOGIN_CONFIG.OAUTH_PROVIDERS.find(p => p.id === providerId && p.enabled);
     if (!provider) throw new Error("Provedor OAuth inválido ou desabilitado");
     showLoading(true, `Entrando com ${provider.name}...`);
-    const { data, error } = await signInWithOAuth(providerId);
+    const { error } = await signInWithOAuth(providerId);
     if (error) throw error;
     showSuccess(`Login com ${provider.name} realizado!`);
     setTimeout(() => (window.location.href = "/index.html"), 1000);
@@ -259,7 +256,7 @@ async function handleBiometricLogin() {
       throw new Error("WebAuthn não suportado neste navegador");
     }
     showLoading(true, "Autenticando biometria...");
-    // Mock de autenticação biométrica
+    // Mock de autenticação biométrica → substituir por integração real com WebAuthn
     await new Promise(resolve => setTimeout(resolve, 1500));
     showSuccess("Login biométrico realizado!");
     setTimeout(() => (window.location.href = "/index.html"), 1000);
@@ -276,7 +273,7 @@ async function handleForgotPassword(email) {
       throw new Error("E-mail inválido");
     }
     showLoading(true, "Enviando link de redefinição...");
-    const { data, error } = await resetPassword(email);
+    const { error } = await resetPassword(email);
     if (error) throw error;
     showSuccess("Link de redefinição enviado para seu e-mail!");
   } catch (err) {
