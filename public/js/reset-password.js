@@ -1,100 +1,99 @@
 /**
- * 🔒 ALSHAM 360° PRIMA - Reset Password System v1.0.0
- * Sistema enterprise para redefinição de senha via Supabase
+ * 🔒 ALSHAM 360° PRIMA - Reset Password System V5.2.0 NASA 10/10 FINAL
+ * Sistema enterprise de redefinição de senha integrado ao Supabase.
  *
- * @version 1.0.0 - NASA 10/10 READY
- * @author
- *   ALSHAM Development Team
+ * @version 5.2.0 - PRODUÇÃO FINAL BUILD
+ * @license MIT
  */
 
-import { resetPassword } from "/src/lib/supabase.js";
+const { resetPassword, createAuditLog } = window.AlshamSupabase || {};
 
-// ==============================
-// STATE
-// ==============================
+// ===== STATE =====
 const resetState = {
   isLoading: false,
-  lastRequest: null
+  lastEmail: null
 };
 
-// ==============================
-// HELPERS
-// ==============================
-function showMessage(msg, type = "info") {
-  const container = document.getElementById("toast-container");
-  if (!container) return;
-  const toast = document.createElement("div");
-  const colors = {
-    success: "bg-green-500",
-    error: "bg-red-500",
-    info: "bg-blue-500"
-  };
-  toast.className = `${colors[type] || "bg-gray-700"} text-white px-4 py-2 rounded shadow mb-2`;
-  toast.textContent = msg;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+// ===== UI HELPERS =====
+function showMessage(id, msg, type = "info") {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove("hidden");
+
+  if (type === "error") {
+    el.className = "mt-4 text-sm text-red-600";
+  } else if (type === "success") {
+    el.className = "mt-4 text-sm text-green-600";
+  } else {
+    el.className = "mt-4 text-sm text-gray-600";
+  }
+}
+function clearMessages() {
+  ["reset-message", "reset-error"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+}
+function showLoading(btn, show) {
+  if (!btn) return;
+  btn.disabled = show;
+  btn.textContent = show ? "⏳ Enviando..." : "Enviar link de redefinição";
 }
 
-function showLoading(show) {
-  resetState.isLoading = show;
-  const btn = document.querySelector("#reset-form button[type='submit']");
-  if (btn) btn.disabled = show;
+// ===== VALIDATION =====
+function validateEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
 }
 
-// ==============================
-// HANDLER
-// ==============================
-async function handleResetPassword(e) {
+// ===== CORE =====
+async function handlePasswordReset(e) {
   e.preventDefault();
+  clearMessages();
 
-  const email = document.getElementById("email")?.value.trim();
-  const msg = document.getElementById("reset-message");
-  const err = document.getElementById("reset-error");
+  const emailInput = document.getElementById("email");
+  const btn = e.target.querySelector("button[type='submit']");
+  const email = emailInput?.value?.trim();
 
-  msg.classList.add("hidden");
-  err.classList.add("hidden");
-
-  if (!email) {
-    err.textContent = "⚠️ Por favor, insira um e-mail válido.";
-    err.classList.remove("hidden");
+  if (!validateEmail(email)) {
+    showMessage("reset-error", "⚠️ Insira um e-mail válido.", "error");
     return;
   }
 
+  showLoading(btn, true);
+  resetState.isLoading = true;
+  resetState.lastEmail = email;
+
   try {
-    showLoading(true);
     const { error } = await resetPassword(email);
     if (error) throw error;
 
-    msg.textContent = "✅ Um link de redefinição foi enviado para seu e-mail.";
-    msg.classList.remove("hidden");
-    showMessage("Link enviado para o e-mail informado", "success");
-    resetState.lastRequest = new Date();
-  } catch (ex) {
-    console.error("❌ Erro reset-password:", ex);
-    err.textContent = "⚠️ Erro ao enviar link: " + (ex.message || "desconhecido");
-    err.classList.remove("hidden");
-    showMessage("Erro ao enviar link de redefinição", "error");
+    showMessage("reset-message", "✅ Um link de redefinição foi enviado para seu e-mail.", "success");
+    await createAuditLog?.("PASSWORD_RESET_REQUEST", { email });
+  } catch (err) {
+    console.error("❌ Erro redefinição:", err);
+    showMessage("reset-error", "⚠️ Erro ao enviar link: " + (err.message || "desconhecido"), "error");
+    await createAuditLog?.("PASSWORD_RESET_FAILURE", { email, reason: err.message });
   } finally {
-    showLoading(false);
+    showLoading(btn, false);
+    resetState.isLoading = false;
   }
 }
 
-// ==============================
-// INIT
-// ==============================
+// ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("reset-form");
   if (form) {
-    form.addEventListener("submit", handleResetPassword);
+    form.addEventListener("submit", handlePasswordReset);
   }
-  console.log("🔒 Reset Password System v1.0.0 pronto - ALSHAM 360° PRIMA");
+  console.log("🔒 Reset Password System v5.2.0 pronto - ALSHAM 360° PRIMA");
 });
 
-// ==============================
-// EXPORT
-// ==============================
+// ===== EXPORT =====
 window.ResetPasswordSystem = {
-  submit: handleResetPassword,
   state: resetState,
-  version: "1.0.0"
+  validateEmail,
+  handlePasswordReset
 };
+export default window.ResetPasswordSystem;
