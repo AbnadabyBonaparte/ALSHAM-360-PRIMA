@@ -1,8 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Authentication System V5.2 NASA 10/10
+ * ALSHAM 360° PRIMA - Enterprise Authentication System V5.3 NASA 10/10
  * Middleware de autenticação com gestão de sessão em tempo real
  *
- * @version 5.2.0 - FINAL BUILD READY
+ * @version 5.3.0 - FINAL BUILD READY
  * @author ALSHAM
  */
 
@@ -15,7 +15,7 @@ const {
   updateUserProfile,
   createAuditLog,
   genericSelect
-} = window.AlshamSupabase;
+} = window.AlshamSupabase || {};
 
 // ===== SISTEMA DE NOTIFICAÇÕES =====
 function showAuthNotification(message, type = "info") {
@@ -77,15 +77,22 @@ class AuthStateManager {
   async setAuthenticatedUser(user, profile, organization = null, badges = []) {
     this.currentUser = user;
     this.currentProfile = profile;
-    this.currentOrganization = organization;
+
+    // 🔥 Sempre garantir que exista um orgId válido
+    const orgId = organization?.id || localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
+    this.currentOrganization = orgId;
+
+    // Persistir no localStorage
+    localStorage.setItem("alsham_org_id", orgId);
+
     this.userBadges = badges;
     this.isAuthenticated = true;
     this.sessionExpiry = new Date(user.expires_at || Date.now() + 3600000);
 
     await this.persistAuthState();
     this.setupSessionRefresh();
-    this.notifyListeners("AUTHENTICATED", { user, profile, organization, badges });
-    console.log("✅ Usuário autenticado:", user.email);
+    this.notifyListeners("AUTHENTICATED", { user, profile, organization: orgId, badges });
+    console.log("✅ Usuário autenticado:", user.email, "| Org:", orgId);
   }
 
   async clearAuthenticatedUser() {
@@ -112,7 +119,7 @@ class AuthStateManager {
         profile: this.currentProfile,
         organization: this.currentOrganization,
         sessionExpiry: this.sessionExpiry?.toISOString(),
-        version: "5.2.0"
+        version: "5.3.0"
       };
       localStorage.setItem("alsham_auth_state", JSON.stringify(authState));
     } catch (err) {
@@ -129,13 +136,13 @@ class AuthStateManager {
       if (parsed.isAuthenticated && parsed.user) {
         this.currentUser = parsed.user;
         this.currentProfile = parsed.profile;
-        this.currentOrganization = parsed.organization;
+        this.currentOrganization = parsed.organization || localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
         this.isAuthenticated = true;
         this.sessionExpiry = parsed.sessionExpiry
           ? new Date(parsed.sessionExpiry)
           : new Date(Date.now() + 3600000);
         this.setupSessionRefresh();
-        console.log("♻️ Sessão restaurada do localStorage");
+        console.log("♻️ Sessão restaurada do localStorage | Org:", this.currentOrganization);
         return true;
       }
     } catch (err) {
@@ -275,4 +282,4 @@ export {
 };
 export default AlshamAuth;
 
-console.log("🔐 Enterprise Authentication v5.2.0 - ALSHAM 360° PRIMA");
+console.log("🔐 Enterprise Authentication v5.3.0 - ALSHAM 360° PRIMA");
