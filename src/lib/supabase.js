@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.2 (Produção)
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.3 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------- 
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.2',
+      'X-Client-Info': 'alsham-360-prima@unified-1.3',
       'X-Environment':
         (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
@@ -68,9 +68,7 @@ function handleError(err, context = 'supabase_operation') {
 }
 
 function isValidUUID(uuid) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    uuid
-  );
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
 }
 
 function generateUUID() {
@@ -110,11 +108,7 @@ function formatTimeAgo(date) {
 function sanitizeInput(input, opts = {}) {
   if (input === null || input === undefined) return opts.allowNull ? null : '';
   let v = typeof input === 'string' ? input : String(input);
-  v = v
-    .replace(/[<>]/g, '')
-    .replace(/javascript:/gi, '')
-    .replace(/on\w+=/gi, '')
-    .trim();
+  v = v.replace(/[<>]/g, '').replace(/javascript:/gi, '').replace(/on\w+=/gi, '').trim();
   if (opts.maxLength && v.length > opts.maxLength) v = v.substring(0, opts.maxLength);
   if (opts.removeSpecialChars) v = v.replace(/[^\w\s@.-]/g, '');
   if (opts.toLowerCase) v = v.toLowerCase();
@@ -167,6 +161,62 @@ function onAuthStateChange(callback) {
 }
 
 // -----------------------------------------------------------------------------
+// Funções de Auth Estendidas (para register.js e reset-password.js)
+// -----------------------------------------------------------------------------
+async function signUpWithEmail(email, password) {
+  try {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    return { data, success: true };
+  } catch (err) {
+    return { success: false, error: handleError(err, 'signUpWithEmail') };
+  }
+}
+
+async function resetPassword(email) {
+  try {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password.html`
+    });
+    if (error) throw error;
+    return { data, success: true };
+  } catch (err) {
+    return { success: false, error: handleError(err, 'resetPassword') };
+  }
+}
+
+async function checkEmailExists(email) {
+  try {
+    const { data, error } = await supabase.from('user_profiles').select('id').eq('email', email).maybeSingle();
+    if (error) throw error;
+    return !!data;
+  } catch (err) {
+    handleError(err, 'checkEmailExists');
+    return false;
+  }
+}
+
+async function createUserProfile(profile, orgIdParam = null) {
+  try {
+    const org_id = orgIdParam || (await getCurrentOrgId());
+    const payload = {
+      id: generateUUID(),
+      user_id: profile.user_id,
+      first_name: sanitizeInput(profile.first_name, { maxLength: 50 }),
+      last_name: sanitizeInput(profile.last_name, { maxLength: 50 }),
+      email: sanitizeInput(profile.email, { maxLength: 100, toLowerCase: true }),
+      org_id,
+      created_at: new Date().toISOString()
+    };
+    const { data, error } = await supabase.from('user_profiles').insert(payload).select();
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: handleError(err, 'createUserProfile') };
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Organização (org_id)
 // -----------------------------------------------------------------------------
 function getDefaultOrgId() {
@@ -178,12 +228,7 @@ async function getCurrentOrgId() {
     const session = await getCurrentSession();
     if (!session?.user) return getDefaultOrgId();
     const userId = session.user.id;
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('org_id')
-      .eq('user_id', userId)
-      .limit(1)
-      .maybeSingle();
+    const { data, error } = await supabase.from('user_profiles').select('org_id').eq('user_id', userId).limit(1).maybeSingle();
     if (error) return getDefaultOrgId();
     return isValidUUID(data?.org_id) ? data.org_id : getDefaultOrgId();
   } catch {
@@ -251,20 +296,10 @@ async function genericDelete(table, id, orgId = null) {
 async function getDashboardKPIs(orgIdParam = null) {
   try {
     const orgId = orgIdParam || (await getCurrentOrgId());
-    const { data, error } = await supabase
-      .from('dashboard_summary')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('updated_at', { ascending: false })
-      .limit(1);
+    const { data, error } = await supabase.from('dashboard_summary').select('*').eq('org_id', orgId).order('updated_at', { ascending: false }).limit(1);
     if (error) throw error;
     if (!data || data.length === 0) {
-      return {
-        leads_total: 0,
-        leads_novos: 0,
-        leads_qualificados: 0,
-        taxa_conversao: 0
-      };
+      return { leads_total: 0, leads_novos: 0, leads_qualificados: 0, taxa_conversao: 0 };
     }
     return data[0];
   } catch (err) {
@@ -275,12 +310,7 @@ async function getDashboardKPIs(orgIdParam = null) {
 async function getLeads(limit = 50, orgIdParam = null) {
   try {
     const orgId = orgIdParam || (await getCurrentOrgId());
-    const { data, error } = await supabase
-      .from('leads_crm')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    const { data, error } = await supabase.from('leads_crm').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(limit);
     if (error) throw error;
     return { data };
   } catch (err) {
@@ -295,16 +325,9 @@ async function createLead(payload, orgIdParam = null) {
 async function createAuditLog(action, details, userId = null, orgIdParam = null) {
   try {
     const org_id = orgIdParam || (await getCurrentOrgId());
-    const { data, error } = await supabase
-      .from('audit_log')
-      .insert({
-        action,
-        details,
-        user_id: userId,
-        org_id,
-        created_at: new Date().toISOString()
-      })
-      .select();
+    const { data, error } = await supabase.from('audit_log').insert({
+      action, details, user_id: userId, org_id, created_at: new Date().toISOString()
+    }).select();
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
@@ -315,12 +338,7 @@ async function createAuditLog(action, details, userId = null, orgIdParam = null)
 async function getUserProfile(userId, orgIdParam = null) {
   try {
     const orgId = orgIdParam || (await getCurrentOrgId());
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .maybeSingle();
+    const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', userId).eq('org_id', orgId).maybeSingle();
     if (error) throw error;
     return { data };
   } catch (err) {
@@ -331,12 +349,7 @@ async function getUserProfile(userId, orgIdParam = null) {
 async function updateUserProfile(userId, updates, orgIdParam = null) {
   try {
     const orgId = orgIdParam || (await getCurrentOrgId());
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .update(updates)
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .select();
+    const { data, error } = await supabase.from('user_profiles').update(updates).eq('user_id', userId).eq('org_id', orgId).select();
     if (error) throw error;
     return { success: true, data };
   } catch (err) {
@@ -349,14 +362,11 @@ async function updateUserProfile(userId, updates, orgIdParam = null) {
 // -----------------------------------------------------------------------------
 function subscribeToTable(table, orgId, callback) {
   try {
-    return supabase
-      .channel(`realtime:${table}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table, filter: `org_id=eq.${orgId}` },
-        payload => callback(payload)
-      )
-      .subscribe();
+    return supabase.channel(`realtime:${table}`).on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table, filter: `org_id=eq.${orgId}` },
+      payload => callback(payload)
+    ).subscribe();
   } catch (err) {
     return { error: handleError(err, 'subscribeToTable') };
   }
@@ -385,6 +395,10 @@ if (typeof window !== 'undefined') {
     getCurrentUser,
     signOut,
     onAuthStateChange,
+    signUpWithEmail,
+    resetPassword,
+    checkEmailExists,
+    createUserProfile,
     getCurrentOrgId,
     getDefaultOrgId,
     DEFAULT_ORG_ID,
@@ -419,6 +433,10 @@ export {
   getCurrentUser,
   signOut,
   onAuthStateChange,
+  signUpWithEmail,
+  resetPassword,
+  checkEmailExists,
+  createUserProfile,
   getCurrentOrgId,
   getDefaultOrgId,
   DEFAULT_ORG_ID,
