@@ -1,8 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Logout System V5.0 NASA 10/10 OPTIMIZED
+ * ALSHAM 360° PRIMA - Enterprise Logout System V5.1 NASA 10/10 OPTIMIZED
  * Handles secure logout with audit logging and clean session termination.
  *
- * @version 5.0.0 - NASA 10/10 FINAL BUILD
+ * @version 5.1.0 - FINAL BUILD READY
  * @license MIT
  */
 
@@ -18,6 +18,8 @@ function showNotification(message, type = "info") {
       ? "bg-red-600"
       : type === "success"
       ? "bg-green-600"
+      : type === "warning"
+      ? "bg-yellow-500"
       : "bg-blue-600"
   }`;
   div.textContent = message;
@@ -28,7 +30,7 @@ const showError = (m) => showNotification(m, "error");
 const showSuccess = (m) => showNotification(m, "success");
 
 // ===== LOGOUT HANDLER =====
-async function handleLogout(redirect = "login.html") {
+async function handleLogout(redirect = "/login.html") {
   try {
     console.log("🔐 Logout iniciado...");
     const user = await getCurrentUser();
@@ -47,8 +49,9 @@ async function handleLogout(redirect = "login.html") {
     }
 
     // Limpa dados locais
-    localStorage.removeItem("alsham_auth_state");
-    localStorage.removeItem("alsham_registration_data");
+    ["alsham_auth_state", "alsham_org_id", "alsham_registration_data"].forEach(k =>
+      localStorage.removeItem(k)
+    );
 
     // Notificação
     showSuccess("Você saiu da sua conta com segurança.");
@@ -56,7 +59,7 @@ async function handleLogout(redirect = "login.html") {
     // Redireciona
     setTimeout(() => {
       window.location.href = redirect;
-    }, 1200);
+    }, 1000);
 
     console.log("✅ Logout concluído com sucesso");
   } catch (err) {
@@ -74,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       handleLogout();
     });
   }
-  console.log("🚀 Logout System V5.0 pronto - ALSHAM 360° PRIMA");
+  console.log("🚀 Logout System V5.1 pronto - ALSHAM 360° PRIMA");
 });
 
 // ===== EXPORT =====
