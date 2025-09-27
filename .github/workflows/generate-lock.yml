@@ -3,18 +3,26 @@ name: Generate Lockfile
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write   # 🔑 Permite ao GitHub Actions criar branch e dar push
+
 jobs:
   generate:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Generate package-lock.json
-        run: npm install --package-lock-only
+        run: |
+          rm -f package-lock.json
+          npm install --package-lock-only
 
       - name: Commit and push lockfile
         run: |
@@ -22,5 +30,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git checkout -b add-lockfile
           git add package-lock.json
-          git commit -m "chore: gerar package-lock.json completo"
+          git commit -m "chore(ci): gerar package-lock.json completo"
           git push origin add-lockfile
