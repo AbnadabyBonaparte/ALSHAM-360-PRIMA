@@ -18,15 +18,17 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      # 🔥 Gera package-lock.json se não existir
       - name: Ensure lockfile exists
         run: |
           if [ ! -f package-lock.json ]; then
-            echo "⚠️ package-lock.json não encontrado. Gerando automaticamente..."
+            echo "⚠️ Nenhum package-lock.json encontrado. Gerando agora..."
             npm install --package-lock-only
           fi
 
+      # 🚀 Instala dependências a partir do lockfile
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci
 
       - name: Run unit tests
         run: npm run test:unit
