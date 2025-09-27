@@ -8,6 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,20 +19,11 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # 🔥 Gera package-lock.json se não existir
-      - name: Ensure lockfile exists
-        run: |
-          if [ ! -f package-lock.json ]; then
-            echo "⚠️ Nenhum package-lock.json encontrado. Gerando agora..."
-            npm install --package-lock-only
-          fi
-
-      # 🚀 Instala dependências a partir do lockfile
       - name: Install dependencies
         run: npm ci
 
-      - name: Run unit tests
+      - name: Run unit tests (Vitest)
         run: npm run test:unit
 
-      - name: Run end-to-end tests
+      - name: Run e2e tests (Cypress)
         run: npm run test:e2e
