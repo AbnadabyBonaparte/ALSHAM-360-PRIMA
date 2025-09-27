@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
     branches: ['*']
-  workflow_dispatch:   # ✅ habilita execução manual pelo GitHub Actions
+  workflow_dispatch:
 
 jobs:
   test:
@@ -18,8 +18,15 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Ensure lockfile exists
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "⚠️ package-lock.json não encontrado. Gerando automaticamente..."
+            npm install --package-lock-only
+          fi
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci || npm install
 
       - name: Run unit tests
         run: npm run test:unit
