@@ -3,7 +3,8 @@ name: CI
 on:
   pull_request:
     branches: ['*']
-  workflow_dispatch:
+  push:
+    branches: ['main']
 
 jobs:
   test:
@@ -20,7 +21,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci   # usa o package-lock.json de forma determinística
 
       - name: Run unit tests (Vitest)
         run: npm run test:unit
