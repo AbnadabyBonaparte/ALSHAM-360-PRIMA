@@ -1,16 +1,35 @@
 // public/js/login.js
 /**
- * ALSHAM 360° PRIMA - Enterprise Login v5.3.0
- * Login robusto com Supabase + tratativas de erro alinhadas ao supabase.js
+ * ALSHAM 360° PRIMA - Enterprise Login v5.3.1
+ * Login robusto com Supabase + aguarda carregamento
  */
 
-const { genericSignIn, resetPassword, showNotification, createAuditLog } =
-  window.AlshamSupabase || {};
+// Aguarda o supabase estar disponível
+function waitForSupabase(callback, maxAttempts = 50) {
+  let attempts = 0;
+  const interval = setInterval(() => {
+    if (window.AlshamSupabase && window.AlshamSupabase.genericSignIn) {
+      clearInterval(interval);
+      callback();
+    } else if (++attempts >= maxAttempts) {
+      clearInterval(interval);
+      console.error("❌ Supabase não carregado após 5 segundos");
+    }
+  }, 100);
+}
 
 const LoginSystem = {
   async login(event) {
     event.preventDefault();
     console.log("🚀 Tentando login...");
+    
+    const { genericSignIn, resetPassword, showNotification, createAuditLog } =
+      window.AlshamSupabase || {};
+
+    if (!genericSignIn) {
+      console.error("❌ genericSignIn não disponível");
+      return;
+    }
 
     const email = document.getElementById("email")?.value.trim();
     const password = document.getElementById("password")?.value.trim();
@@ -38,18 +57,16 @@ const LoginSystem = {
 
     try {
       const result = await genericSignIn(email, password);
-
+      
       if (!result.success) {
         console.warn("⚠️ Falha no login:", result.error);
         errorText.textContent =
           result.error?.message || "Credenciais inválidas ou erro inesperado.";
         errorBox.classList.remove("hidden");
-
         await createAuditLog?.("LOGIN_FAILURE", {
           email,
           reason: result.error?.message || "unknown"
         });
-
         return;
       }
 
@@ -57,7 +74,7 @@ const LoginSystem = {
       console.log("✅ Login bem-sucedido:", result.data);
       successText.textContent = "Login realizado com sucesso!";
       successBox.classList.remove("hidden");
-
+      
       await createAuditLog?.("LOGIN_SUCCESS", {
         email,
         user_id: result.data.user?.id || null
@@ -70,7 +87,6 @@ const LoginSystem = {
       console.error("❌ Erro inesperado no login:", err);
       errorText.textContent = err.message || "Erro inesperado no login.";
       errorBox.classList.remove("hidden");
-
       await createAuditLog?.("LOGIN_JS_ERROR", {
         email,
         reason: err.message || "unknown"
@@ -84,6 +100,7 @@ const LoginSystem = {
   },
 
   async forgotPassword(email) {
+    const { resetPassword, showNotification } = window.AlshamSupabase || {};
     if (!email) {
       showNotification?.("Digite seu e-mail para redefinir a senha.", "warning");
       return;
@@ -97,14 +114,18 @@ const LoginSystem = {
   },
 
   oauthLogin(provider) {
+    const { showNotification } = window.AlshamSupabase || {};
     showNotification?.(`Login OAuth com ${provider} ainda não implementado.`, "info");
   },
 
   biometricLogin() {
+    const { showNotification } = window.AlshamSupabase || {};
     showNotification?.("Login biométrico em desenvolvimento.", "info");
   }
 };
 
-// Expor global
-window.LoginSystem = LoginSystem;
-console.log("✅ Enterprise Login v5.3.0 - ALSHAM 360° PRIMA READY");
+// Expor global DEPOIS que o supabase carregar
+waitForSupabase(() => {
+  window.LoginSystem = LoginSystem;
+  console.log("✅ Enterprise Login v5.3.1 - ALSHAM 360° PRIMA READY");
+});
