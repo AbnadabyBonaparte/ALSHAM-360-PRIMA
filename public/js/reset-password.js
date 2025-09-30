@@ -1,12 +1,12 @@
 /**
- * 🔒 ALSHAM 360° PRIMA - Reset Password System V5.3.0 NASA 10/10
- * Corrigido para Supabase v2 + Cypress
+ * 🔒 ALSHAM 360° PRIMA - Reset Password System V5.2.0 NASA 10/10 FINAL
+ * Sistema enterprise de redefinição de senha integrado ao Supabase.
  *
- * @version 5.3.0 - PRODUÇÃO FINAL BUILD
+ * @version 5.2.0 - PRODUÇÃO FINAL BUILD
  * @license MIT
  */
 
-const { supabase, createAuditLog } = window.AlshamSupabase || {};
+const { resetPassword, createAuditLog } = window.AlshamSupabase || {};
 
 // ===== STATE =====
 const resetState = {
@@ -66,10 +66,7 @@ async function handlePasswordReset(e) {
   resetState.lastEmail = email;
 
   try {
-    // ✅ Supabase v2 API
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password.html`
-    });
+    const { error } = await resetPassword?.(email);
     if (error) throw error;
 
     showMessage("reset-message", "✅ Um link de redefinição foi enviado para seu e-mail.", "success");
@@ -90,13 +87,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (form) {
     form.addEventListener("submit", handlePasswordReset);
   }
-  console.log("🔒 Reset Password System v5.3.0 pronto - ALSHAM 360° PRIMA");
+  console.log("🔒 Reset Password System v5.2.0 pronto - ALSHAM 360° PRIMA");
 });
 
-// ===== EXPORT =====
+// ===== EXPORT GLOBAL =====
 window.ResetPasswordSystem = {
   state: resetState,
   validateEmail,
   handlePasswordReset
 };
-export default window.ResetPasswordSystem;
