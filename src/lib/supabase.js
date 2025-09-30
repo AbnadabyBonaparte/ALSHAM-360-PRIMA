@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.5 (Produção)
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.6 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
 // -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.5',
+      'X-Client-Info': 'alsham-360-prima@unified-1.6',
       'X-Environment':
         (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
@@ -403,11 +403,12 @@ function showNotification(message, type = 'info') {
 }
 
 // -----------------------------------------------------------------------------
-// Exposição no Window (para páginas antigas)
+// Exposição no Window (garantido com Object.assign)
 // -----------------------------------------------------------------------------
 if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
-  window.AlshamSupabase = {
+  window.AlshamSupabase = window.AlshamSupabase || {};
+  Object.assign(window.AlshamSupabase, {
     supabase,
     getCurrentSession,
     getCurrentUser,
@@ -415,7 +416,7 @@ if (typeof window !== 'undefined') {
     onAuthStateChange,
     signUpWithEmail,
     resetPassword,
-    genericSignIn,
+    genericSignIn,   // 🔥 garantido
     checkEmailExists,
     createUserProfile,
     getCurrentOrgId,
@@ -440,7 +441,7 @@ if (typeof window !== 'undefined') {
     generateUUID,
     showNotification,
     handleError
-  };
+  });
   console.log('✅ window.AlshamSupabase disponível:', Object.keys(window.AlshamSupabase));
 }
 
