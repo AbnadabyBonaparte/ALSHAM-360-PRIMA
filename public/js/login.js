@@ -1,8 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Login System V5.2.1 NASA 10/10 FINAL
+ * ALSHAM 360° PRIMA - Enterprise Login System V5.3.0 NASA 10/10 FINAL
  * Autenticação enterprise com multi-provider, biometria e UX premium
  *
- * @version 5.2.1 - NASA 10/10 FINAL BUILD (redirect ajustado)
+ * @version 5.3.0 - NASA 10/10 FINAL BUILD (com suporte ao genericSignIn revisado)
  */
 
 // ===== SUPABASE GLOBAL IMPORT - ALSHAM STANDARD =====
@@ -105,7 +105,8 @@ class DOMElementsManager {
       errorMessage: "#error-message",
       errorText: "#error-text",
       successMessage: "#success-message",
-      successText: "#success-text"
+      successText: "#success-text",
+      togglePassword: "#toggle-password"
     };
     for (const [k, s] of Object.entries(selectors)) {
       this.elements[k] = document.querySelector(s);
@@ -168,6 +169,18 @@ async function initializeLoginPage() {
     validateDependencies();
     domElements.initialize();
     console.log("🔐 Login page initialized");
+
+    // Toggle de senha
+    const toggle = domElements.get("togglePassword");
+    if (toggle) {
+      toggle.addEventListener("click", () => {
+        const input = domElements.get("password");
+        if (input) {
+          input.type = input.type === "password" ? "text" : "password";
+        }
+      });
+    }
+
     await checkAuthStatus();
   } catch (err) {
     console.error("❌ Login init error:", err);
@@ -204,11 +217,14 @@ async function handleFormSubmit(e) {
       incrementFailedAttempts();
       return;
     }
-    const { data, error } = await genericSignIn?.(email, password);
-    if (error) throw error;
 
-    loginState.setState({ isAuthenticated: true, user: data.user, attemptCount: 0 });
-    await createAuditLog?.("LOGIN_SUCCESS", { user_id: data.user.id, email });
+    const result = await genericSignIn?.(email, password);
+    if (!result?.success) {
+      throw new Error(result?.error?.message || "Falha no login");
+    }
+
+    loginState.setState({ isAuthenticated: true, user: result.data.user, attemptCount: 0 });
+    await createAuditLog?.("LOGIN_SUCCESS", { user_id: result.data.user.id, email });
 
     showSuccess("Login realizado com sucesso!");
     setTimeout(() => (window.location.href = "/dashboard.html"), 1000);
@@ -302,8 +318,8 @@ const LoginSystem = {
   forgotPassword: handleForgotPassword,
   validateEmail,
   validatePassword,
-  version: "5.2.1"
+  version: "5.3.0"
 };
 window.LoginSystem = LoginSystem;
 
-console.log("✅ Enterprise Login v5.2.1 - ALSHAM 360° PRIMA READY");
+console.log("✅ Enterprise Login v5.3.0 - ALSHAM 360° PRIMA READY");
