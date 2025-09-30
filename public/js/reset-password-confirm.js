@@ -1,78 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Confirmar Redefinição — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Confirme sua nova senha no ALSHAM 360° PRIMA com segurança empresarial." />
-  <meta name="theme-color" content="#1E40AF" />
+// -----------------------------------------------------------------------------
+// reset-password-confirm.js
+// ALSHAM 360° PRIMA — Confirmação de redefinição de senha
+// -----------------------------------------------------------------------------
 
-  <!-- ✅ CSP revisada -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data:;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    object-src 'none';
-    frame-src 'self';
-    worker-src 'self' blob:;">
+import { supabase, createAuditLog } from '/src/lib/supabase.js';
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🔐 Reset password confirmation page initialized');
+
+  const form = document.getElementById('confirm-form');
+  const passwordInput = document.getElementById('password');
+  const confirmInput = document.getElementById('confirm');
+  const msg = document.getElementById('confirm-message');
+  const errorMsg = document.getElementById('confirm-error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const password = passwordInput.value.trim();
+    const confirm = confirmInput.value.trim();
+
+    msg.classList.add('hidden');
+    errorMsg.classList.add('hidden');
+
+    if (password !== confirm) {
+      errorMsg.textContent = 'As senhas não coincidem.';
+      errorMsg.classList.remove('hidden');
+      return;
     }
-  </script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-</head>
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center">
+    try {
+      const { data, error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
 
-  <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+      msg.textContent = '✅ Senha redefinida com sucesso! Você já pode fazer login.';
+      msg.classList.remove('hidden');
 
-  <!-- Card -->
-  <main class="w-full max-w-md bg-white rounded-lg shadow p-8">
-    <h1 class="text-2xl font-bold text-center text-primary mb-6">🔐 Definir Nova Senha</h1>
+      await createAuditLog('PASSWORD_RESET_COMPLETED', { user: data.user?.email || 'unknown' });
 
-    <form id="confirm-form" class="space-y-4">
-      <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">Nova senha</label>
-        <input id="password" type="password" class="mt-1 w-full border rounded-lg p-2" placeholder="••••••••" required minlength="8" />
-      </div>
-      <div>
-        <label for="confirm" class="block text-sm font-medium text-gray-700">Confirmar senha</label>
-        <input id="confirm" type="password" class="mt-1 w-full border rounded-lg p-2" placeholder="••••••••" required minlength="8" />
-      </div>
-      <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">
-        Salvar nova senha
-      </button>
-    </form>
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 2000);
+    } catch (err) {
+      console.error('❌ Reset password error:', err);
+      errorMsg.textContent = err.message || 'Erro ao redefinir senha.';
+      errorMsg.classList.remove('hidden');
 
-    <p id="confirm-message" class="hidden mt-4 text-sm text-green-600"></p>
-    <p id="confirm-error" class="hidden mt-4 text-sm text-red-600"></p>
-
-    <div class="mt-6 text-center">
-      <a href="/login.html" class="text-sm text-primary hover:underline">← Voltar ao login</a>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="mt-8 text-center text-gray-500 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
-  </footer>
-
-  <!-- Script (SEM type="module") -->
-  <script src="/js/reset-password-confirm.js"></script>
-</body>
-</html>
+      await createAuditLog('PASSWORD_RESET_FAILED', { error: err.message });
+    }
+  });
+});
