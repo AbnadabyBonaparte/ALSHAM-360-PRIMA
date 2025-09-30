@@ -2,26 +2,22 @@
  * fix-imports.js - Correção para problemas de imports/exports
  * Alinhado com auth.js v5.3, dashboard.js v7.2 e navigation.js v2.0
  *
- * @version 2.3.0 - FINAL PRODUÇÃO READY
+ * @version 2.4.0 - PADRONIZADO COM WAIT_FOR_SUPABASE
  * @autor ALSHAM Development Team
  */
 
-function waitForAlshamSupabase(callback, maxAttempts = 25) {
-  let attempts = 0;
-  function check() {
-    attempts++;
-    if (window.AlshamSupabase && typeof window.AlshamSupabase === "object") {
-      console.log("✅ AlshamSupabase encontrado após", attempts, "tentativas");
-      callback();
-    } else if (attempts < maxAttempts) {
-      setTimeout(check, 200);
-    } else {
-      console.error("❌ Timeout: AlshamSupabase não foi carregado");
-      createMockAlshamSupabase();
-      callback();
-    }
+// Aguarda Supabase estar disponível (padrão unificado)
+function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
+  if (window.AlshamSupabase && typeof window.AlshamSupabase === "object") {
+    console.log("✅ AlshamSupabase carregado para fix-imports");
+    callback();
+  } else if (attempt >= maxAttempts) {
+    console.error("❌ Timeout: AlshamSupabase não carregado - criando mock");
+    createMockAlshamSupabase();
+    callback();
+  } else {
+    setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
   }
-  check();
 }
 
 function createMockAlshamSupabase() {
@@ -43,7 +39,6 @@ function createMockAlshamSupabase() {
     signOut: async () => ({ error: null })
   };
 
-  // Registrar auditoria local
   localStorage.setItem("alsham_fiximports_log", JSON.stringify({
     createdAt: new Date().toISOString(),
     reason: "Mock criado por timeout no carregamento do AlshamSupabase",
@@ -51,7 +46,7 @@ function createMockAlshamSupabase() {
   }));
 }
 
-waitForAlshamSupabase(() => {
+waitForSupabase(() => {
   try {
     const alsham = window.AlshamSupabase;
 
@@ -119,10 +114,10 @@ waitForAlshamSupabase(() => {
     }
 
     // ===== LOG =====
-    console.log("🔧 Fix-imports V2.3 aplicado com sucesso!");
+    console.log("🔧 Fix-imports V2.4 aplicado com sucesso!");
     window.dispatchEvent(
       new CustomEvent("fix-imports-ready", {
-        detail: { version: "2.3.0", timestamp: new Date().toISOString() }
+        detail: { version: "2.4.0", timestamp: new Date().toISOString() }
       })
     );
   } catch (error) {
@@ -131,4 +126,4 @@ waitForAlshamSupabase(() => {
   }
 });
 
-console.log("🔧 Fix-imports V2.3 FINAL carregado - aguardando AlshamSupabase...");
+console.log("🔧 Fix-imports V2.4 carregado - aguardando AlshamSupabase...");
