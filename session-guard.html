@@ -5,41 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Session Guard — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Página de diagnóstico do Session Guard do ALSHAM 360° PRIMA. Teste de proteção de rotas com Supabase e autenticação enterprise." />
-
-  <!-- ✅ CSP revisado -->
+  
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
-    }
-  </script>
-
+  
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col">
-
   <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
+  
   <!-- Conteúdo -->
   <main class="flex-1 flex items-center justify-center">
     <div class="bg-white rounded-xl shadow-md p-8 max-w-lg w-full text-center">
@@ -48,25 +34,22 @@
         Esta página é protegida pelo <b>Session Guard</b>.<br/>
         Se você estiver autenticado, verá seus dados abaixo; caso contrário, será redirecionado ao login.
       </p>
-
       <div id="user-info" class="hidden text-left bg-gray-50 border rounded-lg p-4"></div>
-
       <button id="force-check" class="mt-6 w-full bg-primary hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg">
         🔄 Forçar Revalidação
       </button>
     </div>
   </main>
-
+  
   <!-- Footer -->
   <footer class="py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-
-  <!-- Scripts -->
+  
+  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  <script type="module" src="/src/lib/supabase.js"></script>
   <script type="module" src="/js/session-guard.js"></script>
   <script type="module">
-    import enforceSessionGuard from "/js/session-guard.js";
-
     async function showUser() {
       try {
         const { getCurrentSession } = window.AlshamSupabase;
@@ -84,10 +67,14 @@
         console.error("Erro ao carregar usuário:", e);
       }
     }
-
+    
     document.addEventListener("DOMContentLoaded", () => {
       showUser();
-      document.getElementById("force-check").addEventListener("click", enforceSessionGuard);
+      document.getElementById("force-check").addEventListener("click", () => {
+        if (window.AlshamSessionGuard) {
+          window.AlshamSessionGuard();
+        }
+      });
     });
   </script>
 </body>
