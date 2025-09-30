@@ -5,32 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Automações — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gestão de Automações empresariais no ALSHAM 360° PRIMA: KPIs em tempo real, regras inteligentes e logs de execução.">
-
-  <!-- ✅ CSP revisado -->
+  
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
-    }
-  </script>
-
+  
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
@@ -38,7 +25,7 @@
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
   <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
+  
   <!-- Navbar -->
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
@@ -53,39 +40,40 @@
       </div>
     </div>
   </nav>
-
+  
   <!-- Conteúdo -->
   <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
     <h1 class="text-3xl font-bold text-gray-900">Automações Empresariais</h1>
-
+    
     <!-- KPIs -->
     <section id="automation-dashboard"></section>
-
+    
     <!-- Regras -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Regras de Automação</h2>
       <div id="automation-rules" class="space-y-4"></div>
     </section>
-
+    
     <!-- Execuções -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Execuções Recentes</h2>
       <div id="automation-executions" class="bg-white shadow rounded-lg p-4 space-y-2 text-sm"></div>
     </section>
-
+    
     <!-- Logs -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Logs em Tempo Real</h2>
       <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
     </section>
   </main>
-
+  
   <!-- Footer -->
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-
-  <!-- Script Automações -->
+  
+  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  <script type="module" src="/src/lib/supabase.js"></script>
   <script type="module" src="/js/automacoes.js"></script>
 </body>
 </html>
