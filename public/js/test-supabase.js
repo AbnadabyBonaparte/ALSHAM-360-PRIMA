@@ -1,67 +1,111 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Diagnóstico Supabase — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Ferramenta de diagnóstico do Supabase no ALSHAM 360° PRIMA. Testa conexão, autenticação, consultas e variáveis de ambiente." />
+/**
+ * 🧪 ALSHAM 360° PRIMA - Test Supabase Diagnostic Tool V1.0
+ * CORRIGIDO: Aguarda Supabase carregar
+ */
 
-  <!-- ✅ CSP revisada -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data:;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    object-src 'none';
-    frame-src 'self';
-    worker-src 'self' blob:;">
+// Aguarda Supabase estar disponível
+function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
+  if (window.AlshamSupabase && window.AlshamSupabase.supabase) {
+    console.log("✅ Supabase carregado para Test");
+    callback();
+  } else if (attempt >= maxAttempts) {
+    console.error("❌ Supabase não carregou");
+    log("❌ ERRO: Supabase não carregou após 10 segundos");
+  } else {
+    setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
+  }
+}
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
+// Logger
+function log(msg) {
+  const output = document.getElementById("diagnostic-output");
+  if (!output) return;
+  const line = document.createElement("div");
+  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+  console.log(msg);
+}
+
+// Aguarda Supabase antes de executar
+waitForSupabase(() => {
+  const {
+    supabase,
+    getCurrentSession,
+    getCurrentUser,
+    genericSelect,
+    getDefaultOrgId
+  } = window.AlshamSupabase;
+
+  log("✅ Sistema de diagnóstico inicializado");
+
+  // Verificar variáveis
+  document.getElementById("btn-check-env")?.addEventListener("click", () => {
+    log("🔍 Verificando variáveis de ambiente...");
+    
+    const hasSupabase = !!window.AlshamSupabase;
+    const hasClient = !!supabase;
+    const defaultOrg = getDefaultOrgId();
+    
+    log(`✓ AlshamSupabase: ${hasSupabase ? "✅ Carregado" : "❌ Não encontrado"}`);
+    log(`✓ Supabase Client: ${hasClient ? "✅ Inicializado" : "❌ Falhou"}`);
+    log(`✓ Default Org ID: ${defaultOrg || "❌ Não definido"}`);
+  });
+
+  // Testar conexão
+  document.getElementById("btn-check-connection")?.addEventListener("click", async () => {
+    log("🌐 Testando conexão com Supabase...");
+    try {
+      const { data, error } = await supabase.from("organizations").select("count").limit(1);
+      if (error) throw error;
+      log("✅ Conexão bem-sucedida");
+    } catch (err) {
+      log(`❌ Erro de conexão: ${err.message}`);
     }
-  </script>
+  });
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-</head>
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col">
+  // Testar sessão
+  document.getElementById("btn-check-auth")?.addEventListener("click", async () => {
+    log("🔐 Verificando sessão de autenticação...");
+    try {
+      const session = await getCurrentSession();
+      const user = await getCurrentUser();
+      
+      if (session?.user) {
+        log(`✅ Sessão ativa para: ${session.user.email}`);
+        log(`✓ User ID: ${session.user.id}`);
+      } else {
+        log("⚠️ Nenhuma sessão ativa encontrada");
+      }
+      
+      if (user) {
+        log(`✓ User confirmado: ${user.email}`);
+      }
+    } catch (err) {
+      log(`❌ Erro ao verificar sessão: ${err.message}`);
+    }
+  });
 
-  <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  // Testar consulta
+  document.getElementById("btn-check-query")?.addEventListener("click", async () => {
+    log("📊 Testando consulta de dados...");
+    try {
+      const orgId = getDefaultOrgId();
+      log(`✓ Usando Org ID: ${orgId}`);
+      
+      const { data, error } = await genericSelect("leads_crm", { org_id: orgId }, { limit: 5 });
+      
+      if (error) throw error;
+      
+      log(`✅ Consulta bem-sucedida: ${data?.length || 0} registros encontrados`);
+      
+      if (data && data.length > 0) {
+        log(`✓ Exemplo: ${data[0].nome || data[0].id || "registro sem nome"}`);
+      }
+    } catch (err) {
+      log(`❌ Erro na consulta: ${err.message}`);
+    }
+  });
 
-  <!-- Conteúdo -->
-  <main class="flex-1 flex items-center justify-center">
-    <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl w-full">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">🔍 Diagnóstico Supabase</h1>
-
-      <div class="space-y-4">
-        <button id="btn-check-env" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Verificar Variáveis</button>
-        <button id="btn-check-connection" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Testar Conexão</button>
-        <button id="btn-check-auth" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Testar Sessão</button>
-        <button id="btn-check-query" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700">Testar Consulta</button>
-      </div>
-
-      <div id="diagnostic-output" class="mt-6 bg-gray-900 text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="py-6 text-center text-gray-500 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
-  </footer>
-
-  <!-- Script externo -->
-  <script type="module" src="/js/test-supabase.js"></script>
-</body>
-</html>
+  log("🎯 Clique nos botões acima para executar os testes");
+});
