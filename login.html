@@ -9,7 +9,7 @@
   <!-- ✅ CSP revisado -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
@@ -54,7 +54,9 @@
         <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
         <div class="relative">
           <input id="password" type="password" class="mt-1 w-full border rounded-lg p-2 pr-10" placeholder="••••••••" required minlength="8" />
-          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">👁️</button>
+          <button type="button" id="toggle-password" aria-label="Mostrar ou ocultar senha" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700">
+            👁️
+          </button>
         </div>
       </div>
       <button id="login-btn" type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-700 flex justify-center items-center">
@@ -80,7 +82,7 @@
 
     <!-- Esqueci senha -->
     <div class="mt-4 text-center">
-      <button onclick="LoginSystem.forgotPassword(document.getElementById('email').value)" class="text-sm text-primary hover:underline">
+      <button type="button" onclick="LoginSystem.forgotPassword(document.getElementById('email').value)" class="text-sm text-primary hover:underline">
         Esqueci minha senha
       </button>
     </div>
