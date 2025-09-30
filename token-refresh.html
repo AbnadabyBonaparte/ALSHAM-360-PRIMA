@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Token Refresh — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Diagnóstico do sistema de renovação automática de tokens do ALSHAM 360° PRIMA. Testa se sessões são renovadas corretamente." />
+  <meta name="description" content="Diagnóstico do sistema de renovação automática de tokens do ALSHAM 360° PRIMA." />
 
-  <!-- ✅ CSP revisado -->
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
@@ -18,29 +18,13 @@
     frame-src 'self';
     worker-src 'self' blob:;">
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
-    }
-  </script>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col">
 
-  <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  <!-- Conteúdo -->
   <main class="flex-1 flex items-center justify-center">
     <div class="bg-white rounded-xl shadow-md p-8 max-w-lg w-full text-center">
       <h1 class="text-2xl font-bold text-gray-900 mb-4">🔄 Diagnóstico Token Refresh</h1>
@@ -60,16 +44,14 @@
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
 
-  <!-- Scripts -->
-  <script type="module" src="/js/token-refresh.js"></script>
-  <script type="module">
-    import TokenRefresh from "/js/token-refresh.js";
-
+  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script src="/js/token-refresh.js"></script>
+  <script>
     async function showSession() {
       try {
         const { getCurrentSession } = window.AlshamSupabase;
@@ -89,21 +71,23 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("check-now").addEventListener("click", showSession);
+      setTimeout(() => {
+        document.getElementById("check-now").addEventListener("click", showSession);
 
-      document.getElementById("stop-refresh").addEventListener("click", () => {
-        TokenRefresh.stopTokenRefresh();
-        document.getElementById("stop-refresh").classList.add("hidden");
-        document.getElementById("start-refresh").classList.remove("hidden");
-      });
+        document.getElementById("stop-refresh").addEventListener("click", () => {
+          window.AlshamTokenRefresh?.stop();
+          document.getElementById("stop-refresh").classList.add("hidden");
+          document.getElementById("start-refresh").classList.remove("hidden");
+        });
 
-      document.getElementById("start-refresh").addEventListener("click", () => {
-        TokenRefresh.startTokenRefresh();
-        document.getElementById("start-refresh").classList.add("hidden");
-        document.getElementById("stop-refresh").classList.remove("hidden");
-      });
+        document.getElementById("start-refresh").addEventListener("click", () => {
+          window.AlshamTokenRefresh?.start();
+          document.getElementById("start-refresh").classList.add("hidden");
+          document.getElementById("stop-refresh").classList.remove("hidden");
+        });
 
-      showSession();
+        showSession();
+      }, 500);
     });
   </script>
 </body>
