@@ -6,11 +6,11 @@
   <title>ALSHAM 360° PRIMA — Loading</title>
   <meta name="description" content="ALSHAM 360° PRIMA — Sistema Enterprise de CRM, Relatórios, Automações e Agentes Digitais." />
   <meta name="theme-color" content="#1E40AF" />
-
-  <!-- ✅ CSP revisada -->
+  
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    script-src 'self' 'unsafe-inline';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data:;
@@ -18,14 +18,14 @@
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
+  
   <!-- Ícones e Manifesto PWA -->
   <link rel="icon" href="/assets/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
-
-  <!-- Tailwind (opcional para loader estilizado) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="bg-gray-50 font-sans flex flex-col items-center justify-center min-h-screen">
   <!-- Loader -->
@@ -37,11 +37,11 @@
       <p class="text-red-600 mt-4">⚠️ O sistema requer JavaScript habilitado.</p>
     </noscript>
   </main>
-
+  
   <!-- 🚀 Roteamento central -->
   <script type="module">
     import { getCurrentSession } from "/src/lib/supabase.js";
-
+    
     async function routeUser() {
       try {
         const session = await getCurrentSession();
@@ -55,10 +55,10 @@
         window.location.replace("/login.html");
       }
     }
-
+    
     routeUser();
   </script>
-
+  
   <!-- 🔒 PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
