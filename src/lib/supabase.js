@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.3 (Produção)
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.4 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
-// ----------------------------------------------------------------------------- 
+// -----------------------------------------------------------------------------
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.3',
+      'X-Client-Info': 'alsham-360-prima@unified-1.4',
       'X-Environment':
         (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
@@ -63,7 +63,7 @@ function handleError(err, context = 'supabase_operation') {
     hint: err.hint || null,
     context
   };
-  console.error('Supabase Error:', normalized);
+  console.error('❌ Supabase Error:', normalized);
   return normalized;
 }
 
@@ -83,12 +83,7 @@ function formatDateBR(date, options = {}) {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return 'Data inválida';
-  const defaultOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    ...options
-  };
+  const defaultOptions = { year: 'numeric', month: '2-digit', day: '2-digit', ...options };
   return d.toLocaleDateString('pt-BR', defaultOptions);
 }
 
@@ -161,7 +156,7 @@ function onAuthStateChange(callback) {
 }
 
 // -----------------------------------------------------------------------------
-// Funções de Auth Estendidas (para register.js e reset-password.js)
+// Funções de Auth Estendidas
 // -----------------------------------------------------------------------------
 async function signUpWithEmail(email, password) {
   try {
@@ -229,7 +224,10 @@ async function getCurrentOrgId() {
     if (!session?.user) return getDefaultOrgId();
     const userId = session.user.id;
     const { data, error } = await supabase.from('user_profiles').select('org_id').eq('user_id', userId).limit(1).maybeSingle();
-    if (error) return getDefaultOrgId();
+    if (error) {
+      console.warn('⚠️ getCurrentOrgId falhou, usando org padrão');
+      return getDefaultOrgId();
+    }
     return isValidUUID(data?.org_id) ? data.org_id : getDefaultOrgId();
   } catch {
     return getDefaultOrgId();
@@ -372,6 +370,15 @@ function subscribeToTable(table, orgId, callback) {
   }
 }
 
+function unsubscribeFromTable(subscription) {
+  try {
+    supabase.removeChannel(subscription);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: handleError(err, 'unsubscribeFromTable') };
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Notificações / UI
 // -----------------------------------------------------------------------------
@@ -413,6 +420,7 @@ if (typeof window !== 'undefined') {
     updateUserProfile,
     createAuditLog,
     subscribeToTable,
+    unsubscribeFromTable,
     formatDateBR,
     formatTimeAgo,
     sanitizeInput,
@@ -451,6 +459,7 @@ export {
   updateUserProfile,
   createAuditLog,
   subscribeToTable,
+  unsubscribeFromTable,
   formatDateBR,
   formatTimeAgo,
   sanitizeInput,
