@@ -10,10 +10,9 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   return {
     base: '/',
-    root: 'public', // ✅ ADICIONAR ESTA LINHA
-    publicDir: '../public', // ✅ ADICIONAR ESTA LINHA
+    root: 'public',
     build: {
-      outDir: '../dist', // ✅ MUDAR PARA ../dist
+      outDir: '../dist',
       emptyOutDir: true,
       minify: isProduction ? 'esbuild' : false,
       sourcemap: !isProduction,
@@ -41,9 +40,6 @@ export default defineConfig(({ mode }) => {
           short_name: 'PRIMA',
           theme_color: '#3B82F6',
         },
-        workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}']
-        }
       }),
     ],
     define: {
