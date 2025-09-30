@@ -5,40 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leads CRM — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, dashboards e integração com IA." />
-
-  <!-- ✅ CSP revisada -->
+  
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
-    }
-  </script>
-
+  
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
   <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
+  
   <!-- Navbar -->
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
@@ -53,26 +43,26 @@
       </div>
     </div>
   </nav>
-
+  
   <!-- Conteúdo -->
   <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
     <h1 class="text-3xl font-bold text-gray-900">Gestão de Leads</h1>
-
-    <!-- Loader unificado -->
+    
+    <!-- Loader -->
     <div id="leads-loading" class="hidden flex justify-center py-6" role="status" aria-live="polite">
       <div class="inline-block w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
       <span class="sr-only">Carregando leads...</span>
     </div>
-
+    
     <!-- KPIs -->
     <section id="leads-kpis"></section>
-
+    
     <!-- Filtros -->
     <section id="leads-filters" class="bg-white rounded-lg shadow p-4"></section>
-
+    
     <!-- Tabela -->
     <section id="leads-table" class="bg-white rounded-lg shadow p-4"></section>
-
+    
     <!-- Gráficos -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow p-4">
@@ -85,13 +75,14 @@
       </div>
     </section>
   </main>
-
+  
   <!-- Footer -->
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-
-  <!-- Script Leads -->
-  <script type="module" src="/js/leads-real.js"></script>
+  
+  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script src="/js/leads-real.js"></script>
 </body>
 </html>
