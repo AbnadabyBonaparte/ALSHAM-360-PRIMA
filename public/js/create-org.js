@@ -1,16 +1,22 @@
 /**
- * ALSHAM 360° PRIMA - Create Organization System V2.0
- * Criação, verificação e listagem de organizações no Supabase (Produção Ready)
- *
- * @version 2.0.0 - NASA 10/10 FINAL BUILD (Multi-tenant + Audit + Persistência)
- * @author
- *   ALSHAM Development Team
+ * ALSHAM 360° PRIMA - Create Organization System V2.1
+ * CORRIGIDO: Aguarda Supabase carregar
  */
 
-// ===== IMPORTS GLOBAIS =====
-const { supabase, createAuditLog } = window.AlshamSupabase || {};
+// Aguarda Supabase estar disponível
+function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
+  if (window.AlshamSupabase && window.AlshamSupabase.supabase) {
+    console.log("✅ Supabase carregado para Create Org");
+    callback();
+  } else if (attempt >= maxAttempts) {
+    console.error("❌ Supabase não carregou");
+    showToast("Erro ao carregar sistema", "error");
+  } else {
+    setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
+  }
+}
 
-// ===== TOAST SYSTEM =====
+// UI Helper (precisa estar fora)
 function showToast(msg, type = "info") {
   const container = document.getElementById("toast-container");
   if (!container) return;
@@ -34,160 +40,166 @@ function showToast(msg, type = "info") {
   }, 4000);
 }
 
-// ===== UTILIDADES =====
-function generateNewUUID() {
-  const uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+// Aguarda Supabase antes de executar
+waitForSupabase(() => {
+  const { supabase, createAuditLog } = window.AlshamSupabase;
 
-  const input = document.getElementById("org-id");
-  if (input) input.value = uuid;
-  showToast("Novo UUID gerado", "info");
-  return uuid;
-}
+  // ===== UTILIDADES =====
+  function generateNewUUID() {
+    const uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
 
-// ===== AÇÕES =====
-async function createOrganization() {
-  const id = document.getElementById("org-id")?.value.trim();
-  const name = document.getElementById("org-name")?.value.trim();
-  const statusEl = document.getElementById("create-status");
-
-  if (!id || !name) {
-    showToast("Preencha todos os campos", "warning");
-    return;
+    const input = document.getElementById("org-id");
+    if (input) input.value = uuid;
+    showToast("Novo UUID gerado", "info");
+    return uuid;
   }
 
-  statusEl.textContent = "🔄 Criando...";
-  try {
-    // Verificar se já existe
-    const { data: existing } = await supabase
-      .from("organizations")
-      .select("id")
-      .eq("id", id)
-      .single();
+  // ===== AÇÕES =====
+  async function createOrganization() {
+    const id = document.getElementById("org-id")?.value.trim();
+    const name = document.getElementById("org-name")?.value.trim();
+    const statusEl = document.getElementById("create-status");
 
-    if (existing) {
-      statusEl.textContent = "✅ Organização já existe";
-      showToast("Organização já cadastrada", "info");
-      localStorage.setItem("alsham_org_id", id);
+    if (!id || !name) {
+      showToast("Preencha todos os campos", "warning");
       return;
     }
 
-    // Criar nova org
-    const { data, error } = await supabase
-      .from("organizations")
-      .insert([{ id, name, created_at: new Date().toISOString() }])
-      .select();
+    statusEl.textContent = "🔄 Criando...";
+    try {
+      const { data: existing } = await supabase
+        .from("organizations")
+        .select("id")
+        .eq("id", id)
+        .single();
 
-    if (error) throw error;
+      if (existing) {
+        statusEl.textContent = "✅ Organização já existe";
+        showToast("Organização já cadastrada", "info");
+        localStorage.setItem("alsham_org_id", id);
+        return;
+      }
 
-    // Persistir no localStorage
-    localStorage.setItem("alsham_org_id", id);
+      const { data, error } = await supabase
+        .from("organizations")
+        .insert([{ id, name, created_at: new Date().toISOString() }])
+        .select();
 
-    // Registrar auditoria
-    await createAuditLog("ORG_CREATED", { org_id: id, name }, "system", id);
+      if (error) throw error;
 
-    statusEl.textContent = `✅ Criada: ${name}`;
-    showToast("Organização criada com sucesso", "success");
-  } catch (e) {
-    console.error("Erro criar organização:", e);
-    statusEl.textContent = `❌ Erro: ${e.message}`;
-    showToast("Erro ao criar", "error");
-  }
-}
+      localStorage.setItem("alsham_org_id", id);
+      await createAuditLog("ORG_CREATED", { org_id: id, name }, "system", id);
 
-async function verifyOrganization() {
-  const id = document.getElementById("org-id")?.value.trim();
-  const statusEl = document.getElementById("verify-status");
-  const dataEl = document.getElementById("verify-data");
-
-  if (!id) {
-    showToast("Digite um UUID", "warning");
-    return;
-  }
-
-  statusEl.textContent = "🔍 Verificando...";
-  try {
-    const { data, error } = await supabase
-      .from("organizations")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (error) {
-      statusEl.textContent = "❌ Não encontrada";
-      dataEl.classList.add("hidden");
-    } else {
-      statusEl.textContent = `✅ Encontrada: ${data.name}`;
-      dataEl.classList.remove("hidden");
-      dataEl.innerHTML = `
-        <p><b>ID:</b> ${data.id}</p>
-        <p><b>Nome:</b> ${data.name}</p>
-      `;
+      statusEl.textContent = `✅ Criada: ${name}`;
+      showToast("Organização criada com sucesso", "success");
+    } catch (e) {
+      console.error("Erro criar organização:", e);
+      statusEl.textContent = `❌ Erro: ${e.message}`;
+      showToast("Erro ao criar", "error");
     }
-  } catch (e) {
-    console.error("Erro verificar organização:", e);
-    statusEl.textContent = `❌ Erro: ${e.message}`;
-    showToast("Erro ao verificar", "error");
   }
-}
 
-async function listOrganizations() {
-  const statusEl = document.getElementById("list-status");
-  const dataEl = document.getElementById("list-data");
+  async function verifyOrganization() {
+    const id = document.getElementById("org-id")?.value.trim();
+    const statusEl = document.getElementById("verify-status");
+    const dataEl = document.getElementById("verify-data");
 
-  statusEl.textContent = "📋 Listando...";
-  try {
-    const { data, error } = await supabase
-      .from("organizations")
-      .select("*")
-      .order("created_at", { ascending: false });
+    if (!id) {
+      showToast("Digite um UUID", "warning");
+      return;
+    }
 
-    if (error) throw error;
+    statusEl.textContent = "🔍 Verificando...";
+    try {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-    statusEl.textContent = `✅ ${data.length} encontrada(s)`;
-    dataEl.innerHTML =
-      data
-        .map(
-          (org) =>
-            `<div class="border-b py-2"><b>${org.name}</b><br><code>${org.id}</code></div>`
-        )
-        .join("") || "<p>Nenhuma organização encontrada</p>";
-    dataEl.classList.remove("hidden");
-  } catch (e) {
-    console.error("Erro listar organizações:", e);
-    statusEl.textContent = `❌ Erro: ${e.message}`;
-    showToast("Erro ao listar", "error");
+      if (error) {
+        statusEl.textContent = "❌ Não encontrada";
+        dataEl.classList.add("hidden");
+      } else {
+        statusEl.textContent = `✅ Encontrada: ${data.name}`;
+        dataEl.classList.remove("hidden");
+        dataEl.innerHTML = `
+          <p><b>ID:</b> ${data.id}</p>
+          <p><b>Nome:</b> ${data.name}</p>
+        `;
+      }
+    } catch (e) {
+      console.error("Erro verificar organização:", e);
+      statusEl.textContent = `❌ Erro: ${e.message}`;
+      showToast("Erro ao verificar", "error");
+    }
   }
-}
 
-async function setupComplete() {
-  const statusEl = document.getElementById("complete-status");
-  statusEl.textContent = "🚀 Executando setup...";
+  async function listOrganizations() {
+    const statusEl = document.getElementById("list-status");
+    const dataEl = document.getElementById("list-data");
 
-  try {
-    await createOrganization();
-    await verifyOrganization();
-    await listOrganizations();
+    statusEl.textContent = "📋 Listando...";
+    try {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    statusEl.textContent = "🎉 Setup completo!";
-    showToast("Setup completo finalizado!", "success");
-  } catch (e) {
-    console.error("Erro setup completo:", e);
-    statusEl.textContent = `❌ Erro: ${e.message}`;
-    showToast("Erro no setup", "error");
+      if (error) throw error;
+
+      statusEl.textContent = `✅ ${data.length} encontrada(s)`;
+      dataEl.innerHTML =
+        data
+          .map(
+            (org) =>
+              `<div class="border-b py-2"><b>${org.name}</b><br><code>${org.id}</code></div>`
+          )
+          .join("") || "<p>Nenhuma organização encontrada</p>";
+      dataEl.classList.remove("hidden");
+    } catch (e) {
+      console.error("Erro listar organizações:", e);
+      statusEl.textContent = `❌ Erro: ${e.message}`;
+      showToast("Erro ao listar", "error");
+    }
   }
-}
 
-// ===== EXPORT GLOBAL =====
-window.OrganizationSystem = {
-  generateNewUUID,
-  createOrganization,
-  verifyOrganization,
-  listOrganizations,
-  setupComplete,
-};
+  async function setupComplete() {
+    const statusEl = document.getElementById("complete-status");
+    statusEl.textContent = "🚀 Executando setup...";
 
-console.log("🏢 Create Organization System v2.0 pronto - ALSHAM 360° PRIMA");
+    try {
+      await createOrganization();
+      await verifyOrganization();
+      await listOrganizations();
+
+      statusEl.textContent = "🎉 Setup completo!";
+      showToast("Setup completo finalizado!", "success");
+    } catch (e) {
+      console.error("Erro setup completo:", e);
+      statusEl.textContent = `❌ Erro: ${e.message}`;
+      showToast("Erro no setup", "error");
+    }
+  }
+
+  // ===== EXPORT GLOBAL =====
+  window.OrganizationSystem = {
+    generateNewUUID,
+    createOrganization,
+    verifyOrganization,
+    listOrganizations,
+    setupComplete,
+  };
+
+  window.generateNewUUID = generateNewUUID;
+  window.createOrganization = createOrganization;
+  window.verifyOrganization = verifyOrganization;
+  window.listOrganizations = listOrganizations;
+  window.setupComplete = setupComplete;
+
+  console.log("🏢 Create Organization System v2.1 pronto");
+});
