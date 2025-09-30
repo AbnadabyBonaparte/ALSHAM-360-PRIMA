@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.4 (Produção)
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.5 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
 // -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.4',
+      'X-Client-Info': 'alsham-360-prima@unified-1.5',
       'X-Environment':
         (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
@@ -177,6 +177,17 @@ async function resetPassword(email) {
     return { data, success: true };
   } catch (err) {
     return { success: false, error: handleError(err, 'resetPassword') };
+  }
+}
+
+// ✅ Novo método de login usado pelo login.js
+async function genericSignIn(email, password) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return { data, success: true };
+  } catch (err) {
+    return { success: false, error: handleError(err, 'genericSignIn') };
   }
 }
 
@@ -404,6 +415,7 @@ if (typeof window !== 'undefined') {
     onAuthStateChange,
     signUpWithEmail,
     resetPassword,
+    genericSignIn,
     checkEmailExists,
     createUserProfile,
     getCurrentOrgId,
@@ -443,6 +455,7 @@ export {
   onAuthStateChange,
   signUpWithEmail,
   resetPassword,
+  genericSignIn,
   checkEmailExists,
   createUserProfile,
   getCurrentOrgId,
