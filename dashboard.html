@@ -47,6 +47,40 @@
       transition: 0.3s; 
     }
     .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    /* MENU LATERAL */
+    .side-nav {
+      position: fixed;
+      left: 0;
+      top: 64px;
+      width: 220px;
+      height: calc(100vh - 64px);
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      padding: 20px 0;
+      z-index: 30;
+      overflow-y: auto;
+    }
+    .side-nav a {
+      display: block;
+      padding: 12px 24px;
+      color: #6b7280;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    .side-nav a:hover {
+      background: #f3f4f6;
+      color: #3b82f6;
+    }
+    .side-nav a.active {
+      background: #eff6ff;
+      color: #3b82f6;
+      border-right: 3px solid #3b82f6;
+      font-weight: 600;
+    }
+    .main-content-wrapper {
+      margin-left: 220px;
+    }
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -86,8 +120,18 @@
     </div>
   </nav>
 
+  <!-- MENU LATERAL -->
+  <aside class="side-nav">
+    <a href="/dashboard.html" class="active">📊 Dashboard</a>
+    <a href="/leads-real.html">👥 Leads</a>
+    <a href="/automacoes.html">⚙️ Automações</a>
+    <a href="/gamificacao.html">🎮 Gamificação</a>
+    <a href="/relatorios.html">📈 Relatórios</a>
+    <a href="/configuracoes.html">⚙️ Configurações</a>
+  </aside>
+
   <!-- Conteúdo -->
-  <main id="main-content" class="max-w-7xl mx-auto px-4 py-8">
+  <main id="main-content" class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard Executivo</h1>
 
     <!-- KPIs -->
