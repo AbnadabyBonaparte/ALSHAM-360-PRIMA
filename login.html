@@ -95,5 +95,17 @@
 
   <!-- Script oficial de login (SEM type="module") -->
   <script src="/js/login.js"></script>
+  <script>
+    // Toggle senha (funciona mesmo sem o login.js)
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("toggle-password");
+      const pwd = document.getElementById("password");
+      if (toggle && pwd) {
+        toggle.addEventListener("click", () => {
+          pwd.type = pwd.type === "password" ? "text" : "password";
+        });
+      }
+    });
+  </script>
 </body>
 </html>
