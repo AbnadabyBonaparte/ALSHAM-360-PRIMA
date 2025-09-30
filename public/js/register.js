@@ -1,52 +1,25 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Registration System V5.1 NASA 10/10 FINAL
- * Advanced user registration with enterprise-grade security + UX premium
- *
- * @version 5.1.0 - NASA 10/10 FINAL BUILD
- * @author
- *   ALSHAM Development Team
+ * ALSHAM 360° PRIMA - Enterprise Registration System V5.2 NASA 10/10
+ * Corrigido para compatibilidade com Supabase v2 + Cypress
  */
 
-// ===== SUPABASE GLOBAL IMPORT =====
 const {
-  signUpWithEmail,
+  supabase,
   createUserProfile,
-  checkEmailExists,
   createAuditLog
 } = window.AlshamSupabase || {};
-
-// ===== DEPENDENCY VALIDATION =====
-function requireLib(libName, lib) {
-  if (!lib) throw new Error(`❌ Dependência ${libName} não carregada!`);
-  return lib;
-}
-function validateDependencies() {
-  return {
-    localStorage: requireLib("localStorage", window.localStorage),
-    sessionStorage: requireLib("sessionStorage", window.sessionStorage),
-    crypto: requireLib("Web Crypto API", window.crypto),
-    performance: requireLib("Performance API", window.performance),
-    Notification: requireLib("Notification API", window.Notification),
-    navigator: requireLib("Navigator API", window.navigator),
-    fetch: requireLib("Fetch API", window.fetch)
-  };
-}
 
 // ===== CONFIG =====
 const REGISTRATION_CONFIG = Object.freeze({
   SECURITY: {
     PASSWORD_MIN_LENGTH: 8,
-    REQUIRE_UPPERCASE: true,
-    REQUIRE_LOWERCASE: true,
-    REQUIRE_NUMBERS: true,
-    REQUIRE_SYMBOLS: true,
     EMAIL_VERIFICATION_REQUIRED: true,
     AUDIT_ENABLED: true
   },
   VALIDATION: {
     EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     NAME_REGEX: /^[a-zA-ZÀ-ÿ\s]{2,50}$/,
-    PASSWORD_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/
+    PASSWORD_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
   },
   STEPS: [
     { id: "personal", required: ["firstName", "lastName", "email"] },
@@ -59,12 +32,7 @@ const REGISTRATION_CONFIG = Object.freeze({
 // ===== STATE =====
 class RegistrationState {
   constructor() {
-    this.state = {
-      currentStep: 0,
-      totalSteps: REGISTRATION_CONFIG.STEPS.length,
-      formData: {},
-      errors: []
-    };
+    this.state = { currentStep: 0, totalSteps: REGISTRATION_CONFIG.STEPS.length };
   }
   setState(upd) { Object.assign(this.state, upd); }
   getState(key) { return key ? this.state[key] : this.state; }
@@ -83,7 +51,11 @@ class DOMManager {
       firstName: "#first-name",
       lastName: "#last-name",
       verificationCode: "#verification-code",
-      submitButton: "#submit-button"
+      submitButton: "#submit-button",
+      errorBox: "#error-message",
+      errorText: "#error-text",
+      successBox: "#success-message",
+      successText: "#success-text"
     };
     Object.entries(selectors).forEach(([k, s]) => {
       this.elements[k] = document.querySelector(s);
@@ -100,31 +72,21 @@ function showLoading(show, msg = "Carregando...") {
   btn.disabled = show;
   btn.textContent = show ? msg : "Criar conta";
 }
-function showNotification(message, type = "info") {
-  console.log(`[${type}] ${message}`);
-  const div = document.createElement("div");
-  div.className = `fixed top-4 right-4 p-3 rounded shadow-lg text-white z-50 ${
-    type === "error" ? "bg-red-600" :
-    type === "success" ? "bg-green-600" :
-    type === "warning" ? "bg-yellow-500" : "bg-blue-600"
-  }`;
-  div.textContent = message;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 4000);
-}
-const showError   = (m) => showNotification(m, "error");
-const showSuccess = (m) => showNotification(m, "success");
-const showWarning = (m) => showNotification(m, "warning");
-
-function announceToScreenReader(msg) {
-  let el = document.getElementById("sr-announcer");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "sr-announcer";
-    el.className = "sr-only";
-    document.body.appendChild(el);
+function showError(msg) {
+  const box = dom.get("errorBox");
+  const text = dom.get("errorText");
+  if (box && text) {
+    text.textContent = msg;
+    box.classList.remove("hidden");
   }
-  el.textContent = msg;
+}
+function showSuccess(msg) {
+  const box = dom.get("successBox");
+  const text = dom.get("successText");
+  if (box && text) {
+    text.textContent = msg;
+    box.classList.remove("hidden");
+  }
 }
 
 // ===== VALIDATION =====
@@ -148,17 +110,11 @@ async function validateStep(stepIndex) {
 }
 
 // ===== CORE FLOW =====
-document.addEventListener("DOMContentLoaded", initializeRegistration);
-
-async function initializeRegistration() {
-  try {
-    validateDependencies();
-    dom.initialize();
-    console.log("📝 Registration ready v5.1.0");
-  } catch (e) {
-    showError("Erro ao inicializar registro");
-  }
-}
+document.addEventListener("DOMContentLoaded", () => {
+  dom.initialize();
+  console.log("📝 Registration ready v5.2");
+  document.querySelector("#registration-form")?.addEventListener("submit", handleFormSubmit);
+});
 
 async function handleFormSubmit(e) {
   e.preventDefault();
@@ -167,7 +123,6 @@ async function handleFormSubmit(e) {
   if (!valid) return showError("Por favor, corrija os campos obrigatórios.");
   if (stepIndex < REGISTRATION_CONFIG.STEPS.length - 1) {
     registrationState.setState({ currentStep: stepIndex + 1 });
-    announceToScreenReader(`Avançou para etapa ${stepIndex + 2}`);
   } else {
     await submitRegistration();
   }
@@ -183,16 +138,24 @@ async function submitRegistration() {
       lastName: dom.get("lastName")?.value
     };
 
-    // Checa se email já existe
-    if (await checkEmailExists?.(formData.email)) {
-      showWarning("E-mail já cadastrado");
+    // Checa duplicidade (fallback user_profiles)
+    let emailExists = false;
+    try {
+      const { data } = await supabase.from("user_profiles").select("id").eq("email", formData.email).maybeSingle();
+      emailExists = !!data;
+    } catch { /* ignore */ }
+
+    if (emailExists) {
+      showError("E-mail já cadastrado");
       showLoading(false);
       return;
     }
 
-    const { data, error } = await signUpWithEmail(formData.email, formData.password);
+    // Registro no Supabase
+    const { data, error } = await supabase.auth.signUp({ email: formData.email, password: formData.password });
     if (error) throw error;
 
+    // Cria perfil
     await createUserProfile({
       user_id: data.user.id,
       first_name: formData.firstName,
@@ -200,7 +163,6 @@ async function submitRegistration() {
       email: formData.email
     });
 
-    // Log de auditoria
     if (REGISTRATION_CONFIG.SECURITY.AUDIT_ENABLED) {
       await createAuditLog("USER_REGISTERED", {
         user_id: data.user.id,
@@ -219,16 +181,13 @@ async function submitRegistration() {
 }
 
 // ===== PUBLIC API =====
-const RegistrationSystem = {
-  nextStep: () =>
-    registrationState.setState({ currentStep: registrationState.getState("currentStep") + 1 }),
-  prevStep: () =>
-    registrationState.setState({ currentStep: Math.max(0, registrationState.getState("currentStep") - 1) }),
+window.RegistrationSystem = {
+  nextStep: () => registrationState.setState({ currentStep: registrationState.getState("currentStep") + 1 }),
+  prevStep: () => registrationState.setState({ currentStep: Math.max(0, registrationState.getState("currentStep") - 1) }),
   submit: submitRegistration,
   validateField,
-  version: "5.1.0"
+  version: "5.2"
 };
-window.RegistrationSystem = RegistrationSystem;
-export default RegistrationSystem;
+export default window.RegistrationSystem;
 
-console.log("✅ Registration System V5.1.0 pronto - ALSHAM 360° PRIMA");
+console.log("✅ Registration System V5.2 - ALSHAM 360° PRIMA READY");
