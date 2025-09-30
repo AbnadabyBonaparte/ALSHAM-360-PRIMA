@@ -1,21 +1,22 @@
 // public/js/login.js
 /**
- * ALSHAM 360° PRIMA - Enterprise Login v5.3.1
- * Login robusto com Supabase + aguarda carregamento
+ * ALSHAM 360° PRIMA - Enterprise Login v5.4.0
+ * CORRIGIDO: Aguarda Supabase com retry e timeout
  */
 
-// Aguarda o supabase estar disponível
-function waitForSupabase(callback, maxAttempts = 50) {
-  let attempts = 0;
-  const interval = setInterval(() => {
-    if (window.AlshamSupabase && window.AlshamSupabase.genericSignIn) {
-      clearInterval(interval);
-      callback();
-    } else if (++attempts >= maxAttempts) {
-      clearInterval(interval);
-      console.error("❌ Supabase não carregado após 5 segundos");
-    }
-  }, 100);
+// Aguarda window.AlshamSupabase estar disponível
+function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
+  if (window.AlshamSupabase && window.AlshamSupabase.genericSignIn) {
+    console.log("✅ Supabase carregado após", attempt, "tentativas");
+    callback();
+  } else if (attempt >= maxAttempts) {
+    console.error("❌ Supabase não carregou após 10 segundos");
+    document.getElementById("error-message")?.classList.remove("hidden");
+    document.getElementById("error-text").textContent = 
+      "Erro ao carregar sistema. Recarregue a página.";
+  } else {
+    setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
+  }
 }
 
 const LoginSystem = {
@@ -23,11 +24,13 @@ const LoginSystem = {
     event.preventDefault();
     console.log("🚀 Tentando login...");
     
-    const { genericSignIn, resetPassword, showNotification, createAuditLog } =
-      window.AlshamSupabase || {};
+    const { genericSignIn, createAuditLog } = window.AlshamSupabase || {};
 
     if (!genericSignIn) {
       console.error("❌ genericSignIn não disponível");
+      document.getElementById("error-text").textContent = 
+        "Sistema ainda carregando. Aguarde...";
+      document.getElementById("error-message").classList.remove("hidden");
       return;
     }
 
@@ -50,7 +53,6 @@ const LoginSystem = {
       return;
     }
 
-    // Loading state
     btn.disabled = true;
     btnText.textContent = "Entrando...";
     spinner.classList.remove("hidden");
@@ -61,38 +63,26 @@ const LoginSystem = {
       if (!result.success) {
         console.warn("⚠️ Falha no login:", result.error);
         errorText.textContent =
-          result.error?.message || "Credenciais inválidas ou erro inesperado.";
+          result.error?.message || "Credenciais inválidas.";
         errorBox.classList.remove("hidden");
-        await createAuditLog?.("LOGIN_FAILURE", {
-          email,
-          reason: result.error?.message || "unknown"
-        });
+        await createAuditLog?.("LOGIN_FAILURE", { email, reason: result.error?.message });
         return;
       }
 
-      // Sucesso no login
-      console.log("✅ Login bem-sucedido:", result.data);
+      console.log("✅ Login bem-sucedido");
       successText.textContent = "Login realizado com sucesso!";
       successBox.classList.remove("hidden");
       
-      await createAuditLog?.("LOGIN_SUCCESS", {
-        email,
-        user_id: result.data.user?.id || null
-      });
+      await createAuditLog?.("LOGIN_SUCCESS", { email, user_id: result.data.user?.id });
 
       setTimeout(() => {
         window.location.href = "/dashboard.html";
       }, 1200);
     } catch (err) {
-      console.error("❌ Erro inesperado no login:", err);
-      errorText.textContent = err.message || "Erro inesperado no login.";
+      console.error("❌ Erro no login:", err);
+      errorText.textContent = err.message || "Erro inesperado.";
       errorBox.classList.remove("hidden");
-      await createAuditLog?.("LOGIN_JS_ERROR", {
-        email,
-        reason: err.message || "unknown"
-      });
     } finally {
-      // Reset botão
       btn.disabled = false;
       btnText.textContent = "Entrar";
       spinner.classList.add("hidden");
@@ -102,30 +92,28 @@ const LoginSystem = {
   async forgotPassword(email) {
     const { resetPassword, showNotification } = window.AlshamSupabase || {};
     if (!email) {
-      showNotification?.("Digite seu e-mail para redefinir a senha.", "warning");
+      alert("Digite seu e-mail.");
       return;
     }
     const res = await resetPassword?.(email);
     if (res?.success) {
-      showNotification?.("E-mail de redefinição enviado.", "success");
+      alert("E-mail de redefinição enviado.");
     } else {
-      showNotification?.("Erro ao enviar redefinição de senha.", "error");
+      alert("Erro ao enviar.");
     }
   },
 
   oauthLogin(provider) {
-    const { showNotification } = window.AlshamSupabase || {};
-    showNotification?.(`Login OAuth com ${provider} ainda não implementado.`, "info");
+    alert(`Login com ${provider} em desenvolvimento.`);
   },
 
   biometricLogin() {
-    const { showNotification } = window.AlshamSupabase || {};
-    showNotification?.("Login biométrico em desenvolvimento.", "info");
+    alert("Login biométrico em desenvolvimento.");
   }
 };
 
-// Expor global DEPOIS que o supabase carregar
+// Aguarda Supabase antes de expor globalmente
 waitForSupabase(() => {
   window.LoginSystem = LoginSystem;
-  console.log("✅ Enterprise Login v5.3.1 - ALSHAM 360° PRIMA READY");
+  console.log("✅ LoginSystem READY v5.4.0");
 });
