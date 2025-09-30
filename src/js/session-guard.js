@@ -2,7 +2,7 @@
  * ALSHAM 360° PRIMA - Enterprise Session Guard V5.1 NASA 10/10 OPTIMIZED
  * Middleware de proteção de rotas com auditoria + verificação em tempo real
  *
- * @version 5.1.1 - NASA 10/10 FINAL BUILD
+ * @version 5.1.0 - NASA 10/10 FINAL BUILD
  * @license MIT
  */
 
@@ -22,7 +22,6 @@ const SESSION_GUARD_CONFIG = {
 // ===== UI HELPERS =====
 function showGuardNotification(message, type = "info") {
   if (SESSION_GUARD_CONFIG.debug) console.log(`[GUARD][${type}] ${message}`);
-
   const div = document.createElement("div");
   div.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white ${
     type === "error"
@@ -32,7 +31,6 @@ function showGuardNotification(message, type = "info") {
       : "bg-blue-600"
   }`;
   div.textContent = message;
-
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
@@ -41,14 +39,11 @@ function showGuardNotification(message, type = "info") {
 async function enforceSessionGuard() {
   try {
     const path = window.location.pathname;
-
-    // Rotas públicas
     if (SESSION_GUARD_CONFIG.publicRoutes.includes(path)) {
       if (SESSION_GUARD_CONFIG.debug) console.log("🌍 Public route, guard not enforced.");
       return true;
     }
 
-    // Sessão atual
     const session = await getCurrentSession?.();
     const isAuthenticated = !!session?.user;
 
@@ -58,7 +53,6 @@ async function enforceSessionGuard() {
         ? checkRouteAccess(path)
         : isAuthenticated;
 
-    // Bloqueio se não autorizado
     if (!isAuthenticated || !routeAllowed) {
       showGuardNotification("⚠️ Acesso negado. Redirecionando para login...", "error");
 
@@ -77,7 +71,6 @@ async function enforceSessionGuard() {
       throw new Error("Sessão inválida ou rota não autorizada");
     }
 
-    // Sessão válida
     showGuardNotification("🔒 Sessão válida. Acesso permitido.", "success");
 
     if (SESSION_GUARD_CONFIG.auditEnabled && session?.user) {
@@ -89,10 +82,7 @@ async function enforceSessionGuard() {
       });
     }
 
-    if (SESSION_GUARD_CONFIG.debug) {
-      console.log("✅ Session guard passed:", session.user?.email || "anonymous");
-    }
-
+    if (SESSION_GUARD_CONFIG.debug) console.log("✅ Session guard passed:", session.user.email);
     return true;
   } catch (err) {
     console.error("❌ Session guard error:", err);
@@ -111,8 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ===== EXPORT =====
-export default enforceSessionGuard;
+// ===== GLOBAL =====
 window.AlshamSessionGuard = enforceSessionGuard;
-
-console.log("🛡️ Session Guard v5.1.1 carregado - ALSHAM 360° PRIMA com auditoria");
+console.log("🛡️ Session Guard v5.1 carregado - ALSHAM 360° PRIMA com auditoria");
