@@ -6,11 +6,11 @@
   <title>Teste Supabase — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Painel de diagnóstico Supabase do ALSHAM 360° PRIMA. Testa sessões, usuários, registros e funções extendidas.">
 
-  <!-- ✅ CSP segura -->
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
@@ -18,19 +18,7 @@
     frame-src 'self';
     worker-src 'self' blob:;">
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6' }
-        }
-      }
-    }
-  </script>
-
+  <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gray-50 min-h-screen flex flex-col">
@@ -81,19 +69,16 @@
       createUserProfile
     } from "/src/lib/supabase.js";
 
-    // Helpers
     function showResult(id, data) {
       document.getElementById(id).textContent = JSON.stringify(data, null, 2);
     }
 
-    // Sessão
     document.getElementById("check-session").addEventListener("click", async () => {
       const session = await getCurrentSession();
       const user = await getCurrentUser();
       showResult("session-result", { session, user });
     });
 
-    // Email / Registro
     document.getElementById("check-email").addEventListener("click", async () => {
       const email = document.getElementById("test-email").value.trim();
       const exists = await checkEmailExists(email);
@@ -113,7 +98,6 @@
       showResult("register-result", result);
     });
 
-    // Perfil
     document.getElementById("create-profile").addEventListener("click", async () => {
       const demoProfile = {
         user_id: "demo-user-id",
