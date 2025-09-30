@@ -7,30 +7,17 @@
   <meta name="description" content="Painel unificado de diagnóstico de autenticação: sessão, guard e refresh no ALSHAM 360° PRIMA." />
   <meta name="theme-color" content="#1E40AF" />
 
-  <!-- ✅ CSP revisada -->
+  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          colors: { primary: '#3B82F6', secondary: '#8B5CF6', danger: '#EF4444' }
-        }
-      }
-    }
-  </script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
@@ -52,23 +39,34 @@
       <!-- Sessão -->
       <section class="mb-6">
         <h2 class="text-lg font-semibold mb-2">📋 Sessão Atual</h2>
-        <div id="session-info" class="hidden bg-gray-50 border rounded-lg p-4 text-sm"></div>
-        <button id="check-session" class="mt-3 w-full bg-primary hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
-          🔎 Verificar Sessão
+        <div class="bg-gray-50 border rounded-lg p-4 text-sm">
+          <p><strong>Email:</strong> <span id="user-email">--</span></p>
+          <p><strong>ID:</strong> <span id="user-id">--</span></p>
+          <p><strong>Org:</strong> <span id="user-org">--</span></p>
+          <p><strong>Expira:</strong> <span id="session-expiry">--</span></p>
+        </div>
+        <button id="force-refresh" class="mt-3 w-full bg-primary hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+          🔎 Atualizar Sessão
         </button>
       </section>
 
       <!-- Guard -->
       <section class="mb-6">
         <h2 class="text-lg font-semibold mb-2">🛡️ Session Guard</h2>
-        <button id="force-guard" class="w-full bg-secondary hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg">
-          🔄 Forçar Revalidação
+        <div id="guard-status" class="mb-3 font-mono text-sm p-4 rounded-lg bg-gray-100">
+          Clique para testar
+        </div>
+        <button id="test-guard" class="w-full bg-secondary hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg">
+          🔄 Testar Guard
         </button>
       </section>
 
       <!-- Refresh -->
       <section class="mb-6">
         <h2 class="text-lg font-semibold mb-2">🔄 Token Refresh</h2>
+        <div id="token-status" class="mb-3 text-sm p-3 bg-gray-50 rounded-lg">
+          Status: Inativo
+        </div>
         <div class="flex gap-2">
           <button id="start-refresh" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">
             ▶️ Iniciar
@@ -82,15 +80,15 @@
       <!-- Logout -->
       <section>
         <h2 class="text-lg font-semibold mb-2">🚪 Logout Seguro</h2>
-        <button id="logout" class="w-full bg-danger hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
+        <button id="invalidate-session" class="w-full bg-danger hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
           Encerrar Sessão
         </button>
       </section>
 
       <!-- Logs -->
       <section class="mt-8">
-        <h2 class="text-lg font-semibold mb-2">📜 Logs</h2>
-        <div id="auth-logs" class="bg-black text-green-400 p-4 rounded-lg h-48 overflow-y-auto font-mono text-xs"></div>
+        <h2 class="text-lg font-semibold mb-2">📜 Logs de Eventos</h2>
+        <div id="auth-events" class="bg-black text-green-400 p-4 rounded-lg h-48 overflow-y-auto font-mono text-xs"></div>
       </section>
     </div>
   </main>
@@ -100,7 +98,8 @@
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
 
-  <!-- Script -->
-  <script type="module" src="/js/auth-dashboard.js"></script>
+  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script src="/js/auth-dashboard.js"></script>
 </body>
 </html>
