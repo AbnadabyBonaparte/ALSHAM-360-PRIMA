@@ -12,32 +12,53 @@
 </head>
 <body class="bg-gray-50">
   
-  <header class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-      <h1 class="text-2xl font-bold text-gray-900">Pipeline de Vendas</h1>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-6 py-6">
-    <div id="loading" class="text-center py-20">
-      <p class="text-gray-500">Carregando pipeline...</p>
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
+    <div class="h-16 flex items-center px-6 border-b">
+      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
     </div>
     
-    <div id="pipeline-board" class="hidden flex gap-4 overflow-x-auto pb-4"></div>
-  </main>
+    <nav class="mt-5 space-y-1 px-3">
+      <a href="/dashboard.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+        📊 Dashboard
+      </a>
+      <a href="/leads-real.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+        👥 Leads
+      </a>
+      <a href="/pipeline.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-50 text-blue-600 transition-colors">
+        🎯 Pipeline
+      </a>
+      <a href="/automacoes.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+        🤖 Automações
+      </a>
+      <a href="/relatorios.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+        📈 Relatórios
+      </a>
+      <a href="/gamificacao.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+        🎮 Gamificação
+      </a>
+      <a href="/configuracoes.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+        ⚙️ Configurações
+      </a>
+    </nav>
+  </aside>
 
-  <div id="modal-add" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
-      <h2 class="text-xl font-bold mb-4">Nova Oportunidade</h2>
-      <form id="form-opportunity">
-        <input type="text" id="titulo" placeholder="Título" class="w-full border rounded px-3 py-2 mb-3" required>
-        <input type="number" id="valor" placeholder="Valor (R$)" class="w-full border rounded px-3 py-2 mb-3">
-        <button type="submit" class="w-full bg-blue-600 text-white rounded py-2 hover:bg-blue-700">
-          Adicionar
-        </button>
-      </form>
+  <!-- Main Content -->
+  <main class="ml-64">
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <h1 class="text-2xl font-bold text-gray-900">Pipeline de Vendas</h1>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-6">
+      <div id="loading" class="text-center py-20">
+        <p class="text-gray-500">Carregando pipeline...</p>
+      </div>
+      
+      <div id="pipeline-board" class="hidden flex gap-4 overflow-x-auto pb-4"></div>
     </div>
-  </div>
+  </main>
 
   <script type="module" src="/public/js/pipeline.js"></script>
 </body>
