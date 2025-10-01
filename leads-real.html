@@ -26,7 +26,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   
   <style>
-    /* MENU LATERAL */
     .side-nav {
       position: fixed;
       left: 0;
@@ -63,10 +62,8 @@
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
   
-  <!-- Navbar -->
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
@@ -82,4 +79,47 @@
     </div>
   </nav>
   
-  <!-- MENU LATERAL -->
+  <aside class="side-nav">
+    <a href="/dashboard.html">📊 Dashboard</a>
+    <a href="/leads-real.html" class="active">👥 Leads</a>
+    <a href="/pipeline.html">🎯 Pipeline</a>
+    <a href="/automacoes.html">⚙️ Automações</a>
+    <a href="/gamificacao.html">🎮 Gamificação</a>
+    <a href="/relatorios.html">📈 Relatórios</a>
+    <a href="/configuracoes.html">⚙️ Configurações</a>
+  </aside>
+  
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold text-gray-900">Gestão de Leads</h1>
+    
+    <div id="leads-loading" class="hidden flex justify-center py-6" role="status" aria-live="polite">
+      <div class="inline-block w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      <span class="sr-only">Carregando leads...</span>
+    </div>
+    
+    <section id="leads-kpis"></section>
+    
+    <section id="leads-filters" class="bg-white rounded-lg shadow p-4"></section>
+    
+    <section id="leads-table" class="bg-white rounded-lg shadow p-4"></section>
+    
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-lg shadow p-4">
+        <h2 class="font-bold mb-2">Distribuição por Status</h2>
+        <canvas id="leads-status-chart"></canvas>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <h2 class="font-bold mb-2">Leads por Dia (Últimos 7 dias)</h2>
+        <canvas id="leads-daily-chart"></canvas>
+      </div>
+    </section>
+  </main>
+  
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
+  
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script type="module" src="/js/leads-real.js"></script>
+</body>
+</html>
