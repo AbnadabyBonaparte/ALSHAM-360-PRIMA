@@ -47,4 +47,8 @@ export default defineConfig(({ mode }) => {
     define: {
       __SUPABASE_URL__: JSON.stringify(SUPABASE_URL),
       __SUPABASE_ANON_KEY__: JSON.stringify(SUPABASE_KEY),
-      __VERSION__: JSON.stringify(process
+      __VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
+      __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    },
+  };
+});
