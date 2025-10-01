@@ -1,9 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.1
- * CORRIGIDO: Aguarda Supabase carregar completamente
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.2
+ * ADICIONADO: Click handler para abrir modal de lead
  */
 
-// Aguarda Supabase estar disponível
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
     console.log("✅ Supabase carregado para Leads");
@@ -16,7 +15,6 @@ function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   }
 }
 
-// UI Helpers (precisam estar fora)
 function showError(m) {
   const div = document.createElement("div");
   div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-red-600";
@@ -42,7 +40,6 @@ function showNotification(m, t = "info") {
   setTimeout(() => div.remove(), 3000);
 }
 
-// Aguarda Supabase antes de executar todo o sistema
 waitForSupabase(() => {
   const {
     getCurrentSession,
@@ -100,7 +97,6 @@ waitForSupabase(() => {
     charts: {}
   };
 
-  // ===== INICIALIZAÇÃO =====
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       showLoading(true, "🚀 Inicializando Leads...");
@@ -125,7 +121,6 @@ waitForSupabase(() => {
     }
   });
 
-  // ===== AUTENTICAÇÃO =====
   async function authenticateUser() {
     try {
       if (window.AlshamAuth?.isAuthenticated) {
@@ -143,7 +138,6 @@ waitForSupabase(() => {
     window.location.href = "/login.html";
   }
 
-  // ===== CARREGAMENTO DE DADOS =====
   async function loadSystemData() {
     leadsState.isLoading = true;
     try {
@@ -188,7 +182,6 @@ waitForSupabase(() => {
     return { active: data || [] };
   }
 
-  // ===== FILTROS E PAGINAÇÃO =====
   function applyFilters() {
     leadsState.filteredLeads = leadsState.leads.filter(l => {
       if (leadsState.filters.search && !l.name?.toLowerCase().includes(leadsState.filters.search.toLowerCase())) return false;
@@ -203,7 +196,6 @@ waitForSupabase(() => {
     leadsState.pagination.totalPages = Math.ceil(leadsState.pagination.total / leadsState.pagination.perPage);
   }
 
-  // ===== INTERFACE =====
   function setupInterface() {
     renderKPIs();
     renderFilters();
@@ -257,12 +249,18 @@ waitForSupabase(() => {
     const rows = leadsState.filteredLeads.slice(start, end);
     container.innerHTML = `
       <table class="w-full border">
-        <thead><tr class="bg-gray-100"><th>Nome</th><th>Status</th><th>Prioridade</th><th>Origem</th><th>Data</th></tr></thead>
+        <thead><tr class="bg-gray-100">
+          <th class="p-2 text-left">Nome</th>
+          <th class="p-2 text-left">Status</th>
+          <th class="p-2 text-left">Prioridade</th>
+          <th class="p-2 text-left">Origem</th>
+          <th class="p-2 text-left">Data</th>
+        </tr></thead>
         <tbody>
           ${rows.map(l => `
-            <tr class="border-b">
+            <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" data-lead-id="${l.id}" onclick="window.openLeadModal('${l.id}')">
               <td class="p-2">${l.name || "-"}</td>
-              <td class="p-2">${l.status || "-"}</td>
+              <td class="p-2"><span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">${l.status || "-"}</span></td>
               <td class="p-2">${l.prioridade || "-"}</td>
               <td class="p-2">${l.origem || "-"}</td>
               <td class="p-2">${new Date(l.created_at).toLocaleDateString("pt-BR")}</td>
@@ -270,7 +268,7 @@ waitForSupabase(() => {
           `).join("")}
         </tbody>
       </table>
-      <p class="text-sm text-gray-500 mt-2">Página ${leadsState.pagination.current} de ${leadsState.pagination.totalPages}</p>
+      <p class="text-sm text-gray-500 mt-2">Página ${leadsState.pagination.current} de ${leadsState.pagination.totalPages} (${leadsState.pagination.total} leads)</p>
     `;
   }
 
@@ -279,7 +277,6 @@ waitForSupabase(() => {
     const dailyCanvas = document.getElementById("leads-daily-chart");
     if (!statusCanvas || !dailyCanvas || !window.Chart) return;
 
-    // Status Chart
     if (leadsState.charts.statusChart) leadsState.charts.statusChart.destroy();
     const statusCounts = LEADS_CONFIG.statusOptions.map(s => leadsState.filteredLeads.filter(l => l.status === s.value).length);
     leadsState.charts.statusChart = new Chart(statusCanvas.getContext("2d"), {
@@ -291,7 +288,6 @@ waitForSupabase(() => {
       options: { responsive: true, plugins: { legend: { position: "bottom" } } }
     });
 
-    // Daily Chart
     if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
     const days = [], counts = [];
     for (let i = 6; i >= 0; i--) {
@@ -307,7 +303,6 @@ waitForSupabase(() => {
     });
   }
 
-  // ===== REALTIME =====
   function setupRealtime() {
     if (!LEADS_CONFIG.realtime.enabled || !subscribeToTable) return;
     const subscription = subscribeToTable("leads_crm", leadsState.orgId, () => {
@@ -317,7 +312,6 @@ waitForSupabase(() => {
     window.addEventListener("beforeunload", () => subscription?.unsubscribe?.());
   }
 
-  // ===== LOADING =====
   function showLoading(show, msg = "Carregando...") {
     let el = document.getElementById("leads-loading");
     if (show) {
@@ -339,12 +333,23 @@ waitForSupabase(() => {
     }
   }
 
-  // ===== EXPORT =====
+  // NOVO: Função para abrir modal do lead
+  window.openLeadModal = function(leadId) {
+    const lead = leadsState.leads.find(l => l.id === leadId);
+    if (!lead) {
+      showError("Lead não encontrado");
+      return;
+    }
+    
+    alert(`Modal do lead: ${lead.name || "Sem nome"}\n\nEm desenvolvimento: Timeline de Interações`);
+    console.log("Lead selecionado:", lead);
+  };
+
   window.LeadsSystem = {
     init: () => loadSystemData().then(setupInterface),
     refresh: () => loadSystemData().then(setupInterface),
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.1 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.2 carregado e pronto");
 });
