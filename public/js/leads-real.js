@@ -1,6 +1,6 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.5.0
- * CORRIGIDO: Modal de lead expandido (responsivo e maior)
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.5.1
+ * CORRIGIDO: Modal de lead expandido (responsivo e maior), timeline com botão desabilitado e roadmap
  * PREPARADO: Estrutura para integração com timeline real
  */
 
@@ -514,22 +514,37 @@ waitForSupabase(() => {
           </div>
         </div>
         
-        <!-- COLUNA DIREITA: Timeline (Preparado para próxima feature) -->
+        <!-- COLUNA DIREITA: Timeline -->
         <div class="space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Timeline de Interações</h3>
-            <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors font-medium" onclick="alert('Feature em desenvolvimento: Adicionar Interação')">
-              + Nova Interação
-            </button>
+            <div class="flex items-center gap-2">
+              <button 
+                class="px-3 py-1 bg-gray-300 text-gray-500 text-xs rounded transition-colors font-medium cursor-not-allowed" 
+                disabled
+                title="Feature será implementada na próxima sprint"
+              >
+                + Nova Interação
+              </button>
+              <span class="text-xs text-blue-600 font-medium">Em breve</span>
+            </div>
           </div>
           
-          <div class="bg-gray-50 rounded-lg p-6 text-center">
-            <div class="text-gray-400 text-4xl mb-2">📋</div>
-            <p class="text-gray-600 font-medium mb-1">Timeline em Desenvolvimento</p>
-            <p class="text-sm text-gray-500">Em breve você poderá visualizar e adicionar interações com este lead diretamente aqui.</p>
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 text-center border border-blue-200">
+            <div class="text-blue-400 text-4xl mb-3">🚧</div>
+            <p class="text-gray-700 font-semibold mb-1">Timeline em Desenvolvimento</p>
+            <p class="text-sm text-gray-600 mb-3">
+              Esta feature será implementada na <span class="font-semibold text-blue-600">Semana 3-4</span> do roadmap.
+            </p>
+            <div class="bg-white rounded p-3 text-xs text-left space-y-1 text-gray-600">
+              <p>✅ Visualizar histórico de interações</p>
+              <p>✅ Adicionar notas, emails e ligações</p>
+              <p>✅ Filtrar por tipo de interação</p>
+              <p>✅ Integração com automações</p>
+            </div>
           </div>
           
-          <!-- Placeholder para timeline real -->
+          <!-- Container preparado para timeline real -->
           <div id="lead-timeline-container" class="hidden space-y-3"></div>
         </div>
       </div>
@@ -545,5 +560,5 @@ waitForSupabase(() => {
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.5.0 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.5.1 carregado e pronto");
 });
