@@ -1,6 +1,7 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.4.0
- * CORRIGIDO: Botões de período com estado visual dinâmico funcionando
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.5.0
+ * CORRIGIDO: Modal de lead expandido (responsivo e maior)
+ * PREPARADO: Estrutura para integração com timeline real
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -200,7 +201,7 @@ waitForSupabase(() => {
   function setupInterface() {
     renderKPIs();
     renderFilters();
-    setupPeriodButtons(); // ✅ NOVO: Configurar botões uma vez
+    setupPeriodButtons();
     renderTable();
     renderCharts();
   }
@@ -245,7 +246,6 @@ waitForSupabase(() => {
     });
   }
 
-  // ✅ NOVO: Configurar botões de período (chamado uma vez)
   function setupPeriodButtons() {
     const container = document.getElementById("period-buttons-container");
     if (!container) return;
@@ -256,7 +256,6 @@ waitForSupabase(() => {
         const period = parseInt(btn.dataset.period, 10);
         leadsState.chartPeriod = period;
         
-        // ✅ Atualizar classes CSS de todos os botões
         buttons.forEach(b => {
           if (parseInt(b.dataset.period, 10) === period) {
             b.className = "period-btn px-2 py-1 text-xs rounded bg-blue-600 text-white font-semibold";
@@ -320,7 +319,6 @@ waitForSupabase(() => {
     const dailyCanvas = document.getElementById("leads-daily-chart");
     if (!statusCanvas || !dailyCanvas || !window.Chart) return;
 
-    // Status Chart
     if (leadsState.charts.statusChart) leadsState.charts.statusChart.destroy();
     const statusCounts = LEADS_CONFIG.statusOptions.map(s => leadsState.filteredLeads.filter(l => l.status === s.value).length);
     leadsState.charts.statusChart = new Chart(statusCanvas.getContext("2d"), {
@@ -344,7 +342,6 @@ waitForSupabase(() => {
       }
     });
 
-    // Daily Chart
     if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
     const days = [], counts = [];
     const period = leadsState.chartPeriod;
@@ -420,35 +417,126 @@ waitForSupabase(() => {
     }
   }
 
+  // ✅ MODAL EXPANDIDO E MELHORADO
   window.openLeadModal = function(leadId) {
     const lead = leadsState.leads.find(l => l.id === leadId);
     if (!lead) {
       showError("Lead não encontrado");
       return;
     }
+    
     let modal = document.getElementById("lead-modal");
     if (!modal) {
       modal = document.createElement("div");
       modal.id = "lead-modal";
-      modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30";
+      modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4";
       modal.innerHTML = `
-        <div class="bg-white rounded-lg shadow-lg p-6 w-[370px] max-w-full relative">
-          <button id="close-lead-modal" class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white rounded">&times;</button>
-          <div id="lead-modal-content"></div>
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative">
+          <button id="close-lead-modal" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors font-bold text-lg">&times;</button>
+          <div id="lead-modal-content" class="overflow-y-auto p-6"></div>
         </div>
       `;
       document.body.appendChild(modal);
       document.getElementById("close-lead-modal").onclick = () => modal.remove();
+      
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.remove();
+      });
     }
+    
+    const statusConfig = LEADS_CONFIG.statusOptions.find(s => s.value === lead.status) || {};
+    const statusColor = {
+      novo: "bg-blue-100 text-blue-800",
+      contatado: "bg-yellow-100 text-yellow-800",
+      qualificado: "bg-purple-100 text-purple-800",
+      proposta: "bg-orange-100 text-orange-800",
+      convertido: "bg-green-100 text-green-800",
+      perdido: "bg-red-100 text-red-800"
+    }[lead.status] || "bg-gray-100 text-gray-800";
+    
     document.getElementById("lead-modal-content").innerHTML = `
-      <h2 class="text-xl font-bold mb-2">${lead.nome || "Sem nome"}</h2>
-      <div class="mb-2 text-sm text-gray-700"><b>Email:</b> ${lead.email || "-"}<br><b>Telefone:</b> ${lead.telefone || "-"}<br><b>Empresa:</b> ${lead.empresa || "-"}</div>
-      <div class="mb-2 text-sm"><span class="px-2 py-1 rounded bg-blue-100 text-blue-800">${lead.status || "-"}</span> | <span class="px-2 py-1 rounded bg-gray-200">${lead.origem || "-"}</span></div>
-      <div class="mb-2"><b>Pontuação IA:</b> <span class="font-semibold">${lead.score_ia || 0}</span></div>
-      <div class="mb-2"><b>Criado em:</b> ${new Date(lead.created_at).toLocaleDateString("pt-BR")}</div>
-      <div class="mt-4 text-xs text-gray-500">Timeline/Interações: <i>Em desenvolvimento</i></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- COLUNA ESQUERDA: Informações do Lead -->
+        <div class="space-y-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-1">${lead.nome || "Sem nome"}</h2>
+            <div class="flex gap-2 items-center">
+              <span class="px-3 py-1 rounded-full text-sm font-medium ${statusColor}">
+                ${statusConfig.icon || ""} ${statusConfig.label || lead.status || "Indefinido"}
+              </span>
+              <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                ${lead.origem || "Origem desconhecida"}
+              </span>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+            <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Informações de Contato</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start">
+                <span class="font-medium text-gray-600 w-24">Email:</span>
+                <span class="text-gray-900">${lead.email || "-"}</span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-medium text-gray-600 w-24">Telefone:</span>
+                <span class="text-gray-900">${lead.telefone || "-"}</span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-medium text-gray-600 w-24">Empresa:</span>
+                <span class="text-gray-900">${lead.empresa || "-"}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 rounded-lg p-4 space-y-3">
+            <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Qualificação</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-600">Score IA:</span>
+                <span class="text-2xl font-bold text-blue-600">${lead.score_ia || 0}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${lead.score_ia || 0}%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-600">Criado em:</span>
+              <span class="text-gray-900">${new Date(lead.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-600">Última atualização:</span>
+              <span class="text-gray-900">${lead.updated_at ? new Date(lead.updated_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) : "-"}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- COLUNA DIREITA: Timeline (Preparado para próxima feature) -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Timeline de Interações</h3>
+            <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors font-medium" onclick="alert('Feature em desenvolvimento: Adicionar Interação')">
+              + Nova Interação
+            </button>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-6 text-center">
+            <div class="text-gray-400 text-4xl mb-2">📋</div>
+            <p class="text-gray-600 font-medium mb-1">Timeline em Desenvolvimento</p>
+            <p class="text-sm text-gray-500">Em breve você poderá visualizar e adicionar interações com este lead diretamente aqui.</p>
+          </div>
+          
+          <!-- Placeholder para timeline real -->
+          <div id="lead-timeline-container" class="hidden space-y-3"></div>
+        </div>
+      </div>
     `;
+    
     modal.classList.remove("hidden");
+    console.log(`📋 Modal aberto para lead: ${lead.nome} (ID: ${leadId})`);
   };
 
   window.LeadsSystem = {
@@ -457,5 +545,5 @@ waitForSupabase(() => {
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.4.0 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.5.0 carregado e pronto");
 });
