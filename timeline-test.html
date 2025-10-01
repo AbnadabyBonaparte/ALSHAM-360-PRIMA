@@ -17,22 +17,10 @@
   <script type="module">
     import { loadTimeline } from '/public/js/timeline.js';
     
-    // Buscar primeiro lead para testar
-    import { supabase } from '/src/lib/supabase.js';
+    // ID do lead Felipe Araújo
+    const TEST_LEAD_ID = 'd1d8b851-a7af-4307-9e2d-9204aff314cc';
     
-    async function init() {
-      const { data } = await supabase
-        .from('leads_crm')
-        .select('id')
-        .limit(1)
-        .single();
-      
-      if (data) {
-        loadTimeline(data.id, 'timeline-container');
-      }
-    }
-    
-    init();
+    loadTimeline(TEST_LEAD_ID, 'timeline-container');
   </script>
 </body>
 </html>
