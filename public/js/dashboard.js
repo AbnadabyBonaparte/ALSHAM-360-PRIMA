@@ -1,10 +1,10 @@
 /**
  * 📊 ALSHAM 360° PRIMA - Dashboard Executivo
- * @version 8.0.0 - PRODUÇÃO FINAL
+ * @version 8.1.0 - PRODUÇÃO FINAL (CORRIGIDO)
  * @author ALSHAM Development Team
  */
 
-console.log('📊 Dashboard v8.0 carregando...');
+console.log('📊 Dashboard v8.1 carregando...');
 
 // Estado global do dashboard
 const DashboardState = {
@@ -40,6 +40,10 @@ async function initDashboard() {
     DashboardState.orgId = await window.AlshamSupabase.getCurrentOrgId();
     console.log('📍 Org ID:', DashboardState.orgId);
 
+    if (!DashboardState.orgId) {
+      throw new Error('Org ID não encontrado');
+    }
+
     // Carregar dados
     await loadDashboardData();
 
@@ -66,18 +70,19 @@ async function loadDashboardData() {
   try {
     console.log('📥 Carregando dados do dashboard...');
 
-    // Carregar KPIs
-    const kpis = await window.AlshamSupabase.getDashboardKPIs();
+    // ✅ CORRIGIDO: Passa orgId para getDashboardKPIs
+    const kpis = await window.AlshamSupabase.getDashboardKPIs(DashboardState.orgId);
     console.log('📊 KPIs recebidos:', kpis);
     DashboardState.kpis = kpis;
 
-    // Carregar leads
-    const leadsResult = await window.AlshamSupabase.getLeads(100);
+    // ✅ CORRIGIDO: Passa orgId para getLeads
+    const leadsResult = await window.AlshamSupabase.getLeads(100, DashboardState.orgId);
     DashboardState.leads = leadsResult.data || [];
     console.log('📋 Leads carregados:', DashboardState.leads.length);
 
     // Calcular KPIs adicionais se necessário
     if (!DashboardState.kpis || DashboardState.kpis.total_leads === undefined) {
+      console.log('⚠️ View não retornou dados, calculando manualmente...');
       DashboardState.kpis = calculateKPIsFromLeads(DashboardState.leads);
     }
 
@@ -215,7 +220,6 @@ function renderStatusChart() {
 
   const leads = DashboardState.leads;
   
-  // Destruir gráfico anterior se existir
   if (DashboardState.charts.statusChart) {
     DashboardState.charts.statusChart.destroy();
   }
@@ -242,14 +246,7 @@ function renderStatusChart() {
           statusCounts.convertido,
           statusCounts.perdido
         ],
-        backgroundColor: [
-          '#3B82F6', // azul
-          '#F59E0B', // laranja
-          '#8B5CF6', // roxo
-          '#10B981', // verde
-          '#059669', // verde escuro
-          '#EF4444'  // vermelho
-        ],
+        backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#10B981', '#059669', '#EF4444'],
         borderWidth: 2,
         borderColor: '#ffffff'
       }]
@@ -260,10 +257,7 @@ function renderStatusChart() {
       plugins: {
         legend: {
           position: 'bottom',
-          labels: {
-            padding: 15,
-            font: { size: 12 }
-          }
+          labels: { padding: 15, font: { size: 12 } }
         },
         tooltip: {
           callbacks: {
@@ -290,12 +284,10 @@ function renderDailyChart() {
 
   const leads = DashboardState.leads;
   
-  // Destruir gráfico anterior se existir
   if (DashboardState.charts.dailyChart) {
     DashboardState.charts.dailyChart.destroy();
   }
 
-  // Gerar dados dos últimos 7 dias
   const days = [];
   const counts = [];
   
@@ -342,13 +334,8 @@ function renderDailyChart() {
       scales: {
         y: {
           beginAtZero: true,
-          ticks: {
-            stepSize: 1,
-            font: { size: 11 }
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
+          ticks: { stepSize: 1, font: { size: 11 } },
+          grid: { color: 'rgba(0, 0, 0, 0.05)' }
         },
         x: {
           ticks: { font: { size: 11 } },
@@ -363,7 +350,7 @@ function renderLeadsTable() {
   const container = document.getElementById('leads-table');
   if (!container) return;
 
-  const leads = DashboardState.leads.slice(0, 10); // Primeiros 10
+  const leads = DashboardState.leads.slice(0, 10);
 
   if (leads.length === 0) {
     container.innerHTML = '<div class="text-center py-8 text-gray-500">Nenhum lead encontrado</div>';
@@ -404,9 +391,7 @@ function renderLeadsTable() {
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            ${rows}
-          </tbody>
+          <tbody class="bg-white divide-y divide-gray-200">${rows}</tbody>
         </table>
       </div>
     </div>
@@ -438,7 +423,7 @@ function getTemperaturaBadge(temp) {
 }
 
 function showLoading(show) {
-  const loader = document.getElementById('dashboard-loader');
+  const loader = document.getElementById('loading-indicator');
   if (loader) {
     loader.style.display = show ? 'flex' : 'none';
   }
@@ -491,4 +476,4 @@ window.DashboardApp = {
   init: initDashboard
 };
 
-console.log('✅ Dashboard v8.0 carregado e pronto');
+console.log('✅ Dashboard v8.1 carregado e pronto');
