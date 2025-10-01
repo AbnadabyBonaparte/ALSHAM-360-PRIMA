@@ -1,6 +1,7 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.3
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.3.1
  * CORRIGIDO: Tabela completa, gráficos ajustados, nomes dos leads
+ * Atualização: fix para gráfico de linha vazio (data grouping)
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -286,11 +287,13 @@ waitForSupabase(() => {
     `;
   }
 
+  // ✅ CORRIGIDO: renderCharts() - agrupamento de datas para gráfico de linha!
   function renderCharts() {
     const statusCanvas = document.getElementById("leads-status-chart");
     const dailyCanvas = document.getElementById("leads-daily-chart");
     if (!statusCanvas || !dailyCanvas || !window.Chart) return;
 
+    // Status Chart
     if (leadsState.charts.statusChart) leadsState.charts.statusChart.destroy();
     const statusCounts = LEADS_CONFIG.statusOptions.map(s => leadsState.filteredLeads.filter(l => l.status === s.value).length);
     leadsState.charts.statusChart = new Chart(statusCanvas.getContext("2d"), {
@@ -314,16 +317,26 @@ waitForSupabase(() => {
       }
     });
 
+    // Daily Chart - CORRIGIDO
     if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
     const days = [], counts = [];
     const period = leadsState.chartPeriod;
     
+    // Agrupar leads por data
+    const leadsByDate = {};
+    leadsState.filteredLeads.forEach(lead => {
+      const date = new Date(lead.created_at);
+      const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      leadsByDate[dateKey] = (leadsByDate[dateKey] || 0) + 1;
+    });
+    
+    // Criar array dos últimos N dias
     for (let i = period - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split("T")[0];
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       days.push(d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }));
-      counts.push(leadsState.filteredLeads.filter(l => l.created_at?.startsWith(dateStr)).length);
+      counts.push(leadsByDate[dateKey] || 0);
     }
     
     leadsState.charts.dailyChart = new Chart(dailyCanvas.getContext("2d"), {
@@ -404,5 +417,5 @@ waitForSupabase(() => {
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.3 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.3.1 carregado e pronto");
 });
