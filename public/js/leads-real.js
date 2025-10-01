@@ -1,7 +1,7 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.3.1
- * CORRIGIDO: Tabela completa, gráficos ajustados, nomes dos leads
- * Atualização: fix para gráfico de linha vazio (data grouping)
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.3.2
+ * CORRIGIDO: Botões de período, gráficos ajustados, layout melhorado, bugfixes do feedback
+ * Atualização: scroll da tabela, modal lead, estado dinâmico botões de período, gráficos não sobrepostos
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -201,6 +201,7 @@ waitForSupabase(() => {
   function setupInterface() {
     renderKPIs();
     renderFilters();
+    renderPeriodButtons();
     renderTable();
     renderCharts();
   }
@@ -245,16 +246,34 @@ waitForSupabase(() => {
     });
   }
 
+  function renderPeriodButtons() {
+    const container = document.getElementById("leads-period-buttons");
+    if (!container) return;
+    const options = [7, 30, 90];
+    container.innerHTML = `
+      <div class="flex gap-2 mb-2">
+        ${options.map(days => `<button type="button" class="period-btn px-3 py-1 rounded border ${leadsState.chartPeriod === days ? 'bg-blue-600 text-white font-bold' : 'bg-gray-100 text-gray-700'}" data-days="${days}">${days} dias</button>`).join("")}
+      </div>
+    `;
+    Array.from(container.querySelectorAll(".period-btn")).forEach(btn => {
+      btn.onclick = (e) => {
+        leadsState.chartPeriod = parseInt(e.target.dataset.days, 10);
+        renderPeriodButtons();
+        renderCharts();
+      };
+    });
+  }
+
   function renderTable() {
     const container = document.getElementById("leads-table");
     if (!container) return;
     const start = (leadsState.pagination.current - 1) * leadsState.pagination.perPage;
     const end = start + leadsState.pagination.perPage;
     const rows = leadsState.filteredLeads.slice(start, end);
-    
+
     container.innerHTML = `
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse min-w-[1200px]">
+      <div class="overflow-x-auto w-full">
+        <table class="w-full border-collapse min-w-[900px]">
           <thead>
             <tr class="bg-gray-100 border-b-2 border-gray-300">
               <th class="p-3 text-left font-semibold">Nome</th>
@@ -287,7 +306,7 @@ waitForSupabase(() => {
     `;
   }
 
-  // ✅ CORRIGIDO: renderCharts() - agrupamento de datas para gráfico de linha!
+  // CORRIGIDO: renderCharts() - Botão período dinâmico, gráfico pizza ajustado, não sobrepõe
   function renderCharts() {
     const statusCanvas = document.getElementById("leads-status-chart");
     const dailyCanvas = document.getElementById("leads-daily-chart");
@@ -300,28 +319,28 @@ waitForSupabase(() => {
       type: "doughnut",
       data: {
         labels: LEADS_CONFIG.statusOptions.map(s => s.label),
-        datasets: [{ 
-          data: statusCounts, 
+        datasets: [{
+          data: statusCounts,
           backgroundColor: ["#3B82F6", "#F59E0B", "#8B5CF6", "#F97316", "#22C55E", "#EF4444"]
         }]
       },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: true,
-        plugins: { 
-          legend: { 
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
             position: "right",
             labels: { boxWidth: 12, font: { size: 11 } }
-          } 
-        } 
+          }
+        }
       }
     });
 
-    // Daily Chart - CORRIGIDO
+    // Daily Chart
     if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
     const days = [], counts = [];
     const period = leadsState.chartPeriod;
-    
+
     // Agrupar leads por data
     const leadsByDate = {};
     leadsState.filteredLeads.forEach(lead => {
@@ -329,7 +348,7 @@ waitForSupabase(() => {
       const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       leadsByDate[dateKey] = (leadsByDate[dateKey] || 0) + 1;
     });
-    
+
     // Criar array dos últimos N dias
     for (let i = period - 1; i >= 0; i--) {
       const d = new Date();
@@ -338,29 +357,29 @@ waitForSupabase(() => {
       days.push(d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }));
       counts.push(leadsByDate[dateKey] || 0);
     }
-    
+
     leadsState.charts.dailyChart = new Chart(dailyCanvas.getContext("2d"), {
       type: "line",
-      data: { 
-        labels: days, 
-        datasets: [{ 
-          label: "Novos Leads", 
-          data: counts, 
-          borderColor: "#3B82F6", 
+      data: {
+        labels: days,
+        datasets: [{
+          label: "Novos Leads",
+          data: counts,
+          borderColor: "#3B82F6",
           backgroundColor: "rgba(59, 130, 246, 0.1)",
           fill: true,
           tension: 0.3
-        }] 
+        }]
       },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: true,
-        plugins: { 
-          legend: { display: false } 
-        }, 
-        scales: { 
-          y: { beginAtZero: true, ticks: { stepSize: 1 } } 
-        } 
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
       }
     });
   }
@@ -401,13 +420,35 @@ waitForSupabase(() => {
       showError("Lead não encontrado");
       return;
     }
-    
-    alert(`Modal do lead: ${lead.nome || "Sem nome"}\n\nEm desenvolvimento: Timeline de Interações`);
-    console.log("Lead selecionado:", lead);
+    // Modal customizado
+    let modal = document.getElementById("lead-modal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "lead-modal";
+      modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30";
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-lg p-6 w-[370px] max-w-full relative">
+          <button id="close-lead-modal" class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white rounded">&times;</button>
+          <div id="lead-modal-content"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.getElementById("close-lead-modal").onclick = () => modal.remove();
+    }
+    document.getElementById("lead-modal-content").innerHTML = `
+      <h2 class="text-xl font-bold mb-2">${lead.nome || "Sem nome"}</h2>
+      <div class="mb-2 text-sm text-gray-700"><b>Email:</b> ${lead.email || "-"}<br><b>Telefone:</b> ${lead.telefone || "-"}<br><b>Empresa:</b> ${lead.empresa || "-"}</div>
+      <div class="mb-2 text-sm"><span class="px-2 py-1 rounded bg-blue-100 text-blue-800">${lead.status || "-"}</span> | <span class="px-2 py-1 rounded bg-gray-200">${lead.origem || "-"}</span></div>
+      <div class="mb-2"><b>Pontuação IA:</b> <span class="font-semibold">${lead.score_ia || 0}</span></div>
+      <div class="mb-2"><b>Criado em:</b> ${new Date(lead.created_at).toLocaleDateString("pt-BR")}</div>
+      <div class="mt-4 text-xs text-gray-500">Timeline/Interações: <i>Em desenvolvimento</i></div>
+    `;
+    modal.classList.remove("hidden");
   };
 
   window.changePeriod = function(days) {
     leadsState.chartPeriod = days;
+    renderPeriodButtons();
     renderCharts();
   };
 
@@ -417,5 +458,5 @@ waitForSupabase(() => {
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.3.1 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.3.2 carregado e pronto");
 });
