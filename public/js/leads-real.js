@@ -1,7 +1,6 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.5.1
- * CORRIGIDO: Modal de lead expandido (responsivo e maior), timeline com botão desabilitado e roadmap
- * PREPARADO: Estrutura para integração com timeline real
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.6.0
+ * NOVO: Timeline real integrada com lead_interactions
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -46,6 +45,7 @@ waitForSupabase(() => {
     getCurrentSession,
     getCurrentOrgId,
     genericSelect,
+    genericInsert,
     subscribeToTable
   } = window.AlshamSupabase;
 
@@ -75,6 +75,13 @@ waitForSupabase(() => {
       "indicacao", "evento", "cold_calling", "email_marketing",
       "seo_organic", "outro"
     ],
+    interactionTypes: [
+      { value: "email", label: "Email", icon: "📧" },
+      { value: "ligacao", label: "Ligação", icon: "📞" },
+      { value: "reuniao", label: "Reunião", icon: "🤝" },
+      { value: "nota", label: "Nota", icon: "📝" },
+      { value: "whatsapp", label: "WhatsApp", icon: "💬" }
+    ],
     pagination: { defaultPerPage: 25, options: [10, 25, 50, 100] },
     realtime: { enabled: true, refreshInterval: 30000 }
   };
@@ -87,6 +94,7 @@ waitForSupabase(() => {
     kpis: {},
     gamification: {},
     automations: {},
+    currentLeadInteractions: [],
     filters: {
       search: "", status: "", prioridade: "", temperatura: "",
       origem: "", dateRange: "", scoreRange: [0, 100]
@@ -182,6 +190,29 @@ waitForSupabase(() => {
       org_id: leadsState.orgId, is_active: true
     });
     return { active: data || [] };
+  }
+
+  async function loadLeadInteractions(leadId) {
+    const { data, error } = await genericSelect("lead_interactions", 
+      { lead_id: leadId, org_id: leadsState.orgId },
+      { order: { column: "created_at", ascending: false } }
+    );
+    if (error) {
+      console.error("Erro ao carregar interações:", error);
+      return [];
+    }
+    return data || [];
+  }
+
+  async function createInteraction(leadId, interactionData) {
+    const { data, error } = await genericInsert("lead_interactions", {
+      lead_id: leadId,
+      org_id: leadsState.orgId,
+      user_id: leadsState.user.id,
+      ...interactionData
+    });
+    if (error) throw error;
+    return data;
   }
 
   function applyFilters() {
@@ -417,8 +448,7 @@ waitForSupabase(() => {
     }
   }
 
-  // ✅ MODAL EXPANDIDO E MELHORADO
-  window.openLeadModal = function(leadId) {
+  window.openLeadModal = async function(leadId) {
     const lead = leadsState.leads.find(l => l.id === leadId);
     if (!lead) {
       showError("Lead não encontrado");
@@ -444,6 +474,11 @@ waitForSupabase(() => {
       });
     }
     
+    showLoading(true, "Carregando interações...");
+    const interactions = await loadLeadInteractions(leadId);
+    leadsState.currentLeadInteractions = interactions;
+    showLoading(false);
+    
     const statusConfig = LEADS_CONFIG.statusOptions.find(s => s.value === lead.status) || {};
     const statusColor = {
       novo: "bg-blue-100 text-blue-800",
@@ -457,7 +492,6 @@ waitForSupabase(() => {
     document.getElementById("lead-modal-content").innerHTML = `
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- COLUNA ESQUERDA: Informações do Lead -->
         <div class="space-y-4">
           <div>
             <h2 class="text-2xl font-bold text-gray-900 mb-1">${lead.nome || "Sem nome"}</h2>
@@ -514,44 +548,164 @@ waitForSupabase(() => {
           </div>
         </div>
         
-        <!-- COLUNA DIREITA: Timeline -->
         <div class="space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Timeline de Interações</h3>
-            <div class="flex items-center gap-2">
-              <button 
-                class="px-3 py-1 bg-gray-300 text-gray-500 text-xs rounded transition-colors font-medium cursor-not-allowed" 
-                disabled
-                title="Feature será implementada na próxima sprint"
-              >
-                + Nova Interação
-              </button>
-              <span class="text-xs text-blue-600 font-medium">Em breve</span>
-            </div>
+            <button 
+              class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors font-medium" 
+              onclick="window.showAddInteractionForm('${leadId}')"
+            >
+              + Nova Interação
+            </button>
           </div>
           
-          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 text-center border border-blue-200">
-            <div class="text-blue-400 text-4xl mb-3">🚧</div>
-            <p class="text-gray-700 font-semibold mb-1">Timeline em Desenvolvimento</p>
-            <p class="text-sm text-gray-600 mb-3">
-              Esta feature será implementada na <span class="font-semibold text-blue-600">Semana 3-4</span> do roadmap.
-            </p>
-            <div class="bg-white rounded p-3 text-xs text-left space-y-1 text-gray-600">
-              <p>✅ Visualizar histórico de interações</p>
-              <p>✅ Adicionar notas, emails e ligações</p>
-              <p>✅ Filtrar por tipo de interação</p>
-              <p>✅ Integração com automações</p>
-            </div>
+          <div id="lead-timeline-container" class="space-y-3 max-h-[500px] overflow-y-auto">
+            ${interactions.length === 0 ? `
+              <div class="bg-gray-50 rounded-lg p-6 text-center">
+                <div class="text-gray-400 text-4xl mb-2">📋</div>
+                <p class="text-gray-600 font-medium mb-1">Nenhuma interação registrada</p>
+                <p class="text-sm text-gray-500">Clique em "Nova Interação" para adicionar a primeira.</p>
+              </div>
+            ` : interactions.map(int => renderInteractionItem(int)).join('')}
           </div>
-          
-          <!-- Container preparado para timeline real -->
-          <div id="lead-timeline-container" class="hidden space-y-3"></div>
         </div>
       </div>
+      
+      <div id="interaction-form-container" class="hidden mt-6 border-t pt-6"></div>
     `;
     
     modal.classList.remove("hidden");
-    console.log(`📋 Modal aberto para lead: ${lead.nome} (ID: ${leadId})`);
+    console.log(`📋 Modal aberto para lead: ${lead.nome} (${interactions.length} interações)`);
+  };
+
+  function renderInteractionItem(interaction) {
+    const typeConfig = LEADS_CONFIG.interactionTypes.find(t => t.value === interaction.interaction_type) || { icon: "📌", label: "Outro" };
+    const date = new Date(interaction.created_at);
+    const timeAgo = getTimeAgo(date);
+    
+    return `
+      <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+        <div class="flex items-start gap-3">
+          <div class="text-2xl flex-shrink-0">${typeConfig.icon}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-semibold text-gray-900">${typeConfig.label}</span>
+              <span class="text-xs text-gray-500">${timeAgo}</span>
+            </div>
+            ${interaction.notes ? `<p class="text-sm text-gray-700 mb-2">${interaction.notes}</p>` : ''}
+            ${interaction.outcome ? `<div class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded inline-block">Resultado: ${interaction.outcome}</div>` : ''}
+            ${interaction.duration_minutes ? `<div class="text-xs text-gray-500 mt-1">Duração: ${interaction.duration_minutes} min</div>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    const intervals = [
+      { label: 'ano', seconds: 31536000 },
+      { label: 'mês', seconds: 2592000 },
+      { label: 'dia', seconds: 86400 },
+      { label: 'hora', seconds: 3600 },
+      { label: 'minuto', seconds: 60 }
+    ];
+    
+    for (const interval of intervals) {
+      const count = Math.floor(seconds / interval.seconds);
+      if (count > 0) {
+        return `há ${count} ${interval.label}${count > 1 ? 's' : ''}`;
+      }
+    }
+    return 'agora';
+  }
+
+  window.showAddInteractionForm = function(leadId) {
+    const container = document.getElementById("interaction-form-container");
+    if (!container) return;
+    
+    container.classList.remove("hidden");
+    container.innerHTML = `
+      <div class="bg-blue-50 rounded-lg p-4">
+        <h4 class="font-semibold text-gray-900 mb-4">Adicionar Nova Interação</h4>
+        <form id="new-interaction-form" class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Interação</label>
+            <select id="interaction-type" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+              ${LEADS_CONFIG.interactionTypes.map(t => `<option value="${t.value}">${t.icon} ${t.label}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Notas *</label>
+            <textarea id="interaction-notes" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Descreva o que foi discutido..." required></textarea>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Duração (min)</label>
+              <input type="number" id="interaction-duration" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Ex: 30">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Resultado</label>
+              <select id="interaction-outcome" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="">Selecione...</option>
+                <option value="positivo">Positivo</option>
+                <option value="neutro">Neutro</option>
+                <option value="negativo">Negativo</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Próxima Ação</label>
+            <input type="text" id="interaction-next-action" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Ex: Enviar proposta até sexta-feira">
+          </div>
+          
+          <div class="flex gap-2 pt-2">
+            <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium text-sm transition-colors">
+              Salvar Interação
+            </button>
+            <button type="button" onclick="window.cancelAddInteraction()" class="px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded font-medium text-sm transition-colors">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+    
+    document.getElementById("new-interaction-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const formData = {
+        interaction_type: document.getElementById("interaction-type").value,
+        notes: document.getElementById("interaction-notes").value,
+        duration_minutes: parseInt(document.getElementById("interaction-duration").value) || null,
+        outcome: document.getElementById("interaction-outcome").value || null,
+        next_action: document.getElementById("interaction-next-action").value || null
+      };
+      
+      try {
+        showLoading(true, "Salvando interação...");
+        await createInteraction(leadId, formData);
+        showLoading(false);
+        showSuccess("Interação adicionada com sucesso!");
+        
+        // Recarregar modal
+        window.openLeadModal(leadId);
+      } catch (error) {
+        showLoading(false);
+        showError(`Erro ao salvar: ${error.message}`);
+        console.error(error);
+      }
+    });
+    
+    container.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
+
+  window.cancelAddInteraction = function() {
+    const container = document.getElementById("interaction-form-container");
+    if (container) container.classList.add("hidden");
   };
 
   window.LeadsSystem = {
@@ -560,5 +714,5 @@ waitForSupabase(() => {
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.5.1 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.6.0 carregado e pronto");
 });
