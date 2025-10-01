@@ -1,288 +1,301 @@
 /**
- * ALSHAM 360° PRIMA - Enterprise Configuration System V5.3
- * CORRIGIDO: Aguarda Supabase carregar
+ * ALSHAM 360° PRIMA - Enterprise Configuration System V6.0
+ * Corrigido: Botões clicáveis e navegação funcional
  */
 
-// Aguarda Supabase estar disponível
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
     console.log("✅ Supabase carregado para configurações");
     callback();
   } else if (attempt >= maxAttempts) {
     console.error("❌ Supabase não carregou");
-    showNotification("Erro ao carregar sistema", "error");
   } else {
     setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
   }
 }
 
-// UI Helper (precisa estar fora porque showNotification é usado no waitForSupabase)
-function showNotification(message, type = "info", duration = 3000) {
+function showNotification(message, type = "info") {
   const div = document.createElement("div");
-  div.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded text-white ${
-    type === "success" ? "bg-green-600" : 
-    type === "error" ? "bg-red-600" : 
-    type === "warning" ? "bg-yellow-600" : "bg-blue-600"
-  }`;
+  const colors = {
+    success: "bg-green-600",
+    error: "bg-red-600",
+    warning: "bg-yellow-600",
+    info: "bg-blue-600"
+  };
+  div.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded text-white shadow-lg ${colors[type] || colors.info}`;
   div.textContent = message;
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), duration);
+  setTimeout(() => div.remove(), 3000);
 }
 
-// Aguarda Supabase antes de executar todo o resto
 waitForSupabase(async () => {
   const {
     getCurrentSession,
     getCurrentOrgId,
-    getUserProfile,
-    genericUpdate,
     genericSelect,
-    subscribeToTable,
+    genericUpdate,
     createAuditLog
   } = window.AlshamSupabase;
 
-  // ===== DEPENDENCY VALIDATION SYSTEM =====
-  function requireLib(libName, lib) {
-    if (!lib) {
-      const error = new Error(`❌ Dependência ${libName} não carregada!`);
-      error.name = "DependencyError";
-      error.library = libName;
-      throw error;
-    }
-    return lib;
-  }
+  const SECTIONS = [
+    { id: "profile", label: "👤 Perfil", icon: "👤" },
+    { id: "organization", label: "🏢 Organização", icon: "🏢" },
+    { id: "team", label: "👥 Equipe", icon: "👥" },
+    { id: "notifications", label: "🔔 Notificações", icon: "🔔" },
+    { id: "integrations", label: "🔌 Integrações", icon: "🔌" },
+    { id: "security", label: "🔒 Segurança", icon: "🔒" },
+    { id: "billing", label: "💳 Faturamento", icon: "💳" },
+    { id: "analytics", label: "📊 Analytics", icon: "📊" }
+  ];
 
-  function validateDependencies() {
-    return {
-      localStorage: requireLib("localStorage", window.localStorage),
-      sessionStorage: requireLib("sessionStorage", window.sessionStorage),
-      crypto: requireLib("Web Crypto API", window.crypto),
-      performance: requireLib("Performance API", window.performance),
-      Notification: requireLib("Notification API", window.Notification),
-      FileReader: requireLib("FileReader API", window.FileReader)
-    };
-  }
+  const state = {
+    user: null,
+    orgId: null,
+    data: {},
+    currentSection: "profile"
+  };
 
-  // ===== CONFIGURAÇÃO GLOBAL =====
-  const CONFIGURATION_CONFIG = Object.freeze({
-    PERFORMANCE: {
-      REFRESH_INTERVAL: 30000,
-      CACHE_TTL: 300000,
-      AUTO_SAVE_DELAY: 2000,
-      MAX_RETRIES: 3
-    },
-    SECURITY: {
-      MAX_UPLOAD_SIZE: 10485760,
-      ALLOWED_FILE_TYPES: ["jpg", "jpeg", "png", "gif", "pdf", "doc", "docx"],
-      SESSION_TIMEOUT: 1800000,
-      PASSWORD_MIN_LENGTH: 8
-    },
-    SECTIONS: [
-      { id: "profile", label: "Perfil", icon: "👤", color: "blue" },
-      { id: "organization", label: "Organização", icon: "🏢", color: "purple" },
-      { id: "team", label: "Equipe", icon: "👥", color: "green" },
-      { id: "notifications", label: "Notificações", icon: "🔔", color: "yellow" },
-      { id: "integrations", label: "Integrações", icon: "🔌", color: "indigo" },
-      { id: "security", label: "Segurança", icon: "🔒", color: "red" },
-      { id: "billing", label: "Faturamento", icon: "💳", color: "emerald" },
-      { id: "analytics", label: "Analytics", icon: "📊", color: "orange" }
-    ]
-  });
-
-  // ===== STATE MANAGER =====
-  class ConfigurationStateManager {
-    constructor() {
-      this.user = null;
-      this.orgId = null;
-      this.data = {};
-      this.cache = {};
-      this.listeners = new Set();
-    }
-    setData(newData) {
-      this.data = { ...this.data, ...newData };
-      this.notify();
-    }
-    getState() {
-      return { user: this.user, orgId: this.orgId, data: this.data };
-    }
-    notify() {
-      this.listeners.forEach(cb => cb(this.getState()));
-    }
-    addListener(cb) {
-      this.listeners.add(cb);
-    }
-    removeListener(cb) {
-      this.listeners.delete(cb);
-    }
-  }
-
-  const configurationState = new ConfigurationStateManager();
-
-  // ===== INICIALIZAÇÃO =====
-  async function initializeConfiguration() {
-    try {
-      showNotification("⚙️ Carregando configurações...", "info");
-
-      const auth = await authenticateUser();
-      if (!auth.success) return redirectToLogin();
-
-      configurationState.user = auth.user;
-      configurationState.orgId = auth.orgId;
-
-      await loadConfigurationDataWithCache();
-      renderConfigurationInterface();
-      setupRealTimeSubscriptions();
-
-      showNotification("✅ Configurações carregadas!", "success");
-    } catch (e) {
-      console.error("Erro init config:", e);
-      showNotification("Erro ao inicializar configurações", "error");
-    }
-  }
-
-  // ===== AUTENTICAÇÃO =====
-  async function authenticateUser() {
+  async function init() {
     try {
       const session = await getCurrentSession();
-      if (!session?.user) return { success: false };
-
-      let orgId = await getCurrentOrgId();
-      if (!orgId) {
-        orgId = localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
+      if (!session?.user) {
+        window.location.href = "/login.html";
+        return;
       }
-      localStorage.setItem("alsham_org_id", orgId);
 
-      return { success: true, user: session.user, orgId };
+      state.user = session.user;
+      state.orgId = await getCurrentOrgId();
+
+      await loadData();
+      renderSidebar();
+      renderContent(state.currentSection);
+
+      showNotification("Configurações carregadas", "success");
     } catch (e) {
-      console.error("Erro autenticação configurações:", e);
-      return { success: false };
+      console.error("Erro init:", e);
+      showNotification("Erro ao carregar", "error");
     }
   }
 
-  function redirectToLogin() {
-    window.location.href = "/login.html";
-  }
-
-  // ===== DATA LOAD =====
-  async function loadConfigurationDataWithCache() {
+  async function loadData() {
     try {
       const [profile, org, team] = await Promise.all([
-        genericSelect("user_profiles", { user_id: configurationState.user.id, org_id: configurationState.orgId }),
-        genericSelect("organizations", { id: configurationState.orgId }),
-        genericSelect("team_members", { org_id: configurationState.orgId })
+        genericSelect("user_profiles", { user_id: state.user.id, org_id: state.orgId }),
+        genericSelect("organizations", { id: state.orgId }),
+        genericSelect("teams", { org_id: state.orgId })
       ]);
 
-      configurationState.setData({
+      state.data = {
         profile: profile?.data?.[0] || {},
         organization: org?.data?.[0] || {},
         team: team?.data || []
-      });
+      };
     } catch (err) {
-      console.error("Erro load config:", err);
-      showNotification("Falha ao carregar dados de configuração", "error");
+      console.error("Erro carregar dados:", err);
     }
-  }
-
-  // ===== REALTIME =====
-  function setupRealTimeSubscriptions() {
-    const orgId = configurationState.orgId || "DEFAULT_ORG_ID";
-    subscribeToTable("user_profiles", orgId, handleRealTimeUpdate);
-    subscribeToTable("organizations", orgId, handleRealTimeUpdate);
-  }
-
-  function handleRealTimeUpdate(payload) {
-    console.log("🔄 Realtime update:", payload);
-    loadConfigurationDataWithCache();
-  }
-
-  // ===== RENDERIZAÇÃO =====
-  function renderConfigurationInterface() {
-    renderSidebar();
-    renderHeader();
-    renderContent("profile");
   }
 
   function renderSidebar() {
     const sidebar = document.getElementById("config-sidebar");
     if (!sidebar) return;
-    sidebar.innerHTML = CONFIGURATION_CONFIG.SECTIONS.map(sec => `
-      <button onclick="window.switchSection('${sec.id}')" 
-        class="w-full text-left p-3 rounded hover:bg-gray-100 transition">
-        ${sec.icon} ${sec.label}
-      </button>`).join("");
-  }
 
-  function renderHeader() {
-    const header = document.getElementById("config-header");
-    if (!header) return;
-    header.innerHTML = `
-      <h1 class="text-2xl font-bold">⚙️ Configurações</h1>
-      <p class="text-sm text-gray-600">Gerencie suas preferências</p>
-    `;
+    sidebar.innerHTML = SECTIONS.map(sec => `
+      <button 
+        class="config-section-btn ${sec.id === state.currentSection ? 'active' : ''}" 
+        data-section="${sec.id}">
+        ${sec.label}
+      </button>
+    `).join("");
+
+    sidebar.querySelectorAll(".config-section-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const section = btn.dataset.section;
+        state.currentSection = section;
+        renderSidebar();
+        renderContent(section);
+      });
+    });
   }
 
   function renderContent(section) {
     const content = document.getElementById("config-content");
     if (!content) return;
-    const state = configurationState.getState();
+
+    const templates = {
+      profile: renderProfileSection,
+      organization: renderOrganizationSection,
+      team: renderTeamSection,
+      notifications: renderNotificationsSection,
+      integrations: renderIntegrationsSection,
+      security: renderSecuritySection,
+      billing: renderBillingSection,
+      analytics: renderAnalyticsSection
+    };
+
+    const renderer = templates[section] || renderDefaultSection;
+    content.innerHTML = renderer();
 
     if (section === "profile") {
-      content.innerHTML = `
-        <div class="p-4 bg-white rounded shadow">
-          <h2 class="font-bold text-lg mb-3">Perfil</h2>
-          <input id="profile-name" class="border p-2 w-full mb-2" 
-            value="${state.data.profile?.full_name || ''}">
-          <button onclick="window.saveProfileData()" 
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Salvar
-          </button>
-        </div>`;
-    } else {
-      content.innerHTML = `<p class="text-gray-500">Seção ${section} em construção</p>`;
+      setupProfileHandlers();
     }
   }
 
-  // ===== SAVE =====
-  async function saveProfileData() {
+  function renderProfileSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">👤 Perfil</h2>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+          <input 
+            id="profile-name" 
+            type="text"
+            value="${state.data.profile?.full_name || ''}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Seu nome completo">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input 
+            type="email"
+            value="${state.user?.email || ''}"
+            disabled
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            placeholder="email@exemplo.com">
+          <p class="text-xs text-gray-500 mt-1">Email não pode ser alterado</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
+          <input 
+            id="profile-role" 
+            type="text"
+            value="${state.data.profile?.role || ''}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Seu cargo">
+        </div>
+
+        <button 
+          id="save-profile-btn"
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+          Salvar Alterações
+        </button>
+      </div>
+    `;
+  }
+
+  function renderOrganizationSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">🏢 Organização</h2>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <p class="font-medium">${state.data.organization?.name || 'ALSHAM Global'}</p>
+          <p class="text-sm text-gray-600 mt-2">ID: ${state.orgId}</p>
+        </div>
+        <p class="text-gray-600">Configurações de organização em desenvolvimento.</p>
+      </div>
+    `;
+  }
+
+  function renderTeamSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">👥 Equipe</h2>
+        <p class="text-gray-600">Membros da equipe: ${state.data.team?.length || 0}</p>
+        <p class="text-gray-600">Gerenciamento de equipe em desenvolvimento.</p>
+      </div>
+    `;
+  }
+
+  function renderNotificationsSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">🔔 Notificações</h2>
+        <p class="text-gray-600">Configure suas preferências de notificação.</p>
+      </div>
+    `;
+  }
+
+  function renderIntegrationsSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">🔌 Integrações</h2>
+        <p class="text-gray-600">Gerencie integrações com outros sistemas.</p>
+      </div>
+    `;
+  }
+
+  function renderSecuritySection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">🔒 Segurança</h2>
+        <p class="text-gray-600">Configurações de segurança e autenticação.</p>
+      </div>
+    `;
+  }
+
+  function renderBillingSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">💳 Faturamento</h2>
+        <p class="text-gray-600">Gerencie planos e pagamentos.</p>
+      </div>
+    `;
+  }
+
+  function renderAnalyticsSection() {
+    return `
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold">📊 Analytics</h2>
+        <p class="text-gray-600">Configurações de rastreamento e análise.</p>
+      </div>
+    `;
+  }
+
+  function renderDefaultSection() {
+    return `
+      <div class="text-center py-12">
+        <p class="text-gray-500">Seção em desenvolvimento</p>
+      </div>
+    `;
+  }
+
+  function setupProfileHandlers() {
+    const saveBtn = document.getElementById("save-profile-btn");
+    if (saveBtn) {
+      saveBtn.addEventListener("click", saveProfile);
+    }
+  }
+
+  async function saveProfile() {
     try {
-      const name = document.getElementById("profile-name").value;
-      await genericUpdate("user_profiles", configurationState.user.id, 
-        { full_name: name }, configurationState.orgId);
+      const name = document.getElementById("profile-name")?.value;
+      const role = document.getElementById("profile-role")?.value;
+
+      if (!name) {
+        showNotification("Nome é obrigatório", "warning");
+        return;
+      }
+
+      await genericUpdate("user_profiles", state.data.profile.id, 
+        { full_name: name, role }, 
+        state.orgId);
+
       await createAuditLog("PROFILE_UPDATED", 
-        { user_id: configurationState.user.id }, 
-        configurationState.user.id, 
-        configurationState.orgId);
-      showNotification("Perfil atualizado com sucesso", "success");
-      await loadConfigurationDataWithCache();
+        { user_id: state.user.id, changes: { full_name: name, role } }, 
+        state.user.id, 
+        state.orgId);
+
+      showNotification("Perfil atualizado com sucesso!", "success");
+      await loadData();
     } catch (e) {
-      console.error("Erro salvar perfil:", e);
+      console.error("Erro salvar:", e);
       showNotification("Erro ao salvar perfil", "error");
     }
   }
 
-  async function saveAllConfiguration() {
-    await loadConfigurationDataWithCache();
-  }
+  document.addEventListener("DOMContentLoaded", init);
 
-  function switchSection(section) {
-    renderContent(section);
-  }
-
-  // ===== EXPORT GLOBAL =====
-  window.AlshamConfiguration = {
-    state: () => configurationState.getState(),
-    refresh: loadConfigurationDataWithCache,
-    saveAll: saveAllConfiguration,
-    notify: showNotification,
-    version: "5.3.0",
-    buildDate: new Date().toISOString()
-  };
-
-  window.switchSection = switchSection;
-  window.saveProfileData = saveProfileData;
-
-  // ===== INIT =====
-  document.addEventListener("DOMContentLoaded", initializeConfiguration);
-
-  console.log("⚙️ Enterprise Configuration System v5.3 pronto - ALSHAM 360° PRIMA");
+  console.log("⚙️ Enterprise Configuration System v6.0 pronto - ALSHAM 360° PRIMA");
 });
