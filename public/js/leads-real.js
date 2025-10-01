@@ -1,7 +1,6 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.3.2
- * CORRIGIDO: Botões de período, gráficos ajustados, layout melhorado, bugfixes do feedback
- * Atualização: scroll da tabela, modal lead, estado dinâmico botões de período, gráficos não sobrepostos
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.4.0
+ * CORRIGIDO: Botões de período com estado visual dinâmico funcionando
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -201,7 +200,7 @@ waitForSupabase(() => {
   function setupInterface() {
     renderKPIs();
     renderFilters();
-    renderPeriodButtons();
+    setupPeriodButtons(); // ✅ NOVO: Configurar botões uma vez
     renderTable();
     renderCharts();
   }
@@ -246,22 +245,32 @@ waitForSupabase(() => {
     });
   }
 
-  function renderPeriodButtons() {
-    const container = document.getElementById("leads-period-buttons");
+  // ✅ NOVO: Configurar botões de período (chamado uma vez)
+  function setupPeriodButtons() {
+    const container = document.getElementById("period-buttons-container");
     if (!container) return;
-    const options = [7, 30, 90];
-    container.innerHTML = `
-      <div class="flex gap-2 mb-2">
-        ${options.map(days => `<button type="button" class="period-btn px-3 py-1 rounded border ${leadsState.chartPeriod === days ? 'bg-blue-600 text-white font-bold' : 'bg-gray-100 text-gray-700'}" data-days="${days}">${days} dias</button>`).join("")}
-      </div>
-    `;
-    Array.from(container.querySelectorAll(".period-btn")).forEach(btn => {
-      btn.onclick = (e) => {
-        leadsState.chartPeriod = parseInt(e.target.dataset.days, 10);
-        renderPeriodButtons();
+
+    const buttons = container.querySelectorAll(".period-btn");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const period = parseInt(btn.dataset.period, 10);
+        leadsState.chartPeriod = period;
+        
+        // ✅ Atualizar classes CSS de todos os botões
+        buttons.forEach(b => {
+          if (parseInt(b.dataset.period, 10) === period) {
+            b.className = "period-btn px-2 py-1 text-xs rounded bg-blue-600 text-white font-semibold";
+          } else {
+            b.className = "period-btn px-2 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200";
+          }
+        });
+        
         renderCharts();
-      };
+        console.log(`📊 Período alterado para ${period} dias`);
+      });
     });
+    
+    console.log("✅ Botões de período configurados");
   }
 
   function renderTable() {
@@ -306,7 +315,6 @@ waitForSupabase(() => {
     `;
   }
 
-  // CORRIGIDO: renderCharts() - Botão período dinâmico, gráfico pizza ajustado, não sobrepõe
   function renderCharts() {
     const statusCanvas = document.getElementById("leads-status-chart");
     const dailyCanvas = document.getElementById("leads-daily-chart");
@@ -341,7 +349,6 @@ waitForSupabase(() => {
     const days = [], counts = [];
     const period = leadsState.chartPeriod;
 
-    // Agrupar leads por data
     const leadsByDate = {};
     leadsState.filteredLeads.forEach(lead => {
       const date = new Date(lead.created_at);
@@ -349,7 +356,6 @@ waitForSupabase(() => {
       leadsByDate[dateKey] = (leadsByDate[dateKey] || 0) + 1;
     });
 
-    // Criar array dos últimos N dias
     for (let i = period - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
@@ -420,7 +426,6 @@ waitForSupabase(() => {
       showError("Lead não encontrado");
       return;
     }
-    // Modal customizado
     let modal = document.getElementById("lead-modal");
     if (!modal) {
       modal = document.createElement("div");
@@ -446,17 +451,11 @@ waitForSupabase(() => {
     modal.classList.remove("hidden");
   };
 
-  window.changePeriod = function(days) {
-    leadsState.chartPeriod = days;
-    renderPeriodButtons();
-    renderCharts();
-  };
-
   window.LeadsSystem = {
     init: () => loadSystemData().then(setupInterface),
     refresh: () => loadSystemData().then(setupInterface),
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.3.2 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.4.0 carregado e pronto");
 });
