@@ -8,6 +8,7 @@ const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
+  
   return {
     base: '/',
     publicDir: 'public',
@@ -22,6 +23,7 @@ export default defineConfig(({ mode }) => {
           index: resolve(__dirname, 'index.html'),
           dashboard: resolve(__dirname, 'dashboard.html'),
           leadsReal: resolve(__dirname, 'leads-real.html'),
+          pipeline: resolve(__dirname, 'pipeline.html'),
           automacoes: resolve(__dirname, 'automacoes.html'),
           relatorios: resolve(__dirname, 'relatorios.html'),
           gamificacao: resolve(__dirname, 'gamificacao.html'),
@@ -45,8 +47,4 @@ export default defineConfig(({ mode }) => {
     define: {
       __SUPABASE_URL__: JSON.stringify(SUPABASE_URL),
       __SUPABASE_ANON_KEY__: JSON.stringify(SUPABASE_KEY),
-      __VERSION__: JSON.stringify(process.env.npm_package_version || '2.0.0'),
-      __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
-    },
-  };
-});
+      __VERSION__: JSON.stringify(process
