@@ -103,7 +103,7 @@
     
     <section id="leads-table" class="bg-white rounded-lg shadow p-4"></section>
     
-    <!-- GRÁFICOS SUBSTITUÍDOS -->
+    <!-- GRÁFICOS - BOTÕES SEM ONCLICK INLINE, AGORA COM ID PARA JS CONTROLAR -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow p-4">
         <h2 class="font-bold mb-3 text-lg">Distribuição por Status</h2>
@@ -114,10 +114,11 @@
       <div class="bg-white rounded-lg shadow p-4">
         <div class="flex justify-between items-center mb-3">
           <h2 class="font-bold text-lg">Leads por Dia</h2>
-          <div class="flex gap-1">
-            <button onclick="window.changePeriod(7)" class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 hover:bg-blue-200">7d</button>
-            <button onclick="window.changePeriod(30)" class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200">30d</button>
-            <button onclick="window.changePeriod(90)" class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200">90d</button>
+          <!-- ✅ REMOVIDO onclick inline, adicionado container com ID -->
+          <div id="period-buttons-container" class="flex gap-1">
+            <button data-period="7" class="period-btn px-2 py-1 text-xs rounded bg-blue-600 text-white font-semibold">7d</button>
+            <button data-period="30" class="period-btn px-2 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200">30d</button>
+            <button data-period="90" class="period-btn px-2 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200">90d</button>
           </div>
         </div>
         <div class="h-64">
