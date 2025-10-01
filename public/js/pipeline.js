@@ -1,32 +1,38 @@
-// Importar Supabase
-import { supabase } from '../lib/supabase.js';
+/**
+ * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
+ * Versão: 1.0
+ * Data: 01/10/2025
+ * Estrutura: public/js/pipeline.js
+ */
 
-// Definir as colunas do pipeline
+import { supabase } from './supabase.js';
+
 const COLUNAS = [
-  { id: 'qualificacao', nome: 'Qualificação', cor: 'blue' },
-  { id: 'proposta', nome: 'Proposta', cor: 'yellow' },
-  { id: 'negociacao', nome: 'Negociação', cor: 'orange' },
-  { id: 'fechado_ganho', nome: 'Fechado - Ganho', cor: 'green' },
-  { id: 'fechado_perdido', nome: 'Fechado - Perdido', cor: 'red' }
+  { id: 'qualificacao', nome: 'Qualificação', cor: 'bg-blue-100' },
+  { id: 'proposta', nome: 'Proposta', cor: 'bg-yellow-100' },
+  { id: 'negociacao', nome: 'Negociação', cor: 'bg-orange-100' },
+  { id: 'fechado_ganho', nome: 'Fechado Ganho', cor: 'bg-green-100' },
+  { id: 'fechado_perdido', nome: 'Perdido', cor: 'bg-red-100' }
 ];
 
-// Estado global
 let opportunities = [];
-let orgId = null;
 
-// Inicializar
+// Inicialização
 async function init() {
-  // Obter org_id
-  orgId = await window.AlshamSupabase.getCurrentOrgId();
-  
-  // Carregar oportunidades
-  await loadOpportunities();
-  
-  // Renderizar board
-  renderBoard();
-  
-  // Setup de eventos
-  setupEvents();
+  try {
+    console.log('🎯 Iniciando Pipeline de Vendas...');
+    await loadOpportunities();
+    renderBoard();
+    setupDragDrop();
+    
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('pipeline-board').classList.remove('hidden');
+    console.log('✅ Pipeline carregado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao inicializar pipeline:', error);
+    document.getElementById('loading').innerHTML = 
+      `<p class="text-red-500">Erro ao carregar pipeline: ${error.message}</p>`;
+  }
 }
 
 // Carregar oportunidades do Supabase
@@ -34,71 +40,58 @@ async function loadOpportunities() {
   const { data, error } = await supabase
     .from('sales_opportunities')
     .select('*')
-    .eq('org_id', orgId)
     .order('created_at', { ascending: false });
   
   if (error) {
-    console.error('Erro ao carregar oportunidades:', error);
-    return;
+    console.error('Erro ao buscar oportunidades:', error);
+    throw error;
   }
   
   opportunities = data || [];
-  console.log(`✅ ${opportunities.length} oportunidades carregadas`);
+  console.log(`📊 ${opportunities.length} oportunidades carregadas`);
 }
 
-// Renderizar o board completo
+// Renderizar board completo
 function renderBoard() {
   const board = document.getElementById('pipeline-board');
-  board.innerHTML = '';
   
-  COLUNAS.forEach(coluna => {
-    const column = createColumn(coluna);
-    board.appendChild(column);
-  });
+  board.innerHTML = COLUNAS.map(col => {
+    const opps = opportunities.filter(o => o.status === col.id);
+    const total = opps.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
+    
+    return `
+      <div class="flex-shrink-0 w-80 ${col.cor} rounded-lg p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-semibold text-gray-700">${col.nome}</h3>
+          <span class="bg-white px-2 py-1 rounded text-sm font-medium">${opps.length}</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-4 font-medium">
+          Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+        </p>
+        <div class="space-y-2 min-h-[100px]" data-column="${col.id}">
+          ${opps.map(opp => createCard(opp)).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
-// Criar uma coluna
-function createColumn(coluna) {
-  const col = document.createElement('div');
-  col.className = 'flex-shrink-0 w-80 bg-gray-100 rounded-lg p-4';
-  col.dataset.status = coluna.id;
-  
-  // Filtrar oportunidades desta coluna
-  const opps = opportunities.filter(o => o.status === coluna.id);
-  const total = opps.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
-  
-  col.innerHTML = `
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-semibold text-gray-700">${coluna.nome}</h3>
-      <span class="text-sm bg-white px-2 py-1 rounded">${opps.length}</span>
-    </div>
-    <div class="text-sm text-gray-600 mb-4">
-      Total: R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-    </div>
-    <div class="space-y-3" data-column="${coluna.id}">
-      ${opps.map(opp => createCard(opp)).join('')}
-    </div>
-  `;
-  
-  return col;
-}
-
-// Criar um card de oportunidade
+// Criar card individual
 function createCard(opp) {
   return `
     <div 
-      class="bg-white p-4 rounded-lg shadow-sm cursor-move hover:shadow-md transition-shadow"
+      class="bg-white p-3 rounded shadow-sm cursor-move hover:shadow-md transition-shadow border border-gray-200"
       draggable="true"
       data-id="${opp.id}"
     >
-      <h4 class="font-medium text-gray-900 mb-2">${opp.titulo}</h4>
-      <p class="text-sm text-gray-600">
-        R$ ${(opp.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+      <h4 class="font-medium text-gray-900 mb-1 text-sm">${opp.titulo}</h4>
+      <p class="text-sm text-gray-600 mb-2">
+        R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
       </p>
-      <div class="mt-2 flex items-center justify-between">
-        <span class="text-xs text-gray-500">${opp.probabilidade}% prob.</span>
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${opp.probabilidade}%</span>
         <button 
-          onclick="viewOpportunity('${opp.id}')" 
+          onclick="viewOpportunityDetails('${opp.id}')" 
           class="text-xs text-blue-600 hover:underline"
         >
           Ver detalhes
@@ -108,75 +101,106 @@ function createCard(opp) {
   `;
 }
 
-// Setup de eventos (drag & drop simplificado)
-function setupEvents() {
-  const board = document.getElementById('pipeline-board');
+// Sistema de Drag and Drop
+function setupDragDrop() {
   let draggedCard = null;
+  let draggedFrom = null;
   
-  // Drag start
-  board.addEventListener('dragstart', (e) => {
+  document.addEventListener('dragstart', (e) => {
     if (e.target.draggable) {
       draggedCard = e.target;
-      e.target.style.opacity = '0.5';
+      draggedFrom = e.target.closest('[data-column]')?.dataset.column;
+      e.target.classList.add('opacity-50', 'scale-105');
+      e.dataTransfer.effectAllowed = 'move';
     }
   });
-  
-  // Drag end
-  board.addEventListener('dragend', (e) => {
+
+  document.addEventListener('dragend', (e) => {
     if (e.target.draggable) {
-      e.target.style.opacity = '1';
+      e.target.classList.remove('opacity-50', 'scale-105');
     }
   });
-  
-  // Drag over (permitir drop)
-  board.addEventListener('dragover', (e) => {
+
+  document.addEventListener('dragover', (e) => {
     e.preventDefault();
     const column = e.target.closest('[data-column]');
     if (column) {
       e.dataTransfer.dropEffect = 'move';
+      column.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
     }
   });
-  
-  // Drop
-  board.addEventListener('drop', async (e) => {
+
+  document.addEventListener('dragleave', (e) => {
+    const column = e.target.closest('[data-column]');
+    if (column && !column.contains(e.relatedTarget)) {
+      column.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+    }
+  });
+
+  document.addEventListener('drop', async (e) => {
     e.preventDefault();
     const column = e.target.closest('[data-column]');
     
     if (column && draggedCard) {
+      column.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
       const newStatus = column.dataset.column;
       const oppId = draggedCard.dataset.id;
       
-      // Atualizar no Supabase
-      await updateOpportunityStatus(oppId, newStatus);
+      // Não fazer nada se soltar na mesma coluna
+      if (draggedFrom === newStatus) {
+        console.log('⏸️ Card solto na mesma coluna');
+        return;
+      }
       
-      // Recarregar
-      await loadOpportunities();
-      renderBoard();
-      setupEvents();
+      try {
+        console.log(`🔄 Movendo oportunidade ${oppId} para ${newStatus}`);
+        
+        const { error } = await supabase
+          .from('sales_opportunities')
+          .update({ 
+            status: newStatus, 
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', oppId);
+        
+        if (error) throw error;
+        
+        console.log(`✅ Oportunidade movida com sucesso para ${newStatus}`);
+        
+        // Recarregar e re-renderizar
+        await loadOpportunities();
+        renderBoard();
+        setupDragDrop();
+        
+      } catch (error) {
+        console.error('❌ Erro ao mover card:', error);
+        alert(`Erro ao mover card: ${error.message}`);
+      }
     }
   });
 }
 
-// Atualizar status da oportunidade
-async function updateOpportunityStatus(oppId, newStatus) {
-  const { error } = await supabase
-    .from('sales_opportunities')
-    .update({ status: newStatus, updated_at: new Date().toISOString() })
-    .eq('id', oppId);
-  
-  if (error) {
-    console.error('Erro ao atualizar:', error);
-    alert('Erro ao mover card');
-  } else {
-    console.log(`✅ Oportunidade movida para ${newStatus}`);
-  }
-}
-
-// Ver detalhes (placeholder)
-window.viewOpportunity = function(id) {
+// Ver detalhes da oportunidade (placeholder)
+window.viewOpportunityDetails = function(id) {
   const opp = opportunities.find(o => o.id === id);
-  alert(`Detalhes:\n\nTítulo: ${opp.titulo}\nValor: R$ ${opp.valor}\nStatus: ${opp.status}`);
+  if (!opp) return;
+  
+  alert(`
+📋 Detalhes da Oportunidade
+
+Título: ${opp.titulo}
+Valor: R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+Probabilidade: ${opp.probabilidade}%
+Status: ${opp.status}
+Criado em: ${new Date(opp.created_at).toLocaleDateString('pt-BR')}
+  `);
 }
 
-// Iniciar quando página carrega
-document.addEventListener('DOMContentLoaded', init);
+// Auto-inicializar
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+console.log('🎯 Pipeline.js carregado');
