@@ -5,24 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pipeline de Vendas - ALSHAM 360°</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .dragging { opacity: 0.5; }
+    .drag-over { background-color: #e0e7ff; }
+  </style>
 </head>
 <body class="bg-gray-50">
   
-  <!-- Header -->
-  <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 py-4">
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-6 py-4">
       <h1 class="text-2xl font-bold text-gray-900">Pipeline de Vendas</h1>
     </div>
   </header>
 
-  <!-- Pipeline Container -->
-  <main class="max-w-7xl mx-auto px-4 py-6">
-    <div id="pipeline-board" class="flex gap-4 overflow-x-auto pb-4">
-      <!-- As colunas serão inseridas aqui pelo JavaScript -->
+  <main class="max-w-7xl mx-auto px-6 py-6">
+    <div id="loading" class="text-center py-20">
+      <p class="text-gray-500">Carregando pipeline...</p>
     </div>
+    
+    <div id="pipeline-board" class="hidden flex gap-4 overflow-x-auto pb-4"></div>
   </main>
 
-  <!-- Modal para adicionar oportunidade -->
   <div id="modal-add" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
       <h2 class="text-xl font-bold mb-4">Nova Oportunidade</h2>
@@ -36,6 +39,6 @@
     </div>
   </div>
 
-  <script type="module" src="/src/pages/pipeline.js"></script>
+  <script type="module" src="/public/js/pipeline.js"></script>
 </body>
 </html>
