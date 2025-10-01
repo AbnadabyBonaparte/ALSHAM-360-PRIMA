@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.7 (Produção)
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.8 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
 // -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ const SUPABASE_ANON_KEY =
 const DEFAULT_ORG_ID =
   typeof __DEFAULT_ORG_ID__ !== 'undefined'
     ? __DEFAULT_ORG_ID__
-    : import.meta?.env?.VITE_DEFAULT_ORG_ID || null;
+    : import.meta?.env?.VITE_DEFAULT_ORG_ID || 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.warn('⚠️ Supabase URL ou Key não configuradas — verifique variáveis no Vercel.');
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.7',
+      'X-Client-Info': 'alsham-360-prima@unified-1.8',
       'X-Environment':
         (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
@@ -231,14 +231,19 @@ function getDefaultOrgId() {
 async function getCurrentOrgId() {
   try {
     const session = await getCurrentSession();
-    if (!session?.user) return getDefaultOrgId();
+    if (!session?.user) {
+      console.log('📍 Sem sessão - usando org padrão:', DEFAULT_ORG_ID);
+      return getDefaultOrgId();
+    }
     const userId = session.user.id;
     const { data, error } = await supabase.from('user_profiles').select('org_id').eq('user_id', userId).limit(1).maybeSingle();
     if (error) {
       console.warn('⚠️ getCurrentOrgId falhou, usando org padrão');
       return getDefaultOrgId();
     }
-    return isValidUUID(data?.org_id) ? data.org_id : getDefaultOrgId();
+    const orgId = isValidUUID(data?.org_id) ? data.org_id : getDefaultOrgId();
+    console.log('📍 Org ID detectado:', orgId);
+    return orgId;
   } catch {
     return getDefaultOrgId();
   }
@@ -304,25 +309,78 @@ async function genericDelete(table, id, orgId = null) {
 async function getDashboardKPIs(orgIdParam = null) {
   try {
     const orgId = orgIdParam || (await getCurrentOrgId());
+    console.log('📊 Buscando KPIs para org:', orgId);
+    
+    // Tentar buscar da view primeiro
     const { data, error } = await supabase
       .from('dashboard_kpis')
       .select('*')
       .eq('org_id', orgId)
       .maybeSingle();
     
-    if (error) throw error;
+    if (error) {
+      console.warn('⚠️ View dashboard_kpis falhou, calculando diretamente:', error.message);
+      
+      // FALLBACK: Calcular direto da tabela leads_crm
+      const { data: leads, error: leadsError } = await supabase
+        .from('leads_crm')
+        .select('id, status, temperatura, created_at')
+        .eq('org_id', orgId);
+      
+      if (leadsError) throw leadsError;
+      
+      console.log('📋 Total de leads encontrados:', leads?.length || 0);
+      
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      
+      const kpis = {
+        total_leads: leads?.length || 0,
+        new_leads_last_7_days: leads?.filter(l => new Date(l.created_at) >= sevenDaysAgo).length || 0,
+        qualified_leads: leads?.filter(l => ['qualificado', 'em_contato'].includes(l.status)).length || 0,
+        hot_leads: leads?.filter(l => l.temperatura === 'quente').length || 0,
+        converted_leads: leads?.filter(l => l.status === 'convertido').length || 0,
+        lost_leads: leads?.filter(l => l.status === 'perdido').length || 0,
+        warm_leads: leads?.filter(l => l.temperatura === 'morno').length || 0,
+        cold_leads: leads?.filter(l => l.temperatura === 'frio').length || 0,
+        conversion_rate: leads?.length ? ((leads.filter(l => l.status === 'convertido').length / leads.length) * 100).toFixed(2) : 0
+      };
+      
+      console.log('✅ KPIs calculados via fallback:', kpis);
+      return kpis;
+    }
     
     if (!data) {
-      return { 
-        total_leads: 0, 
-        new_leads_last_7_days: 0, 
-        qualified_leads: 0, 
-        hot_leads: 0 
+      console.warn('⚠️ View retornou vazio, usando fallback');
+      // Se view existe mas não retorna dados, usar fallback
+      const { data: leads } = await supabase
+        .from('leads_crm')
+        .select('id, status, temperatura, created_at')
+        .eq('org_id', orgId);
+      
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      
+      return {
+        total_leads: leads?.length || 0,
+        new_leads_last_7_days: leads?.filter(l => new Date(l.created_at) >= sevenDaysAgo).length || 0,
+        qualified_leads: leads?.filter(l => ['qualificado', 'em_contato'].includes(l.status)).length || 0,
+        hot_leads: leads?.filter(l => l.temperatura === 'quente').length || 0
       };
     }
+    
+    console.log('✅ KPIs da view:', data);
     return data;
+    
   } catch (err) {
-    return { error: handleError(err, 'getDashboardKPIs') };
+    console.error('❌ getDashboardKPIs falhou completamente:', err);
+    return {
+      total_leads: 0,
+      new_leads_last_7_days: 0,
+      qualified_leads: 0,
+      hot_leads: 0,
+      error: handleError(err, 'getDashboardKPIs')
+    };
   }
 }
 
