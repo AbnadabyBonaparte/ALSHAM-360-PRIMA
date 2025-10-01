@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.6 (Produção)
+// ALSHAM 360° PRIMA - Supabase Unified Client v1.7 (Produção)
 // Fonte única da verdade para toda integração com Supabase no sistema.
 // Multi-tenant: cada cliente opera isolado pelo seu próprio org_id.
 // -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.6',
+      'X-Client-Info': 'alsham-360-prima@unified-1.7',
       'X-Environment':
         (typeof window !== 'undefined' && window.location?.hostname) || 'server'
     }
@@ -180,7 +180,6 @@ async function resetPassword(email) {
   }
 }
 
-// ✅ Novo método de login usado pelo login.js
 async function genericSignIn(email, password) {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -305,12 +304,23 @@ async function genericDelete(table, id, orgId = null) {
 async function getDashboardKPIs(orgIdParam = null) {
   try {
     const orgId = orgIdParam || (await getCurrentOrgId());
-    const { data, error } = await supabase.from('dashboard_summary').select('*').eq('org_id', orgId).order('updated_at', { ascending: false }).limit(1);
+    const { data, error } = await supabase
+      .from('dashboard_kpis')
+      .select('*')
+      .eq('org_id', orgId)
+      .maybeSingle();
+    
     if (error) throw error;
-    if (!data || data.length === 0) {
-      return { leads_total: 0, leads_novos: 0, leads_qualificados: 0, taxa_conversao: 0 };
+    
+    if (!data) {
+      return { 
+        total_leads: 0, 
+        new_leads_last_7_days: 0, 
+        qualified_leads: 0, 
+        hot_leads: 0 
+      };
     }
-    return data[0];
+    return data;
   } catch (err) {
     return { error: handleError(err, 'getDashboardKPIs') };
   }
@@ -416,7 +426,7 @@ if (typeof window !== 'undefined') {
     onAuthStateChange,
     signUpWithEmail,
     resetPassword,
-    genericSignIn,   // 🔥 garantido
+    genericSignIn,
     checkEmailExists,
     createUserProfile,
     getCurrentOrgId,
