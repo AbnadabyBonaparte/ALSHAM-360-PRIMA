@@ -1,6 +1,6 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.2
- * ADICIONADO: Click handler para abrir modal de lead
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.3
+ * CORRIGIDO: Tabela completa, gráficos ajustados, nomes dos leads
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -94,7 +94,8 @@ waitForSupabase(() => {
     sorting: { field: "created_at", direction: "desc" },
     isLoading: false,
     lastUpdate: null,
-    charts: {}
+    charts: {},
+    chartPeriod: 7
   };
 
   document.addEventListener("DOMContentLoaded", async () => {
@@ -184,7 +185,7 @@ waitForSupabase(() => {
 
   function applyFilters() {
     leadsState.filteredLeads = leadsState.leads.filter(l => {
-      if (leadsState.filters.search && !l.name?.toLowerCase().includes(leadsState.filters.search.toLowerCase())) return false;
+      if (leadsState.filters.search && !l.nome?.toLowerCase().includes(leadsState.filters.search.toLowerCase())) return false;
       if (leadsState.filters.status && l.status !== leadsState.filters.status) return false;
       if (leadsState.filters.prioridade && l.prioridade !== leadsState.filters.prioridade) return false;
       if (leadsState.filters.temperatura && l.temperatura !== leadsState.filters.temperatura) return false;
@@ -209,10 +210,10 @@ waitForSupabase(() => {
     const kpis = leadsState.kpis;
     container.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded shadow"><p>Total Leads</p><h2 class="text-xl font-bold">${kpis.total_leads || 0}</h2></div>
-        <div class="bg-white p-4 rounded shadow"><p>Convertidos</p><h2 class="text-xl font-bold">${kpis.convertidos || 0}</h2></div>
-        <div class="bg-white p-4 rounded shadow"><p>Taxa Conversão</p><h2 class="text-xl font-bold">${kpis.conversao || 0}%</h2></div>
-        <div class="bg-white p-4 rounded shadow"><p>Pontos Gamificação</p><h2 class="text-xl font-bold">${leadsState.gamification.points || 0}</h2></div>
+        <div class="bg-white p-4 rounded shadow"><p class="text-gray-600 text-sm">Total Leads</p><h2 class="text-2xl font-bold">${kpis.total_leads || 0}</h2></div>
+        <div class="bg-white p-4 rounded shadow"><p class="text-gray-600 text-sm">Convertidos</p><h2 class="text-2xl font-bold">${kpis.convertidos || 0}</h2></div>
+        <div class="bg-white p-4 rounded shadow"><p class="text-gray-600 text-sm">Taxa Conversão</p><h2 class="text-2xl font-bold">${kpis.conversao || 0}%</h2></div>
+        <div class="bg-white p-4 rounded shadow"><p class="text-gray-600 text-sm">Pontos Gamificação</p><h2 class="text-2xl font-bold">${leadsState.gamification.points || 0}</h2></div>
       </div>
     `;
   }
@@ -221,11 +222,13 @@ waitForSupabase(() => {
     const container = document.getElementById("leads-filters");
     if (!container) return;
     container.innerHTML = `
-      <input type="text" id="filter-search" placeholder="🔍 Buscar..." class="border p-2 rounded w-full mb-2">
-      <select id="filter-status" class="border p-2 rounded w-full mb-2">
-        <option value="">Todos Status</option>
-        ${LEADS_CONFIG.statusOptions.map(s => `<option value="${s.value}">${s.icon} ${s.label}</option>`).join("")}
-      </select>
+      <div class="flex gap-2">
+        <input type="text" id="filter-search" placeholder="🔍 Buscar por nome..." class="border p-2 rounded flex-1">
+        <select id="filter-status" class="border p-2 rounded">
+          <option value="">Todos Status</option>
+          ${LEADS_CONFIG.statusOptions.map(s => `<option value="${s.value}">${s.icon} ${s.label}</option>`).join("")}
+        </select>
+      </div>
     `;
     document.getElementById("filter-search").addEventListener("input", e => {
       leadsState.filters.search = e.target.value;
@@ -247,28 +250,39 @@ waitForSupabase(() => {
     const start = (leadsState.pagination.current - 1) * leadsState.pagination.perPage;
     const end = start + leadsState.pagination.perPage;
     const rows = leadsState.filteredLeads.slice(start, end);
+    
     container.innerHTML = `
-      <table class="w-full border">
-        <thead><tr class="bg-gray-100">
-          <th class="p-2 text-left">Nome</th>
-          <th class="p-2 text-left">Status</th>
-          <th class="p-2 text-left">Prioridade</th>
-          <th class="p-2 text-left">Origem</th>
-          <th class="p-2 text-left">Data</th>
-        </tr></thead>
-        <tbody>
-          ${rows.map(l => `
-            <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" data-lead-id="${l.id}" onclick="window.openLeadModal('${l.id}')">
-              <td class="p-2">${l.name || "-"}</td>
-              <td class="p-2"><span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">${l.status || "-"}</span></td>
-              <td class="p-2">${l.prioridade || "-"}</td>
-              <td class="p-2">${l.origem || "-"}</td>
-              <td class="p-2">${new Date(l.created_at).toLocaleDateString("pt-BR")}</td>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse min-w-[1200px]">
+          <thead>
+            <tr class="bg-gray-100 border-b-2 border-gray-300">
+              <th class="p-3 text-left font-semibold">Nome</th>
+              <th class="p-3 text-left font-semibold">Email</th>
+              <th class="p-3 text-left font-semibold">Telefone</th>
+              <th class="p-3 text-left font-semibold">Empresa</th>
+              <th class="p-3 text-left font-semibold">Status</th>
+              <th class="p-3 text-left font-semibold">Origem</th>
+              <th class="p-3 text-left font-semibold">Score IA</th>
+              <th class="p-3 text-left font-semibold">Data</th>
             </tr>
-          `).join("")}
-        </tbody>
-      </table>
-      <p class="text-sm text-gray-500 mt-2">Página ${leadsState.pagination.current} de ${leadsState.pagination.totalPages} (${leadsState.pagination.total} leads)</p>
+          </thead>
+          <tbody>
+            ${rows.map(l => `
+              <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" onclick="window.openLeadModal('${l.id}')">
+                <td class="p-3 font-medium">${l.nome || "-"}</td>
+                <td class="p-3 text-sm text-gray-600">${l.email || "-"}</td>
+                <td class="p-3 text-sm text-gray-600">${l.telefone || "-"}</td>
+                <td class="p-3 text-sm text-gray-600">${l.empresa || "-"}</td>
+                <td class="p-3"><span class="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">${l.status || "-"}</span></td>
+                <td class="p-3 text-sm">${l.origem || "-"}</td>
+                <td class="p-3 text-sm font-semibold">${l.score_ia || 0}</td>
+                <td class="p-3 text-sm text-gray-600">${new Date(l.created_at).toLocaleDateString("pt-BR")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-gray-500 mt-3">Página ${leadsState.pagination.current} de ${leadsState.pagination.totalPages} (${leadsState.pagination.total} leads)</p>
     `;
   }
 
@@ -283,23 +297,58 @@ waitForSupabase(() => {
       type: "doughnut",
       data: {
         labels: LEADS_CONFIG.statusOptions.map(s => s.label),
-        datasets: [{ data: statusCounts, backgroundColor: ["#3B82F6", "#F59E0B", "#8B5CF6", "#F97316", "#22C55E", "#EF4444"] }]
+        datasets: [{ 
+          data: statusCounts, 
+          backgroundColor: ["#3B82F6", "#F59E0B", "#8B5CF6", "#F97316", "#22C55E", "#EF4444"]
+        }]
       },
-      options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: true,
+        plugins: { 
+          legend: { 
+            position: "right",
+            labels: { boxWidth: 12, font: { size: 11 } }
+          } 
+        } 
+      }
     });
 
     if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
     const days = [], counts = [];
-    for (let i = 6; i >= 0; i--) {
+    const period = leadsState.chartPeriod;
+    
+    for (let i = period - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
       days.push(d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }));
-      counts.push(leadsState.filteredLeads.filter(l => l.created_at?.startsWith(d.toISOString().split("T")[0])).length);
+      counts.push(leadsState.filteredLeads.filter(l => l.created_at?.startsWith(dateStr)).length);
     }
+    
     leadsState.charts.dailyChart = new Chart(dailyCanvas.getContext("2d"), {
       type: "line",
-      data: { labels: days, datasets: [{ label: "Novos Leads", data: counts, borderColor: "#3B82F6", fill: true }] },
-      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      data: { 
+        labels: days, 
+        datasets: [{ 
+          label: "Novos Leads", 
+          data: counts, 
+          borderColor: "#3B82F6", 
+          backgroundColor: "rgba(59, 130, 246, 0.1)",
+          fill: true,
+          tension: 0.3
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: true,
+        plugins: { 
+          legend: { display: false } 
+        }, 
+        scales: { 
+          y: { beginAtZero: true, ticks: { stepSize: 1 } } 
+        } 
+      }
     });
   }
 
@@ -333,7 +382,6 @@ waitForSupabase(() => {
     }
   }
 
-  // NOVO: Função para abrir modal do lead
   window.openLeadModal = function(leadId) {
     const lead = leadsState.leads.find(l => l.id === leadId);
     if (!lead) {
@@ -341,8 +389,13 @@ waitForSupabase(() => {
       return;
     }
     
-    alert(`Modal do lead: ${lead.name || "Sem nome"}\n\nEm desenvolvimento: Timeline de Interações`);
+    alert(`Modal do lead: ${lead.nome || "Sem nome"}\n\nEm desenvolvimento: Timeline de Interações`);
     console.log("Lead selecionado:", lead);
+  };
+
+  window.changePeriod = function(days) {
+    leadsState.chartPeriod = days;
+    renderCharts();
   };
 
   window.LeadsSystem = {
@@ -351,5 +404,5 @@ waitForSupabase(() => {
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.2 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.3 carregado e pronto");
 });
