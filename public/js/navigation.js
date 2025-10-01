@@ -1,6 +1,7 @@
 /**
- * ALSHAM 360° PRIMA - Sistema de Navegação Enterprise V2.2
- * CORRIGIDO: Aguarda Supabase e Auth carregarem
+ * ALSHAM 360° PRIMA - Sistema de Navegação Enterprise V2.3
+ * CORRIGIDO: Estrutura alinhada com repositório + Pipeline adicionado
+ * Data: 01/10/2025
  */
 
 // Aguarda Supabase e Auth estarem disponíveis
@@ -9,7 +10,7 @@ function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     console.log("✅ Supabase e Auth carregados para Navigation");
     callback();
   } else if (attempt >= maxAttempts) {
-    console.error("❌ Supabase/Auth não carregaram");
+    console.error("❌ Supabase/Auth não carregaram após", maxAttempts * 100, "ms");
     callback();
   } else {
     setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
@@ -27,6 +28,7 @@ waitForSupabase(() => {
   const ROUTES = Object.freeze({
     dashboard: "/index.html",
     leads: "/leads-real.html",
+    pipeline: "/pipeline.html",
     automacoes: "/automacoes.html",
     relatorios: "/relatorios.html",
     gamificacao: "/gamificacao.html",
@@ -48,7 +50,7 @@ waitForSupabase(() => {
     try {
       await initializeAuth();
       initializeNavigation();
-      console.log("✅ Navigation System v2.2 inicializado");
+      console.log("✅ Navigation System v2.3 inicializado");
     } catch (err) {
       console.error("❌ Erro na inicialização da navegação:", err);
     }
@@ -88,14 +90,14 @@ waitForSupabase(() => {
       !navigationState.isAuthenticated &&
       !["login", "register"].includes(navigationState.currentPage)
     ) {
-      console.warn("⚠️ Usuário não autenticado → login");
+      console.warn("⚠️ Usuário não autenticado, redirecionando para login");
       window.location.href = ROUTES.login;
       return false;
     }
 
     if (!checkRouteAccess(navigationState.currentPage)) {
       console.warn("🚫 Acesso negado à rota:", navigationState.currentPage);
-      showAuthNotification("Acesso negado", "error");
+      showAuthNotification("Acesso negado a esta página", "error");
       window.location.href = ROUTES.dashboard;
       return false;
     }
@@ -161,14 +163,25 @@ waitForSupabase(() => {
   }
 
   function updatePageTitle() {
-    document.title = `ALSHAM 360° PRIMA - ${navigationState.currentPage}`;
+    const pageNames = {
+      dashboard: "Dashboard",
+      leads: "Leads",
+      pipeline: "Pipeline de Vendas",
+      automacoes: "Automações",
+      relatorios: "Relatórios",
+      gamificacao: "Gamificação",
+      configuracoes: "Configurações",
+    };
+    
+    const pageName = pageNames[navigationState.currentPage] || "Dashboard";
+    document.title = `ALSHAM 360° PRIMA - ${pageName}`;
   }
 
   // ===== EXPORT GLOBAL =====
   window.navigationSystem = {
     initializeNavigation,
     navigationState,
-    ROUTES
+    ROUTES,
   };
 
   // ===== AUTO-INIT =====
@@ -178,5 +191,5 @@ waitForSupabase(() => {
     initNavigation();
   }
 
-  console.log("🧭 Navigation System v2.2 carregado");
+  console.log("🧭 Navigation System v2.3 carregado com Pipeline");
 });
