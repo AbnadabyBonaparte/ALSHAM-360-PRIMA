@@ -6,7 +6,6 @@
   <title>Configurações — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gerencie as configurações do ALSHAM 360° PRIMA: preferências, segurança, notificações e personalização avançada." />
 
-  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline';
@@ -18,12 +17,10 @@
     frame-src 'self';
     worker-src 'self' blob:;">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 
   <style>
-    /* MENU LATERAL */
     .side-nav {
       position: fixed;
       left: 0;
@@ -57,27 +54,47 @@
     .main-content-wrapper {
       margin-left: 220px;
     }
+    .config-section-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .config-section-btn:hover {
+      background: #f3f4f6;
+      border-color: #3b82f6;
+    }
+    .config-section-btn.active {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #3b82f6;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen font-inter">
-  <!-- Navbar -->
   <header class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <h1 class="text-xl font-bold text-primary">⚙️ ALSHAM 360° PRIMA</h1>
+        <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
         <nav class="hidden md:flex space-x-6">
-          <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">📊 Dashboard</a>
-          <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">👥 Leads</a>
-          <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">⚙️ Automações</a>
-          <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">🎮 Gamificação</a>
-          <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">📈 Relatórios</a>
-          <a href="/configuracoes.html" aria-current="page" class="text-primary font-medium">⚙️ Configurações</a>
+          <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+          <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
+          <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
+          <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
+          <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+          <a href="/configuracoes.html" class="text-primary font-medium">Configurações</a>
         </nav>
       </div>
     </div>
   </header>
 
-  <!-- MENU LATERAL -->
   <aside class="side-nav">
     <a href="/dashboard.html">📊 Dashboard</a>
     <a href="/leads-real.html">👥 Leads</a>
@@ -87,44 +104,34 @@
     <a href="/configuracoes.html" class="active">⚙️ Configurações</a>
   </aside>
 
-  <!-- Loader -->
-  <div id="config-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-    <div class="text-center">
-      <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
-      <p class="text-gray-600 font-medium">Carregando configurações...</p>
-    </div>
-  </div>
-
-  <!-- Main Content -->
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      <!-- Sidebar -->
-      <aside id="config-sidebar" class="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <!-- Renderizado via configuracoes.js -->
+      <aside class="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div id="config-sidebar"></div>
       </aside>
 
-      <!-- Content -->
       <section class="lg:col-span-3 space-y-6">
-        <div id="config-header"></div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h1 class="text-2xl font-bold mb-2">⚙️ Configurações</h1>
+          <p class="text-sm text-gray-600">Gerencie suas preferências</p>
+        </div>
+        
         <div id="config-content" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <div class="text-center py-8">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600">Preparando painel de configurações...</p>
+            <p class="mt-4 text-gray-600">Carregando configurações...</p>
           </div>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
 
-  <!-- Toast Container -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
   <script type="module" src="/src/lib/supabase.js"></script>
   <script type="module" src="/js/configuracoes.js"></script>
 </body>
