@@ -5,7 +5,7 @@
  * Estrutura: public/js/pipeline.js
  */
 
-import { supabase } from './supabase.js';
+import { supabase } from '../../src/lib/supabase.js';
 
 const COLUNAS = [
   { id: 'qualificacao', nome: 'Qualificação', cor: 'bg-blue-100' },
