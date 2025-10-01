@@ -1,4 +1,3 @@
-// vite.config.js
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
@@ -19,21 +18,21 @@ export default defineConfig(({ mode }) => {
       sourcemap: !isProduction,
       target: 'esnext',
       rollupOptions: {
-  input: {
-    index: resolve(__dirname, 'index.html'),
-    dashboard: resolve(__dirname, 'dashboard.html'),
-    leadsReal: resolve(__dirname, 'leads-real.html'),
-    pipeline: resolve(__dirname, 'pipeline.html'),
-    timelineTest: resolve(__dirname, 'timeline-test.html'), // ADICIONE ESTA LINHA
-    automacoes: resolve(__dirname, 'automacoes.html'),
-    relatorios: resolve(__dirname, 'relatorios.html'),
-    gamificacao: resolve(__dirname, 'gamificacao.html'),
-    configuracoes: resolve(__dirname, 'configuracoes.html'),
-    login: resolve(__dirname, 'login.html'),
-    register: resolve(__dirname, 'register.html'),
-    createOrg: resolve(__dirname, 'create-org.html'),
-  },
-},
+        input: {
+          index: resolve(__dirname, 'index.html'),
+          dashboard: resolve(__dirname, 'dashboard.html'),
+          leadsReal: resolve(__dirname, 'leads-real.html'),
+          pipeline: resolve(__dirname, 'pipeline.html'),
+          timelineTest: resolve(__dirname, 'timeline-test.html'), // ADICIONE ESTA LINHA
+          automacoes: resolve(__dirname, 'automacoes.html'),
+          relatorios: resolve(__dirname, 'relatorios.html'),
+          gamificacao: resolve(__dirname, 'gamificacao.html'),
+          configuracoes: resolve(__dirname, 'configuracoes.html'),
+          login: resolve(__dirname, 'login.html'),
+          register: resolve(__dirname, 'register.html'),
+          createOrg: resolve(__dirname, 'create-org.html'),
+        },
+      },
     },
     plugins: [
       VitePWA({
