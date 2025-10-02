@@ -43,7 +43,7 @@ const supabaseAdmin = createClient(
 
 const app = express();
 
-// ✅ Middlewares enterprise
+// ✅ Helmet (segurança enterprise)
 app.use(
   helmet({
     contentSecurityPolicy:
@@ -51,10 +51,33 @@ app.use(
         ? {
             directives: {
               defaultSrc: ["'self'"],
-              scriptSrc: ["'self'", SUPABASE_URL],
-              connectSrc: ["'self'", SUPABASE_URL],
-              imgSrc: ["'self'", "data:"],
-              styleSrc: ["'self'", "'unsafe-inline'"],
+              scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "'unsafe-eval'",
+                "https://cdn.jsdelivr.net",
+                "https://cdnjs.cloudflare.com",
+                "https://cdn.tailwindcss.com",
+                "https://*.supabase.co",
+                "https://us-assets.i.posthog.com",
+                "https://app.posthog.com",
+                "https://apis.google.com"
+              ],
+              styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
+              fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+              connectSrc: [
+                "'self'",
+                "https://*.supabase.co",
+                "wss://*.supabase.co",
+                "https://api.openai.com",
+                "https://app.posthog.com",
+                "https://us-assets.i.posthog.com"
+              ],
+              imgSrc: ["'self'", "data:", "blob:", "https:"],
+              workerSrc: ["'self'", "blob:"],
+              objectSrc: ["'none'"],
+              frameSrc: ["'self'"],
+              manifestSrc: ["'self'"]
             },
           }
         : false,
@@ -62,6 +85,7 @@ app.use(
   })
 );
 
+// ✅ Middlewares enterprise
 app.use(cors({ origin: true, credentials: true }));
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
@@ -103,7 +127,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ✅ Endpoints
+// ✅ Endpoints protegidos
 app.get('/api/leads', authMiddleware, async (req, res) => {
   try {
     const { data, error } = await supabaseAdmin.from('leads_crm').select('*').limit(100);
