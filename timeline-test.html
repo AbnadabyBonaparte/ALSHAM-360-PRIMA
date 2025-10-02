@@ -11,16 +11,33 @@
   <div class="max-w-3xl mx-auto">
     <h1 class="text-2xl font-bold mb-6">Timeline de Interações - Teste</h1>
     
-    <div id="timeline-container"></div>
+    <div id="timeline-container" class="bg-white rounded-lg shadow p-6">
+      <p class="text-gray-500 text-center">Carregando...</p>
+    </div>
   </div>
 
+  <!-- ✅ ORDEM CORRETA: Supabase ANTES do Timeline -->
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script type="module" src="/public/js/timeline.js"></script>
+  
   <script type="module">
-    import { loadTimeline } from '/public/js/timeline.js';
+    // Aguardar carregamento do Supabase
+    function waitForSupabase(callback) {
+      if (window.AlshamSupabase && window.loadTimeline) {
+        callback();
+      } else {
+        setTimeout(() => waitForSupabase(callback), 100);
+      }
+    }
     
-    // ID do lead Felipe Araújo
-    const TEST_LEAD_ID = 'd1d8b851-a7af-4307-9e2d-9204aff314cc';
-    
-    loadTimeline(TEST_LEAD_ID, 'timeline-container');
+    waitForSupabase(() => {
+      console.log('✅ Iniciando teste do timeline');
+      
+      // ID do lead Felipe Araújo
+      const TEST_LEAD_ID = 'd1d8b851-a7af-4307-9e2d-9204aff314cc';
+      
+      window.loadTimeline(TEST_LEAD_ID, 'timeline-container');
+    });
   </script>
 </body>
 </html>
