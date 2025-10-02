@@ -1,32 +1,27 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Relatórios — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Sistema de Relatórios multi-tenant do ALSHAM 360° PRIMA: KPIs, gráficos e exportações inteligentes." />
-
-  <!-- ✅ CSP CORRIGIDA -->
+  <meta name="description" content="Sistema de Relatórios do ALSHAM 360° PRIMA" />
+  
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob: https:;
+    img-src 'self' data: blob:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
-  <!-- CSS -->
+  
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-
-  <!-- Chart.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   
   <style>
-    /* MENU LATERAL */
     .side-nav {
       position: fixed;
       left: 0;
@@ -63,34 +58,29 @@
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  <!-- Loader -->
-  <div id="relatorios-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div class="text-center">
-      <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
-      <p class="text-gray-600 font-medium">Carregando relatórios...</p>
+  
+  <div id="relatorios-loader" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6">
+      <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <p class="text-gray-700">Carregando...</p>
     </div>
   </div>
-
-  <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
-  <!-- Navbar -->
+  
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
       <div class="hidden md:flex space-x-6">
         <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
         <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
         <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
         <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
         <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
-        <a href="/relatorios.html" class="text-primary font-medium">Relatórios</a>
+        <a href="/relatorios.html" class="text-blue-600 font-medium">Relatórios</a>
         <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
       </div>
     </div>
   </nav>
   
-  <!-- MENU LATERAL -->
   <aside class="side-nav">
     <a href="/dashboard.html">📊 Dashboard</a>
     <a href="/leads-real.html">👥 Leads</a>
@@ -100,39 +90,48 @@
     <a href="/relatorios.html" class="active">📈 Relatórios</a>
     <a href="/configuracoes.html">⚙️ Configurações</a>
   </aside>
-
-  <!-- Conteúdo -->
-  <main id="main-content" class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
+  
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
     <h1 class="text-3xl font-bold text-gray-900">📊 Relatórios</h1>
-
-    <!-- KPIs -->
+    
+    <section id="kpi-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></section>
+    
     <section>
-      <h2 class="text-xl font-semibold mb-4">Indicadores</h2>
-      <div id="kpi-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </section>
-
-    <!-- Gráficos -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Evolução de Leads</h2>
-      <div class="bg-white rounded-xl shadow p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">Evolução de Leads</h2>
+        <div class="flex gap-1">
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200" data-period="7">7d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-blue-600 text-white font-semibold" data-period="30">30d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200" data-period="90">90d</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6 h-80">
         <canvas id="leads-chart"></canvas>
       </div>
     </section>
-
-    <!-- Outros Gráficos -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Outros Gráficos</h2>
-      <div id="extra-charts" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
-    </section>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section>
+        <h2 class="text-2xl font-bold mb-4">Leads por Status</h2>
+        <div class="bg-white rounded-lg shadow p-6 h-80">
+          <canvas id="status-chart"></canvas>
+        </div>
+      </section>
+      
+      <section>
+        <h2 class="text-2xl font-bold mb-4">Receita por Mês</h2>
+        <div class="bg-white rounded-lg shadow p-6 h-80">
+          <canvas id="revenue-chart"></canvas>
+        </div>
+      </section>
+    </div>
   </main>
-
-  <!-- Footer -->
+  
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  
   <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/js/relatorios.js"></script>
+  <script type="module" src="/public/js/relatorios.js"></script>
 </body>
 </html>
