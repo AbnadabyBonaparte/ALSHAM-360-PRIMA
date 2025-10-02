@@ -1,7 +1,7 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.8.0
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.8.1
  * Sistema completo de gerenciamento de leads com IA e gamificação
- * CORRIGIDO: Edge Function com URL e headers corretos
+ * ✅ CORRIGIDO: Eventos inline substituídos por addEventListener (CSP compliance)
  */
 
 /* =============================================================================
@@ -465,7 +465,7 @@ waitForSupabase(() => {
           <tbody>
             ${rows.map(l => `
               <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" 
-                  onclick="window.openLeadModal('${l.id}')">
+                  data-lead-id="${l.id}">
                 <td class="p-3 font-medium">${l.nome || "-"}</td>
                 <td class="p-3 text-sm text-gray-600">${l.email || "-"}</td>
                 <td class="p-3 text-sm text-gray-600">${l.telefone || "-"}</td>
@@ -490,6 +490,14 @@ waitForSupabase(() => {
         (${leadsState.pagination.total} leads)
       </p>
     `;
+
+    // ✅ Event listeners para as linhas (CSP compliance)
+    container.querySelectorAll('tr[data-lead-id]').forEach(row => {
+      row.addEventListener('click', () => {
+        const leadId = row.getAttribute('data-lead-id');
+        window.openLeadModal(leadId);
+      });
+    });
   }
 
   function renderCharts() {
@@ -723,7 +731,7 @@ waitForSupabase(() => {
                 <div class="flex items-center gap-2">
                   <span class="text-2xl font-bold text-blue-600">${lead.score_ia || 0}</span>
                   <button 
-                    onclick="window.recalculateLeadScore('${lead.id}')" 
+                    data-recalc-lead="${lead.id}"
                     class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
                   >
                     🔄 Recalcular
@@ -764,8 +772,8 @@ waitForSupabase(() => {
               Timeline de Interações
             </h3>
             <button 
-              class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors font-medium" 
-              onclick="window.showAddInteractionForm('${leadId}')"
+              data-add-interaction="${leadId}"
+              class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors font-medium"
             >
               + Nova Interação
             </button>
@@ -787,6 +795,22 @@ waitForSupabase(() => {
       
       <div id="interaction-form-container" class="hidden mt-6 border-t pt-6"></div>
     `;
+    
+    // ✅ Event listener para botão de recalcular score (CSP compliance)
+    const recalcBtn = modal.querySelector('[data-recalc-lead]');
+    if (recalcBtn) {
+      recalcBtn.addEventListener('click', () => {
+        window.recalculateLeadScore(recalcBtn.dataset.recalcLead);
+      });
+    }
+
+    // ✅ Event listener para botão de nova interação (CSP compliance)
+    const addInteractionBtn = modal.querySelector('[data-add-interaction]');
+    if (addInteractionBtn) {
+      addInteractionBtn.addEventListener('click', () => {
+        window.showAddInteractionForm(addInteractionBtn.dataset.addInteraction);
+      });
+    }
     
     modal.classList.remove("hidden");
     console.log(`📋 Modal aberto para lead: ${lead.nome} (${interactions.length} interações)`);
@@ -877,7 +901,7 @@ waitForSupabase(() => {
             </button>
             <button 
               type="button" 
-              onclick="window.cancelAddInteraction()" 
+              data-cancel-interaction="true"
               class="px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded font-medium text-sm transition-colors"
             >
               Cancelar
@@ -887,6 +911,7 @@ waitForSupabase(() => {
       </div>
     `;
     
+    // ✅ Event listener para submit (CSP compliance)
     document.getElementById("new-interaction-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -910,6 +935,12 @@ waitForSupabase(() => {
         console.error(error);
       }
     });
+
+    // ✅ Event listener para botão de cancelar (CSP compliance)
+    const cancelBtn = container.querySelector('[data-cancel-interaction]');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', window.cancelAddInteraction);
+    }
     
     container.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
@@ -920,7 +951,7 @@ waitForSupabase(() => {
   };
 
   /* ===========================================================================
-     RECÁLCULO DE SCORE COM IA - ✅ CORRIGIDO
+     RECÁLCULO DE SCORE COM IA
      =========================================================================== */
 
   window.recalculateLeadScore = async function(leadId) {
@@ -932,7 +963,6 @@ waitForSupabase(() => {
         throw new Error("Sessão inválida");
       }
 
-      // ✅ Pegar apikey do window.AlshamSupabase
       const supabaseConfig = window.AlshamSupabase.supabase;
       
       const response = await fetch(
@@ -997,5 +1027,5 @@ waitForSupabase(() => {
     config: LEADS_CONFIG
   };
 
-  console.log("✅ 📋 Leads-Real.js v5.8.0 carregado e pronto!");
+  console.log("✅ 📋 Leads-Real.js v5.8.1 carregado e pronto!");
 });
