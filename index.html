@@ -3,51 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ALSHAM 360° PRIMA — Loading</title>
-  <meta name="description" content="ALSHAM 360° PRIMA — Sistema Enterprise de CRM, Relatórios, Automações e Agentes Digitais." />
+  <title>ALSHAM 360° PRIMA</title>
+  <meta name="description" content="ALSHAM 360° PRIMA — Sistema Enterprise de CRM" />
   <meta name="theme-color" content="#1E40AF" />
   
-  <!-- ✅ CSP CORRIGIDA -->
+  <!-- CSP CORRIGIDA com unsafe-eval -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data:;
+    img-src 'self' data: https:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
   
-  <!-- Ícones e Manifesto PWA -->
   <link rel="icon" href="/assets/favicon.ico" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  
-  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="bg-gray-50 font-sans flex flex-col items-center justify-center min-h-screen">
-  <!-- Loader -->
+  
   <main class="text-center p-6">
     <div class="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
     <h1 class="text-xl font-bold text-gray-800">Carregando...</h1>
-    <p class="text-gray-600 mt-2">Verificando sua sessão</p>
-    <noscript>
-      <p class="text-red-600 mt-4">⚠️ O sistema requer JavaScript habilitado.</p>
-    </noscript>
+    <p class="text-gray-600 mt-2">Verificando sessão</p>
   </main>
   
-  <!-- 🚀 Roteamento central -->
   <script type="module">
-    import { getCurrentSession } from "/src/lib/supabase.js";
+    // CAMINHO CORRETO
+    import { getCurrentSession } from "/js/supabase.js";
     
     async function routeUser() {
       try {
+        console.log('Verificando sessão...');
         const session = await getCurrentSession();
+        
         if (session?.user) {
+          console.log('Usuário autenticado, redirecionando para dashboard');
           window.location.replace("/dashboard.html");
         } else {
+          console.log('Sem sessão, redirecionando para login');
           window.location.replace("/login.html");
         }
       } catch (err) {
@@ -59,14 +56,12 @@
     routeUser();
   </script>
   
-  <!-- 🔒 PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/sw.js')
-          .then(() => console.log('✅ Service Worker registrado com sucesso'))
-          .catch(err => console.error('⚠️ Erro ao registrar Service Worker:', err));
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('Service Worker OK'))
+          .catch(err => console.error('SW Error:', err));
       });
     }
   </script>
