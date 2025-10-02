@@ -18,6 +18,9 @@
     frame-src 'self';
     worker-src 'self' blob:;">
   
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
@@ -144,6 +147,24 @@
     .hidden {
       display: none !important;
     }
+    
+    /* ===================================
+       PRIMARY COLOR
+       =================================== */
+    .text-primary {
+      color: #3b82f6;
+    }
+    
+    .bg-primary {
+      background-color: #3b82f6;
+    }
+    
+    /* ===================================
+       FONT INTER
+       =================================== */
+    .font-inter {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -250,18 +271,24 @@
     
     <!-- LOADING INDICATOR -->
     <div id="leads-loading" class="hidden flex justify-center py-6" role="status" aria-live="polite">
-      <div class="inline-block w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      <div class="inline-block w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
       <span class="sr-only">Carregando leads...</span>
     </div>
     
     <!-- KPI CARDS -->
-    <section id="leads-kpis" aria-label="Indicadores de Performance"></section>
+    <section id="leads-kpis" aria-label="Indicadores de Performance">
+      <!-- Será preenchido pelo JS -->
+    </section>
     
     <!-- FILTERS -->
-    <section id="leads-filters" class="card p-4" aria-label="Filtros de Busca"></section>
+    <section id="leads-filters" class="card p-4" aria-label="Filtros de Busca">
+      <!-- Será preenchido pelo JS -->
+    </section>
     
     <!-- LEADS TABLE -->
-    <section id="leads-table" class="card p-4" aria-label="Tabela de Leads"></section>
+    <section id="leads-table" class="card p-4" aria-label="Tabela de Leads">
+      <!-- Será preenchido pelo JS -->
+    </section>
     
     <!-- CHARTS -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -334,5 +361,19 @@
        =================================== -->
   <script type="module" src="/src/lib/supabase.js"></script>
   <script type="module" src="/js/leads-real.js"></script>
+  
+  <!-- ✅ MOBILE MENU TOGGLE SCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mobileToggle = document.getElementById('mobile-menu-toggle');
+      const sideNav = document.getElementById('side-nav');
+      
+      if (mobileToggle && sideNav) {
+        mobileToggle.addEventListener('click', () => {
+          sideNav.classList.toggle('open');
+        });
+      }
+    });
+  </script>
 </body>
 </html>
