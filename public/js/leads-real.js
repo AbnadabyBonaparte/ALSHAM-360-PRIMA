@@ -1,6 +1,6 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.6.0
- * NOVO: Timeline real integrada com lead_interactions
+ * ALSHAM 360° PRIMA - LEADS REAIS V5.7.0
+ * NOVO: Timeline real integrada com lead_interactions + Recálculo manual de Score IA
  */
 
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
@@ -528,7 +528,15 @@ waitForSupabase(() => {
             <div class="space-y-2">
               <div class="flex justify-between items-center">
                 <span class="text-sm font-medium text-gray-600">Score IA:</span>
-                <span class="text-2xl font-bold text-blue-600">${lead.score_ia || 0}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-blue-600">${lead.score_ia || 0}</span>
+                  <button 
+                    onclick="window.recalculateLeadScore('${lead.id}')" 
+                    class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
+                  >
+                    🔄 Recalcular
+                  </button>
+                </div>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${lead.score_ia || 0}%"></div>
@@ -708,11 +716,47 @@ waitForSupabase(() => {
     if (container) container.classList.add("hidden");
   };
 
+  // Função para recalcular score manualmente
+  window.recalculateLeadScore = async function(leadId) {
+    try {
+      showLoading(true, "Recalculando score...");
+      
+      // ✅ URL CORRIGIDA
+      const supabaseUrl = 'https://rgvnbtuqtsvfxhrdnkjs.supabase.co';
+      const session = await getCurrentSession();
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/calculate-lead-score`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ leadId })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        showSuccess(`Score atualizado: ${result.score}`);
+        await loadSystemData();
+        renderTable();
+        window.openLeadModal(leadId);
+      } else {
+        throw new Error(result.error || 'Erro desconhecido');
+      }
+    } catch (error) {
+      showError(`Erro ao calcular score: ${error.message}`);
+      console.error('Erro completo:', error);
+    } finally {
+      showLoading(false);
+    }
+  };
+
   window.LeadsSystem = {
     init: () => loadSystemData().then(setupInterface),
     refresh: () => loadSystemData().then(setupInterface),
     state: leadsState
   };
 
-  console.log("📋 Leads-Real.js v5.6.0 carregado e pronto");
+  console.log("📋 Leads-Real.js v5.7.0 carregado e pronto");
 });
