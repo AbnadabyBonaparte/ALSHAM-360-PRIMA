@@ -1,6 +1,6 @@
 /**
- * TIMELINE DE INTERAÇÕES - LEADS CRM
- * Carrega e exibe histórico de interações com leads
+ * TIMELINE DE INTERAÇÕES - LEADS CRM v2.0
+ * ✅ CORRIGIDO: usa created_at em vez de interaction_date
  */
 
 const ICONS = {
@@ -19,11 +19,6 @@ const COLORS = {
   whatsapp: 'bg-green-50 text-green-600'
 };
 
-/**
- * Carrega timeline de interações de um lead
- * @param {string} leadId - UUID do lead
- * @param {string} containerId - ID do container HTML
- */
 export async function loadTimeline(leadId, containerId) {
   const container = document.getElementById(containerId);
   
@@ -35,20 +30,24 @@ export async function loadTimeline(leadId, containerId) {
   container.innerHTML = '<p class="text-gray-500 text-center py-8">⏳ Carregando interações...</p>';
 
   try {
-    // ✅ Usar window.AlshamSupabase em vez de import direto
     if (!window.AlshamSupabase) {
       throw new Error('Supabase não está carregado');
     }
 
-    const { genericSelect } = window.AlshamSupabase;
+    const { genericSelect, getCurrentOrgId } = window.AlshamSupabase;
+    const orgId = await getCurrentOrgId();
     
+    // ✅ CORRIGIDO: created_at em vez de interaction_date
     const { data, error } = await genericSelect(
       'lead_interactions',
-      { lead_id: leadId },
-      { order: { column: 'interaction_date', ascending: false } }
+      { lead_id: leadId, org_id: orgId },
+      { order: { column: 'created_at', ascending: false } }
     );
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Erro no Supabase:', error);
+      throw error;
+    }
 
     if (!data || data.length === 0) {
       container.innerHTML = `
@@ -56,7 +55,7 @@ export async function loadTimeline(leadId, containerId) {
           <div class="text-4xl mb-3">📋</div>
           <p class="text-gray-600 font-medium mb-3">Nenhuma interação registrada</p>
           <button 
-            onclick="window.showAddInteractionForm('${leadId}')" 
+            onclick="window.showAddInteractionForm?.('${leadId}')" 
             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             ➕ Adicionar Primeira Interação
@@ -71,7 +70,7 @@ export async function loadTimeline(leadId, containerId) {
         ${data.map(interaction => createInteractionCard(interaction)).join('')}
       </div>
       <button 
-        onclick="window.showAddInteractionForm('${leadId}')" 
+        onclick="window.showAddInteractionForm?.('${leadId}')" 
         class="mt-4 w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors font-medium"
       >
         ➕ Adicionar Nova Interação
@@ -87,19 +86,23 @@ export async function loadTimeline(leadId, containerId) {
       <div class="text-center py-8">
         <p class="text-red-600 font-medium mb-2">❌ Erro ao carregar interações</p>
         <p class="text-sm text-gray-500">${err.message}</p>
+        <button 
+          onclick="location.reload()" 
+          class="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+        >
+          🔄 Recarregar
+        </button>
       </div>
     `;
   }
 }
 
-/**
- * Cria card HTML de uma interação
- */
 function createInteractionCard(interaction) {
   const icon = ICONS[interaction.interaction_type] || '📄';
   const color = COLORS[interaction.interaction_type] || 'bg-gray-50';
   
-  const date = new Date(interaction.interaction_date);
+  // ✅ CORRIGIDO: usar created_at
+  const date = new Date(interaction.created_at);
   const timeAgo = getTimeAgo(date);
   const formattedDate = date.toLocaleDateString('pt-BR', {
     day: '2-digit',
@@ -144,9 +147,6 @@ function createInteractionCard(interaction) {
   `;
 }
 
-/**
- * Retorna badge CSS baseado no resultado
- */
 function getOutcomeBadge(outcome) {
   const badges = {
     positivo: 'bg-green-100 text-green-800',
@@ -157,9 +157,6 @@ function getOutcomeBadge(outcome) {
   return badges[outcome] || 'bg-gray-100 text-gray-800';
 }
 
-/**
- * Formata tipo de interação
- */
 function formatType(type) {
   const labels = {
     email: 'Email',
@@ -171,9 +168,6 @@ function formatType(type) {
   return labels[type] || type;
 }
 
-/**
- * Formata resultado
- */
 function formatOutcome(outcome) {
   const labels = {
     positivo: '✅ Positivo',
@@ -184,9 +178,6 @@ function formatOutcome(outcome) {
   return labels[outcome] || outcome;
 }
 
-/**
- * Calcula tempo relativo (ex: "há 2 horas")
- */
 function getTimeAgo(date) {
   const seconds = Math.floor((new Date() - date) / 1000);
   const intervals = [
@@ -206,16 +197,11 @@ function getTimeAgo(date) {
   return 'agora';
 }
 
-/**
- * Escapa HTML para prevenir XSS
- */
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// ✅ Expor função globalmente
 window.loadTimeline = loadTimeline;
-
-console.log('✅ Timeline.js carregado');
+console.log('✅ Timeline.js v2.0 carregado');
