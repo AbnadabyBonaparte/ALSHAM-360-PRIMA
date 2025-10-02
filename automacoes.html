@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Automações — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Gestão de Automações empresariais no ALSHAM 360° PRIMA: KPIs em tempo real, regras inteligentes e logs de execução.">
+  <meta name="description" content="Sistema de Automações do ALSHAM 360° PRIMA" />
   
-  <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
@@ -18,12 +17,10 @@
     frame-src 'self';
     worker-src 'self' blob:;">
   
-  <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-
+  
   <style>
-    /* MENU LATERAL */
     .side-nav {
       position: fixed;
       left: 0;
@@ -60,18 +57,15 @@
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
   
-  <!-- Navbar -->
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
       <div class="hidden md:flex space-x-6">
         <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
         <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
         <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
-        <a href="/automacoes.html" class="text-primary font-medium">Automações</a>
+        <a href="/automacoes.html" class="text-blue-600 font-medium">Automações</a>
         <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
         <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
         <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
@@ -79,7 +73,6 @@
     </div>
   </nav>
   
-  <!-- MENU LATERAL -->
   <aside class="side-nav">
     <a href="/dashboard.html">📊 Dashboard</a>
     <a href="/leads-real.html">👥 Leads</a>
@@ -90,39 +83,32 @@
     <a href="/configuracoes.html">⚙️ Configurações</a>
   </aside>
   
-  <!-- Conteúdo -->
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
-    <h1 class="text-3xl font-bold text-gray-900">Automações Empresariais</h1>
+    <h1 class="text-3xl font-bold text-gray-900">🤖 Automações</h1>
     
-    <!-- KPIs -->
-    <section id="automation-dashboard"></section>
+    <section id="automation-kpis"></section>
     
-    <!-- Regras -->
     <section>
-      <h2 class="text-xl font-semibold mb-4">Regras de Automação</h2>
-      <div id="automation-rules" class="space-y-4"></div>
+      <h2 class="text-2xl font-bold mb-4">Regras de Automação</h2>
+      <div id="automation-rules" class="space-y-3"></div>
     </section>
     
-    <!-- Execuções -->
     <section>
-      <h2 class="text-xl font-semibold mb-4">Execuções Recentes</h2>
-      <div id="automation-executions" class="bg-white shadow rounded-lg p-4 space-y-2 text-sm"></div>
+      <h2 class="text-2xl font-bold mb-4">Execuções Recentes</h2>
+      <div id="automation-executions" class="bg-white shadow rounded-lg p-4"></div>
     </section>
     
-    <!-- Logs -->
     <section>
-      <h2 class="text-xl font-semibold mb-4">Logs em Tempo Real</h2>
-      <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
+      <h2 class="text-2xl font-bold mb-4">Logs do Sistema</h2>
+      <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-xs"></div>
     </section>
   </main>
   
-  <!-- Footer -->
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
   
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
   <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/js/automacoes.js"></script>
+  <script type="module" src="/public/js/automacoes.js"></script>
 </body>
 </html>
