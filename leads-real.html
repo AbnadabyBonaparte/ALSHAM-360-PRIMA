@@ -6,10 +6,10 @@
   <title>Leads CRM — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, dashboards e integração com IA." />
   
-  <!-- ✅ CSP CORRIGIDA - Removido 'unsafe-inline' do script-src -->
+  <!-- ✅ CSP CORRIGIDA - SEM UNSAFE-INLINE -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' https://cdnjs.cloudflare.com;
+    script-src 'self' https://cdnjs.cloudflare.com 'wasm-unsafe-eval';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob: https:;
@@ -112,6 +112,7 @@
       
       .side-nav.open {
         transform: translateX(0);
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
       }
       
       .main-content-wrapper {
@@ -136,6 +137,13 @@
         opacity: 1;
       }
     }
+    
+    /* ===================================
+       UTILITY CLASSES
+       =================================== */
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -151,7 +159,7 @@
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <div class="flex items-center gap-4">
-        <button id="mobile-menu-toggle" class="md:hidden text-gray-600 hover:text-gray-900">
+        <button id="mobile-menu-toggle" class="md:hidden text-gray-600 hover:text-gray-900" aria-label="Toggle menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
@@ -170,16 +178,16 @@
       </div>
       
       <div class="flex items-center gap-3">
-        <button id="notifications-btn" class="text-gray-600 hover:text-gray-900 relative">
+        <button id="notifications-btn" class="text-gray-600 hover:text-gray-900 relative" aria-label="Notificações">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
           </svg>
           <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
         
-        <button id="user-menu-btn" class="flex items-center gap-2 text-gray-700 hover:text-gray-900">
-          <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-            A
+        <button id="user-menu-btn" class="flex items-center gap-2 text-gray-700 hover:text-gray-900" aria-label="Menu do usuário">
+          <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+            AB
           </div>
         </button>
       </div>
@@ -226,13 +234,13 @@
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
     
     <!-- PAGE HEADER -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-4">
       <div>
         <h1 class="text-3xl font-bold text-gray-900">Gestão de Leads</h1>
         <p class="text-gray-600 mt-1">Gerencie e qualifique seus leads com inteligência artificial</p>
       </div>
       
-      <button id="new-lead-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+      <button id="new-lead-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
@@ -326,25 +334,5 @@
        =================================== -->
   <script type="module" src="/src/lib/supabase.js"></script>
   <script type="module" src="/js/leads-real.js"></script>
-  
-  <!-- Mobile Menu Toggle -->
-  <script>
-    // Mobile menu toggle
-    document.getElementById('mobile-menu-toggle')?.addEventListener('click', () => {
-      document.getElementById('side-nav')?.classList.toggle('open');
-    });
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-      const sideNav = document.getElementById('side-nav');
-      const menuToggle = document.getElementById('mobile-menu-toggle');
-      
-      if (sideNav && menuToggle && 
-          !sideNav.contains(e.target) && 
-          !menuToggle.contains(e.target)) {
-        sideNav.classList.remove('open');
-      }
-    });
-  </script>
 </body>
 </html>
