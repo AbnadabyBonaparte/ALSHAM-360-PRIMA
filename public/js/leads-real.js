@@ -1,7 +1,7 @@
 /**
  * ALSHAM 360° PRIMA - LEADS REAIS V5.8.0
  * Sistema completo de gerenciamento de leads com IA e gamificação
- * CORRIGIDO: Edge Function com URL e headers corretos
+ * CORRIGIDO: Edge Function com configurações dinâmicas do Supabase
  */
 
 /* =============================================================================
@@ -290,7 +290,7 @@ waitForSupabase(() => {
       { order: { column: "created_at", ascending: false } }
     );
     if (error) {
-      console.error("Erro ao carregar interações:", error);
+      console.error("❌ Erro ao carregar interações:", error);
       return [];
     }
     return data || [];
@@ -902,11 +902,11 @@ waitForSupabase(() => {
         showLoading(true, "Salvando interação...");
         await createInteraction(leadId, formData);
         showLoading(false);
-        showSuccess("Interação adicionada com sucesso!");
+        showSuccess("✅ Interação adicionada com sucesso!");
         window.openLeadModal(leadId);
       } catch (error) {
         showLoading(false);
-        showError(`Erro ao salvar: ${error.message}`);
+        showError(`❌ Erro ao salvar: ${error.message}`);
         console.error(error);
       }
     });
@@ -920,26 +920,33 @@ waitForSupabase(() => {
   };
 
   /* ===========================================================================
-     RECÁLCULO DE SCORE COM IA
+     RECÁLCULO DE SCORE COM IA - ✅ CORRIGIDO
      =========================================================================== */
 
   window.recalculateLeadScore = async function(leadId) {
     try {
-      showLoading(true, "Recalculando score...");
+      showLoading(true, "🤖 Recalculando score...");
       
       const session = await getCurrentSession();
       if (!session || !session.access_token) {
         throw new Error("Sessão inválida");
       }
 
+      // ✅ Pegar configurações do Supabase de forma segura
+      const supabaseConfig = window.AlshamSupabase.supabase;
+      
+      if (!supabaseConfig || !supabaseConfig.supabaseUrl || !supabaseConfig.supabaseAnonKey) {
+        throw new Error("Configurações do Supabase não disponíveis");
+      }
+
       const response = await fetch(
-        'https://rgvnbtuqtsvfxhrdnkjs.supabase.co/functions/v1/calculate-lead-score', 
+        `${supabaseConfig.supabaseUrl}/functions/v1/calculate-lead-score`, 
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHN2ZnhocmRua2pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjUxMDA0NjUsImV4cCI6MjA0MDY3NjQ2NX0.sb_publishable_AGXjFzIbpEtaIwWu-ZNfA_BAdNS1Gp'
+            'apikey': supabaseConfig.supabaseAnonKey
           },
           body: JSON.stringify({ leadId })
         }
@@ -953,7 +960,7 @@ waitForSupabase(() => {
       const result = await response.json();
 
       if (result.success) {
-        showSuccess(`Score atualizado: ${result.score}`);
+        showSuccess(`✅ Score atualizado: ${result.score}`);
         await loadSystemData();
         renderTable();
         window.openLeadModal(leadId);
@@ -961,8 +968,8 @@ waitForSupabase(() => {
         throw new Error(result.error || 'Erro desconhecido');
       }
     } catch (error) {
-      showError(`Erro ao calcular score: ${error.message}`);
-      console.error('Erro completo:', error);
+      showError(`❌ Erro ao calcular score: ${error.message}`);
+      console.error('❌ Erro completo:', error);
     } finally {
       showLoading(false);
     }
@@ -994,5 +1001,5 @@ waitForSupabase(() => {
     config: LEADS_CONFIG
   };
 
-  console.log("✅ 📋 Leads-Real.js v5.8.0 carregado e pronto!");
+  console.log("✅ 📋 Leads-Real.js v5.8.0 CORRIGIDO - Carregado e pronto!");
 });
