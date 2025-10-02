@@ -1,9 +1,8 @@
 /**
- * ALSHAM 360° PRIMA - Sistema de Automações V2.3
- * CORRIGIDO: Aguarda Supabase e sem ES6 imports
+ * ALSHAM 360° PRIMA - Sistema de Automações V2.4.0
+ * Sistema completo de automações com regras, execuções e logs
  */
 
-// Aguarda Supabase estar disponível
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
     console.log("✅ Supabase carregado para Automações");
@@ -16,10 +15,9 @@ function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   }
 }
 
-// UI Helpers (fora do waitForSupabase)
 function showError(msg) {
   const div = document.createElement("div");
-  div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-red-600";
+  div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-red-600 shadow-lg";
   div.textContent = msg;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
@@ -27,114 +25,57 @@ function showError(msg) {
 
 function showSuccess(msg) {
   const div = document.createElement("div");
-  div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-green-600";
+  div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-green-600 shadow-lg";
   div.textContent = msg;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
 
-// Aguarda Supabase antes de executar
 waitForSupabase(() => {
-  const {
-    getCurrentSession,
-    getCurrentOrgId,
-    genericSelect,
-    subscribeToTable
-  } = window.AlshamSupabase;
+  const { getCurrentSession, getCurrentOrgId, genericSelect, genericUpdate } = window.AlshamSupabase;
 
-  // ===== CONFIGURAÇÃO GLOBAL =====
-  const ALSHAM_AUTOMATION_CONFIG = {
-    version: "2.3.0",
-    triggerTypes: [
-      { value: "lead_created", label: "👤 Lead Criado", icon: "🆕", category: "leads" },
-      { value: "lead_status_changed", label: "📊 Status do Lead Alterado", icon: "🔄", category: "leads" },
-      { value: "lead_temperature_changed", label: "🌡️ Temperatura Alterada", icon: "🔥", category: "leads" },
-      { value: "opportunity_created", label: "💰 Oportunidade Criada", icon: "✨", category: "sales" },
-      { value: "interaction_logged", label: "💬 Interação Registrada", icon: "📝", category: "interactions" },
-      { value: "score_threshold", label: "🤖 Score IA Atingido", icon: "⚡", category: "ai" },
-      { value: "time_based", label: "⏰ Baseado em Tempo", icon: "🕐", category: "schedule" },
-      { value: "webhook_received", label: "🔗 Webhook Recebido", icon: "📡", category: "integrations" }
-    ],
-    actionTypes: [
-      { value: "send_email", label: "📧 Enviar Email", icon: "✉️", category: "communication" },
-      { value: "send_sms", label: "📱 Enviar SMS", icon: "💬", category: "communication" },
-      { value: "update_lead", label: "✏️ Atualizar Lead", icon: "📝", category: "data" },
-      { value: "create_task", label: "✅ Criar Tarefa", icon: "📋", category: "tasks" },
-      { value: "assign_owner", label: "👤 Designar Responsável", icon: "🎯", category: "assignment" },
-      { value: "add_to_sequence", label: "🔄 Adicionar à Sequência", icon: "⚙️", category: "sequences" },
-      { value: "call_webhook", label: "🌐 Chamar Webhook", icon: "🔗", category: "integrations" },
-      { value: "n8n_workflow", label: "🔧 N8N Workflow", icon: "⚡", category: "integrations" },
-      { value: "make_scenario", label: "🎛️ Make Scenario", icon: "🤖", category: "integrations" },
-      { value: "zapier_zap", label: "⚡ Zapier Zap", icon: "🔥", category: "integrations" }
-    ],
-    executionStatus: [
-      { value: "pending", label: "Pendente", color: "yellow", icon: "⏳" },
-      { value: "running", label: "Executando", color: "blue", icon: "🔄" },
-      { value: "success", label: "Sucesso", color: "green", icon: "✅" },
-      { value: "failed", label: "Falhou", color: "red", icon: "❌" },
-      { value: "cancelled", label: "Cancelado", color: "gray", icon: "⏹️" }
-    ],
-    integrations: {
-      n8n: { name: "N8N", icon: "🔧", description: "Workflows avançados com N8N", webhookUrl: "/api/webhooks/n8n" },
-      make: { name: "Make.com", icon: "🎛️", description: "Automação visual com Make", webhookUrl: "/api/webhooks/make" },
-      zapier: { name: "Zapier", icon: "⚡", description: "Conecte 5000+ apps", webhookUrl: "/api/webhooks/zapier" }
-    },
-    realtime: { enabled: true, refreshInterval: 10000 }
-  };
-
-  // ===== ESTADO GLOBAL =====
-  const alshamAutomationState = {
+  const automationState = {
     user: null,
     orgId: null,
-    automationRules: [],
-    executionHistory: [],
+    rules: [],
+    executions: [],
     logs: [],
-    lastUpdate: null,
     isLoading: false
   };
 
-  // ===== INICIALIZAÇÃO =====
   document.addEventListener("DOMContentLoaded", async () => {
     try {
-      showLoading(true, "🤖 Carregando Sistema de Automações...");
+      showLoading(true);
       const authResult = await authenticateUser();
       if (!authResult.success) {
         redirectToLogin();
         return;
       }
 
-      alshamAutomationState.user = authResult.user;
-      alshamAutomationState.orgId = authResult.orgId;
+      automationState.user = authResult.user;
+      automationState.orgId = authResult.orgId;
 
-      await loadAutomationData();
-      setupAutomationInterface();
-      setupRealtimeSubscriptions();
+      await loadData();
+      renderInterface();
+      setupRealtime();
 
       showLoading(false);
-      showSuccess("🎉 Sistema de Automações carregado!");
+      showSuccess("Automações carregadas!");
     } catch (error) {
-      console.error("❌ Erro na inicialização:", error);
+      console.error("❌ Erro:", error);
       showLoading(false);
-      showError("Erro ao carregar sistema de automações");
+      showError("Erro ao carregar automações");
     }
   });
 
-  // ===== AUTENTICAÇÃO =====
   async function authenticateUser() {
     try {
       const session = await getCurrentSession();
       if (!session?.user) return { success: false };
-
-      let orgId = await getCurrentOrgId();
-      if (!orgId) {
-        orgId = localStorage.getItem("alsham_org_id") || "DEFAULT_ORG_ID";
-      }
-      localStorage.setItem("alsham_org_id", orgId);
-
+      const orgId = await getCurrentOrgId();
       return { success: true, user: session.user, orgId };
-    } catch (e) {
-      console.error("Erro na autenticação:", e);
-      return { success: false, error: e };
+    } catch {
+      return { success: false };
     }
   }
 
@@ -142,154 +83,196 @@ waitForSupabase(() => {
     window.location.href = "/login.html";
   }
 
-  // ===== CARREGAR DADOS =====
-  async function loadAutomationData() {
+  async function loadData() {
     try {
-      alshamAutomationState.isLoading = true;
+      automationState.isLoading = true;
 
       const [rules, executions, logs] = await Promise.allSettled([
-        genericSelect("automation_rules", { org_id: alshamAutomationState.orgId }),
-        genericSelect("automation_executions", { org_id: alshamAutomationState.orgId }),
-        genericSelect("logs_automacao", { org_id: alshamAutomationState.orgId })
+        genericSelect("automation_rules", { org_id: automationState.orgId }),
+        genericSelect("automation_executions", { org_id: automationState.orgId }, { order: { column: "started_at", ascending: false }, limit: 20 }),
+        genericSelect("logs_automacao", { org_id: automationState.orgId }, { order: { column: "created_at", ascending: false }, limit: 50 })
       ]);
 
-      alshamAutomationState.automationRules = rules.value?.data || [];
-      alshamAutomationState.executionHistory = executions.value?.data || [];
-      alshamAutomationState.logs = logs.value?.data || [];
-      alshamAutomationState.lastUpdate = new Date();
+      automationState.rules = rules.status === "fulfilled" ? rules.value.data || [] : [];
+      automationState.executions = executions.status === "fulfilled" ? executions.value.data || [] : [];
+      automationState.logs = logs.status === "fulfilled" ? logs.value.data || [] : [];
 
-      console.log("✅ Dados de automações carregados do Supabase | Org:", alshamAutomationState.orgId);
-    } catch (e) {
-      console.error("❌ Erro ao carregar automações:", e);
-      loadDemoData();
+      console.log(`✅ ${automationState.rules.length} regras carregadas`);
+    } catch (error) {
+      console.error("❌ Erro ao carregar:", error);
     } finally {
-      alshamAutomationState.isLoading = false;
+      automationState.isLoading = false;
     }
   }
 
-  // ===== DEMO =====
-  function loadDemoData() {
-    console.log("📋 Carregando dados demo automações...");
-    alshamAutomationState.automationRules = [
-      { id: 1, name: "Regra Demo", trigger: "lead_created", action: "send_email", is_active: true }
-    ];
-    alshamAutomationState.executionHistory = [
-      { id: 1, rule_id: 1, status: "success", executed_at: new Date().toISOString() }
-    ];
-    alshamAutomationState.logs = [
-      { id: 1, message: "Execução simulada", created_at: new Date().toISOString() }
-    ];
-    showSuccess("Usando dados demo automações");
-  }
-
-  // ===== REALTIME =====
-  function setupRealtimeSubscriptions() {
-    if (!ALSHAM_AUTOMATION_CONFIG.realtime.enabled) return;
-
-    const orgId = alshamAutomationState.orgId || "DEFAULT_ORG_ID";
-
-    if (typeof subscribeToTable === "function") {
-      subscribeToTable("automation_rules", orgId, () => loadAutomationData());
-      subscribeToTable("automation_executions", orgId, () => loadAutomationData());
-    } else {
-      setInterval(() => {
-        if (!document.hidden && !alshamAutomationState.isLoading) loadAutomationData();
-      }, ALSHAM_AUTOMATION_CONFIG.realtime.refreshInterval);
-    }
-  }
-
-  // ===== INTERFACE =====
-  function setupAutomationInterface() {
-    renderRulesTable();
+  function renderInterface() {
+    renderKPIs();
+    renderRules();
     renderExecutions();
     renderLogs();
-    console.log("🎨 Interface automações renderizada");
   }
 
-  function renderRulesTable() {
-    const container = document.getElementById("automation-rules");
+  function renderKPIs() {
+    const container = document.getElementById("automation-kpis");
     if (!container) return;
-    container.innerHTML = alshamAutomationState.automationRules.map(rule => `
-      <div class="p-4 border rounded-lg mb-2 ${rule.is_active ? "bg-green-50" : "bg-gray-50"}">
-        <div class="flex justify-between items-center">
-          <div>
-            <div class="font-semibold">${rule.name}</div>
-            <div class="text-sm text-gray-600">${rule.trigger} → ${rule.action}</div>
-          </div>
-          <button onclick="window.toggleRule(${rule.id})" class="px-3 py-1 rounded text-sm ${rule.is_active ? "bg-red-500 text-white" : "bg-green-500 text-white"}">
-            ${rule.is_active ? "Desativar" : "Ativar"}
-          </button>
+
+    const activeRules = automationState.rules.filter(r => r.is_active).length;
+    const successRate = automationState.executions.length > 0
+      ? ((automationState.executions.filter(e => e.status === "success").length / automationState.executions.length) * 100).toFixed(1)
+      : 0;
+
+    container.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <p class="text-sm text-gray-600 mb-1">Total de Regras</p>
+          <p class="text-3xl font-bold text-blue-600">${automationState.rules.length}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <p class="text-sm text-gray-600 mb-1">Regras Ativas</p>
+          <p class="text-3xl font-bold text-green-600">${activeRules}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <p class="text-sm text-gray-600 mb-1">Execuções (24h)</p>
+          <p class="text-3xl font-bold text-purple-600">${automationState.executions.length}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <p class="text-sm text-gray-600 mb-1">Taxa de Sucesso</p>
+          <p class="text-3xl font-bold text-orange-600">${successRate}%</p>
         </div>
       </div>
-    `).join("") || `<p class="text-gray-500">Nenhuma regra cadastrada</p>`;
+    `;
+  }
+
+  function renderRules() {
+    const container = document.getElementById("automation-rules");
+    if (!container) return;
+
+    if (!automationState.rules.length) {
+      container.innerHTML = `<p class="text-gray-500 text-center py-8">Nenhuma regra cadastrada ainda.</p>`;
+      return;
+    }
+
+    container.innerHTML = automationState.rules.map(rule => `
+      <div class="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow border-l-4 ${rule.is_active ? 'border-green-500' : 'border-gray-300'}">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900 mb-1">${rule.name}</h3>
+            <p class="text-sm text-gray-600 mb-2">
+              <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">${rule.trigger_event || 'Trigger'}</span>
+              <span class="mx-2">→</span>
+              <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">${(rule.actions && rule.actions[0]) || 'Ação'}</span>
+            </p>
+            ${rule.conditions ? `<p class="text-xs text-gray-500">Condições: ${JSON.stringify(rule.conditions).substring(0, 50)}...</p>` : ''}
+          </div>
+          <div class="flex items-center gap-2">
+            <button 
+              onclick="window.toggleRule('${rule.id}')" 
+              class="px-3 py-1 text-sm rounded transition-colors ${rule.is_active ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white'}"
+            >
+              ${rule.is_active ? 'Desativar' : 'Ativar'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
   }
 
   function renderExecutions() {
     const container = document.getElementById("automation-executions");
     if (!container) return;
-    container.innerHTML = alshamAutomationState.executionHistory.map(exec => `
-      <div class="p-2 border-b text-sm">
-        Execução #${exec.id} - ${exec.status} - ${new Date(exec.executed_at).toLocaleString("pt-BR")}
-      </div>
-    `).join("") || `<p class="text-gray-500">Nenhuma execução registrada</p>`;
+
+    if (!automationState.executions.length) {
+      container.innerHTML = `<p class="text-gray-500 text-center py-4">Nenhuma execução recente.</p>`;
+      return;
+    }
+
+    container.innerHTML = automationState.executions.map(exec => {
+      const statusColors = {
+        success: 'bg-green-100 text-green-800',
+        failed: 'bg-red-100 text-red-800',
+        running: 'bg-blue-100 text-blue-800',
+        pending: 'bg-yellow-100 text-yellow-800'
+      };
+      const statusColor = statusColors[exec.status] || 'bg-gray-100 text-gray-800';
+
+      return `
+        <div class="flex justify-between items-center p-3 border-b hover:bg-gray-50">
+          <div class="flex-1">
+            <span class="font-medium text-sm">Regra #${exec.rule_id}</span>
+            <span class="text-xs text-gray-500 ml-2">${exec.trigger_event || 'N/A'}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-1 rounded text-xs font-medium ${statusColor}">${exec.status}</span>
+            <span class="text-xs text-gray-500">${new Date(exec.started_at).toLocaleString('pt-BR')}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   function renderLogs() {
     const container = document.getElementById("automation-logs");
     if (!container) return;
-    container.innerHTML = alshamAutomationState.logs.map(log => `
-      <div class="p-2 border-b text-xs text-gray-600">
-        ${new Date(log.created_at).toLocaleString("pt-BR")} - ${log.message}
-      </div>
-    `).join("") || `<p class="text-gray-500">Nenhum log encontrado</p>`;
+
+    if (!automationState.logs.length) {
+      container.innerHTML = `<p class="text-gray-400">Nenhum log disponível.</p>`;
+      return;
+    }
+
+    container.innerHTML = automationState.logs.slice(0, 30).map(log => {
+      const timestamp = new Date(log.created_at).toLocaleTimeString('pt-BR');
+      const category = log.categoria || 'INFO';
+      return `<div class="text-xs mb-1"><span class="text-gray-500">[${timestamp}]</span> <span class="text-green-400">${category}</span>: ${log.mensagem || log.evento || 'N/A'}</div>`;
+    }).join('');
   }
 
-  // ===== OPERAÇÕES =====
-  function toggleRule(ruleId) {
-    const rule = alshamAutomationState.automationRules.find(r => r.id === ruleId);
+  window.toggleRule = async function(ruleId) {
+    const rule = automationState.rules.find(r => r.id === ruleId);
     if (!rule) return;
-    rule.is_active = !rule.is_active;
-    renderRulesTable();
-    showSuccess(`Regra ${rule.is_active ? "ativada" : "desativada"}`);
-  }
 
-  function refreshData() {
-    loadAutomationData().then(setupAutomationInterface);
-  }
+    try {
+      const newStatus = !rule.is_active;
+      await genericUpdate("automation_rules", { is_active: newStatus }, { id: ruleId });
+      rule.is_active = newStatus;
+      renderRules();
+      renderKPIs();
+      showSuccess(`Regra ${newStatus ? 'ativada' : 'desativada'}`);
+    } catch (error) {
+      showError(`Erro ao atualizar regra: ${error.message}`);
+    }
+  };
 
-  // ===== LOADING =====
-  function showLoading(show, message = "Carregando...") {
-    let el = document.getElementById("automation-loading");
-    if (show) {
-      if (!el) {
-        el = document.createElement("div");
-        el.id = "automation-loading";
-        el.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-        el.innerHTML = `
-          <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
-            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-            <span class="text-gray-700">${message}</span>
-          </div>`;
-        document.body.appendChild(el);
-      } else {
-        el.querySelector("span").textContent = message;
-        el.classList.remove("hidden");
+  function setupRealtime() {
+    setInterval(() => {
+      if (!document.hidden && !automationState.isLoading) {
+        loadData().then(renderInterface);
       }
-    } else {
-      el?.remove();
+    }, 30000);
+  }
+
+  function showLoading(show) {
+    const loader = document.getElementById("automation-loading");
+    if (show && !loader) {
+      const div = document.createElement("div");
+      div.id = "automation-loading";
+      div.className = "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center";
+      div.innerHTML = `
+        <div class="bg-white rounded-lg p-6">
+          <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p class="text-gray-700">Carregando...</p>
+        </div>
+      `;
+      document.body.appendChild(div);
+    } else if (!show && loader) {
+      loader.remove();
     }
   }
 
-  // ===== EXPORT GLOBAL =====
   window.AutomationSystem = {
-    getState: () => ({ ...alshamAutomationState }),
-    refresh: refreshData,
-    integrations: ALSHAM_AUTOMATION_CONFIG.integrations,
-    version: ALSHAM_AUTOMATION_CONFIG.version
+    refresh: () => loadData().then(renderInterface),
+    getState: () => ({ ...automationState }),
+    version: "2.4.0"
   };
 
-  window.toggleRule = toggleRule;
-  window.refreshData = refreshData;
-
-  console.log("🤖 Automações V2.3 carregado");
+  console.log("🤖 Automações v2.4.0 carregadas");
 });
