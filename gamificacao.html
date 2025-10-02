@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gamificação — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Sistema de Gamificação Enterprise do ALSHAM 360° PRIMA. Pontos, níveis, badges, leaderboards e atividades em tempo real com Supabase." />
-
-  <!-- ✅ CSP CORRIGIDA -->
+  <meta name="description" content="Sistema de Gamificação do ALSHAM 360° PRIMA" />
+  
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
@@ -17,16 +16,11 @@
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
-  <!-- CSS -->
+  
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-
-  <!-- Chart.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
   
   <style>
-    /* MENU LATERAL */
     .side-nav {
       position: fixed;
       left: 0;
@@ -63,35 +57,30 @@
   </style>
 </head>
 
-<body class="font-inter bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-  <!-- Loader -->
-  <div id="gamification-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div class="text-center">
-      <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
-      <p class="text-gray-600 font-medium">Carregando gamificação...</p>
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+  
+  <div id="gamification-loading" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6">
+      <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <p class="text-gray-700">Carregando...</p>
     </div>
   </div>
-
-  <!-- Toasts -->
-  <div id="gamification-notifications" class="fixed top-4 right-4 z-50 space-y-2 max-w-md"></div>
-
-  <!-- Navbar -->
+  
   <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
       <div class="hidden md:flex space-x-6">
         <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
         <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
         <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
         <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
-        <a href="/gamificacao.html" class="text-primary font-medium">Gamificação</a>
+        <a href="/gamificacao.html" class="text-blue-600 font-medium">Gamificação</a>
         <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
         <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
       </div>
     </div>
   </nav>
   
-  <!-- MENU LATERAL -->
   <aside class="side-nav">
     <a href="/dashboard.html">📊 Dashboard</a>
     <a href="/leads-real.html">👥 Leads</a>
@@ -101,44 +90,30 @@
     <a href="/relatorios.html">📈 Relatórios</a>
     <a href="/configuracoes.html">⚙️ Configurações</a>
   </aside>
-
-  <!-- Conteúdo -->
-  <main id="main-content" class="main-content-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <!-- Header -->
-    <div id="gamification-header"></div>
-
-    <!-- KPIs / Stats -->
-    <div id="gamification-stats"></div>
-
-    <!-- Progress -->
-    <div id="gamification-progress"></div>
-
-    <!-- Badges -->
+  
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold text-gray-900">🎮 Gamificação</h1>
+    
+    <section id="user-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4"></section>
+    
+    <section id="level-progress"></section>
+    
     <section>
-      <h2 class="text-xl font-semibold mb-4">🎖️ Badges</h2>
-      <div id="gamification-badges" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      <h2 class="text-2xl font-bold mb-4">🏆 Conquistas</h2>
+      <div id="badges-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
     </section>
-
-    <!-- Leaderboard -->
+    
     <section>
-      <h2 class="text-xl font-semibold mb-4">🏆 Leaderboard</h2>
-      <div id="gamification-leaderboard" class="bg-white rounded-xl shadow p-4"></div>
-    </section>
-
-    <!-- Atividades Recentes -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">📜 Atividades Recentes</h2>
-      <div id="gamification-activities" class="bg-white rounded-xl shadow p-4"></div>
+      <h2 class="text-2xl font-bold mb-4">📊 Histórico de Pontos</h2>
+      <div id="points-history" class="space-y-2"></div>
     </section>
   </main>
-
-  <!-- Footer -->
+  
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
+  
   <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/js/gamificacao.js"></script>
+  <script type="module" src="/public/js/gamificacao.js"></script>
 </body>
 </html>
