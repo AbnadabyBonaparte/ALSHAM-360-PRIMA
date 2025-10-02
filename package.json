@@ -22,7 +22,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "engines": {
-    "node": ">=18.20.0 <21",
+    "node": "20.x",
     "npm": ">=9.0.0"
   },
   "dependencies": {
