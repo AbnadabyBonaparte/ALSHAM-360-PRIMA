@@ -21,7 +21,7 @@ const {
   NODE_ENV,
   PORT = 3000,
   RATE_LIMIT_MAX = 1000,
-  RATE_LIMIT_WINDOW = 15 * 60 * 1000, // 15min
+  RATE_LIMIT_WINDOW = 15 * 60 * 1000,
 } = process.env;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -33,23 +33,41 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 const supabaseAnon = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: false },
 });
-const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE || SUPABASE_ANON_KEY, {
-  auth: { persistSession: false },
-});
+const supabaseAdmin = createClient(
+  SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE || SUPABASE_ANON_KEY,
+  {
+    auth: { persistSession: false },
+  }
+);
 
 const app = express();
 
 // ✅ Middlewares enterprise
-app.use(helmet({
-  contentSecurityPolicy: NODE_ENV === 'production' ? undefined : false,
-  crossOriginEmbedderPolicy: false,
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy:
+      NODE_ENV === 'production'
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'", SUPABASE_URL],
+              connectSrc: ["'self'", SUPABASE_URL],
+              imgSrc: ["'self'", "data:"],
+              styleSrc: ["'self'", "'unsafe-inline'"],
+            },
+          }
+        : false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-// ✅ Rate limiting refinado
+// ✅ Rate limiting
 const apiLimiter = rateLimit({
   windowMs: RATE_LIMIT_WINDOW,
   max: RATE_LIMIT_MAX,
@@ -58,7 +76,7 @@ const apiLimiter = rateLimit({
 });
 app.use('/api', apiLimiter);
 
-// ✅ Auth Middleware seguro
+// ✅ Auth Middleware
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -70,7 +88,7 @@ const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.error("Auth error:", err);
+    console.error('Auth error:', err);
     res.status(500).json({ error: 'Auth middleware error' });
   }
 };
@@ -79,7 +97,7 @@ const authMiddleware = async (req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: '2.0.0',
+    version: '2.0.1',
     env: NODE_ENV || 'development',
     timestamp: new Date().toISOString(),
   });
@@ -88,10 +106,7 @@ app.get('/health', (req, res) => {
 // ✅ Endpoints
 app.get('/api/leads', authMiddleware, async (req, res) => {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('leads_crm')
-      .select('*')
-      .limit(100);
+    const { data, error } = await supabaseAdmin.from('leads_crm').select('*').limit(100);
     if (error) throw error;
     res.json(data);
   } catch (err) {
@@ -102,10 +117,7 @@ app.get('/api/leads', authMiddleware, async (req, res) => {
 
 app.post('/api/leads', authMiddleware, async (req, res) => {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('leads_crm')
-      .insert(req.body)
-      .select();
+    const { data, error } = await supabaseAdmin.from('leads_crm').insert(req.body).select();
     if (error) throw error;
     res.status(201).json(data);
   } catch (err) {
@@ -128,10 +140,10 @@ app.get('/api/relatorios', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Servir estáticos (Railway)
+// ✅ Servir estáticos
 app.use(express.static(join(__dirname, 'dist'), { extensions: ['html'], maxAge: '1d' }));
 
-// ✅ SPA/MPA fallback
+// ✅ SPA fallback
 app.get('*', (req, res) => {
   try {
     const indexPath = join(__dirname, 'dist', 'index.html');
