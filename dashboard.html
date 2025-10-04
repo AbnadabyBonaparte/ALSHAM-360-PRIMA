@@ -29,7 +29,7 @@
       box-shadow: var(--alsham-shadow-md); 
       padding: var(--alsham-space-6); 
       border: 1px solid var(--alsham-border-default);
-      overflow: visible; /* Fix: allow tooltips to overflow */
+      overflow: visible;
       transition: all var(--alsham-motion-productive) var(--alsham-ease-productive); 
     }
     
@@ -160,8 +160,8 @@
     .chart-container {
       position: relative;
       height: 300px;
-      padding-top: 40px; /* AUMENTADO de 20px para 40px para evitar corte do tooltip */
-      overflow: visible; /* Fix: allow tooltips */
+      padding-top: 40px;
+      overflow: visible;
     }
     
     *:focus-visible {
@@ -170,7 +170,6 @@
       border-radius: var(--alsham-radius-sm);
     }
     
-    /* Texto adaptativo */
     .text-primary {
       color: var(--alsham-text-primary);
     }
@@ -183,7 +182,6 @@
       color: var(--alsham-text-tertiary);
     }
     
-    /* Nav adaptativa */
     nav {
       background: var(--alsham-bg-surface);
       border-bottom: 1px solid var(--alsham-border-default);
@@ -227,7 +225,7 @@
       
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707[...]"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
         <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
@@ -274,6 +272,33 @@
       <h1 class="text-3xl font-bold text-primary mb-2">Dashboard Executivo</h1>
       <p class="text-secondary">Visão completa do seu funil de vendas e performance em tempo real</p>
     </header>
+
+    <div class="card mb-8" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));">
+      <h3 class="text-lg font-semibold text-primary mb-3">🧪 Teste do Sistema de Notificações</h3>
+      <p class="text-sm text-secondary mb-4">Clique nos botões abaixo para testar as notificações toast:</p>
+      <div class="flex flex-wrap gap-3">
+        <button onclick="window.notify?.success('Operação realizada com sucesso!', { title: 'Sucesso' })" 
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm">
+          ✅ Testar Sucesso
+        </button>
+        <button onclick="window.notify?.error('Erro ao processar requisição', { title: 'Erro', duration: 0 })" 
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm">
+          ❌ Testar Erro
+        </button>
+        <button onclick="window.notify?.warning('Atenção: Esta ação não pode ser desfeita', { title: 'Aviso' })" 
+                class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium text-sm">
+          ⚠️ Testar Aviso
+        </button>
+        <button onclick="window.notify?.info('Você tem 3 novas mensagens', { title: 'Informação' })" 
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
+          ℹ️ Testar Info
+        </button>
+        <button onclick="window.notify?.clearAll()" 
+                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm">
+          🗑️ Limpar Todas
+        </button>
+      </div>
+    </div>
 
     <div id="dashboard-kpis"></div>
 
@@ -428,7 +453,7 @@
                 </div>
                 <div style="background: rgba(59, 130, 246, 0.1); padding: 0.75rem; border-radius: 9999px;">
                   <svg class="w-6 h-6" style="color: #3B82F6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857[...]"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                 </div>
               </div>
@@ -541,8 +566,8 @@
                 }
               },
               tooltip: {
-                position: 'nearest', // Fix: tooltip stays in visible area
-                yAlign: 'top',    // MUDADO de 'bottom' para 'top' para evitar corte do tooltip
+                position: 'nearest',
+                yAlign: 'top',
                 xAlign: 'center',
                 backgroundColor: 'rgba(0, 0, 0, 0.9)',
                 padding: 12,
