@@ -238,10 +238,13 @@ window.createNewLead = async function() {
     // Fechar modal
     document.getElementById("new-lead-modal").remove();
 
-    // Recarregar dados
-    await loadSystemData();    // ← CORREÇÃO: chama função local
-    setupInterface();          // ← CORREÇÃO: atualiza a interface
-
+    // Recarregar dados (CORREÇÃO: fallback de escopo)
+    if (typeof loadSystemData === 'function') {
+      await loadSystemData();
+      setupInterface();
+    } else {
+      window.location.reload();
+    }
   } catch (error) {
     showLoading(false);
     console.error("Erro ao criar lead:", error);
@@ -364,6 +367,10 @@ waitForSupabase(() => {
     charts: {},
     chartPeriod: 7
   };
+
+  // Tornar loadSystemData e setupInterface acessíveis globalmente
+  window.loadSystemData = loadSystemData;
+  window.setupInterface = setupInterface;
 
   async function authenticateUser() {
     try {
