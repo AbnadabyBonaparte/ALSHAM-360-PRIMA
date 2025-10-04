@@ -4,34 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Acesse o ALSHAM 360° PRIMA com segurança empresarial: login com email, senha ou provedores (Google, Microsoft, Apple, Biometria)." />
-
-  <!-- ✅ CSP CORRIGIDO -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    object-src 'none';
-    frame-src 'self';
-    worker-src 'self' blob:;">
-
-  <!-- CSS -->
+  <meta name="description" content="Acesse o ALSHAM 360° PRIMA com segurança empresarial" />
+  
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center">
 
-  <!-- Toasts -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-  <!-- Container -->
   <main class="w-full max-w-md bg-white rounded-lg shadow p-8">
     <h1 class="text-2xl font-bold text-center text-primary mb-6">ALSHAM 360° — Login</h1>
 
-    <!-- Formulário -->
     <form id="login-form" class="space-y-4" onsubmit="LoginSystem.login(event)">
       <div>
         <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
@@ -41,7 +25,7 @@
         <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
         <div class="relative">
           <input id="password" type="password" class="mt-1 w-full border rounded-lg p-2 pr-10" placeholder="••••••••" required minlength="8" />
-          <button type="button" id="toggle-password" aria-label="Mostrar ou ocultar senha" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700">
+          <button type="button" id="toggle-password" aria-label="Mostrar senha" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
             👁️
           </button>
         </div>
@@ -52,7 +36,6 @@
       </button>
     </form>
 
-    <!-- Feedback -->
     <p id="error-message" class="hidden mt-4 text-sm text-red-600">
       <span id="error-text"></span>
     </p>
@@ -60,35 +43,37 @@
       <span id="success-text"></span>
     </p>
 
-    <!-- Providers -->
     <div class="mt-6 space-y-2">
-      <button id="google-login" onclick="LoginSystem.oauthLogin('google')" class="w-full border rounded-lg py-2 hover:bg-gray-50">🔍 Entrar com Google</button>
-      <button id="microsoft-login" onclick="LoginSystem.oauthLogin('microsoft')" class="w-full border rounded-lg py-2 hover:bg-gray-50">🪟 Entrar com Microsoft</button>
-      <button id="biometric-login" onclick="LoginSystem.biometricLogin()" class="w-full border rounded-lg py-2 hover:bg-gray-50">🔒 Entrar com Biometria</button>
+      <button onclick="LoginSystem.oauthLogin('google')" class="w-full border rounded-lg py-2 hover:bg-gray-50">🔍 Entrar com Google</button>
+      <button onclick="LoginSystem.oauthLogin('microsoft')" class="w-full border rounded-lg py-2 hover:bg-gray-50">🪟 Entrar com Microsoft</button>
     </div>
 
-    <!-- Esqueci senha -->
     <div class="mt-4 text-center">
       <button type="button" onclick="LoginSystem.forgotPassword(document.getElementById('email').value)" class="text-sm text-primary hover:underline">
         Esqueci minha senha
       </button>
     </div>
+
+    <div class="mt-4 text-center">
+      <p class="text-sm text-gray-600">
+        Não tem uma conta? 
+        <a href="/register.html" class="text-primary font-semibold hover:underline">Criar conta</a>
+      </p>
+    </div>
   </main>
 
-  <!-- Footer -->
   <footer class="mt-8 text-center text-gray-500 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+    © 2025 ALSHAM 360° PRIMA
   </footer>
 
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module">
-  import * as SupabaseLib from '/src/lib/supabase.js';
-  window.AlshamSupabase = SupabaseLib;
-</script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
   <script src="/js/login.js"></script>
+  
   <script>
-    // Toggle senha
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.getElementById("toggle-password");
       const pwd = document.getElementById("password");
