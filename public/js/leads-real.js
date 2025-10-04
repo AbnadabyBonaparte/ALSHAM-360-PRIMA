@@ -3,14 +3,12 @@
  * Sistema completo de gerenciamento de leads com IA e gamificação
  * ✅ CORRIGIDO: URL da Edge Function + Event listeners CSP compliance + Score IA funcional
  */
-
 // ============================================
 // CRIAR NOVO LEAD
 // ============================================
-
 window.openNewLeadModal = function() {
   let modal = document.getElementById("new-lead-modal");
-  
+ 
   if (!modal) {
     modal = document.createElement("div");
     modal.id = "new-lead-modal";
@@ -21,80 +19,80 @@ window.openNewLeadModal = function() {
           <h2 class="text-2xl font-bold text-gray-900">Novo Lead</h2>
           <button id="close-new-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
         </div>
-        
+       
         <div class="overflow-y-auto p-6">
           <form id="new-lead-form" class="space-y-4">
-            
+           
             <!-- Nome (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
                 Nome Completo <span class="text-red-500">*</span>
               </label>
-              <input 
-                type="text" 
-                id="new-lead-nome" 
-                required 
+              <input
+                type="text"
+                id="new-lead-nome"
+                required
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: João Silva"
               >
               <p class="text-xs text-gray-500 mt-1">Mínimo 3 caracteres</p>
             </div>
-            
+           
             <!-- Email (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
                 Email <span class="text-red-500">*</span>
               </label>
-              <input 
-                type="email" 
-                id="new-lead-email" 
-                required 
+              <input
+                type="email"
+                id="new-lead-email"
+                required
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="exemplo@empresa.com.br"
               >
             </div>
-            
+           
             <!-- Telefone -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
-              <input 
-                type="tel" 
-                id="new-lead-telefone" 
+              <input
+                type="tel"
+                id="new-lead-telefone"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="(11) 99999-9999"
                 maxlength="15"
               >
             </div>
-            
+           
             <!-- Grid: Empresa + Cargo -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Empresa</label>
-                <input 
-                  type="text" 
-                  id="new-lead-empresa" 
+                <input
+                  type="text"
+                  id="new-lead-empresa"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Nome da empresa"
                 >
               </div>
-              
+             
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
-                <input 
-                  type="text" 
-                  id="new-lead-cargo" 
+                <input
+                  type="text"
+                  id="new-lead-cargo"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: Gerente de TI"
                 >
               </div>
             </div>
-            
+           
             <!-- Grid: Status + Origem -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Status</label>
-                <select 
-                  id="new-lead-status" 
+                <select
+                  id="new-lead-status"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   ${window.LeadsSystem?.config?.statusOptions
@@ -103,11 +101,11 @@ window.openNewLeadModal = function() {
                   }
                 </select>
               </div>
-              
+             
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
-                <select 
-                  id="new-lead-origem" 
+                <select
+                  id="new-lead-origem"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Selecione...</option>
@@ -118,61 +116,61 @@ window.openNewLeadModal = function() {
                 </select>
               </div>
             </div>
-            
+           
             <!-- Observações -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
-              <textarea 
-                id="new-lead-observacoes" 
-                rows="3" 
+              <textarea
+                id="new-lead-observacoes"
+                rows="3"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 placeholder="Informações adicionais sobre o lead..."
               ></textarea>
             </div>
-            
+           
             <!-- Botões -->
             <div class="flex gap-3 pt-4 border-t border-gray-200">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 Criar Lead
               </button>
-              <button 
-                type="button" 
-                id="cancel-new-lead" 
+              <button
+                type="button"
+                id="cancel-new-lead"
                 class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold text-sm transition-colors"
               >
                 Cancelar
               </button>
             </div>
-            
+           
           </form>
         </div>
       </div>
     `;
-    
+   
     document.body.appendChild(modal);
-    
+   
     // Event listeners
     document.getElementById("close-new-lead-modal").addEventListener("click", () => {
       modal.remove();
     });
-    
+   
     document.getElementById("cancel-new-lead").addEventListener("click", () => {
       modal.remove();
     });
-    
+   
     modal.addEventListener("click", (e) => {
       if (e.target === modal) modal.remove();
     });
-    
+   
     // Form submit
     document.getElementById("new-lead-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       await window.createNewLead();
     });
-    
+   
     // Máscara de telefone
     const telefoneInput = document.getElementById("new-lead-telefone");
     telefoneInput.addEventListener("input", (e) => {
@@ -184,10 +182,9 @@ window.openNewLeadModal = function() {
       e.target.value = value;
     });
   }
-  
+ 
   modal.classList.remove("hidden");
 };
-
 // CORRIGIDO: owner_id incluso no leadData
 window.createNewLead = async function() {
   const nome = document.getElementById("new-lead-nome").value.trim();
@@ -198,21 +195,17 @@ window.createNewLead = async function() {
   const status = document.getElementById("new-lead-status").value;
   const origem = document.getElementById("new-lead-origem").value;
   const observacoes = document.getElementById("new-lead-observacoes").value.trim();
-
   // Validações
   if (nome.length < 3) {
     showError("Nome deve ter pelo menos 3 caracteres");
     return;
   }
-
   if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
     showError("Email inválido");
     return;
   }
-
   try {
     showLoading(true, "Criando lead...");
-
     // owner_id adicionado!
     const leadData = {
       org_id: window.LeadsSystem?.state?.orgId,
@@ -227,17 +220,12 @@ window.createNewLead = async function() {
       observacoes: observacoes || null,
       consentimento: true
     };
-
     const { data, error } = await window.AlshamSupabase.genericInsert("leads_crm", leadData);
-
     if (error) throw error;
-
     showLoading(false);
     showSuccess("Lead criado com sucesso!");
-
     // Fechar modal
     document.getElementById("new-lead-modal").remove();
-
     // Recarregar dados (CORREÇÃO: fallback de escopo)
     if (typeof loadSystemData === 'function') {
       await loadSystemData();
@@ -251,11 +239,9 @@ window.createNewLead = async function() {
     showError(`Erro: ${error.message}`);
   }
 };
-
 // ==========================
 // FIM NOVO LEAD
 // ==========================
-
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
     console.log("✅ Supabase carregado para Leads");
@@ -267,7 +253,6 @@ function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
   }
 }
-
 function showError(m) {
   const div = document.createElement("div");
   div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-red-600 shadow-lg";
@@ -275,7 +260,6 @@ function showError(m) {
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
-
 function showSuccess(m) {
   const div = document.createElement("div");
   div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-green-600 shadow-lg";
@@ -283,7 +267,6 @@ function showSuccess(m) {
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
-
 function showNotification(m, t = "info") {
   const colors = { success: "bg-green-600", error: "bg-red-600", warning: "bg-yellow-600", info: "bg-blue-600" };
   const div = document.createElement("div");
@@ -292,7 +275,6 @@ function showNotification(m, t = "info") {
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
 }
-
 function showLoading(show, msg = "Carregando...") {
   let el = document.getElementById("leads-loading");
   if (show) {
@@ -313,10 +295,8 @@ function showLoading(show, msg = "Carregando...") {
     if (el) el.classList.add("hidden");
   }
 }
-
 waitForSupabase(() => {
   const { getCurrentSession, getCurrentOrgId, genericSelect, genericInsert, subscribeToTable } = window.AlshamSupabase;
-
   const LEADS_CONFIG = {
     statusOptions: [
       { value: "novo", label: "Novo", color: "blue", icon: "🆕", points: 5 },
@@ -349,7 +329,6 @@ waitForSupabase(() => {
     pagination: { defaultPerPage: 25, options: [10, 25, 50, 100] },
     realtime: { enabled: true, refreshInterval: 30000 }
   };
-
   const leadsState = {
     user: null,
     orgId: null,
@@ -367,9 +346,8 @@ waitForSupabase(() => {
     charts: {},
     chartPeriod: 7
   };
-
   // Tornar loadSystemData e setupInterface acessíveis globalmente
-  
+ 
   async function authenticateUser() {
     try {
       if (window.AlshamAuth?.isAuthenticated) {
@@ -382,11 +360,9 @@ waitForSupabase(() => {
       return { success: false };
     }
   }
-
   function redirectToLogin() {
     window.location.href = "/login.html";
   }
-
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       showLoading(true, "Inicializando Leads...");
@@ -408,7 +384,6 @@ waitForSupabase(() => {
       showError("Falha ao carregar sistema de Leads");
     }
   });
-
   async function loadSystemData() {
     leadsState.isLoading = true;
     try {
@@ -423,28 +398,23 @@ waitForSupabase(() => {
       leadsState.isLoading = false;
     }
   }
-
   async function loadLeads() {
     const { data, error } = await genericSelect("leads_crm", { org_id: leadsState.orgId }, { order: { column: "created_at", ascending: false } });
     if (error) throw error;
     return data || [];
   }
-
   async function loadKPIs() {
     const { data } = await genericSelect("dashboard_kpis", { org_id: leadsState.orgId });
     return data?.[0] || {};
   }
-
   async function loadGamification() {
     const { data: points } = await genericSelect("gamification_points", { user_id: leadsState.user.id, org_id: leadsState.orgId });
     return { points: points?.reduce((s, p) => s + (p.points_awarded || 0), 0) || 0 };
   }
-
   async function loadAutomations() {
     const { data } = await genericSelect("automation_rules", { org_id: leadsState.orgId, is_active: true });
     return { active: data || [] };
   }
-
   async function loadLeadInteractions(leadId) {
     const { data, error } = await genericSelect("lead_interactions", { lead_id: leadId, org_id: leadsState.orgId }, { order: { column: "created_at", ascending: false } });
     if (error) {
@@ -453,13 +423,11 @@ waitForSupabase(() => {
     }
     return data || [];
   }
-
   async function createInteraction(leadId, interactionData) {
     const { data, error } = await genericInsert("lead_interactions", { lead_id: leadId, org_id: leadsState.orgId, user_id: leadsState.user.id, ...interactionData });
     if (error) throw error;
     return data;
   }
-
   function applyFilters() {
     leadsState.filteredLeads = leadsState.leads.filter(l => {
       if (leadsState.filters.search && !l.nome?.toLowerCase().includes(leadsState.filters.search.toLowerCase())) return false;
@@ -472,7 +440,6 @@ waitForSupabase(() => {
     leadsState.pagination.total = leadsState.filteredLeads.length;
     leadsState.pagination.totalPages = Math.ceil(leadsState.pagination.total / leadsState.pagination.perPage);
   }
-
   function setupInterface() {
     renderKPIs();
     renderFilters();
@@ -480,10 +447,9 @@ waitForSupabase(() => {
     renderTable();
     renderCharts();
   }
-
   window.loadSystemData = loadSystemData;
   window.setupInterface = setupInterface;
-  
+ 
   function renderKPIs() {
     const container = document.getElementById("leads-kpis");
     if (!container) return;
@@ -497,7 +463,6 @@ waitForSupabase(() => {
       </div>
     `;
   }
-
   function renderFilters() {
     const container = document.getElementById("leads-filters");
     if (!container) return;
@@ -523,7 +488,6 @@ waitForSupabase(() => {
       renderCharts();
     });
   }
-
   function setupPeriodButtons() {
     const container = document.getElementById("period-buttons-container");
     if (!container) return;
@@ -543,7 +507,6 @@ waitForSupabase(() => {
       });
     });
   }
-
   function renderTable() {
     const container = document.getElementById("leads-table");
     if (!container) return;
@@ -589,7 +552,6 @@ waitForSupabase(() => {
       });
     });
   }
-
   function renderCharts() {
     const statusCanvas = document.getElementById("leads-status-chart");
     const dailyCanvas = document.getElementById("leads-daily-chart");
@@ -623,7 +585,6 @@ waitForSupabase(() => {
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
     });
   }
-
   function getTimeAgo(date) {
     const seconds = Math.floor((new Date() - date) / 1000);
     const intervals = [{ label: 'ano', seconds: 31536000 }, { label: 'mês', seconds: 2592000 }, { label: 'dia', seconds: 86400 }, { label: 'hora', seconds: 3600 }, { label: 'minuto', seconds: 60 }];
@@ -633,7 +594,6 @@ waitForSupabase(() => {
     }
     return 'agora';
   }
-
   function renderInteractionItem(interaction) {
     const typeConfig = LEADS_CONFIG.interactionTypes.find(t => t.value === interaction.interaction_type) || { icon: "📌", label: "Outro" };
     const date = new Date(interaction.created_at);
@@ -655,7 +615,6 @@ waitForSupabase(() => {
       </div>
     `;
   }
-
   // ============================================
   // MODAL LEAD DETALHES
   // ============================================
@@ -699,7 +658,15 @@ waitForSupabase(() => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-4">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-1">${lead.nome || "Sem nome"}</h2>
+            <div class="flex justify-between items-center mb-1">
+              <h2 class="text-2xl font-bold text-gray-900">${lead.nome || "Sem nome"}</h2>
+              <button
+                data-edit-lead="${lead.id}"
+                class="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded transition-colors font-medium flex items-center gap-1"
+              >
+                ✏️ Editar
+              </button>
+            </div>
             <div class="flex gap-2 items-center">
               <span class="px-3 py-1 rounded-full text-sm font-medium ${statusColor}">${statusConfig.icon || ""} ${statusConfig.label || lead.status || "Indefinido"}</span>
               <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">${lead.origem || "Origem desconhecida"}</span>
@@ -769,9 +736,259 @@ waitForSupabase(() => {
         window.showAddInteractionForm(addInteractionBtn.dataset.addInteraction);
       });
     }
+    const editBtn = modal.querySelector('[data-edit-lead]');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        window.openEditLeadModal(editBtn.dataset.editLead);
+      });
+    }
     modal.classList.remove("hidden");
   };
-
+// ============================================
+// EDITAR LEAD
+// ============================================
+window.openEditLeadModal = function(leadId) {
+  const lead = window.LeadsSystem.state.leads.find(l => l.id === leadId);
+  if (!lead) {
+    showError("Lead não encontrado");
+    return;
+  }
+  let modal = document.getElementById("edit-lead-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "edit-lead-modal";
+    modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4";
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="flex justify-between items-center p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-900">Editar Lead</h2>
+        <button id="close-edit-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
+      </div>
+    
+      <div class="overflow-y-auto p-6">
+        <form id="edit-lead-form" class="space-y-4">
+        
+          <!-- Nome -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">
+              Nome Completo <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="edit-lead-nome"
+              required
+              value="${lead.nome || ''}"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+          </div>
+        
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="edit-lead-email"
+              required
+              value="${lead.email || ''}"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+          </div>
+        
+          <!-- Telefone -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
+            <input
+              type="tel"
+              id="edit-lead-telefone"
+              value="${lead.telefone || ''}"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              maxlength="15"
+            >
+          </div>
+        
+          <!-- Grid: Empresa + Cargo -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Empresa</label>
+              <input
+                type="text"
+                id="edit-lead-empresa"
+                value="${lead.empresa || ''}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+            </div>
+          
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
+              <input
+                type="text"
+                id="edit-lead-cargo"
+                value="${lead.cargo || ''}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+            </div>
+          </div>
+        
+          <!-- Grid: Status + Origem -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+              <select
+                id="edit-lead-status"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                ${window.LeadsSystem?.config?.statusOptions
+                  ? window.LeadsSystem.config.statusOptions.map(s =>
+                      `<option value="${s.value}" ${s.value === lead.status ? 'selected' : ''}>${s.icon} ${s.label}</option>`
+                    ).join('')
+                  : ''
+                }
+              </select>
+            </div>
+          
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
+              <select
+                id="edit-lead-origem"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Selecione...</option>
+                ${window.LeadsSystem?.config?.origemOptions
+                  ? window.LeadsSystem.config.origemOptions.map(o =>
+                      `<option value="${o}" ${o === lead.origem ? 'selected' : ''}>${o}</option>`
+                    ).join('')
+                  : ''
+                }
+              </select>
+            </div>
+          </div>
+        
+          <!-- Observações -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
+            <textarea
+              id="edit-lead-observacoes"
+              rows="3"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            >${lead.observacoes || ''}</textarea>
+          </div>
+        
+          <!-- Botões -->
+          <div class="flex gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="submit"
+              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Salvar Alterações
+            </button>
+            <button
+              type="button"
+              id="cancel-edit-lead"
+              class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold text-sm transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        
+        </form>
+      </div>
+    </div>
+  `;
+  // Event listeners
+  document.getElementById("close-edit-lead-modal").addEventListener("click", () => {
+    modal.remove();
+  });
+  document.getElementById("cancel-edit-lead").addEventListener("click", () => {
+    modal.remove();
+  });
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.remove();
+  });
+  // Form submit
+  document.getElementById("edit-lead-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await window.updateLead(leadId);
+  });
+  // Máscara de telefone
+  const telefoneInput = document.getElementById("edit-lead-telefone");
+  telefoneInput.addEventListener("input", (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+      value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+      value = value.replace(/(\d{5})(\d)/, '$1-$2');
+    }
+    e.target.value = value;
+  });
+  modal.classList.remove("hidden");
+};
+window.updateLead = async function(leadId) {
+  const nome = document.getElementById("edit-lead-nome").value.trim();
+  const email = document.getElementById("edit-lead-email").value.trim();
+  const telefone = document.getElementById("edit-lead-telefone").value.trim();
+  const empresa = document.getElementById("edit-lead-empresa").value.trim();
+  const cargo = document.getElementById("edit-lead-cargo").value.trim();
+  const status = document.getElementById("edit-lead-status").value;
+  const origem = document.getElementById("edit-lead-origem").value;
+  const observacoes = document.getElementById("edit-lead-observacoes").value.trim();
+  // Validações
+  if (nome.length < 3) {
+    showError("Nome deve ter pelo menos 3 caracteres");
+    return;
+  }
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    showError("Email inválido");
+    return;
+  }
+  try {
+    showLoading(true, "Atualizando lead...");
+  
+    const updateData = {
+      nome,
+      email,
+      telefone: telefone || null,
+      empresa: empresa || null,
+      cargo: cargo || null,
+      status,
+      origem: origem || null,
+      observacoes: observacoes || null
+    };
+  
+    const { data, error } = await window.AlshamSupabase.genericUpdate(
+      "leads_crm",
+      { id: leadId },
+      updateData
+    );
+  
+    if (error) throw error;
+  
+    showLoading(false);
+    showSuccess("Lead atualizado com sucesso!");
+  
+    // Fechar modal de edição
+    document.getElementById("edit-lead-modal").remove();
+  
+    // Fechar modal de detalhes (se estiver aberto)
+    const detailModal = document.getElementById("lead-modal");
+    if (detailModal) detailModal.remove();
+  
+    // Recarregar dados
+    if (typeof window.loadSystemData === 'function') {
+      await window.loadSystemData();
+      window.setupInterface();
+    } else {
+      window.location.reload();
+    }
+  
+  } catch (error) {
+    showLoading(false);
+    console.error("Erro ao atualizar lead:", error);
+    showError(`Erro: ${error.message}`);
+  }
+};
   window.showAddInteractionForm = function(leadId) {
     const container = document.getElementById("interaction-form-container");
     if (!container) return;
@@ -843,12 +1060,10 @@ waitForSupabase(() => {
     }
     container.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
-
   window.cancelAddInteraction = function() {
     const container = document.getElementById("interaction-form-container");
     if (container) container.classList.add("hidden");
   };
-
   window.recalculateLeadScore = async function(leadId) {
     try {
       showLoading(true, "Recalculando score...");
@@ -885,7 +1100,6 @@ waitForSupabase(() => {
       showLoading(false);
     }
   };
-
   function setupRealtime() {
     if (!LEADS_CONFIG.realtime.enabled || !subscribeToTable) return;
     const subscription = subscribeToTable("leads_crm", leadsState.orgId, () => {
@@ -894,13 +1108,11 @@ waitForSupabase(() => {
     });
     window.addEventListener("beforeunload", () => subscription?.unsubscribe?.());
   }
-
   window.LeadsSystem = {
     init: () => loadSystemData().then(setupInterface),
     refresh: () => loadSystemData().then(setupInterface),
     state: leadsState,
     config: LEADS_CONFIG
   };
-
   console.log("✅ Leads-Real.js v5.8.3 carregado com sucesso");
 });
