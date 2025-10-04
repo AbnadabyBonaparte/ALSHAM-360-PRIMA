@@ -4,6 +4,251 @@
  * ✅ CORRIGIDO: URL da Edge Function + Event listeners CSP compliance + Score IA funcional
  */
 
+// ============================================
+// CRIAR NOVO LEAD
+// ============================================
+
+window.openNewLeadModal = function() {
+  let modal = document.getElementById("new-lead-modal");
+  
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "new-lead-modal";
+    modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4";
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 class="text-2xl font-bold text-gray-900">Novo Lead</h2>
+          <button id="close-new-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
+        </div>
+        
+        <div class="overflow-y-auto p-6">
+          <form id="new-lead-form" class="space-y-4">
+            
+            <!-- Nome (obrigatório) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Nome Completo <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="new-lead-nome" 
+                required 
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Ex: João Silva"
+              >
+              <p class="text-xs text-gray-500 mt-1">Mínimo 3 caracteres</p>
+            </div>
+            
+            <!-- Email (obrigatório) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Email <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="email" 
+                id="new-lead-email" 
+                required 
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="exemplo@empresa.com.br"
+              >
+            </div>
+            
+            <!-- Telefone -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
+              <input 
+                type="tel" 
+                id="new-lead-telefone" 
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="(11) 99999-9999"
+                maxlength="15"
+              >
+            </div>
+            
+            <!-- Grid: Empresa + Cargo -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Empresa</label>
+                <input 
+                  type="text" 
+                  id="new-lead-empresa" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Nome da empresa"
+                >
+              </div>
+              
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
+                <input 
+                  type="text" 
+                  id="new-lead-cargo" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: Gerente de TI"
+                >
+              </div>
+            </div>
+            
+            <!-- Grid: Status + Origem -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+                <select 
+                  id="new-lead-status" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  ${window.LeadsSystem?.config?.statusOptions
+                    ? window.LeadsSystem.config.statusOptions.map(s => `<option value="${s.value}">${s.icon} ${s.label}</option>`).join('')
+                    : ''
+                  }
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
+                <select 
+                  id="new-lead-origem" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Selecione...</option>
+                  ${window.LeadsSystem?.config?.origemOptions
+                    ? window.LeadsSystem.config.origemOptions.map(o => `<option value="${o}">${o}</option>`).join('')
+                    : ''
+                  }
+                </select>
+              </div>
+            </div>
+            
+            <!-- Observações -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
+              <textarea 
+                id="new-lead-observacoes" 
+                rows="3" 
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                placeholder="Informações adicionais sobre o lead..."
+              ></textarea>
+            </div>
+            
+            <!-- Botões -->
+            <div class="flex gap-3 pt-4 border-t border-gray-200">
+              <button 
+                type="submit" 
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Criar Lead
+              </button>
+              <button 
+                type="button" 
+                id="cancel-new-lead" 
+                class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold text-sm transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Event listeners
+    document.getElementById("close-new-lead-modal").addEventListener("click", () => {
+      modal.remove();
+    });
+    
+    document.getElementById("cancel-new-lead").addEventListener("click", () => {
+      modal.remove();
+    });
+    
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.remove();
+    });
+    
+    // Form submit
+    document.getElementById("new-lead-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await window.createNewLead();
+    });
+    
+    // Máscara de telefone
+    const telefoneInput = document.getElementById("new-lead-telefone");
+    telefoneInput.addEventListener("input", (e) => {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      }
+      e.target.value = value;
+    });
+  }
+  
+  modal.classList.remove("hidden");
+};
+
+window.createNewLead = async function() {
+  const nome = document.getElementById("new-lead-nome").value.trim();
+  const email = document.getElementById("new-lead-email").value.trim();
+  const telefone = document.getElementById("new-lead-telefone").value.trim();
+  const empresa = document.getElementById("new-lead-empresa").value.trim();
+  const cargo = document.getElementById("new-lead-cargo").value.trim();
+  const status = document.getElementById("new-lead-status").value;
+  const origem = document.getElementById("new-lead-origem").value;
+  const observacoes = document.getElementById("new-lead-observacoes").value.trim();
+  
+  // Validações
+  if (nome.length < 3) {
+    showError("Nome deve ter pelo menos 3 caracteres");
+    return;
+  }
+  
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    showError("Email inválido");
+    return;
+  }
+  
+  try {
+    showLoading(true, "Criando lead...");
+    
+    const leadData = {
+      org_id: window.LeadsSystem?.state?.orgId,
+      nome,
+      email,
+      telefone: telefone || null,
+      empresa: empresa || null,
+      cargo: cargo || null,
+      status,
+      origem: origem || null,
+      observacoes: observacoes || null,
+      consentimento: true
+    };
+    
+    const { data, error } = await window.AlshamSupabase.genericInsert("leads_crm", leadData);
+    
+    if (error) throw error;
+    
+    showLoading(false);
+    showSuccess("Lead criado com sucesso!");
+    
+    // Fechar modal
+    document.getElementById("new-lead-modal").remove();
+    
+    // Recarregar dados
+    await window.LeadsSystem.refresh();
+    
+  } catch (error) {
+    showLoading(false);
+    console.error("Erro ao criar lead:", error);
+    showError(`Erro: ${error.message}`);
+  }
+};
+
+// ==========================
+// FIM NOVO LEAD
+// ==========================
+
 function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
   if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
     console.log("✅ Supabase carregado para Leads");
@@ -399,6 +644,9 @@ waitForSupabase(() => {
     `;
   }
 
+  // ============================================
+  // MODAL LEAD DETALHES
+  // ============================================
   window.openLeadModal = async function(leadId) {
     const lead = leadsState.leads.find(l => l.id === leadId);
     if (!lead) {
