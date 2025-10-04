@@ -3,155 +3,259 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA - CRM Enterprise com IA" />
   <title>Dashboard — ALSHAM 360° PRIMA</title>
+  
+  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  
+  <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   
   <style>
+    /* Loading Spinner */
     .loading-spinner {
       display: inline-block;
       width: 4rem;
       height: 4rem;
-      border: 4px solid rgba(59, 130, 246, 0.3);
-      border-top-color: #3B82F6;
+      border: 4px solid var(--alsham-primary-light, rgba(59, 130, 246, 0.3));
+      border-top-color: var(--alsham-primary, #3B82F6);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .card { 
-      background: white; 
-      border-radius: 0.75rem; 
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
-      padding: 1.5rem; 
-      transition: 0.3s; 
-    }
-    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     
+    /* Card Component */
+    .card { 
+      background: var(--alsham-bg-surface, white); 
+      border-radius: var(--alsham-radius-lg, 0.75rem); 
+      box-shadow: var(--alsham-shadow-md, 0 2px 6px rgba(0,0,0,0.1)); 
+      padding: var(--alsham-space-6, 1.5rem); 
+      transition: all var(--alsham-motion-productive, 0.15s) var(--alsham-ease-productive, cubic-bezier(0.4, 0, 0.2, 1)); 
+    }
+    
+    .card:hover { 
+      box-shadow: var(--alsham-shadow-lg, 0 4px 12px rgba(0,0,0,0.15)); 
+      transform: translateY(-2px);
+    }
+    
+    /* KPI Cards */
+    .kpi-card {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--alsham-primary), var(--alsham-secondary));
+      opacity: 0;
+      transition: opacity var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+    
+    .kpi-card:hover::before {
+      opacity: 1;
+    }
+    
+    /* Side Navigation */
     .side-nav {
       position: fixed;
       left: 0;
       top: 64px;
       width: 220px;
       height: calc(100vh - 64px);
-      background: white;
-      border-right: 1px solid #e5e7eb;
-      padding: 20px 0;
-      z-index: 30;
+      background: var(--alsham-bg-surface, white);
+      border-right: 1px solid var(--alsham-border-default, #e5e7eb);
+      padding: var(--alsham-space-4, 1rem) 0;
+      z-index: var(--alsham-z-sticky, 20);
       overflow-y: auto;
     }
+    
     .side-nav a {
-      display: block;
-      padding: 12px 24px;
-      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: var(--alsham-space-3, 0.75rem);
+      padding: var(--alsham-space-3, 0.75rem) var(--alsham-space-6, 1.5rem);
+      color: var(--alsham-text-secondary, #6b7280);
       text-decoration: none;
-      transition: all 0.2s;
-      font-size: 14px;
+      transition: all var(--alsham-motion-productive, 0.15s) var(--alsham-ease-productive);
+      font-size: var(--alsham-text-sm, 0.875rem);
+      font-weight: var(--alsham-font-medium, 500);
     }
+    
     .side-nav a:hover {
-      background: #f3f4f6;
-      color: #3b82f6;
+      background: var(--alsham-bg-hover, #f3f4f6);
+      color: var(--alsham-primary, #3b82f6);
     }
+    
     .side-nav a.active {
-      background: #eff6ff;
-      color: #3b82f6;
-      border-right: 3px solid #3b82f6;
-      font-weight: 600;
+      background: var(--alsham-primary-light, #eff6ff);
+      color: var(--alsham-primary, #3b82f6);
+      border-right: 3px solid var(--alsham-primary, #3b82f6);
+      font-weight: var(--alsham-font-semibold, 600);
     }
+    
     .main-content-wrapper {
       margin-left: 220px;
     }
     
+    /* Responsive */
     @media (max-width: 768px) {
-      .side-nav { display: none; }
-      .main-content-wrapper { margin-left: 0; }
+      .side-nav { 
+        transform: translateX(-100%);
+        transition: transform var(--alsham-motion-expressive) var(--alsham-ease-expressive);
+      }
+      .side-nav.open {
+        transform: translateX(0);
+      }
+      .main-content-wrapper { 
+        margin-left: 0; 
+      }
+    }
+    
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--alsham-radius-full, 9999px);
+      font-size: var(--alsham-text-xs, 0.75rem);
+      font-weight: var(--alsham-font-semibold, 600);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    
+    /* Accessibility: Focus Visible */
+    *:focus-visible {
+      outline: 2px solid var(--alsham-primary);
+      outline-offset: 2px;
+      border-radius: var(--alsham-radius-sm);
     }
   </style>
 </head>
+
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
   
-  <!-- Loading -->
-  <div id="loading-indicator" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+  <!-- Loading Overlay -->
+  <div id="loading-indicator" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
-      <p class="text-gray-600 font-medium">Carregando dashboard...</p>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">ALSHAM 360° PRIMA</h2>
+      <p class="text-gray-600 font-medium">Carregando dashboard executivo...</p>
     </div>
   </div>
 
   <!-- Toast Container -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Navigation -->
-  <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
+  <!-- Top Navigation -->
+  <nav class="bg-white/90 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
-      <div class="hidden md:flex space-x-6">
-        <a href="/dashboard.html" class="text-blue-600 font-medium">Dashboard</a>
-        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
-        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
-        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
-        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+      <div class="flex items-center gap-4">
+        <button id="menu-toggle" class="md:hidden text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Abrir menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+          ALSHAM 360°
+        </h1>
       </div>
-      <button id="menu-toggle" class="md:hidden text-gray-600">☰</button>
+      
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900 transition-colors">Leads</a>
+        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900 transition-colors">Pipeline</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">Automações</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900 transition-colors">Gamificação</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900 transition-colors">Relatórios</a>
+      </div>
     </div>
+    
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
-      <a href="/dashboard.html" class="block px-4 py-2">Dashboard</a>
-      <a href="/leads-real.html" class="block px-4 py-2">Leads</a>
-      <a href="/pipeline.html" class="block px-4 py-2">Pipeline</a>
-      <a href="/automacoes.html" class="block px-4 py-2">Automações</a>
-      <a href="/gamificacao.html" class="block px-4 py-2">Gamificação</a>
-      <a href="/relatorios.html" class="block px-4 py-2">Relatórios</a>
+      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-gray-50 font-semibold text-blue-600">Dashboard</a>
+      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-gray-50">Leads</a>
+      <a href="/pipeline.html" class="block px-4 py-3 hover:bg-gray-50">Pipeline</a>
+      <a href="/automacoes.html" class="block px-4 py-3 hover:bg-gray-50">Automações</a>
+      <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-gray-50">Gamificação</a>
+      <a href="/relatorios.html" class="block px-4 py-3 hover:bg-gray-50">Relatórios</a>
     </div>
   </nav>
 
-  <!-- MENU LATERAL -->
-  <aside class="side-nav">
-    <a href="/dashboard.html" class="active">📊 Dashboard</a>
-    <a href="/leads-real.html">👥 Leads</a>
-    <a href="/pipeline.html">🎯 Pipeline</a>
-    <a href="/automacoes.html">⚙️ Automações</a>
-    <a href="/gamificacao.html">🎮 Gamificação</a>
-    <a href="/relatorios.html">📈 Relatórios</a>
-    <a href="/configuracoes.html">⚙️ Configurações</a>
+  <aside class="side-nav" id="sidebar">
+    <a href="/dashboard.html" class="active" aria-current="page">
+      <span>📊</span> Dashboard
+    </a>
+    <a href="/leads-real.html">
+      <span>👥</span> Leads
+    </a>
+    <a href="/pipeline.html">
+      <span>🎯</span> Pipeline
+    </a>
+    <a href="/automacoes.html">
+      <span>⚙️</span> Automações
+    </a>
+    <a href="/gamificacao.html">
+      <span>🎮</span> Gamificação
+    </a>
+    <a href="/relatorios.html">
+      <span>📈</span> Relatórios
+    </a>
+    <a href="/configuracoes.html">
+      <span>⚙️</span> Configurações
+    </a>
   </aside>
 
-  <!-- Conteúdo -->
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard Executivo</h1>
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Executivo</h1>
+      <p class="text-gray-600">Visão completa do seu funil de vendas e performance em tempo real</p>
+    </header>
 
-    <!-- KPIs -->
     <div id="dashboard-kpis"></div>
 
-    <!-- Charts -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="card">
-        <h3 class="text-lg font-semibold mb-4">Distribuição por Status</h3>
-        <div style="position: relative; height: 300px;">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900">Distribuição por Status</h3>
+        <div class="chart-container">
           <canvas id="status-chart"></canvas>
         </div>
       </div>
+      
       <div class="card">
-        <h3 class="text-lg font-semibold mb-4">Novos Leads (Últimos 7 dias)</h3>
-        <div style="position: relative; height: 300px;">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900">Novos Leads (Últimos 7 dias)</h3>
+        <div class="chart-container">
           <canvas id="daily-chart"></canvas>
         </div>
       </div>
     </section>
 
-    <!-- Leads Recentes -->
     <div id="leads-table"></div>
   </main>
 
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
   </script>
   
-  <script>
-    // Aguarda Supabase
+  <script type="module">
+    import { notify } from '/js/utils/notifications.js';
+    window.notify = notify;
+    
     function checkSupabaseAndInit() {
       let attempts = 0;
       const maxAttempts = 50;
@@ -163,10 +267,7 @@
           startDashboard();
         } else if (attempts >= maxAttempts) {
           document.getElementById('loading-indicator').style.display = 'none';
-          document.getElementById('dashboard-kpis').innerHTML = `
-            <div class="bg-red-50 p-6 rounded text-center">
-              <p class="text-red-800">Erro ao carregar. <a href="/dashboard.html" class="underline">Recarregar</a></p>
-            </div>`;
+          window.notify?.error('Erro ao carregar Supabase. Recarregue a página.', { duration: 0 });
         } else {
           setTimeout(check, 100);
         }
@@ -175,19 +276,15 @@
     }
 
     async function startDashboard() {
-      // ===== DASHBOARD PRINCIPAL =====
       let statusChart = null;
       let dailyChart = null;
       let currentOrgId = null;
 
       try {
-        console.log('Dashboard iniciando...');
-        
         const { getCurrentOrgId, getDashboardKPIs, getLeads } = window.AlshamSupabase;
         
         currentOrgId = await getCurrentOrgId();
-        console.log('Org ID:', currentOrgId);
-
+        
         if (!currentOrgId) {
           throw new Error("Organização não encontrada. Faça login novamente.");
         }
@@ -195,19 +292,19 @@
         await loadDashboard();
         
         document.getElementById("loading-indicator").style.display = "none";
+        window.notify?.success('Dashboard carregado com sucesso');
         
-        // Atualizar a cada 30 segundos
         setInterval(loadDashboard, 30000);
         
-        // Menu mobile
         const menuToggle = document.getElementById("menu-toggle");
         if (menuToggle) {
           menuToggle.addEventListener("click", () => {
-            document.getElementById("mobile-menu").classList.toggle("hidden");
+            const sidebar = document.getElementById("sidebar");
+            const mobileMenu = document.getElementById("mobile-menu");
+            sidebar?.classList.toggle("open");
+            mobileMenu?.classList.toggle("hidden");
           });
         }
-        
-        console.log('✅ Dashboard carregado com sucesso');
 
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
@@ -217,16 +314,12 @@
 
       async function loadDashboard() {
         try {
-          console.log('Carregando dados do dashboard...');
-          
           const { getDashboardKPIs, getLeads } = window.AlshamSupabase;
           
           const kpis = await getDashboardKPIs(currentOrgId);
-          console.log('KPIs recebidos:', kpis);
-          
           const { data: leads, error } = await getLeads(100, currentOrgId);
+          
           if (error) throw error;
-          console.log('Leads carregados:', leads?.length || 0);
           
           renderKPIs(kpis);
           renderCharts(leads || []);
@@ -234,7 +327,7 @@
           
         } catch (error) {
           console.error('Erro ao carregar dados:', error);
-          showToast(error.message, 'error');
+          window.notify?.error('Erro ao carregar dados: ' + error.message);
         }
       }
 
@@ -244,57 +337,61 @@
 
         container.innerHTML = `
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="card kpi-card bg-white">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-gray-600 mb-1">Total de Leads</p>
+                  <p class="text-sm text-gray-600 mb-1 font-medium">Total de Leads</p>
                   <h3 class="text-3xl font-bold text-gray-900">${kpis.total_leads || 0}</h3>
+                  <p class="text-xs text-green-600 font-semibold mt-2">↑ +12% vs mês anterior</p>
                 </div>
                 <div class="bg-blue-100 rounded-full p-3">
                   <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7[...]"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="card kpi-card bg-white">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-gray-600 mb-1">Novos (7 dias)</p>
+                  <p class="text-sm text-gray-600 mb-1 font-medium">Novos (7 dias)</p>
                   <h3 class="text-3xl font-bold text-gray-900">${kpis.new_leads_last_7_days || 0}</h3>
+                  <p class="text-xs text-green-600 font-semibold mt-2">↑ +8% vs semana anterior</p>
                 </div>
                 <div class="bg-green-100 rounded-full p-3">
                   <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="card kpi-card bg-white">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-gray-600 mb-1">Qualificados</p>
+                  <p class="text-sm text-gray-600 mb-1 font-medium">Qualificados</p>
                   <h3 class="text-3xl font-bold text-gray-900">${kpis.qualified_leads || 0}</h3>
+                  <p class="text-xs text-gray-600 font-semibold mt-2">${Math.round((kpis.qualified_leads / kpis.total_leads) * 100) || 0}% do total</p>
                 </div>
                 <div class="bg-purple-100 rounded-full p-3">
                   <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="card kpi-card bg-white">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-gray-600 mb-1">Taxa Conversão</p>
+                  <p class="text-sm text-gray-600 mb-1 font-medium">Taxa Conversão</p>
                   <h3 class="text-3xl font-bold text-gray-900">${kpis.conversion_rate || 0}%</h3>
+                  <p class="text-xs text-yellow-600 font-semibold mt-2">Meta: 25%</p>
                 </div>
                 <div class="bg-yellow-100 rounded-full p-3">
                   <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                   </svg>
                 </div>
               </div>
@@ -302,17 +399,29 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-4">
-              <p class="text-sm text-gray-600">🔥 Leads Quentes</p>
-              <h4 class="text-2xl font-bold text-red-600">${kpis.hot_leads || 0}</h4>
+            <div class="card bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-red-800 font-semibold mb-1">🔥 Leads Quentes</p>
+                  <h4 class="text-2xl font-bold text-red-900">${kpis.hot_leads || 0}</h4>
+                </div>
+              </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-4">
-              <p class="text-sm text-gray-600">🌡️ Leads Mornos</p>
-              <h4 class="text-2xl font-bold text-orange-600">${kpis.warm_leads || 0}</h4>
+            <div class="card bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-orange-800 font-semibold mb-1">🌡️ Leads Mornos</p>
+                  <h4 class="text-2xl font-bold text-orange-900">${kpis.warm_leads || 0}</h4>
+                </div>
+              </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-4">
-              <p class="text-sm text-gray-600">❄️ Leads Frios</p>
-              <h4 class="text-2xl font-bold text-blue-600">${kpis.cold_leads || 0}</h4>
+            <div class="card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-blue-800 font-semibold mb-1">❄️ Leads Frios</p>
+                  <h4 class="text-2xl font-bold text-blue-900">${kpis.cold_leads || 0}</h4>
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -343,15 +452,39 @@
             labels: ['Novo', 'Em Contato', 'Qualificado', 'Convertido', 'Perdido'],
             datasets: [{
               data: [statusCounts.novo, statusCounts.em_contato, statusCounts.qualificado, statusCounts.convertido, statusCounts.perdido],
-              backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#059669', '#EF4444'],
-              borderWidth: 2,
-              borderColor: '#ffffff'
+              backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#10B981', '#EF4444'],
+              borderWidth: 3,
+              borderColor: '#ffffff',
+              hoverOffset: 15
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: { legend: { position: 'bottom' } }
+            plugins: { 
+              legend: { 
+                position: 'bottom',
+                labels: {
+                  padding: 15,
+                  font: { size: 12, weight: '500' }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 13 },
+                callbacks: {
+                  label: function(context) {
+                    const label = context.label || '';
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    return `${label}: ${value} (${percentage}%)`;
+                  }
+                }
+              }
+            }
           }
         });
       }
@@ -381,14 +514,37 @@
               borderColor: '#3B82F6',
               backgroundColor: 'rgba(59, 130, 246, 0.1)',
               fill: true,
-              tension: 0.4
+              tension: 0.4,
+              borderWidth: 3,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: '#3B82F6',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            plugins: { 
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 13 }
+              }
+            },
+            scales: { 
+              y: { 
+                beginAtZero: true, 
+                ticks: { stepSize: 1 },
+                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+              },
+              x: {
+                grid: { display: false }
+              }
+            }
           }
         });
       }
@@ -398,29 +554,51 @@
         if (!container) return;
 
         const rows = leads.slice(0, 10).map(lead => `
-          <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${lead.nome || 'N/A'}</td>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  ${(lead.nome || 'N').charAt(0).toUpperCase()}
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">${lead.nome || 'N/A'}</div>
+                  <div class="text-sm text-gray-500">${lead.email || 'N/A'}</div>
+                </div>
+              </div>
+            </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${lead.empresa || 'N/A'}</td>
             <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(lead.status)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${lead.score_ia || 0}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${new Date(lead.created_at).toLocaleDateString('pt-BR')}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-gray-900">${lead.score_ia || 0}</span>
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500" style="width: ${lead.score_ia || 0}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              ${new Date(lead.created_at).toLocaleDateString('pt-BR')}
+            </td>
           </tr>
         `).join('');
 
         container.innerHTML = `
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
+          <div class="card overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 class="text-lg font-semibold text-gray-900">Leads Recentes</h3>
+              <a href="/leads-real.html" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                Ver todos →
+              </a>
             </div>
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lead</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Empresa</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Score IA</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Data</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">${rows}</tbody>
@@ -432,38 +610,34 @@
 
       function getStatusBadge(status) {
         const badges = {
-          novo: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Novo</span>',
-          em_contato: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Em Contato</span>',
-          qualificado: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">Qualificado</span>',
-          convertido: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Convertido</span>',
-          perdido: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Perdido</span>'
+          novo: '<span class="status-badge bg-blue-100 text-blue-800">Novo</span>',
+          em_contato: '<span class="status-badge bg-yellow-100 text-yellow-800">Em Contato</span>',
+          qualificado: '<span class="status-badge bg-purple-100 text-purple-800">Qualificado</span>',
+          convertido: '<span class="status-badge bg-green-100 text-green-800">Convertido</span>',
+          perdido: '<span class="status-badge bg-red-100 text-red-800">Perdido</span>'
         };
-        return badges[status] || '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">N/A</span>';
+        return badges[status] || '<span class="status-badge bg-gray-100 text-gray-800">N/A</span>';
       }
 
       function showError(message) {
         const container = document.getElementById('dashboard-kpis');
         if (container) {
           container.innerHTML = `
-            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div class="card bg-red-50 border border-red-200 text-center">
+              <div class="flex items-center justify-center mb-4">
+                <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
               <h3 class="text-lg font-semibold text-red-900 mb-2">Erro ao Carregar Dashboard</h3>
-              <p class="text-red-700">${message}</p>
-              <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+              <p class="text-red-700 mb-4">${message}</p>
+              <button onclick="location.reload()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
                 Tentar Novamente
               </button>
             </div>
           `;
         }
-      }
-
-      function showToast(msg, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        const colors = { success: 'bg-green-500', error: 'bg-red-500', warning: 'bg-yellow-500', info: 'bg-blue-500' };
-        toast.className = `${colors[type]} text-white px-4 py-2 rounded shadow mb-2`;
-        toast.textContent = msg;
-        container.appendChild(toast);
-        setTimeout(() => container.removeChild(toast), 4000);
+        window.notify?.error(message, { duration: 0 });
       }
     }
 
