@@ -188,6 +188,7 @@ window.openNewLeadModal = function() {
   modal.classList.remove("hidden");
 };
 
+// CORRIGIDO: owner_id incluso no leadData
 window.createNewLead = async function() {
   const nome = document.getElementById("new-lead-nome").value.trim();
   const email = document.getElementById("new-lead-email").value.trim();
@@ -197,23 +198,25 @@ window.createNewLead = async function() {
   const status = document.getElementById("new-lead-status").value;
   const origem = document.getElementById("new-lead-origem").value;
   const observacoes = document.getElementById("new-lead-observacoes").value.trim();
-  
+
   // Validações
   if (nome.length < 3) {
     showError("Nome deve ter pelo menos 3 caracteres");
     return;
   }
-  
+
   if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
     showError("Email inválido");
     return;
   }
-  
+
   try {
     showLoading(true, "Criando lead...");
-    
+
+    // owner_id adicionado!
     const leadData = {
       org_id: window.LeadsSystem?.state?.orgId,
+      owner_id: window.LeadsSystem?.state?.user?.id,
       nome,
       email,
       telefone: telefone || null,
@@ -224,20 +227,21 @@ window.createNewLead = async function() {
       observacoes: observacoes || null,
       consentimento: true
     };
-    
+
     const { data, error } = await window.AlshamSupabase.genericInsert("leads_crm", leadData);
-    
+
     if (error) throw error;
-    
+
     showLoading(false);
     showSuccess("Lead criado com sucesso!");
-    
+
     // Fechar modal
     document.getElementById("new-lead-modal").remove();
-    
+
     // Recarregar dados
-    await window.LeadsSystem.refresh();
-    
+    await loadSystemData();    // ← CORREÇÃO: chama função local
+    setupInterface();          // ← CORREÇÃO: atualiza a interface
+
   } catch (error) {
     showLoading(false);
     console.error("Erro ao criar lead:", error);
