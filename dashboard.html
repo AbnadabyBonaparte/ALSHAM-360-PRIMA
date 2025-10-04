@@ -28,7 +28,6 @@
     }
     .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     
-    /* MENU LATERAL */
     .side-nav {
       position: fixed;
       left: 0;
@@ -144,24 +143,54 @@
     <div id="leads-table"></div>
   </main>
 
-  <script type="module">
-    // ✅ CAMINHO CORRIGIDO - ERA ESSE O ÚNICO PROBLEMA REAL
-    import { getCurrentOrgId, getDashboardKPIs, getLeads } from "/js/supabase.js";
+  <!-- ✅ CORRIGIDO: Carrega Supabase ANTES do script principal -->
+  <script src="/js/supabase.js"></script>
+  
+  <script>
+    // ✅ CORRIGIDO: Aguarda Supabase estar disponível
+    (function initDashboard() {
+      let attempts = 0;
+      const maxAttempts = 50;
+      
+      function checkSupabaseAndInit() {
+        attempts++;
+        
+        if (window.AlshamSupabase && typeof window.AlshamSupabase.getCurrentOrgId === 'function') {
+          console.log('✅ Supabase disponível, iniciando dashboard...');
+          startDashboard();
+        } else if (attempts >= maxAttempts) {
+          console.error('❌ Timeout: Supabase não carregou');
+          showError('Erro ao conectar com o servidor. Tente recarregar a página.');
+          document.getElementById('loading-indicator').style.display = 'none';
+        } else {
+          setTimeout(checkSupabaseAndInit, 100);
+        }
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkSupabaseAndInit);
+      } else {
+        checkSupabaseAndInit();
+      }
+    })();
 
-    console.log('Dashboard v10 iniciando...');
-
+    // ===== DASHBOARD PRINCIPAL =====
     let statusChart = null;
     let dailyChart = null;
     let currentOrgId = null;
 
-    document.addEventListener("DOMContentLoaded", async () => {
+    async function startDashboard() {
       try {
-        console.log('DOM carregado');
+        console.log('Dashboard iniciando...');
+        
+        const { getCurrentOrgId, getDashboardKPIs, getLeads } = window.AlshamSupabase;
         
         currentOrgId = await getCurrentOrgId();
         console.log('Org ID:', currentOrgId);
 
-        if (!currentOrgId) throw new Error("Org ID não encontrado");
+        if (!currentOrgId) {
+          throw new Error("Organização não encontrada. Faça login novamente.");
+        }
 
         await loadDashboard();
         
@@ -171,22 +200,27 @@
         setInterval(loadDashboard, 30000);
         
         // Menu mobile
-        document.getElementById("menu-toggle")?.addEventListener("click", () => {
-          document.getElementById("mobile-menu").classList.toggle("hidden");
-        });
+        const menuToggle = document.getElementById("menu-toggle");
+        if (menuToggle) {
+          menuToggle.addEventListener("click", () => {
+            document.getElementById("mobile-menu").classList.toggle("hidden");
+          });
+        }
         
-        console.log('Dashboard carregado');
+        console.log('✅ Dashboard carregado com sucesso');
 
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
         showError(error.message);
         document.getElementById("loading-indicator").style.display = "none";
       }
-    });
+    }
 
     async function loadDashboard() {
       try {
         console.log('Carregando dados do dashboard...');
+        
+        const { getDashboardKPIs, getLeads } = window.AlshamSupabase;
         
         const kpis = await getDashboardKPIs(currentOrgId);
         console.log('KPIs recebidos:', kpis);
@@ -211,7 +245,6 @@
 
       container.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <!-- Total de Leads -->
           <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
@@ -226,7 +259,6 @@
             </div>
           </div>
 
-          <!-- Novos (7 dias) -->
           <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
@@ -241,7 +273,6 @@
             </div>
           </div>
 
-          <!-- Qualificados -->
           <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
@@ -256,7 +287,6 @@
             </div>
           </div>
 
-          <!-- Taxa de Conversão -->
           <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
@@ -272,7 +302,6 @@
           </div>
         </div>
 
-        <!-- Segunda linha de KPIs -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div class="bg-white rounded-lg shadow p-4">
             <p class="text-sm text-gray-600">🔥 Leads Quentes</p>
