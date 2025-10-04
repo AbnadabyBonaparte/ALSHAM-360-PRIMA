@@ -658,14 +658,22 @@ waitForSupabase(() => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-4">
           <div>
-            <div class="flex justify-between items-center mb-1">
+            <div class="flex justify-between items-center mb-1 gap-2">
               <h2 class="text-2xl font-bold text-gray-900">${lead.nome || "Sem nome"}</h2>
-              <button
-                data-edit-lead="${lead.id}"
-                class="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded transition-colors font-medium flex items-center gap-1"
-              >
-                ✏️ Editar
-              </button>
+              <div class="flex gap-2">
+                <button
+                  data-edit-lead="${lead.id}"
+                  class="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded transition-colors font-medium flex items-center gap-1"
+                >
+                  ✏️ Editar
+                </button>
+                <button
+                  data-delete-lead="${lead.id}"
+                  class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded transition-colors font-medium flex items-center gap-1"
+                >
+                  🗑️ Deletar
+                </button>
+              </div>
             </div>
             <div class="flex gap-2 items-center">
               <span class="px-3 py-1 rounded-full text-sm font-medium ${statusColor}">${statusConfig.icon || ""} ${statusConfig.label || lead.status || "Indefinido"}</span>
@@ -740,6 +748,12 @@ waitForSupabase(() => {
     if (editBtn) {
       editBtn.addEventListener('click', () => {
         window.openEditLeadModal(editBtn.dataset.editLead);
+      });
+    }
+    const deleteBtn = modal.querySelector('[data-delete-lead]');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => {
+        window.openDeleteLeadModal(deleteBtn.dataset.deleteLead);
       });
     }
     modal.classList.remove("hidden");
@@ -986,6 +1000,77 @@ window.updateLead = async function(leadId) {
   } catch (error) {
     showLoading(false);
     console.error("Erro ao atualizar lead:", error);
+    showError(`Erro: ${error.message}`);
+  }
+};
+// ============================================
+// DELETAR LEAD
+// ============================================
+window.openDeleteLeadModal = function(leadId) {
+  let modal = document.getElementById("delete-lead-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "delete-lead-modal";
+    modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4";
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="flex justify-between items-center p-6 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900">Confirmar Deleção</h2>
+        <button id="close-delete-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-700 mb-6">Tem certeza que deseja deletar este lead? Essa ação é irreversível.</p>
+        <div class="flex gap-3">
+          <button
+            id="confirm-delete-lead"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Confirmar
+          </button>
+          <button
+            id="cancel-delete-lead"
+            class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold text-sm transition-colors"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  // Event listeners
+  document.getElementById("close-delete-lead-modal").addEventListener("click", () => modal.remove());
+  document.getElementById("cancel-delete-lead").addEventListener("click", () => modal.remove());
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
+  document.getElementById("confirm-delete-lead").addEventListener("click", async () => {
+    await window.deleteLead(leadId);
+  });
+  modal.classList.remove("hidden");
+};
+window.deleteLead = async function(leadId) {
+  try {
+    showLoading(true, "Deletando lead...");
+    // Assumindo genericDelete existe; se não, use o client direto: await supabase.from("leads_crm").delete().eq("id", leadId);
+    const { error } = await window.AlshamSupabase.genericDelete("leads_crm", { id: leadId });
+    if (error) throw error;
+    showLoading(false);
+    showSuccess("Lead deletado com sucesso!");
+    // Fechar modal de deleção
+    document.getElementById("delete-lead-modal").remove();
+    // Fechar modal de detalhes
+    const detailModal = document.getElementById("lead-modal");
+    if (detailModal) detailModal.remove();
+    // Recarregar dados
+    if (typeof window.loadSystemData === 'function') {
+      await window.loadSystemData();
+      window.setupInterface();
+    } else {
+      window.location.reload();
+    }
+  } catch (error) {
+    showLoading(false);
+    console.error("Erro ao deletar lead:", error);
     showError(`Erro: ${error.message}`);
   }
 };
