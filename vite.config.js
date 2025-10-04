@@ -32,6 +32,19 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        login: './login.html',
+        dashboard: './dashboard.html',
+        leads: './leads-real.html',
+        pipeline: './pipeline.html',
+        automacoes: './automacoes.html',
+        gamificacao: './gamificacao.html',
+        relatorios: './relatorios.html',
+        configuracoes: './configuracoes.html',
+      },
+    },
   },
   server: {
     port: 5173,
