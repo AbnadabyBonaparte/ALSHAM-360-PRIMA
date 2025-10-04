@@ -558,7 +558,7 @@
             maintainAspectRatio: true,
             plugins: { 
               legend: { 
-                position: 'bottom',
+                position: 'bottom', // <-- corrigido para exibir a legenda abaixo do gráfico
                 labels: {
                   padding: 15,
                   font: { size: 12, weight: '500' },
@@ -588,6 +588,7 @@
         });
       }
 
+      // CORRIGIDO: renderDailyChart agora conta todos leads criados do dia inteiro (00:00 às 23:59)
       function renderDailyChart(leads) {
         const canvas = document.getElementById('daily-chart');
         if (!canvas || !window.Chart) return;
@@ -595,12 +596,26 @@
         if (dailyChart) dailyChart.destroy();
 
         const days = [], counts = [];
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
         for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const dateStr = date.toISOString().split('T')[0];
-          days.push(date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
-          counts.push(leads.filter(l => l.created_at && l.created_at.startsWith(dateStr)).length);
+          const dataInicio = new Date(hoje);
+          dataInicio.setDate(dataInicio.getDate() - i);
+          dataInicio.setHours(0, 0, 0, 0);
+
+          const dataFim = new Date(dataInicio);
+          dataFim.setHours(23, 59, 59, 999);
+
+          days.push(dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+
+          const leadsNoDia = leads.filter(l => {
+            if (!l.created_at) return false;
+            const createdDate = new Date(l.created_at);
+            return createdDate >= dataInicio && createdDate <= dataFim;
+          }).length;
+
+          counts.push(leadsNoDia);
         }
 
         dailyChart = new Chart(canvas.getContext('2d'), {
