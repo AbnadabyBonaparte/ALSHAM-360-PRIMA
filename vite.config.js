@@ -46,6 +46,16 @@ export default defineConfig({
       },
     },
   },
+  // ✅ ADICIONAR ESTAS LINHAS:
+  publicDir: 'public',
+  resolve: {
+    alias: {
+      '@': '/src',
+      '/js': '/public/js',
+      '/css': '/public/css'
+    }
+  },
+  // ✅ FIM DA ADIÇÃO
   server: {
     port: 5173,
     host: '0.0.0.0',
