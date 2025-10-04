@@ -1,7 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Design Tokens Enterprise
  * Baseado em: Salesforce SLDS, HubSpot Canvas, Monday.com Vibe, Material Design 3
- * Referência: plano-evolucao-alsham.md
  */
 
 :root {
@@ -18,7 +17,7 @@
   --alsham-accent: #F59E0B;
   --alsham-accent-hover: #D97706;
   
-  /* === CORES SEMÂNTICAS (WCAG 2.2 AA Compliant) === */
+  /* === CORES SEMÂNTICAS === */
   --alsham-success: #059669;
   --alsham-success-bg: #D1FAE5;
   --alsham-success-border: #6EE7B7;
@@ -54,14 +53,14 @@
   --alsham-border-default: #E5E7EB;
   --alsham-border-strong: #D1D5DB;
   
-  /* === SOMBRAS (Profundidade) === */
+  /* === SOMBRAS === */
   --alsham-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --alsham-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --alsham-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --alsham-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --alsham-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   
-  /* === MOTION SYSTEM (Monday.com Vibe) === */
+  /* === MOTION === */
   --alsham-motion-instant: 70ms;
   --alsham-motion-productive: 150ms;
   --alsham-motion-expressive: 300ms;
@@ -119,29 +118,42 @@
 }
 
 /* === MODO ESCURO === */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --alsham-bg-canvas: #0F172A;
-    --alsham-bg-surface: #1E293B;
-    --alsham-bg-hover: #334155;
-    --alsham-bg-active: #475569;
-    
-    --alsham-text-primary: #F1F5F9;
-    --alsham-text-secondary: #94A3B8;
-    --alsham-text-tertiary: #64748B;
-    --alsham-text-disabled: #475569;
-    
-    --alsham-border-light: #1E293B;
-    --alsham-border-default: #334155;
-    --alsham-border-strong: #475569;
-    
-    --alsham-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --alsham-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --alsham-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  }
+html.dark {
+  --alsham-primary: #3B82F6;
+  --alsham-primary-hover: #60A5FA;
+  --alsham-primary-light: #1E3A8A;
+  
+  --alsham-bg-canvas: #0F172A;
+  --alsham-bg-surface: #1E293B;
+  --alsham-bg-hover: #334155;
+  --alsham-bg-active: #475569;
+  
+  --alsham-text-primary: #F1F5F9;
+  --alsham-text-secondary: #94A3B8;
+  --alsham-text-tertiary: #64748B;
+  --alsham-text-disabled: #475569;
+  
+  --alsham-border-light: #1E293B;
+  --alsham-border-default: #334155;
+  --alsham-border-strong: #475569;
+  
+  --alsham-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --alsham-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --alsham-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }
 
-/* === REDUCED MOTION (Acessibilidade WCAG 2.2) === */
+/* === TRANSIÇÃO DE TEMA === */
+html {
+  transition: background-color var(--alsham-motion-expressive) var(--alsham-ease-productive),
+              color var(--alsham-motion-expressive) var(--alsham-ease-productive);
+}
+
+body {
+  background: var(--alsham-bg-canvas);
+  color: var(--alsham-text-primary);
+}
+
+/* === REDUCED MOTION === */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
