@@ -157,11 +157,16 @@
       letter-spacing: 0.025em;
     }
     
+    /* CORRIGIDO: chart-container com altura maior e canvas responsivo */
     .chart-container {
       position: relative;
-      height: 300px;
-      padding-top: 40px;
-      overflow: visible;
+      height: 350px;
+      width: 100%;
+      padding: 1rem 0;
+    }
+
+    .chart-container canvas {
+      max-height: 100%;
     }
     
     *:focus-visible {
@@ -272,33 +277,6 @@
       <h1 class="text-3xl font-bold text-primary mb-2">Dashboard Executivo</h1>
       <p class="text-secondary">Visão completa do seu funil de vendas e performance em tempo real</p>
     </header>
-
-    <div class="card mb-8" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));">
-      <h3 class="text-lg font-semibold text-primary mb-3">🧪 Teste do Sistema de Notificações</h3>
-      <p class="text-sm text-secondary mb-4">Clique nos botões abaixo para testar as notificações toast:</p>
-      <div class="flex flex-wrap gap-3">
-        <button onclick="window.notify?.success('Operação realizada com sucesso!', { title: 'Sucesso' })" 
-                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm">
-          ✅ Testar Sucesso
-        </button>
-        <button onclick="window.notify?.error('Erro ao processar requisição', { title: 'Erro', duration: 0 })" 
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm">
-          ❌ Testar Erro
-        </button>
-        <button onclick="window.notify?.warning('Atenção: Esta ação não pode ser desfeita', { title: 'Aviso' })" 
-                class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium text-sm">
-          ⚠️ Testar Aviso
-        </button>
-        <button onclick="window.notify?.info('Você tem 3 novas mensagens', { title: 'Informação' })" 
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
-          ℹ️ Testar Info
-        </button>
-        <button onclick="window.notify?.clearAll()" 
-                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm">
-          🗑️ Limpar Todas
-        </button>
-      </div>
-    </div>
 
     <div id="dashboard-kpis"></div>
 
@@ -558,7 +536,7 @@
             maintainAspectRatio: true,
             plugins: { 
               legend: { 
-                position: 'bottom', // <-- corrigido para exibir a legenda abaixo do gráfico
+                position: 'bottom',
                 labels: {
                   padding: 15,
                   font: { size: 12, weight: '500' },
@@ -588,7 +566,6 @@
         });
       }
 
-      // CORRIGIDO: renderDailyChart agora conta todos leads criados do dia inteiro (00:00 às 23:59)
       function renderDailyChart(leads) {
         const canvas = document.getElementById('daily-chart');
         if (!canvas || !window.Chart) return;
