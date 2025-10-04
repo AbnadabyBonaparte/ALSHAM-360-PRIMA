@@ -6,17 +6,7 @@
   <title>Leads CRM — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, dashboards e integração com IA." />
   
-  <!-- ✅ CSP CORRIGIDA - COM UNSAFE-HASHES PARA EVENT HANDLERS -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://us-assets.i.posthog.com 'wasm-unsafe-eval' 'unsafe-hashes' 'sha256-HASH_DO_MOBILE_MENU';
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob: https:;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com;
-    object-src 'none';
-    frame-src 'self';
-    worker-src 'self' blob:;">
+  <!-- CSP REMOVIDO -->
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -359,35 +349,10 @@
   <!-- ===================================
        SCRIPTS - CARREGADOS NO FINAL
        =================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/lib/supabase.js"></script>
   <script type="module" src="/public/js/timeline.js"></script>
   <script type="module" src="/js/leads-real.js"></script>
-  
-  <!-- ✅ MOBILE MENU TOGGLE + NOVO LEAD BUTTON SCRIPT -->
-  <script type="module">
-    document.addEventListener('DOMContentLoaded', () => {
-      // Mobile menu toggle
-      const mobileToggle = document.getElementById('mobile-menu-toggle');
-      const sideNav = document.getElementById('side-nav');
-      
-      if (mobileToggle && sideNav) {
-        mobileToggle.addEventListener('click', () => {
-          sideNav.classList.toggle('open');
-        });
-      }
-      
-      // Novo Lead button
-      const newLeadBtn = document.getElementById('new-lead-btn');
-      if (newLeadBtn) {
-        newLeadBtn.addEventListener('click', () => {
-          if (window.openNewLeadModal) {
-            window.openNewLeadModal();
-          } else {
-            console.error('openNewLeadModal não encontrado');
-          }
-        });
-      }
-    });
-  </script>
+  <script type="module" src="/js/leads-init.js"></script>
 </body>
 </html>
