@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 // Configuração HARDCODED (temporário para resolver problema de variáveis)
 // -----------------------------------------------------------------------------
 const SUPABASE_URL = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc4OTU2ODQsImV4cCI6MjA0MzQ3MTY4NH0.sb_publishable_4GXjFzIqbEtaLwAu-ZNFA_BxkNHSIGp';
+const SUPABASE_ANON_KEY = 'sb_publishable_AGXjFz1bpEtaLIwAu-ZNfA_BAdNSiGp';
 const DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
 
 console.log('✅ Supabase configurado:', SUPABASE_URL);
