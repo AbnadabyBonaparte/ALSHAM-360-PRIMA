@@ -160,7 +160,7 @@
     .chart-container {
       position: relative;
       height: 300px;
-      padding-top: 20px; /* Fix: space for tooltip */
+      padding-top: 40px; /* AUMENTADO de 20px para 40px para evitar corte do tooltip */
       overflow: visible; /* Fix: allow tooltips */
     }
     
@@ -542,7 +542,7 @@
               },
               tooltip: {
                 position: 'nearest', // Fix: tooltip stays in visible area
-                yAlign: 'bottom',    // Fix: tooltip appears above chart segment
+                yAlign: 'top',    // MUDADO de 'bottom' para 'top' para evitar corte do tooltip
                 xAlign: 'center',
                 backgroundColor: 'rgba(0, 0, 0, 0.9)',
                 padding: 12,
