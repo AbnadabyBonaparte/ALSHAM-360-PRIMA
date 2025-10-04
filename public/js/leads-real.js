@@ -369,9 +369,7 @@ waitForSupabase(() => {
   };
 
   // Tornar loadSystemData e setupInterface acessíveis globalmente
-  window.loadSystemData = loadSystemData;
-  window.setupInterface = setupInterface;
-
+  
   async function authenticateUser() {
     try {
       if (window.AlshamAuth?.isAuthenticated) {
@@ -483,6 +481,9 @@ waitForSupabase(() => {
     renderCharts();
   }
 
+  window.loadSystemData = loadSystemData;
+  window.setupInterface = setupInterface;
+  
   function renderKPIs() {
     const container = document.getElementById("leads-kpis");
     if (!container) return;
