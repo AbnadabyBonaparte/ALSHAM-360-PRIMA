@@ -678,12 +678,6 @@ waitForSupabase(() => {
               <div class="flex items-start"><span class="font-medium text-gray-600 w-24">Empresa:</span><span class="text-gray-900">${lead.empresa || "-"}</span></div>
             </div>
           </div>
-${lead.observacoes ? `
-  <div class="bg-yellow-50 rounded-lg p-4 space-y-2">
-    <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Observações</h3>
-    <p class="text-sm text-gray-700 whitespace-pre-wrap">${lead.observacoes}</p>
-  </div>
-` : ''}
           <div class="bg-blue-50 rounded-lg p-4 space-y-3">
             <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Qualificação</h3>
             <div class="space-y-2">
@@ -982,20 +976,36 @@ window.updateLead = async function(leadId) {
     console.log("🔍 Response error:", error);
     
     if (error) throw error;
-    
-    showLoading(false);
-    showSuccess("Lead atualizado com sucesso!");
-    
-    document.getElementById("edit-lead-modal").remove();
-    const detailModal = document.getElementById("lead-modal");
-    if (detailModal) detailModal.remove();
-    
-    if (typeof window.loadSystemData === 'function') {
-      await window.loadSystemData();
-      window.setupInterface();
-    } else {
-      window.location.reload();
-    }
+
+showLoading(false);
+showSuccess("Lead atualizado com sucesso!");
+
+// ✅ ATUALIZAR O ESTADO LOCAL IMEDIATAMENTE (sem esperar reload)
+const leadIndex = window.LeadsSystem.state.leads.findIndex(l => l.id === leadId);
+if (leadIndex !== -1) {
+  window.LeadsSystem.state.leads[leadIndex] = {
+    ...window.LeadsSystem.state.leads[leadIndex],
+    ...updateData,
+    updated_at: new Date().toISOString()
+  };
+}
+
+document.getElementById("edit-lead-modal").remove();
+const detailModal = document.getElementById("lead-modal");
+if (detailModal) detailModal.remove();
+
+// Aplicar filtros e renderizar com dados já atualizados
+window.LeadsSystem.state.filteredLeads = window.LeadsSystem.state.leads;
+applyFilters();
+renderTable();
+
+// Reload em background (opcional, para garantir sincronização)
+setTimeout(async () => {
+  if (typeof window.loadSystemData === 'function') {
+    await window.loadSystemData();
+    window.setupInterface();
+  }
+}, 1000);
   } catch (error) {
     showLoading(false);
     console.error("❌ Erro completo ao atualizar lead:", error);
@@ -1062,7 +1072,7 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_
         },
         body: JSON.stringify({ lead_id: leadId })
       }
@@ -1176,7 +1186,7 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_
         },
         body: JSON.stringify({ leadId })
       });
