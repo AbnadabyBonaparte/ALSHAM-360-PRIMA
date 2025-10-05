@@ -260,9 +260,20 @@ async function genericInsert(table, payload, orgId = null) {
   }
 }
 
-async function genericUpdate(table, id, updates, orgId = null) {
+// 1️⃣ CORRIGIDO: genericUpdate agora aceita filtro string ou objeto { id: ... }
+async function genericUpdate(table, filter, updates, orgId = null) {
   try {
-    let q = supabase.from(table).update(updates).eq('id', id);
+    let q = supabase.from(table).update(updates);
+
+    // Aceitar tanto string (id direto) quanto objeto { id: '...' }
+    if (typeof filter === 'string') {
+      q = q.eq('id', filter);
+    } else if (typeof filter === 'object' && filter.id) {
+      q = q.eq('id', filter.id);
+    } else {
+      throw new Error('Filter inválido: deve ser string ou objeto com propriedade id');
+    }
+
     if (orgId) q = q.eq('org_id', orgId);
     const { data, error } = await q.select();
     if (error) throw error;
