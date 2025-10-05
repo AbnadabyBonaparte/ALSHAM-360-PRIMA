@@ -5,61 +5,170 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pipeline de Vendas - ALSHAM 360°</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style id="dark-theme-critical">
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #f9fafb;
+      --alsham-bg-surface: #ffffff;
+      --alsham-bg-hover: #f3f4f6;
+      --alsham-border-default: #e5e7eb;
+      --alsham-border-light: #f3f4f6;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-border-default: #334155;
+      --alsham-border-light: #475569;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+    html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; }
+    html.dark .text-blue-800 { color: #93c5fd !important; }
+    html.dark .bg-yellow-100 { background-color: rgba(251, 191, 36, 0.2) !important; }
+    html.dark .text-yellow-800 { color: #fcd34d !important; }
+    html.dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.2) !important; }
+    html.dark .text-purple-800 { color: #c4b5fd !important; }
+    html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.2) !important; }
+    html.dark .text-green-800 { color: #86efac !important; }
+    html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
+    html.dark .text-red-800 { color: #fca5a5 !important; }
+  </style>
+ 
+  <!-- Dark Mode Script INLINE para evitar erros de module -->
+  <script>
+  (function() {
+    'use strict';
+    
+    // Aplicar tema salvo IMEDIATAMENTE (antes do render)
+    const savedTheme = localStorage.getItem('alsham-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    
+    // Função para alternar tema
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      
+      if (isDark) {
+        html.classList.remove('dark');
+        html.removeAttribute('data-theme');
+        localStorage.setItem('alsham-theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('alsham-theme', 'dark');
+      }
+      
+      // Recarregar gráficos se existirem
+      if (window.dashboardCharts?.reload) {
+        window.dashboardCharts.reload();
+      }
+    }
+    
+    // Adicionar listener quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+    });
+  })();
+  </script>
+
   <style>
     .dragging { opacity: 0.5; }
-    .drag-over { background-color: #e0e7ff; }
+    .drag-over { background-color: #e0e7ff; dark:background-color: #3730a3; }
   </style>
 </head>
-<body class="bg-gray-50">
-  
+<body class="bg-gray-50 dark:bg-gray-900">
+ 
   <!-- Sidebar -->
-  <aside class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
-    <div class="h-16 flex items-center px-6 border-b">
-      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
+  <aside class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg">
+    <div class="h-16 flex items-center px-6 border-b dark:border-gray-700">
+      <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">ALSHAM 360°</h1>
     </div>
-    
+   
     <nav class="mt-5 space-y-1 px-3">
-      <a href="/dashboard.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+      <a href="/dashboard.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         📊 Dashboard
       </a>
-      <a href="/leads-real.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+      <a href="/leads-real.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         👥 Leads
       </a>
-      <a href="/pipeline.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-50 text-blue-600 transition-colors">
+      <a href="/pipeline.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 transition-colors">
         🎯 Pipeline
       </a>
-      <a href="/automacoes.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+      <a href="/automacoes.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         🤖 Automações
       </a>
-      <a href="/relatorios.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+      <a href="/relatorios.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         📈 Relatórios
       </a>
-      <a href="/gamificacao.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+      <a href="/gamificacao.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         🎮 Gamificação
       </a>
-      <a href="/configuracoes.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+      <a href="/configuracoes.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         ⚙️ Configurações
       </a>
     </nav>
   </aside>
-
   <!-- Main Content -->
   <main class="ml-64">
-    <header class="bg-white shadow-sm border-b">
-      <div class="max-w-7xl mx-auto px-6 py-4">
-        <h1 class="text-2xl font-bold text-gray-900">Pipeline de Vendas</h1>
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Pipeline de Vendas</h1>
+        <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer transition-all hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105" aria-label="Alternar tema claro/escuro">
+          <svg class="sun-icon w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <svg class="moon-icon hidden w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
       </div>
     </header>
-
     <div class="max-w-7xl mx-auto px-6 py-6">
       <div id="loading" class="text-center py-20">
-        <p class="text-gray-500">Carregando pipeline...</p>
+        <p class="text-gray-500 dark:text-gray-400">Carregando pipeline...</p>
       </div>
-      
+     
       <div id="pipeline-board" class="hidden flex gap-4 overflow-x-auto pb-4"></div>
     </div>
   </main>
-
   <script type="module" src="/public/js/pipeline.js"></script>
+  <script>
+    // Toggle icon display based on theme
+    if (document.documentElement.classList.contains('dark')) {
+      document.querySelector('.sun-icon').classList.add('hidden');
+      document.querySelector('.moon-icon').classList.remove('hidden');
+    } else {
+      document.querySelector('.sun-icon').classList.remove('hidden');
+      document.querySelector('.moon-icon').classList.add('hidden');
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.querySelector('.sun-icon').classList.remove('hidden');
+        document.querySelector('.moon-icon').classList.add('hidden');
+      } else {
+        document.querySelector('.sun-icon').classList.add('hidden');
+        document.querySelector('.moon-icon').classList.remove('hidden');
+      }
+    });
+  </script>
 </body>
 </html>
