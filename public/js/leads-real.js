@@ -1,4 +1,4 @@
- /**
+/**
  * ALSHAM 360° PRIMA - LEADS REAIS V5.8.3
  * Sistema completo de gerenciamento de leads com IA e gamificação
  * ✅ CORRIGIDO: URL da Edge Function + Event listeners CSP compliance + Score IA funcional
@@ -1060,7 +1060,7 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc4OTU2ODQsImV4cCI6MjA0MzQ3MTY4NH0.sb_publishable_4GXjFzIqbEtaLwAu-ZNFA_BxkNHSIGp'
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc4OTU2ODQsImV4cCI6MjA0MzQ3MTY4NH0.4GXjFzIqbEtaLwAu-ZNFA_BxkNHSIGp'
         }
       }
     );
@@ -1176,7 +1176,7 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc4OTU2ODQsImV4cCI6MjA0MzQ3MTY4NH0.sb_publishable_4GXjFzIqbEtaLwAu-ZNFA_BxkNHSIGp'
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc4OTU2ODQsImV4cCI6MjA0MzQ3MTY4NH0.4GXjFzIqbEtaLwAu-ZNFA_BxkNHSIGp'
         },
         body: JSON.stringify({ leadId })
       });
