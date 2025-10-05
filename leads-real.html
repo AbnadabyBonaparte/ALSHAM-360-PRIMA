@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA - CRM Enterprise com IA" />
-  <title>Dashboard — ALSHAM 360° PRIMA</title>
+  <title>Leads — ALSHAM 360° PRIMA</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/tokens.css" />
  
+  <!-- Variáveis CSS essenciais -->
   <style id="dark-theme-critical">
     :root {
       --alsham-text-primary: #111827;
@@ -19,9 +20,31 @@
       --alsham-bg-hover: #f3f4f6;
       --alsham-border-default: #e5e7eb;
       --alsham-border-light: #f3f4f6;
-      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
-      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
-      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
+      --alsham-primary: #3B82F6;
+      --alsham-primary-light: rgba(59,130,246,0.3);
+      --alsham-secondary: #6366F1;
+      --alsham-radius-lg: 1rem;
+      --alsham-radius-full: 9999px;
+      --alsham-radius-sm: 0.25rem;
+      --alsham-space-3: 0.75rem;
+      --alsham-space-4: 1rem;
+      --alsham-space-6: 1.5rem;
+      --alsham-font-medium: 500;
+      --alsham-font-semibold: 600;
+      --alsham-text-sm: 1rem;
+      --alsham-text-xs: 0.75rem;
+      --alsham-motion-productive: 0.25s;
+      --alsham-ease-productive: cubic-bezier(0.4, 0, 0.2, 1);
+      --alsham-motion-expressive: 0.3s;
+      --alsham-ease-expressive: cubic-bezier(0.4, 0, 0.2, 1);
+      --alsham-z-sticky: 1020;
+      --alsham-error-bg: #FEE2E2;
+      --alsham-error-border: #FCA5A5;
+      --alsham-error: #EF4444;
+      --alsham-error-text: #991B1B;
     }
     html.dark {
       --alsham-text-primary: #f9fafb;
@@ -32,9 +55,9 @@
       --alsham-bg-hover: #334155;
       --alsham-border-default: #334155;
       --alsham-border-light: #475569;
-      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
-      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
-      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
       color-scheme: dark;
     }
     html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; }
@@ -53,19 +76,14 @@
   <script>
   (function() {
     'use strict';
-    
-    // Aplicar tema salvo IMEDIATAMENTE (antes do render)
     const savedTheme = localStorage.getItem('alsham-theme');
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.setAttribute('data-theme', 'dark');
     }
-    
-    // Função para alternar tema
     function toggleTheme() {
       const html = document.documentElement;
       const isDark = html.classList.contains('dark');
-      
       if (isDark) {
         html.classList.remove('dark');
         html.removeAttribute('data-theme');
@@ -75,14 +93,10 @@
         html.setAttribute('data-theme', 'dark');
         localStorage.setItem('alsham-theme', 'dark');
       }
-      
-      // Recarregar gráficos se existirem
       if (window.dashboardCharts?.reload) {
         window.dashboardCharts.reload();
       }
     }
-    
-    // Adicionar listener quando o DOM estiver pronto
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('theme-toggle');
       if (themeToggle) {
@@ -94,7 +108,7 @@
  
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
- 
+  <!-- Supabase (uma única vez, duplicidade removida) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  
   <style>
@@ -102,10 +116,13 @@
       display: inline-block;
       width: 4rem;
       height: 4rem;
-      border: 4px solid var(--alsham-primary-light, rgba(59, 130, 246, 0.3));
-      border-top-color: var(--alsham-primary, #3B82F6);
+      border: 4px solid var(--alsham-primary-light);
+      border-top-color: var(--alsham-primary);
       border-radius: 50%;
-      animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
+      animation: alsham-spin var(--alsham-motion-productive, 0.6s) linear infinite;
+    }
+    @keyframes alsham-spin {
+      to { transform: rotate(360deg);}
     }
     .card {
       background: var(--alsham-bg-surface);
@@ -224,7 +241,6 @@
       text-transform: uppercase;
       letter-spacing: 0.025em;
     }
-    /* CORRIGIDO: chart-container com altura maior e canvas responsivo */
     .chart-container {
       position: relative;
       height: 350px;
@@ -239,15 +255,9 @@
       outline-offset: 2px;
       border-radius: var(--alsham-radius-sm);
     }
-    .text-primary {
-      color: var(--alsham-text-primary);
-    }
-    .text-secondary {
-      color: var(--alsham-text-secondary);
-    }
-    .text-tertiary {
-      color: var(--alsham-text-tertiary);
-    }
+    .text-primary { color: var(--alsham-text-primary);}
+    .text-secondary { color: var(--alsham-text-secondary);}
+    .text-tertiary { color: var(--alsham-text-tertiary);}
     nav {
       background: var(--alsham-bg-surface);
       border-bottom: 1px solid var(--alsham-border-default);
@@ -275,16 +285,14 @@
           ALSHAM 360°
         </h1>
       </div>
-  
       <div class="hidden md:flex items-center space-x-6">
-        <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Dashboard</a>
-        <a href="/leads-real.html" class="text-secondary hover:text-primary transition-colors">Leads</a>
+        <a href="/dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+        <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Leads</a>
         <a href="/pipeline.html" class="text-secondary hover:text-primary transition-colors">Pipeline</a>
         <a href="/automacoes.html" class="text-secondary hover:text-primary transition-colors">Automações</a>
         <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
         <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
       </div>
-  
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -295,8 +303,8 @@
       </button>
     </div>
     <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
-      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Dashboard</a>
-      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover text-secondary">Leads</a>
+      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover text-secondary">Dashboard</a>
+      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Leads</a>
       <a href="/pipeline.html" class="block px-4 py-3 hover:bg-hover text-secondary">Pipeline</a>
       <a href="/automacoes.html" class="block px-4 py-3 hover:bg-hover text-secondary">Automações</a>
       <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-hover text-secondary">Gamificação</a>
@@ -304,10 +312,10 @@
     </div>
   </nav>
   <aside class="side-nav" id="sidebar">
-    <a href="/dashboard.html" class="active" aria-current="page">
+    <a href="/dashboard.html">
       <span>📊</span> Dashboard
     </a>
-    <a href="/leads-real.html">
+    <a href="/leads-real.html" class="active" aria-current="page">
       <span>👥</span> Leads
     </a>
     <a href="/pipeline.html">
@@ -328,8 +336,8 @@
   </aside>
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
     <header class="mb-8">
-      <h1 class="text-3xl font-bold text-primary mb-2">Dashboard Executivo</h1>
-      <p class="text-secondary">Visão completa do seu funil de vendas e performance em tempo real</p>
+      <h1 class="text-3xl font-bold text-primary mb-2">Leads Executivos</h1>
+      <p class="text-secondary">Veja todos os leads do funil em tempo real</p>
     </header>
     <div id="dashboard-kpis"></div>
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -339,7 +347,6 @@
           <canvas id="status-chart"></canvas>
         </div>
       </div>
-  
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos 7 dias)</h3>
         <div class="chart-container">
@@ -349,7 +356,6 @@
     </section>
     <div id="leads-table"></div>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
@@ -360,11 +366,10 @@
     function checkSupabaseAndInit() {
       let attempts = 0;
       const maxAttempts = 50;
-  
       function check() {
         attempts++;
         if (window.AlshamSupabase?.getCurrentOrgId) {
-          console.log('✅ Supabase carregado no dashboard');
+          console.log('✅ Supabase carregado no leads');
           startDashboard();
         } else if (attempts >= maxAttempts) {
           document.getElementById('loading-indicator').style.display = 'none';
@@ -388,19 +393,14 @@
       };
       try {
         const { getCurrentOrgId, getDashboardKPIs, getLeads } = window.AlshamSupabase;
-    
         currentOrgId = await getCurrentOrgId();
-    
         if (!currentOrgId) {
           throw new Error("Organização não encontrada. Faça login novamente.");
         }
         await loadDashboard();
-    
         document.getElementById("loading-indicator").style.display = "none";
-        window.notify?.success('✅ Dashboard carregado com sucesso', { duration: 3000 });
-    
+        window.notify?.success('✅ Leads carregados com sucesso', { duration: 3000 });
         setInterval(loadDashboard, 30000);
-    
         const menuToggle = document.getElementById("menu-toggle");
         if (menuToggle) {
           menuToggle.addEventListener("click", () => {
@@ -411,23 +411,19 @@
           });
         }
       } catch (error) {
-        console.error("Erro ao carregar dashboard:", error);
+        console.error("Erro ao carregar leads:", error);
         showError(error.message);
         document.getElementById("loading-indicator").style.display = "none";
       }
       async function loadDashboard() {
         try {
           const { getDashboardKPIs, getLeads } = window.AlshamSupabase;
-      
           const kpis = await getDashboardKPIs(currentOrgId);
           const { data: leads, error } = await getLeads(100, currentOrgId);
-      
           if (error) throw error;
-      
           renderKPIs(kpis);
           renderCharts(leads || []);
           renderLeadsTable(leads || []);
-      
         } catch (error) {
           console.error('Erro ao carregar dados:', error);
           window.notify?.error('Erro ao carregar dados: ' + error.message);
@@ -471,7 +467,7 @@
                 <div>
                   <p class="text-sm text-secondary mb-1 font-medium">Qualificados</p>
                   <h3 class="text-3xl font-bold text-primary">${kpis.qualified_leads || 0}</h3>
-                  <p class="text-xs text-secondary font-semibold mt-2">${Math.round((kpis.qualified_leads / kpis.total_leads) * 100) || 0}% do total</p>
+                  <p class="text-xs text-secondary font-semibold mt-2">${kpis.total_leads ? Math.round((kpis.qualified_leads / kpis.total_leads) * 100) : 0}% do total</p>
                 </div>
                 <div style="background: rgba(139, 92, 246, 0.1); padding: 0.75rem; border-radius: 9999px;">
                   <svg class="w-6 h-6" style="color: #8B5CF6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -563,7 +559,7 @@
                     const label = context.label || '';
                     const value = context.parsed || 0;
                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = ((value / total) * 100).toFixed(1);
+                    const percentage = total ? ((value / total) * 100).toFixed(1) : 0;
                     return `${label}: ${value} (${percentage}%)`;
                   }
                 }
@@ -672,7 +668,7 @@
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary">
-              ${new Date(lead.created_at).toLocaleDateString('pt-BR')}
+              ${lead.created_at ? new Date(lead.created_at).toLocaleDateString('pt-BR') : 'N/A'}
             </td>
           </tr>
         `).join('');
@@ -680,7 +676,7 @@
           <div class="card overflow-hidden">
             <div class="px-6 py-4 flex items-center justify-between" style="border-bottom: 1px solid var(--alsham-border-default);">
               <h3 class="text-lg font-semibold text-primary">Leads Recentes</h3>
-              <a href="/leads-real.html" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <a href="/leads-lista.html" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 Ver todos →
               </a>
             </div>
@@ -721,7 +717,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold mb-2" style="color: var(--alsham-error-text);">Erro ao Carregar Dashboard</h3>
+              <h3 class="text-lg font-semibold mb-2" style="color: var(--alsham-error-text);">Erro ao Carregar Leads</h3>
               <p class="mb-4" style="color: var(--alsham-error-text);">${message}</p>
               <button onclick="location.reload()" class="px-6 py-2 rounded-lg font-medium" style="background: var(--alsham-error); color: white;">
                 Tentar Novamente
