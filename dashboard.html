@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA - CRM Enterprise com IA" />
   <title>Dashboard — ALSHAM 360° PRIMA</title>
+  
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/dark-theme.css" />
-  <!-- CORRIGIDO: Chart.js ANTES do Supabase -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- CORRIGIDO: Dark Mode ANTES de tudo -->
+  
+  <!-- Dark Mode Script PRIMEIRO para evitar flash -->
   <script src="/js/dark-mode.js"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  
   <style>
     .loading-spinner {
       display: inline-block;
@@ -24,27 +27,27 @@
       border-radius: 50%;
       animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
     }
- 
-    .card {
-      background: var(--alsham-bg-surface);
-      border-radius: var(--alsham-radius-lg);
-      box-shadow: var(--alsham-shadow-md);
-      padding: var(--alsham-space-6);
+    
+    .card { 
+      background: var(--alsham-bg-surface); 
+      border-radius: var(--alsham-radius-lg); 
+      box-shadow: var(--alsham-shadow-md); 
+      padding: var(--alsham-space-6); 
       border: 1px solid var(--alsham-border-default);
       overflow: visible;
-      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive); 
     }
- 
-    .card:hover {
-      box-shadow: var(--alsham-shadow-lg);
+    
+    .card:hover { 
+      box-shadow: var(--alsham-shadow-lg); 
       transform: translateY(-2px);
     }
- 
+    
     .kpi-card {
       position: relative;
       overflow: hidden;
     }
- 
+    
     .kpi-card::before {
       content: '';
       position: absolute;
@@ -56,11 +59,11 @@
       opacity: 0;
       transition: opacity var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
+    
     .kpi-card:hover::before {
       opacity: 1;
     }
- 
+    
     .side-nav {
       position: fixed;
       left: 0;
@@ -73,7 +76,7 @@
       z-index: var(--alsham-z-sticky);
       overflow-y: auto;
     }
- 
+    
     .side-nav a {
       display: flex;
       align-items: center;
@@ -85,23 +88,23 @@
       font-size: var(--alsham-text-sm);
       font-weight: var(--alsham-font-medium);
     }
- 
+    
     .side-nav a:hover {
       background: var(--alsham-bg-hover);
       color: var(--alsham-primary);
     }
- 
+    
     .side-nav a.active {
       background: var(--alsham-primary-light);
       color: var(--alsham-primary);
       border-right: 3px solid var(--alsham-primary);
       font-weight: var(--alsham-font-semibold);
     }
- 
+    
     .main-content-wrapper {
       margin-left: 220px;
     }
- 
+    
     .theme-toggle-btn {
       width: 2.5rem;
       height: 2.5rem;
@@ -114,40 +117,40 @@
       cursor: pointer;
       transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
+    
     .theme-toggle-btn:hover {
       background: var(--alsham-primary-light);
       border-color: var(--alsham-primary);
       transform: scale(1.05);
     }
- 
+    
     .theme-toggle-btn svg {
       width: 1.25rem;
       height: 1.25rem;
       color: var(--alsham-text-secondary);
       transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
+    
     .theme-toggle-btn:hover svg {
       color: var(--alsham-primary);
     }
- 
+    
     html:not(.dark) .moon-icon { display: none; }
     html.dark .sun-icon { display: none; }
- 
+    
     @media (max-width: 768px) {
-      .side-nav {
+      .side-nav { 
         transform: translateX(-100%);
         transition: transform var(--alsham-motion-expressive) var(--alsham-ease-expressive);
       }
       .side-nav.open {
         transform: translateX(0);
       }
-      .main-content-wrapper {
-        margin-left: 0;
+      .main-content-wrapper { 
+        margin-left: 0; 
       }
     }
- 
+    
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -158,43 +161,45 @@
       text-transform: uppercase;
       letter-spacing: 0.025em;
     }
- 
-    /* CORRIGIDO: chart-container com altura maior e canvas responsivo */
+    
     .chart-container {
       position: relative;
       height: 350px;
       width: 100%;
       padding: 1rem 0;
     }
+
     .chart-container canvas {
       max-height: 100%;
     }
- 
+    
     *:focus-visible {
       outline: 2px solid var(--alsham-primary);
       outline-offset: 2px;
       border-radius: var(--alsham-radius-sm);
     }
- 
+    
     .text-primary {
       color: var(--alsham-text-primary);
     }
- 
+    
     .text-secondary {
       color: var(--alsham-text-secondary);
     }
- 
+    
     .text-tertiary {
       color: var(--alsham-text-tertiary);
     }
- 
+    
     nav {
       background: var(--alsham-bg-surface);
       border-bottom: 1px solid var(--alsham-border-default);
     }
   </style>
 </head>
+
 <body class="font-inter min-h-screen" style="background: var(--alsham-bg-canvas);">
+  
   <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
@@ -202,7 +207,9 @@
       <p class="text-secondary font-medium">Carregando dashboard executivo...</p>
     </div>
   </div>
+
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+
   <nav class="sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <div class="flex items-center gap-4">
@@ -215,7 +222,7 @@
           ALSHAM 360°
         </h1>
       </div>
-   
+      
       <div class="hidden md:flex items-center space-x-6">
         <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Dashboard</a>
         <a href="/leads-real.html" class="text-secondary hover:text-primary transition-colors">Leads</a>
@@ -224,7 +231,7 @@
         <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
         <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
       </div>
-   
+      
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -234,7 +241,7 @@
         </svg>
       </button>
     </div>
- 
+    
     <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
       <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Dashboard</a>
       <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover text-secondary">Leads</a>
@@ -244,6 +251,7 @@
       <a href="/relatorios.html" class="block px-4 py-3 hover:bg-hover text-secondary">Relatórios</a>
     </div>
   </nav>
+
   <aside class="side-nav" id="sidebar">
     <a href="/dashboard.html" class="active" aria-current="page">
       <span>📊</span> Dashboard
@@ -267,12 +275,15 @@
       <span>⚙️</span> Configurações
     </a>
   </aside>
+
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
     <header class="mb-8">
       <h1 class="text-3xl font-bold text-primary mb-2">Dashboard Executivo</h1>
       <p class="text-secondary">Visão completa do seu funil de vendas e performance em tempo real</p>
     </header>
+
     <div id="dashboard-kpis"></div>
+
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição por Status</h3>
@@ -280,7 +291,7 @@
           <canvas id="status-chart"></canvas>
         </div>
       </div>
-    
+      
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos 7 dias)</h3>
         <div class="chart-container">
@@ -288,21 +299,24 @@
         </div>
       </div>
     </section>
+
     <div id="leads-table"></div>
   </main>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
   </script>
+  
   <script type="module">
     import { notify } from '/public/js/utils/notifications.js';
     window.notify = notify;
- 
+    
     function checkSupabaseAndInit() {
       let attempts = 0;
       const maxAttempts = 50;
-   
+      
       function check() {
         attempts++;
         if (window.AlshamSupabase?.getCurrentOrgId) {
@@ -317,10 +331,12 @@
       }
       check();
     }
+
     async function startDashboard() {
       let statusChart = null;
       let dailyChart = null;
       let currentOrgId = null;
+
       window.dashboardCharts = {
         reload: () => {
           if (statusChart) statusChart.destroy();
@@ -328,21 +344,23 @@
           loadDashboard();
         }
       };
+
       try {
         const { getCurrentOrgId, getDashboardKPIs, getLeads } = window.AlshamSupabase;
-     
+        
         currentOrgId = await getCurrentOrgId();
-     
+        
         if (!currentOrgId) {
           throw new Error("Organização não encontrada. Faça login novamente.");
         }
+
         await loadDashboard();
-     
+        
         document.getElementById("loading-indicator").style.display = "none";
         window.notify?.success('✅ Dashboard carregado com sucesso', { duration: 3000 });
-     
+        
         setInterval(loadDashboard, 30000);
-     
+        
         const menuToggle = document.getElementById("menu-toggle");
         if (menuToggle) {
           menuToggle.addEventListener("click", () => {
@@ -352,32 +370,36 @@
             mobileMenu?.classList.toggle("hidden");
           });
         }
+
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
         showError(error.message);
         document.getElementById("loading-indicator").style.display = "none";
       }
+
       async function loadDashboard() {
         try {
           const { getDashboardKPIs, getLeads } = window.AlshamSupabase;
-       
+          
           const kpis = await getDashboardKPIs(currentOrgId);
           const { data: leads, error } = await getLeads(100, currentOrgId);
-       
+          
           if (error) throw error;
-       
+          
           renderKPIs(kpis);
           renderCharts(leads || []);
           renderLeadsTable(leads || []);
-       
+          
         } catch (error) {
           console.error('Erro ao carregar dados:', error);
           window.notify?.error('Erro ao carregar dados: ' + error.message);
         }
       }
+
       function renderKPIs(kpis) {
         const container = document.getElementById('dashboard-kpis');
         if (!container) return;
+
         container.innerHTML = `
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="card kpi-card">
@@ -394,6 +416,7 @@
                 </div>
               </div>
             </div>
+
             <div class="card kpi-card">
               <div class="flex items-center justify-between">
                 <div>
@@ -408,6 +431,7 @@
                 </div>
               </div>
             </div>
+
             <div class="card kpi-card">
               <div class="flex items-center justify-between">
                 <div>
@@ -422,6 +446,7 @@
                 </div>
               </div>
             </div>
+
             <div class="card kpi-card">
               <div class="flex items-center justify-between">
                 <div>
@@ -437,6 +462,7 @@
               </div>
             </div>
           </div>
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05)); border-left: 4px solid #EF4444;">
               <p class="text-sm font-semibold mb-1" style="color: #991B1B;">🔥 Leads Quentes</p>
@@ -453,14 +479,18 @@
           </div>
         `;
       }
+
       function renderCharts(leads) {
         renderStatusChart(leads);
         renderDailyChart(leads);
       }
+
       function renderStatusChart(leads) {
         const canvas = document.getElementById('status-chart');
         if (!canvas || !window.Chart) return;
+
         if (statusChart) statusChart.destroy();
+
         const statusCounts = {
           novo: leads.filter(l => l.status === 'novo').length,
           em_contato: leads.filter(l => l.status === 'em_contato').length,
@@ -468,6 +498,7 @@
           convertido: leads.filter(l => l.status === 'convertido').length,
           perdido: leads.filter(l => l.status === 'perdido').length
         };
+
         statusChart = new Chart(canvas.getContext('2d'), {
           type: 'doughnut',
           data: {
@@ -483,8 +514,8 @@
           options: {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: {
-              legend: {
+            plugins: { 
+              legend: { 
                 position: 'bottom',
                 labels: {
                   padding: 15,
@@ -514,27 +545,36 @@
           }
         });
       }
+
       function renderDailyChart(leads) {
         const canvas = document.getElementById('daily-chart');
         if (!canvas || !window.Chart) return;
+
         if (dailyChart) dailyChart.destroy();
+
         const days = [], counts = [];
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
+
         for (let i = 6; i >= 0; i--) {
           const dataInicio = new Date(hoje);
           dataInicio.setDate(dataInicio.getDate() - i);
           dataInicio.setHours(0, 0, 0, 0);
+
           const dataFim = new Date(dataInicio);
           dataFim.setHours(23, 59, 59, 999);
+
           days.push(dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+
           const leadsNoDia = leads.filter(l => {
             if (!l.created_at) return false;
             const createdDate = new Date(l.created_at);
             return createdDate >= dataInicio && createdDate <= dataFim;
           }).length;
+
           counts.push(leadsNoDia);
         }
+
         dailyChart = new Chart(canvas.getContext('2d'), {
           type: 'line',
           data: {
@@ -557,7 +597,7 @@
           options: {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: {
+            plugins: { 
               legend: { display: false },
               tooltip: {
                 backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -566,14 +606,14 @@
                 bodyFont: { size: 13 }
               }
             },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
+            scales: { 
+              y: { 
+                beginAtZero: true, 
+                ticks: { 
                   stepSize: 1,
                   color: getComputedStyle(document.documentElement).getPropertyValue('--alsham-text-tertiary').trim()
                 },
-                grid: {
+                grid: { 
                   color: getComputedStyle(document.documentElement).getPropertyValue('--alsham-border-light').trim()
                 }
               },
@@ -587,9 +627,11 @@
           }
         });
       }
+
       function renderLeadsTable(leads) {
         const container = document.getElementById('leads-table');
         if (!container) return;
+
         const rows = leads.slice(0, 10).map(lead => `
           <tr style="transition: background 0.2s;">
             <td class="px-6 py-4 whitespace-nowrap">
@@ -618,6 +660,7 @@
             </td>
           </tr>
         `).join('');
+
         container.innerHTML = `
           <div class="card overflow-hidden">
             <div class="px-6 py-4 flex items-center justify-between" style="border-bottom: 1px solid var(--alsham-border-default);">
@@ -643,6 +686,7 @@
           </div>
         `;
       }
+
       function getStatusBadge(status) {
         const badges = {
           novo: '<span class="status-badge bg-blue-100 text-blue-800">Novo</span>',
@@ -653,6 +697,7 @@
         };
         return badges[status] || '<span class="status-badge bg-gray-100 text-gray-800">N/A</span>';
       }
+
       function showError(message) {
         const container = document.getElementById('dashboard-kpis');
         if (container) {
@@ -674,6 +719,7 @@
         window.notify?.error(message, { duration: 0 });
       }
     }
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', checkSupabaseAndInit);
     } else {
