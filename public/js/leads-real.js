@@ -678,6 +678,12 @@ waitForSupabase(() => {
               <div class="flex items-start"><span class="font-medium text-gray-600 w-24">Empresa:</span><span class="text-gray-900">${lead.empresa || "-"}</span></div>
             </div>
           </div>
+${lead.observacoes ? `
+  <div class="bg-yellow-50 rounded-lg p-4 space-y-2">
+    <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Observações</h3>
+    <p class="text-sm text-gray-700 whitespace-pre-wrap">${lead.observacoes}</p>
+  </div>
+` : ''}
           <div class="bg-blue-50 rounded-lg p-4 space-y-3">
             <h3 class="font-semibold text-gray-700 text-sm uppercase tracking-wide">Qualificação</h3>
             <div class="space-y-2">
@@ -938,6 +944,7 @@ window.updateLead = async function(leadId) {
   const status = document.getElementById("edit-lead-status").value;
   const origem = document.getElementById("edit-lead-origem").value;
   const observacoes = document.getElementById("edit-lead-observacoes").value.trim();
+  
   // Validações
   if (nome.length < 3) {
     showError("Nome deve ter pelo menos 3 caracteres");
@@ -947,8 +954,10 @@ window.updateLead = async function(leadId) {
     showError("Email inválido");
     return;
   }
+  
   try {
     showLoading(true, "Atualizando lead...");
+    
     const updateData = {
       nome,
       email,
@@ -959,20 +968,28 @@ window.updateLead = async function(leadId) {
       origem: origem || null,
       observacoes: observacoes || null
     };
+    
+    console.log("🔍 Lead ID:", leadId);
+    console.log("🔍 Update Data:", updateData);
+    
     const { data, error } = await window.AlshamSupabase.genericUpdate(
       "leads_crm",
       { id: leadId },
       updateData
     );
+    
+    console.log("🔍 Response data:", data);
+    console.log("🔍 Response error:", error);
+    
     if (error) throw error;
+    
     showLoading(false);
     showSuccess("Lead atualizado com sucesso!");
-    // Fechar modal de edição
+    
     document.getElementById("edit-lead-modal").remove();
-    // Fechar modal de detalhes (se estiver aberto)
     const detailModal = document.getElementById("lead-modal");
     if (detailModal) detailModal.remove();
-    // Recarregar dados
+    
     if (typeof window.loadSystemData === 'function') {
       await window.loadSystemData();
       window.setupInterface();
@@ -981,7 +998,7 @@ window.updateLead = async function(leadId) {
     }
   } catch (error) {
     showLoading(false);
-    console.error("Erro ao atualizar lead:", error);
+    console.error("❌ Erro completo ao atualizar lead:", error);
     showError(`Erro: ${error.message}`);
   }
 };
@@ -1038,7 +1055,6 @@ window.deleteLead = async function(leadId) {
     if (!session || !session.access_token) {
       throw new Error("Sessão inválida");
     }
-
     const response = await fetch(
       'https://rgvnbtuqtxvfxhrdnkjg.supabase.co/rest/v1/rpc/delete_lead',
       {
@@ -1046,25 +1062,21 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          // ✅ KEY ATUAL (válida até 2070)
-         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
         },
         body: JSON.stringify({ lead_id: leadId })
       }
     );
-
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-
     showLoading(false);
     showSuccess("Lead deletado com sucesso!");
-    
+   
     document.getElementById("delete-lead-modal").remove();
     const detailModal = document.getElementById("lead-modal");
     if (detailModal) detailModal.remove();
-
     if (typeof window.loadSystemData === 'function') {
       await window.loadSystemData();
       window.setupInterface();
@@ -1164,7 +1176,6 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          // ✅ KEY ATUAL (válida até 2070)
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
         },
         body: JSON.stringify({ leadId })
