@@ -8,12 +8,95 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/tokens.css" />
-  <link rel="stylesheet" href="/css/dark-theme.css" />
-  <!-- CORRIGIDO: Dark Mode ANTES de tudo -->
-  <script src="/js/dark-mode.js"></script>
-  <!-- CORRIGIDO: Chart.js ANTES do Supabase -->
+ 
+  <style id="dark-theme-critical">
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #f9fafb;
+      --alsham-bg-surface: #ffffff;
+      --alsham-bg-hover: #f3f4f6;
+      --alsham-border-default: #e5e7eb;
+      --alsham-border-light: #f3f4f6;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-border-default: #334155;
+      --alsham-border-light: #475569;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+    html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; }
+    html.dark .text-blue-800 { color: #93c5fd !important; }
+    html.dark .bg-yellow-100 { background-color: rgba(251, 191, 36, 0.2) !important; }
+    html.dark .text-yellow-800 { color: #fcd34d !important; }
+    html.dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.2) !important; }
+    html.dark .text-purple-800 { color: #c4b5fd !important; }
+    html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.2) !important; }
+    html.dark .text-green-800 { color: #86efac !important; }
+    html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
+    html.dark .text-red-800 { color: #fca5a5 !important; }
+  </style>
+ 
+  <!-- Dark Mode Script INLINE para evitar erros de module -->
+  <script>
+  (function() {
+    'use strict';
+    
+    // Aplicar tema salvo IMEDIATAMENTE (antes do render)
+    const savedTheme = localStorage.getItem('alsham-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    
+    // Função para alternar tema
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      
+      if (isDark) {
+        html.classList.remove('dark');
+        html.removeAttribute('data-theme');
+        localStorage.setItem('alsham-theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('alsham-theme', 'dark');
+      }
+      
+      // Recarregar gráficos se existirem
+      if (window.dashboardCharts?.reload) {
+        window.dashboardCharts.reload();
+      }
+    }
+    
+    // Adicionar listener quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+    });
+  })();
+  </script>
+ 
+  <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+ 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ 
   <style>
     .loading-spinner {
       display: inline-block;
@@ -24,7 +107,6 @@
       border-radius: 50%;
       animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
     }
- 
     .card {
       background: var(--alsham-bg-surface);
       border-radius: var(--alsham-radius-lg);
@@ -34,17 +116,14 @@
       overflow: visible;
       transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
     .card:hover {
       box-shadow: var(--alsham-shadow-lg);
       transform: translateY(-2px);
     }
- 
     .kpi-card {
       position: relative;
       overflow: hidden;
     }
- 
     .kpi-card::before {
       content: '';
       position: absolute;
@@ -56,11 +135,9 @@
       opacity: 0;
       transition: opacity var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
     .kpi-card:hover::before {
       opacity: 1;
     }
- 
     .side-nav {
       position: fixed;
       left: 0;
@@ -73,7 +150,6 @@
       z-index: var(--alsham-z-sticky);
       overflow-y: auto;
     }
- 
     .side-nav a {
       display: flex;
       align-items: center;
@@ -85,23 +161,19 @@
       font-size: var(--alsham-text-sm);
       font-weight: var(--alsham-font-medium);
     }
- 
     .side-nav a:hover {
       background: var(--alsham-bg-hover);
       color: var(--alsham-primary);
     }
- 
     .side-nav a.active {
       background: var(--alsham-primary-light);
       color: var(--alsham-primary);
       border-right: 3px solid var(--alsham-primary);
       font-weight: var(--alsham-font-semibold);
     }
- 
     .main-content-wrapper {
       margin-left: 220px;
     }
- 
     .theme-toggle-btn {
       width: 2.5rem;
       height: 2.5rem;
@@ -114,27 +186,22 @@
       cursor: pointer;
       transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
     .theme-toggle-btn:hover {
       background: var(--alsham-primary-light);
       border-color: var(--alsham-primary);
       transform: scale(1.05);
     }
- 
     .theme-toggle-btn svg {
       width: 1.25rem;
       height: 1.25rem;
       color: var(--alsham-text-secondary);
       transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
- 
     .theme-toggle-btn:hover svg {
       color: var(--alsham-primary);
     }
- 
     html:not(.dark) .moon-icon { display: none; }
     html.dark .sun-icon { display: none; }
- 
     @media (max-width: 768px) {
       .side-nav {
         transform: translateX(-100%);
@@ -147,7 +214,6 @@
         margin-left: 0;
       }
     }
- 
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -158,7 +224,6 @@
       text-transform: uppercase;
       letter-spacing: 0.025em;
     }
- 
     /* CORRIGIDO: chart-container com altura maior e canvas responsivo */
     .chart-container {
       position: relative;
@@ -169,25 +234,20 @@
     .chart-container canvas {
       max-height: 100%;
     }
- 
     *:focus-visible {
       outline: 2px solid var(--alsham-primary);
       outline-offset: 2px;
       border-radius: var(--alsham-radius-sm);
     }
- 
     .text-primary {
       color: var(--alsham-text-primary);
     }
- 
     .text-secondary {
       color: var(--alsham-text-secondary);
     }
- 
     .text-tertiary {
       color: var(--alsham-text-tertiary);
     }
- 
     nav {
       background: var(--alsham-bg-surface);
       border-bottom: 1px solid var(--alsham-border-default);
@@ -215,7 +275,7 @@
           ALSHAM 360°
         </h1>
       </div>
-   
+  
       <div class="hidden md:flex items-center space-x-6">
         <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Dashboard</a>
         <a href="/leads-real.html" class="text-secondary hover:text-primary transition-colors">Leads</a>
@@ -224,7 +284,7 @@
         <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
         <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
       </div>
-   
+  
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -234,7 +294,6 @@
         </svg>
       </button>
     </div>
- 
     <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
       <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Dashboard</a>
       <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover text-secondary">Leads</a>
@@ -280,7 +339,7 @@
           <canvas id="status-chart"></canvas>
         </div>
       </div>
-   
+  
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos 7 dias)</h3>
         <div class="chart-container">
@@ -298,11 +357,10 @@
   <script type="module">
     import { notify } from '/public/js/utils/notifications.js';
     window.notify = notify;
- 
     function checkSupabaseAndInit() {
       let attempts = 0;
       const maxAttempts = 50;
-   
+  
       function check() {
         attempts++;
         if (window.AlshamSupabase?.getCurrentOrgId) {
@@ -330,19 +388,19 @@
       };
       try {
         const { getCurrentOrgId, getDashboardKPIs, getLeads } = window.AlshamSupabase;
-     
+    
         currentOrgId = await getCurrentOrgId();
-     
+    
         if (!currentOrgId) {
           throw new Error("Organização não encontrada. Faça login novamente.");
         }
         await loadDashboard();
-     
+    
         document.getElementById("loading-indicator").style.display = "none";
         window.notify?.success('✅ Dashboard carregado com sucesso', { duration: 3000 });
-     
+    
         setInterval(loadDashboard, 30000);
-     
+    
         const menuToggle = document.getElementById("menu-toggle");
         if (menuToggle) {
           menuToggle.addEventListener("click", () => {
@@ -360,16 +418,16 @@
       async function loadDashboard() {
         try {
           const { getDashboardKPIs, getLeads } = window.AlshamSupabase;
-       
+      
           const kpis = await getDashboardKPIs(currentOrgId);
           const { data: leads, error } = await getLeads(100, currentOrgId);
-       
+      
           if (error) throw error;
-       
+      
           renderKPIs(kpis);
           renderCharts(leads || []);
           renderLeadsTable(leads || []);
-       
+      
         } catch (error) {
           console.error('Erro ao carregar dados:', error);
           window.notify?.error('Erro ao carregar dados: ' + error.message);
