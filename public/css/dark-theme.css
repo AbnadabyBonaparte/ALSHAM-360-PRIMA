@@ -1,106 +1,192 @@
 /**
- * ALSHAM 360° - DARK THEME SYSTEM
- * Sistema completo de cores para modo escuro
+ * ALSHAM 360° - DARK THEME CSS
+ * Estilos complementares para modo escuro
  */
 
-/* ===================================
+/* =========================================
    VARIÁVEIS DARK MODE
-   =================================== */
+   ========================================= */
 :root {
-  /* Light Mode (padrão) */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --border-color: #e5e7eb;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --shadow-lg: rgba(0, 0, 0, 0.15);
+  /* Light mode colors (padrão) */
+  --alsham-text-primary: #111827;
+  --alsham-text-secondary: #6b7280;
+  --alsham-text-tertiary: #9ca3af;
+  --alsham-bg-canvas: #f9fafb;
+  --alsham-bg-surface: #ffffff;
+  --alsham-bg-hover: #f3f4f6;
+  --alsham-border-default: #e5e7eb;
+  --alsham-border-light: #f3f4f6;
+  --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
+  --alsham-shadow-md: rgba(0, 0, 0, 0.1);
+  --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
 }
 
+html.dark,
 [data-theme="dark"] {
-  /* Dark Mode */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #242424;
-  --bg-tertiary: #2d2d2d;
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --border-color: #374151;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --shadow-lg: rgba(0, 0, 0, 0.5);
+  /* Dark mode colors */
+  --alsham-text-primary: #f9fafb;
+  --alsham-text-secondary: #d1d5db;
+  --alsham-text-tertiary: #9ca3af;
+  --alsham-bg-canvas: #0f172a;
+  --alsham-bg-surface: #1e293b;
+  --alsham-bg-hover: #334155;
+  --alsham-border-default: #334155;
+  --alsham-border-light: #475569;
+  --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
+  --alsham-shadow-md: rgba(0, 0, 0, 0.4);
+  --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+  
+  color-scheme: dark;
 }
 
-/* ===================================
+/* =========================================
    TRANSIÇÕES SUAVES
-   =================================== */
+   ========================================= */
 body,
-.bg-white,
-.bg-gray-50,
-.bg-gray-100,
-.text-gray-600,
-.text-gray-700,
-.text-gray-900,
-.border,
-.shadow,
+nav,
+aside,
+.card,
+.side-nav,
 input,
 textarea,
 select,
 button {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: 
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-/* ===================================
-   APLICAÇÃO GLOBAL
-   =================================== */
-[data-theme="dark"] {
-  color-scheme: dark;
+/* =========================================
+   STATUS BADGES DARK MODE
+   ========================================= */
+html.dark .status-badge {
+  opacity: 0.9;
 }
 
-[data-theme="dark"] body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; }
+html.dark .text-blue-800 { color: #93c5fd !important; }
+
+html.dark .bg-yellow-100 { background-color: rgba(251, 191, 36, 0.2) !important; }
+html.dark .text-yellow-800 { color: #fcd34d !important; }
+
+html.dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.2) !important; }
+html.dark .text-purple-800 { color: #c4b5fd !important; }
+
+html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.2) !important; }
+html.dark .text-green-800 { color: #86efac !important; }
+
+html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
+html.dark .text-red-800 { color: #fca5a5 !important; }
+
+html.dark .bg-gray-100 { background-color: rgba(156, 163, 175, 0.2) !important; }
+html.dark .text-gray-800 { color: #d1d5db !important; }
+
+/* =========================================
+   MODAIS E OVERLAYS
+   ========================================= */
+html.dark .fixed.inset-0.bg-black {
+  background-color: rgba(0, 0, 0, 0.7) !important;
 }
 
-/* ===================================
-   BACKGROUNDS
-   =================================== */
-[data-theme="dark"] .bg-white {
-  background-color: var(--bg-secondary) !important;
+/* =========================================
+   INPUTS E FORMS
+   ========================================= */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: var(--alsham-bg-surface);
+  border-color: var(--alsham-border-default);
+  color: var(--alsham-text-primary);
 }
 
-[data-theme="dark"] .bg-gray-50 {
-  background-color: var(--bg-tertiary) !important;
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--alsham-text-tertiary);
+  opacity: 0.6;
 }
 
-[data-theme="dark"] .bg-gray-100 {
-  background-color: var(--bg-tertiary) !important;
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: var(--alsham-primary);
+  background-color: var(--alsham-bg-hover);
 }
 
-[data-theme="dark"] .bg-blue-50 {
-  background-color: rgba(59, 130, 246, 0.1) !important;
+/* =========================================
+   TABELAS
+   ========================================= */
+html.dark table tr:hover {
+  background-color: var(--alsham-bg-hover) !important;
 }
 
-[data-theme="dark"] .bg-yellow-50 {
-  background-color: rgba(251, 191, 36, 0.1) !important;
+html.dark thead {
+  background-color: var(--alsham-bg-hover) !important;
 }
 
-[data-theme="dark"] .bg-green-50 {
-  background-color: rgba(34, 197, 94, 0.1) !important;
+/* =========================================
+   GRÁFICOS (Chart.js)
+   ========================================= */
+html.dark canvas {
+  filter: brightness(0.9);
 }
 
-[data-theme="dark"] .bg-red-50 {
-  background-color: rgba(239, 68, 68, 0.1) !important;
+/* =========================================
+   LOADING SPINNER
+   ========================================= */
+html.dark .loading-spinner {
+  border-color: rgba(59, 130, 246, 0.2);
+  border-top-color: #3B82F6;
 }
 
-/* ===================================
-   TEXTOS
-   =================================== */
-[data-theme="dark"] .text-gray-600,
-[data-theme="dark"] .text-gray-700 {
-  color: var(--text-secondary) !important;
+/* =========================================
+   SCROLLBAR (Webkit)
+   ========================================= */
+html.dark ::-webkit-scrollbar {
+  width: 12px;
+  background: var(--alsham-bg-canvas);
 }
 
-[data-theme="dark"] .text-gray-500 {
-  color: var(--
+html.dark ::-webkit-scrollbar-track {
+  background: var(--alsham-bg-surface);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--alsham-border-default);
+  border-radius: 6px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--alsham-border-light);
+}
+
+/* =========================================
+   FOCUS STATES
+   ========================================= */
+html.dark *:focus-visible {
+  outline-color: var(--alsham-primary);
+}
+
+/* =========================================
+   LINKS
+   ========================================= */
+html.dark a {
+  color: #60a5fa;
+}
+
+html.dark a:hover {
+  color: #93c5fd;
+}
+
+/* =========================================
+   KPIS E CARDS ESPECIAIS
+   ========================================= */
+html.dark .kpi-card {
+  border: 1px solid var(--alsham-border-default);
+}
+
+html.dark .kpi-card:hover {
+  border-color: var(--alsham-primary);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
