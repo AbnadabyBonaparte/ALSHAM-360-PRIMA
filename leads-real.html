@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leads CRM — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, dashboards e integração com IA." />
-  
+ 
   <!-- CSP REMOVIDO -->
-  
+ 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+ 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-  
+  <link rel="stylesheet" href="/css/dark-theme.css" />
+ 
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  
+ 
   <style>
     /* ===================================
        SIDEBAR NAVIGATION
@@ -35,7 +36,7 @@
       overflow-y: auto;
       transition: transform 0.3s ease;
     }
-    
+   
     .side-nav a {
       display: block;
       padding: 12px 24px;
@@ -47,20 +48,20 @@
       align-items: center;
       gap: 8px;
     }
-    
+   
     .side-nav a:hover {
       background: #f3f4f6;
       color: #3b82f6;
       padding-left: 28px;
     }
-    
+   
     .side-nav a.active {
       background: #eff6ff;
       color: #3b82f6;
       border-right: 3px solid #3b82f6;
       font-weight: 600;
     }
-    
+   
     /* ===================================
        MAIN CONTENT AREA
        =================================== */
@@ -69,18 +70,18 @@
       min-height: calc(100vh - 64px);
       transition: margin-left 0.3s ease;
     }
-    
+   
     /* ===================================
        LOADING SPINNER
        =================================== */
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    
+   
     .animate-spin {
       animation: spin 1s linear infinite;
     }
-    
+   
     /* ===================================
        CARDS E CONTAINERS
        =================================== */
@@ -90,11 +91,11 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: box-shadow 0.3s ease;
     }
-    
+   
     .card:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    
+   
     /* ===================================
        RESPONSIVE DESIGN
        =================================== */
@@ -102,24 +103,23 @@
       .side-nav {
         transform: translateX(-100%);
       }
-      
+     
       .side-nav.open {
         transform: translateX(0);
-        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
       }
-      
+     
       .main-content-wrapper {
         margin-left: 0;
       }
     }
-    
+   
     /* ===================================
        TOAST NOTIFICATIONS
        =================================== */
     .toast {
       animation: slideIn 0.3s ease-out;
     }
-    
+   
     @keyframes slideIn {
       from {
         transform: translateX(100%);
@@ -130,25 +130,25 @@
         opacity: 1;
       }
     }
-    
+   
     /* ===================================
        UTILITY CLASSES
        =================================== */
     .hidden {
       display: none !important;
     }
-    
+   
     /* ===================================
        PRIMARY COLOR
        =================================== */
     .text-primary {
       color: #3b82f6;
     }
-    
+   
     .bg-primary {
       background-color: #3b82f6;
     }
-    
+   
     /* ===================================
        FONT INTER
        =================================== */
@@ -158,12 +158,12 @@
   </style>
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  
+ 
   <!-- ===================================
        TOAST CONTAINER
        =================================== -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-  
+ 
   <!-- ===================================
        TOP NAVIGATION BAR
        =================================== -->
@@ -177,7 +177,7 @@
         </button>
         <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
       </div>
-      
+     
       <div class="hidden md:flex space-x-6">
         <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
         <a href="/leads-real.html" class="text-primary font-medium">Leads</a>
@@ -187,7 +187,7 @@
         <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900 transition-colors">Relatórios</a>
         <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">Configurações</a>
       </div>
-      
+     
       <div class="flex items-center gap-3">
         <button id="notifications-btn" class="text-gray-600 hover:text-gray-900 relative" aria-label="Notificações">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +195,7 @@
           </svg>
           <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
-        
+       
         <button id="user-menu-btn" class="flex items-center gap-2 text-gray-700 hover:text-gray-900" aria-label="Menu do usuário">
           <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
             AB
@@ -204,7 +204,7 @@
       </div>
     </div>
   </nav>
-  
+ 
   <!-- ===================================
        SIDEBAR NAVIGATION
        =================================== -->
@@ -238,19 +238,19 @@
       <span>Configurações</span>
     </a>
   </aside>
-  
+ 
   <!-- ===================================
        MAIN CONTENT
        =================================== -->
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
-    
+   
     <!-- PAGE HEADER -->
     <div class="flex justify-between items-center flex-wrap gap-4">
       <div>
         <h1 class="text-3xl font-bold text-gray-900">Gestão de Leads</h1>
         <p class="text-gray-600 mt-1">Gerencie e qualifique seus leads com inteligência artificial</p>
       </div>
-      
+     
       <button id="new-lead-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -258,31 +258,31 @@
         Novo Lead
       </button>
     </div>
-    
+   
     <!-- LOADING INDICATOR -->
     <div id="leads-loading" class="hidden flex justify-center py-6" role="status" aria-live="polite">
       <div class="inline-block w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
       <span class="sr-only">Carregando leads...</span>
     </div>
-    
+   
     <!-- KPI CARDS -->
     <section id="leads-kpis" aria-label="Indicadores de Performance">
       <!-- Será preenchido pelo JS -->
     </section>
-    
+   
     <!-- FILTERS -->
     <section id="leads-filters" class="card p-4" aria-label="Filtros de Busca">
       <!-- Será preenchido pelo JS -->
     </section>
-    
+   
     <!-- LEADS TABLE -->
     <section id="leads-table" class="card p-4" aria-label="Tabela de Leads">
       <!-- Será preenchido pelo JS -->
     </section>
-    
+   
     <!-- CHARTS -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
+     
       <!-- STATUS DISTRIBUTION CHART -->
       <div class="card p-4">
         <h2 class="font-bold mb-3 text-lg text-gray-900">Distribuição por Status</h2>
@@ -290,30 +290,30 @@
           <canvas id="leads-status-chart" aria-label="Gráfico de distribuição de leads por status"></canvas>
         </div>
       </div>
-      
+     
       <!-- DAILY LEADS CHART -->
       <div class="card p-4">
         <div class="flex justify-between items-center mb-3">
           <h2 class="font-bold text-lg text-gray-900">Leads por Dia</h2>
-          
+         
           <!-- ✅ PERIOD BUTTONS - SEM ONCLICK INLINE -->
           <div id="period-buttons-container" class="flex gap-1" role="group" aria-label="Seleção de período">
-            <button 
-              data-period="7" 
+            <button
+              data-period="7"
               class="period-btn px-3 py-1 text-xs rounded bg-blue-600 text-white font-semibold transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-pressed="true"
             >
               7d
             </button>
-            <button 
-              data-period="30" 
+            <button
+              data-period="30"
               class="period-btn px-3 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-pressed="false"
             >
               30d
             </button>
-            <button 
-              data-period="90" 
+            <button
+              data-period="90"
               class="period-btn px-3 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-pressed="false"
             >
@@ -325,11 +325,11 @@
           <canvas id="leads-daily-chart" aria-label="Gráfico de leads por dia"></canvas>
         </div>
       </div>
-      
+     
     </section>
-    
+   
   </main>
-  
+ 
   <!-- ===================================
        FOOTER
        =================================== -->
@@ -345,7 +345,7 @@
       </div>
     </div>
   </footer>
-  
+ 
   <!-- ===================================
        SCRIPTS - CARREGADOS NO FINAL
        =================================== -->
@@ -354,5 +354,6 @@
   <script type="module" src="/public/js/timeline.js"></script>
   <script type="module" src="/js/leads-real.js"></script>
   <script type="module" src="/src/js/leads-init.js"></script>
+  <script src="/js/dark-mode.js"></script>
 </body>
 </html>
