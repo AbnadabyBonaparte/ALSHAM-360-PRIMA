@@ -1047,8 +1047,10 @@ window.openDeleteLeadModal = function(leadId) {
 window.deleteLead = async function(leadId) {
   try {
     showLoading(true, "Deletando lead...");
-    // Assumindo genericDelete existe; se não, use o client direto: await supabase.from("leads_crm").delete().eq("id", leadId);
-    const { error } = await window.AlshamSupabase.genericDelete("leads_crm", leadId);
+    const { error } = await window.AlshamSupabase.client
+      .from("leads_crm")
+      .delete()
+      .eq("id", leadId);
     if (error) throw error;
     showLoading(false);
     showSuccess("Lead deletado com sucesso!");
