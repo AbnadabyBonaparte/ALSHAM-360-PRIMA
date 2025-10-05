@@ -3,367 +3,684 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leads CRM — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Gestão de Leads CRM do ALSHAM 360° PRIMA: captação inteligente, filtros avançados, dashboards e integração com IA." />
- 
-  <!-- CSP REMOVIDO -->
- 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
- 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
+  <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA - CRM Enterprise com IA" />
+  <title>Dashboard — ALSHAM 360° PRIMA</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/dark-theme.css" />
- 
-  <!-- Chart.js -->
+
+  <!-- CORRIGIDO: Chart.js ANTES do Supabase -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
- 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- CORRIGIDO: Dark Mode ANTES de tudo -->
+  <script src="/js/dark-mode.js"></script>
   <style>
-    /* ===================================
-       SIDEBAR NAVIGATION
-       =================================== */
+    .loading-spinner {
+      display: inline-block;
+      width: 4rem;
+      height: 4rem;
+      border: 4px solid var(--alsham-primary-light, rgba(59, 130, 246, 0.3));
+      border-top-color: var(--alsham-primary, #3B82F6);
+      border-radius: 50%;
+      animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
+    }
+  
+    .card {
+      background: var(--alsham-bg-surface);
+      border-radius: var(--alsham-radius-lg);
+      box-shadow: var(--alsham-shadow-md);
+      padding: var(--alsham-space-6);
+      border: 1px solid var(--alsham-border-default);
+      overflow: visible;
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+  
+    .card:hover {
+      box-shadow: var(--alsham-shadow-lg);
+      transform: translateY(-2px);
+    }
+  
+    .kpi-card {
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--alsham-primary), var(--alsham-secondary));
+      opacity: 0;
+      transition: opacity var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+  
+    .kpi-card:hover::before {
+      opacity: 1;
+    }
+  
     .side-nav {
       position: fixed;
       left: 0;
       top: 64px;
       width: 220px;
       height: calc(100vh - 64px);
-      background: white;
-      border-right: 1px solid #e5e7eb;
-      padding: 20px 0;
-      z-index: 30;
+      background: var(--alsham-bg-surface);
+      border-right: 1px solid var(--alsham-border-default);
+      padding: var(--alsham-space-4) 0;
+      z-index: var(--alsham-z-sticky);
       overflow-y: auto;
-      transition: transform 0.3s ease;
     }
-   
+  
     .side-nav a {
-      display: block;
-      padding: 12px 24px;
-      color: #6b7280;
-      text-decoration: none;
-      transition: all 0.2s;
-      font-size: 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--alsham-space-3);
+      padding: var(--alsham-space-3) var(--alsham-space-6);
+      color: var(--alsham-text-secondary);
+      text-decoration: none;
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+      font-size: var(--alsham-text-sm);
+      font-weight: var(--alsham-font-medium);
     }
-   
+  
     .side-nav a:hover {
-      background: #f3f4f6;
-      color: #3b82f6;
-      padding-left: 28px;
+      background: var(--alsham-bg-hover);
+      color: var(--alsham-primary);
     }
-   
+  
     .side-nav a.active {
-      background: #eff6ff;
-      color: #3b82f6;
-      border-right: 3px solid #3b82f6;
-      font-weight: 600;
+      background: var(--alsham-primary-light);
+      color: var(--alsham-primary);
+      border-right: 3px solid var(--alsham-primary);
+      font-weight: var(--alsham-font-semibold);
     }
-   
-    /* ===================================
-       MAIN CONTENT AREA
-       =================================== */
+  
     .main-content-wrapper {
       margin-left: 220px;
-      min-height: calc(100vh - 64px);
-      transition: margin-left 0.3s ease;
     }
-   
-    /* ===================================
-       LOADING SPINNER
-       =================================== */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+  
+    .theme-toggle-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--alsham-bg-hover);
+      border: 1px solid var(--alsham-border-default);
+      cursor: pointer;
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
-   
-    .animate-spin {
-      animation: spin 1s linear infinite;
+  
+    .theme-toggle-btn:hover {
+      background: var(--alsham-primary-light);
+      border-color: var(--alsham-primary);
+      transform: scale(1.05);
     }
-   
-    /* ===================================
-       CARDS E CONTAINERS
-       =================================== */
-    .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: box-shadow 0.3s ease;
+  
+    .theme-toggle-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--alsham-text-secondary);
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
     }
-   
-    .card:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+    .theme-toggle-btn:hover svg {
+      color: var(--alsham-primary);
     }
-   
-    /* ===================================
-       RESPONSIVE DESIGN
-       =================================== */
+  
+    html:not(.dark) .moon-icon { display: none; }
+    html.dark .sun-icon { display: none; }
+  
     @media (max-width: 768px) {
       .side-nav {
         transform: translateX(-100%);
+        transition: transform var(--alsham-motion-expressive) var(--alsham-ease-expressive);
       }
-     
       .side-nav.open {
         transform: translateX(0);
       }
-     
       .main-content-wrapper {
         margin-left: 0;
       }
     }
-   
-    /* ===================================
-       TOAST NOTIFICATIONS
-       =================================== */
-    .toast {
-      animation: slideIn 0.3s ease-out;
+  
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--alsham-radius-full);
+      font-size: var(--alsham-text-xs);
+      font-weight: var(--alsham-font-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
     }
-   
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
+  
+    /* CORRIGIDO: chart-container com altura maior e canvas responsivo */
+    .chart-container {
+      position: relative;
+      height: 350px;
+      width: 100%;
+      padding: 1rem 0;
     }
-   
-    /* ===================================
-       UTILITY CLASSES
-       =================================== */
-    .hidden {
-      display: none !important;
+    .chart-container canvas {
+      max-height: 100%;
     }
-   
-    /* ===================================
-       PRIMARY COLOR
-       =================================== */
+  
+    *:focus-visible {
+      outline: 2px solid var(--alsham-primary);
+      outline-offset: 2px;
+      border-radius: var(--alsham-radius-sm);
+    }
+  
     .text-primary {
-      color: #3b82f6;
+      color: var(--alsham-text-primary);
     }
-   
-    .bg-primary {
-      background-color: #3b82f6;
+  
+    .text-secondary {
+      color: var(--alsham-text-secondary);
     }
-   
-    /* ===================================
-       FONT INTER
-       =================================== */
-    .font-inter {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+    .text-tertiary {
+      color: var(--alsham-text-tertiary);
+    }
+  
+    nav {
+      background: var(--alsham-bg-surface);
+      border-bottom: 1px solid var(--alsham-border-default);
     }
   </style>
 </head>
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
- 
-  <!-- ===================================
-       TOAST CONTAINER
-       =================================== -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
- 
-  <!-- ===================================
-       TOP NAVIGATION BAR
-       =================================== -->
-  <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
+<body class="font-inter min-h-screen" style="background: var(--alsham-bg-canvas);">
+  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);">
+    <div class="text-center">
+      <div class="loading-spinner mb-4"></div>
+      <h2 class="text-xl font-bold text-primary mb-2">ALSHAM 360° PRIMA</h2>
+      <p class="text-secondary font-medium">Carregando dashboard executivo...</p>
+    </div>
+  </div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+  <nav class="sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <div class="flex items-center gap-4">
-        <button id="mobile-menu-toggle" class="md:hidden text-gray-600 hover:text-gray-900" aria-label="Toggle menu">
+        <button id="menu-toggle" class="md:hidden p-2 hover:bg-hover rounded-lg transition-colors text-secondary" aria-label="Abrir menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
-        <h1 class="text-xl font-bold text-primary">ALSHAM 360°</h1>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+          ALSHAM 360°
+        </h1>
       </div>
-     
-      <div class="hidden md:flex space-x-6">
-        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
-        <a href="/leads-real.html" class="text-primary font-medium">Leads</a>
-        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900 transition-colors">Pipeline</a>
-        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">Automações</a>
-        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900 transition-colors">Gamificação</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900 transition-colors">Relatórios</a>
-        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900 transition-colors">Configurações</a>
+    
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Dashboard</a>
+        <a href="/leads-real.html" class="text-secondary hover:text-primary transition-colors">Leads</a>
+        <a href="/pipeline.html" class="text-secondary hover:text-primary transition-colors">Pipeline</a>
+        <a href="/automacoes.html" class="text-secondary hover:text-primary transition-colors">Automações</a>
+        <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
+        <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
       </div>
-     
-      <div class="flex items-center gap-3">
-        <button id="notifications-btn" class="text-gray-600 hover:text-gray-900 relative" aria-label="Notificações">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-          </svg>
-          <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
-       
-        <button id="user-menu-btn" class="flex items-center gap-2 text-gray-700 hover:text-gray-900" aria-label="Menu do usuário">
-          <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-            AB
-          </div>
-        </button>
-       
-        <!-- Toggle Button -->
-        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema">
-          <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </nav>
- 
-  <!-- ===================================
-       SIDEBAR NAVIGATION
-       =================================== -->
-  <aside id="side-nav" class="side-nav">
-    <a href="/dashboard.html">
-      <span>📊</span>
-      <span>Dashboard</span>
-    </a>
-    <a href="/leads-real.html" class="active">
-      <span>👥</span>
-      <span>Leads</span>
-    </a>
-    <a href="/pipeline.html">
-      <span>🎯</span>
-      <span>Pipeline</span>
-    </a>
-    <a href="/automacoes.html">
-      <span>⚙️</span>
-      <span>Automações</span>
-    </a>
-    <a href="/gamificacao.html">
-      <span>🎮</span>
-      <span>Gamificação</span>
-    </a>
-    <a href="/relatorios.html">
-      <span>📈</span>
-      <span>Relatórios</span>
-    </a>
-    <a href="/configuracoes.html">
-      <span>⚙️</span>
-      <span>Configurações</span>
-    </a>
-  </aside>
- 
-  <!-- ===================================
-       MAIN CONTENT
-       =================================== -->
-  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
-   
-    <!-- PAGE HEADER -->
-    <div class="flex justify-between items-center flex-wrap gap-4">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">Gestão de Leads</h1>
-        <p class="text-gray-600 mt-1">Gerencie e qualifique seus leads com inteligência artificial</p>
-      </div>
-     
-      <button id="new-lead-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+    
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
-        Novo Lead
+        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
       </button>
     </div>
-   
-    <!-- LOADING INDICATOR -->
-    <div id="leads-loading" class="hidden flex justify-center py-6" role="status" aria-live="polite">
-      <div class="inline-block w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-      <span class="sr-only">Carregando leads...</span>
+  
+    <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
+      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Dashboard</a>
+      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover text-secondary">Leads</a>
+      <a href="/pipeline.html" class="block px-4 py-3 hover:bg-hover text-secondary">Pipeline</a>
+      <a href="/automacoes.html" class="block px-4 py-3 hover:bg-hover text-secondary">Automações</a>
+      <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-hover text-secondary">Gamificação</a>
+      <a href="/relatorios.html" class="block px-4 py-3 hover:bg-hover text-secondary">Relatórios</a>
     </div>
-   
-    <!-- KPI CARDS -->
-    <section id="leads-kpis" aria-label="Indicadores de Performance">
-      <!-- Será preenchido pelo JS -->
-    </section>
-   
-    <!-- FILTERS -->
-    <section id="leads-filters" class="card p-4" aria-label="Filtros de Busca">
-      <!-- Será preenchido pelo JS -->
-    </section>
-   
-    <!-- LEADS TABLE -->
-    <section id="leads-table" class="card p-4" aria-label="Tabela de Leads">
-      <!-- Será preenchido pelo JS -->
-    </section>
-   
-    <!-- CHARTS -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-     
-      <!-- STATUS DISTRIBUTION CHART -->
-      <div class="card p-4">
-        <h2 class="font-bold mb-3 text-lg text-gray-900">Distribuição por Status</h2>
-        <div class="h-64 relative">
-          <canvas id="leads-status-chart" aria-label="Gráfico de distribuição de leads por status"></canvas>
+  </nav>
+  <aside class="side-nav" id="sidebar">
+    <a href="/dashboard.html" class="active" aria-current="page">
+      <span>📊</span> Dashboard
+    </a>
+    <a href="/leads-real.html">
+      <span>👥</span> Leads
+    </a>
+    <a href="/pipeline.html">
+      <span>🎯</span> Pipeline
+    </a>
+    <a href="/automacoes.html">
+      <span>⚙️</span> Automações
+    </a>
+    <a href="/gamificacao.html">
+      <span>🎮</span> Gamificação
+    </a>
+    <a href="/relatorios.html">
+      <span>📈</span> Relatórios
+    </a>
+    <a href="/configuracoes.html">
+      <span>⚙️</span> Configurações
+    </a>
+  </aside>
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-primary mb-2">Dashboard Executivo</h1>
+      <p class="text-secondary">Visão completa do seu funil de vendas e performance em tempo real</p>
+    </header>
+    <div id="dashboard-kpis"></div>
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição por Status</h3>
+        <div class="chart-container">
+          <canvas id="status-chart"></canvas>
         </div>
       </div>
-     
-      <!-- DAILY LEADS CHART -->
-      <div class="card p-4">
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="font-bold text-lg text-gray-900">Leads por Dia</h2>
-         
-          <!-- ✅ PERIOD BUTTONS - SEM ONCLICK INLINE -->
-          <div id="period-buttons-container" class="flex gap-1" role="group" aria-label="Seleção de período">
-            <button
-              data-period="7"
-              class="period-btn px-3 py-1 text-xs rounded bg-blue-600 text-white font-semibold transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-pressed="true"
-            >
-              7d
-            </button>
-            <button
-              data-period="30"
-              class="period-btn px-3 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-pressed="false"
-            >
-              30d
-            </button>
-            <button
-              data-period="90"
-              class="period-btn px-3 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-pressed="false"
-            >
-              90d
-            </button>
-          </div>
-        </div>
-        <div class="h-64 relative">
-          <canvas id="leads-daily-chart" aria-label="Gráfico de leads por dia"></canvas>
+    
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos 7 dias)</h3>
+        <div class="chart-container">
+          <canvas id="daily-chart"></canvas>
         </div>
       </div>
-     
     </section>
-   
+    <div id="leads-table"></div>
   </main>
- 
-  <!-- ===================================
-       FOOTER
-       =================================== -->
-  <footer class="main-content-wrapper max-w-7xl mx-auto px-4 py-6 border-t border-gray-200 mt-12">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-gray-500 text-sm">
-        © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
-      </p>
-      <div class="flex gap-4 text-sm text-gray-500">
-        <a href="/termos.html" class="hover:text-gray-700 transition-colors">Termos de Uso</a>
-        <a href="/privacidade.html" class="hover:text-gray-700 transition-colors">Privacidade</a>
-        <a href="/suporte.html" class="hover:text-gray-700 transition-colors">Suporte</a>
-      </div>
-    </div>
-  </footer>
- 
-  <!-- ===================================
-       SCRIPTS - CARREGADOS NO FINAL
-       =================================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/public/js/timeline.js"></script>
-  <script type="module" src="/js/leads-real.js"></script>
-  <script type="module" src="/src/js/leads-init.js"></script>
-  <script src="/js/dark-mode.js"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
+  <script type="module">
+    import { notify } from '/public/js/utils/notifications.js';
+    window.notify = notify;
+  
+    function checkSupabaseAndInit() {
+      let attempts = 0;
+      const maxAttempts = 50;
+    
+      function check() {
+        attempts++;
+        if (window.AlshamSupabase?.getCurrentOrgId) {
+          console.log('✅ Supabase carregado no dashboard');
+          startDashboard();
+        } else if (attempts >= maxAttempts) {
+          document.getElementById('loading-indicator').style.display = 'none';
+          window.notify?.error('Erro ao carregar Supabase. Recarregue a página.', { duration: 0 });
+        } else {
+          setTimeout(check, 100);
+        }
+      }
+      check();
+    }
+    async function startDashboard() {
+      let statusChart = null;
+      let dailyChart = null;
+      let currentOrgId = null;
+      window.dashboardCharts = {
+        reload: () => {
+          if (statusChart) statusChart.destroy();
+          if (dailyChart) dailyChart.destroy();
+          loadDashboard();
+        }
+      };
+      try {
+        const { getCurrentOrgId, getDashboardKPIs, getLeads } = window.AlshamSupabase;
+      
+        currentOrgId = await getCurrentOrgId();
+      
+        if (!currentOrgId) {
+          throw new Error("Organização não encontrada. Faça login novamente.");
+        }
+        await loadDashboard();
+      
+        document.getElementById("loading-indicator").style.display = "none";
+        window.notify?.success('✅ Dashboard carregado com sucesso', { duration: 3000 });
+      
+        setInterval(loadDashboard, 30000);
+      
+        const menuToggle = document.getElementById("menu-toggle");
+        if (menuToggle) {
+          menuToggle.addEventListener("click", () => {
+            const sidebar = document.getElementById("sidebar");
+            const mobileMenu = document.getElementById("mobile-menu");
+            sidebar?.classList.toggle("open");
+            mobileMenu?.classList.toggle("hidden");
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dashboard:", error);
+        showError(error.message);
+        document.getElementById("loading-indicator").style.display = "none";
+      }
+      async function loadDashboard() {
+        try {
+          const { getDashboardKPIs, getLeads } = window.AlshamSupabase;
+        
+          const kpis = await getDashboardKPIs(currentOrgId);
+          const { data: leads, error } = await getLeads(100, currentOrgId);
+        
+          if (error) throw error;
+        
+          renderKPIs(kpis);
+          renderCharts(leads || []);
+          renderLeadsTable(leads || []);
+        
+        } catch (error) {
+          console.error('Erro ao carregar dados:', error);
+          window.notify?.error('Erro ao carregar dados: ' + error.message);
+        }
+      }
+      function renderKPIs(kpis) {
+        const container = document.getElementById('dashboard-kpis');
+        if (!container) return;
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="card kpi-card">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-secondary mb-1 font-medium">Total de Leads</p>
+                  <h3 class="text-3xl font-bold text-primary">${kpis.total_leads || 0}</h3>
+                  <p class="text-xs text-green-600 font-semibold mt-2">↑ +12% vs mês anterior</p>
+                </div>
+                <div style="background: rgba(59, 130, 246, 0.1); padding: 0.75rem; border-radius: 9999px;">
+                  <svg class="w-6 h-6" style="color: #3B82F6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="card kpi-card">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-secondary mb-1 font-medium">Novos (7 dias)</p>
+                  <h3 class="text-3xl font-bold text-primary">${kpis.new_leads_last_7_days || 0}</h3>
+                  <p class="text-xs text-green-600 font-semibold mt-2">↑ +8% vs semana anterior</p>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 0.75rem; border-radius: 9999px;">
+                  <svg class="w-6 h-6" style="color: #10B981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="card kpi-card">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-secondary mb-1 font-medium">Qualificados</p>
+                  <h3 class="text-3xl font-bold text-primary">${kpis.qualified_leads || 0}</h3>
+                  <p class="text-xs text-secondary font-semibold mt-2">${Math.round((kpis.qualified_leads / kpis.total_leads) * 100) || 0}% do total</p>
+                </div>
+                <div style="background: rgba(139, 92, 246, 0.1); padding: 0.75rem; border-radius: 9999px;">
+                  <svg class="w-6 h-6" style="color: #8B5CF6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="card kpi-card">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-secondary mb-1 font-medium">Taxa Conversão</p>
+                  <h3 class="text-3xl font-bold text-primary">${kpis.conversion_rate || 0}%</h3>
+                  <p class="text-xs text-yellow-600 font-semibold mt-2">Meta: 25%</p>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 0.75rem; border-radius: 9999px;">
+                  <svg class="w-6 h-6" style="color: #F59E0B;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05)); border-left: 4px solid #EF4444;">
+              <p class="text-sm font-semibold mb-1" style="color: #991B1B;">🔥 Leads Quentes</p>
+              <h4 class="text-2xl font-bold" style="color: #DC2626;">${kpis.hot_leads || 0}</h4>
+            </div>
+            <div class="card" style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.1), rgba(249, 115, 22, 0.05)); border-left: 4px solid #F97316;">
+              <p class="text-sm font-semibold mb-1" style="color: #9A3412;">🌡️ Leads Mornos</p>
+              <h4 class="text-2xl font-bold" style="color: #EA580C;">${kpis.warm_leads || 0}</h4>
+            </div>
+            <div class="card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05)); border-left: 4px solid #3B82F6;">
+              <p class="text-sm font-semibold mb-1" style="color: #1E40AF;">❄️ Leads Frios</p>
+              <h4 class="text-2xl font-bold" style="color: #2563EB;">${kpis.cold_leads || 0}</h4>
+            </div>
+          </div>
+        `;
+      }
+      function renderCharts(leads) {
+        renderStatusChart(leads);
+        renderDailyChart(leads);
+      }
+      function renderStatusChart(leads) {
+        const canvas = document.getElementById('status-chart');
+        if (!canvas || !window.Chart) return;
+        if (statusChart) statusChart.destroy();
+        const statusCounts = {
+          novo: leads.filter(l => l.status === 'novo').length,
+          em_contato: leads.filter(l => l.status === 'em_contato').length,
+          qualificado: leads.filter(l => l.status === 'qualificado').length,
+          convertido: leads.filter(l => l.status === 'convertido').length,
+          perdido: leads.filter(l => l.status === 'perdido').length
+        };
+        statusChart = new Chart(canvas.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Novo', 'Em Contato', 'Qualificado', 'Convertido', 'Perdido'],
+            datasets: [{
+              data: [statusCounts.novo, statusCounts.em_contato, statusCounts.qualificado, statusCounts.convertido, statusCounts.perdido],
+              backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#10B981', '#EF4444'],
+              borderWidth: 3,
+              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--alsham-bg-surface').trim(),
+              hoverOffset: 15
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 15,
+                  font: { size: 12, weight: '500' },
+                  color: getComputedStyle(document.documentElement).getPropertyValue('--alsham-text-secondary').trim()
+                }
+              },
+              tooltip: {
+                position: 'nearest',
+                yAlign: 'top',
+                xAlign: 'center',
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                padding: 12,
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 13 },
+                callbacks: {
+                  label: function(context) {
+                    const label = context.label || '';
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    return `${label}: ${value} (${percentage}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+      function renderDailyChart(leads) {
+        const canvas = document.getElementById('daily-chart');
+        if (!canvas || !window.Chart) return;
+        if (dailyChart) dailyChart.destroy();
+        const days = [], counts = [];
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        for (let i = 6; i >= 0; i--) {
+          const dataInicio = new Date(hoje);
+          dataInicio.setDate(dataInicio.getDate() - i);
+          dataInicio.setHours(0, 0, 0, 0);
+          const dataFim = new Date(dataInicio);
+          dataFim.setHours(23, 59, 59, 999);
+          days.push(dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+          const leadsNoDia = leads.filter(l => {
+            if (!l.created_at) return false;
+            const createdDate = new Date(l.created_at);
+            return createdDate >= dataInicio && createdDate <= dataFim;
+          }).length;
+          counts.push(leadsNoDia);
+        }
+        dailyChart = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [{
+              label: 'Novos Leads',
+              data: counts,
+              borderColor: '#3B82F6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              fill: true,
+              tension: 0.4,
+              borderWidth: 3,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: '#3B82F6',
+              pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--alsham-bg-surface').trim(),
+              pointBorderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                padding: 12,
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 13 }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  color: getComputedStyle(document.documentElement).getPropertyValue('--alsham-text-tertiary').trim()
+                },
+                grid: {
+                  color: getComputedStyle(document.documentElement).getPropertyValue('--alsham-border-light').trim()
+                }
+              },
+              x: {
+                grid: { display: false },
+                ticks: {
+                  color: getComputedStyle(document.documentElement).getPropertyValue('--alsham-text-tertiary').trim()
+                }
+              }
+            }
+          }
+        });
+      }
+      function renderLeadsTable(leads) {
+        const container = document.getElementById('leads-table');
+        if (!container) return;
+        const rows = leads.slice(0, 10).map(lead => `
+          <tr style="transition: background 0.2s;">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  ${(lead.nome || 'N').charAt(0).toUpperCase()}
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-primary">${lead.nome || 'N/A'}</div>
+                  <div class="text-sm text-secondary">${lead.email || 'N/A'}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary">${lead.empresa || 'N/A'}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(lead.status)}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-primary">${lead.score_ia || 0}</span>
+                <div class="w-24 rounded-full h-2" style="background: var(--alsham-bg-hover);">
+                  <div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500" style="width: ${lead.score_ia || 0}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary">
+              ${new Date(lead.created_at).toLocaleDateString('pt-BR')}
+            </td>
+          </tr>
+        `).join('');
+        container.innerHTML = `
+          <div class="card overflow-hidden">
+            <div class="px-6 py-4 flex items-center justify-between" style="border-bottom: 1px solid var(--alsham-border-default);">
+              <h3 class="text-lg font-semibold text-primary">Leads Recentes</h3>
+              <a href="/leads-real.html" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                Ver todos →
+              </a>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full">
+                <thead style="background: var(--alsham-bg-hover);">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider">Lead</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider">Empresa</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider">Score IA</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider">Data</th>
+                  </tr>
+                </thead>
+                <tbody style="background: var(--alsham-bg-surface);">${rows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      function getStatusBadge(status) {
+        const badges = {
+          novo: '<span class="status-badge bg-blue-100 text-blue-800">Novo</span>',
+          em_contato: '<span class="status-badge bg-yellow-100 text-yellow-800">Em Contato</span>',
+          qualificado: '<span class="status-badge bg-purple-100 text-purple-800">Qualificado</span>',
+          convertido: '<span class="status-badge bg-green-100 text-green-800">Convertido</span>',
+          perdido: '<span class="status-badge bg-red-100 text-red-800">Perdido</span>'
+        };
+        return badges[status] || '<span class="status-badge bg-gray-100 text-gray-800">N/A</span>';
+      }
+      function showError(message) {
+        const container = document.getElementById('dashboard-kpis');
+        if (container) {
+          container.innerHTML = `
+            <div class="card text-center" style="background: var(--alsham-error-bg); border: 1px solid var(--alsham-error-border);">
+              <div class="flex items-center justify-center mb-4">
+                <svg class="w-12 h-12" style="color: var(--alsham-error);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold mb-2" style="color: var(--alsham-error-text);">Erro ao Carregar Dashboard</h3>
+              <p class="mb-4" style="color: var(--alsham-error-text);">${message}</p>
+              <button onclick="location.reload()" class="px-6 py-2 rounded-lg font-medium" style="background: var(--alsham-error); color: white;">
+                Tentar Novamente
+              </button>
+            </div>
+          `;
+        }
+        window.notify?.error(message, { duration: 0 });
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkSupabaseAndInit);
+    } else {
+      checkSupabaseAndInit();
+    }
+  </script>
 </body>
 </html>
