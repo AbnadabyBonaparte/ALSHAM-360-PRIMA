@@ -1047,11 +1047,27 @@ window.openDeleteLeadModal = function(leadId) {
 window.deleteLead = async function(leadId) {
   try {
     showLoading(true, "Deletando lead...");
-    const { error } = await window.AlshamSupabase.client
-      .from("leads_crm")
-      .delete()
-      .eq("id", leadId);
-    if (error) throw error;
+    // Usar fetch direto com API do Supabase
+    const session = await window.AlshamSupabase.getCurrentSession();
+    if (!session || !session.access_token) {
+      throw new Error("Sessão inválida");
+    }
+
+    const response = await fetch(
+      `https://rgvnbtuqtxvfxhrdnkjg.supabase.co/rest/v1/leads_crm?id=eq.${leadId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc4OTU2ODQsImV4cCI6MjA0MzQ3MTY4NH0.sb_publishable_4GXjFzIqbEtaLwAu-ZNFA_BxkNHSIGp'
+        }
+      }
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Erro ao deletar');
+    }
     showLoading(false);
     showSuccess("Lead deletado com sucesso!");
     // Fechar modal de deleção
