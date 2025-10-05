@@ -50,8 +50,48 @@
     html.dark .text-red-800 { color: #fca5a5 !important; }
   </style>
  
-  <!-- Dark Mode Script PRIMEIRO para evitar flash -->
-  <script src="/js/dark-mode.js"></script>
+  <!-- Dark Mode Script INLINE para evitar erros de module -->
+  <script>
+  (function() {
+    'use strict';
+    
+    // Aplicar tema salvo IMEDIATAMENTE (antes do render)
+    const savedTheme = localStorage.getItem('alsham-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    
+    // Função para alternar tema
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      
+      if (isDark) {
+        html.classList.remove('dark');
+        html.removeAttribute('data-theme');
+        localStorage.setItem('alsham-theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('alsham-theme', 'dark');
+      }
+      
+      // Recarregar gráficos se existirem
+      if (window.dashboardCharts?.reload) {
+        window.dashboardCharts.reload();
+      }
+    }
+    
+    // Adicionar listener quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+    });
+  })();
+  </script>
  
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
