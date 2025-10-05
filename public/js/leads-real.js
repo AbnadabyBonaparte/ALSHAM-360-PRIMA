@@ -1,4 +1,4 @@
-/**
+ /**
  * ALSHAM 360° PRIMA - LEADS REAIS V5.8.3
  * Sistema completo de gerenciamento de leads com IA e gamificação
  * ✅ CORRIGIDO: URL da Edge Function + Event listeners CSP compliance + Score IA funcional
@@ -1047,7 +1047,7 @@ window.openDeleteLeadModal = function(leadId) {
 window.deleteLead = async function(leadId) {
   try {
     showLoading(true, "Deletando lead...");
-    // Usar fetch direto com API do Supabase
+    
     const session = await window.AlshamSupabase.getCurrentSession();
     if (!session || !session.access_token) {
       throw new Error("Sessão inválida");
@@ -1064,18 +1064,19 @@ window.deleteLead = async function(leadId) {
         }
       }
     );
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Erro ao deletar');
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
+
     showLoading(false);
     showSuccess("Lead deletado com sucesso!");
-    // Fechar modal de deleção
+
     document.getElementById("delete-lead-modal").remove();
-    // Fechar modal de detalhes
     const detailModal = document.getElementById("lead-modal");
     if (detailModal) detailModal.remove();
-    // Recarregar dados
+
     if (typeof window.loadSystemData === 'function') {
       await window.loadSystemData();
       window.setupInterface();
