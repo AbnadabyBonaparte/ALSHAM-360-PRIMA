@@ -18,10 +18,10 @@ window.openNewLeadModal = function() {
           <h2 class="text-2xl font-bold text-gray-900">Novo Lead</h2>
           <button id="close-new-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
         </div>
-      
+     
         <div class="overflow-y-auto p-6">
           <form id="new-lead-form" class="space-y-4">
-          
+         
             <!-- Nome (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -36,7 +36,7 @@ window.openNewLeadModal = function() {
               >
               <p class="text-xs text-gray-500 mt-1">Mínimo 3 caracteres</p>
             </div>
-          
+         
             <!-- Email (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -50,7 +50,7 @@ window.openNewLeadModal = function() {
                 placeholder="exemplo@empresa.com.br"
               >
             </div>
-          
+         
             <!-- Telefone -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
@@ -62,7 +62,7 @@ window.openNewLeadModal = function() {
                 maxlength="15"
               >
             </div>
-          
+         
             <!-- Grid: Empresa + Cargo -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -74,7 +74,7 @@ window.openNewLeadModal = function() {
                   placeholder="Nome da empresa"
                 >
               </div>
-            
+           
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
                 <input
@@ -85,7 +85,7 @@ window.openNewLeadModal = function() {
                 >
               </div>
             </div>
-          
+         
             <!-- Grid: Status + Origem -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -100,7 +100,7 @@ window.openNewLeadModal = function() {
                   }
                 </select>
               </div>
-            
+           
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
                 <select
@@ -115,7 +115,7 @@ window.openNewLeadModal = function() {
                 </select>
               </div>
             </div>
-          
+         
             <!-- Observações -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
@@ -126,7 +126,7 @@ window.openNewLeadModal = function() {
                 placeholder="Informações adicionais sobre o lead..."
               ></textarea>
             </div>
-          
+         
             <!-- Botões -->
             <div class="flex gap-3 pt-4 border-t border-gray-200">
               <button
@@ -143,33 +143,33 @@ window.openNewLeadModal = function() {
                 Cancelar
               </button>
             </div>
-          
+         
           </form>
         </div>
       </div>
     `;
-  
+ 
     document.body.appendChild(modal);
-  
+ 
     // Event listeners
     document.getElementById("close-new-lead-modal").addEventListener("click", () => {
       modal.remove();
     });
-  
+ 
     document.getElementById("cancel-new-lead").addEventListener("click", () => {
       modal.remove();
     });
-  
+ 
     modal.addEventListener("click", (e) => {
       if (e.target === modal) modal.remove();
     });
-  
+ 
     // Form submit
     document.getElementById("new-lead-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       await window.createNewLead();
     });
-  
+ 
     // Máscara de telefone
     const telefoneInput = document.getElementById("new-lead-telefone");
     telefoneInput.addEventListener("input", (e) => {
@@ -776,10 +776,10 @@ window.openEditLeadModal = function(leadId) {
         <h2 class="text-2xl font-bold text-gray-900">Editar Lead</h2>
         <button id="close-edit-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
       </div>
-   
+  
       <div class="overflow-y-auto p-6">
         <form id="edit-lead-form" class="space-y-4">
-       
+      
           <!-- Nome -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -793,7 +793,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>
-       
+      
           <!-- Email -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -807,7 +807,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>
-       
+      
           <!-- Telefone -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
@@ -819,7 +819,7 @@ window.openEditLeadModal = function(leadId) {
               maxlength="15"
             >
           </div>
-       
+      
           <!-- Grid: Empresa + Cargo -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -831,7 +831,7 @@ window.openEditLeadModal = function(leadId) {
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
             </div>
-         
+        
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
               <input
@@ -842,7 +842,7 @@ window.openEditLeadModal = function(leadId) {
               >
             </div>
           </div>
-       
+      
           <!-- Grid: Status + Origem -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -859,7 +859,7 @@ window.openEditLeadModal = function(leadId) {
                 }
               </select>
             </div>
-         
+        
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
               <select
@@ -876,7 +876,7 @@ window.openEditLeadModal = function(leadId) {
               </select>
             </div>
           </div>
-       
+      
           <!-- Observações -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
@@ -886,7 +886,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             >${lead.observacoes || ''}</textarea>
           </div>
-       
+      
           <!-- Botões -->
           <div class="flex gap-3 pt-4 border-t border-gray-200">
             <button
@@ -903,7 +903,7 @@ window.openEditLeadModal = function(leadId) {
               Cancelar
             </button>
           </div>
-       
+      
         </form>
       </div>
     </div>
@@ -955,7 +955,6 @@ window.updateLead = async function(leadId) {
   }
   try {
     showLoading(true, "Atualizando lead...");
- 
     const updateData = {
       nome,
       email,
@@ -966,25 +965,19 @@ window.updateLead = async function(leadId) {
       origem: origem || null,
       observacoes: observacoes || null
     };
- 
     const { data, error } = await window.AlshamSupabase.genericUpdate(
       "leads_crm",
       { id: leadId },
       updateData
     );
- 
     if (error) throw error;
- 
     showLoading(false);
     showSuccess("Lead atualizado com sucesso!");
- 
     // Fechar modal de edição
     document.getElementById("edit-lead-modal").remove();
- 
     // Fechar modal de detalhes (se estiver aberto)
     const detailModal = document.getElementById("lead-modal");
     if (detailModal) detailModal.remove();
- 
     // Recarregar dados
     if (typeof window.loadSystemData === 'function') {
       await window.loadSystemData();
@@ -992,7 +985,6 @@ window.updateLead = async function(leadId) {
     } else {
       window.location.reload();
     }
- 
   } catch (error) {
     showLoading(false);
     console.error("Erro ao atualizar lead:", error);
@@ -1048,30 +1040,27 @@ window.deleteLead = async function(leadId) {
   try {
     showLoading(true, "Deletando lead...");
     
-    // Usar o wrapper do AlshamSupabase que JÁ tem as credenciais corretas
-    const supabase = window.AlshamSupabase;
-    
-    // Fazer delete usando o padrão do Supabase client
-    const session = await supabase.getCurrentSession();
+    const session = await window.AlshamSupabase.getCurrentSession();
     const response = await fetch(
-      `https://rgvnbtuqtxvfxhrdnkjg.supabase.co/rest/v1/leads_crm?id=eq.${leadId}`,
+      'https://rgvnbtuqtxvfxhrdnkjg.supabase.co/rest/v1/rpc/delete_lead',
       {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': window.AlshamSupabase.anonKey,  // Usar a key que já está configurada
-          'Prefer': 'return=minimal'
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ lead_id: leadId })
       }
     );
 
     if (!response.ok) {
-      throw new Error('Erro ao deletar');
+      const errorText = await response.text();
+      throw new Error(`Erro ao deletar: ${errorText}`);
     }
 
     showLoading(false);
     showSuccess("Lead deletado com sucesso!");
-
+    
     document.getElementById("delete-lead-modal").remove();
     const detailModal = document.getElementById("lead-modal");
     if (detailModal) detailModal.remove();
