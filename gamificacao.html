@@ -101,3 +101,107 @@
     .side-nav a.active {
       background: rgba(59, 130, 246, 0.1);
       color: #3b82f6;
+      border-right: 3px solid #3b82f6;
+      font-weight: 600;
+    }
+    .main-content-wrapper {
+      margin-left: 220px;
+    }
+    nav {
+      background: var(--alsham-bg-surface);
+      border-bottom: 1px solid var(--alsham-border-default);
+    }
+    .theme-toggle-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--alsham-bg-hover);
+      border: 1px solid var(--alsham-border-default);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+      transform: scale(1.05);
+    }
+    .theme-toggle-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--alsham-text-secondary);
+    }
+    html:not(.dark) .moon-icon { display: none; }
+    html.dark .sun-icon { display: none; }
+  </style>
+</head>
+
+<body class="font-inter min-h-screen">
+  
+  <div id="gamification-loading" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6">
+      <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <p class="text-gray-700">Carregando...</p>
+    </div>
+  </div>
+  
+  <nav class="sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
+        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
+        <a href="/gamificacao.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Gamificação</a>
+        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema">
+        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+  
+  <aside class="side-nav">
+    <a href="/dashboard.html">📊 Dashboard</a>
+    <a href="/leads-real.html">👥 Leads</a>
+    <a href="/pipeline.html">🎯 Pipeline</a>
+    <a href="/automacoes.html">⚙️ Automações</a>
+    <a href="/gamificacao.html" class="active">🎮 Gamificação</a>
+    <a href="/relatorios.html">📈 Relatórios</a>
+    <a href="/configuracoes.html">⚙️ Configurações</a>
+  </aside>
+  
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold" style="color: var(--alsham-text-primary);">🎮 Gamificação</h1>
+    
+    <section id="user-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4"></section>
+    
+    <section id="level-progress"></section>
+    
+    <section>
+      <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">🏆 Conquistas</h2>
+      <div id="badges-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+    </section>
+    
+    <section>
+      <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">📊 Histórico de Pontos</h2>
+      <div id="points-history" class="space-y-2"></div>
+    </section>
+  </main>
+  
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm" style="color: var(--alsham-text-tertiary);">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
+  
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script type="module" src="/public/js/gamificacao.js"></script>
+</body>
+</html>
