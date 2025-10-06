@@ -1,7 +1,7 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Notificações Toast Enterprise
- * Versão: 2.5.2 – SOUND CONTROL EDITION (Toggle Fix)
- * 🔊 Opção “com ou sem som” salva no localStorage
+ * Versão: 2.5.3 – SOUND CONTROL WORKING EDITION
+ * 🔊 Toggle de som 100% funcional e persistente
  * 🌓 Dark mode, animações refinadas e sons dinâmicos integrados
  * ✅ CSS das animações sempre injetado no head
  */
@@ -49,36 +49,29 @@ export class NotificationSystem {
   }
 
   setSoundPreference(enabled) {
-    localStorage.setItem('alsham_sound_enabled', enabled);
-    this.soundEnabled = this.getSoundPreference(); // <- sempre pega do localStorage
+    localStorage.setItem('alsham_sound_enabled', enabled ? 'true' : 'false');
+    this.soundEnabled = enabled;
     this.updateSoundToggleIcon();
+    console.log('Som está', enabled ? 'ATIVADO' : 'DESATIVADO');
   }
 
   addSoundToggleUI() {
-    if (document.getElementById('sound-toggle-btn')) return;
+    let btn = document.getElementById('sound-toggle-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'sound-toggle-btn';
+      btn.className =
+        'fixed bottom-4 right-4 z-[9999] bg-neutral-800/80 text-white dark:bg-neutral-200/80 dark:text-black rounded-full shadow-lg p-3 backdrop-blur-md border border-white/10 hover:scale-105 transition';
+      document.body.appendChild(btn);
+    }
+    this.updateSoundToggleIcon();
 
-    const btn = document.createElement('button');
-    btn.id = 'sound-toggle-btn';
-    btn.className =
-      'fixed bottom-4 right-4 z-[9999] bg-neutral-800/80 text-white dark:bg-neutral-200/80 dark:text-black rounded-full shadow-lg p-3 backdrop-blur-md border border-white/10 hover:scale-105 transition';
-    btn.innerHTML = this.soundEnabled
-      ? this.getSoundIcon(true)
-      : this.getSoundIcon(false);
-
-    btn.title = this.soundEnabled
-      ? 'Som ativado – clique para desativar'
-      : 'Som desativado – clique para ativar';
-
-    btn.setAttribute('aria-pressed', this.soundEnabled ? 'true' : 'false');
-    btn.setAttribute('aria-label', btn.title);
-
-    btn.addEventListener('click', () => {
+    // Remover event listener antigo para evitar duplicidade
+    btn.onclick = null;
+    btn.onclick = () => {
       this.setSoundPreference(!this.soundEnabled);
       this.playToggleSound();
-    });
-
-    document.body.appendChild(btn);
-    this.updateSoundToggleIcon(); // Garante atualização visual
+    };
   }
 
   getSoundIcon(enabled) {
@@ -90,9 +83,7 @@ export class NotificationSystem {
   updateSoundToggleIcon() {
     const btn = document.getElementById('sound-toggle-btn');
     if (!btn) return;
-    btn.innerHTML = this.soundEnabled
-      ? this.getSoundIcon(true)
-      : this.getSoundIcon(false);
+    btn.innerHTML = this.getSoundIcon(this.soundEnabled);
     btn.title = this.soundEnabled
       ? 'Som ativado – clique para desativar'
       : 'Som desativado – clique para ativar';
@@ -178,7 +169,9 @@ export class NotificationSystem {
       const audio = new Audio(src);
       audio.volume = 0.25;
       audio.play().catch(() => {});
-    } catch {}
+    } catch (e) {
+      console.log("Erro ao tocar som:", e);
+    }
   }
 
   remove(toast) {
