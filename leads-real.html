@@ -628,10 +628,17 @@ function showNotification(m, t = "info") {
   setTimeout(() => div.remove(), 3000);
 }
 function showLoading(show, msg = "Carregando...") {
-  let el = document.getElementById("leads-loading");
+  let el = document.getElementById("loading-indicator");
+  
+  if (!el) {
+    el = document.getElementById("leads-loading");
+  }
+  
   if (show) {
     if (el) {
       el.classList.remove("hidden");
+      const msgEl = el.querySelector('p');
+      if (msgEl) msgEl.textContent = msg;
     } else {
       el = document.createElement("div");
       el.id = "leads-loading";
@@ -644,7 +651,9 @@ function showLoading(show, msg = "Carregando...") {
       document.body.appendChild(el);
     }
   } else {
-    if (el) el.classList.add("hidden");
+    if (el) el.remove();
+    const fixedLoading = document.getElementById("loading-indicator");
+    if (fixedLoading) fixedLoading.remove();
   }
 }
 waitForSupabase(() => {
