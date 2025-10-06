@@ -17,6 +17,20 @@ const COLUNAS = [
 let opportunities = [];
 let draggedCard = null;
 
+// === Sons dinâmicos ===
+const successSounds = [
+  '/public/assets/sounds/success/success.mp3',
+  '/public/assets/sounds/success/success-level.mp3',
+  '/public/assets/sounds/success/success-bonus.mp3',
+  '/public/assets/sounds/success/success-rise.mp3',
+  '/public/assets/sounds/success/success-start.mp3'
+];
+const errorSounds = [
+  '/public/assets/sounds/error/error.mp3',
+  '/public/assets/sounds/error/error-alert.mp3',
+  '/public/assets/sounds/error/error-glitch.mp3'
+];
+
 // Inicialização
 async function init() {
   try {
@@ -197,11 +211,13 @@ function updateTotal() {
     totalEl.innerText = `Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
   }
 }
-// Função para tocar som de feedback
+// Função para tocar som de feedback dinâmico
 function playSound(type) {
-  const audio = new Audio(type === 'success' ? '/public/assets/success.mp3' : '/public/assets/error.mp3');
-  audio.volume = 0.2;
-  audio.play().catch(error => console.warn('⚠️ Áudio não reproduzido:', error.message));
+  const list = type === 'success' ? successSounds : errorSounds;
+  const src = list[Math.floor(Math.random() * list.length)];
+  const audio = new Audio(src);
+  audio.volume = 0.25;
+  audio.play().catch(error => console.warn('⚠️ Falha ao tocar som:', error.message));
 }
 // Ver detalhes da oportunidade (placeholder)
 window.viewOpportunityDetails = function(id) {
