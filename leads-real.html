@@ -708,13 +708,28 @@ waitForSupabase(() => {
   // Tornar loadSystemData e setupInterface acessíveis globalmente
   async function authenticateUser() {
     try {
+      console.log('🔍 Tentando autenticar...');
+      
       if (window.AlshamAuth?.isAuthenticated) {
+        console.log('✅ Autenticado via AlshamAuth');
         return { success: true, user: window.AlshamAuth.currentUser, orgId: await getCurrentOrgId() };
       }
+      
+      console.log('🔍 Verificando sessão Supabase...');
       const session = await getCurrentSession();
-      if (!session?.user) return { success: false };
-      return { success: true, user: session.user, orgId: await getCurrentOrgId() };
-    } catch {
+      console.log('📦 Sessão:', session);
+      
+      if (!session?.user) {
+        console.log('❌ Sem sessão ativa - redirecionando para login');
+        return { success: false };
+      }
+      
+      const orgId = await getCurrentOrgId();
+      console.log('🏢 Org ID:', orgId);
+      
+      return { success: true, user: session.user, orgId };
+    } catch (error) {
+      console.error('❌ Erro na autenticação:', error);
       return { success: false };
     }
   }
