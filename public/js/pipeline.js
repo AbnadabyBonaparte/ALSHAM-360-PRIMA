@@ -1,287 +1,230 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pipeline de Vendas - ALSHAM 360°</title>
+/**
+ * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
+ * Versão: 1.1.0 - FIX DRAG-DROP
+ * Data: 01/10/2025 16:45
+ * Estrutura: public/js/pipeline.js
+ */
 
-  <style id="dark-theme-critical">
-    /* :root variables (unchanged) */
-    :root {
-      --alsham-text-primary: #111827;
-      --alsham-text-secondary: #6b7280;
-      --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #f3f4f6;
-      --alsham-bg-surface: #ffffff;
-      --alsham-bg-hover: #f3f4f6;
-      --alsham-border-default: #e5e7eb;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
-      --alsham-primary: #3B82F6;
-      --alsham-primary-light: rgba(59,130,246,0.1);
-      --alsham-radius-lg: 1rem;
-      --alsham-radius-full: 9999px;
-    }
-    html.dark {
-      --alsham-text-primary: #f9fafb;
-      --alsham-text-secondary: #d1d5db;
-      --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #0f172a;
-      --alsham-bg-surface: #1e293b;
-      --alsham-bg-hover: #334155;
-      --alsham-border-default: #334155;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
-      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
-      color-scheme: dark;
-    }
-  </style>
-  <script>
-    // Dark mode script (unchanged)
-    (function() {
-      'use strict';
-      const savedTheme = localStorage.getItem('alsham-theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-      function toggleTheme() {
-        const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        if (isDark) {
-          html.classList.remove('dark');
-          html.removeAttribute('data-theme');
-          localStorage.setItem('alsham-theme', 'light');
-        } else {
-          html.classList.add('dark');
-          html.setAttribute('data-theme', 'dark');
-          localStorage.setItem('alsham-theme', 'dark');
-        }
-      }
-      document.addEventListener('DOMContentLoaded', function() {
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-          themeToggle.addEventListener('click', toggleTheme);
-        }
-      });
-    })();
-  </script>
-  <style>
-    /* General Styles (mostly unchanged) */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--alsham-bg-canvas);
-      color: var(--alsham-text-primary);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    aside {
-      position: fixed; top: 0; left: 0; width: 16rem; height: 100vh;
-      background: var(--alsham-bg-surface);
-      box-shadow: var(--alsham-shadow-lg);
-      border-right: 1px solid var(--alsham-border-default);
-    }
-    aside > div:first-child {
-      height: 4rem; display: flex; align-items: center; padding: 0 1.5rem;
-      border-bottom: 1px solid var(--alsham-border-default);
-    }
-    aside h1 { font-size: 1.25rem; font-weight: 700; color: #3B82F6; }
-    nav { margin-top: 1.25rem; padding: 0 0.75rem; }
-    nav a {
-      display: flex; align-items: center; padding: 0.5rem 0.75rem; margin-bottom: 0.25rem;
-      font-size: 0.875rem; font-weight: 500; border-radius: 0.375rem;
-      color: var(--alsham-text-secondary); text-decoration: none; transition: all 0.2s;
-    }
-    nav a:hover { background: var(--alsham-bg-hover); color: #3B82F6; }
-    nav a.active { background: var(--alsham-primary-light); color: #3B82F6; }
+import { supabase } from '../../src/lib/supabase.js';
 
-    /* Main Content (mostly unchanged) */
-    main { margin-left: 16rem; }
-    header {
-      background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-sm);
-      border-bottom: 1px solid var(--alsham-border-default);
-    }
-    header > div {
-      max-width: 90rem; margin: 0 auto; padding: 1rem 2rem; display: flex;
-      justify-content: space-between; align-items: center;
-    }
-    header h1 { font-size: 1.5rem; font-weight: 700; }
-    #theme-toggle {
-      width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
-      background: transparent; border: 1px solid var(--alsham-border-default); border-radius: 0.375rem;
-      cursor: pointer; transition: all 0.2s;
-    }
-    #theme-toggle:hover { background: var(--alsham-primary-light); border-color: #3b82f6; transform: scale(1.05); }
-    #theme-toggle svg { width: 1.25rem; height: 1.25rem; color: var(--alsham-text-secondary); }
-    html:not(.dark) .moon-icon { display: none; }
-    html.dark .sun-icon { display: none; }
+const COLUNAS = [
+  { id: 'qualificacao', nome: 'Qualificação', cor: 'bg-blue-100' },
+  { id: 'proposta', nome: 'Proposta', cor: 'bg-yellow-100' },
+  { id: 'negociacao', nome: 'Negociação', cor: 'bg-orange-100' },
+  { id: 'fechado_ganho', nome: 'Fechado Ganho', cor: 'bg-green-100' },
+  { id: 'fechado_perdido', nome: 'Perdido', cor: 'bg-red-100' }
+];
 
-    /* =========================================
-     * ✨ NEW & IMPROVED PIPELINE STYLES ✨
-     * ========================================= */
+let opportunities = [];
+let draggedCard = null;
+let draggedFrom = null;
 
-    /* Pipeline Container */
-    .pipeline-container {
-      padding: 2rem;
-      overflow-x: auto; /* Permite rolagem horizontal */
-    }
-    #loading {
-      text-align: center;
-      padding: 5rem 0;
-      font-size: 1.125rem;
-      color: var(--alsham-text-secondary);
-    }
-    #pipeline-board {
-      display: flex;
-      gap: 1.5rem;
-      min-width: max-content; /* Garante que as colunas não quebrem a linha */
-      align-items: flex-start;
-    }
-    #pipeline-board.hidden { display: none; }
+// Inicialização
+async function init() {
+  try {
+    console.log('🎯 Iniciando Pipeline de Vendas...');
+    await loadOpportunities();
+    renderBoard();
+    attachEventListeners(); // ✅ CHAMADA EXPLÍCITA
+    
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('pipeline-board').classList.remove('hidden');
+    console.log('✅ Pipeline carregado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao inicializar pipeline:', error);
+    document.getElementById('loading').innerHTML = 
+      `<p class="text-red-500">Erro ao carregar pipeline: ${error.message}</p>`;
+  }
+}
 
-    /* Pipeline Column */
-    .pipeline-column {
-      background-color: var(--alsham-bg-canvas);
-      border-radius: 0.75rem;
-      width: 320px; /* Largura fixa para consistência */
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0; /* Previne que as colunas encolham */
-    }
-    .pipeline-column-header {
-      padding: 1rem 1.25rem;
-      border-bottom: 3px solid; /* Borda colorida para destaque */
-      border-radius: 0.75rem 0.75rem 0 0;
-      background-color: var(--alsham-bg-surface);
-      box-shadow: var(--alsham-shadow-sm);
-    }
-    .pipeline-column-header h3 {
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-      color: var(--alsham-text-primary);
-    }
-    .pipeline-column-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.875rem;
-      color: var(--alsham-text-secondary);
-    }
-    .pipeline-column-stats .deal-count {
-      background-color: var(--alsham-bg-hover);
-      padding: 0.1rem 0.5rem;
-      border-radius: var(--alsham-radius-full);
-      font-weight: 500;
-    }
-    .pipeline-column-body {
-      padding: 0.75rem;
-      flex: 1;
-      overflow-y: auto;
-      min-height: 200px;
-      border-radius: 0 0 0.75rem 0.75rem;
-      transition: background-color 0.2s ease;
-    }
+// Carregar oportunidades do Supabase
+async function loadOpportunities() {
+  const { data, error } = await supabase
+    .from('sales_opportunities')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Erro ao buscar oportunidades:', error);
+    throw error;
+  }
+  
+  opportunities = data || [];
+  console.log(`📊 ${opportunities.length} oportunidades carregadas`);
+}
 
-    /* Column Header Colors */
-    .pipeline-column[data-stage="qualificacao"] .pipeline-column-header { border-color: #3B82F6; }
-    .pipeline-column[data-stage="proposta"]     .pipeline-column-header { border-color: #F59E0B; }
-    .pipeline-column[data-stage="negociacao"]   .pipeline-column-header { border-color: #8B5CF6; }
-    .pipeline-column[data-stage="fechado_ganho"] .pipeline-column-header { border-color: #10B981; }
-    .pipeline-column[data-stage="perdido"]       .pipeline-column-header { border-color: #EF4444; }
+// Renderizar board completo
+function renderBoard() {
+  const board = document.getElementById('pipeline-board');
+  
+  board.innerHTML = COLUNAS.map(col => {
+    const opps = opportunities.filter(o => o.status === col.id);
+    const total = opps.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
+    
+    return `
+      <div class="flex-shrink-0 w-80 ${col.cor} rounded-lg p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-semibold text-gray-700">${col.nome}</h3>
+          <span class="bg-white px-2 py-1 rounded text-sm font-medium">${opps.length}</span>
+        </div>
+        <p class="text-sm text-gray-600 mb-4 font-medium">
+          Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+        </p>
+        <div class="space-y-2 min-h-[100px] drop-zone" data-column="${col.id}">
+          ${opps.map(opp => createCard(opp)).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-    /* Opportunity Card */
-    .opportunity-card {
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-left: 4px solid var(--alsham-border-default);
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-      cursor: grab;
-      transition: all 0.2s ease-in-out;
-      box-shadow: var(--alsham-shadow-sm);
-    }
-    .opportunity-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--alsham-shadow-md);
-      border-left-color: var(--alsham-primary);
-    }
-    .opportunity-card:active { cursor: grabbing; }
-    .opportunity-card.dragging { opacity: 0.5; transform: rotate(3deg); }
-    .opportunity-card-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--alsham-text-primary);
-    }
-    .opportunity-card-value {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--alsham-text-secondary);
-      margin-bottom: 0.75rem;
-    }
-    .opportunity-card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      color: var(--alsham-text-secondary);
-    }
-    .opportunity-probability {
-      background: var(--alsham-primary-light);
-      color: #3B82F6;
-      padding: 0.25rem 0.5rem;
-      border-radius: var(--alsham-radius-full);
-      font-weight: 600;
-    }
-    html.dark .opportunity-probability {
-        background: rgba(59, 130, 246, 0.25);
-        color: #93c5fd;
-    }
-
-    /* Drag & Drop UX States */
-    .pipeline-column-body.drag-over {
-      background: var(--alsham-primary-light);
-      border-radius: 0.5rem;
-    }
-  </style>
-</head>
-<body>
-  <aside>
-    <div><h1>ALSHAM 360°</h1></div>
-    <nav>
-      <a href="/dashboard.html">📊 Dashboard</a>
-      <a href="/leads-real.html">👥 Leads</a>
-      <a href="/pipeline.html" class="active">🎯 Pipeline</a>
-      <a href="/automacoes.html">🤖 Automações</a>
-      <a href="/relatorios.html">📈 Relatórios</a>
-      <a href="/gamificacao.html">🎮 Gamificação</a>
-      <a href="/configuracoes.html">⚙️ Configurações</a>
-    </nav>
-  </aside>
-  <main>
-    <header>
-      <div>
-        <h1>Pipeline de Vendas</h1>
-        <button id="theme-toggle">
-          <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-          </svg>
+// Criar card individual
+function createCard(opp) {
+  return `
+    <div 
+      class="bg-white p-3 rounded shadow-sm cursor-move hover:shadow-md transition-shadow border border-gray-200 draggable-card"
+      draggable="true"
+      data-id="${opp.id}"
+    >
+      <h4 class="font-medium text-gray-900 mb-1 text-sm">${opp.titulo}</h4>
+      <p class="text-sm text-gray-600 mb-2">
+        R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+      </p>
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${opp.probabilidade}%</span>
+        <button 
+          onclick="viewOpportunityDetails('${opp.id}')" 
+          class="text-xs text-blue-600 hover:underline"
+        >
+          Ver detalhes
         </button>
       </div>
-    </header>
-    <div class="pipeline-container">
-      <div id="loading">Carregando pipeline...</div>
-      <div id="pipeline-board" class="hidden"></div>
     </div>
-  </main>
-  <script type="module" src="/public/js/pipeline.js"></script>
-</body>
-</html>
+  `;
+}
+
+// ✅ NOVO: Anexar event listeners (pode ser chamado múltiplas vezes)
+function attachEventListeners() {
+  const board = document.getElementById('pipeline-board');
+  
+  // Limpar listeners antigos (prevenir duplicação)
+  const newBoard = board.cloneNode(true);
+  board.parentNode.replaceChild(newBoard, board);
+  
+  // ✅ DRAGSTART: Capturar o card sendo arrastado
+  newBoard.addEventListener('dragstart', (e) => {
+    const card = e.target.closest('.draggable-card');
+    if (card) {
+      draggedCard = card;
+      draggedFrom = card.closest('[data-column]')?.dataset.column;
+      card.classList.add('opacity-50', 'scale-105');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', card.dataset.id);
+      console.log(`🎯 Drag iniciado: ${card.dataset.id} de ${draggedFrom}`);
+    }
+  });
+
+  // ✅ DRAGEND: Remover estilos
+  newBoard.addEventListener('dragend', (e) => {
+    const card = e.target.closest('.draggable-card');
+    if (card) {
+      card.classList.remove('opacity-50', 'scale-105');
+    }
+  });
+
+  // ✅ DRAGOVER: Permitir drop (CRÍTICO!)
+  newBoard.addEventListener('dragover', (e) => {
+    e.preventDefault(); // ← SEM ISSO, DROP NÃO FUNCIONA!
+    const dropZone = e.target.closest('.drop-zone');
+    if (dropZone) {
+      e.dataTransfer.dropEffect = 'move';
+      dropZone.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
+    }
+  });
+
+  // ✅ DRAGLEAVE: Remover highlight
+  newBoard.addEventListener('dragleave', (e) => {
+    const dropZone = e.target.closest('.drop-zone');
+    if (dropZone && !dropZone.contains(e.relatedTarget)) {
+      dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+    }
+  });
+
+  // ✅ DROP: Processar o drop
+  newBoard.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    const dropZone = e.target.closest('.drop-zone');
+    
+    if (dropZone && draggedCard) {
+      dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+      const newStatus = dropZone.dataset.column;
+      const oppId = draggedCard.dataset.id;
+      
+      // Não fazer nada se soltar na mesma coluna
+      if (draggedFrom === newStatus) {
+        console.log('⏸️ Card solto na mesma coluna');
+        return;
+      }
+      
+      try {
+        console.log(`🔄 Movendo oportunidade ${oppId}: ${draggedFrom} → ${newStatus}`);
+        
+        const { error } = await supabase
+          .from('sales_opportunities')
+          .update({ 
+            status: newStatus, 
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', oppId);
+        
+        if (error) throw error;
+        
+        console.log(`✅ Oportunidade movida com sucesso para ${newStatus}`);
+        
+        // Recarregar e re-renderizar
+        await loadOpportunities();
+        renderBoard();
+        attachEventListeners(); // ✅ RE-ANEXAR LISTENERS!
+        
+      } catch (error) {
+        console.error('❌ Erro ao mover card:', error);
+        alert(`Erro ao mover card: ${error.message}`);
+        
+        // Em caso de erro, re-renderizar para estado original
+        renderBoard();
+        attachEventListeners();
+      } finally {
+        // Limpar estado
+        draggedCard = null;
+        draggedFrom = null;
+      }
+    }
+  });
+  
+  console.log('✅ Event listeners anexados ao board');
+}
+
+// Ver detalhes da oportunidade (placeholder)
+window.viewOpportunityDetails = function(id) {
+  const opp = opportunities.find(o => o.id === id);
+  if (!opp) return;
+  
+  alert(`
+📋 Detalhes da Oportunidade
+
+Título: ${opp.titulo}
+Valor: R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+Probabilidade: ${opp.probabilidade}%
+Status: ${opp.status}
+Criado em: ${new Date(opp.created_at).toLocaleDateString('pt-BR')}
+  `);
+}
+
+// Auto-inicializar
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+console.log('🎯 Pipeline.js v1.1.0 carregado');
