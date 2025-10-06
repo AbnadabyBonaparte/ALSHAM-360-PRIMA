@@ -775,19 +775,38 @@ waitForSupabase(() => {
     }
   }
   async function loadSystemData() {
-    leadsState.isLoading = true;
-    try {
-      const [leads, kpis, gamification, automations] = await Promise.allSettled([loadLeads(), loadKPIs(), loadGamification(), loadAutomations()]);
-      if (leads.status === "fulfilled") leadsState.leads = leads.value;
-      if (kpis.status === "fulfilled") leadsState.kpis = kpis.value;
-      if (gamification.status === "fulfilled") leadsState.gamification = gamification.value;
-      if (automations.status === "fulfilled") leadsState.automations = automations.value;
-      applyFilters();
-      leadsState.lastUpdate = new Date();
-    } finally {
-      leadsState.isLoading = false;
-    }
+  console.log('📥 DEBUG: loadSystemData INICIADO');
+  leadsState.isLoading = true;
+  try {
+    console.log('📥 DEBUG: Carregando leads...');
+    const [leads, kpis, gamification, automations] = await Promise.allSettled([
+      loadLeads(), 
+      loadKPIs(), 
+      loadGamification(), 
+      loadAutomations()
+    ]);
+    
+    console.log('📥 DEBUG: Resultados:', { 
+      leads: leads.status, 
+      kpis: kpis.status, 
+      gamification: gamification.status, 
+      automations: automations.status 
+    });
+    
+    if (leads.status === "fulfilled") leadsState.leads = leads.value;
+    if (kpis.status === "fulfilled") leadsState.kpis = kpis.value;
+    if (gamification.status === "fulfilled") leadsState.gamification = gamification.value;
+    if (automations.status === "fulfilled") leadsState.automations = automations.value;
+    
+    console.log('📥 DEBUG: Aplicando filtros...');
+    applyFilters();
+    
+    leadsState.lastUpdate = new Date();
+    console.log('📥 DEBUG: loadSystemData CONCLUÍDO');
+  } finally {
+    leadsState.isLoading = false;
   }
+}
   async function loadLeads() {
     const { data, error } = await genericSelect("leads_crm", { org_id: leadsState.orgId }, { order: { column: "created_at", ascending: false } });
     if (error) throw error;
