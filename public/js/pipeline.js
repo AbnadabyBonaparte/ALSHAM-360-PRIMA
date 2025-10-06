@@ -5,7 +5,7 @@
  * Estrutura: public/js/pipeline.js
  */
 import { supabase } from '../../src/lib/supabase.js';
-import { showNotification } from '/public/js/utils/notifications.js';
+import { notify } from './utils/notifications.js';
 
 const COLUNAS = [
   { id: 'qualificacao', nome: 'Qualificação' },
@@ -16,6 +16,7 @@ const COLUNAS = [
 ];
 let opportunities = [];
 let draggedCard = null;
+
 // Inicialização
 async function init() {
   try {
@@ -37,7 +38,7 @@ async function init() {
         });
       })
       .subscribe();
-   
+
     const loadingEl = document.getElementById('loading');
     if (loadingEl) loadingEl.style.display = 'none';
     const boardEl = document.getElementById('pipeline-board');
@@ -51,18 +52,20 @@ async function init() {
     }
   }
 }
+
 // Carregar oportunidades do Supabase
 async function loadOpportunities() {
   const { data, error } = await supabase
     .from('sales_opportunities')
     .select('*')
     .order('created_at', { ascending: false });
- 
+
   if (error) throw error;
- 
+
   opportunities = data || [];
   console.log(`📊 ${opportunities.length} oportunidades carregadas.`);
 }
+
 // Renderizar board completo
 function renderBoard() {
   const board = document.getElementById('pipeline-board');
@@ -70,7 +73,7 @@ function renderBoard() {
   board.innerHTML = COLUNAS.map(col => {
     const oppsInColumn = opportunities.filter(o => o.status === col.id);
     const totalValue = oppsInColumn.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
-   
+
     return `
       <div class="pipeline-column" data-stage="${col.id}">
         <div class="pipeline-column-header">
@@ -87,6 +90,7 @@ function renderBoard() {
     `;
   }).join('');
 }
+
 // Criar card individual
 function createCardHTML(opp) {
   return `
@@ -112,6 +116,7 @@ function createCardHTML(opp) {
     </div>
   `;
 }
+
 // Anexar event listeners de Drag and Drop
 function attachDragAndDropListeners() {
   const cards = document.querySelectorAll('.opportunity-card');
@@ -156,9 +161,9 @@ function attachDragAndDropListeners() {
           })
           .eq('id', opportunityId);
         if (error) throw error;
-       
+
         console.log('✅ Oportunidade movida com sucesso no banco de dados.');
-        showNotification('Oportunidade movida com sucesso!', 'success');
+        notify.success('Oportunidade movida com sucesso!');
         playSound('success');
         // Recarregar os dados e renderizar tudo para manter a consistência
         await loadOpportunities();
@@ -167,7 +172,7 @@ function attachDragAndDropListeners() {
         updateTotal(); // Atualiza o total global após movimento
       } catch (error) {
         console.error('❌ Erro ao mover card:', error);
-        showNotification(`Erro ao mover a oportunidade: ${error.message}`, 'error');
+        notify.error(`Erro ao mover a oportunidade: ${error.message}`);
         playSound('error');
         // Reverter em caso de erro
         renderBoard();
@@ -178,6 +183,7 @@ function attachDragAndDropListeners() {
   });
   console.log('🔗 Eventos de Drag & Drop anexados.');
 }
+
 // Atualizar total global
 function updateTotal() {
   let totalEl = document.getElementById('pipeline-total');
@@ -199,17 +205,19 @@ function updateTotal() {
     totalEl.innerText = `Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
   }
 }
+
 // Função para tocar som de feedback
 function playSound(type) {
   const audio = new Audio(type === 'success' ? '/public/assets/success.mp3' : '/public/assets/error.mp3');
   audio.volume = 0.2;
   audio.play().catch(error => console.warn('⚠️ Áudio não reproduzido:', error.message));
 }
+
 // Ver detalhes da oportunidade (placeholder)
 window.viewOpportunityDetails = function(id) {
   const opp = opportunities.find(o => o.id.toString() === id);
   if (!opp) return;
- 
+
   alert(`
 📋 Detalhes da Oportunidade
 Título: ${opp.titulo || 'N/A'}
@@ -219,6 +227,7 @@ Status: ${opp.status || 'N/A'}
 Criado em: ${opp.created_at ? new Date(opp.created_at).toLocaleDateString('pt-BR') : 'N/A'}
   `);
 }
+
 // Auto-inicializar
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
