@@ -8,7 +8,6 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/tokens.css" />
- 
   <style id="dark-theme-critical">
     :root {
       --alsham-text-primary: #111827;
@@ -48,24 +47,23 @@
     html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
     html.dark .text-red-800 { color: #fca5a5 !important; }
   </style>
- 
   <!-- Dark Mode Script INLINE para evitar erros de module -->
   <script>
   (function() {
     'use strict';
-    
+   
     // Aplicar tema salvo IMEDIATAMENTE (antes do render)
     const savedTheme = localStorage.getItem('alsham-theme');
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.setAttribute('data-theme', 'dark');
     }
-    
+   
     // Função para alternar tema
     function toggleTheme() {
       const html = document.documentElement;
       const isDark = html.classList.contains('dark');
-      
+     
       if (isDark) {
         html.classList.remove('dark');
         html.removeAttribute('data-theme');
@@ -75,13 +73,13 @@
         html.setAttribute('data-theme', 'dark');
         localStorage.setItem('alsham-theme', 'dark');
       }
-      
+     
       // Recarregar gráficos se existirem
       if (window.dashboardCharts?.reload) {
         window.dashboardCharts.reload();
       }
     }
-    
+   
     // Adicionar listener quando o DOM estiver pronto
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('theme-toggle');
@@ -91,12 +89,9 @@
     });
   })();
   </script>
- 
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
- 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- 
   <style>
     .loading-spinner {
       display: inline-block;
@@ -275,7 +270,7 @@
           ALSHAM 360°
         </h1>
       </div>
-  
+ 
       <div class="hidden md:flex items-center space-x-6">
         <a href="/dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
         <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Leads</a>
@@ -284,7 +279,7 @@
         <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
         <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
       </div>
-  
+ 
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -385,10 +380,10 @@ window.openNewLeadModal = function() {
           <h2 class="text-2xl font-bold text-gray-900">Novo Lead</h2>
           <button id="close-new-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
         </div>
-   
+  
         <div class="overflow-y-auto p-6">
           <form id="new-lead-form" class="space-y-4">
-       
+      
             <!-- Nome (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -403,7 +398,7 @@ window.openNewLeadModal = function() {
               >
               <p class="text-xs text-gray-500 mt-1">Mínimo 3 caracteres</p>
             </div>
-       
+      
             <!-- Email (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -417,7 +412,7 @@ window.openNewLeadModal = function() {
                 placeholder="exemplo@empresa.com.br"
               >
             </div>
-       
+      
             <!-- Telefone -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
@@ -429,7 +424,7 @@ window.openNewLeadModal = function() {
                 maxlength="15"
               >
             </div>
-       
+      
             <!-- Grid: Empresa + Cargo -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -441,7 +436,7 @@ window.openNewLeadModal = function() {
                   placeholder="Nome da empresa"
                 >
               </div>
-         
+        
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
                 <input
@@ -452,7 +447,7 @@ window.openNewLeadModal = function() {
                 >
               </div>
             </div>
-       
+      
             <!-- Grid: Status + Origem -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -467,7 +462,7 @@ window.openNewLeadModal = function() {
                   }
                 </select>
               </div>
-         
+        
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
                 <select
@@ -482,7 +477,7 @@ window.openNewLeadModal = function() {
                 </select>
               </div>
             </div>
-       
+      
             <!-- Observações -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
@@ -493,7 +488,7 @@ window.openNewLeadModal = function() {
                 placeholder="Informações adicionais sobre o lead..."
               ></textarea>
             </div>
-       
+      
             <!-- Botões -->
             <div class="flex gap-3 pt-4 border-t border-gray-200">
               <button
@@ -510,7 +505,7 @@ window.openNewLeadModal = function() {
                 Cancelar
               </button>
             </div>
-       
+      
           </form>
         </div>
       </div>
@@ -655,7 +650,11 @@ function showLoading(show, msg = "Carregando...") {
   }
 }
 waitForSupabase(() => {
+  console.log('🎯 DEBUG: waitForSupabase callback executado!');
+  
   const { getCurrentSession, getCurrentOrgId, genericSelect, genericInsert, subscribeToTable } = window.AlshamSupabase;
+  
+  console.log('🎯 DEBUG: Funções extraídas do AlshamSupabase');
   const LEADS_CONFIG = {
     statusOptions: [
       { value: "novo", label: "Novo", color: "blue", icon: "🆕", points: 5 },
@@ -709,24 +708,24 @@ waitForSupabase(() => {
   async function authenticateUser() {
     try {
       console.log('🔍 Tentando autenticar...');
-      
+     
       if (window.AlshamAuth?.isAuthenticated) {
         console.log('✅ Autenticado via AlshamAuth');
         return { success: true, user: window.AlshamAuth.currentUser, orgId: await getCurrentOrgId() };
       }
-      
+     
       console.log('🔍 Verificando sessão Supabase...');
       const session = await getCurrentSession();
       console.log('📦 Sessão:', session);
-      
+     
       if (!session?.user) {
         console.log('❌ Sem sessão ativa - redirecionando para login');
         return { success: false };
       }
-      
+     
       const orgId = await getCurrentOrgId();
       console.log('🏢 Org ID:', orgId);
-      
+     
       return { success: true, user: session.user, orgId };
     } catch (error) {
       console.error('❌ Erro na autenticação:', error);
@@ -737,7 +736,10 @@ waitForSupabase(() => {
     window.location.href = "/login.html";
   }
   document.addEventListener("DOMContentLoaded", async () => {
+    console.log('🎯 DEBUG: DOMContentLoaded disparou!');
+    
     try {
+      console.log('🎯 DEBUG: Iniciando fluxo de autenticação...');
       showLoading(true, "Inicializando Leads...");
       const authResult = await authenticateUser();
       if (!authResult.success) {
@@ -1154,7 +1156,7 @@ window.openEditLeadModal = function(leadId) {
       </div>
       <div class="overflow-y-auto p-6">
         <form id="edit-lead-form" class="space-y-4">
-    
+   
           <!-- Nome -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -1168,7 +1170,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>
-    
+   
           <!-- Email -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -1182,7 +1184,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>
-    
+   
           <!-- Telefone -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
@@ -1194,7 +1196,7 @@ window.openEditLeadModal = function(leadId) {
               maxlength="15"
             >
           </div>
-    
+   
           <!-- Grid: Empresa + Cargo -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -1206,7 +1208,7 @@ window.openEditLeadModal = function(leadId) {
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
             </div>
-      
+     
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
               <input
@@ -1217,7 +1219,7 @@ window.openEditLeadModal = function(leadId) {
               >
             </div>
           </div>
-    
+   
           <!-- Grid: Status + Origem -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -1234,7 +1236,7 @@ window.openEditLeadModal = function(leadId) {
                 }
               </select>
             </div>
-      
+     
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
               <select
@@ -1251,7 +1253,7 @@ window.openEditLeadModal = function(leadId) {
               </select>
             </div>
           </div>
-    
+   
           <!-- Observações -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
@@ -1261,7 +1263,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             >${lead.observacoes || ''}</textarea>
           </div>
-    
+   
           <!-- Botões -->
           <div class="flex gap-3 pt-4 border-t border-gray-200">
             <button
@@ -1278,7 +1280,7 @@ window.openEditLeadModal = function(leadId) {
               Cancelar
             </button>
           </div>
-    
+   
         </form>
       </div>
     </div>
@@ -1414,7 +1416,7 @@ window.openDeleteLeadModal = function(leadId) {
 window.deleteLead = async function(leadId) {
   try {
     showLoading(true, "Deletando lead...");
-   
+  
     const session = await window.AlshamSupabase.getCurrentSession();
     if (!session || !session.access_token) {
       throw new Error("Sessão inválida");
@@ -1437,7 +1439,7 @@ window.deleteLead = async function(leadId) {
     }
     showLoading(false);
     showSuccess("Lead deletado com sucesso!");
-   
+  
     document.getElementById("delete-lead-modal").remove();
     const detailModal = document.getElementById("lead-modal");
     if (detailModal) detailModal.remove();
