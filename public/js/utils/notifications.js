@@ -1,21 +1,15 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Notificações Toast Enterprise
- * Versão: 2.5.0 – SOUND CONTROL EDITION (UX + Persistência)
- * 🔊 Opção “com ou sem som” salva no localStorage
- * 🌓 Dark mode, animações refinadas e sons dinâmicos integrados
+ * Versão: 2.4.0 – PATCH SUPREMO (velocidade equilibrada + UX refinado)
+ * ✨ Tempo ampliado p/ leitura confortável + SVG fix + dark mode
  */
 
 export class NotificationSystem {
   constructor(containerId = 'toast-container') {
     this.container = document.getElementById(containerId);
     if (!this.container) this.createContainer();
-
-    // Preferência persistente do usuário
-    this.soundEnabled = this.getSoundPreference();
-    this.addSoundToggleUI();
   }
 
-  // === 🔧 Container principal ===
   createContainer() {
     const container = document.createElement('div');
     container.id = 'toast-container';
@@ -27,66 +21,6 @@ export class NotificationSystem {
     this.container = container;
   }
 
-  // === 🎛 Controle de som persistente ===
-  getSoundPreference() {
-    return localStorage.getItem('alsham_sound_enabled') === 'true';
-  }
-
-  setSoundPreference(enabled) {
-    this.soundEnabled = enabled;
-    localStorage.setItem('alsham_sound_enabled', enabled);
-    this.updateSoundToggleIcon();
-  }
-
-  // === 🎚️ UI para alternar som on/off ===
-  addSoundToggleUI() {
-    if (document.getElementById('sound-toggle-btn')) return;
-
-    const btn = document.createElement('button');
-    btn.id = 'sound-toggle-btn';
-    btn.className =
-      'fixed bottom-4 right-4 z-[9999] bg-neutral-800/80 text-white dark:bg-neutral-200/80 dark:text-black rounded-full shadow-lg p-3 backdrop-blur-md border border-white/10 hover:scale-105 transition';
-    btn.innerHTML = this.soundEnabled
-      ? this.getSoundIcon(true)
-      : this.getSoundIcon(false);
-
-    btn.title = this.soundEnabled
-      ? 'Som ativado – clique para desativar'
-      : 'Som desativado – clique para ativar';
-
-    btn.addEventListener('click', () => {
-      this.setSoundPreference(!this.soundEnabled);
-      this.playToggleSound();
-    });
-
-    document.body.appendChild(btn);
-  }
-
-  getSoundIcon(enabled) {
-    return enabled
-      ? `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.5a1 1 0 00-1.707-.707L4.586 6.5H3a1 1 0 00-1 1v5a1 1 0 001 1h1.586l2.707 2.707A1 1 0 009 15.5V4.5zM15.707 14.707a1 1 0 01-1.414-1.414A5 5 0 0014 10a5 5 0 00.707-3.293 1 1 0 011.414-1.414A7 7 0 0116 10a7 7 0 01-.293 2.707z"/></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.5a1 1 0 00-1.707-.707L4.586 6.5H3a1 1 0 00-1 1v5a1 1 0 001 1h1.586l2.707 2.707A1 1 0 009 15.5V4.5zM15.707 14.707L5.293 4.293a1 1 0 00-1.414 1.414l10.414 10.414a1 1 0 001.414-1.414z"/></svg>`;
-  }
-
-  updateSoundToggleIcon() {
-    const btn = document.getElementById('sound-toggle-btn');
-    if (!btn) return;
-    btn.innerHTML = this.soundEnabled
-      ? this.getSoundIcon(true)
-      : this.getSoundIcon(false);
-    btn.title = this.soundEnabled
-      ? 'Som ativado – clique para desativar'
-      : 'Som desativado – clique para ativar';
-  }
-
-  playToggleSound() {
-    if (this.soundEnabled)
-      this.playSound('/assets/sounds/success/success-level.mp3');
-    else
-      this.playSound('/assets/sounds/error/error-glitch.mp3');
-  }
-
-  // === 🔔 Notificação Toast ===
   show(message, type = 'info', duration = 6500, options = {}) {
     if (!this.container) this.createContainer();
 
@@ -95,6 +29,7 @@ export class NotificationSystem {
     toast.id = id;
     toast.className = this.getToastClasses(type);
     toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
     toast.style.cssText = `
       transform: translateX(120%);
       opacity: 0;
@@ -113,12 +48,16 @@ export class NotificationSystem {
           <p class="text-sm leading-snug break-words">${message}</p>
         </div>
         ${closeBtn ? `
-          <button aria-label="Fechar" onclick="document.getElementById('${id}').remove()"
-            class="flex-shrink-0 opacity-60 hover:opacity-100 transition p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <button
+            aria-label="Fechar"
+            onclick="document.getElementById('${id}').remove()"
+            class="flex-shrink-0 opacity-60 hover:opacity-100 transition p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
             <svg class="w-4 h-4 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
-          </button>` : ''}
+          </button>
+        ` : ''}
         ${duration > 0 ? `
           <div class="absolute bottom-0 left-0 h-1 bg-current/30 rounded-b"
                style="width:100%;animation:toast-progress ${duration}ms linear forwards;"></div>
@@ -128,6 +67,7 @@ export class NotificationSystem {
 
     this.container.appendChild(toast);
 
+    // Animação de entrada
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         toast.style.transform = 'translateX(0)';
@@ -137,27 +77,22 @@ export class NotificationSystem {
 
     if (duration > 0) setTimeout(() => this.remove(toast), duration);
 
-    if (this.soundEnabled) this.playSoundForType(type);
+    if (!document.getElementById('toast-progress-style')) {
+      const style = document.createElement('style');
+      style.id = 'toast-progress-style';
+      style.textContent = `
+        @keyframes toast-progress { from {width:100%;} to {width:0;} }
+        @keyframes toast-fadeout { to {opacity:0; transform:translateX(120%);} }
+        #toast-container svg {
+          width:1.25rem !important;
+          height:1.25rem !important;
+          display:inline-block !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
     return toast;
-  }
-
-  playSoundForType(type) {
-    const sounds = {
-      success: '/assets/sounds/success/success-start.mp3',
-      error: '/assets/sounds/error/error.mp3',
-      warning: '/assets/sounds/error/warning.mp3',
-      info: '/assets/sounds/success/success-rise.mp3',
-    };
-    this.playSound(sounds[type] || sounds.info);
-  }
-
-  playSound(src) {
-    try {
-      const audio = new Audio(src);
-      audio.volume = 0.25;
-      audio.play().catch(() => {});
-    } catch {}
   }
 
   remove(toast) {
@@ -184,20 +119,69 @@ export class NotificationSystem {
 
   getIcon(type) {
     const icons = {
-      success: `<svg class="w-5 h-5 text-green-600 dark:text-green-400 inline-block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>`,
-      error: `<svg class="w-5 h-5 text-red-600 dark:text-red-400 inline-block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10 7.293 11.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>`,
-      warning: `<svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 inline-block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099a1.5 1.5 0 012.486 0l5.58 9.92A1.5 1.5 0 0115.58 16H4.42a1.5 1.5 0 01-1.743-2.981l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>`,
-      info: `<svg class="w-5 h-5 text-blue-600 dark:text-blue-400 inline-block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>`,
+      success: `
+        <svg class="w-5 h-5 text-green-600 dark:text-green-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 
+               7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"/>
+        </svg>`,
+      error: `
+        <svg class="w-5 h-5 text-red-600 dark:text-red-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10
+               7.293 11.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0
+               001.414-1.414L11.414 10l1.293-1.293a1 1 0
+               00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd"/>
+        </svg>`,
+      warning: `
+        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M8.257 3.099a1.5 1.5 0 012.486 0l5.58 9.92A1.5 1.5 0 0115.58 16H4.42a1.5
+               1.5 0 01-1.743-2.981l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0
+               012 0zm-1-8a1 1 0 00-1 1v3a1 1 0
+               002 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"/>
+        </svg>`,
+      info: `
+        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0
+               0116 0zm-7-4a1 1 0 11-2 0 1 1 0
+               012 0zM9 9a1 1 0 000 2v3a1 1 0
+               001 1h1a1 1 0 100-2v-3a1 1 0
+               00-1-1H9z"
+            clip-rule="evenodd"/>
+        </svg>`,
     };
     return icons[type] || icons.info;
   }
+
+  success(message, options = {}) {
+    return this.show(message, 'success', options.duration || 6500, options);
+  }
+
+  error(message, options = {}) {
+    return this.show(message, 'error', options.duration || 7000, options);
+  }
+
+  warning(message, options = {}) {
+    return this.show(message, 'warning', options.duration || 6500, options);
+  }
+
+  info(message, options = {}) {
+    return this.show(message, 'info', options.duration || 6500, options);
+  }
+
+  clearAll() {
+    if (this.container) this.container.innerHTML = '';
+  }
 }
 
-// Instância global
 export const notify = new NotificationSystem();
 export default NotificationSystem;
 
-// Função rápida
-export function showNotification(message, type = 'info', duration = 10500, options = {}) {
+export function showNotification(message, type = 'info', duration = 6500, options = {}) {
   return notify.show(message, type, duration, options);
 }
