@@ -1,6 +1,7 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Notificações Toast Enterprise
- * Versão: 2.3.1 – PATCH DEFINITIVO (SVG gigante / layout fix)
+ * Versão: 2.4.0 – PATCH SUPREMO (velocidade equilibrada + UX refinado)
+ * ✨ Tempo ampliado p/ leitura confortável + SVG fix + dark mode
  */
 
 export class NotificationSystem {
@@ -20,7 +21,7 @@ export class NotificationSystem {
     this.container = container;
   }
 
-  show(message, type = 'info', duration = 4000, options = {}) {
+  show(message, type = 'info', duration = 6500, options = {}) {
     if (!this.container) this.createContainer();
 
     const toast = document.createElement('div');
@@ -32,7 +33,7 @@ export class NotificationSystem {
     toast.style.cssText = `
       transform: translateX(120%);
       opacity: 0;
-      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+      transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: auto;
     `;
 
@@ -82,7 +83,11 @@ export class NotificationSystem {
       style.textContent = `
         @keyframes toast-progress { from {width:100%;} to {width:0;} }
         @keyframes toast-fadeout { to {opacity:0; transform:translateX(120%);} }
-        #toast-container svg { width:1.25rem !important; height:1.25rem !important; display:inline-block !important; }
+        #toast-container svg {
+          width:1.25rem !important;
+          height:1.25rem !important;
+          display:inline-block !important;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -92,18 +97,22 @@ export class NotificationSystem {
 
   remove(toast) {
     if (!toast) return;
-    toast.style.animation = 'toast-fadeout 0.3s forwards';
-    setTimeout(() => toast.remove(), 300);
+    toast.style.animation = 'toast-fadeout 0.4s forwards';
+    setTimeout(() => toast.remove(), 400);
   }
 
   getToastClasses(type) {
     const base =
       'relative flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg overflow-hidden backdrop-blur-sm transition-colors border text-sm font-medium';
     const variants = {
-      success: 'bg-green-50 dark:bg-green-900/25 border-green-300 dark:border-green-700 text-green-900 dark:text-green-100',
-      error: 'bg-red-50 dark:bg-red-900/25 border-red-300 dark:border-red-700 text-red-900 dark:text-red-100',
-      warning: 'bg-yellow-50 dark:bg-yellow-900/25 border-yellow-300 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100',
-      info: 'bg-blue-50 dark:bg-blue-900/25 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100',
+      success:
+        'bg-green-50 dark:bg-green-900/25 border-green-300 dark:border-green-700 text-green-900 dark:text-green-100',
+      error:
+        'bg-red-50 dark:bg-red-900/25 border-red-300 dark:border-red-700 text-red-900 dark:text-red-100',
+      warning:
+        'bg-yellow-50 dark:bg-yellow-900/25 border-yellow-300 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100',
+      info:
+        'bg-blue-50 dark:bg-blue-900/25 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100',
     };
     return `${base} ${variants[type] || variants.info}`;
   }
@@ -150,19 +159,19 @@ export class NotificationSystem {
   }
 
   success(message, options = {}) {
-    return this.show(message, 'success', options.duration || 4000, options);
+    return this.show(message, 'success', options.duration || 6500, options);
   }
 
   error(message, options = {}) {
-    return this.show(message, 'error', options.duration || 5000, options);
+    return this.show(message, 'error', options.duration || 7000, options);
   }
 
   warning(message, options = {}) {
-    return this.show(message, 'warning', options.duration || 4000, options);
+    return this.show(message, 'warning', options.duration || 6500, options);
   }
 
   info(message, options = {}) {
-    return this.show(message, 'info', options.duration || 4000, options);
+    return this.show(message, 'info', options.duration || 6500, options);
   }
 
   clearAll() {
@@ -173,6 +182,6 @@ export class NotificationSystem {
 export const notify = new NotificationSystem();
 export default NotificationSystem;
 
-export function showNotification(message, type = 'info', duration = 4000, options = {}) {
+export function showNotification(message, type = 'info', duration = 6500, options = {}) {
   return notify.show(message, type, duration, options);
 }
