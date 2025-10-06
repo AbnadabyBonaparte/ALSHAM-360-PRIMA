@@ -14,8 +14,13 @@
       --alsham-bg-surface: #ffffff;
       --alsham-bg-hover: #f3f4f6;
       --alsham-border-default: #e5e7eb;
-      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
-      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
+      --alsham-primary: #3B82F6;
+      --alsham-primary-light: rgba(59,130,246,0.1);
+      --alsham-radius-lg: 1rem;
+      --alsham-radius-full: 9999px;
     }
     html.dark {
       --alsham-text-primary: #f9fafb;
@@ -25,8 +30,9 @@
       --alsham-bg-surface: #1e293b;
       --alsham-bg-hover: #334155;
       --alsham-border-default: #334155;
-      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
-      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
       color-scheme: dark;
     }
   </style>
@@ -66,7 +72,6 @@
       background: var(--alsham-bg-canvas);
       color: var(--alsham-text-primary);
     }
-    
     /* Sidebar */
     aside {
       position: fixed;
@@ -111,10 +116,10 @@
       color: #3B82F6;
     }
     nav a.active {
-      background: rgba(59, 130, 246, 0.1);
+      background: var(--alsham-primary-light);
       color: #3B82F6;
     }
-   
+
     /* Main */
     main {
       margin-left: 16rem;
@@ -136,7 +141,7 @@
       font-size: 1.5rem;
       font-weight: 700;
     }
-   
+
     /* Theme Toggle */
     #theme-toggle {
       width: 2.5rem;
@@ -151,7 +156,7 @@
       transition: all 0.2s;
     }
     #theme-toggle:hover {
-      background: rgba(59, 130, 246, 0.1);
+      background: var(--alsham-primary-light);
       border-color: #3b82f6;
       transform: scale(1.05);
     }
@@ -162,7 +167,7 @@
     }
     html:not(.dark) .moon-icon { display: none; }
     html.dark .sun-icon { display: none; }
-   
+
     /* Pipeline Board */
     .pipeline-container {
       padding: 2rem;
@@ -180,7 +185,7 @@
     #pipeline-board.hidden {
       display: none;
     }
-   
+
     /* Pipeline Column */
     .pipeline-column {
       background: var(--alsham-bg-surface);
@@ -217,7 +222,7 @@
       overflow-y: auto;
       min-height: 200px;
     }
-   
+
     /* Column Colors */
     .pipeline-column[data-stage="qualificacao"] .pipeline-column-header {
       background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
@@ -239,7 +244,7 @@
       background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
       border-color: #B91C1C;
     }
-   
+
     /* Opportunity Card */
     .opportunity-card {
       background: var(--alsham-bg-surface);
@@ -282,21 +287,20 @@
       color: var(--alsham-text-secondary);
     }
     .opportunity-probability {
-      background: rgba(59, 130, 246, 0.1);
+      background: var(--alsham-primary-light);
       color: #3B82F6;
       padding: 0.25rem 0.5rem;
       border-radius: 0.25rem;
       font-weight: 600;
     }
-   
+
     /* Drag Over State */
     .pipeline-column-body.drag-over {
-      background: rgba(59, 130, 246, 0.05);
+      background: var(--alsham-primary-light);
       border: 2px dashed #3B82F6;
       border-radius: 0.5rem;
     }
   </style>
-
 </head>
 <body>
   <aside>
@@ -311,7 +315,6 @@
       <a href="/configuracoes.html">⚙️ Configurações</a>
     </nav>
   </aside>
-
   <main>
     <header>
       <div>
