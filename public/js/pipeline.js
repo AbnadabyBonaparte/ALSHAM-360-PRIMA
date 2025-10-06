@@ -1,39 +1,42 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 1.1.0 - FIX DRAG-DROP
- * Data: 01/10/2025 16:45
+ * Versão: 2.0.0 - MODERN UI REFACTORED
+ * Data: 06/10/2025
  * Estrutura: public/js/pipeline.js
  */
 
 import { supabase } from '../../src/lib/supabase.js';
 
 const COLUNAS = [
-  { id: 'qualificacao', nome: 'Qualificação', cor: 'bg-blue-100' },
-  { id: 'proposta', nome: 'Proposta', cor: 'bg-yellow-100' },
-  { id: 'negociacao', nome: 'Negociação', cor: 'bg-orange-100' },
-  { id: 'fechado_ganho', nome: 'Fechado Ganho', cor: 'bg-green-100' },
-  { id: 'fechado_perdido', nome: 'Perdido', cor: 'bg-red-100' }
+  { id: 'qualificacao', nome: 'Qualificação' },
+  { id: 'proposta', nome: 'Proposta' },
+  { id: 'negociacao', nome: 'Negociação' },
+  { id: 'fechado_ganho', nome: 'Fechado Ganho' },
+  { id: 'perdido', nome: 'Perdido' }
 ];
 
 let opportunities = [];
 let draggedCard = null;
-let draggedFrom = null;
 
 // Inicialização
 async function init() {
   try {
-    console.log('🎯 Iniciando Pipeline de Vendas...');
+    console.log('🎯 Iniciando Pipeline de Vendas v2.0...');
     await loadOpportunities();
     renderBoard();
-    attachEventListeners(); // ✅ CHAMADA EXPLÍCITA
+    attachDragAndDropListeners();
     
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('pipeline-board').classList.remove('hidden');
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+    const boardEl = document.getElementById('pipeline-board');
+    if (boardEl) boardEl.classList.remove('hidden');
     console.log('✅ Pipeline carregado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar pipeline:', error);
-    document.getElementById('loading').innerHTML = 
-      `<p class="text-red-500">Erro ao carregar pipeline: ${error.message}</p>`;
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+      loadingEl.innerHTML = `<p style="color: #EF4444;">Erro ao carregar pipeline: ${error.message}</p>`;
+    }
   }
 }
 
@@ -44,34 +47,31 @@ async function loadOpportunities() {
     .select('*')
     .order('created_at', { ascending: false });
   
-  if (error) {
-    console.error('Erro ao buscar oportunidades:', error);
-    throw error;
-  }
+  if (error) throw error;
   
   opportunities = data || [];
-  console.log(`📊 ${opportunities.length} oportunidades carregadas`);
+  console.log(`📊 ${opportunities.length} oportunidades carregadas.`);
 }
 
 // Renderizar board completo
 function renderBoard() {
   const board = document.getElementById('pipeline-board');
-  
+  if (!board) return;
   board.innerHTML = COLUNAS.map(col => {
-    const opps = opportunities.filter(o => o.status === col.id);
-    const total = opps.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
+    const oppsInColumn = opportunities.filter(o => o.status === col.id);
+    const totalValue = oppsInColumn.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
     
     return `
-      <div class="flex-shrink-0 w-80 ${col.cor} rounded-lg p-4">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="font-semibold text-gray-700">${col.nome}</h3>
-          <span class="bg-white px-2 py-1 rounded text-sm font-medium">${opps.length}</span>
+      <div class="pipeline-column" data-stage="${col.id}">
+        <div class="pipeline-column-header">
+          <h3>${col.nome}</h3>
+          <div class="pipeline-column-stats">
+            <span>R$ ${totalValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+            <span class="deal-count">${oppsInColumn.length}</span>
+          </div>
         </div>
-        <p class="text-sm text-gray-600 mb-4 font-medium">
-          Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-        </p>
-        <div class="space-y-2 min-h-[100px] drop-zone" data-column="${col.id}">
-          ${opps.map(opp => createCard(opp)).join('')}
+        <div class="pipeline-column-body" data-column-id="${col.id}">
+          ${oppsInColumn.map(opp => createCardHTML(opp)).join('') || '<div class="p-4 text-center text-sm text-gray-500">Nenhuma oportunidade.</div>'}
         </div>
       </div>
     `;
@@ -79,19 +79,19 @@ function renderBoard() {
 }
 
 // Criar card individual
-function createCard(opp) {
+function createCardHTML(opp) {
   return `
     <div 
-      class="bg-white p-3 rounded shadow-sm cursor-move hover:shadow-md transition-shadow border border-gray-200 draggable-card"
+      class="opportunity-card"
       draggable="true"
-      data-id="${opp.id}"
+      data-opportunity-id="${opp.id}"
     >
-      <h4 class="font-medium text-gray-900 mb-1 text-sm">${opp.titulo}</h4>
-      <p class="text-sm text-gray-600 mb-2">
+      <h4 class="opportunity-card-title">${opp.titulo || 'N/A'}</h4>
+      <p class="opportunity-card-value">
         R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
       </p>
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${opp.probabilidade}%</span>
+      <div class="opportunity-card-footer">
+        <span class="opportunity-probability">${opp.probabilidade || 0}%</span>
         <button 
           onclick="viewOpportunityDetails('${opp.id}')" 
           class="text-xs text-blue-600 hover:underline"
@@ -103,120 +103,92 @@ function createCard(opp) {
   `;
 }
 
-// ✅ NOVO: Anexar event listeners (pode ser chamado múltiplas vezes)
-function attachEventListeners() {
-  const board = document.getElementById('pipeline-board');
-  
-  // Limpar listeners antigos (prevenir duplicação)
-  const newBoard = board.cloneNode(true);
-  board.parentNode.replaceChild(newBoard, board);
-  
-  // ✅ DRAGSTART: Capturar o card sendo arrastado
-  newBoard.addEventListener('dragstart', (e) => {
-    const card = e.target.closest('.draggable-card');
-    if (card) {
+// Anexar event listeners de Drag and Drop
+function attachDragAndDropListeners() {
+  const cards = document.querySelectorAll('.opportunity-card');
+  const columns = document.querySelectorAll('.pipeline-column-body');
+
+  cards.forEach(card => {
+    card.addEventListener('dragstart', () => {
       draggedCard = card;
-      draggedFrom = card.closest('[data-column]')?.dataset.column;
-      card.classList.add('opacity-50', 'scale-105');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', card.dataset.id);
-      console.log(`🎯 Drag iniciado: ${card.dataset.id} de ${draggedFrom}`);
-    }
+      setTimeout(() => card.classList.add('dragging'), 0);
+    });
+
+    card.addEventListener('dragend', () => {
+      if (draggedCard) draggedCard.classList.remove('dragging');
+      draggedCard = null;
+    });
   });
 
-  // ✅ DRAGEND: Remover estilos
-  newBoard.addEventListener('dragend', (e) => {
-    const card = e.target.closest('.draggable-card');
-    if (card) {
-      card.classList.remove('opacity-50', 'scale-105');
-    }
-  });
+  columns.forEach(column => {
+    column.addEventListener('dragover', e => {
+      e.preventDefault();
+      column.classList.add('drag-over');
+    });
 
-  // ✅ DRAGOVER: Permitir drop (CRÍTICO!)
-  newBoard.addEventListener('dragover', (e) => {
-    e.preventDefault(); // ← SEM ISSO, DROP NÃO FUNCIONA!
-    const dropZone = e.target.closest('.drop-zone');
-    if (dropZone) {
-      e.dataTransfer.dropEffect = 'move';
-      dropZone.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
-    }
-  });
+    column.addEventListener('dragleave', () => {
+      column.classList.remove('drag-over');
+    });
 
-  // ✅ DRAGLEAVE: Remover highlight
-  newBoard.addEventListener('dragleave', (e) => {
-    const dropZone = e.target.closest('.drop-zone');
-    if (dropZone && !dropZone.contains(e.relatedTarget)) {
-      dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
-    }
-  });
+    column.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      column.classList.remove('drag-over');
+      if (!draggedCard) return;
 
-  // ✅ DROP: Processar o drop
-  newBoard.addEventListener('drop', async (e) => {
-    e.preventDefault();
-    const dropZone = e.target.closest('.drop-zone');
-    
-    if (dropZone && draggedCard) {
-      dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
-      const newStatus = dropZone.dataset.column;
-      const oppId = draggedCard.dataset.id;
-      
-      // Não fazer nada se soltar na mesma coluna
-      if (draggedFrom === newStatus) {
-        console.log('⏸️ Card solto na mesma coluna');
-        return;
-      }
-      
+      const targetColumnId = column.dataset.columnId;
+      const opportunityId = draggedCard.dataset.opportunityId;
+
+      const originalOpp = opportunities.find(o => o.id == opportunityId);
+      if (!originalOpp) return;
+      const originalColumn = originalOpp.status;
+      if (originalColumn === targetColumnId) return; // Não faz nada se soltar na mesma coluna
+
+      // Mover o card visualmente para resposta imediata
+      column.appendChild(draggedCard);
+
       try {
-        console.log(`🔄 Movendo oportunidade ${oppId}: ${draggedFrom} → ${newStatus}`);
-        
+        console.log(`🔄 Movendo oportunidade ${opportunityId} para ${targetColumnId}`);
         const { error } = await supabase
           .from('sales_opportunities')
           .update({ 
-            status: newStatus, 
+            status: targetColumnId, 
             updated_at: new Date().toISOString() 
           })
-          .eq('id', oppId);
-        
+          .eq('id', opportunityId);
+
         if (error) throw error;
         
-        console.log(`✅ Oportunidade movida com sucesso para ${newStatus}`);
-        
-        // Recarregar e re-renderizar
+        console.log('✅ Oportunidade movida com sucesso no banco de dados.');
+        // Recarregar os dados e renderizar tudo para manter a consistência
         await loadOpportunities();
         renderBoard();
-        attachEventListeners(); // ✅ RE-ANEXAR LISTENERS!
-        
+        attachDragAndDropListeners(); // Reanexar listeners ao novo DOM
+
       } catch (error) {
         console.error('❌ Erro ao mover card:', error);
-        alert(`Erro ao mover card: ${error.message}`);
-        
-        // Em caso de erro, re-renderizar para estado original
+        alert(`Erro ao mover a oportunidade: ${error.message}`);
+        // Reverter em caso de erro
         renderBoard();
-        attachEventListeners();
-      } finally {
-        // Limpar estado
-        draggedCard = null;
-        draggedFrom = null;
+        attachDragAndDropListeners();
       }
-    }
+    });
   });
-  
-  console.log('✅ Event listeners anexados ao board');
+  console.log('🔗 Eventos de Drag & Drop anexados.');
 }
 
 // Ver detalhes da oportunidade (placeholder)
 window.viewOpportunityDetails = function(id) {
-  const opp = opportunities.find(o => o.id === id);
+  const opp = opportunities.find(o => o.id.toString() === id);
   if (!opp) return;
   
   alert(`
 📋 Detalhes da Oportunidade
 
-Título: ${opp.titulo}
+Título: ${opp.titulo || 'N/A'}
 Valor: R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-Probabilidade: ${opp.probabilidade}%
-Status: ${opp.status}
-Criado em: ${new Date(opp.created_at).toLocaleDateString('pt-BR')}
+Probabilidade: ${opp.probabilidade || 0}%
+Status: ${opp.status || 'N/A'}
+Criado em: ${opp.created_at ? new Date(opp.created_at).toLocaleDateString('pt-BR') : 'N/A'}
   `);
 }
 
@@ -226,5 +198,3 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-
-console.log('🎯 Pipeline.js v1.1.0 carregado');
