@@ -10,12 +10,10 @@
       --alsham-text-primary: #111827;
       --alsham-text-secondary: #6b7280;
       --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #f9fafb;
+      --alsham-bg-canvas: #f3f4f6;
       --alsham-bg-surface: #ffffff;
       --alsham-bg-hover: #f3f4f6;
       --alsham-border-default: #e5e7eb;
-      --alsham-border-light: #f3f4f6;
-      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
       --alsham-shadow-md: rgba(0, 0, 0, 0.1);
       --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
     }
@@ -27,28 +25,43 @@
       --alsham-bg-surface: #1e293b;
       --alsham-bg-hover: #334155;
       --alsham-border-default: #334155;
-      --alsham-border-light: #475569;
-      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
       --alsham-shadow-md: rgba(0, 0, 0, 0.4);
       --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
       color-scheme: dark;
     }
-    html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; }
-    html.dark .text-blue-800 { color: #93c5fd !important; }
-    html.dark .bg-yellow-100 { background-color: rgba(251, 191, 36, 0.2) !important; }
-    html.dark .text-yellow-800 { color: #fcd34d !important; }
-    html.dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.2) !important; }
-    html.dark .text-purple-800 { color: #c4b5fd !important; }
-    html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.2) !important; }
-    html.dark .text-green-800 { color: #86efac !important; }
-    html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
-    html.dark .text-red-800 { color: #fca5a5 !important; }
   </style>
-
+  <script>
+  (function() {
+    'use strict';
+    const savedTheme = localStorage.getItem('alsham-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      if (isDark) {
+        html.classList.remove('dark');
+        html.removeAttribute('data-theme');
+        localStorage.setItem('alsham-theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('alsham-theme', 'dark');
+      }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+    });
+  })();
+  </script>
   <style>
-    /* Reset e Base */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--alsham-bg-canvas);
       color: var(--alsham-text-primary);
@@ -101,7 +114,7 @@
       background: rgba(59, 130, 246, 0.1);
       color: #3B82F6;
     }
-    
+   
     /* Main */
     main {
       margin-left: 16rem;
@@ -122,9 +135,8 @@
     header h1 {
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--alsham-text-primary);
     }
-    
+   
     /* Theme Toggle */
     #theme-toggle {
       width: 2.5rem;
@@ -140,7 +152,7 @@
     }
     #theme-toggle:hover {
       background: rgba(59, 130, 246, 0.1);
-      border-color: #3B82F6;
+      border-color: #3b82f6;
       transform: scale(1.05);
     }
     #theme-toggle svg {
@@ -148,12 +160,13 @@
       height: 1.25rem;
       color: var(--alsham-text-secondary);
     }
-    
-    /* Content */
-    .max-w-7xl {
-      max-width: 80rem;
-      margin: 0 auto;
-      padding: 1.5rem;
+    html:not(.dark) .moon-icon { display: none; }
+    html.dark .sun-icon { display: none; }
+   
+    /* Pipeline Board */
+    .pipeline-container {
+      padding: 2rem;
+      overflow-x: auto;
     }
     #loading {
       text-align: center;
@@ -161,105 +174,151 @@
     }
     #pipeline-board {
       display: flex;
-      gap: 1rem;
-      overflow-x: auto;
-      padding-bottom: 1rem;
+      gap: 1.5rem;
+      min-width: max-content;
     }
     #pipeline-board.hidden {
       display: none;
     }
-    
-    /* Drag & Drop */
-    .dragging { opacity: 0.5; }
-    .drag-over { background-color: rgba(59, 130, 246, 0.1); }
-    
-    /* Icon Toggle */
-    html:not(.dark) .moon-icon { display: none; }
-    html.dark .sun-icon { display: none; }
+   
+    /* Pipeline Column */
+    .pipeline-column {
+      background: var(--alsham-bg-surface);
+      border-radius: 0.75rem;
+      box-shadow: var(--alsham-shadow-md);
+      border: 1px solid var(--alsham-border-default);
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      min-width: 280px;
+    }
+    .pipeline-column-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 2px solid;
+      border-radius: 0.75rem 0.75rem 0 0;
+      color: white;
+    }
+    .pipeline-column-header h3 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .pipeline-column-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+    .pipeline-column-body {
+      padding: 1rem;
+      flex: 1;
+      overflow-y: auto;
+      min-height: 200px;
+    }
+   
+    /* Column Colors */
+    .pipeline-column[data-stage="qualificacao"] .pipeline-column-header {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      border-color: #1D4ED8;
+    }
+    .pipeline-column[data-stage="proposta"] .pipeline-column-header {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      border-color: #B45309;
+    }
+    .pipeline-column[data-stage="negociacao"] .pipeline-column-header {
+      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+      border-color: #6D28D9;
+    }
+    .pipeline-column[data-stage="fechado_ganho"] .pipeline-column-header {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      border-color: #047857;
+    }
+    .pipeline-column[data-stage="perdido"] .pipeline-column-header {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      border-color: #B91C1C;
+    }
+   
+    /* Opportunity Card */
+    .opportunity-card {
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      cursor: grab;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .opportunity-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .opportunity-card:active {
+      cursor: grabbing;
+    }
+    .opportunity-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+    .opportunity-card-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--alsham-text-primary);
+    }
+    .opportunity-card-value {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #3B82F6;
+      margin-bottom: 0.75rem;
+    }
+    .opportunity-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--alsham-text-secondary);
+    }
+    .opportunity-probability {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3B82F6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+    }
+   
+    /* Drag Over State */
+    .pipeline-column-body.drag-over {
+      background: rgba(59, 130, 246, 0.05);
+      border: 2px dashed #3B82F6;
+      border-radius: 0.5rem;
+    }
   </style>
- 
-  <!-- Dark Mode Script INLINE para evitar erros de module -->
-  <script>
-  (function() {
-    'use strict';
-    
-    // Aplicar tema salvo IMEDIATAMENTE (antes do render)
-    const savedTheme = localStorage.getItem('alsham-theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-    
-    // Função para alternar tema
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.contains('dark');
-      
-      if (isDark) {
-        html.classList.remove('dark');
-        html.removeAttribute('data-theme');
-        localStorage.setItem('alsham-theme', 'light');
-      } else {
-        html.classList.add('dark');
-        html.setAttribute('data-theme', 'dark');
-        localStorage.setItem('alsham-theme', 'dark');
-      }
-      
-      // Recarregar gráficos se existirem
-      if (window.dashboardCharts?.reload) {
-        window.dashboardCharts.reload();
-      }
-    }
-    
-    // Adicionar listener quando o DOM estiver pronto
-    document.addEventListener('DOMContentLoaded', function() {
-      const themeToggle = document.getElementById('theme-toggle');
-      if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-      }
-    });
-  })();
-  </script>
 
+  <script type="module" crossorigin src="/assets/pipeline-Ov5KKGIl.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-BjMNRurO.js">
 </head>
 <body>
- 
-  <!-- Sidebar -->
   <aside>
-    <div>
-      <h1>ALSHAM 360°</h1>
-    </div>
-   
+    <div><h1>ALSHAM 360°</h1></div>
     <nav>
-      <a href="/dashboard.html">
-        📊 Dashboard
-      </a>
-      <a href="/leads-real.html">
-        👥 Leads
-      </a>
-      <a href="/pipeline.html" class="active">
-        🎯 Pipeline
-      </a>
-      <a href="/automacoes.html">
-        🤖 Automações
-      </a>
-      <a href="/relatorios.html">
-        📈 Relatórios
-      </a>
-      <a href="/gamificacao.html">
-        🎮 Gamificação
-      </a>
-      <a href="/configuracoes.html">
-        ⚙️ Configurações
-      </a>
+      <a href="/dashboard.html">📊 Dashboard</a>
+      <a href="/leads-real.html">👥 Leads</a>
+      <a href="/pipeline.html" class="active">🎯 Pipeline</a>
+      <a href="/automacoes.html">🤖 Automações</a>
+      <a href="/relatorios.html">📈 Relatórios</a>
+      <a href="/gamificacao.html">🎮 Gamificação</a>
+      <a href="/configuracoes.html">⚙️ Configurações</a>
     </nav>
   </aside>
-  <!-- Main Content -->
+
   <main>
     <header>
       <div>
         <h1>Pipeline de Vendas</h1>
-        <button id="theme-toggle" aria-label="Alternar tema claro/escuro">
+        <button id="theme-toggle">
           <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
@@ -269,14 +328,10 @@
         </button>
       </div>
     </header>
-    <div class="max-w-7xl">
-      <div id="loading">
-        <p>Carregando pipeline...</p>
-      </div>
-     
+    <div class="pipeline-container">
+      <div id="loading">Carregando pipeline...</div>
       <div id="pipeline-board" class="hidden"></div>
     </div>
   </main>
-  <script type="module" src="/public/js/pipeline.js"></script>
 </body>
 </html>
