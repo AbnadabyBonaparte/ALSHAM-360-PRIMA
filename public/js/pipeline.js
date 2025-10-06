@@ -5,7 +5,7 @@
  * Estrutura: public/js/pipeline.js
  */
 import { supabase } from '../../src/lib/supabase.js';
-import { showNotification } from '/public/js/notifications.js';
+import { showNotification } from '/public/js/utils/notifications.js';
 
 const COLUNAS = [
   { id: 'qualificacao', nome: 'Qualificação' },
