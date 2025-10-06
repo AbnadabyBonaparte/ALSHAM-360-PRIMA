@@ -1,6 +1,7 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 2.3.1 – FIX: Toggle Global de Som (menu lateral) + UX suave
+ * Versão: 2.3.3 – ENTERPRISE SYNC PATCH
+ * 🧩 Som Global Integrado + Notificações Suaves + UX Refinado
  * Data: 06/10/2025
  */
 
@@ -18,7 +19,7 @@ const COLUNAS = [
 let opportunities = [];
 let draggedCard = null;
 
-// === Sons ===
+// === Sons Dinâmicos ===
 const successSounds = [
   '/assets/sounds/success/success.mp3',
   '/assets/sounds/success/success-level.mp3',
@@ -32,37 +33,41 @@ const errorSounds = [
 ];
 const fallbackSound = '/assets/sounds/success/success.mp3';
 
-// === Controle global de som ===
-let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled')) ?? true;
+// === Controle Global de Som Unificado ===
+let soundEnabled = localStorage.getItem('alsham_sound_enabled') === 'true';
 
-// 🔊 Atualiza botão do menu lateral
+// Atualiza botão lateral
 function updateSoundButtonUI() {
-  const soundBtn = document.getElementById('sound-toggle-btn');
-  if (!soundBtn) return;
-  soundBtn.innerHTML = soundEnabled ? '🔊 Som Ativo' : '🔇 Som Mudo';
-  soundBtn.classList.toggle('opacity-60', !soundEnabled);
+  const btn = document.getElementById('sound-toggle-btn');
+  if (!btn) return;
+  btn.textContent = soundEnabled ? '🔊 Som Ativo' : '🔇 Som Mudo';
+  btn.style.opacity = soundEnabled ? '1' : '0.6';
 }
 
-// 🔊 Alternar som (botão lateral)
+// Alternar som global
 window.toggleGlobalSound = function () {
   soundEnabled = !soundEnabled;
-  localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
+  localStorage.setItem('alsham_sound_enabled', soundEnabled ? 'true' : 'false');
   updateSoundButtonUI();
-  notify(soundEnabled ? 'Som ativado 🔊' : 'Som desativado 🔇', 'info');
+  if (window.notify && typeof notify.setSoundPreference === 'function') {
+    notify.setSoundPreference(soundEnabled);
+  }
+  notify(soundEnabled ? 'Som ativado 🔊' : 'Som desativado 🔇', 'info', 2500, { showProgress: false });
 };
 
 // === Inicialização ===
 async function init() {
   try {
-    console.log('🎯 Iniciando Pipeline de Vendas v2.3.1...');
+    console.log('🎯 Iniciando Pipeline de Vendas v2.3.3...');
     await loadOpportunities();
     renderBoard();
     attachDragAndDropListeners();
     updateTotal();
     updateSoundButtonUI();
 
-    // Canal realtime Supabase
-    supabase
+    // Canal realtime Supabase (sem duplicar)
+    if (window.salesChannel) window.salesChannel.unsubscribe();
+    window.salesChannel = supabase
       .channel('sales_opportunities')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sales_opportunities' }, async () => {
         await loadOpportunities();
@@ -77,12 +82,12 @@ async function init() {
     console.log('✅ Pipeline carregado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar pipeline:', error);
-    document.getElementById('loading').innerHTML =
-      `<p style="color:#EF4444;">Erro ao carregar pipeline: ${error.message}</p>`;
+    const el = document.getElementById('loading');
+    if (el) el.innerHTML = `<p style="color:#EF4444;">Erro ao carregar pipeline: ${error.message}</p>`;
   }
 }
 
-// === Carregar dados ===
+// === Carregar oportunidades ===
 async function loadOpportunities() {
   const { data, error } = await supabase
     .from('sales_opportunities')
@@ -122,12 +127,16 @@ function renderBoard() {
 // === Criar Card ===
 function createCardHTML(opp) {
   return `
-    <div class="opportunity-card transition-transform duration-300 ease-in-out hover:scale-[1.02]" draggable="true" data-opportunity-id="${opp.id}">
+    <div class="opportunity-card transition-transform duration-300 ease-in-out hover:scale-[1.02]"
+         draggable="true" data-opportunity-id="${opp.id}">
       <h4 class="opportunity-card-title">${opp.titulo || 'N/A'}</h4>
       <p class="opportunity-card-value">R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
       <div class="opportunity-card-footer flex justify-between items-center">
         <span class="opportunity-probability text-sm">${opp.probabilidade || 0}%</span>
-        <button onclick="viewOpportunityDetails('${opp.id}')" class="text-xs text-blue-600 hover:underline">Ver detalhes</button>
+        <button onclick="viewOpportunityDetails('${opp.id}')"
+                class="text-xs text-blue-600 hover:underline">
+          Ver detalhes
+        </button>
       </div>
     </div>
   `;
@@ -173,7 +182,7 @@ function attachDragAndDropListeners() {
           .eq('id', oppId);
         if (error) throw error;
 
-        notify('Oportunidade movida com sucesso!', 'success');
+        notify('Oportunidade movida com sucesso!', 'success', 3000, { showProgress: false });
         playSound('success');
         await loadOpportunities();
         renderBoard();
@@ -181,14 +190,14 @@ function attachDragAndDropListeners() {
         updateTotal();
       } catch (err) {
         console.error('❌ Erro ao mover card:', err);
-        notify(`Erro: ${err.message}`, 'error');
+        notify(`Erro: ${err.message}`, 'error', 4000, { showProgress: false });
         playSound('error');
       }
     });
   });
 }
 
-// === Total ===
+// === Atualizar total ===
 function updateTotal() {
   let totalEl = document.getElementById('pipeline-total');
   if (!totalEl) {
@@ -206,9 +215,9 @@ function updateTotal() {
   }
 }
 
-// === Sons ===
+// === Som de feedback ===
 function playSound(type) {
-  if (!soundEnabled) return;
+  if (!soundEnabled) return; // ✅ respeita toggle global
   const list = type === 'success' ? successSounds : errorSounds;
   const src = list[Math.floor(Math.random() * list.length)];
   const audio = new Audio(src);
@@ -220,7 +229,7 @@ function playSound(type) {
   });
 }
 
-// === Detalhes ===
+// === Detalhes da Oportunidade ===
 window.viewOpportunityDetails = function (id) {
   const opp = opportunities.find(o => o.id.toString() === id);
   if (!opp) return;
