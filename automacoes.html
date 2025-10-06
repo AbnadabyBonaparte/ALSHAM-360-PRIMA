@@ -8,6 +8,8 @@
   
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <!-- Opcional: Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   
   <style id="dark-theme-critical">
     :root {
@@ -19,9 +21,11 @@
       --alsham-bg-hover: #f3f4f6;
       --alsham-border-default: #e5e7eb;
       --alsham-border-light: #f3f4f6;
-      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
-      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
-      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
+      --alsham-primary: #3B82F6;
+      --alsham-primary-light: rgba(59,130,246,0.1);
     }
     html.dark {
       --alsham-text-primary: #f9fafb;
@@ -32,9 +36,9 @@
       --alsham-bg-hover: #334155;
       --alsham-border-default: #334155;
       --alsham-border-light: #475569;
-      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
-      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
-      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
       color-scheme: dark;
     }
   </style>
@@ -73,6 +77,7 @@
     body {
       background: var(--alsham-bg-canvas);
       color: var(--alsham-text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     .side-nav {
       position: fixed;
@@ -99,7 +104,7 @@
       color: #3b82f6;
     }
     .side-nav a.active {
-      background: rgba(59, 130, 246, 0.1);
+      background: var(--alsham-primary-light);
       color: #3b82f6;
       border-right: 3px solid #3b82f6;
       font-weight: 600;
@@ -124,7 +129,7 @@
       transition: all 0.2s;
     }
     .theme-toggle-btn:hover {
-      background: rgba(59, 130, 246, 0.1);
+      background: var(--alsham-primary-light);
       border-color: #3b82f6;
       transform: scale(1.05);
     }
