@@ -1,6 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Notificações Toast Enterprise
- * Versão: 2.5.1 – SOUND CONTROL EDITION (UX + Persistência + CSS Fix)
+ * Versão: 2.5.2 – SOUND CONTROL EDITION (Toggle Fix)
  * 🔊 Opção “com ou sem som” salva no localStorage
  * 🌓 Dark mode, animações refinadas e sons dinâmicos integrados
  * ✅ CSS das animações sempre injetado no head
@@ -12,12 +12,10 @@ export class NotificationSystem {
     this.container = document.getElementById(containerId);
     if (!this.container) this.createContainer();
 
-    // Preferência persistente do usuário
     this.soundEnabled = this.getSoundPreference();
     this.addSoundToggleUI();
   }
 
-  // Garante que animações CSS existam
   injectAnimationCSS() {
     if (!document.getElementById('toast-animations-style')) {
       const style = document.createElement('style');
@@ -35,7 +33,6 @@ export class NotificationSystem {
     }
   }
 
-  // === 🔧 Container principal ===
   createContainer() {
     const container = document.createElement('div');
     container.id = 'toast-container';
@@ -47,18 +44,16 @@ export class NotificationSystem {
     this.container = container;
   }
 
-  // === 🎛 Controle de som persistente ===
   getSoundPreference() {
     return localStorage.getItem('alsham_sound_enabled') === 'true';
   }
 
   setSoundPreference(enabled) {
-    this.soundEnabled = enabled;
     localStorage.setItem('alsham_sound_enabled', enabled);
+    this.soundEnabled = this.getSoundPreference(); // <- sempre pega do localStorage
     this.updateSoundToggleIcon();
   }
 
-  // === 🎚️ UI para alternar som on/off ===
   addSoundToggleUI() {
     if (document.getElementById('sound-toggle-btn')) return;
 
@@ -83,6 +78,7 @@ export class NotificationSystem {
     });
 
     document.body.appendChild(btn);
+    this.updateSoundToggleIcon(); // Garante atualização visual
   }
 
   getSoundIcon(enabled) {
@@ -111,7 +107,6 @@ export class NotificationSystem {
       this.playSound('/assets/sounds/error/error-glitch.mp3');
   }
 
-  // === 🔔 Notificação Toast ===
   show(message, type = 'info', duration = 6500, options = {}) {
     if (!this.container) this.createContainer();
 
@@ -242,7 +237,6 @@ export class NotificationSystem {
 export const notify = new NotificationSystem();
 export default NotificationSystem;
 
-// Função rápida
 export function showNotification(message, type = 'info', duration = 6500, options = {}) {
   return notify.show(message, type, duration, options);
 }
