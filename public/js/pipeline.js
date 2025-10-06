@@ -1,6 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 2.1.0 - MODERN UI REFACTORED WITH REALTIME, NOTIFICATIONS & GLOBAL TOTAL
+ * Versão: 2.2.0 - MODERN UI REFACTORED WITH REALTIME, NOTIFICATIONS, GLOBAL TOTAL, AUDIO FEEDBACK & ANIMATIONS
  * Data: 06/10/2025
  * Estrutura: public/js/pipeline.js
  */
@@ -19,7 +19,7 @@ let draggedCard = null;
 // Inicialização
 async function init() {
   try {
-    console.log('🎯 Iniciando Pipeline de Vendas v2.1.0...');
+    console.log('🎯 Iniciando Pipeline de Vendas v2.2.0...');
     await loadOpportunities();
     renderBoard();
     attachDragAndDropListeners();
@@ -104,6 +104,7 @@ function createCardHTML(opp) {
         <button
           onclick="viewOpportunityDetails('${opp.id}')"
           class="text-xs text-blue-600 hover:underline"
+          title="Abrir detalhes da oportunidade"
         >
           Ver detalhes
         </button>
@@ -158,6 +159,7 @@ function attachDragAndDropListeners() {
        
         console.log('✅ Oportunidade movida com sucesso no banco de dados.');
         showNotification('Oportunidade movida com sucesso!', 'success');
+        playSound('success');
         // Recarregar os dados e renderizar tudo para manter a consistência
         await loadOpportunities();
         renderBoard();
@@ -166,6 +168,7 @@ function attachDragAndDropListeners() {
       } catch (error) {
         console.error('❌ Erro ao mover card:', error);
         showNotification(`Erro ao mover a oportunidade: ${error.message}`, 'error');
+        playSound('error');
         // Reverter em caso de erro
         renderBoard();
         attachDragAndDropListeners();
@@ -195,6 +198,12 @@ function updateTotal() {
     const totalGeral = opportunities.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
     totalEl.innerText = `Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
   }
+}
+// Função para tocar som de feedback
+function playSound(type) {
+  const audio = new Audio(type === 'success' ? '/public/assets/success.mp3' : '/public/assets/error.mp3');
+  audio.volume = 0.2;
+  audio.play().catch(error => console.warn('⚠️ Áudio não reproduzido:', error.message));
 }
 // Ver detalhes da oportunidade (placeholder)
 window.viewOpportunityDetails = function(id) {
