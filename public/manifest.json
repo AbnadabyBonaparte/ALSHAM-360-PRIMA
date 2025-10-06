@@ -2,9 +2,11 @@
   "name": "ALSHAM 360° PRIMA",
   "short_name": "ALSHAM360",
   "description": "CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas.",
-  "start_url": ".",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#3B82F6",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
   "theme_color": "#3B82F6",
   "icons": [
     {
