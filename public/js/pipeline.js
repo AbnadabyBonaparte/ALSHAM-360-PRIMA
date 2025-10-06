@@ -1,6 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 2.2.1 – PATCHED: CSP, Notificações, PWA, Container, Áudio
+ * Versão: 2.2.2 – PATCHED: CSP, Notificações, PWA, Container, Áudio, Caminho Absoluto
  * Data: 06/10/2025
  * Estrutura: public/js/pipeline.js
  */
@@ -19,28 +19,34 @@ let draggedCard = null;
 
 // === Sons dinâmicos ===
 const successSounds = [
-  '/public/assets/sounds/success/success.mp3',
-  '/public/assets/sounds/success/success-level.mp3',
-  '/public/assets/sounds/success/success-bonus.mp3',
-  '/public/assets/sounds/success/success-rise.mp3',
-  '/public/assets/sounds/success/success-start.mp3'
+  '/assets/sounds/success/success.mp3',
+  '/assets/sounds/success/success-level.mp3',
+  '/assets/sounds/success/success-bonus.mp3',
+  '/assets/sounds/success/success-rise.mp3',
+  '/assets/sounds/success/success-start.mp3'
 ];
 const errorSounds = [
-  '/public/assets/sounds/error/error.mp3',
-  '/public/assets/sounds/error/error-alert.mp3',
-  '/public/assets/sounds/error/error-glitch.mp3'
+  '/assets/sounds/error/error.mp3',
+  '/assets/sounds/error/error-alert.mp3',
+  '/assets/sounds/error/error-glitch.mp3'
 ];
+const fallbackSound = '/assets/sounds/success/success.mp3';
+
+// Pré-carrega todos os sons para reduzir delay
+[...successSounds, ...errorSounds].forEach(src => {
+  const audio = new Audio(src);
+  audio.preload = 'auto';
+});
 
 // Inicialização
 async function init() {
   try {
-    console.log('🎯 Iniciando Pipeline de Vendas v2.2.1...');
+    console.log('🎯 Iniciando Pipeline de Vendas v2.2.2...');
     await loadOpportunities();
     renderBoard();
     attachDragAndDropListeners();
-    updateTotal(); // Atualiza o total global inicial
+    updateTotal();
 
-    // Adicionar realtime sync com Supabase
     supabase
       .channel('sales_opportunities')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sales_opportunities' }, payload => {
@@ -158,8 +164,7 @@ function attachDragAndDropListeners() {
       const originalOpp = opportunities.find(o => o.id == opportunityId);
       if (!originalOpp) return;
       const originalColumn = originalOpp.status;
-      if (originalColumn === targetColumnId) return; // Não faz nada se soltar na mesma coluna
-      // Mover o card visualmente para resposta imediata
+      if (originalColumn === targetColumnId) return;
       column.appendChild(draggedCard);
       try {
         console.log(`🔄 Movendo oportunidade ${opportunityId} para ${targetColumnId}`);
@@ -211,13 +216,21 @@ function updateTotal() {
     totalEl.innerText = `Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
   }
 }
-// Função para tocar som de feedback dinâmico
+// Função para tocar som de feedback dinâmico com fallback
 function playSound(type) {
   const list = type === 'success' ? successSounds : errorSounds;
   const src = list[Math.floor(Math.random() * list.length)];
   const audio = new Audio(src);
   audio.volume = 0.25;
-  audio.play().catch(error => console.warn('⚠️ Falha ao tocar som:', error.message));
+  audio.play().catch(error => {
+    console.warn(`⚠️ Falha ao tocar som (${src}): ${error.message}`);
+    // Fallback automático
+    if (src !== fallbackSound) {
+      const fallback = new Audio(fallbackSound);
+      fallback.volume = 0.2;
+      fallback.play().catch(() => {});
+    }
+  });
 }
 // Ver detalhes da oportunidade (placeholder)
 window.viewOpportunityDetails = function(id) {
