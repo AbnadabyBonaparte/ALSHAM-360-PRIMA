@@ -1,6 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 2.3.0 – PATCH: Toggle de Som + Animação Suave + UX Refinado
+ * Versão: 2.3.1 – FIX: Toggle Global de Som (menu lateral) + UX suave
  * Data: 06/10/2025
  */
 
@@ -32,28 +32,36 @@ const errorSounds = [
 ];
 const fallbackSound = '/assets/sounds/success/success.mp3';
 
-// === Controle de som ===
+// === Controle global de som ===
 let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled')) ?? true;
 
-function toggleSound() {
+// 🔊 Atualiza botão do menu lateral
+function updateSoundButtonUI() {
+  const soundBtn = document.getElementById('sound-toggle-btn');
+  if (!soundBtn) return;
+  soundBtn.innerHTML = soundEnabled ? '🔊 Som Ativo' : '🔇 Som Mudo';
+  soundBtn.classList.toggle('opacity-60', !soundEnabled);
+}
+
+// 🔊 Alternar som (botão lateral)
+window.toggleGlobalSound = function () {
   soundEnabled = !soundEnabled;
   localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
-  const btn = document.getElementById('toggle-sound');
-  if (btn) btn.innerText = soundEnabled ? '🔊 Som: Ativo' : '🔇 Som: Mudo';
+  updateSoundButtonUI();
   notify(soundEnabled ? 'Som ativado 🔊' : 'Som desativado 🔇', 'info');
-}
+};
 
 // === Inicialização ===
 async function init() {
   try {
-    console.log('🎯 Iniciando Pipeline de Vendas v2.3.0...');
+    console.log('🎯 Iniciando Pipeline de Vendas v2.3.1...');
     await loadOpportunities();
     renderBoard();
     attachDragAndDropListeners();
-    updateHeaderUI();
     updateTotal();
+    updateSoundButtonUI();
 
-    // Canal realtime
+    // Canal realtime Supabase
     supabase
       .channel('sales_opportunities')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sales_opportunities' }, async () => {
@@ -66,6 +74,7 @@ async function init() {
 
     document.getElementById('loading')?.remove();
     document.getElementById('pipeline-board')?.classList.remove('hidden');
+    console.log('✅ Pipeline carregado com sucesso');
   } catch (error) {
     console.error('❌ Erro ao inicializar pipeline:', error);
     document.getElementById('loading').innerHTML =
@@ -84,7 +93,7 @@ async function loadOpportunities() {
   console.log(`📊 ${opportunities.length} oportunidades carregadas.`);
 }
 
-// === Renderização do board ===
+// === Renderizar Board ===
 function renderBoard() {
   const board = document.getElementById('pipeline-board');
   if (!board) return;
@@ -102,28 +111,29 @@ function renderBoard() {
           </div>
         </div>
         <div class="pipeline-column-body" data-column-id="${col.id}">
-          ${opps.map(opp => createCardHTML(opp)).join('') || '<div class="p-4 text-center text-sm text-gray-500">Nenhuma oportunidade.</div>'}
+          ${opps.map(opp => createCardHTML(opp)).join('') ||
+            '<div class="p-4 text-center text-sm text-gray-500">Nenhuma oportunidade.</div>'}
         </div>
       </div>
     `;
   }).join('');
 }
 
-// === Cartão de oportunidade ===
+// === Criar Card ===
 function createCardHTML(opp) {
   return `
-    <div class="opportunity-card" draggable="true" data-opportunity-id="${opp.id}">
+    <div class="opportunity-card transition-transform duration-300 ease-in-out hover:scale-[1.02]" draggable="true" data-opportunity-id="${opp.id}">
       <h4 class="opportunity-card-title">${opp.titulo || 'N/A'}</h4>
       <p class="opportunity-card-value">R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-      <div class="opportunity-card-footer">
-        <span class="opportunity-probability">${opp.probabilidade || 0}%</span>
+      <div class="opportunity-card-footer flex justify-between items-center">
+        <span class="opportunity-probability text-sm">${opp.probabilidade || 0}%</span>
         <button onclick="viewOpportunityDetails('${opp.id}')" class="text-xs text-blue-600 hover:underline">Ver detalhes</button>
       </div>
     </div>
   `;
 }
 
-// === Drag and Drop ===
+// === Drag & Drop ===
 function attachDragAndDropListeners() {
   const cards = document.querySelectorAll('.opportunity-card');
   const columns = document.querySelectorAll('.pipeline-column-body');
@@ -178,23 +188,7 @@ function attachDragAndDropListeners() {
   });
 }
 
-// === Atualizar total e header ===
-function updateHeaderUI() {
-  const headerDiv = document.querySelector('header > div');
-  if (!headerDiv) return;
-
-  // Botão de som
-  let btn = document.getElementById('toggle-sound');
-  if (!btn) {
-    btn = document.createElement('button');
-    btn.id = 'toggle-sound';
-    btn.className = 'ml-4 px-3 py-1 text-sm rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition';
-    btn.onclick = toggleSound;
-    headerDiv.appendChild(btn);
-  }
-  btn.innerText = soundEnabled ? '🔊 Som: Ativo' : '🔇 Som: Mudo';
-}
-
+// === Total ===
 function updateTotal() {
   let totalEl = document.getElementById('pipeline-total');
   if (!totalEl) {
@@ -227,7 +221,7 @@ function playSound(type) {
 }
 
 // === Detalhes ===
-window.viewOpportunityDetails = function(id) {
+window.viewOpportunityDetails = function (id) {
   const opp = opportunities.find(o => o.id.toString() === id);
   if (!opp) return;
   alert(`
