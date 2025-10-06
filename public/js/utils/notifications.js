@@ -24,14 +24,6 @@ export class NotificationSystem {
     this.container = container;
   }
 
-  /**
-   * Exibe notificação toast
-   * @param {string} message - Mensagem a exibir
-   * @param {('success'|'error'|'warning'|'info')} type - Tipo de notificação
-   * @param {number} duration - Duração em ms (0 = permanente)
-   * @param {Object} options - Opções adicionais
-   * @returns {HTMLElement} Elemento do toast
-   */
   show(message, type = 'info', duration = 4000, options = {}) {
     if (!this.container) return null;
 
@@ -76,7 +68,6 @@ export class NotificationSystem {
       ` : ''}
     `;
 
-    // Animação de entrada
     toast.style.cssText = `
       transform: translateX(calc(100% + 1rem));
       opacity: 0;
@@ -85,7 +76,6 @@ export class NotificationSystem {
     
     this.container.appendChild(toast);
     
-    // Trigger animation (RAF for smooth animation)
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         toast.style.transform = 'translateX(0)';
@@ -93,12 +83,10 @@ export class NotificationSystem {
       });
     });
 
-    // Auto-remover
     if (duration > 0) {
       setTimeout(() => this.remove(toast), duration);
     }
     
-    // Adicionar estilo de progresso (apenas uma vez)
     if (!document.getElementById('toast-progress-style')) {
       const style = document.createElement('style');
       style.id = 'toast-progress-style';
@@ -114,9 +102,6 @@ export class NotificationSystem {
     return toast;
   }
 
-  /**
-   * Remove toast com animação
-   */
   remove(toast) {
     if (!toast || !toast.parentElement) return;
     
@@ -130,9 +115,6 @@ export class NotificationSystem {
     }, 300);
   }
 
-  /**
-   * Classes do toast baseadas no tipo (DARK MODE READY)
-   */
   getToastClasses(type) {
     const base = 'relative flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg mb-2 overflow-hidden backdrop-blur-sm transition-colors duration-300';
     
@@ -146,9 +128,6 @@ export class NotificationSystem {
     return `${base} ${variants[type] || variants.info}`;
   }
 
-  /**
-   * Ícones para cada tipo de notificação
-   */
   getIcon(type) {
     const icons = {
       success: `
@@ -176,9 +155,6 @@ export class NotificationSystem {
     return icons[type] || icons.info;
   }
 
-  /**
-   * Métodos de atalho
-   */
   success(message, options = {}) {
     return this.show(message, 'success', options.duration || 4000, options);
   }
@@ -195,9 +171,6 @@ export class NotificationSystem {
     return this.show(message, 'info', options.duration || 4000, options);
   }
 
-  /**
-   * Limpa todas as notificações
-   */
   clearAll() {
     if (this.container) {
       const toasts = this.container.querySelectorAll('[role="alert"]');
@@ -206,8 +179,5 @@ export class NotificationSystem {
   }
 }
 
-// Instância global
 export const notify = new NotificationSystem();
-
-// Exportação para uso direto
 export default NotificationSystem;
