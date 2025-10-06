@@ -1,6 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 2.2.1 - PATCHED: CSP, Notificações, Ícones PWA, Container
+ * Versão: 2.2.1 – PATCHED: CSP, Notificações, PWA, Container, Áudio
  * Data: 06/10/2025
  * Estrutura: public/js/pipeline.js
  */
@@ -16,6 +16,7 @@ const COLUNAS = [
 ];
 let opportunities = [];
 let draggedCard = null;
+
 // Inicialização
 async function init() {
   try {
@@ -198,7 +199,7 @@ function updateTotal() {
 }
 // Função para tocar som de feedback
 function playSound(type) {
-  const audio = new Audio(type === 'success' ? '/public/pwa-192x192.mp3' : '/public/pwa-512x512.mp3');
+  const audio = new Audio(type === 'success' ? '/public/assets/success.mp3' : '/public/assets/error.mp3');
   audio.volume = 0.2;
   audio.play().catch(error => console.warn('⚠️ Áudio não reproduzido:', error.message));
 }
