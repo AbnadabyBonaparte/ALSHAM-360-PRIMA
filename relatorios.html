@@ -144,4 +144,85 @@
 <body class="font-inter min-h-screen">
   
   <div id="relatorios-loader" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class
+    <div class="bg-white rounded-lg p-6">
+      <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <p class="text-gray-700">Carregando...</p>
+    </div>
+  </div>
+  
+  <nav class="sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
+        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
+        <a href="/relatorios.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Relatórios</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema">
+        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+  
+  <aside class="side-nav">
+    <a href="/dashboard.html">📊 Dashboard</a>
+    <a href="/leads-real.html">👥 Leads</a>
+    <a href="/pipeline.html">🎯 Pipeline</a>
+    <a href="/automacoes.html">⚙️ Automações</a>
+    <a href="/gamificacao.html">🎮 Gamificação</a>
+    <a href="/relatorios.html" class="active">📈 Relatórios</a>
+    <a href="/configuracoes.html">⚙️ Configurações</a>
+  </aside>
+  
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <h1 class="text-3xl font-bold" style="color: var(--alsham-text-primary);">📊 Relatórios</h1>
+    
+    <section id="kpi-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></section>
+    
+    <section>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold" style="color: var(--alsham-text-primary);">Evolução de Leads</h2>
+        <div class="flex gap-1">
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200" data-period="7">7d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-blue-600 text-white font-semibold" data-period="30">30d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200" data-period="90">90d</button>
+        </div>
+      </div>
+      <div class="rounded-lg p-6 h-80" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);">
+        <canvas id="leads-chart"></canvas>
+      </div>
+    </section>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section>
+        <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Leads por Status</h2>
+        <div class="rounded-lg p-6 h-80" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);">
+          <canvas id="status-chart"></canvas>
+        </div>
+      </section>
+      
+      <section>
+        <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Receita por Mês</h2>
+        <div class="rounded-lg p-6 h-80" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);">
+          <canvas id="revenue-chart"></canvas>
+        </div>
+      </section>
+    </div>
+  </main>
+  
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm" style="color: var(--alsham-text-tertiary);">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
+  
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script type="module" src="/public/js/relatorios.js"></script>
+</body>
+</html>
