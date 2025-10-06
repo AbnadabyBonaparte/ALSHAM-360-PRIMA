@@ -1,8 +1,6 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Notificações Toast Enterprise
- * Versão: 2.3.0 — FIX: Tamanho, Posição, Overflow e Acessibilidade
- * Inspirado em: HubSpot Canvas + Linear + Notion
- * Compatível com: DARK MODE + PWA + CSP
+ * Versão: 2.3.1 – PATCH DEFINITIVO (SVG gigante / layout fix)
  */
 
 export class NotificationSystem {
@@ -22,13 +20,6 @@ export class NotificationSystem {
     this.container = container;
   }
 
-  /**
-   * Exibe um toast moderno
-   * @param {string} message - Texto da mensagem
-   * @param {'success'|'error'|'warning'|'info'} type - Tipo da notificação
-   * @param {number} duration - Tempo em ms (0 = permanente)
-   * @param {object} options - Configurações extras
-   */
   show(message, type = 'info', duration = 4000, options = {}) {
     if (!this.container) this.createContainer();
 
@@ -50,7 +41,7 @@ export class NotificationSystem {
 
     toast.innerHTML = `
       <div class="flex items-start gap-3 relative">
-        <div class="flex-shrink-0 mt-[2px]">${icon}</div>
+        <div class="flex-shrink-0 mt-[2px] w-5 h-5 flex items-center justify-center">${icon}</div>
         <div class="flex-1 min-w-0">
           ${options.title ? `<p class="font-semibold text-sm mb-1">${options.title}</p>` : ''}
           <p class="text-sm leading-snug break-words">${message}</p>
@@ -61,7 +52,7 @@ export class NotificationSystem {
             onclick="document.getElementById('${id}').remove()"
             class="flex-shrink-0 opacity-60 hover:opacity-100 transition p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
@@ -83,16 +74,15 @@ export class NotificationSystem {
       });
     });
 
-    // Remoção automática
     if (duration > 0) setTimeout(() => this.remove(toast), duration);
 
-    // Estilo global do progresso (se ainda não existir)
     if (!document.getElementById('toast-progress-style')) {
       const style = document.createElement('style');
       style.id = 'toast-progress-style';
       style.textContent = `
         @keyframes toast-progress { from {width:100%;} to {width:0;} }
         @keyframes toast-fadeout { to {opacity:0; transform:translateX(120%);} }
+        #toast-container svg { width:1.25rem !important; height:1.25rem !important; display:inline-block !important; }
       `;
       document.head.appendChild(style);
     }
@@ -100,18 +90,12 @@ export class NotificationSystem {
     return toast;
   }
 
-  /**
-   * Remove com animação
-   */
   remove(toast) {
     if (!toast) return;
     toast.style.animation = 'toast-fadeout 0.3s forwards';
     setTimeout(() => toast.remove(), 300);
   }
 
-  /**
-   * Retorna classes de estilo baseadas no tipo
-   */
   getToastClasses(type) {
     const base =
       'relative flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg overflow-hidden backdrop-blur-sm transition-colors border text-sm font-medium';
@@ -124,20 +108,17 @@ export class NotificationSystem {
     return `${base} ${variants[type] || variants.info}`;
   }
 
-  /**
-   * Ícones simples e consistentes
-   */
   getIcon(type) {
     const icons = {
       success: `
-        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="w-5 h-5 text-green-600 dark:text-green-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd"
             d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 
                7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
             clip-rule="evenodd"/>
         </svg>`,
       error: `
-        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="w-5 h-5 text-red-600 dark:text-red-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd"
             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10
                7.293 11.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0
@@ -146,7 +127,7 @@ export class NotificationSystem {
             clip-rule="evenodd"/>
         </svg>`,
       warning: `
-        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd"
             d="M8.257 3.099a1.5 1.5 0 012.486 0l5.58 9.92A1.5 1.5 0 0115.58 16H4.42a1.5
                1.5 0 01-1.743-2.981l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0
@@ -155,7 +136,7 @@ export class NotificationSystem {
             clip-rule="evenodd"/>
         </svg>`,
       info: `
-        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd"
             d="M18 10a8 8 0 11-16 0 8 8 0
                0116 0zm-7-4a1 1 0 11-2 0 1 1 0
@@ -189,11 +170,9 @@ export class NotificationSystem {
   }
 }
 
-// Instância global
 export const notify = new NotificationSystem();
 export default NotificationSystem;
 
-// Função auxiliar direta
 export function showNotification(message, type = 'info', duration = 4000, options = {}) {
   return notify.show(message, type, duration, options);
 }
