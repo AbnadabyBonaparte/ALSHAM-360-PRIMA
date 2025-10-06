@@ -1,11 +1,11 @@
 /**
  * ALSHAM 360° PRIMA - Pipeline de Vendas (Kanban Board)
- * Versão: 2.2.0 - MODERN UI REFACTORED WITH REALTIME, NOTIFICATIONS, GLOBAL TOTAL, AUDIO FEEDBACK & ANIMATIONS
+ * Versão: 2.2.1 - PATCHED: CSP, Notificações, Ícones PWA, Container
  * Data: 06/10/2025
  * Estrutura: public/js/pipeline.js
  */
 import { supabase } from '../../src/lib/supabase.js';
-import { notify } from './utils/notifications.js';
+import { showNotification as notify } from '/public/js/utils/notifications.js';
 
 const COLUNAS = [
   { id: 'qualificacao', nome: 'Qualificação' },
@@ -16,11 +16,10 @@ const COLUNAS = [
 ];
 let opportunities = [];
 let draggedCard = null;
-
 // Inicialização
 async function init() {
   try {
-    console.log('🎯 Iniciando Pipeline de Vendas v2.2.0...');
+    console.log('🎯 Iniciando Pipeline de Vendas v2.2.1...');
     await loadOpportunities();
     renderBoard();
     attachDragAndDropListeners();
@@ -52,7 +51,6 @@ async function init() {
     }
   }
 }
-
 // Carregar oportunidades do Supabase
 async function loadOpportunities() {
   const { data, error } = await supabase
@@ -65,7 +63,6 @@ async function loadOpportunities() {
   opportunities = data || [];
   console.log(`📊 ${opportunities.length} oportunidades carregadas.`);
 }
-
 // Renderizar board completo
 function renderBoard() {
   const board = document.getElementById('pipeline-board');
@@ -90,7 +87,6 @@ function renderBoard() {
     `;
   }).join('');
 }
-
 // Criar card individual
 function createCardHTML(opp) {
   return `
@@ -116,7 +112,6 @@ function createCardHTML(opp) {
     </div>
   `;
 }
-
 // Anexar event listeners de Drag and Drop
 function attachDragAndDropListeners() {
   const cards = document.querySelectorAll('.opportunity-card');
@@ -163,18 +158,16 @@ function attachDragAndDropListeners() {
         if (error) throw error;
 
         console.log('✅ Oportunidade movida com sucesso no banco de dados.');
-        notify.success('Oportunidade movida com sucesso!');
+        notify('Oportunidade movida com sucesso!', 'success');
         playSound('success');
-        // Recarregar os dados e renderizar tudo para manter a consistência
         await loadOpportunities();
         renderBoard();
-        attachDragAndDropListeners(); // Reanexar listeners ao novo DOM
-        updateTotal(); // Atualiza o total global após movimento
+        attachDragAndDropListeners();
+        updateTotal();
       } catch (error) {
         console.error('❌ Erro ao mover card:', error);
-        notify.error(`Erro ao mover a oportunidade: ${error.message}`);
+        notify(`Erro ao mover a oportunidade: ${error.message}`, 'error');
         playSound('error');
-        // Reverter em caso de erro
         renderBoard();
         attachDragAndDropListeners();
         updateTotal();
@@ -183,12 +176,10 @@ function attachDragAndDropListeners() {
   });
   console.log('🔗 Eventos de Drag & Drop anexados.');
 }
-
 // Atualizar total global
 function updateTotal() {
   let totalEl = document.getElementById('pipeline-total');
   if (!totalEl) {
-    // Inserir dinamicamente se não existir
     const headerDiv = document.querySelector('header > div');
     if (headerDiv) {
       totalEl = document.createElement('span');
@@ -205,14 +196,12 @@ function updateTotal() {
     totalEl.innerText = `Total: R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
   }
 }
-
 // Função para tocar som de feedback
 function playSound(type) {
-  const audio = new Audio(type === 'success' ? '/public/assets/success.mp3' : '/public/assets/error.mp3');
+  const audio = new Audio(type === 'success' ? '/public/pwa-192x192.mp3' : '/public/pwa-512x512.mp3');
   audio.volume = 0.2;
   audio.play().catch(error => console.warn('⚠️ Áudio não reproduzido:', error.message));
 }
-
 // Ver detalhes da oportunidade (placeholder)
 window.viewOpportunityDetails = function(id) {
   const opp = opportunities.find(o => o.id.toString() === id);
@@ -227,7 +216,6 @@ Status: ${opp.status || 'N/A'}
 Criado em: ${opp.created_at ? new Date(opp.created_at).toLocaleDateString('pt-BR') : 'N/A'}
   `);
 }
-
 // Auto-inicializar
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
