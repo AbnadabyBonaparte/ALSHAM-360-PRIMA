@@ -6,29 +6,82 @@
   <title>Gamificação — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema de Gamificação do ALSHAM 360° PRIMA" />
   
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    object-src 'none';
-    frame-src 'self';
-    worker-src 'self' blob:;">
-  
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
   
+  <style id="dark-theme-critical">
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #f9fafb;
+      --alsham-bg-surface: #ffffff;
+      --alsham-bg-hover: #f3f4f6;
+      --alsham-border-default: #e5e7eb;
+      --alsham-border-light: #f3f4f6;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-border-default: #334155;
+      --alsham-border-light: #475569;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+  </style>
+
+  <script>
+  (function() {
+    'use strict';
+    const savedTheme = localStorage.getItem('alsham-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      if (isDark) {
+        html.classList.remove('dark');
+        html.removeAttribute('data-theme');
+        localStorage.setItem('alsham-theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('alsham-theme', 'dark');
+      }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+    });
+  })();
+  </script>
+  
   <style>
+    body {
+      background: var(--alsham-bg-canvas);
+      color: var(--alsham-text-primary);
+    }
     .side-nav {
       position: fixed;
       left: 0;
       top: 64px;
       width: 220px;
       height: calc(100vh - 64px);
-      background: white;
-      border-right: 1px solid #e5e7eb;
+      background: var(--alsham-bg-surface);
+      border-right: 1px solid var(--alsham-border-default);
       padding: 20px 0;
       z-index: 30;
       overflow-y: auto;
@@ -36,84 +89,15 @@
     .side-nav a {
       display: block;
       padding: 12px 24px;
-      color: #6b7280;
+      color: var(--alsham-text-secondary);
       text-decoration: none;
       transition: all 0.2s;
       font-size: 14px;
     }
     .side-nav a:hover {
-      background: #f3f4f6;
+      background: var(--alsham-bg-hover);
       color: #3b82f6;
     }
     .side-nav a.active {
-      background: #eff6ff;
+      background: rgba(59, 130, 246, 0.1);
       color: #3b82f6;
-      border-right: 3px solid #3b82f6;
-      font-weight: 600;
-    }
-    .main-content-wrapper {
-      margin-left: 220px;
-    }
-  </style>
-</head>
-
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-  
-  <div id="gamification-loading" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-6">
-      <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-      <p class="text-gray-700">Carregando...</p>
-    </div>
-  </div>
-  
-  <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
-      <div class="hidden md:flex space-x-6">
-        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
-        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
-        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
-        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
-        <a href="/gamificacao.html" class="text-blue-600 font-medium">Gamificação</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
-        <a href="/configuracoes.html" class="text-gray-600 hover:text-gray-900">Configurações</a>
-      </div>
-    </div>
-  </nav>
-  
-  <aside class="side-nav">
-    <a href="/dashboard.html">📊 Dashboard</a>
-    <a href="/leads-real.html">👥 Leads</a>
-    <a href="/pipeline.html">🎯 Pipeline</a>
-    <a href="/automacoes.html">⚙️ Automações</a>
-    <a href="/gamificacao.html" class="active">🎮 Gamificação</a>
-    <a href="/relatorios.html">📈 Relatórios</a>
-    <a href="/configuracoes.html">⚙️ Configurações</a>
-  </aside>
-  
-  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
-    <h1 class="text-3xl font-bold text-gray-900">🎮 Gamificação</h1>
-    
-    <section id="user-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4"></section>
-    
-    <section id="level-progress"></section>
-    
-    <section>
-      <h2 class="text-2xl font-bold mb-4">🏆 Conquistas</h2>
-      <div id="badges-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-    </section>
-    
-    <section>
-      <h2 class="text-2xl font-bold mb-4">📊 Histórico de Pontos</h2>
-      <div id="points-history" class="space-y-2"></div>
-    </section>
-  </main>
-  
-  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
-  </footer>
-  
-  <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/public/js/gamificacao.js"></script>
-</body>
-</html>
