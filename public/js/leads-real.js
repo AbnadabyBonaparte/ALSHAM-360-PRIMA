@@ -1,21 +1,19 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V6.0.0 ENTERPRISE SYNC
+ * ALSHAM 360° PRIMA - LEADS REAIS V6.0.2-stable
  * Sistema completo de gerenciamento de leads com IA, gamificação e Supabase Realtime.
  * Conectado ao Supabase Enterprise + Realtime Sync v2.0
  * ✅ CSP Compliance • ✅ Edge Function Score • ✅ Owner ID integrado
  * © 2025 ALSHAM Global Commerce — Desenvolvido por Abnadaby Bonaparte (Supremo X.0)
  */
-
 import { supabase } from '/src/lib/supabase.js';
-import { notify, showNotification } from '/public/js/utils/notifications.js';
-
+import { notify } from '/public/js/utils/notifications.js';
 // PATCH v6.0 — Fallback seguro Supabase
 if (!window.AlshamSupabase) {
-  console.error('❌ Supabase não encontrado. Verifique import /src/lib/supabase.js');
-  notify.error('Erro crítico ao carregar Supabase');
+  console.log('✅ Inicializando Supabase global');
+  window.AlshamSupabase = supabase;
+} else {
+  console.log('ℹ️ Supabase global já inicializado');
 }
-window.AlshamSupabase = { ...supabase };
-
 const LEADS_CONFIG = {
   statusOptions: [
     { value: "novo", label: "Novo", color: "blue", icon: "🆕", points: 5 },
@@ -48,7 +46,6 @@ const LEADS_CONFIG = {
   pagination: { defaultPerPage: 25, options: [10, 25, 50, 100] },
   realtime: { enabled: true, refreshInterval: 30000 }
 };
-
 let leadsState = {
   user: null,
   orgId: null,
@@ -66,7 +63,6 @@ let leadsState = {
   charts: {},
   chartPeriod: 7
 };
-
 // ============================================
 // CRIAR NOVO LEAD
 // ============================================
@@ -82,10 +78,10 @@ window.openNewLeadModal = function() {
           <h2 class="text-2xl font-bold text-gray-900">Novo Lead</h2>
           <button id="close-new-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
         </div>
-    
+  
         <div class="overflow-y-auto p-6">
           <form id="new-lead-form" class="space-y-4">
-        
+      
             <!-- Nome (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -100,7 +96,7 @@ window.openNewLeadModal = function() {
               >
               <p class="text-xs text-gray-500 mt-1">Mínimo 3 caracteres</p>
             </div>
-        
+      
             <!-- Email (obrigatório) -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -114,7 +110,7 @@ window.openNewLeadModal = function() {
                 placeholder="exemplo@empresa.com.br"
               >
             </div>
-        
+      
             <!-- Telefone -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
@@ -126,7 +122,7 @@ window.openNewLeadModal = function() {
                 maxlength="15"
               >
             </div>
-        
+      
             <!-- Grid: Empresa + Cargo -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -138,7 +134,7 @@ window.openNewLeadModal = function() {
                   placeholder="Nome da empresa"
                 >
               </div>
-          
+        
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
                 <input
@@ -149,7 +145,7 @@ window.openNewLeadModal = function() {
                 >
               </div>
             </div>
-        
+      
             <!-- Grid: Status + Origem -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -164,7 +160,7 @@ window.openNewLeadModal = function() {
                   }
                 </select>
               </div>
-          
+        
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
                 <select
@@ -179,7 +175,7 @@ window.openNewLeadModal = function() {
                 </select>
               </div>
             </div>
-        
+      
             <!-- Observações -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
@@ -190,7 +186,7 @@ window.openNewLeadModal = function() {
                 placeholder="Informações adicionais sobre o lead..."
               ></textarea>
             </div>
-        
+      
             <!-- Botões -->
             <div class="flex gap-3 pt-4 border-t border-gray-200">
               <button
@@ -207,7 +203,7 @@ window.openNewLeadModal = function() {
                 Cancelar
               </button>
             </div>
-        
+      
           </form>
         </div>
       </div>
@@ -317,7 +313,7 @@ function showError(m) {
   document.body.appendChild(div);
   setTimeout(() => div.classList.add('hidden'), 3000);
   try { navigator.vibrate?.(30); } catch {}
-  try { new Audio('/assets/sounds/error/error.mp3').play(); } catch {}
+  playSoundSafe('/assets/sounds/error/error.mp3');
 }
 function showSuccess(m) {
   const div = document.createElement("div");
@@ -326,19 +322,14 @@ function showSuccess(m) {
   document.body.appendChild(div);
   setTimeout(() => div.classList.add('hidden'), 3000);
   try { navigator.vibrate?.(30); } catch {}
-  try { new Audio('/assets/sounds/success/success.mp3').play(); } catch {}
+  playSoundSafe('/assets/sounds/success/success.mp3');
 }
-// PATCH v6.0.1-hotfix: Som condicional por tipo
-function showNotification(m, t = "info") {
-  const colors = { success: "bg-green-600", error: "bg-red-600", warning: "bg-yellow-600", info: "bg-blue-600" };
-  const div = document.createElement("div");
-  div.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded text-white ${colors[t]} shadow-lg`;
-  div.textContent = m;
-  document.body.appendChild(div);
-  setTimeout(() => div.classList.add('hidden'), 3000);
-  try { navigator.vibrate?.(30); } catch {}
-  if(t==='success') try { new Audio('/assets/sounds/success/success.mp3').play(); } catch {}
-  else if(t==='error') try { new Audio('/assets/sounds/error/error.mp3').play(); } catch {}
+function playSoundSafe(src) {
+  try {
+    const audio = new Audio(src);
+    audio.volume = 0.6;
+    audio.play().catch(()=>{});
+  } catch {}
 }
 function showLoading(show, msg = "Carregando...") {
   let el = document.getElementById("leads-loading");
@@ -359,6 +350,14 @@ function showLoading(show, msg = "Carregando...") {
   } else {
     if (el) el.classList.add("hidden");
   }
+}
+// Função debounce para otimizar filtros
+function debounce(func, delay) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), delay);
+  };
 }
 waitForSupabase(() => {
   const { getCurrentSession, getCurrentOrgId, genericSelect, genericInsert, subscribeToTable } = window.AlshamSupabase;
@@ -496,23 +495,23 @@ waitForSupabase(() => {
       <option value="">Todas Origens</option>
       ${LEADS_CONFIG.origemOptions.map(o => `<option value="${o}">${o}</option>`).join('')}
     `;
-    origemSelect.addEventListener('change', e => {
-      leadsState.filters.origem = e.target.value;
-      applyFilters();
-      renderTable();
-    });
     container.querySelector('div.flex').appendChild(origemSelect);
-    document.getElementById("filter-search").addEventListener("input", e => {
-      leadsState.filters.search = e.target.value;
+    const applyAndRender = debounce(() => {
       applyFilters();
       renderTable();
       renderCharts();
+    }, 300);
+    document.getElementById("filter-search").addEventListener("input", e => {
+      leadsState.filters.search = e.target.value;
+      applyAndRender();
     });
     document.getElementById("filter-status").addEventListener("change", e => {
       leadsState.filters.status = e.target.value;
-      applyFilters();
-      renderTable();
-      renderCharts();
+      applyAndRender();
+    });
+    origemSelect.addEventListener('change', e => {
+      leadsState.filters.origem = e.target.value;
+      applyAndRender();
     });
   }
   function setupPeriodButtons() {
@@ -807,10 +806,9 @@ window.openEditLeadModal = function(leadId) {
         <h2 class="text-2xl font-bold text-gray-900">Editar Lead</h2>
         <button id="close-edit-lead-modal" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors">&times;</button>
       </div>
- 
       <div class="overflow-y-auto p-6">
         <form id="edit-lead-form" class="space-y-4">
-     
+   
           <!-- Nome -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -824,7 +822,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>
-     
+   
           <!-- Email -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
@@ -838,7 +836,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>
-     
+   
           <!-- Telefone -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Telefone</label>
@@ -850,7 +848,7 @@ window.openEditLeadModal = function(leadId) {
               maxlength="15"
             >
           </div>
-     
+   
           <!-- Grid: Empresa + Cargo -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -862,7 +860,7 @@ window.openEditLeadModal = function(leadId) {
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
             </div>
-       
+     
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Cargo</label>
               <input
@@ -873,7 +871,7 @@ window.openEditLeadModal = function(leadId) {
               >
             </div>
           </div>
-     
+   
           <!-- Grid: Status + Origem -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -890,7 +888,7 @@ window.openEditLeadModal = function(leadId) {
                 }
               </select>
             </div>
-       
+     
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Origem</label>
               <select
@@ -907,7 +905,7 @@ window.openEditLeadModal = function(leadId) {
               </select>
             </div>
           </div>
-     
+   
           <!-- Observações -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Observações</label>
@@ -917,7 +915,7 @@ window.openEditLeadModal = function(leadId) {
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             >${lead.observacoes || ''}</textarea>
           </div>
-     
+   
           <!-- Botões -->
           <div class="flex gap-3 pt-4 border-t border-gray-200">
             <button
@@ -934,7 +932,7 @@ window.openEditLeadModal = function(leadId) {
               Cancelar
             </button>
           </div>
-     
+   
         </form>
       </div>
     </div>
@@ -976,7 +974,6 @@ window.updateLead = async function(leadId) {
   const status = document.getElementById("edit-lead-status").value;
   const origem = document.getElementById("edit-lead-origem").value;
   const observacoes = document.getElementById("edit-lead-observacoes").value.trim();
-  
   // Validações
   if (nome.length < 3) {
     notify.error("Nome deve ter pelo menos 3 caracteres");
@@ -986,10 +983,9 @@ window.updateLead = async function(leadId) {
     notify.error("Email inválido");
     return;
   }
-  
   try {
     showLoading(true, "Atualizando lead...");
-    
+  
     const updateData = {
       nome,
       email,
@@ -1001,25 +997,17 @@ window.updateLead = async function(leadId) {
       observacoes: observacoes || null
     };
     updateData.updated_at = new Date().toISOString();
-    
-    console.log("🔍 Lead ID:", leadId);
-    console.log("🔍 Update Data:", updateData);
-    
+  
     const { data, error } = await window.AlshamSupabase.genericUpdate(
       "leads_crm",
       { id: leadId },
       updateData
     );
-    
-    console.log("🔍 Response data:", data);
-    console.log("🔍 Response error:", error);
-    
+  
     if (error) throw error;
-
     showLoading(false);
     notify.success("Lead atualizado com sucesso!");
-    try { navigator.vibrate?.(30); new Audio('/assets/sounds/success/success.mp3').play(); } catch {}
-
+    try { navigator.vibrate?.(30); playSoundSafe('/assets/sounds/success/success.mp3'); } catch {}
 // ✅ ATUALIZAR O ESTADO LOCAL IMEDIATAMENTE (sem esperar reload)
 const leadIndex = window.LeadsSystem.state.all.findIndex(l => l.id === leadId);
 if (leadIndex !== -1) {
@@ -1029,16 +1017,13 @@ if (leadIndex !== -1) {
     updated_at: new Date().toISOString()
   };
 }
-
 document.getElementById("edit-lead-modal").remove();
 const detailModal = document.getElementById("lead-modal");
 if (detailModal) detailModal.remove();
-
 // Aplicar filtros e renderizar com dados já atualizados
 window.LeadsSystem.state.filtered = window.LeadsSystem.state.all;
 applyFilters();
 renderTable();
-
 // Reload em background (opcional, para garantir sincronização)
 setTimeout(async () => {
   if (typeof window.loadSystemData === 'function') {
@@ -1198,7 +1183,7 @@ window.deleteLead = async function(leadId) {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY
         },
         body: JSON.stringify({ leadId })
       });
@@ -1226,7 +1211,7 @@ window.deleteLead = async function(leadId) {
   async function setupRealtime() {
     if (!LEADS_CONFIG.realtime.enabled) return;
     if (window.leadsChannel) window.leadsChannel.unsubscribe();
-    window.leadsChannel = supabase
+    window.leadsChannel = window.AlshamSupabase
       .channel('leads_crm')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads_crm' }, async () => {
         console.log('🔁 Atualização realtime recebida');
@@ -1242,10 +1227,9 @@ window.deleteLead = async function(leadId) {
     state: leadsState,
     config: LEADS_CONFIG
   };
-  console.log("✅ Leads-Real.js v6.0.0 carregado com sucesso");
+  console.log("✅ Leads-Real.js v6.0.2-stable carregado com sucesso");
 });
-
-console.log('📇 Leads v6.0.0 ENTERPRISE SYNC carregado com sucesso');
-console.log('%c✅ ALSHAM 360° PRIMA — LEADS v6.0.0 ENTERPRISE SYNC Validado', 'color:#22c55e;font-weight:bold;');
+console.log('📇 Leads v6.0.2-stable ENTERPRISE SYNC carregado com sucesso');
+console.log('%c✅ ALSHAM 360° PRIMA — LEADS ENTERPRISE SYNC v6.0.2-STABLE [Production]', 'color:#22c55e;font-weight:bold;');
 // PATCH v6.0.1-hotfix: Refresh como arrow function para escopo seguro
-window.LeadsModule = { version: '6.0.0', refresh: () => window.loadSystemData() };
+window.LeadsModule = { version: '6.0.2-stable', refresh: () => window.loadSystemData() };
