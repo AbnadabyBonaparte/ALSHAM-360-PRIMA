@@ -6,11 +6,23 @@
   <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA - CRM Enterprise com IA" />
   <meta name="theme-color" content="#3B82F6" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+  <!-- ✅ CSP SEGURA COM NONCE -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co https://*.supabase.in; media-src 'self' data:; frame-src 'self';" />
+    content="
+      default-src 'self';
+      img-src 'self' data: https:;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      script-src 'self' 'nonce-ALSHAM360' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+      font-src 'self' https://fonts.gstatic.com data:;
+      connect-src 'self' https://*.supabase.co https://*.supabase.in;
+      media-src 'self' data:;
+      frame-src 'self';
+    " />
 
   <title>Leads — ALSHAM 360° PRIMA</title>
 
+  <!-- Meta Assets -->
   <link rel="icon" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
 
@@ -18,98 +30,50 @@
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/dark-theme.css" />
-
-  <!-- Preloads -->
-  <link rel="preload" as="script" href="/js/leads-real.js" />
-
-  <!-- External Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
-  <script src="/js/dark-mode.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     .loading-spinner {
       display: inline-block;
       width: 4rem;
       height: 4rem;
-      border: 4px solid var(--alsham-primary-light, rgba(59, 130, 246, 0.3));
-      border-top-color: var(--alsham-primary, #3B82F6);
+      border: 4px solid rgba(59,130,246,0.3);
+      border-top-color: #3B82F6;
       border-radius: 50%;
-      animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
+      animation: alsham-spin 0.6s linear infinite;
     }
+    @keyframes alsham-spin { 100% { transform: rotate(360deg); } }
     .card {
       background: var(--alsham-bg-surface);
       border-radius: var(--alsham-radius-lg);
       box-shadow: var(--alsham-shadow-md);
       padding: var(--alsham-space-6);
       border: 1px solid var(--alsham-border-default);
-      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
-    }
-    .card:hover {
-      box-shadow: var(--alsham-shadow-lg);
-      transform: translateY(-2px);
     }
     .side-nav {
-      position: fixed;
-      left: 0;
-      top: 64px;
-      width: 220px;
-      height: calc(100vh - 64px);
-      background: var(--alsham-bg-surface);
+      position: fixed; left: 0; top: 64px; width: 220px;
+      height: calc(100vh - 64px); background: var(--alsham-bg-surface);
       border-right: 1px solid var(--alsham-border-default);
-      padding: var(--alsham-space-4) 0;
-      overflow-y: auto;
-      z-index: var(--alsham-z-sticky);
+      overflow-y: auto; z-index: 40;
     }
     .side-nav a {
-      display: flex;
-      align-items: center;
-      gap: var(--alsham-space-3);
-      padding: var(--alsham-space-3) var(--alsham-space-6);
-      color: var(--alsham-text-secondary);
-      text-decoration: none;
-      font-size: var(--alsham-text-sm);
-      font-weight: var(--alsham-font-medium);
-      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+      display: flex; align-items: center; gap: .75rem;
+      padding: .75rem 1.5rem; color: var(--alsham-text-secondary);
+      text-decoration: none; font-size: 14px; transition: .2s;
     }
-    .side-nav a:hover {
-      background: var(--alsham-bg-hover);
-      color: var(--alsham-primary);
-    }
+    .side-nav a:hover { background: var(--alsham-bg-hover); color: var(--alsham-primary); }
     .side-nav a.active {
-      background: var(--alsham-primary-light);
-      color: var(--alsham-primary);
-      border-right: 3px solid var(--alsham-primary);
-      font-weight: var(--alsham-font-semibold);
+      background: var(--alsham-primary-light); color: var(--alsham-primary);
+      border-right: 3px solid var(--alsham-primary); font-weight: 600;
     }
-    .main-content-wrapper {
-      margin-left: 220px;
-    }
-    @media (max-width: 768px) {
-      .side-nav {
-        transform: translateX(-100%);
-        transition: transform var(--alsham-motion-expressive) var(--alsham-ease-expressive);
-      }
-      .side-nav.open { transform: translateX(0); }
-      .main-content-wrapper { margin-left: 0; }
-    }
-    nav {
-      background: var(--alsham-bg-surface);
-      border-bottom: 1px solid var(--alsham-border-default);
-    }
-    .chart-container {
-      position: relative;
-      height: 350px;
-      width: 100%;
-      padding: 1rem 0;
-    }
-    .chart-container canvas { max-height: 100%; }
+    nav { background: var(--alsham-bg-surface); border-bottom: 1px solid var(--alsham-border-default); }
   </style>
 </head>
 
 <body class="font-inter min-h-screen" data-theme="auto" style="background: var(--alsham-bg-canvas);">
-  <!-- Loading -->
-  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);">
+  
+  <!-- Loader -->
+  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center bg-[var(--alsham-bg-canvas)]">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
       <h2 class="text-xl font-bold text-primary mb-2">ALSHAM 360° PRIMA</h2>
@@ -118,94 +82,69 @@
   </div>
 
   <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
   <!-- Navbar -->
   <nav class="sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <div class="flex items-center gap-4">
-        <button id="menu-toggle" class="md:hidden p-2 hover:bg-hover rounded-lg transition-colors text-secondary" aria-label="Abrir menu">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">ALSHAM 360°</h1>
-      </div>
+      <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">ALSHAM 360°</h1>
       <div class="hidden md:flex items-center space-x-6">
-        <a href="/dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+        <a href="/dashboard.html" class="text-secondary hover:text-primary">Dashboard</a>
         <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Leads</a>
-        <a href="/pipeline.html" class="text-secondary hover:text-primary transition-colors">Pipeline</a>
-        <a href="/automacoes.html" class="text-secondary hover:text-primary transition-colors">Automações</a>
-        <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
-        <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
+        <a href="/pipeline.html" class="text-secondary hover:text-primary">Pipeline</a>
+        <a href="/automacoes.html" class="text-secondary hover:text-primary">Automações</a>
+        <a href="/gamificacao.html" class="text-secondary hover:text-primary">Gamificação</a>
+        <a href="/relatorios.html" class="text-secondary hover:text-primary">Relatórios</a>
       </div>
-      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
         <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            d="M20.354 15.354A9 9 0 018.646 3.646A9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       </button>
-    </div>
-    <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
-      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover text-secondary">Dashboard</a>
-      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Leads</a>
-      <a href="/pipeline.html" class="block px-4 py-3 hover:bg-hover text-secondary">Pipeline</a>
-      <a href="/automacoes.html" class="block px-4 py-3 hover:bg-hover text-secondary">Automações</a>
-      <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-hover text-secondary">Gamificação</a>
-      <a href="/relatorios.html" class="block px-4 py-3 hover:bg-hover text-secondary">Relatórios</a>
     </div>
   </nav>
 
   <!-- Sidebar -->
   <aside class="side-nav" id="sidebar">
-    <a href="/dashboard.html"><span>📊</span> Dashboard</a>
-    <a href="/leads-real.html" class="active" aria-current="page"><span>👥</span> Leads</a>
-    <a href="/pipeline.html"><span>🎯</span> Pipeline</a>
-    <a href="/automacoes.html"><span>⚙️</span> Automações</a>
-    <a href="/gamificacao.html"><span>🎮</span> Gamificação</a>
-    <a href="/relatorios.html"><span>📈</span> Relatórios</a>
-    <a href="/configuracoes.html"><span>⚙️</span> Configurações</a>
+    <a href="/dashboard.html">📊 Dashboard</a>
+    <a href="/leads-real.html" class="active">👥 Leads</a>
+    <a href="/pipeline.html">🎯 Pipeline</a>
+    <a href="/automacoes.html">⚙️ Automações</a>
+    <a href="/gamificacao.html">🎮 Gamificação</a>
+    <a href="/relatorios.html">📈 Relatórios</a>
+    <a href="/configuracoes.html">⚙️ Configurações</a>
   </aside>
 
-  <!-- Main -->
+  <!-- Conteúdo -->
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold text-primary mb-2">Leads</h1>
-      <p class="text-secondary">Gerencie seus leads com eficiência</p>
-    </header>
+    <h1 class="text-3xl font-bold text-primary mb-4">Leads</h1>
+    <p class="text-secondary mb-8">Gerencie seus leads com eficiência.</p>
 
     <div id="leads-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
 
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição por Status</h3>
-        <div class="chart-container">
-          <canvas id="leads-status-chart"></canvas>
-        </div>
+        <div class="chart-container"><canvas id="leads-status-chart"></canvas></div>
       </div>
       <div class="card">
-        <h3 class="text-lg font-semibold mb-4 text-primary">
-          Novos Leads (Últimos <span id="current-period">7</span> dias)
-        </h3>
-        <div class="chart-container">
-          <canvas id="leads-daily-chart"></canvas>
-        </div>
+        <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos 7 dias)</h3>
+        <div class="chart-container"><canvas id="leads-daily-chart"></canvas></div>
       </div>
     </section>
 
-    <div class="mb-6">
+    <div>
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold text-primary">Lista de Leads</h3>
-        <button onclick="window.openNewLeadModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">+ Novo Lead</button>
+        <button onclick="window.openNewLeadModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition">+ Novo Lead</button>
       </div>
-
       <div id="leads-filters" class="mb-4"></div>
       <div id="leads-table"></div>
-
       <div class="flex justify-between mt-4">
         <button id="prev-page" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm font-medium disabled:opacity-50">Anterior</button>
         <span class="text-sm text-gray-600">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
@@ -214,11 +153,14 @@
     </div>
   </main>
 
-  <!-- Main Script -->
-  <script type="module" src="/js/leads-real.js"></script>
+  <!-- Scripts principais (✅ corrigidos) -->
+  <script nonce="ALSHAM360" type="module" src="/js/supabase.js"></script>
+  <script nonce="ALSHAM360" type="module" src="/js/notifications.js"></script>
+  <script nonce="ALSHAM360" type="module" src="/js/dark-mode.js"></script>
+  <script nonce="ALSHAM360" type="module" src="/js/leads-real.js"></script>
 
-  <!-- PWA Registration -->
-  <script>
+  <!-- PWA Registration (✅ com nonce) -->
+  <script nonce="ALSHAM360">
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then(() => console.log('🧭 PWA ativo: ALSHAM 360° PRIMA'))
@@ -227,8 +169,8 @@
   </script>
 
   <!-- Log -->
-  <script>
-    console.log('%c⚡ ALSHAM 360° PRIMA — Leads v6.0.2-stable [Production]', 'color:#3B82F6;font-weight:bold;');
+  <script nonce="ALSHAM360">
+    console.log('%c⚡ ALSHAM 360° PRIMA — Leads v6.0.3-secure', 'color:#3B82F6;font-weight:bold;');
   </script>
 </body>
 </html>
