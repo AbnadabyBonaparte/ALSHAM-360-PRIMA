@@ -3,81 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Automações — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema de Automações do ALSHAM 360° PRIMA" />
-  
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-  <!-- Opcional: Inter font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  
-  <style id="dark-theme-critical">
-    :root {
-      --alsham-text-primary: #111827;
-      --alsham-text-secondary: #6b7280;
-      --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #f9fafb;
-      --alsham-bg-surface: #ffffff;
-      --alsham-bg-hover: #f3f4f6;
-      --alsham-border-default: #e5e7eb;
-      --alsham-border-light: #f3f4f6;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
-      --alsham-primary: #3B82F6;
-      --alsham-primary-light: rgba(59,130,246,0.1);
-    }
-    html.dark {
-      --alsham-text-primary: #f9fafb;
-      --alsham-text-secondary: #d1d5db;
-      --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #0f172a;
-      --alsham-bg-surface: #1e293b;
-      --alsham-bg-hover: #334155;
-      --alsham-border-default: #334155;
-      --alsham-border-light: #475569;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
-      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
-      color-scheme: dark;
-    }
-  </style>
+  <meta name="theme-color" content="#3B82F6" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co https://*.supabase.in; media-src 'self' data:; frame-src 'self';" />
 
-  <script>
-  (function() {
-    'use strict';
-    const savedTheme = localStorage.getItem('alsham-theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.contains('dark');
-      if (isDark) {
-        html.classList.remove('dark');
-        html.removeAttribute('data-theme');
-        localStorage.setItem('alsham-theme', 'light');
-      } else {
-        html.classList.add('dark');
-        html.setAttribute('data-theme', 'dark');
-        localStorage.setItem('alsham-theme', 'dark');
-      }
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      const themeToggle = document.getElementById('theme-toggle');
-      if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-      }
-    });
-  })();
-  </script>
-  
+  <title>Automações — ALSHAM 360° PRIMA</title>
+
+  <!-- Styles -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/dark-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Preloads -->
+  <link rel="preload" as="script" href="/js/automacoes.js" />
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="/js/dark-mode.js" defer></script>
+
   <style>
     body {
       background: var(--alsham-bg-canvas);
       color: var(--alsham-text-primary);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', sans-serif;
+    }
+    nav {
+      background: var(--alsham-bg-surface);
+      border-bottom: 1px solid var(--alsham-border-default);
     }
     .side-nav {
       position: fixed;
@@ -88,33 +45,44 @@
       background: var(--alsham-bg-surface);
       border-right: 1px solid var(--alsham-border-default);
       padding: 20px 0;
-      z-index: 30;
       overflow-y: auto;
+      z-index: var(--alsham-z-sticky);
     }
     .side-nav a {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       padding: 12px 24px;
       color: var(--alsham-text-secondary);
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
       font-size: 14px;
+      font-weight: 500;
     }
     .side-nav a:hover {
       background: var(--alsham-bg-hover);
-      color: #3b82f6;
+      color: var(--alsham-primary);
     }
     .side-nav a.active {
       background: var(--alsham-primary-light);
-      color: #3b82f6;
-      border-right: 3px solid #3b82f6;
+      color: var(--alsham-primary);
+      border-right: 3px solid var(--alsham-primary);
       font-weight: 600;
     }
     .main-content-wrapper {
       margin-left: 220px;
     }
-    nav {
+    .card {
       background: var(--alsham-bg-surface);
-      border-bottom: 1px solid var(--alsham-border-default);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-lg);
+      box-shadow: var(--alsham-shadow-md);
+      padding: var(--alsham-space-6);
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+    .card:hover {
+      box-shadow: var(--alsham-shadow-lg);
+      transform: translateY(-2px);
     }
     .theme-toggle-btn {
       width: 2.5rem;
@@ -126,11 +94,11 @@
       background: var(--alsham-bg-hover);
       border: 1px solid var(--alsham-border-default);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
     .theme-toggle-btn:hover {
       background: var(--alsham-primary-light);
-      border-color: #3b82f6;
+      border-color: var(--alsham-primary);
       transform: scale(1.05);
     }
     .theme-toggle-btn svg {
@@ -142,31 +110,43 @@
     html.dark .sun-icon { display: none; }
   </style>
 </head>
-<body class="font-inter min-h-screen">
-  
-  <nav class="sticky top-0 z-40">
+
+<body class="font-inter min-h-screen" data-theme="auto">
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
+      <div class="flex items-center gap-4">
+        <button id="menu-toggle" class="md:hidden p-2 hover:bg-hover rounded-lg transition-colors text-secondary" aria-label="Abrir menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">ALSHAM 360°</h1>
+      </div>
       <div class="hidden md:flex items-center space-x-6">
-        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
-        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
-        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
+        <a href="/dashboard.html" class="text-secondary hover:text-primary">Dashboard</a>
+        <a href="/leads-real.html" class="text-secondary hover:text-primary">Leads</a>
+        <a href="/pipeline.html" class="text-secondary hover:text-primary">Pipeline</a>
         <a href="/automacoes.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Automações</a>
-        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
-        <a href="/relatorios.html" class="text-gray-600 hover:text-gray-900">Relatórios</a>
+        <a href="/gamificacao.html" class="text-secondary hover:text-primary">Gamificação</a>
+        <a href="/relatorios.html" class="text-secondary hover:text-primary">Relatórios</a>
       </div>
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
         <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
         </svg>
       </button>
     </div>
   </nav>
-  
-  <aside class="side-nav">
+
+  <!-- Sidebar -->
+  <aside class="side-nav" id="sidebar">
     <a href="/dashboard.html">📊 Dashboard</a>
     <a href="/leads-real.html">👥 Leads</a>
     <a href="/pipeline.html">🎯 Pipeline</a>
@@ -175,33 +155,48 @@
     <a href="/relatorios.html">📈 Relatórios</a>
     <a href="/configuracoes.html">⚙️ Configurações</a>
   </aside>
-  
-  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
-    <h1 class="text-3xl font-bold" style="color: var(--alsham-text-primary);">🤖 Automações</h1>
-    
+
+  <!-- Main -->
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-10">
+    <header>
+      <h1 class="text-3xl font-bold text-primary mb-2">🤖 Automações</h1>
+      <p class="text-secondary">Gerencie suas regras, execuções e logs inteligentes</p>
+    </header>
+
     <section id="automation-kpis"></section>
-    
+
     <section>
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Regras de Automação</h2>
+      <h2 class="text-2xl font-semibold mb-4 text-primary">Regras de Automação</h2>
       <div id="automation-rules" class="space-y-3"></div>
     </section>
-    
+
     <section>
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Execuções Recentes</h2>
-      <div id="automation-executions" class="p-4 rounded-lg" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);"></div>
+      <h2 class="text-2xl font-semibold mb-4 text-primary">Execuções Recentes</h2>
+      <div id="automation-executions" class="card"></div>
     </section>
-    
+
     <section>
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Logs do Sistema</h2>
-      <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-xs"></div>
+      <h2 class="text-2xl font-semibold mb-4 text-primary">Logs do Sistema</h2>
+      <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-xs shadow-inner"></div>
     </section>
   </main>
-  
-  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm" style="color: var(--alsham-text-tertiary);">
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-tertiary">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-  
-  <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/public/js/automacoes.js"></script>
+
+  <!-- Main Script -->
+  <script type="module" src="/js/automacoes.js"></script>
+
+  <!-- PWA + Log -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('🧭 PWA ativo: ALSHAM 360° PRIMA'))
+        .catch(err => console.warn('SW error', err));
+    }
+    console.log('%c⚡ ALSHAM 360° PRIMA — Automações v6.0.0-stable [Production]', 'color:#3B82F6;font-weight:bold;');
+  </script>
 </body>
 </html>
