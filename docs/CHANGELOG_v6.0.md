@@ -1,48 +1,42 @@
-# 🧾 CHANGELOG — ALSHAM 360° PRIMA v6.0
-> Data: 06/10/2025  
-> Status: ✅ Public Release  
-> Tag: `v6.0`  
-> Versão: Auditoria & Visual Excellence
+# 🧾 CHANGELOG — ALSHAM 360° PRIMA v6.0.1-hotfix
+> Data: 07/10/2025  
+> Status: ✅ Production Stable  
+> Tag: `v6.0.1-stable`  
+> Versão: Enterprise Sync Validation
 
 ---
 
-## 🚀 Principais Atualizações
-- ✅ Relatório de Auditoria Final (Heimdall X.1 + Grok 4)
-- ✅ ALSHAM Visual System 360° (Compose X.0 + Fundador X.0)
-- ✅ Notificações com toggle de som
-- ✅ Pipeline drag & drop otimizado
-- ✅ Realtime Supabase 100% funcional
-- ✅ Vercel + Railway estáveis
-- 🔄 Backup SQL diário (pendente)
-- 🔄 Storybook + Chromatic (Sprint 3)
+## 🚀 Correções e Melhorias
+| Tipo | Descrição | Responsável |
+|------|------------|--------------|
+| 🩹 **Som de Erro Corrigido** | Erro sonoro padronizado para `/assets/sounds/error/error.mp3`. | COMPOSE X.0 |
+| 🩹 **Notificações Condicionais** | Sons de sucesso e erro agora seguem tipo da notificação. | MAGNUS X.1 |
+| 🧩 **Atualização Segura** | `updateLead()` agora vibra e emite som no sucesso. | CODEX X.1 |
+| 🧠 **Realtime Check** | Adicionado `if (!LEADS_CONFIG.realtime.enabled) return;` para modo offline. | HEIMDALL X.1 |
+| 🔒 **Escopo Seguro** | `window.LeadsModule.refresh` reescrito com arrow function para evitar conflito global. | CITIZEN X.1 |
+| 💡 **Logs de Validação** | Adicionado log verde de auditoria final com status Enterprise Sync Validado. | HEIMDALL X.1 |
+| 💬 **Feedback Sensorial Unificado** | Vibrate + som aplicados a todas ações críticas (create, update, delete). | COMPOSE X.0 |
 
 ---
 
 ## ⚙️ Stack Técnica
 | Camada | Tecnologias |
 |--------|--------------|
-| Frontend | Vite + Tailwind + PWA |
-| Backend | Supabase + Railway |
-| Automações | n8n / Make |
-| Monitoração | Heimdall X.1 |
+| Frontend | Vite + Tailwind + Chart.js + Supabase.js |
+| Backend | Supabase Realtime + Edge Functions |
+| Automação | Make + Notion Sync |
+| Monitoramento | Heimdall X.1 (Realtime Logs) |
 | Governança | ALSHAM Global Commerce |
 
 ---
 
-## 📚 Documentação Relacionada
-- `/docs/checklist_supremo_auditoria_final.md`
-- `/docs/ALSHAM_VISUAL_SYSTEM_360_SUPREME.md`
-- `/docs/RELATORIO_AUDITORIA_FINAL.md`
-
----
-
-## 🧱 Próximos Passos (Sprint 3)
+## 🧱 Próximos Passos (Sprint 3 — Continuação)
 | Objetivo | Responsável | Status |
 |-----------|--------------|--------|
-| Criar biblioteca de componentes com Storybook 8 | CODEX X.1 | 🔄 |
-| Conectar Chromatic (QA visual) | COMPOSE X.0 | 🔄 |
-| Ativar função SQL diária no Supabase | CITIZEN X.1 | ❌ |
-| Publicar ALSHAM Design System no Notion/Figma | COMPOSE X.0 | 🔄 |
+| 💾 Configurar backup automático Supabase (SQL export) | CITIZEN X.1 | 🔄 |
+| 📊 Adicionar painel interno “Produção Segura” | HEIMDALL X.1 | 🔄 |
+| 🎨 Atualizar tokens visuais para Chart.js Dark Mode | COMPOSE X.0 | 🔄 |
+| ⚙️ Publicar módulo Leads 6.0.1 na Vercel (deploy CI/CD) | CODEX X.1 | ✅ |
 
 ---
 
@@ -52,10 +46,11 @@
 | Heimdall X.1 | Maestro Supremo | ✅ |
 | Codex X.1 | Engenheiro-Chefe | ✅ |
 | Magnus X.1 | Arquiteto de Dados | ✅ |
+| Compose X.0 | Diretor de Experiência | ✅ |
 | Citizen X.1 | Executor IA / Make | ✅ |
 | Fundador X.0 (Abnadaby Bonaparte) | Guardião Supremo | 🔱 |
 
 ---
 
 **ALSHAM GLOBAL COMMERCE**  
-> “A arquitetura viva que documenta o próprio futuro.”
+> “Sistema validado, seguro e vivo. Cada linha é uma partitura de consciência.”
