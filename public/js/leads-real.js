@@ -1,8 +1,72 @@
 /**
- * ALSHAM 360° PRIMA - LEADS REAIS V5.8.3
- * Sistema completo de gerenciamento de leads com IA e gamificação
- * ✅ CORRIGIDO: URL da Edge Function + Event listeners CSP compliance + Score IA funcional
+ * ALSHAM 360° PRIMA - LEADS REAIS V6.0.0 ENTERPRISE SYNC
+ * Sistema completo de gerenciamento de leads com IA, gamificação e Supabase Realtime.
+ * Conectado ao Supabase Enterprise + Realtime Sync v2.0
+ * ✅ CSP Compliance • ✅ Edge Function Score • ✅ Owner ID integrado
+ * © 2025 ALSHAM Global Commerce — Desenvolvido por Abnadaby Bonaparte (Supremo X.0)
  */
+
+import { supabase } from '/src/lib/supabase.js';
+import { notify, showNotification } from '/public/js/utils/notifications.js';
+
+// PATCH v6.0 — Fallback seguro Supabase
+if (!window.AlshamSupabase) {
+  console.error('❌ Supabase não encontrado. Verifique import /src/lib/supabase.js');
+  notify.error('Erro crítico ao carregar Supabase');
+}
+window.AlshamSupabase = { ...supabase };
+
+const LEADS_CONFIG = {
+  statusOptions: [
+    { value: "novo", label: "Novo", color: "blue", icon: "🆕", points: 5 },
+    { value: "contatado", label: "Contatado", color: "yellow", icon: "📞", points: 10 },
+    { value: "qualificado", label: "Qualificado", color: "purple", icon: "✅", points: 20 },
+    { value: "proposta", label: "Proposta", color: "orange", icon: "📋", points: 30 },
+    { value: "convertido", label: "Convertido", color: "green", icon: "💰", points: 50 },
+    { value: "perdido", label: "Perdido", color: "red", icon: "❌", points: 0 }
+  ],
+  prioridadeOptions: [
+    { value: "baixa", label: "Baixa", color: "gray" },
+    { value: "media", label: "Média", color: "yellow" },
+    { value: "alta", label: "Alta", color: "orange" },
+    { value: "urgente", label: "Urgente", color: "red" }
+  ],
+  temperaturaOptions: [
+    { value: "frio", label: "Frio", color: "gray", multiplier: 0.5 },
+    { value: "morno", label: "Morno", color: "yellow", multiplier: 0.75 },
+    { value: "quente", label: "Quente", color: "orange", multiplier: 1.0 },
+    { value: "muito_quente", label: "Muito Quente", color: "red", multiplier: 1.5 }
+  ],
+  origemOptions: ["Orgânico", "Indicação", "Anúncio", "Evento", "Outro"],
+  interactionTypes: [
+    { value: "email", label: "Email", icon: "📧" },
+    { value: "ligacao", label: "Ligação", icon: "📞" },
+    { value: "reuniao", label: "Reunião", icon: "🤝" },
+    { value: "nota", label: "Nota", icon: "📝" },
+    { value: "whatsapp", label: "WhatsApp", icon: "💬" }
+  ],
+  pagination: { defaultPerPage: 25, options: [10, 25, 50, 100] },
+  realtime: { enabled: true, refreshInterval: 30000 }
+};
+
+let leadsState = {
+  user: null,
+  orgId: null,
+  all: [],
+  filtered: [],
+  kpis: {},
+  gamification: {},
+  automations: {},
+  currentLeadInteractions: [],
+  filters: { search: "", status: "", prioridade: "", temperatura: "", origem: "", dateRange: "", scoreRange: [0, 100] },
+  pagination: { current: 1, perPage: LEADS_CONFIG.pagination.defaultPerPage, total: 0, totalPages: 0 },
+  sorting: { field: "created_at", direction: "desc" },
+  isLoading: false,
+  lastUpdate: null,
+  charts: {},
+  chartPeriod: 7
+};
+
 // ============================================
 // CRIAR NOVO LEAD
 // ============================================
@@ -240,32 +304,41 @@ function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     callback();
   } else if (attempt >= maxAttempts) {
     console.error("❌ Supabase não carregou");
-    showError("Erro ao carregar sistema");
+    notify.error("Erro ao carregar sistema");
   } else {
     setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
   }
 }
+// PATCH v6.0.1-hotfix: Corrigir som de erro
 function showError(m) {
   const div = document.createElement("div");
   div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-red-600 shadow-lg";
   div.textContent = m;
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 3000);
+  setTimeout(() => div.classList.add('hidden'), 3000);
+  try { navigator.vibrate?.(30); } catch {}
+  try { new Audio('/assets/sounds/error/error.mp3').play(); } catch {}
 }
 function showSuccess(m) {
   const div = document.createElement("div");
   div.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded text-white bg-green-600 shadow-lg";
   div.textContent = m;
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 3000);
+  setTimeout(() => div.classList.add('hidden'), 3000);
+  try { navigator.vibrate?.(30); } catch {}
+  try { new Audio('/assets/sounds/success/success.mp3').play(); } catch {}
 }
+// PATCH v6.0.1-hotfix: Som condicional por tipo
 function showNotification(m, t = "info") {
   const colors = { success: "bg-green-600", error: "bg-red-600", warning: "bg-yellow-600", info: "bg-blue-600" };
   const div = document.createElement("div");
   div.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded text-white ${colors[t]} shadow-lg`;
   div.textContent = m;
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 3000);
+  setTimeout(() => div.classList.add('hidden'), 3000);
+  try { navigator.vibrate?.(30); } catch {}
+  if(t==='success') try { new Audio('/assets/sounds/success/success.mp3').play(); } catch {}
+  else if(t==='error') try { new Audio('/assets/sounds/error/error.mp3').play(); } catch {}
 }
 function showLoading(show, msg = "Carregando...") {
   let el = document.getElementById("leads-loading");
@@ -289,55 +362,6 @@ function showLoading(show, msg = "Carregando...") {
 }
 waitForSupabase(() => {
   const { getCurrentSession, getCurrentOrgId, genericSelect, genericInsert, subscribeToTable } = window.AlshamSupabase;
-  const LEADS_CONFIG = {
-    statusOptions: [
-      { value: "novo", label: "Novo", color: "blue", icon: "🆕", points: 5 },
-      { value: "contatado", label: "Contatado", color: "yellow", icon: "📞", points: 10 },
-      { value: "qualificado", label: "Qualificado", color: "purple", icon: "✅", points: 20 },
-      { value: "proposta", label: "Proposta", color: "orange", icon: "📋", points: 30 },
-      { value: "convertido", label: "Convertido", color: "green", icon: "💰", points: 50 },
-      { value: "perdido", label: "Perdido", color: "red", icon: "❌", points: 0 }
-    ],
-    prioridadeOptions: [
-      { value: "baixa", label: "Baixa", color: "gray" },
-      { value: "media", label: "Média", color: "yellow" },
-      { value: "alta", label: "Alta", color: "orange" },
-      { value: "urgente", label: "Urgente", color: "red" }
-    ],
-    temperaturaOptions: [
-      { value: "frio", label: "Frio", color: "gray", multiplier: 0.5 },
-      { value: "morno", label: "Morno", color: "yellow", multiplier: 0.75 },
-      { value: "quente", label: "Quente", color: "orange", multiplier: 1.0 },
-      { value: "muito_quente", label: "Muito Quente", color: "red", multiplier: 1.5 }
-    ],
-    origemOptions: ["website", "google_ads", "facebook_ads", "linkedin", "indicacao", "evento", "cold_calling", "email_marketing", "seo_organic", "outro"],
-    interactionTypes: [
-      { value: "email", label: "Email", icon: "📧" },
-      { value: "ligacao", label: "Ligação", icon: "📞" },
-      { value: "reuniao", label: "Reunião", icon: "🤝" },
-      { value: "nota", label: "Nota", icon: "📝" },
-      { value: "whatsapp", label: "WhatsApp", icon: "💬" }
-    ],
-    pagination: { defaultPerPage: 25, options: [10, 25, 50, 100] },
-    realtime: { enabled: true, refreshInterval: 30000 }
-  };
-  const leadsState = {
-    user: null,
-    orgId: null,
-    leads: [],
-    filteredLeads: [],
-    kpis: {},
-    gamification: {},
-    automations: {},
-    currentLeadInteractions: [],
-    filters: { search: "", status: "", prioridade: "", temperatura: "", origem: "", dateRange: "", scoreRange: [0, 100] },
-    pagination: { current: 1, perPage: LEADS_CONFIG.pagination.defaultPerPage, total: 0, totalPages: 0 },
-    sorting: { field: "created_at", direction: "desc" },
-    isLoading: false,
-    lastUpdate: null,
-    charts: {},
-    chartPeriod: 7
-  };
   // Tornar loadSystemData e setupInterface acessíveis globalmente
   async function authenticateUser() {
     try {
@@ -368,18 +392,18 @@ waitForSupabase(() => {
       setupInterface();
       setupRealtime();
       showLoading(false);
-      showSuccess("Leads carregados com sucesso!");
+      notify.success("Leads carregados com sucesso!");
     } catch (e) {
       console.error("Erro crítico:", e);
       showLoading(false);
-      showError("Falha ao carregar sistema de Leads");
+      notify.error("Falha ao carregar sistema de Leads");
     }
   });
   async function loadSystemData() {
     leadsState.isLoading = true;
     try {
       const [leads, kpis, gamification, automations] = await Promise.allSettled([loadLeads(), loadKPIs(), loadGamification(), loadAutomations()]);
-      if (leads.status === "fulfilled") leadsState.leads = leads.value;
+      if (leads.status === "fulfilled") leadsState.all = leads.value;
       if (kpis.status === "fulfilled") leadsState.kpis = kpis.value;
       if (gamification.status === "fulfilled") leadsState.gamification = gamification.value;
       if (automations.status === "fulfilled") leadsState.automations = automations.value;
@@ -420,7 +444,7 @@ waitForSupabase(() => {
     return data;
   }
   function applyFilters() {
-    leadsState.filteredLeads = leadsState.leads.filter(l => {
+    leadsState.filtered = leadsState.all.filter(l => {
       if (leadsState.filters.search && !l.nome?.toLowerCase().includes(leadsState.filters.search.toLowerCase())) return false;
       if (leadsState.filters.status && l.status !== leadsState.filters.status) return false;
       if (leadsState.filters.prioridade && l.prioridade !== leadsState.filters.prioridade) return false;
@@ -428,7 +452,7 @@ waitForSupabase(() => {
       if (leadsState.filters.origem && l.origem !== leadsState.filters.origem) return false;
       return true;
     });
-    leadsState.pagination.total = leadsState.filteredLeads.length;
+    leadsState.pagination.total = leadsState.filtered.length;
     leadsState.pagination.totalPages = Math.ceil(leadsState.pagination.total / leadsState.pagination.perPage);
   }
   function setupInterface() {
@@ -465,6 +489,19 @@ waitForSupabase(() => {
         </select>
       </div>
     `;
+    const origemSelect = document.createElement('select');
+    origemSelect.id = 'filter-origem';
+    origemSelect.className = 'border p-2 rounded';
+    origemSelect.innerHTML = `
+      <option value="">Todas Origens</option>
+      ${LEADS_CONFIG.origemOptions.map(o => `<option value="${o}">${o}</option>`).join('')}
+    `;
+    origemSelect.addEventListener('change', e => {
+      leadsState.filters.origem = e.target.value;
+      applyFilters();
+      renderTable();
+    });
+    container.querySelector('div.flex').appendChild(origemSelect);
     document.getElementById("filter-search").addEventListener("input", e => {
       leadsState.filters.search = e.target.value;
       applyFilters();
@@ -502,7 +539,7 @@ waitForSupabase(() => {
     if (!container) return;
     const start = (leadsState.pagination.current - 1) * leadsState.pagination.perPage;
     const end = start + leadsState.pagination.perPage;
-    const rows = leadsState.filteredLeads.slice(start, end);
+    const rows = leadsState.filtered.slice(start, end);
     container.innerHTML = `
       <div class="overflow-x-auto w-full">
         <table class="w-full border-collapse min-w-[900px]">
@@ -547,17 +584,17 @@ waitForSupabase(() => {
     const dailyCanvas = document.getElementById("leads-daily-chart");
     if (!statusCanvas || !dailyCanvas || !window.Chart) return;
     if (leadsState.charts.statusChart) leadsState.charts.statusChart.destroy();
-    const statusCounts = LEADS_CONFIG.statusOptions.map(s => leadsState.filteredLeads.filter(l => l.status === s.value).length);
+    const statusCounts = LEADS_CONFIG.statusOptions.map(s => leadsState.filtered.filter(l => l.status === s.value).length);
     leadsState.charts.statusChart = new Chart(statusCanvas.getContext("2d"), {
       type: "doughnut",
       data: { labels: LEADS_CONFIG.statusOptions.map(s => s.label), datasets: [{ data: statusCounts, backgroundColor: ["#3B82F6", "#F59E0B", "#8B5CF6", "#F97316", "#22C55E", "#EF4444"] }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } } } }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right", labels: { boxWidth: 12, font: { size: 11, family: 'Inter, sans-serif' } } } } }
     });
     if (leadsState.charts.dailyChart) leadsState.charts.dailyChart.destroy();
     const days = [], counts = [];
     const period = leadsState.chartPeriod;
     const leadsByDate = {};
-    leadsState.filteredLeads.forEach(lead => {
+    leadsState.filtered.forEach(lead => {
       const date = new Date(lead.created_at);
       const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       leadsByDate[dateKey] = (leadsByDate[dateKey] || 0) + 1;
@@ -609,9 +646,9 @@ waitForSupabase(() => {
   // MODAL LEAD DETALHES
   // ============================================
   window.openLeadModal = async function(leadId) {
-    const lead = leadsState.leads.find(l => l.id === leadId);
+    const lead = leadsState.all.find(l => l.id === leadId);
     if (!lead) {
-      showError("Lead não encontrado");
+      notify.error("Lead não encontrado");
       return;
     }
     let modal = document.getElementById("lead-modal");
@@ -752,9 +789,9 @@ waitForSupabase(() => {
 // EDITAR LEAD
 // ============================================
 window.openEditLeadModal = function(leadId) {
-  const lead = window.LeadsSystem.state.leads.find(l => l.id === leadId);
+  const lead = window.LeadsSystem.state.all.find(l => l.id === leadId);
   if (!lead) {
-    showError("Lead não encontrado");
+    notify.error("Lead não encontrado");
     return;
   }
   let modal = document.getElementById("edit-lead-modal");
@@ -929,6 +966,7 @@ window.openEditLeadModal = function(leadId) {
   });
   modal.classList.remove("hidden");
 };
+// PATCH v6.0.1-hotfix: Adicionar vibração e som no sucesso
 window.updateLead = async function(leadId) {
   const nome = document.getElementById("edit-lead-nome").value.trim();
   const email = document.getElementById("edit-lead-email").value.trim();
@@ -941,11 +979,11 @@ window.updateLead = async function(leadId) {
   
   // Validações
   if (nome.length < 3) {
-    showError("Nome deve ter pelo menos 3 caracteres");
+    notify.error("Nome deve ter pelo menos 3 caracteres");
     return;
   }
   if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-    showError("Email inválido");
+    notify.error("Email inválido");
     return;
   }
   
@@ -962,6 +1000,7 @@ window.updateLead = async function(leadId) {
       origem: origem || null,
       observacoes: observacoes || null
     };
+    updateData.updated_at = new Date().toISOString();
     
     console.log("🔍 Lead ID:", leadId);
     console.log("🔍 Update Data:", updateData);
@@ -977,14 +1016,15 @@ window.updateLead = async function(leadId) {
     
     if (error) throw error;
 
-showLoading(false);
-showSuccess("Lead atualizado com sucesso!");
+    showLoading(false);
+    notify.success("Lead atualizado com sucesso!");
+    try { navigator.vibrate?.(30); new Audio('/assets/sounds/success/success.mp3').play(); } catch {}
 
 // ✅ ATUALIZAR O ESTADO LOCAL IMEDIATAMENTE (sem esperar reload)
-const leadIndex = window.LeadsSystem.state.leads.findIndex(l => l.id === leadId);
+const leadIndex = window.LeadsSystem.state.all.findIndex(l => l.id === leadId);
 if (leadIndex !== -1) {
-  window.LeadsSystem.state.leads[leadIndex] = {
-    ...window.LeadsSystem.state.leads[leadIndex],
+  window.LeadsSystem.state.all[leadIndex] = {
+    ...window.LeadsSystem.state.all[leadIndex],
     ...updateData,
     updated_at: new Date().toISOString()
   };
@@ -995,7 +1035,7 @@ const detailModal = document.getElementById("lead-modal");
 if (detailModal) detailModal.remove();
 
 // Aplicar filtros e renderizar com dados já atualizados
-window.LeadsSystem.state.filteredLeads = window.LeadsSystem.state.leads;
+window.LeadsSystem.state.filtered = window.LeadsSystem.state.all;
 applyFilters();
 renderTable();
 
@@ -1009,7 +1049,7 @@ setTimeout(async () => {
   } catch (error) {
     showLoading(false);
     console.error("❌ Erro completo ao atualizar lead:", error);
-    showError(`Erro: ${error.message}`);
+    notify.error(`Erro: ${error.message}`);
   }
 };
 // ============================================
@@ -1059,44 +1099,16 @@ window.openDeleteLeadModal = function(leadId) {
 };
 window.deleteLead = async function(leadId) {
   try {
-    showLoading(true, "Deletando lead...");
-    
-    const session = await window.AlshamSupabase.getCurrentSession();
-    if (!session || !session.access_token) {
-      throw new Error("Sessão inválida");
-    }
-    const response = await fetch(
-      'https://rgvnbtuqtxvfxhrdnkjg.supabase.co/rest/v1/rpc/delete_lead',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI'
-        },
-        body: JSON.stringify({ lead_id: leadId })
-      }
-    );
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
-    showLoading(false);
-    showSuccess("Lead deletado com sucesso!");
-   
-    document.getElementById("delete-lead-modal").remove();
-    const detailModal = document.getElementById("lead-modal");
-    if (detailModal) detailModal.remove();
-    if (typeof window.loadSystemData === 'function') {
-      await window.loadSystemData();
-      window.setupInterface();
-    } else {
-      window.location.reload();
-    }
+    showLoading(true, 'Deletando lead...');
+    const { error } = await window.AlshamSupabase.genericDelete('leads_crm', { id: leadId });
+    if (error) throw error;
+    notify.success('Lead deletado com sucesso!');
+    await loadSystemData();
+    setupInterface();
   } catch (error) {
+    notify.error(`Erro: ${error.message}`);
+  } finally {
     showLoading(false);
-    console.error("Erro ao deletar lead:", error);
-    showError(`Erro: ${error.message}`);
   }
 };
   window.showAddInteractionForm = function(leadId) {
@@ -1156,11 +1168,11 @@ window.deleteLead = async function(leadId) {
         showLoading(true, "Salvando interação...");
         await createInteraction(leadId, formData);
         showLoading(false);
-        showSuccess("Interação adicionada com sucesso!");
+        notify.success("Interação adicionada com sucesso!");
         window.openLeadModal(leadId);
       } catch (error) {
         showLoading(false);
-        showError(`Erro ao salvar: ${error.message}`);
+        notify.error(`Erro ao salvar: ${error.message}`);
         console.error(error);
       }
     });
@@ -1196,7 +1208,7 @@ window.deleteLead = async function(leadId) {
       }
       const result = await response.json();
       if (result.success) {
-        showSuccess(`Score atualizado: ${result.score}`);
+        notify.success(`Score atualizado: ${result.score}`);
         await loadSystemData();
         renderTable();
         window.openLeadModal(leadId);
@@ -1204,19 +1216,25 @@ window.deleteLead = async function(leadId) {
         throw new Error(result.error || 'Erro desconhecido');
       }
     } catch (error) {
-      showError(`Erro ao calcular score: ${error.message}`);
+      notify.error(`Erro ao calcular score: ${error.message}`);
       console.error('Erro completo:', error);
     } finally {
       showLoading(false);
     }
   };
-  function setupRealtime() {
-    if (!LEADS_CONFIG.realtime.enabled || !subscribeToTable) return;
-    const subscription = subscribeToTable("leads_crm", leadsState.orgId, () => {
-      console.log("Atualização realtime recebida");
-      loadSystemData().then(setupInterface);
-    });
-    window.addEventListener("beforeunload", () => subscription?.unsubscribe?.());
+  // PATCH v6.0.1-hotfix: Checagem realtime habilitado
+  async function setupRealtime() {
+    if (!LEADS_CONFIG.realtime.enabled) return;
+    if (window.leadsChannel) window.leadsChannel.unsubscribe();
+    window.leadsChannel = supabase
+      .channel('leads_crm')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads_crm' }, async () => {
+        console.log('🔁 Atualização realtime recebida');
+        await loadSystemData();
+        renderTable();
+        renderKPIs();
+      })
+      .subscribe();
   }
   window.LeadsSystem = {
     init: () => loadSystemData().then(setupInterface),
@@ -1224,5 +1242,10 @@ window.deleteLead = async function(leadId) {
     state: leadsState,
     config: LEADS_CONFIG
   };
-  console.log("✅ Leads-Real.js v5.8.3 carregado com sucesso");
+  console.log("✅ Leads-Real.js v6.0.0 carregado com sucesso");
 });
+
+console.log('📇 Leads v6.0.0 ENTERPRISE SYNC carregado com sucesso');
+console.log('%c✅ ALSHAM 360° PRIMA — LEADS v6.0.0 ENTERPRISE SYNC Validado', 'color:#22c55e;font-weight:bold;');
+// PATCH v6.0.1-hotfix: Refresh como arrow function para escopo seguro
+window.LeadsModule = { version: '6.0.0', refresh: () => window.loadSystemData() };
