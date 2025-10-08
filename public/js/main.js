@@ -1,28 +1,26 @@
 /**
- * 🚀 ALSHAM 360° PRIMA - Main Application Script v3.0.0
- * ✅ CORRIGIDO: Removido loop infinito
+ * 🚀 ALSHAM 360° PRIMA - Main Application Script v3.1.0
+ * ✅ Estável | Melhorias de Resiliência, Sync e Logs
  */
 
-// ✅ PROTEÇÃO CONTRA INICIALIZAÇÃO MÚLTIPLA
 if (window.AlshamMainInitialized) {
   console.warn('⚠️ Main.js já foi inicializado. Ignorando segunda execução.');
 } else {
   window.AlshamMainInitialized = true;
-  
-  // Aguarda Supabase estar disponível
-  function waitForSupabase(callback, maxAttempts = 50, attempt = 0) {
+
+  // 🔁 Aguardando Supabase (até 20s)
+  function waitForSupabase(callback, maxAttempts = 200, attempt = 0) {
     if (window.AlshamSupabase?.getCurrentSession) {
-      console.log("✅ Supabase carregado para Main");
+      console.log('✅ Supabase carregado para Main');
       callback();
     } else if (attempt >= maxAttempts) {
-      console.error("❌ Supabase não carregou após 5 segundos - ativando modo demo");
-      callback(); // Continua em modo demo
+      console.error('❌ Supabase não carregou após 20 segundos — ativando modo demo');
+      callback(); // continua em modo demo
     } else {
       setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
     }
   }
 
-  // Aguarda Supabase antes de executar
   waitForSupabase(() => {
     const {
       getCurrentSession,
@@ -34,8 +32,8 @@ if (window.AlshamMainInitialized) {
 
     // ===== CONFIG GLOBAL =====
     const APP_CONFIG = {
-      version: "3.0.0",
-      environment: "production",
+      version: '3.1.0',
+      environment: 'production',
       features: {
         realTimeUpdates: true,
         animations: true,
@@ -50,15 +48,8 @@ if (window.AlshamMainInitialized) {
         retryAttempts: 3,
         retryDelay: 2000,
       },
-      ui: {
-        animationDuration: 600,
-        staggerDelay: 100,
-        rippleAnimationDuration: 600,
-        notificationDuration: 5000,
-      },
     };
 
-    // ===== ESTADO GLOBAL =====
     const AppState = {
       isInitialized: false,
       isDemoMode: false,
@@ -81,10 +72,7 @@ if (window.AlshamMainInitialized) {
           const firstKey = this.cache.keys().next().value;
           this.cache.delete(firstKey);
         }
-        this.cache.set(key, {
-          value,
-          expires: Date.now() + this.ttl,
-        });
+        this.cache.set(key, { value, expires: Date.now() + this.ttl });
       }
       get(key) {
         const item = this.cache.get(key);
@@ -111,53 +99,53 @@ if (window.AlshamMainInitialized) {
           userAgent: navigator.userAgent,
           context,
         };
-        console.error("🚨 Application Error:", errorInfo);
+        console.error('🚨 Application Error:', errorInfo);
 
         if (createAuditLog) {
           try {
-            await createAuditLog("APP_ERROR", errorInfo);
+            await createAuditLog('APP_ERROR', errorInfo);
           } catch (e) {
-            console.warn("Não foi possível registrar erro no audit log:", e);
+            console.warn('⚠️ Falha ao registrar erro no audit log:', e);
           }
         }
-        this.showUserNotification(context.userMessage || "Erro inesperado");
+        this.showUserNotification(context.userMessage || 'Erro inesperado');
       }
-      
+
       static showUserNotification(msg) {
-        console.warn("⚠️", msg);
+        const toast = document.createElement('div');
+        toast.textContent = msg;
+        toast.style = `
+          position:fixed;bottom:20px;right:20px;background:#1E40AF;
+          color:white;padding:12px 20px;border-radius:8px;
+          box-shadow:0 4px 8px rgba(0,0,0,0.3);z-index:9999;
+          font-size:14px;animation:fadeIn 0.3s ease-out;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
       }
     }
 
-    // ===== INIT (NÃO AUTO-EXECUTA) =====
+    // ===== INIT =====
     async function initializeMain() {
-      // ✅ Previne inicialização dupla
-      if (AppState.isInitialized) {
-        console.warn("⚠️ Main já foi inicializado anteriormente");
-        return;
-      }
-      
-      try {
-        console.info("🚀 ALSHAM 360° PRIMA - Main Script v3.0.0 iniciando...");
+      if (AppState.isInitialized) return console.warn('⚠️ Main já inicializado.');
 
+      try {
+        console.info('🚀 ALSHAM 360° PRIMA - Main Script v3.1.0 iniciando...');
         await checkSupabaseAvailability();
         await initializeApplication();
-
-        console.info("✅ Main inicializado com sucesso");
+        console.info('✅ Main inicializado com sucesso');
       } catch (error) {
-        ErrorHandler.track(error, {
-          phase: "init",
-          userMessage: "Erro ao inicializar aplicação",
-        });
+        ErrorHandler.track(error, { phase: 'init', userMessage: 'Erro ao inicializar' });
         initializeDemoMode();
       }
     }
 
     // ===== SUPABASE CHECK =====
     async function checkSupabaseAvailability() {
-      if (typeof genericSelect === "function" && typeof getCurrentSession === "function") {
-        console.info("✅ Supabase disponível");
+      if (typeof genericSelect === 'function' && typeof getCurrentSession === 'function') {
+        console.info('✅ Supabase disponível');
       } else {
-        console.warn("⚠️ Supabase não disponível → Modo Demo");
+        console.warn('⚠️ Supabase não disponível → modo demo');
         AppState.isDemoMode = true;
       }
     }
@@ -165,12 +153,18 @@ if (window.AlshamMainInitialized) {
     // ===== APPLICATION =====
     async function initializeApplication() {
       AppState.user = (await getCurrentSession?.())?.user || null;
-
       initializeAnimations();
       initializeGamification();
 
       if (APP_CONFIG.features.realTimeUpdates && !AppState.isDemoMode) {
         startRealTimeUpdates();
+      }
+
+      // 🔁 Tenta sincronizar com SW
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.sync?.register('sync-dashboard').catch(() => {});
+        });
       }
 
       AppState.isInitialized = true;
@@ -179,7 +173,7 @@ if (window.AlshamMainInitialized) {
 
     // ===== DEMO MODE =====
     function initializeDemoMode() {
-      console.info("🎭 Ativando Demo Mode");
+      console.info('🎭 Ativando Demo Mode');
       AppState.isDemoMode = true;
       window.demoData = {
         kpis: generateDemoKPIs(),
@@ -190,48 +184,47 @@ if (window.AlshamMainInitialized) {
 
     // ===== REALTIME =====
     function startRealTimeUpdates() {
-      getCurrentOrgId?.().then((orgId) => {
+      getCurrentOrgId?.().then(orgId => {
         if (orgId && subscribeToTable) {
-          subscribeToTable("dashboard_kpis", orgId, () => {
-            console.log("Dashboard KPIs atualizados via realtime");
-            cacheManager.clear();
-          });
-          subscribeToTable("leads_crm", orgId, () => {
-            console.log("Leads atualizados via realtime");
-            cacheManager.clear();
+          const tables = ['dashboard_kpis', 'leads_crm'];
+          tables.forEach(table => {
+            subscribeToTable(table, orgId, () => {
+              console.log(`🔁 ${table} atualizado em tempo real`);
+              cacheManager.clear();
+            });
           });
         }
-      }).catch(err => {
-        console.warn("Erro ao configurar realtime:", err);
-      });
+      }).catch(err => ErrorHandler.track(err, { phase: 'realtime' }));
     }
 
     // ===== HELPERS =====
     function initializeAnimations() {
-      console.log("✨ Animations initialized");
+      if (APP_CONFIG.environment === 'production') return; // silencia animações no build
+      console.log('✨ Animations initialized');
     }
 
     function initializeGamification() {
-      console.log("🎮 Gamification initialized");
+      if (APP_CONFIG.environment === 'production') return;
+      console.log('🎮 Gamification initialized');
     }
 
     function generateDemoKPIs() {
-      return { 
-        totalLeads: 123, 
-        qualifiedLeads: 45, 
-        conversionRate: 38, 
-        totalRevenue: 95000 
+      return {
+        totalLeads: 123,
+        qualifiedLeads: 45,
+        conversionRate: 38,
+        totalRevenue: 95000,
       };
     }
 
     function generateDemoLeads() {
       return Array.from({ length: 5 }, (_, i) => ({
         id: i + 1,
-        nome: ["Maria Silva", "João Santos", "Ana Costa", "Pedro Lima", "Carla Souza"][i],
-        empresa: ["Tech Corp", "Inovação LTDA", "Digital Plus", "StartupX", "Future Tech"][i],
-        status: ["novo", "qualificado", "em_contato", "convertido", "perdido"][i],
+        nome: ['Maria Silva', 'João Santos', 'Ana Costa', 'Pedro Lima', 'Carla Souza'][i],
+        empresa: ['Tech Corp', 'Inovação LTDA', 'Digital Plus', 'StartupX', 'Future Tech'][i],
+        status: ['novo', 'qualificado', 'em_contato', 'convertido', 'perdido'][i],
         score_ia: Math.floor(Math.random() * 100),
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       }));
     }
 
@@ -241,9 +234,9 @@ if (window.AlshamMainInitialized) {
       AppState,
       initializeMain,
       cacheManager,
-      ErrorHandler
+      ErrorHandler,
     };
 
-    console.info("🚀 ALSHAM 360° PRIMA Main Script v3.0.0 PRONTO (aguardando chamada manual)");
+    console.info('🚀 ALSHAM 360° PRIMA Main Script v3.1.0 pronto (aguardando chamada manual)');
   });
 }
