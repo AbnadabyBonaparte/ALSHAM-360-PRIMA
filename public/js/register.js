@@ -1,253 +1,120 @@
-/**
- * ALSHAM 360° PRIMA - Enterprise Registration System V5.2
- * CORRIGIDO: Aguarda Supabase carregar
- */
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Crie sua conta no ALSHAM 360° PRIMA. Sistema de registro enterprise com multi-step, segurança avançada e integração Supabase." />
 
-// Aguarda Supabase estar disponível
-function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
-  if (window.AlshamSupabase && window.AlshamSupabase.signUpWithEmail) {
-    console.log("✅ Supabase carregado para Register");
-    callback();
-  } else if (attempt >= maxAttempts) {
-    console.error("❌ Supabase não carregou");
-    showNotification("Erro ao carregar sistema", "error");
-  } else {
-    setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
-  }
-}
+  <!-- 🔐 CSP UNIFICADA COM LOGIN/INDEX -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval'
+                            https://cdn.jsdelivr.net
+                            https://cdnjs.cloudflare.com
+                            https://cdn.tailwindcss.com
+                            https://apis.google.com;
+                 style-src 'self' 'unsafe-inline'
+                            https://fonts.googleapis.com
+                            https://cdn.tailwindcss.com;
+                 font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com;
+                 connect-src 'self'
+                             https://*.supabase.co
+                             wss://*.supabase.co
+                             https://api.openai.com;
+                 img-src 'self' data: blob: https:;
+                 worker-src 'self' blob:;
+                 manifest-src 'self';
+                 object-src 'none';">
 
-// UI Helpers (precisam estar fora)
-function showNotification(message, type = "info") {
-  console.log(`[${type}] ${message}`);
-  const div = document.createElement("div");
-  div.className = `fixed top-4 right-4 p-3 rounded shadow-lg text-white z-50 ${
-    type === "error" ? "bg-red-600" :
-    type === "success" ? "bg-green-600" :
-    type === "warning" ? "bg-yellow-500" : "bg-blue-600"
-  }`;
-  div.textContent = message;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 4000);
-}
+  <!-- 🎨 CSS -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+</head>
 
-const showError = (m) => showNotification(m, "error");
-const showSuccess = (m) => showNotification(m, "success");
-const showWarning = (m) => showNotification(m, "warning");
+<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col justify-center">
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-// Aguarda Supabase antes de executar
-waitForSupabase(() => {
-  const {
-    signUpWithEmail,
-    createUserProfile,
-    checkEmailExists,
-    createAuditLog
-  } = window.AlshamSupabase;
+  <main class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100 w-full transition-all duration-300">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">Criar Conta</h1>
 
-  // ===== DEPENDENCY VALIDATION =====
-  function requireLib(libName, lib) {
-    if (!lib) throw new Error(`❌ Dependência ${libName} não carregada!`);
-    return lib;
-  }
+    <form id="registration-form" class="space-y-6">
+      <!-- STEP 1: Dados pessoais -->
+      <div class="step" data-step="0">
+        <div>
+          <label for="first-name" class="block text-sm font-medium mb-1">Nome</label>
+          <input id="first-name" type="text"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 placeholder="Seu nome" required />
+        </div>
+        <div>
+          <label for="last-name" class="block text-sm font-medium mb-1">Sobrenome</label>
+          <input id="last-name" type="text"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 placeholder="Seu sobrenome" required />
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1">E-mail</label>
+          <input id="email" type="email"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 placeholder="seu@email.com" required />
+        </div>
+      </div>
 
-  function validateDependencies() {
-    return {
-      localStorage: requireLib("localStorage", window.localStorage),
-      sessionStorage: requireLib("sessionStorage", window.sessionStorage),
-      crypto: requireLib("Web Crypto API", window.crypto),
-      performance: requireLib("Performance API", window.performance),
-      Notification: requireLib("Notification API", window.Notification),
-      navigator: requireLib("Navigator API", window.navigator),
-      fetch: requireLib("Fetch API", window.fetch)
-    };
-  }
+      <!-- STEP 2: Senha -->
+      <div class="step hidden" data-step="1">
+        <div>
+          <label for="password" class="block text-sm font-medium mb-1">Senha</label>
+          <input id="password" type="password"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 placeholder="••••••••" required minlength="8" />
+        </div>
+        <div>
+          <label for="confirm-password" class="block text-sm font-medium mb-1">Confirmar Senha</label>
+          <input id="confirm-password" type="password"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 placeholder="••••••••" required minlength="8" />
+        </div>
+      </div>
 
-  // ===== CONFIG =====
-  const REGISTRATION_CONFIG = Object.freeze({
-    SECURITY: {
-      PASSWORD_MIN_LENGTH: 8,
-      REQUIRE_UPPERCASE: true,
-      REQUIRE_LOWERCASE: true,
-      REQUIRE_NUMBERS: true,
-      REQUIRE_SYMBOLS: true,
-      EMAIL_VERIFICATION_REQUIRED: true,
-      AUDIT_ENABLED: true
-    },
-    VALIDATION: {
-      EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      NAME_REGEX: /^[a-zA-ZÀ-ÿ\s]{2,50}$/,
-      PASSWORD_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/
-    },
-    STEPS: [
-      { id: "personal", required: ["firstName", "lastName", "email"] },
-      { id: "security", required: ["password", "confirmPassword"] },
-      { id: "organization", required: [] },
-      { id: "verification", required: ["verificationCode"] }
-    ]
-  });
+      <!-- STEP 3: Organização -->
+      <div class="step hidden" data-step="2">
+        <p class="text-gray-600">Criação de organização é opcional neste momento.</p>
+        <p class="text-sm text-gray-500">Você poderá configurar sua organização depois nas configurações.</p>
+      </div>
 
-  // ===== STATE =====
-  class RegistrationState {
-    constructor() {
-      this.state = {
-        currentStep: 0,
-        totalSteps: REGISTRATION_CONFIG.STEPS.length,
-        formData: {},
-        errors: []
-      };
-    }
-    setState(upd) { Object.assign(this.state, upd); }
-    getState(key) { return key ? this.state[key] : this.state; }
-  }
-  const registrationState = new RegistrationState();
+      <!-- STEP 4: Verificação -->
+      <div class="step hidden" data-step="3">
+        <label for="verification-code" class="block text-sm font-medium mb-1">Código de Verificação</label>
+        <input id="verification-code" type="text" maxlength="6"
+               class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+               placeholder="000000" />
+      </div>
 
-  // ===== DOM =====
-  class DOMManager {
-    constructor() { this.elements = {}; }
-    initialize() {
-      const selectors = {
-        form: "#registration-form",
-        email: "#email",
-        password: "#password",
-        confirmPassword: "#confirm-password",
-        firstName: "#first-name",
-        lastName: "#last-name",
-        verificationCode: "#verification-code",
-        submitButton: "#submit-button"
-      };
-      Object.entries(selectors).forEach(([k, s]) => {
-        this.elements[k] = document.querySelector(s);
-      });
-    }
-    get(key) { return this.elements[key]; }
-  }
-  const dom = new DOMManager();
+      <!-- Submit -->
+      <button id="submit-button" type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+        Criar conta
+      </button>
+    </form>
 
-  // ===== UI HELPERS =====
-  function showLoading(show, msg = "Carregando...") {
-    const btn = dom.get("submitButton");
-    if (!btn) return;
-    btn.disabled = show;
-    btn.textContent = show ? msg : "Criar conta";
-  }
+    <p class="mt-4 text-center text-sm text-gray-600">
+      Já tem uma conta?
+      <a href="/login.html" class="text-blue-600 font-semibold hover:underline">Fazer login</a>
+    </p>
+  </main>
 
-  function announceToScreenReader(msg) {
-    let el = document.getElementById("sr-announcer");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "sr-announcer";
-      el.className = "sr-only";
-      document.body.appendChild(el);
-    }
-    el.textContent = msg;
-  }
+  <footer class="mt-8 text-center text-gray-500 text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  </footer>
 
-  // ===== VALIDATION =====
-  function validateField(name) {
-    const val = dom.get(name)?.value?.trim() || "";
-    if (["firstName", "lastName"].includes(name))
-      return REGISTRATION_CONFIG.VALIDATION.NAME_REGEX.test(val);
-    if (name === "email")
-      return REGISTRATION_CONFIG.VALIDATION.EMAIL_REGEX.test(val);
-    if (name === "password")
-      return REGISTRATION_CONFIG.VALIDATION.PASSWORD_REGEX.test(val);
-    if (name === "confirmPassword")
-      return val === dom.get("password")?.value;
-    if (name === "verificationCode")
-      return /^\d{6}$/.test(val);
-    return true;
-  }
-
-  async function validateStep(stepIndex) {
-    const step = REGISTRATION_CONFIG.STEPS[stepIndex];
-    return step.required.every((f) => validateField(f));
-  }
-
-  // ===== CORE FLOW =====
-  document.addEventListener("DOMContentLoaded", initializeRegistration);
-
-  async function initializeRegistration() {
-    try {
-      validateDependencies();
-      dom.initialize();
-      
-      const form = dom.get("form");
-      if (form) {
-        form.addEventListener("submit", handleFormSubmit);
-      }
-      
-      console.log("📝 Registration ready v5.2.0");
-    } catch (e) {
-      showError("Erro ao inicializar registro");
-    }
-  }
-
-  async function handleFormSubmit(e) {
-    e.preventDefault();
-    const stepIndex = registrationState.getState("currentStep");
-    const valid = await validateStep(stepIndex);
-    if (!valid) return showError("Por favor, corrija os campos obrigatórios.");
-    if (stepIndex < REGISTRATION_CONFIG.STEPS.length - 1) {
-      registrationState.setState({ currentStep: stepIndex + 1 });
-      announceToScreenReader(`Avançou para etapa ${stepIndex + 2}`);
-    } else {
-      await submitRegistration();
-    }
-  }
-
-  async function submitRegistration() {
-    try {
-      showLoading(true, "Criando conta...");
-      const formData = {
-        email: dom.get("email")?.value,
-        password: dom.get("password")?.value,
-        firstName: dom.get("firstName")?.value,
-        lastName: dom.get("lastName")?.value
-      };
-
-      if (await checkEmailExists(formData.email)) {
-        showWarning("E-mail já cadastrado");
-        showLoading(false);
-        return;
-      }
-
-      const { data, error } = await signUpWithEmail(formData.email, formData.password);
-      if (error) throw error;
-
-      await createUserProfile({
-        user_id: data.user.id,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email
-      });
-
-      if (REGISTRATION_CONFIG.SECURITY.AUDIT_ENABLED) {
-        await createAuditLog("USER_REGISTERED", {
-          user_id: data.user.id,
-          email: formData.email,
-          timestamp: new Date().toISOString()
-        });
-      }
-
-      showSuccess("Conta criada! Verifique seu email.");
-      setTimeout(() => (window.location.href = "/login.html"), 2000);
-    } catch (err) {
-      showError("Erro ao registrar: " + err.message);
-    } finally {
-      showLoading(false);
-    }
-  }
-
-  // ===== PUBLIC API =====
-  const RegistrationSystem = {
-    nextStep: () =>
-      registrationState.setState({ currentStep: registrationState.getState("currentStep") + 1 }),
-    prevStep: () =>
-      registrationState.setState({ currentStep: Math.max(0, registrationState.getState("currentStep") - 1) }),
-    submit: submitRegistration,
-    validateField,
-    version: "5.2.0"
-  };
-  window.RegistrationSystem = RegistrationSystem;
-
-  console.log("✅ Registration System V5.2.0 pronto");
-});
+  <!-- 🧩 Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
+  <script src="/public/js/register.js"></script>
+</body>
+</html>
