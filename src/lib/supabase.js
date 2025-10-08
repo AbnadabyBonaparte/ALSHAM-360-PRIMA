@@ -386,7 +386,8 @@ if (typeof window !== 'undefined') {
     isValidUUID,
     generateUUID,
     showNotification,
-    handleError
+    handleError,
+    retryOperation // <-- CORREÇÃO: agora está disponível globalmente!
   });
   console.log('✅ window.AlshamSupabase disponível:', Object.keys(window.AlshamSupabase));
 }
@@ -428,6 +429,7 @@ export {
   isValidUUID,
   generateUUID,
   showNotification,
-  handleError
+  handleError,
+  retryOperation
 };
 export default supabase;
