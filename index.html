@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ALSHAM 360° PRIMA</title>
+
+  <!-- 🧠 PWA Essentials -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#3B82F6" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- 🔐 Security CSP -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
                  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com;
@@ -12,19 +20,24 @@
                  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com;
                  img-src 'self' data: blob: https:;
                  worker-src 'self' blob:;
+                 manifest-src 'self';
                  object-src 'none';">
+
+  <!-- 🎨 Styles -->
   <link rel="stylesheet" href="/css/style.css" />
 </head>
+
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
   <div id="toast-container"></div>
-  <main class="text-center">
+  <main class="text-center animate-fade-in">
     <div class="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-    <h1 class="text-xl font-bold">Carregando...</h1>
+    <h1 class="text-xl font-bold text-blue-800">Carregando...</h1>
   </main>
-  
+
+  <!-- 🧩 App Routing -->
   <script type="module">
     import { getCurrentSession } from "/src/lib/supabase.js";
-    
+
     async function routeUser() {
       try {
         const session = await getCurrentSession();
@@ -35,7 +48,13 @@
     }
     routeUser();
   </script>
+
+  <!-- ⚙️ Scripts Principais -->
+  <script type="module" src="/public/js/main.js"></script>
   <script type="module" src="/public/js/utils/notifications.js"></script>
   <script type="module" src="/public/js/pipeline.js"></script>
+
+  <!-- 🧠 Registro do Service Worker -->
+  <script src="/public/js/sw-register.js"></script>
 </body>
 </html>
