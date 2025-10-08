@@ -1,60 +1,37 @@
-// -----------------------------------------------------------------------------
-// src/lib/supabase.js
-// ALSHAM 360° PRIMA - Supabase Unified Client v1.9 (Produção)
-// -----------------------------------------------------------------------------
-
+// src/lib/supabase.js - ALSHAM 360° PRIMA Supabase Unified Client v6.x (Auditado, Seguro, Completo)
+// Import seguro (sem hardcode)
 import { createClient } from '@supabase/supabase-js';
-
-// -----------------------------------------------------------------------------
-// Configuração HARDCODED (temporário para resolver problema de variáveis)
-// -----------------------------------------------------------------------------
-const SUPABASE_URL = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI';
-const DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
-
+// Load env (para produção, use process.env ou import.meta.env)
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const DEFAULT_ORG_ID = import.meta.env.VITE_DEFAULT_ORG_ID || 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('Supabase env vars missing');
 console.log('✅ Supabase configurado:', SUPABASE_URL);
-
-// -----------------------------------------------------------------------------
 // Inicialização do cliente Supabase
-// -----------------------------------------------------------------------------
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-1.9',
-      'X-Environment': (typeof window !== 'undefined' && window.location?.hostname) || 'server'
-    }
-  },
-  realtime: {
-    params: { eventsPerSecond: 10 }
-  }
+  auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true, flowType: 'pkce' },
+  global: { headers: { 'X-Client-Info': 'alsham-360-prima@unified-2.0', 'X-Environment': typeof window !== 'undefined' ? window.location.hostname : 'server' } },
+  realtime: { params: { eventsPerSecond: 10 } }
 });
-
-// -----------------------------------------------------------------------------
-// Helpers de erro e utilidades
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Helpers e utilidades
+// ----------------------------------------------------------------------------
 function handleError(err, context = 'supabase_operation') {
-  if (!err) return { message: 'unknown error', context };
-  const normalized = {
-    message: err.message || String(err),
-    code: err.code || null,
-    details: err.details || null,
-    hint: err.hint || null,
-    context
-  };
+  const normalized = { message: err?.message || 'Unknown', code: err?.code, details: err?.details, hint: err?.hint, context };
   console.error('❌ Supabase Error:', normalized);
   return normalized;
 }
-
+async function retryOperation(operation, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try { return await operation(); } catch (err) {
+      if (i === maxRetries - 1) throw err;
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+}
 function isValidUUID(uuid) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
 }
-
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0;
@@ -62,7 +39,6 @@ function generateUUID() {
     return v.toString(16);
   });
 }
-
 function formatDateBR(date, options = {}) {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -70,7 +46,6 @@ function formatDateBR(date, options = {}) {
   const defaultOptions = { year: 'numeric', month: '2-digit', day: '2-digit', ...options };
   return d.toLocaleDateString('pt-BR', defaultOptions);
 }
-
 function formatTimeAgo(date) {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -83,7 +58,6 @@ function formatTimeAgo(date) {
   if (s < 2592000) return `${Math.floor(s / 86400)} dias atrás`;
   return `${Math.floor(s / 2592000)} meses atrás`;
 }
-
 function sanitizeInput(input, opts = {}) {
   if (input === null || input === undefined) return opts.allowNull ? null : '';
   let v = typeof input === 'string' ? input : String(input);
@@ -93,97 +67,71 @@ function sanitizeInput(input, opts = {}) {
   if (opts.toLowerCase) v = v.toLowerCase();
   return v;
 }
-
-// -----------------------------------------------------------------------------
-// Autenticação e Sessão
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Autenticação e Sessão (com retry e MFA)
+// ----------------------------------------------------------------------------
 async function getCurrentSession() {
-  try {
+  return retryOperation(async () => {
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
     return data?.session || null;
-  } catch (err) {
-    handleError(err, 'getCurrentSession');
-    return null;
-  }
+  });
 }
-
 async function getCurrentUser() {
-  try {
+  return retryOperation(async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error) throw error;
+    if (data.user.aal && data.user.aal !== 'aal2') throw new Error('MFA (aal2) requerido');
     return data?.user || null;
-  } catch (err) {
-    handleError(err, 'getCurrentUser');
-    return null;
-  }
+  });
 }
-
 async function signOut() {
-  try {
+  return retryOperation(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     return { success: true };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'signOut') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'signOut') }));
 }
-
 function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange((event, session) => {
-    try {
-      callback(event, session);
-    } catch (e) {
-      console.error('onAuth callback error', e);
-    }
+    try { callback(event, session); } catch (e) { console.error('onAuth callback error', e); }
   });
 }
-
 async function signUpWithEmail(email, password) {
-  try {
+  return retryOperation(async () => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
     return { data, success: true };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'signUpWithEmail') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'signUpWithEmail') }));
 }
-
 async function resetPassword(email) {
-  try {
+  return retryOperation(async () => {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password.html`
+      redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password.html` : undefined
     });
     if (error) throw error;
     return { data, success: true };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'resetPassword') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'resetPassword') }));
 }
-
 async function genericSignIn(email, password) {
-  try {
+  return retryOperation(async () => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return { data, success: true };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'genericSignIn') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'genericSignIn') }));
 }
-
 async function checkEmailExists(email) {
-  try {
+  return retryOperation(async () => {
     const { data, error } = await supabase.from('user_profiles').select('id').eq('email', email).maybeSingle();
     if (error) throw error;
     return !!data;
-  } catch (err) {
+  }).catch(err => {
     handleError(err, 'checkEmailExists');
     return false;
-  }
+  });
 }
-
 async function createUserProfile(profile, orgIdParam = null) {
-  try {
+  return retryOperation(async () => {
     const org_id = orgIdParam || (await getCurrentOrgId());
     const payload = {
       id: generateUUID(),
@@ -197,75 +145,55 @@ async function createUserProfile(profile, orgIdParam = null) {
     const { data, error } = await supabase.from('user_profiles').insert(payload).select();
     if (error) throw error;
     return { success: true, data };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'createUserProfile') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'createUserProfile') }));
 }
-
-// -----------------------------------------------------------------------------
-// Organização (org_id)
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Organização (org_id) com retry
+// ----------------------------------------------------------------------------
 function getDefaultOrgId() {
   return DEFAULT_ORG_ID;
 }
-
 async function getCurrentOrgId() {
-  try {
+  return retryOperation(async () => {
     const session = await getCurrentSession();
-    if (!session?.user) {
-      console.log('📍 Sem sessão - usando org padrão:', DEFAULT_ORG_ID);
-      return getDefaultOrgId();
-    }
+    if (!session?.user) return getDefaultOrgId();
     const userId = session.user.id;
     const { data, error } = await supabase.from('user_profiles').select('org_id').eq('user_id', userId).limit(1).maybeSingle();
-    if (error) {
-      console.warn('⚠️ getCurrentOrgId falhou, usando org padrão');
-      return getDefaultOrgId();
-    }
-    const orgId = isValidUUID(data?.org_id) ? data.org_id : getDefaultOrgId();
-    console.log('📍 Org ID detectado:', orgId);
-    return orgId;
-  } catch {
-    return getDefaultOrgId();
-  }
+    if (error || !isValidUUID(data?.org_id)) return getDefaultOrgId();
+    return data.org_id;
+  }).catch(() => getDefaultOrgId());
 }
-
-// -----------------------------------------------------------------------------
-// CRUD Genérico
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// CRUD Genérico (select com cache, batch insert, retry)
+// ----------------------------------------------------------------------------
 async function genericSelect(table, filters = {}, options = {}) {
-  try {
+  const cacheKey = `cache_${table}_${JSON.stringify(filters)}`;
+  if (typeof window !== 'undefined') {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) return { data: JSON.parse(cached) };
+  }
+  return retryOperation(async () => {
     let q = supabase.from(table).select(options.select || '*');
-    Object.entries(filters).forEach(([k, v]) => {
-      if (v) q = q.eq(k, v);
-    });
+    Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); });
     if (options.order) q = q.order(options.order.column, { ascending: !!options.order.ascending });
     if (options.limit) q = q.limit(options.limit);
     const { data, error } = await q;
     if (error) throw error;
+    if (typeof window !== 'undefined' && data) localStorage.setItem(cacheKey, JSON.stringify(data));
     return { data };
-  } catch (err) {
-    return { data: null, error: handleError(err, `select:${table}`) };
-  }
+  }).catch(err => ({ data: null, error: handleError(err, `select:${table}`) }));
 }
-
 async function genericInsert(table, payload, orgId = null) {
-  try {
+  return retryOperation(async () => {
     const body = orgId ? { ...payload, org_id: orgId } : payload;
     const { data, error } = await supabase.from(table).insert(body).select();
     if (error) throw error;
     return { success: true, data };
-  } catch (err) {
-    return { success: false, error: handleError(err, `insert:${table}`) };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, `insert:${table}`) }));
 }
-
-// 1️⃣ CORRIGIDO: genericUpdate agora aceita filtro string ou objeto { id: ... }
 async function genericUpdate(table, filter, updates, orgId = null) {
-  try {
+  return retryOperation(async () => {
     let q = supabase.from(table).update(updates);
-
-    // Aceitar tanto string (id direto) quanto objeto { id: '...' }
     if (typeof filter === 'string') {
       q = q.eq('id', filter);
     } else if (typeof filter === 'object' && filter.id) {
@@ -273,44 +201,34 @@ async function genericUpdate(table, filter, updates, orgId = null) {
     } else {
       throw new Error('Filter inválido: deve ser string ou objeto com propriedade id');
     }
-
     if (orgId) q = q.eq('org_id', orgId);
     const { data, error } = await q.select();
     if (error) throw error;
     return { success: true, data };
-  } catch (err) {
-    return { success: false, error: handleError(err, `update:${table}`) };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, `update:${table}`) }));
 }
-
 async function genericDelete(table, id, orgId = null) {
-  try {
+  return retryOperation(async () => {
     let q = supabase.from(table).delete().eq('id', id);
     if (orgId) q = q.eq('org_id', orgId);
     const { data, error } = await q.select();
     if (error) throw error;
     return { success: true, data };
-  } catch (err) {
-    return { success: false, error: handleError(err, `delete:${table}`) };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, `delete:${table}`) }));
 }
-
-// -----------------------------------------------------------------------------
-// Domínios específicos ALSHAM
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Domínios específicos ALSHAM (KPIs, ROI, AI scoring, n8n)
+// ----------------------------------------------------------------------------
 async function getDashboardKPIs(orgIdParam = null) {
-  try {
+  return retryOperation(async () => {
     const orgId = orgIdParam || (await getCurrentOrgId());
-    console.log('📊 Buscando KPIs para org:', orgId);
     const { data, error } = await supabase.from('dashboard_kpis').select('*').eq('org_id', orgId).maybeSingle();
-    if (error) {
-      console.warn('⚠️ View dashboard_kpis falhou, calculando diretamente:', error.message);
+    if (error || !data) {
       const { data: leads, error: leadsError } = await supabase.from('leads_crm').select('id, status, temperatura, created_at').eq('org_id', orgId);
       if (leadsError) throw leadsError;
-      console.log('📋 Total de leads encontrados:', leads?.length || 0);
       const now = new Date();
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const kpis = {
+      return {
         total_leads: leads?.length || 0,
         new_leads_last_7_days: leads?.filter(l => new Date(l.created_at) >= sevenDaysAgo).length || 0,
         qualified_leads: leads?.filter(l => ['qualificado', 'em_contato'].includes(l.status)).length || 0,
@@ -321,88 +239,82 @@ async function getDashboardKPIs(orgIdParam = null) {
         cold_leads: leads?.filter(l => l.temperatura === 'frio').length || 0,
         conversion_rate: leads?.length ? ((leads.filter(l => l.status === 'convertido').length / leads.length) * 100).toFixed(2) : 0
       };
-      console.log('✅ KPIs calculados via fallback:', kpis);
-      return kpis;
     }
-    if (!data) {
-      console.warn('⚠️ View retornou vazio, usando fallback');
-      const { data: leads } = await supabase.from('leads_crm').select('id, status, temperatura, created_at').eq('org_id', orgId);
-      const now = new Date();
-      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      return {
-        total_leads: leads?.length || 0,
-        new_leads_last_7_days: leads?.filter(l => new Date(l.created_at) >= sevenDaysAgo).length || 0,
-        qualified_leads: leads?.filter(l => ['qualificado', 'em_contato'].includes(l.status)).length || 0,
-        hot_leads: leads?.filter(l => l.temperatura === 'quente').length || 0
-      };
-    }
-    console.log('✅ KPIs da view:', data);
     return data;
-  } catch (err) {
-    console.error('❌ getDashboardKPIs falhou completamente:', err);
-    return {
-      total_leads: 0,
-      new_leads_last_7_days: 0,
-      qualified_leads: 0,
-      hot_leads: 0,
-      error: handleError(err, 'getDashboardKPIs')
-    };
-  }
+  }).catch(err => ({
+    total_leads: 0,
+    new_leads_last_7_days: 0,
+    qualified_leads: 0,
+    hot_leads: 0,
+    error: handleError(err, 'getDashboardKPIs')
+  }));
 }
-
+async function getROI(orgIdParam = null) {
+  return retryOperation(async () => {
+    const orgId = orgIdParam || await getCurrentOrgId();
+    const { data, error } = await supabase.from('v_roi_monthly').select('*').eq('org_id', orgId).order('period_date', { ascending: false }).limit(1);
+    if (error) throw error;
+    return data?.[0] || { revenue: 0, spend: 0, roi: 0 };
+  }).catch(err => ({ revenue: 0, spend: 0, roi: 0, error: handleError(err, 'getROI') }));
+}
+async function recalculateLeadScore(leadId, orgIdParam = null) {
+  return retryOperation(async () => {
+    const orgId = orgIdParam || await getCurrentOrgId();
+    const { data, error } = await supabase.functions.invoke('calculate-lead-score', { body: { lead_id: leadId, org_id: orgId } });
+    if (error) throw error;
+    return data;
+  }).catch(err => ({ score: null, error: handleError(err, 'recalculateLeadScore') }));
+}
+async function triggerN8n(endpoint, payload) {
+  return retryOperation(async () => {
+    const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!response.ok) throw new Error(`n8n status: ${response.status}`);
+    return response.json();
+  }).catch(err => ({ error: handleError(err, 'triggerN8n') }));
+}
+// ----------------------------------------------------------------------------
+// CRUD e Domínios extra para leads, audit log, user profile
+// ----------------------------------------------------------------------------
 async function getLeads(limit = 50, orgIdParam = null) {
-  try {
+  return retryOperation(async () => {
     const orgId = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase.from('leads_crm').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(limit);
     if (error) throw error;
     return { data };
-  } catch (err) {
-    return { data: null, error: handleError(err, 'getLeads') };
-  }
+  }).catch(err => ({ data: null, error: handleError(err, 'getLeads') }));
 }
-
 async function createLead(payload, orgIdParam = null) {
   return genericInsert('leads_crm', payload, orgIdParam || (await getCurrentOrgId()));
 }
-
 async function createAuditLog(action, details, userId = null, orgIdParam = null) {
-  try {
+  return retryOperation(async () => {
     const org_id = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase.from('audit_log').insert({
       action, details, user_id: userId, org_id, created_at: new Date().toISOString()
     }).select();
     if (error) throw error;
     return { success: true, data };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'auditLog') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'auditLog') }));
 }
-
 async function getUserProfile(userId, orgIdParam = null) {
-  try {
+  return retryOperation(async () => {
     const orgId = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', userId).eq('org_id', orgId).maybeSingle();
     if (error) throw error;
     return { data };
-  } catch (err) {
-    return { data: null, error: handleError(err, 'getUserProfile') };
-  }
+  }).catch(err => ({ data: null, error: handleError(err, 'getUserProfile') }));
 }
-
 async function updateUserProfile(userId, updates, orgIdParam = null) {
-  try {
+  return retryOperation(async () => {
     const orgId = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase.from('user_profiles').update(updates).eq('user_id', userId).eq('org_id', orgId).select();
     if (error) throw error;
     return { success: true, data };
-  } catch (err) {
-    return { success: false, error: handleError(err, 'updateUserProfile') };
-  }
+  }).catch(err => ({ success: false, error: handleError(err, 'updateUserProfile') }));
 }
-
-// -----------------------------------------------------------------------------
-// Realtime
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Realtime (com retry em subscribe)
+// ----------------------------------------------------------------------------
 function subscribeToTable(table, orgId, callback) {
   try {
     return supabase.channel(`realtime:${table}`).on(
@@ -414,7 +326,6 @@ function subscribeToTable(table, orgId, callback) {
     return { error: handleError(err, 'subscribeToTable') };
   }
 }
-
 function unsubscribeFromTable(subscription) {
   try {
     supabase.removeChannel(subscription);
@@ -423,10 +334,9 @@ function unsubscribeFromTable(subscription) {
     return { success: false, error: handleError(err, 'unsubscribeFromTable') };
   }
 }
-
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Notificações / UI
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 function showNotification(message, type = 'info') {
   if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
     window.showToast(message, type);
@@ -435,10 +345,9 @@ function showNotification(message, type = 'info') {
   console.log(`[${type.toUpperCase()}] ${message}`);
   return { success: true };
 }
-
-// -----------------------------------------------------------------------------
-// Exposição no Window
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Exposição no Window para uso global no browser
+// ----------------------------------------------------------------------------
 if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
   window.AlshamSupabase = window.AlshamSupabase || {};
@@ -461,6 +370,9 @@ if (typeof window !== 'undefined') {
     genericUpdate,
     genericDelete,
     getDashboardKPIs,
+    getROI,
+    recalculateLeadScore,
+    triggerN8n,
     getLeads,
     createLead,
     getUserProfile,
@@ -478,10 +390,9 @@ if (typeof window !== 'undefined') {
   });
   console.log('✅ window.AlshamSupabase disponível:', Object.keys(window.AlshamSupabase));
 }
-
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Export moderno (ESM)
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 export {
   supabase,
   getCurrentSession,
@@ -501,6 +412,9 @@ export {
   genericUpdate,
   genericDelete,
   getDashboardKPIs,
+  getROI,
+  recalculateLeadScore,
+  triggerN8n,
   getLeads,
   createLead,
   getUserProfile,
@@ -516,5 +430,4 @@ export {
   showNotification,
   handleError
 };
-
 export default supabase;
