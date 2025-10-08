@@ -35,7 +35,6 @@ const fallbackSound = '/assets/sounds/success/success.mp3';
 let soundVolume = parseFloat(localStorage.getItem('alsham_sound_volume')) || 0.25;
 let soundEnabled = localStorage.getItem('alsham_sound_enabled') === 'true';
 
-// Atualiza botão lateral
 function updateSoundButtonUI() {
   const btn = document.getElementById('sound-toggle-btn');
   if (btn) {
@@ -44,7 +43,6 @@ function updateSoundButtonUI() {
   }
 }
 
-// Alternar som global
 window.toggleGlobalSound = function () {
   soundEnabled = !soundEnabled;
   localStorage.setItem('alsham_sound_enabled', soundEnabled ? 'true' : 'false');
@@ -55,7 +53,6 @@ window.toggleGlobalSound = function () {
   notify(soundEnabled ? 'Som ativado 🔊' : 'Som desativado 🔇', 'info', 2500, { showProgress: false });
 };
 
-// Ajustar volume do som
 window.setGlobalSoundVolume = function (vol) {
   soundVolume = Math.max(0, Math.min(1, parseFloat(vol)));
   localStorage.setItem('alsham_sound_volume', soundVolume);
@@ -84,7 +81,6 @@ async function init() {
       })
       .subscribe();
     window.addEventListener('beforeunload', () => { if (window.salesChannel) window.salesChannel.unsubscribe(); });
-    // Add export button
     addExportButton();
     document.getElementById('loading')?.remove();
     document.getElementById('pipeline-board')?.classList.remove('hidden');
@@ -390,9 +386,19 @@ window.deleteOpportunity = async function(id) {
 
 // === Gamificação Award on Move ===
 async function awardGamificationPoints(action, type) {
+  let userId = null;
+  if (supabase.auth && supabase.auth.getCurrentUser) {
+    const user = await supabase.auth.getCurrentUser();
+    userId = user?.id;
+  }
+  if (!userId && window.AlshamSupabase && window.AlshamSupabase.getCurrentUser) {
+    const user = await window.AlshamSupabase.getCurrentUser();
+    userId = user?.id;
+  }
+  userId = userId || 'default_user';
   const points = 20;
   const payload = {
-    user_id: 'default_user', // Pull from auth
+    user_id: userId,
     points_awarded: points,
     reason: `${type}: ${action}`
   };
@@ -401,7 +407,12 @@ async function awardGamificationPoints(action, type) {
 
 // === n8n Trigger on Win ===
 async function triggerN8nOnWin(oppId) {
-  const endpoint = 'https://your-n8n-url/webhook/won'; // Configure in env
+  let endpoint = '';
+  if (window.LEADS_CONFIG && window.LEADS_CONFIG.n8nEndpoints?.followUp)
+    endpoint = window.LEADS_CONFIG.n8nEndpoints.followUp;
+  else if (window.AlshamSupabase && window.AlshamSupabase.n8nEndpoints?.followUp)
+    endpoint = window.AlshamSupabase.n8nEndpoints.followUp;
+  endpoint = endpoint || 'https://your-n8n-url/webhook/follow-up';
   const payload = { oppId, event: 'won' };
   await window.AlshamSupabase.triggerN8n(endpoint, payload);
 }
