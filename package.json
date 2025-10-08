@@ -1,7 +1,7 @@
 {
   "name": "alsham-360-prima",
-  "version": "2.0.1",
-  "description": "ALSHAM 360° PRIMA - CRM Enterprise com IA, Gamificação e Automações",
+  "version": "2.0.2",
+  "description": "ALSHAM 360° PRIMA — CRM Enterprise com IA, Gamificação e Automações Integradas (Build Estável v6.0)",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -19,11 +19,12 @@
     "test": "npm run test:unit",
     "test:unit": "vitest run",
     "test:e2e": "start-server-and-test dev:test http://127.0.0.1:4173 \"cypress run\"",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "audit:fix": "npm audit fix --force"
   },
   "engines": {
-    "node": "20.x",
-    "npm": ">=9.0.0"
+    "node": "22.x",
+    "npm": ">=10.0.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.45.4",
@@ -62,10 +63,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alsham-team/alsham-360-prima.git"
+    "url": "https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA.git"
   },
   "bugs": {
-    "url": "https://github.com/alsham-team/alsham-360-prima/issues"
+    "url": "https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/issues"
   },
   "homepage": "https://app.alshamglobal.com.br"
 }
