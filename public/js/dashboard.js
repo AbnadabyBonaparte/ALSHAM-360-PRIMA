@@ -1,7 +1,7 @@
 /**
  * 📊 ALSHAM 360° PRIMA - Dashboard Executivo v6.1 (Auditado, Completo)
  * @author ALSHAM Development
- * Fixes: Full integration with gamification/ROI, export CSV for leads table, caching for data loads, retry on errors, enhanced mobile responsivity with Tailwind grids, award points on dashboard refresh, n8n trigger on KPI thresholds, complete error handling
+ * Fixes: Full integration with gamification/ROI, export CSV for leads table, caching for data loads, retry on errors, enhanced mobile grids and responsivity, award points on dashboard refresh, trigger n8n on KPI thresholds, complete error handling
  */
 console.log("📊 Dashboard v6.1 — inicializando...");
 // ============================================================================
