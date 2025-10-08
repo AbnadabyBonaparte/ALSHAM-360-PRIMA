@@ -1,8 +1,8 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Configuração Oficial de Build (v6.0)
+ * ⚡ ALSHAM 360° PRIMA — Configuração Oficial de Build (v6.0.1)
  * Ambiente: Produção — Node 22.x / Vite 5.4.20
  * Autor: ALSHAM Development Team | 2025
- * 
+ *
  * Inclui:
  * - Compatibilidade com navegadores modernos e fallback legacy
  * - PWA autoUpdate + Workbox precache otimizado
@@ -15,18 +15,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 import legacy from '@vitejs/plugin-legacy';
 import compression from 'vite-plugin-compression';
 
-// ============================================================================
-// ⚙️ CONFIGURAÇÃO PRINCIPAL
-// ============================================================================
 export default defineConfig({
   plugins: [
-    // 🔹 Suporte a navegadores modernos e fallback legacy
     legacy({
       targets: ['defaults', 'not IE 11'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime']
     }),
 
-    // 🔹 Progressive Web App (PWA) com atualização automática
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
@@ -52,11 +47,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,ico,json}'],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 // 5MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
       }
     }),
 
-    // 🔹 Compressão Brotli e Gzip automática
+    // Compressão Brotli e Gzip
     compression({
       algorithm: 'brotliCompress',
       ext: '.br',
@@ -69,9 +64,6 @@ export default defineConfig({
     })
   ],
 
-  // ========================================================================
-  // ⚡ BUILD CONFIG
-  // ========================================================================
   build: {
     target: 'esnext',
     outDir: 'dist',
@@ -98,6 +90,26 @@ export default defineConfig({
     }
   },
 
-  // ========================================================================
-  // 📂 ESTRUTURA E RESOLUÇÃO DE CAMINHOS
-  // ========================================================================
+  publicDir: 'public',
+  resolve: {
+    alias: {
+      '@': '/src',
+      '/js': '/public/js',
+      '/css': '/public/css'
+    }
+  },
+
+  server: {
+    port: 5173,
+    host: '0.0.0.0',
+    open: true,
+    strictPort: true
+  },
+
+  optimizeDeps: {
+    include: ['chart.js', '@supabase/supabase-js']
+  },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+  }
+});
