@@ -1,3 +1,4 @@
+// ✅ Auditado em 10/10/2025 - Padrão window globals correto
 /**
  * 🔐 ALSHAM 360° PRIMA - Reset Password Confirmation V2.0
  * CORRIGIDO: Aguarda Supabase carregar e sem imports ES6
