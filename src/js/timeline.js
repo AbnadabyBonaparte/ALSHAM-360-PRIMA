@@ -1,6 +1,7 @@
 /**
  * TIMELINE DE INTERAÇÕES - LEADS CRM v2.0
  * ✅ CORRIGIDO: usa created_at em vez de interaction_date
+ * ✅ CORRIGIDO: removido export ES6, mantido apenas window export
  */
 
 const ICONS = {
@@ -19,7 +20,8 @@ const COLORS = {
   whatsapp: 'bg-green-50 text-green-600'
 };
 
-export async function loadTimeline(leadId, containerId) {
+// ✅ REMOVIDO "export" - agora usa apenas window export
+async function loadTimeline(leadId, containerId) {
   const container = document.getElementById(containerId);
   
   if (!container) {
@@ -203,5 +205,6 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// ✅ Export via window (padrão correto)
 window.loadTimeline = loadTimeline;
 console.log('✅ Timeline.js v2.0 carregado');
