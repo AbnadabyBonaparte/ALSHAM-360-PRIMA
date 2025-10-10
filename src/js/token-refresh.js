@@ -1,3 +1,4 @@
+// ✅ Auditado em 10/10/2025 - Padrão window globals correto
 /**
  * ALSHAM 360° PRIMA - Enterprise Token Refresh V5.2
  * CORRIGIDO: Aguarda Supabase carregar e sem exports ES6
