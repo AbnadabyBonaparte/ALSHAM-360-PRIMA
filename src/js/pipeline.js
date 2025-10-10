@@ -3,8 +3,8 @@
  * 🧩 Som Global Integrado + Notificações Suaves + UX Refinado + Automação n8n on Close + Gamificação Points on Move + Export CSV Escapado + Caching + Retry Errors + Mobile Responsivity + Modal Edit
  * Data: 08/10/2025
  */
-import { supabase } from '../../src/lib/supabase.js';
-import { showNotification as notify } from '/public/js/utils/notifications.js';
+import { supabase } from '/src/lib/supabase.js';
+import { showNotification as notify } from '/src/js/utils/notifications.js';
 
 const COLUNAS = [
   { id: 'qualificacao', nome: 'Qualificação' },
