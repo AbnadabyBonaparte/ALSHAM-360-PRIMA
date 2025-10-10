@@ -2,6 +2,8 @@
  * ⚡ ALSHAM 360° PRIMA — Tailwind Config v6.0.5
  * ✅ CORRIGIDO: Usa variáveis CSS do tokens.css como fonte única
  * 
+ * 🎯 PRIMEIRO ARQUIVO A MEXER NO PROJETO!
+ * 
  * Mudanças:
  * - Cores agora usam var(--alsham-*) do tokens.css
  * - Eliminada duplicação de definições
