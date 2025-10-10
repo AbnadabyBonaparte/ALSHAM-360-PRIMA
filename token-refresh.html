@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Token Refresh — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Diagnóstico do sistema de renovação automática de tokens do ALSHAM 360° PRIMA." />
-
   <!-- ✅ CSP CORRIGIDA -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
@@ -17,21 +16,16 @@
     object-src 'none';
     frame-src 'self';
     worker-src 'self' blob:;">
-
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
 </head>
 <body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col">
-
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
   <main class="flex-1 flex items-center justify-center">
     <div class="bg-white rounded-xl shadow-md p-8 max-w-lg w-full text-center">
       <h1 class="text-2xl font-bold text-gray-900 mb-4">🔄 Diagnóstico Token Refresh</h1>
       <p class="text-gray-600 mb-6">Este painel verifica automaticamente a renovação de tokens a cada <b>5 minutos</b>.</p>
-
       <div id="session-info" class="text-left bg-gray-50 border rounded-lg p-4 hidden"></div>
-
       <button id="check-now" class="mt-6 w-full bg-primary hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg">
         🔎 Verificar Agora
       </button>
@@ -43,14 +37,12 @@
       </button>
     </div>
   </main>
-
   <footer class="py-6 text-center text-gray-500 text-sm">
     © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
   </footer>
-
   <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
   <script type="module" src="/src/lib/supabase.js"></script>
-  <script src="/js/token-refresh.js"></script>
+  <script src="/src/js/token-refresh.js"></script>
   <script>
     async function showSession() {
       try {
@@ -69,23 +61,19 @@
         console.error("Erro ao exibir sessão:", e);
       }
     }
-
     document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         document.getElementById("check-now").addEventListener("click", showSession);
-
         document.getElementById("stop-refresh").addEventListener("click", () => {
           window.AlshamTokenRefresh?.stop();
           document.getElementById("stop-refresh").classList.add("hidden");
           document.getElementById("start-refresh").classList.remove("hidden");
         });
-
         document.getElementById("start-refresh").addEventListener("click", () => {
           window.AlshamTokenRefresh?.start();
           document.getElementById("start-refresh").classList.add("hidden");
           document.getElementById("stop-refresh").classList.remove("hidden");
         });
-
         showSession();
       }, 500);
     });
