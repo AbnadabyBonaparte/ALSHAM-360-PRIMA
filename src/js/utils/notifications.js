@@ -1,12 +1,13 @@
 /**
  * ALSHAM 360° PRIMA - Sistema de Notificações Toast Enterprise
- * Versão: 2.6.0 — SUPREME SYNC EDITION
+ * Versão: 2.6.1 — SUPREME SYNC EDITION (Padrão Window Export)
+ * ✅ CORRIGIDO: Removido exports ES6, usa window exports
  * 🔊 Som totalmente sincronizado com pipeline.js (menu lateral)
  * 🌓 Dark mode, animações refinadas e sons dinâmicos
  * 💅 Toasts suaves, sem barra visual e CSP-safe
  */
 
-export class NotificationSystem {
+class NotificationSystem {
   constructor(containerId = 'toast-container') {
     this.injectAnimationCSS();
     this.container = document.getElementById(containerId);
@@ -197,8 +198,7 @@ export class NotificationSystem {
 }
 
 // === Instância global ===
-export const notify = new NotificationSystem();
-export default NotificationSystem;
+const notify = new NotificationSystem();
 
 // === Controle de som global sincronizado ===
 let notifySoundEnabled = localStorage.getItem('alsham_sound_enabled') === 'true';
@@ -232,6 +232,13 @@ notify.show = function (message, type = 'info', duration = 4000, options = {}) {
 };
 
 // Compatibilidade com chamadas simples
-export function showNotification(message, type = 'info', duration = 4000, options = {}) {
+function showNotification(message, type = 'info', duration = 4000, options = {}) {
   return notify.show(message, type, duration, options);
 }
+
+// ✅ EXPORTS VIA WINDOW (padrão correto do projeto)
+window.NotificationSystem = NotificationSystem;
+window.notify = notify;
+window.showNotification = showNotification;
+
+console.log('✅ Notifications System v2.6.1 carregado (window exports)');
