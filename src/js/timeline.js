@@ -1,3 +1,4 @@
+// ✅ Auditado em 10/10/2025 - Corrigido e commitado - window export correto
 /**
  * TIMELINE DE INTERAÇÕES - LEADS CRM v2.0
  * ✅ CORRIGIDO: usa created_at em vez de interaction_date
