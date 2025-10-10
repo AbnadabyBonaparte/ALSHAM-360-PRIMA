@@ -48,7 +48,7 @@
   
   <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
   <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/src/js/session-guard.js"></script>
+  <!-- ✅ REMOVIDO: import de session-guard.js que não existe -->
   <script type="module">
     async function showUser() {
       try {
@@ -62,18 +62,20 @@
             <p><b>Org:</b> ${session.user.user_metadata?.org_id || "N/A"}</p>
           `;
           userDiv.classList.remove("hidden");
+        } else {
+          // Se não tem sessão, redireciona
+          window.location.href = "/login.html";
         }
       } catch (e) {
         console.error("Erro ao carregar usuário:", e);
+        window.location.href = "/login.html";
       }
     }
     
     document.addEventListener("DOMContentLoaded", () => {
       showUser();
       document.getElementById("force-check").addEventListener("click", () => {
-        if (window.AlshamSessionGuard) {
-          window.AlshamSessionGuard();
-        }
+        showUser();
       });
     });
   </script>
