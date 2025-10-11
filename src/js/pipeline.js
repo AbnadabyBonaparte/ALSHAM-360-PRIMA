@@ -1,445 +1,397 @@
-/**
- * Pipeline v7.0 FINAL - COMPLETO E FUNCIONAL
- * ✅ Todas as funções implementadas
- * ✅ Visual corrigido
- * ✅ Sem gambiarras
- */
-
-let checkCount = 0;
-const maxChecks = 100;
-
-function waitForDeps() {
-  checkCount++;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  if (window.AlshamSupabase?.supabase && window.showNotification) {
-    console.log('✅ Pipeline: Dependências OK');
-    initPipeline();
-  } else if (checkCount >= maxChecks) {
-    console.error('❌ Pipeline: Timeout');
-    showErrorScreen();
-  } else {
-    setTimeout(waitForDeps, 100);
-  }
-}
-
-function showErrorScreen() {
-  const loading = document.getElementById('loading');
-  if (loading) {
-    loading.innerHTML = `
-      <div style="background: white; padding: 3rem; border-radius: 1rem; text-align: center; max-width: 500px; margin: 0 auto;">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">❌</div>
-        <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #EF4444;">
-          Erro ao Carregar Pipeline
-        </h3>
-        <p style="color: #6B7280; margin-bottom: 2rem;">
-          As dependências não carregaram. Tente recarregar a página.
-        </p>
-        <button onclick="location.reload()" 
-                style="padding: 0.75rem 2rem; background: #3B82F6; color: white; 
-                       border: none; border-radius: 0.5rem; font-weight: 600; 
-                       cursor: pointer; font-size: 1rem;">
-          🔄 Recarregar Página
-        </button>
-      </div>
-    `;
-  }
-}
-
-function initPipeline() {
-  const supabase = window.AlshamSupabase.supabase;
-  const notify = window.showNotification;
-
-  const COLUNAS = [
-    { id: 'qualificacao', nome: 'Qualificação', color: '#3B82F6' },
-    { id: 'proposta', nome: 'Proposta', color: '#F59E0B' },
-    { id: 'negociacao', nome: 'Negociação', color: '#8B5CF6' },
-    { id: 'fechado_ganho', nome: 'Fechado Ganho', color: '#10B981' },
-    { id: 'perdido', nome: 'Perdido', color: '#EF4444' }
-  ];
-
-  let opportunities = [];
-  let draggedCard = null;
-
-  // ===== CARREGAR OPORTUNIDADES =====
-  async function loadOpportunities() {
-    try {
-      const { data, error } = await supabase
-        .from('sales_opportunities')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      opportunities = data || [];
-      console.log(`📊 ${opportunities.length} oportunidades carregadas`);
-      return opportunities;
-    } catch (err) {
-      console.error('❌ Erro ao carregar:', err);
-      notify(`Erro: ${err.message}`, 'error', 4000);
-      return [];
+  <!-- ✅ Theme Init - PRIMEIRO script -->
+  <script src="/js/theme-init.js"></script>
+  
+  <title>Pipeline de Vendas — ALSHAM 360° PRIMA</title>
+  
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  
+  <!-- 🎨 Dark Mode Critical CSS -->
+  <style id="dark-theme-critical">
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #f3f4f6;
+      --alsham-bg-surface: #ffffff;
+      --alsham-bg-hover: #f3f4f6;
+      --alsham-border-default: #e5e7eb;
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
+      --alsham-primary: #3B82F6;
+      --alsham-primary-light: rgba(59,130,246,0.1);
+      --alsham-radius-lg: 1rem;
+      --alsham-radius-full: 9999px;
     }
-  }
-
-  // ===== RENDERIZAR BOARD =====
-  function renderBoard() {
-    const board = document.getElementById('pipeline-board');
-    if (!board) return;
     
-    board.innerHTML = COLUNAS.map(col => {
-      const opps = opportunities.filter(o => o.status === col.id);
-      const total = opps.reduce((sum, o) => sum + (parseFloat(o.valor) || 0), 0);
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-border-default: #334155;
+      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
+      color-scheme: dark;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--alsham-bg-canvas);
+      color: var(--alsham-text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+    }
+  </style>
+  
+  <!-- 🌙 Theme Toggle Script -->
+  <script>
+    (function() {
+      'use strict';
+      const savedTheme = localStorage.getItem('alsham-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
       
-      return `
-        <div class="pipeline-column" data-stage="${col.id}">
-          <div class="pipeline-column-header" style="border-bottom-color: ${col.color};">
-            <h3>${col.nome}</h3>
-            <div class="pipeline-column-stats">
-              <span>R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-              <span class="deal-count">${opps.length}</span>
-            </div>
-          </div>
-          <div class="pipeline-column-body" data-column-id="${col.id}">
-            ${opps.length > 0 ? opps.map(opp => createCard(opp)).join('') : 
-              '<div style="padding: 2rem; text-align: center; color: #9CA3AF; font-size: 0.875rem;">Nenhuma oportunidade</div>'}
-          </div>
-        </div>
-      `;
-    }).join('');
-    
-    attachDragListeners();
-  }
-
-  function createCard(opp) {
-    return `
-      <div class="opportunity-card" draggable="true" data-opportunity-id="${opp.id}">
-        <div style="margin-bottom: 0.75rem;">
-          <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827;">
-            ${escapeHtml(opp.titulo || 'Sem título')}
-          </h4>
-          <p style="font-size: 1.25rem; font-weight: 700; color: #3B82F6; margin: 0;">
-            R$ ${(parseFloat(opp.valor) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; color: #6B7280;">
-          <span>${opp.probabilidade || 0}% prob.</span>
-          <div style="display: flex; gap: 0.5rem;">
-            <button onclick="editOpp('${opp.id}')" 
-                    style="background: none; border: none; color: #3B82F6; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
-              ✏️ Editar
-            </button>
-            <button onclick="deleteOpp('${opp.id}')" 
-                    style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
-              🗑️ Deletar
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // ===== DRAG & DROP =====
-  function attachDragListeners() {
-    document.querySelectorAll('.opportunity-card').forEach(card => {
-      card.addEventListener('dragstart', () => {
-        draggedCard = card;
-        card.style.opacity = '0.5';
-      });
-      card.addEventListener('dragend', () => {
-        card.style.opacity = '1';
-        draggedCard = null;
-      });
-    });
-
-    document.querySelectorAll('.pipeline-column-body').forEach(column => {
-      column.addEventListener('dragover', e => {
-        e.preventDefault();
-        column.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-      });
-      column.addEventListener('dragleave', () => {
-        column.style.backgroundColor = '';
-      });
-      column.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        column.style.backgroundColor = '';
-        
-        if (!draggedCard) return;
-        
-        const targetStage = column.dataset.columnId;
-        const oppId = draggedCard.dataset.opportunityId;
-        const opp = opportunities.find(o => o.id == oppId);
-        
-        if (!opp || opp.status === targetStage) return;
-        
-        column.appendChild(draggedCard);
-        
-        try {
-          const { error } = await supabase
-            .from('sales_opportunities')
-            .update({ status: targetStage, updated_at: new Date().toISOString() })
-            .eq('id', oppId);
-          
-          if (error) throw error;
-          
-          notify('✅ Oportunidade movida com sucesso!', 'success', 2000);
-          await loadOpportunities();
-          renderBoard();
-        } catch (err) {
-          notify(`❌ Erro ao mover: ${err.message}`, 'error', 3000);
-          await loadOpportunities();
-          renderBoard();
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        if (isDark) {
+          html.classList.remove('dark');
+          html.removeAttribute('data-theme');
+          localStorage.setItem('alsham-theme', 'light');
+        } else {
+          html.classList.add('dark');
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('alsham-theme', 'dark');
+        }
+      }
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+          themeToggle.addEventListener('click', toggleTheme);
         }
       });
-    });
-  }
-
-  // ===== CRIAR OPORTUNIDADE =====
-  window.createNewOpp = function() {
-    const modal = createModal('Criar Oportunidade', `
-      <form id="create-form" style="display: flex; flex-direction: column; gap: 1rem;">
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Título</label>
-          <input type="text" id="new-titulo" required 
-                 style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-        </div>
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Valor (R$)</label>
-          <input type="number" id="new-valor" required step="0.01" min="0"
-                 style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-        </div>
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Probabilidade (%)</label>
-          <input type="number" id="new-prob" min="0" max="100" value="50"
-                 style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-        </div>
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Status</label>
-          <select id="new-status" 
-                  style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-            ${COLUNAS.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')}
-          </select>
-        </div>
-        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-          <button type="submit" 
-                  style="flex: 1; padding: 0.75rem; background: #3B82F6; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-            ✅ Criar
-          </button>
-          <button type="button" onclick="closeModal()" 
-                  style="flex: 1; padding: 0.75rem; background: #F3F4F6; color: #374151; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-            Cancelar
-          </button>
-        </div>
-      </form>
-    `);
-    
-    document.getElementById('create-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const titulo = document.getElementById('new-titulo').value.trim();
-      const valor = parseFloat(document.getElementById('new-valor').value) || 0;
-      const probabilidade = parseInt(document.getElementById('new-prob').value) || 0;
-      const status = document.getElementById('new-status').value;
-      
-      if (!titulo) {
-        notify('❌ Título é obrigatório', 'error', 2000);
-        return;
-      }
-      
-      try {
-        const { error } = await supabase
-          .from('sales_opportunities')
-          .insert({
-            titulo,
-            valor,
-            probabilidade,
-            status,
-            org_id: await window.AlshamSupabase.getCurrentOrgId(),
-            created_at: new Date().toISOString()
-          });
-        
-        if (error) throw error;
-        
-        notify('✅ Oportunidade criada!', 'success', 2000);
-        closeModal();
-        await loadOpportunities();
-        renderBoard();
-      } catch (err) {
-        notify(`❌ Erro: ${err.message}`, 'error', 3000);
-      }
-    });
-  };
-
-  // ===== EDITAR OPORTUNIDADE =====
-  window.editOpp = function(id) {
-    const opp = opportunities.find(o => o.id == id);
-    if (!opp) return;
-    
-    const modal = createModal('Editar Oportunidade', `
-      <form id="edit-form" style="display: flex; flex-direction: column; gap: 1rem;">
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Título</label>
-          <input type="text" id="edit-titulo" value="${escapeHtml(opp.titulo || '')}" required 
-                 style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-        </div>
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Valor (R$)</label>
-          <input type="number" id="edit-valor" value="${opp.valor || 0}" required step="0.01" min="0"
-                 style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-        </div>
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Probabilidade (%)</label>
-          <input type="number" id="edit-prob" value="${opp.probabilidade || 0}" min="0" max="100"
-                 style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-        </div>
-        <div>
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Status</label>
-          <select id="edit-status" 
-                  style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-            ${COLUNAS.map(c => `<option value="${c.id}" ${c.id === opp.status ? 'selected' : ''}>${c.nome}</option>`).join('')}
-          </select>
-        </div>
-        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-          <button type="submit" 
-                  style="flex: 1; padding: 0.75rem; background: #3B82F6; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-            ✅ Salvar
-          </button>
-          <button type="button" onclick="closeModal()" 
-                  style="flex: 1; padding: 0.75rem; background: #F3F4F6; color: #374151; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-            Cancelar
-          </button>
-        </div>
-      </form>
-    `);
-    
-    document.getElementById('edit-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const titulo = document.getElementById('edit-titulo').value.trim();
-      const valor = parseFloat(document.getElementById('edit-valor').value) || 0;
-      const probabilidade = parseInt(document.getElementById('edit-prob').value) || 0;
-      const status = document.getElementById('edit-status').value;
-      
-      if (!titulo) {
-        notify('❌ Título é obrigatório', 'error', 2000);
-        return;
-      }
-      
-      try {
-        const { error } = await supabase
-          .from('sales_opportunities')
-          .update({ titulo, valor, probabilidade, status, updated_at: new Date().toISOString() })
-          .eq('id', id);
-        
-        if (error) throw error;
-        
-        notify('✅ Oportunidade atualizada!', 'success', 2000);
-        closeModal();
-        await loadOpportunities();
-        renderBoard();
-      } catch (err) {
-        notify(`❌ Erro: ${err.message}`, 'error', 3000);
-      }
-    });
-  };
-
-  // ===== DELETAR OPORTUNIDADE =====
-  window.deleteOpp = async function(id) {
-    if (!confirm('❌ Tem certeza que deseja deletar esta oportunidade?')) return;
-    
-    try {
-      const { error } = await supabase
-        .from('sales_opportunities')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-      
-      notify('✅ Oportunidade deletada!', 'success', 2000);
-      await loadOpportunities();
-      renderBoard();
-    } catch (err) {
-      notify(`❌ Erro: ${err.message}`, 'error', 3000);
+    })();
+  </script>
+  
+  <!-- 🎨 Pipeline Styles -->
+  <style>
+    /* Sidebar */
+    aside {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 16rem;
+      height: 100vh;
+      background: var(--alsham-bg-surface);
+      box-shadow: var(--alsham-shadow-lg);
+      border-right: 1px solid var(--alsham-border-default);
+      display: flex;
+      flex-direction: column;
+      z-index: 40;
     }
-  };
-
-  // ===== MODAL =====
-  function createModal(title, content) {
-    const existing = document.getElementById('pipeline-modal');
-    if (existing) existing.remove();
     
-    const modal = document.createElement('div');
-    modal.id = 'pipeline-modal';
-    modal.style.cssText = 'position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); padding: 1rem;';
+    aside > div:first-child {
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      border-bottom: 1px solid var(--alsham-border-default);
+    }
     
-    modal.innerHTML = `
-      <div style="background: white; border-radius: 1rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);">
-        <div style="padding: 1.5rem; border-bottom: 1px solid #E5E7EB;">
-          <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0; color: #111827;">${title}</h2>
-        </div>
-        <div style="padding: 1.5rem;">
-          ${content}
-        </div>
+    aside h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #3B82F6;
+    }
+    
+    nav {
+      margin-top: 1.25rem;
+      padding: 0 0.75rem;
+      flex-grow: 1;
+    }
+    
+    nav a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      color: var(--alsham-text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    nav a:hover {
+      background: var(--alsham-bg-hover);
+      color: #3B82F6;
+    }
+    
+    nav a.active {
+      background: var(--alsham-primary-light);
+      color: #3B82F6;
+      font-weight: 600;
+    }
+    
+    /* Main */
+    main {
+      margin-left: 16rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    header {
+      background: var(--alsham-bg-surface);
+      box-shadow: var(--alsham-shadow-sm);
+      border-bottom: 1px solid var(--alsham-border-default);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    
+    header > div {
+      max-width: 90rem;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    #theme-toggle {
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--alsham-border-default);
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    #theme-toggle:hover {
+      background: var(--alsham-primary-light);
+      border-color: #3b82f6;
+      transform: scale(1.05);
+    }
+    
+    #theme-toggle svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--alsham-text-secondary);
+    }
+    
+    html:not(.dark) .moon-icon { display: none; }
+    html.dark .sun-icon { display: none; }
+    
+    /* Pipeline Container */
+    .pipeline-container {
+      padding: 2rem;
+      overflow-x: auto;
+      flex: 1;
+    }
+    
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      font-size: 1.125rem;
+      color: var(--alsham-text-secondary);
+    }
+    
+    #pipeline-board {
+      display: flex;
+      gap: 1.5rem;
+      min-width: max-content;
+      align-items: flex-start;
+    }
+    
+    #pipeline-board.hidden {
+      display: none;
+    }
+    
+    /* Pipeline Columns */
+    .pipeline-column {
+      background: var(--alsham-bg-canvas);
+      border-radius: 0.75rem;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .pipeline-column-header {
+      padding: 1.25rem;
+      border-bottom: 3px solid;
+      border-radius: 0.75rem 0.75rem 0 0;
+      background: var(--alsham-bg-surface);
+      box-shadow: var(--alsham-shadow-sm);
+    }
+    
+    .pipeline-column-header h3 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+      color: var(--alsham-text-primary);
+    }
+    
+    .pipeline-column-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+      color: var(--alsham-text-secondary);
+    }
+    
+    .deal-count {
+      background: var(--alsham-bg-hover);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--alsham-radius-full);
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    
+    .pipeline-column-body {
+      padding: 1rem;
+      flex: 1;
+      min-height: 200px;
+      border-radius: 0 0 0.75rem 0.75rem;
+      transition: background-color 0.2s ease;
+    }
+    
+    .pipeline-column-body.drag-over {
+      background: var(--alsham-primary-light);
+    }
+    
+    /* Opportunity Cards */
+    .opportunity-card {
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-left: 4px solid #3B82F6;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      cursor: grab;
+      transition: all 0.2s;
+      box-shadow: var(--alsham-shadow-sm);
+    }
+    
+    .opportunity-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--alsham-shadow-md);
+    }
+    
+    .opportunity-card:active {
+      cursor: grabbing;
+    }
+    
+    .opportunity-card.dragging {
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🎯 Sidebar -->
+  <aside>
+    <div>
+      <h1>ALSHAM 360°</h1>
+    </div>
+    <nav>
+      <a href="/dashboard.html">📊 Dashboard</a>
+      <a href="/leads-real.html">👥 Leads</a>
+      <a href="/pipeline.html" class="active">🎯 Pipeline</a>
+      <a href="/automacoes.html">🤖 Automações</a>
+      <a href="/relatorios.html">📈 Relatórios</a>
+      <a href="/gamificacao.html">🎮 Gamificação</a>
+      <a href="/configuracoes.html">⚙️ Configurações</a>
+    </nav>
+  </aside>
+  
+  <!-- 📄 Main Content -->
+  <main>
+    <header>
+      <div>
+        <h1>Pipeline de Vendas</h1>
+        <button id="theme-toggle">
+          <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
       </div>
-    `;
+    </header>
     
-    document.body.appendChild(modal);
-    
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-    
-    return modal;
-  }
-
-  window.closeModal = function() {
-    const modal = document.getElementById('pipeline-modal');
-    if (modal) modal.remove();
-  };
-
-  // ===== UTILITÃRIOS =====
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  // ===== INICIALIZAÃÃO =====
-  async function init() {
-    try {
-      await loadOpportunities();
-      renderBoard();
-      
-      // Adicionar botão criar
-      const header = document.querySelector('header > div');
-      if (header && !document.getElementById('create-opp-btn')) {
-        const btn = document.createElement('button');
-        btn.id = 'create-opp-btn';
-        btn.textContent = '➕ Nova Oportunidade';
-        btn.onclick = window.createNewOpp;
-        btn.style.cssText = 'padding: 0.75rem 1.5rem; background: #10B981; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.875rem;';
-        header.appendChild(btn);
-      }
-      
-      document.getElementById('loading')?.remove();
-      const board = document.getElementById('pipeline-board');
-      if (board) {
-        board.classList.remove('hidden');
-        board.style.display = 'flex';
-      }
-      
-      console.log('✅ Pipeline v7.0 carregado com sucesso!');
-    } catch (err) {
-      console.error('❌ Erro ao inicializar:', err);
-      showErrorScreen();
-    }
-  }
-
-  init();
-}
-
-// Inicia quando DOM estiver pronto
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', waitForDeps);
-} else {
-  waitForDeps();
-}
-
-console.log('🚀 Pipeline v7.0 - Sistema completo inicializado');
+    <div class="pipeline-container">
+      <div id="loading">⏳ Carregando pipeline...</div>
+      <div id="pipeline-board" class="hidden"></div>
+    </div>
+  </main>
+  
+  <!-- ✅ Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
+  
+  <!-- ✅ Notifications (global function) -->
+  <script>
+    window.showNotification = function(message, type = 'info', duration = 3000) {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10000;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6'};
+        color: white;
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), duration);
+    };
+  </script>
+  
+  <!-- ✅ Pipeline Script (v8.0 UNIFICADO) -->
+  <script type="module" src="/src/js/pipeline.js"></script>
+</body>
+</html>
