@@ -1,10 +1,11 @@
 /**
  * 📊 ALSHAM 360° PRIMA - Dashboard Executivo
- * @version 8.2.0 - PRODUÇÃO FINAL (Unificado, Corrigido)
+ * @version 8.3.0 - BUG GAMIFICAÇÃO CORRIGIDO ✅
  * @author ALSHAM Development Team
+ * @fix Adicionado org_id em gamification_points
  */
 
-console.log('📊 Dashboard v8.2 carregando...');
+console.log('📊 Dashboard v8.3 carregando...');
 
 // Estado global do dashboard
 const DashboardState = {
@@ -38,13 +39,15 @@ async function initDashboard() {
       return;
     }
 
-    // Obter usuário logado, se a função existir
+    // Obter usuário logado
     if (typeof window.AlshamSupabase.getCurrentUser === 'function') {
       DashboardState.user = await window.AlshamSupabase.getCurrentUser();
       if (!DashboardState.user || !DashboardState.user.id) {
+        console.warn('⚠️ Usuário não autenticado');
         showError('Usuário não autenticado');
         return;
       }
+      console.log('👤 Usuário:', DashboardState.user.id);
     }
 
     // Obter org_id
@@ -83,6 +86,7 @@ async function initDashboard() {
 async function loadDashboardData() {
   try {
     console.log('📥 Carregando dados do dashboard...');
+    
     // Carregamento paralelo
     const [kpis, roi, leadsResult, gamification] = await Promise.all([
       window.AlshamSupabase.getDashboardKPIs(DashboardState.orgId),
@@ -90,6 +94,7 @@ async function loadDashboardData() {
       window.AlshamSupabase.getLeads(100, DashboardState.orgId),
       loadGamification()
     ]);
+    
     DashboardState.kpis = kpis || {};
     DashboardState.roi = roi || { revenue: 0, spend: 0, roi: 0 };
     DashboardState.leads = leadsResult?.data || [];
@@ -101,7 +106,10 @@ async function loadDashboardData() {
     }
 
     // Trigger n8n se conversão baixa
-    if (DashboardState.kpis.conversion_rate < 5) await triggerN8nOnLowConversion();
+    if (DashboardState.kpis.conversion_rate < 5) {
+      await triggerN8nOnLowConversion();
+    }
+    
     console.log(`✅ ${DashboardState.leads.length} leads carregados`);
   } catch (error) {
     console.error('❌ Erro ao carregar dados:', error);
@@ -113,6 +121,7 @@ function calculateKPIsFromLeads(leads) {
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const today = new Date().toDateString();
+  
   return {
     total_leads: leads.length,
     new_leads_last_7_days: leads.filter(l => new Date(l.created_at) >= sevenDaysAgo).length,
@@ -127,28 +136,73 @@ function calculateKPIsFromLeads(leads) {
   };
 }
 
+// ============================================================================
+// 🎮 GAMIFICAÇÃO (CORRIGIDO) ✅
+// ============================================================================
 async function loadGamification() {
-  if (!DashboardState.user?.id) return { points: 0 };
-  const { data } = await window.AlshamSupabase.genericSelect("gamification_points", { user_id: DashboardState.user.id, org_id: DashboardState.orgId });
-  return { points: data?.reduce((s, p) => s + (p.points_awarded || 0), 0) || 0 };
+  if (!DashboardState.user?.id || !DashboardState.orgId) {
+    console.warn('⚠️ Gamificação: sem user_id ou org_id');
+    return { points: 0 };
+  }
+  
+  try {
+    const { data, error } = await window.AlshamSupabase.genericSelect(
+      "gamification_points", 
+      { 
+        user_id: DashboardState.user.id, 
+        org_id: DashboardState.orgId 
+      }
+    );
+    
+    if (error) throw error;
+    
+    const totalPoints = data?.reduce((sum, p) => sum + (p.points_awarded || 0), 0) || 0;
+    console.log(`🏅 Pontos do usuário: ${totalPoints}`);
+    return { points: totalPoints };
+  } catch (error) {
+    console.error('❌ Erro ao carregar gamificação:', error);
+    return { points: 0 };
+  }
 }
 
 async function awardGamificationPoints(action, type) {
-  if (!DashboardState.user?.id) return;
-  const points = 10;
-  const payload = {
-    user_id: DashboardState.user.id,
-    points_awarded: points,
-    reason: `${type}: ${action}`
-  };
-  await window.AlshamSupabase.genericInsert('gamification_points', payload);
-  DashboardState.gamification.points += points;
+  if (!DashboardState.user?.id || !DashboardState.orgId) {
+    console.warn('⚠️ Gamificação: user_id ou org_id não disponível');
+    return;
+  }
+  
+  try {
+    const points = 10;
+    const payload = {
+      user_id: DashboardState.user.id,
+      org_id: DashboardState.orgId,  // ✅ CORRIGIDO!
+      points_awarded: points,
+      activity_type: type,
+      reason: `${type}: ${action}`
+    };
+    
+    await window.AlshamSupabase.genericInsert('gamification_points', payload);
+    DashboardState.gamification.points += points;
+    console.log(`✅ +${points} pontos por ${action}`);
+  } catch (error) {
+    console.error('❌ Erro ao pontuar gamificação:', error);
+    // Não quebra o dashboard se gamificação falhar
+  }
 }
 
 async function triggerN8nOnLowConversion() {
-  const endpoint = 'https://your-n8n-url/webhook/low-conversion'; // Configure in env
-  const payload = { orgId: DashboardState.orgId, conversion_rate: DashboardState.kpis.conversion_rate };
-  await window.AlshamSupabase.triggerN8n(endpoint, payload);
+  const endpoint = 'https://your-n8n-url/webhook/low-conversion';
+  const payload = { 
+    orgId: DashboardState.orgId, 
+    conversion_rate: DashboardState.kpis.conversion_rate 
+  };
+  
+  try {
+    await window.AlshamSupabase.triggerN8n(endpoint, payload);
+    console.log('📡 n8n notificado: conversão baixa');
+  } catch (error) {
+    console.warn('⚠️ Falha ao notificar n8n:', error);
+  }
 }
 
 // ============================================================================
@@ -167,10 +221,12 @@ function renderKPIs() {
   const kpis = DashboardState.kpis;
   const gamification = DashboardState.gamification;
   const container = document.getElementById('dashboard-kpis');
+  
   if (!container) {
     console.warn('⚠️ Container dashboard-kpis não encontrado');
     return;
   }
+  
   container.innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
       <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between">
@@ -180,6 +236,7 @@ function renderKPIs() {
         </div>
         <div class="bg-blue-100 rounded-full p-3 mt-3 text-blue-600">👥</div>
       </div>
+      
       <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between">
         <div>
           <p class="text-sm text-gray-600 mb-1">Novos Hoje</p>
@@ -187,6 +244,7 @@ function renderKPIs() {
         </div>
         <div class="bg-green-100 rounded-full p-3 mt-3 text-green-600">🟢</div>
       </div>
+      
       <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between">
         <div>
           <p class="text-sm text-gray-600 mb-1">Qualificados</p>
@@ -194,6 +252,7 @@ function renderKPIs() {
         </div>
         <div class="bg-purple-100 rounded-full p-3 mt-3 text-purple-600">⭐</div>
       </div>
+      
       <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between">
         <div>
           <p class="text-sm text-gray-600 mb-1">Taxa Conversão</p>
@@ -201,6 +260,7 @@ function renderKPIs() {
         </div>
         <div class="bg-yellow-100 rounded-full p-3 mt-3 text-yellow-600">🏆</div>
       </div>
+      
       <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between">
         <div>
           <p class="text-sm text-gray-600 mb-1">Pontos Gamificação</p>
@@ -209,6 +269,7 @@ function renderKPIs() {
         <div class="bg-yellow-100 rounded-full p-3 mt-3 text-yellow-600">🏅</div>
       </div>
     </div>
+    
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-white rounded-lg shadow p-4">
         <p class="text-sm text-gray-600">🔥 Leads Quentes</p>
@@ -230,6 +291,7 @@ function renderKPIs() {
 function renderROI() {
   const container = document.getElementById("roi-container");
   if (!container) return;
+  
   const { roi } = DashboardState;
   container.innerHTML = `
     <div class="bg-white rounded-lg shadow p-6 mb-8">
@@ -261,7 +323,9 @@ function renderStatusChart() {
   }
 
   const leads = DashboardState.leads;
-  if (DashboardState.charts.statusChart) DashboardState.charts.statusChart.destroy();
+  if (DashboardState.charts.statusChart) {
+    DashboardState.charts.statusChart.destroy();
+  }
 
   const statusCounts = {
     novo: leads.filter(l => l.status === 'novo').length,
@@ -322,7 +386,9 @@ function renderDailyChart() {
   }
 
   const leads = DashboardState.leads;
-  if (DashboardState.charts.dailyChart) DashboardState.charts.dailyChart.destroy();
+  if (DashboardState.charts.dailyChart) {
+    DashboardState.charts.dailyChart.destroy();
+  }
 
   const days = [];
   const counts = [];
@@ -383,11 +449,13 @@ function renderDailyChart() {
 function renderLeadsTable() {
   const container = document.getElementById('leads-table');
   if (!container) return;
+  
   const leads = DashboardState.leads.slice(0, 10);
   if (leads.length === 0) {
     container.innerHTML = '<div class="text-center py-8 text-gray-500">Nenhum lead encontrado</div>';
     return;
   }
+  
   const rows = leads.map(lead => {
     const statusBadge = getStatusBadge(lead.status);
     const tempBadge = getTemperaturaBadge(lead.temperatura);
@@ -403,11 +471,14 @@ function renderLeadsTable() {
       </tr>
     `;
   }).join('');
+  
   container.innerHTML = `
     <div class="bg-white rounded-lg shadow overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 class="text-lg font-semibold text-gray-900">Leads Recentes</h3>
-        <button onclick="exportLeadsCSV()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Exportar CSV</button>
+        <button onclick="exportLeadsCSV()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+          Exportar CSV
+        </button>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
@@ -454,7 +525,9 @@ function getTemperaturaBadge(temp) {
 
 function showLoading(show) {
   const loader = document.getElementById('loading-indicator');
-  if (loader) loader.style.display = show ? 'flex' : 'none';
+  if (loader) {
+    loader.style.display = show ? 'flex' : 'none';
+  }
 }
 
 function showError(message) {
@@ -483,11 +556,13 @@ window.exportLeadsCSV = function() {
     if (val == null) return '';
     return `"${String(val).replace(/"/g, '""').replace(/\n/g, ' ')}"`;
   }
+  
   const csvContent = "data:text/csv;charset=utf-8," +
     "ID,Nome,Email,Telefone,Empresa,Cargo,Status,Origem,Score IA,Data Criação\n" +
     DashboardState.leads.map(l =>
       `${esc(l.id)},${esc(l.nome)},${esc(l.email)},${esc(l.telefone)},${esc(l.empresa)},${esc(l.cargo)},${esc(l.status)},${esc(l.origem)},${esc(l.score_ia || 0)},${esc(new Date(l.created_at).toLocaleDateString('pt-BR'))}`
     ).join("\n");
+  
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
@@ -502,6 +577,7 @@ window.exportLeadsCSV = function() {
 // ============================================================================
 function setupRealtime() {
   if (!window.AlshamSupabase || !DashboardState.orgId) return;
+  
   window.AlshamSupabase.subscribeToTable('leads_crm', DashboardState.orgId, (payload) => {
     console.log('🔔 Atualização em tempo real:', payload);
     refreshDashboard();
@@ -525,4 +601,4 @@ window.DashboardApp = {
   init: initDashboard
 };
 
-console.log('✅ Dashboard v8.2 carregado e pronto');
+console.log('✅ Dashboard v8.3 carregado e pronto');
