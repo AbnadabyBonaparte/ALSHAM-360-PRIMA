@@ -1,0 +1,436 @@
+/**
+ * ALSHAM 360° PRIMA - Dashboard Animations v11.0
+ * Animações premium para Dashboard executivo
+ */
+
+/* ============================================================================
+   KEYFRAMES ANIMATIONS
+   ============================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progressBar {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+/* ============================================================================
+   CARD ANIMATIONS
+   ============================================================================ */
+
+.card-animate {
+  animation: slideUp 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.card-animate:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.card-animate:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.card-animate:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.card-animate:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.card-animate:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+/* ============================================================================
+   HOVER EFFECTS
+   ============================================================================ */
+
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.button-hover {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.button-hover::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.button-hover:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* ============================================================================
+   CHART ANIMATIONS
+   ============================================================================ */
+
+.chart-container {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.chart-drilldown {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-drilldown:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-drilldown:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================================
+   NUMBER COUNTER ANIMATIONS
+   ============================================================================ */
+
+.counter {
+  display: inline-block;
+  transition: all 0.5s ease;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-animate {
+  animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================================
+   LOADING STATES
+   ============================================================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    #1e293b 25%,
+    #2d3b52 50%,
+    #1e293b 75%
+  );
+  background-size: 200% 100%;
+}
+
+.spinner {
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================================================
+   PROGRESS BAR ANIMATIONS
+   ============================================================================ */
+
+.progress-bar {
+  height: 8px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #e5e7eb;
+  position: relative;
+}
+
+.dark .progress-bar {
+  background-color: #374151;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================================================
+   MODAL ANIMATIONS
+   ============================================================================ */
+
+.modal {
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-backdrop {
+  animation: fadeIn 0.3s ease;
+}
+
+/* ============================================================================
+   TOAST/ALERT ANIMATIONS
+   ============================================================================ */
+
+.toast {
+  animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast.exit {
+  animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* ============================================================================
+   BADGE ANIMATIONS
+   ============================================================================ */
+
+.badge-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.badge-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* ============================================================================
+   TABLE ROW ANIMATIONS
+   ============================================================================ */
+
+.table-row-animate {
+  animation: slideIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.table-row-animate:nth-child(1) { animation-delay: 0.05s; }
+.table-row-animate:nth-child(2) { animation-delay: 0.1s; }
+.table-row-animate:nth-child(3) { animation-delay: 0.15s; }
+.table-row-animate:nth-child(4) { animation-delay: 0.2s; }
+.table-row-animate:nth-child(5) { animation-delay: 0.25s; }
+.table-row-animate:nth-child(6) { animation-delay: 0.3s; }
+.table-row-animate:nth-child(7) { animation-delay: 0.35s; }
+.table-row-animate:nth-child(8) { animation-delay: 0.4s; }
+.table-row-animate:nth-child(9) { animation-delay: 0.45s; }
+.table-row-animate:nth-child(10) { animation-delay: 0.5s; }
+
+/* ============================================================================
+   SCROLL REVEAL
+   ============================================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================================
+   FOCUS STATES (ACCESSIBILITY)
+   ============================================================================ */
+
+*:focus-visible {
+  outline: 3px solid #3B82F6;
+  outline-offset: 2px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.high-contrast *:focus-visible {
+  outline: 4px solid #00ffff;
+  outline-offset: 3px;
+}
+
+/* ============================================================================
+   CONFETTI CONTAINER
+   ============================================================================ */
+
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================================================================
+   RESPONSIVE ANIMATIONS
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATION
+   ============================================================================ */
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* ============================================================================
+   END OF FILE
+   ============================================================================ */
