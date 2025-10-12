@@ -42,7 +42,7 @@
   // 🌐 VARIÁVEIS GLOBAIS (FORA DO waitForSupabase)
   // ============================================================
   
-  window.globalSupabase = null;  // Changed from client to supabase
+  window.globalClient = null;
   window.globalGenericSelect = null;
   window.globalGenericInsert = null;
   window.globalGenericUpdate = null;
@@ -242,12 +242,12 @@
         genericInsert,
         genericUpdate,
         genericDelete,
-        supabase,  // Changed from client to supabase
+        client,
       } = window.AlshamSupabase;
       
       window.globalGetCurrentSession = getCurrentSession;
       window.globalGetCurrentOrgId = getCurrentOrgId;
-      window.globalSupabase = supabase;  // Changed from client to supabase
+      window.globalClient = client;
       window.globalGenericSelect = genericSelect;
       window.globalGenericInsert = genericInsert;
       window.globalGenericUpdate = genericUpdate;
@@ -256,8 +256,8 @@
       // ✅ DEBUG COMPLETO
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       console.log("🔍 DEBUG: Atribuições globais");
-      console.log("window.globalSupabase:", window.globalSupabase);
-      console.log("window.globalSupabase.channel:", typeof window.globalSupabase?.channel);
+      console.log("window.globalClient:", window.globalClient);
+      console.log("window.globalClient.channel:", typeof window.globalClient?.channel);
       console.log("window.globalGenericSelect:", typeof window.globalGenericSelect);
       console.log("AlshamSupabase:", window.AlshamSupabase);
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -542,7 +542,7 @@
       }
 
       // FIX: Aplicar filtro de data corretamente
-      let query = window.globalSupabase  // Changed from globalClient
+      let query = window.globalClient
         .from('automation_executions')
         .select('*', { count: 'exact' })
         .match(filters)
@@ -1206,9 +1206,9 @@
      * Subscribe a mudanças em tempo real
      */
     function subscribeRealtime() {
-      // ✅ VERIFICAR SE window.globalSupabase ESTÁ DEFINIDO
-      if (!window.globalSupabase) {
-        console.error("❌ window.globalSupabase não está definido! Pulando realtime.");
+      // ✅ VERIFICAR SE window.globalClient ESTÁ DEFINIDO
+      if (!window.globalClient) {
+        console.error("❌ window.globalClient não está definido! Pulando realtime.");
         showNotification("Realtime não disponível no momento.", "warning");
         return;
       }
@@ -1217,7 +1217,7 @@
         console.log("⚡ Iniciando realtime subscriptions...");
         
         // Subscribe a automation_rules
-        window.globalSupabase
+        window.globalClient
           .channel("automation_rules_channel")
           .on(
             "postgres_changes",
@@ -1230,7 +1230,7 @@
           .subscribe();
 
         // Subscribe a automation_executions
-        window.globalSupabase
+        window.globalClient
           .channel("automation_executions_channel")
           .on(
             "postgres_changes",
@@ -1243,7 +1243,7 @@
           .subscribe();
 
         // Subscribe a logs_automacao
-        window.globalSupabase
+        window.globalClient
           .channel("automation_logs_channel")
           .on(
             "postgres_changes",
@@ -2289,7 +2289,7 @@ function trapFocus() {
 
 // ============================================================
 // 🎯 FUNÇÕES DE FILTRO (FALTANDO)
-// ============================================================
+ // ============================================================
 
 function filterByStatus(status) {
   applyFilters({ status });
@@ -2312,14 +2312,10 @@ function clearFilters() {
   };
   
   // Reset inputs
-  const statusFilter = document.getElementById('status-filter');
-  if (statusFilter) statusFilter.value = 'all';
-  const dateRangeFilter = document.getElementById('date-range-filter');
-  if (dateRangeFilter) dateRangeFilter.value = '7days';
-  const ruleFilter = document.getElementById('rule-filter');
-  if (ruleFilter) ruleFilter.value = '';
-  const logSearch = document.getElementById('log-search');
-  if (logSearch) logSearch.value = '';
+  document.getElementById('status-filter').value = 'all';
+  document.getElementById('date-range-filter').value = '7days';
+  document.getElementById('rule-filter').value = '';
+  document.getElementById('log-search').value = '';
   
   loadData().then(() => {
     renderExecutions();
