@@ -13,7 +13,6 @@
   <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=()">
   
   <!-- Theme Init -->
-  <script src="/public/js/theme-init.js"></script>
   
   <!-- SEO -->
   <meta name="description" content="Automações ALSHAM 360° PRIMA v11.0 - Gerencie regras, execuções e logs com IA e n8n. Exports completos, animações premium e acessibilidade WCAG AAA." />
@@ -847,6 +846,31 @@
     });
   </script>
 
-  <script type="module" src="/src/js/automacoes.js"></script>
+    <script type="module" src="/src/js/automacoes.js"></script>
+  
++ <!-- 🔥 HOTFIX v11.1.1 - Global API Fallback -->
++ <script>
++ (function() {
++   'use strict';
++   if (!window.AutomationSystem) {
++     window.AutomationSystem = {
++       openModalCreateRule: () => { /* ... */ },
++       // ... outros métodos
++     };
++   }
++ })();
++ </script>
++
++ <!-- Export Dropdown Handler -->
++ <script>
++ document.addEventListener('DOMContentLoaded', function() {
++   const exportBtn = document.getElementById('export-btn');
++   // ... handler completo
++ });
++ </script>
+
+</body>
+</html>
+  
 </body>
 </html>
