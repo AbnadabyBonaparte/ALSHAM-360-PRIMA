@@ -4,14 +4,60 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=()">
+  
   <!-- Theme Init -->
   <script src="/js/theme-init.js"></script>
   
-  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.0 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG e scheduled reports" />
+  <!-- SEO -->
+  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.0 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
+  <meta name="keywords" content="CRM, dashboard, leads, pipeline, automação, IA, enterprise, analytics, ROI, gamificação">
+  <meta name="author" content="ALSHAM Global">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="pt-BR">
+  <link rel="canonical" href="https://app.alshamglobal.com.br/dashboard">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://app.alshamglobal.com.br/dashboard">
+  <meta property="og:title" content="Dashboard Executivo v11.0 — ALSHAM 360° PRIMA">
+  <meta property="og:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações com inteligência artificial">
+  <meta property="og:image" content="https://app.alshamglobal.com.br/og-image.png">
+  <meta property="og:site_name" content="ALSHAM 360° PRIMA">
+  <meta property="og:locale" content="pt_BR">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://app.alshamglobal.com.br/dashboard">
+  <meta name="twitter:title" content="Dashboard Executivo v11.0 — ALSHAM 360° PRIMA">
+  <meta name="twitter:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações">
+  <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
+  
   <title>Dashboard Executivo v11.0 — ALSHAM 360° PRIMA</title>
 
-  <!-- Favicon -->
+  <!-- Favicon SVG Inline -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  
+  <!-- PWA Manifest Inline -->
+  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ALSHAM%20360%C2%B0%20PRIMA%22%2C%22short_name%22%3A%22ALSHAM%22%2C%22description%22%3A%22CRM%20Enterprise%20com%20IA%22%2C%22start_url%22%3A%22%2Fdashboard.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f9fafb%22%2C%22theme_color%22%3A%22%230176D3%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+  <meta name="theme-color" content="#0176D3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
+  
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
   
   <!-- Estilos - ORDEM CORRETA -->
   <link rel="stylesheet" href="/css/tokens.css" />
@@ -19,12 +65,8 @@
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/dashboard-animations.css" />
 
-  <!-- ========================================
-       TAILWIND CSS CDN - CORRIGIDO v11.0
-       ======================================== -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Tailwind Config -->
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -41,40 +83,17 @@
           fontFamily: {
             sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
             display: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
-          },
-          fontSize: {
-            'xs': ['0.75rem', { lineHeight: '1rem' }],
-            'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-            'base': ['1rem', { lineHeight: '1.5rem' }],
-            'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-            'xl': ['1.25rem', { lineHeight: '1.75rem' }],
-            '2xl': ['1.5rem', { lineHeight: '2rem' }],
-            '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-            '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-          },
-          spacing: {
-            '72': '18rem',
-            '84': '21rem',
-            '96': '24rem',
           }
         }
       },
-      corePlugins: {
-        preflight: false, // Não sobrescrever nosso CSS customizado
-      }
+      corePlugins: { preflight: false }
     }
   </script>
 
-  <!-- Chart.js -->
+  <!-- External Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  
-  <!-- jsPDF para export PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
-  <!-- SheetJS para export Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  
-  <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <!-- Critical CSS -->
@@ -88,7 +107,6 @@
       --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
       --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
-    
     html.dark {
       --alsham-bg-canvas: #0f172a;
       --alsham-bg-surface: #1e293b;
@@ -97,8 +115,6 @@
       --alsham-text-secondary: #d1d5db;
       color-scheme: dark;
     }
-    
-    /* High Contrast Mode */
     html.high-contrast {
       --alsham-bg-canvas: #000000;
       --alsham-bg-surface: #1a1a1a;
@@ -106,14 +122,27 @@
       --alsham-text-primary: #ffffff;
       --alsham-text-secondary: #cccccc;
     }
-    
     html.high-contrast .text-blue-600 { color: #00ffff !important; }
     html.high-contrast button { border: 2px solid #ffffff !important; }
-    
     body {
       background: var(--alsham-bg-canvas);
       color: var(--alsham-text-primary);
       transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #0176D3;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    .skip-link:focus {
+      top: 0;
     }
     
     /* Loading Spinner */
@@ -126,588 +155,588 @@
       animation: spin 0.6s linear infinite;
       margin: 0 auto;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
     
-    @keyframes spin { 
-      to { transform: rotate(360deg); } 
+    /* Skeleton Loader */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
     
-    /* Number Counter Animation */
-    .counter {
-      display: inline-block;
-      transition: all 0.5s ease;
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      z-index: 1000;
+      min-width: 300px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
     }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast.success { border-left: 4px solid #22C55E; }
+    .toast.error { border-left: 4px solid #EF4444; }
+    .toast.info { border-left: 4px solid #3B82F6; }
+    
+    /* Counter Animation */
+    .counter { display: inline-block; transition: all 0.5s ease; }
     
     /* Scroll Reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    
-    .reveal.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.active { opacity: 1; transform: translateY(0); }
     
     /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      animation: fadeIn 0.3s ease;
-    }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s ease; }
+    .modal.active { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: var(--alsham-bg-surface); padding: 2rem; border-radius: 0.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    .modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-content {
-      background: var(--alsham-bg-surface);
-      padding: 2rem;
-      border-radius: 0.5rem;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-      animation: slideUp 0.3s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    /* Print Styles */
+    @media print {
+      .no-print, nav, aside, button, .modal { display: none !important; }
+      body { background: white; color: black; }
+      .main-content-wrapper { margin-left: 0 !important; }
+      .chart-drilldown { page-break-inside: avoid; }
     }
     
     /* Mobile Responsive */
     @media (max-width: 768px) {
-      .side-nav { display: none !important; }
+      .side-nav.mobile-hidden { display: none !important; }
+      .side-nav.mobile-visible { 
+        display: block !important;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 64px);
+        z-index: 50;
+      }
       .main-content-wrapper { margin-left: 0 !important; }
       .grid { grid-template-columns: 1fr !important; }
       .md\:flex { display: none !important; }
     }
     
     /* Focus Visible */
-    *:focus-visible {
-      outline: 3px solid #3B82F6;
-      outline-offset: 2px;
-    }
-    
-    /* Utility classes */
+    *:focus-visible { outline: 3px solid #3B82F6; outline-offset: 2px; }
     .hidden { display: none !important; }
+    .chart-drilldown { cursor: pointer; }
+    .chart-drilldown:hover { opacity: 0.8; }
     
-    /* Drill-down cursor */
-    .chart-drilldown {
-      cursor: pointer;
+    /* Offline Indicator */
+    .offline-badge {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background: #EF4444;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      animation: slideInRight 0.3s ease;
     }
-    
-    .chart-drilldown:hover {
-      opacity: 0.8;
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
     }
   </style>
 
-  <!-- Theme Toggle Inline -->
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ALSHAM 360° PRIMA",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BRL"
+    },
+    "description": "CRM Enterprise com IA para gestão de leads, pipeline e automações",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ALSHAM Global"
+    }
+  }
+  </script>
+
+  <!-- Theme Init Inline -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('alsham-theme');
       const savedContrast = localStorage.getItem('alsham-contrast');
-      
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
         document.documentElement.setAttribute('data-theme', 'dark');
       }
-      
       if (savedContrast === 'high') {
         document.documentElement.classList.add('high-contrast');
       }
     })();
   </script>
 </head>
-
 <body class="font-inter min-h-screen">
 
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
+
+  <!-- Offline Indicator -->
+  <div id="offline-indicator" class="offline-badge hidden" role="alert" aria-live="assertive">
+    🔴 Sem conexão
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
   <!-- LOADING INDICATOR -->
-  <div id="loading-indicator" 
-       class="fixed inset-0 z-50 flex items-center justify-center" 
-       style="background: var(--alsham-bg-canvas);"
-       role="status"
-       aria-live="polite"
-       aria-label="Carregando dashboard">
+  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando dashboard">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
-      <h2 class="text-xl font-bold mb-2" style="color: #3B82F6;">ALSHAM 360° PRIMA</h2>
-      <p class="font-medium" style="color: var(--alsham-text-secondary);">
+      <!-- Logo SVG Inline -->
+      <svg width="180" height="60" viewBox="0 0 180 60" xmlns="http://www.w3.org/2000/svg" aria-label="Logo ALSHAM 360° PRIMA">
+        <defs>
+          <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <text x="10" y="35" font-family="Poppins, sans-serif" font-size="28" font-weight="700" fill="url(#logo-gradient)">ALSHAM</text>
+        <text x="10" y="52" font-family="Inter, sans-serif" font-size="12" fill="#6b7280">360° PRIMA</text>
+        <circle cx="155" cy="30" r="20" fill="none" stroke="url(#logo-gradient)" stroke-width="2"/>
+        <path d="M150 30 L160 30 M155 25 L155 35" stroke="url(#logo-gradient)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p class="font-medium mt-4" style="color: var(--alsham-text-secondary);">
         Carregando dashboard executivo v11.0...
       </p>
     </div>
   </div>
 
   <!-- NAVBAR -->
-  <nav class="sticky top-0 z-40 shadow-sm border-b" 
-       style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);"
-       role="navigation"
-       aria-label="Navegação principal">
+  <nav class="sticky top-0 z-40 shadow-sm border-b no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" role="navigation" aria-label="Navegação principal">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <!-- Logo + Menu Mobile -->
       <div class="flex items-center gap-4">
-        <button id="menu-toggle" 
-                class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-                aria-label="Abrir menu"
-                aria-expanded="false">
-          <svg class="w-6 h-6" style="color: var(--alsham-text-secondary);" 
-               fill="none" stroke="currentColor" viewBox="0 0 24 24"
-               aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M4 6h16M4 12h16M4 18h16"/>
+        <button id="menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Abrir menu" aria-expanded="false">
+          <!-- Menu Icon SVG -->
+          <svg class="w-6 h-6" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
-        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-          ALSHAM 360°
-        </h1>
+        <!-- Logo SVG Inline -->
+        <svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" aria-label="ALSHAM 360°">
+          <defs>
+            <linearGradient id="nav-logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <text x="5" y="25" font-family="Poppins, sans-serif" font-size="20" font-weight="700" fill="url(#nav-logo-gradient)">ALSHAM 360°</text>
+        </svg>
       </div>
 
-      <!-- Links Desktop -->
       <div class="hidden md:flex items-center space-x-6" role="menubar">
-        <a href="/dashboard.html" 
-           class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-           role="menuitem"
-           aria-current="page">
-          Dashboard
-        </a>
-        <a href="/leads-real.html" 
-           style="color: var(--alsham-text-secondary);" 
-           class="hover:text-blue-600 transition"
-           role="menuitem">
-          Leads
-        </a>
-        <a href="/pipeline.html" 
-           style="color: var(--alsham-text-secondary);" 
-           class="hover:text-blue-600 transition"
-           role="menuitem">
-          Pipeline
-        </a>
-        <a href="/automacoes.html" 
-           style="color: var(--alsham-text-secondary);" 
-           class="hover:text-blue-600 transition"
-           role="menuitem">
-          Automações
-        </a>
-        <a href="/gamificacao.html" 
-           style="color: var(--alsham-text-secondary);" 
-           class="hover:text-blue-600 transition"
-           role="menuitem">
-          Gamificação
-        </a>
-        <a href="/relatorios.html" 
-           style="color: var(--alsham-text-secondary);" 
-           class="hover:text-blue-600 transition"
-           role="menuitem">
-          Relatórios
-        </a>
+        <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1" role="menuitem" aria-current="page">Dashboard</a>
+        <a href="/leads-real.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Leads</a>
+        <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Pipeline</a>
+        <a href="/automacoes.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Automações</a>
+        <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Gamificação</a>
+        <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Relatórios</a>
       </div>
 
-      <!-- Accessibility + Theme Controls -->
       <div class="flex items-center gap-2">
         <!-- High Contrast Toggle -->
-        <button id="contrast-toggle" 
-                class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" 
-                style="border-color: var(--alsham-border-default);"
-                aria-label="Alternar modo de alto contraste"
-                title="Alto Contraste">
-          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" 
-               fill="none" stroke="currentColor" viewBox="0 0 24 24"
-               aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        <button id="contrast-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar modo de alto contraste" title="Alto Contraste">
+          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
           </svg>
         </button>
         
         <!-- Theme Toggle -->
-        <button id="theme-toggle" 
-                class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" 
-                style="border-color: var(--alsham-border-default);"
-                aria-label="Alternar tema claro/escuro"
-                title="Tema">
-          <svg class="sun-icon w-5 h-5 dark:hidden" 
-               style="color: var(--alsham-text-primary);" 
-               fill="none" stroke="currentColor" viewBox="0 0 24 24"
-               aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        <button id="theme-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar tema claro/escuro" title="Tema">
+          <svg class="sun-icon w-5 h-5 dark:hidden" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
-          <svg class="moon-icon w-5 h-5 hidden dark:block" 
-               style="color: var(--alsham-text-secondary);" 
-               fill="none" stroke="currentColor" viewBox="0 0 24 24"
-               aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          <svg class="moon-icon w-5 h-5 hidden dark:block" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+        
+        <!-- Fullscreen Toggle -->
+        <button id="fullscreen-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition hidden md:block" style="border-color: var(--alsham-border-default);" aria-label="Tela cheia" title="Tela Cheia">
+          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
           </svg>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- SIDENAV (Desktop) -->
-  <aside class="side-nav hidden md:block fixed left-0 top-16 w-56 h-[calc(100vh-64px)] border-r p-4 overflow-y-auto" 
-         style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);"
-         role="navigation"
-         aria-label="Navegação lateral">
+  <!-- SIDENAV -->
+  <aside id="sidenav" class="side-nav mobile-hidden md:block fixed left-0 top-16 w-56 h-[calc(100vh-64px)] border-r p-4 overflow-y-auto no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" role="navigation" aria-label="Navegação lateral">
     <nav class="flex flex-col space-y-2">
-      <a href="/dashboard.html" 
-         class="font-semibold text-blue-600 p-2 rounded transition"
-         style="background: rgba(59,130,246,0.1);"
-         aria-current="page">
-        📊 Dashboard
+      <a href="/dashboard.html" class="font-semibold text-blue-600 p-2 rounded transition flex items-center gap-2" style="background: rgba(59,130,246,0.1);" aria-current="page">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        Dashboard
       </a>
-      <a href="/leads-real.html" 
-         style="color: var(--alsham-text-secondary);" 
-         class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-        👥 Leads
+      <a href="/leads-real.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        Leads
       </a>
-      <a href="/pipeline.html" 
-         style="color: var(--alsham-text-secondary);" 
-         class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-        🎯 Pipeline
+      <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Pipeline
       </a>
-      <a href="/automacoes.html" 
-         style="color: var(--alsham-text-secondary);" 
-         class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-        ⚙️ Automações
+      <a href="/automacoes.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Automações
       </a>
-      <a href="/gamificacao.html" 
-         style="color: var(--alsham-text-secondary);" 
-         class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-        🎮 Gamificação
+      <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
+        </svg>
+        Gamificação
       </a>
-      <a href="/relatorios.html" 
-         style="color: var(--alsham-text-secondary);" 
-         class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-        📈 Relatórios
+      <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Relatórios
       </a>
     </nav>
   </aside>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 md:ml-56" role="main">
-    
-    <!-- Header -->
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 md:ml-56" role="main">
     <header class="mb-8">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
         <div>
-          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">
-            Dashboard Executivo v11.0
-          </h1>
-          <p style="color: var(--alsham-text-secondary);">
-            CRM Enterprise com IA - Exports completos, animações premium e acessibilidade WCAG
-          </p>
+          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Dashboard Executivo v11.0</h1>
+          <p style="color: var(--alsham-text-secondary);">CRM Enterprise com IA - Exports completos, animações premium e acessibilidade WCAG AAA</p>
         </div>
-        
-        <!-- Controls -->
         <div class="flex flex-wrap items-center gap-2">
-          <!-- Auto-refresh -->
-          <label class="flex items-center gap-2 text-sm cursor-pointer" 
-                 style="color: var(--alsham-text-secondary);">
-            <input type="checkbox" 
-                   id="auto-refresh" 
-                   class="w-4 h-4 cursor-pointer"
-                   aria-label="Auto-atualização a cada minuto">
-            <span>🔄 Auto-refresh (1min)</span>
+          <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--alsham-text-secondary);">
+            <input type="checkbox" id="auto-refresh" class="w-4 h-4 cursor-pointer" aria-label="Auto-atualização a cada minuto">
+            <span>🔄 Auto-refresh</span>
           </label>
-          
-          <!-- Scheduled Reports -->
-          <button onclick="window.DashboardApp.openScheduledReports()" 
-                  class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
-                  aria-label="Agendar relatórios automáticos">
-            📅 Agendar Relatórios
-          </button>
+          <button onclick="window.DashboardApp.openScheduledReports()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm" aria-label="Agendar relatórios automáticos">📅 Agendar Relatórios</button>
         </div>
       </div>
     </header>
 
-    <!-- Filtros -->
     <div id="dashboard-filters" aria-label="Filtros do dashboard"></div>
-
-    <!-- KPIs -->
     <div id="dashboard-kpis" aria-label="Indicadores principais" class="reveal"></div>
-
-    <!-- Metas -->
     <div id="dashboard-goals" aria-label="Metas e objetivos" class="reveal"></div>
-
-    <!-- ROI -->
     <div id="dashboard-roi" aria-label="ROI mensal" class="reveal"></div>
 
-    <!-- Gráficos -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" aria-label="Gráficos analíticos">
-      <!-- Status Chart -->
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" 
-           style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);"
-           onclick="window.DashboardApp.drilldownStatus(event)"
-           role="button"
-           tabindex="0"
-           aria-label="Gráfico de distribuição por status - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">
-          Distribuição por Status
-        </h3>
-        <div class="h-[350px]">
-          <canvas id="status-chart" aria-label="Gráfico de pizza com distribuição de status"></canvas>
-        </div>
+      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownStatus(event)" role="button" tabindex="0" aria-label="Gráfico de distribuição por status - clique para detalhes">
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Distribuição por Status</h3>
+        <div class="h-[350px]"><canvas id="status-chart" aria-label="Gráfico de pizza com distribuição de status"></canvas></div>
       </div>
-
-      <!-- Daily Chart -->
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" 
-           style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);"
-           onclick="window.DashboardApp.drilldownDaily(event)"
-           role="button"
-           tabindex="0"
-           aria-label="Gráfico de novos leads - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">
-          Novos Leads (Últimos 7 dias)
-        </h3>
-        <div class="h-[350px]">
-          <canvas id="daily-chart" aria-label="Gráfico de linha com novos leads diários"></canvas>
-        </div>
+      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownDaily(event)" role="button" tabindex="0" aria-label="Gráfico de novos leads - clique para detalhes">
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Novos Leads (Últimos 7 dias)</h3>
+        <div class="h-[350px]"><canvas id="daily-chart" aria-label="Gráfico de linha com novos leads diários"></canvas></div>
       </div>
-
-      <!-- Funnel Chart -->
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" 
-           style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);"
-           onclick="window.DashboardApp.drilldownFunnel(event)"
-           role="button"
-           tabindex="0"
-           aria-label="Gráfico de funil de conversão - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">
-          Funil de Conversão
-        </h3>
-        <div class="h-[350px]">
-          <canvas id="funnel-chart" aria-label="Gráfico de barras com funil de conversão"></canvas>
-        </div>
+      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownFunnel(event)" role="button" tabindex="0" aria-label="Gráfico de funil de conversão - clique para detalhes">
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Funil de Conversão</h3>
+        <div class="h-[350px]"><canvas id="funnel-chart" aria-label="Gráfico de barras com funil de conversão"></canvas></div>
       </div>
-
-      <!-- Origem Chart -->
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" 
-           style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);"
-           onclick="window.DashboardApp.drilldownOrigem(event)"
-           role="button"
-           tabindex="0"
-           aria-label="Gráfico de leads por origem - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">
-          Leads por Origem
-        </h3>
-        <div class="h-[350px]">
-          <canvas id="origem-chart" aria-label="Gráfico de pizza com distribuição por origem"></canvas>
-        </div>
+      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownOrigem(event)" role="button" tabindex="0" aria-label="Gráfico de leads por origem - clique para detalhes">
+        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Leads por Origem</h3>
+        <div class="h-[350px]"><canvas id="origem-chart" aria-label="Gráfico de pizza com distribuição por origem"></canvas></div>
       </div>
     </section>
 
-    <!-- Tabela de Leads -->
     <div id="leads-table" class="reveal" aria-label="Tabela de leads recentes"></div>
-
   </main>
 
-  <!-- MODAIS -->
-  
-  <!-- Modal de Filtros de Status -->
+  <!-- FOOTER -->
+  <footer class="border-t mt-16 py-8 no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
+    <div class="max-w-7xl mx-auto px-4 md:ml-56">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+        <div>
+          <h3 class="font-bold mb-3" style="color: var(--alsham-text-primary);">ALSHAM 360° PRIMA</h3>
+          <p class="text-sm" style="color: var(--alsham-text-secondary);">CRM Enterprise com IA</p>
+          <p class="text-xs mt-2" style="color: var(--alsham-text-secondary);">v11.0.0 • Build 2025.10.11</p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3" style="color: var(--alsham-text-primary);">Links Úteis</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/docs" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Documentação</a></li>
+            <li><a href="/help" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Central de Ajuda</a></li>
+            <li><a href="/api" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">API Docs</a></li>
+            <li><a href="/status" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Status do Sistema</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3" style="color: var(--alsham-text-primary);">Legal</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/privacy" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Política de Privacidade</a></li>
+            <li><a href="/terms" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Termos de Uso</a></li>
+            <li><a href="/lgpd" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">LGPD/GDPR</a></li>
+            <li><a href="/cookies" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Política de Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t pt-6 flex flex-col md:flex-row justify-between items-center text-sm" style="border-color: var(--alsham-border-default); color: var(--alsham-text-secondary);">
+        <p>© 2025 ALSHAM Global. Todos os direitos reservados.</p>
+        <p class="flex items-center gap-2 mt-2 md:mt-0">
+          <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">Ctrl+K</kbd> Atalhos
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
   <div id="status-filter-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="status-modal-title">
-    <div class="modal-content">
+    <div class="modal-content" role="document">
       <div class="flex justify-between items-center mb-4">
-        <h2 id="status-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">
-          Filtrar por Status
-        </h2>
-        <button onclick="window.DashboardApp.closeStatusFilter()" 
-                class="text-gray-500 hover:text-gray-700"
-                aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h2 id="status-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Filtrar por Status</h2>
+        <button onclick="window.DashboardApp.closeStatusFilter()" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
       <div id="status-checkboxes" class="space-y-2"></div>
       <div class="mt-4 flex gap-2">
-        <button onclick="window.DashboardApp.applyStatusFilter()" 
-                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Aplicar
-        </button>
-        <button onclick="window.DashboardApp.closeStatusFilter()" 
-                class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
-          Cancelar
-        </button>
+        <button onclick="window.DashboardApp.applyStatusFilter()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
+        <button onclick="window.DashboardApp.closeStatusFilter()" class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancelar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal de Filtros de Origem -->
   <div id="origem-filter-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="origem-modal-title">
-    <div class="modal-content">
+    <div class="modal-content" role="document">
       <div class="flex justify-between items-center mb-4">
-        <h2 id="origem-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">
-          Filtrar por Origem
-        </h2>
-        <button onclick="window.DashboardApp.closeOrigemFilter()" 
-                class="text-gray-500 hover:text-gray-700"
-                aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h2 id="origem-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Filtrar por Origem</h2>
+        <button onclick="window.DashboardApp.closeOrigemFilter()" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
       <div id="origem-checkboxes" class="space-y-2"></div>
       <div class="mt-4 flex gap-2">
-        <button onclick="window.DashboardApp.applyOrigemFilter()" 
-                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Aplicar
-        </button>
-        <button onclick="window.DashboardApp.closeOrigemFilter()" 
-                class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
-          Cancelar
-        </button>
+        <button onclick="window.DashboardApp.applyOrigemFilter()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
+        <button onclick="window.DashboardApp.closeOrigemFilter()" class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancelar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal de Scheduled Reports -->
   <div id="scheduled-reports-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="scheduled-modal-title">
-    <div class="modal-content">
+    <div class="modal-content" role="document">
       <div class="flex justify-between items-center mb-4">
-        <h2 id="scheduled-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">
-          Agendar Relatórios Automáticos
-        </h2>
-        <button onclick="window.DashboardApp.closeScheduledReports()" 
-                class="text-gray-500 hover:text-gray-700"
-                aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h2 id="scheduled-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Agendar Relatórios Automáticos</h2>
+        <button onclick="window.DashboardApp.closeScheduledReports()" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
       <form id="schedule-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">
-            Frequência
-          </label>
-          <select id="schedule-frequency" 
-                  class="w-full px-3 py-2 border rounded"
-                  style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
+          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Frequência</label>
+          <select id="schedule-frequency" class="w-full px-3 py-2 border rounded" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
             <option value="daily">Diário</option>
             <option value="weekly">Semanal</option>
             <option value="monthly">Mensal</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">
-            Email de destino
-          </label>
-          <input type="email" 
-                 id="schedule-email" 
-                 placeholder="seu@email.com"
-                 class="w-full px-3 py-2 border rounded"
-                 style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);"
-                 required>
+          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Email de destino</label>
+          <input type="email" id="schedule-email" placeholder="seu@email.com" class="w-full px-3 py-2 border rounded" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);" required>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">
-            Formato
-          </label>
-          <select id="schedule-format" 
-                  class="w-full px-3 py-2 border rounded"
-                  style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
+          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Formato</label>
+          <select id="schedule-format" class="w-full px-3 py-2 border rounded" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
             <option value="pdf">PDF</option>
             <option value="excel">Excel</option>
             <option value="both">Ambos</option>
           </select>
         </div>
-        <button type="submit" 
-                class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Agendar Relatório
-        </button>
+        <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Agendar Relatório</button>
       </form>
     </div>
   </div>
 
-  <!-- Supabase CDN -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Supabase Module -->
-  <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
-  </script>
+  <script type="module" src="/src/js/supabase-init.js"></script>
 
-  <!-- Theme & Contrast Scripts -->
   <script>
-    // Theme Toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      themeToggle.addEventListener('click', function() {
-        const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        
-        if (isDark) {
-          html.classList.remove('dark');
-          html.removeAttribute('data-theme');
-          localStorage.setItem('alsham-theme', 'light');
-        } else {
-          html.classList.add('dark');
-          html.setAttribute('data-theme', 'dark');
-          localStorage.setItem('alsham-theme', 'dark');
-        }
-      });
-    }
-    
-    // High Contrast Toggle
-    const contrastToggle = document.getElementById('contrast-toggle');
-    if (contrastToggle) {
-      contrastToggle.addEventListener('click', function() {
-        const html = document.documentElement;
-        const isHighContrast = html.classList.contains('high-contrast');
-        
-        if (isHighContrast) {
-          html.classList.remove('high-contrast');
-          localStorage.setItem('alsham-contrast', 'normal');
-        } else {
-          html.classList.add('high-contrast');
-          localStorage.setItem('alsham-contrast', 'high');
-        }
-      });
-    }
-    
-    // Scroll Reveal
-    const revealElements = document.querySelectorAll('.reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
-      });
-    }, { threshold: 0.1 });
-    
-    revealElements.forEach(el => revealObserver.observe(el));
-    
-    // Keyboard Navigation Enhancement
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        // Close all modals
-        document.querySelectorAll('.modal').forEach(modal => {
-          modal.classList.remove('active');
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme Toggle
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const html = document.documentElement;
+          const isDark = html.classList.contains('dark');
+          if (isDark) {
+            html.classList.remove('dark');
+            html.removeAttribute('data-theme');
+            localStorage.setItem('alsham-theme', 'light');
+          } else {
+            html.classList.add('dark');
+            html.setAttribute('data-theme', 'dark');
+            localStorage.setItem('alsham-theme', 'dark');
+          }
         });
       }
+
+      // High Contrast Toggle
+      const contrastToggle = document.getElementById('contrast-toggle');
+      if (contrastToggle) {
+        contrastToggle.addEventListener('click', function() {
+          const html = document.documentElement;
+          const isHighContrast = html.classList.contains('high-contrast');
+          if (isHighContrast) {
+            html.classList.remove('high-contrast');
+            localStorage.setItem('alsham-contrast', 'normal');
+          } else {
+            html.classList.add('high-contrast');
+            localStorage.setItem('alsham-contrast', 'high');
+          }
+        });
+      }
+
+      // Menu Mobile Toggle
+      const menuToggle = document.getElementById('menu-toggle');
+      const sideNav = document.getElementById('sidenav');
+      if (menuToggle && sideNav) {
+        menuToggle.addEventListener('click', function() {
+          sideNav.classList.toggle('mobile-hidden');
+          sideNav.classList.toggle('mobile-visible');
+          const isExpanded = sideNav.classList.contains('mobile-visible');
+          menuToggle.setAttribute('aria-expanded', isExpanded);
+        });
+      }
+
+      // Fullscreen Toggle
+      const fullscreenToggle = document.getElementById('fullscreen-toggle');
+      if (fullscreenToggle) {
+        fullscreenToggle.addEventListener('click', function() {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+          } else {
+            document.exitFullscreen();
+          }
+        });
+      }
+
+      // Offline/Online Detection
+      const offlineIndicator = document.getElementById('offline-indicator');
+      window.addEventListener('offline', () => {
+        if (offlineIndicator) offlineIndicator.classList.remove('hidden');
+      });
+      window.addEventListener('online', () => {
+        if (offlineIndicator) offlineIndicator.classList.add('hidden');
+      });
+
+      // Scroll Reveal
+      const revealElements = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('active');
+        });
+      }, { threshold: 0.1 });
+      revealElements.forEach(el => revealObserver.observe(el));
+
+      // Keyboard Shortcuts
+      document.addEventListener('keydown', (e) => {
+        // ESC closes modals
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
+        }
+        // Ctrl+K for shortcuts (placeholder)
+        if (e.ctrlKey && e.key === 'k') {
+          e.preventDefault();
+          showToast('Atalhos disponíveis: ESC (fechar), F11 (tela cheia)', 'info');
+        }
+      });
+
+      // Toast Notification System
+      window.showToast = function(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
+              ${type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
+              ${type === 'info' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
+            </svg>
+            <p class="text-sm flex-1" style="color: var(--alsham-text-primary);">${message}</p>
+          </div>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      };
+
+      // Trap Focus in Modals
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+        modal.addEventListener('keydown', function(e) {
+          if (e.key === 'Tab' && modal.classList.contains('active')) {
+            const focusable = Array.from(modal.querySelectorAll(focusableElements));
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+              last.focus();
+              e.preventDefault();
+            } else if (!e.shiftKey && document.activeElement === last) {
+              first.focus();
+              e.preventDefault();
+            }
+          }
+        });
+      });
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showToast('Instale o ALSHAM 360° como app!', 'info');
+      });
     });
   </script>
 
-  <!-- Dashboard Script v11.0 -->
   <script type="module" src="/src/js/dashboard.js"></script>
-
 </body>
 </html>
