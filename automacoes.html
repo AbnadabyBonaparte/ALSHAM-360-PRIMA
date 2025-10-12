@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
   <!-- Security Headers - AJUSTADO -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://your-n8n-instance.cloud https://*.cloudflare.com; manifest-src 'self' data:; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://your-n8n-instance.cloud https://*.cloudflare.com; manifest-src 'self' data:; frame-ancestors 'none';">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -55,7 +55,6 @@
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
   
   <!-- Estilos - ORDEM CORRETA -->
@@ -398,7 +397,7 @@
     <nav class="flex flex-col space-y-2">
       <a href="/dashboard.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/>
         </svg>
         <span>Dashboard</span>
       </a>
@@ -790,51 +789,6 @@
         });
       }, { threshold: 0.1 });
       revealElements.forEach(el => revealObserver.observe(el));
-
-      // Toast Notification System
-      window.showToast = function(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
-              ${type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
-              ${type === 'info' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
-            </svg>
-            <p class="text-sm flex-1" style="color: var(--alsham-text-primary);">${message}</p>
-          </div>
-        `;
-        container.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-      };
-
-      // Trap Focus in Modals
-      const modals = document.querySelectorAll('dialog');
-      modals.forEach(modal => {
-        modal.addEventListener('keydown', function(e) {
-          if (e.key === 'Tab') {
-            const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'));
-            if (focusable.length === 0) return;
-            
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            
-            if (e.shiftKey && document.activeElement === first) {
-              last.focus();
-              e.preventDefault();
-            } else if (!e.shiftKey && document.activeElement === last) {
-              first.focus();
-              e.preventDefault();
-            }
-          }
-        });
-      });
 
       // PWA Install Prompt
       let deferredPrompt;
