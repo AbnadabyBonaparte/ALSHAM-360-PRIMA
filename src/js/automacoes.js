@@ -1,8 +1,8 @@
 /**
- * 🤖 ALSHAM 360° PRIMA — Automações v11.1 ENTERPRISE TOTAL
+ * 🤖 ALSHAM 360° PRIMA — Automações v11.1.1 HOTFIX
  * Sistema completo de automações com IA, regras, execuções, logs e analytics
  * 
- * FEATURES (60/60 - 100% + n8n):
+ * FEATURES (60/60 - 100%):
  * ✅ CRUD completo de regras com validações
  * ✅ Modais interativos (criar/editar/detalhes)
  * ✅ Editor visual de condições e ações
@@ -216,7 +216,7 @@
    */
   function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
-      console.log("✅ Supabase carregado para Automações v11.1");
+      console.log("✅ Supabase carregado para Automações v11.1.1");
       callback();
     } else if (attempt >= maxAttempts) {
       console.error("❌ Supabase não carregou após", maxAttempts, "tentativas");
@@ -319,7 +319,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         toggleLoading(true);
-        console.log("🚀 Iniciando Automações v11.1...");
+        console.log("🚀 Iniciando Automações v11.1.1 HOTFIX...");
 
         // Autenticação
         const authResult = await authenticateUser();
@@ -363,7 +363,7 @@
 
         toggleLoading(false);
         showNotification("Automações carregadas com sucesso!", "success");
-        console.log("✅ Automações v11.1 iniciadas completamente - n8n integrado");
+        console.log("✅ Automações v11.1.1 iniciadas completamente - n8n integrado");
         
       } catch (error) {
         console.error("❌ Erro crítico na inicialização:", error);
@@ -481,7 +481,7 @@
     }
 
     /**
-     * Carrega execuções com filtros
+     * Carrega execuções com filtros - FIXADO INVALID TIMESTAMP
      */
     async function loadExecutions() {
       const filters = { org_id: AutomationState.orgId };
@@ -496,7 +496,24 @@
         filters.rule_id = AutomationState.filters.ruleId;
       }
 
-      // Aplicar filtro de data
+      const options = {
+        order: { column: "started_at", ascending: false },
+        limit: AutomationState.pagination.perPage,
+      };
+
+      // Aplicar paginação
+      if (AutomationState.pagination.page > 1) {
+        options.offset = (AutomationState.pagination.page - 1) * AutomationState.pagination.perPage;
+      }
+
+      // FIX: Aplicar filtro de data corretamente
+      let query = client
+        .from('automation_executions')
+        .select('*', { count: 'exact' })
+        .match(filters)
+        .order('started_at', { ascending: false })
+        .limit(options.limit);
+
       if (AutomationState.filters.dateRange !== "all") {
         const now = new Date();
         let startDate;
@@ -512,24 +529,11 @@
             break;
         }
         if (startDate) {
-          filters.started_at = { _gte: startDate.toISOString() };
+          query = query.gte('started_at', startDate.toISOString());
         }
       }
 
-      const options = {
-        order: { column: "started_at", ascending: false },
-        limit: AutomationState.pagination.perPage,
-      };
-
-      // Aplicar paginação
-      if (AutomationState.pagination.page > 1) {
-        options.offset = (AutomationState.pagination.page - 1) * AutomationState.pagination.perPage;
-      }
-
-      const { data, error, count } = await genericSelect("automation_executions", filters, {
-        ...options,
-        count: "exact",
-      });
+      const { data, error, count } = await query;
 
       if (error) throw error;
 
@@ -571,50 +575,6 @@
       }
 
       return logs;
-    }
-
-    /**
-     * Carrega gamificação
-     */
-    async function loadGamification() {
-      if (!AutomationState.user?.id || !AutomationState.orgId) {
-        return { points: 0 };
-      }
-      
-      try {
-        const { data, error } = await genericSelect(
-          "gamification_points", 
-          { user_id: AutomationState.user.id, org_id: AutomationState.orgId }
-        );
-        
-        if (error) throw error;
-        
-        const totalPoints = data?.reduce((sum, p) => sum + (p.points_awarded || 0), 0) || 0;
-        console.log(`🏅 Pontos: ${totalPoints}`);
-        return { points: totalPoints };
-      } catch (error) {
-        console.error('❌ Erro gamificação:', error);
-        return { points: 0 };
-      }
-    }
-
-    /**
-     * Carrega scheduled reports
-     */
-    async function loadScheduledReports() {
-      try {
-        const { data, error } = await genericSelect(
-          "scheduled_reports",
-          { user_id: AutomationState.user.id, org_id: AutomationState.orgId }
-        );
-        
-        if (error) throw error;
-        
-        AutomationState.scheduledReports = data || [];
-        console.log(`📅 ${AutomationState.scheduledReports.length} relatórios agendados`);
-      } catch (error) {
-        console.error('❌ Erro ao carregar scheduled reports:', error);
-      }
     }
 
     /**
@@ -1591,8 +1551,7 @@
       AutomationState.modal.type = "scheduled";
       AutomationState.modal.isOpen = true;
       
-      const modal = document.createElement("dialog");
-      modal.id = "scheduled-modal";
+      const modal = document.getElementById("scheduled-modal");
       modal.innerHTML = `
         <form id="schedule-form" class="p-6 space-y-4">
           <h2 class="text-xl font-bold">Agendar Relatórios</h2>
@@ -1620,7 +1579,6 @@
           <button type="button" onclick="window.AutomationSystem.closeModal()">Cancelar</button>
         </form>
       `;
-      document.body.appendChild(modal);
       modal.showModal();
       
       document.getElementById("schedule-form").addEventListener("submit", handleScheduleSubmit);
@@ -1936,7 +1894,7 @@
         // Ctrl+F - Buscar logs
         if (e.ctrlKey && e.key === 'f') {
           e.preventDefault();
-          const searchInput = document.getElementById('global-search'); // Align com HTML
+          const searchInput = document.getElementById('log-search'); // Align com HTML
           if (searchInput) searchInput.focus();
         }
         
@@ -2052,7 +2010,7 @@
     }
 
     // ============================================================
-    // 🌐 EXPOSE GLOBAL API (alinhado com dashboard)
+    // 🌐 EXPOSE GLOBAL API (FIXADO)
     // ============================================================
     window.AutomationSystem = {
       // Básicos
@@ -2102,9 +2060,9 @@
       
       // Utilitários
       calculateKPIs,
-      version: "11.1",
+      version: "11.1.1-hotfix",
     };
 
-    console.log("%c🤖 Automações v11.1 ENTERPRISE TOTAL carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
+    console.log("%c🤖 Automações v11.1.1 HOTFIX carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
   });
 })();
