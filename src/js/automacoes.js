@@ -1,37 +1,25 @@
 /**
- * 🤖 ALSHAM 360° PRIMA — Automações v11.1.1 HOTFIX
- * Sistema completo de automações com IA, regras, execuções, logs e analytics
- * 
- * FEATURES (60/60 - 100%):
- * ✅ CRUD completo de regras com validações
- * ✅ Modais interativos (criar/editar/detalhes)
- * ✅ Editor visual de condições e ações
- * ✅ Filtros avançados (status, data, regra)
- * ✅ Export (CSV, JSON, Excel, PDF)
- * ✅ Paginação completa
- * ✅ Charts (Chart.js) - Execuções, Taxa Sucesso, Top Regras
- * ✅ Realtime em 3 tabelas (rules, executions, logs)
- * ✅ Keyboard shortcuts (Ctrl+N, ESC, Ctrl+F, Ctrl+E)
- * ✅ Acessibilidade WCAG AAA
- * ✅ Performance otimizada (debounce, virtual scroll)
- * ✅ Empty states com ilustrações
- * ✅ Error boundaries
- * ✅ Toast notifications avançadas
- * ✅ Preview e teste de regras
- * ✅ n8n Integration: New Lead webhook + PRL análise
- * ✅ Scheduled Reports modal/form
- * ✅ Drill-down charts
- * ✅ Auto-refresh
- * ✅ Gamificação points on actions
- * 
- * Stack: Supabase + Vite + Tailwind + Chart.js + SheetJS + jsPDF + n8n
- * Última atualização: 12/10/2025
- * Autor: ALSHAM Development Team
- * Nota técnica: 10/10 (World-class)
+ * 🤖 ALSHAM 360° PRIMA — Automações v11.1.2 HOTFIX CRÍTICO
+ * FIXES:
+ * - ✅ window.AutomationSystem exposto corretamente
+ * - ✅ client disponível globalmente
+ * - ✅ activity_type corrigido
+ * - ✅ Event listeners protegidos
+ * - ✅ Escopo de funções corrigido
  */
 
 (function () {
   "use strict";
+
+  // ============================================================
+  // 🌐 VARIÁVEIS GLOBAIS (FORA DO waitForSupabase)
+  // ============================================================
+  
+  let globalClient = null;
+  let globalGenericSelect = null;
+  let globalGenericInsert = null;
+  let globalGenericUpdate = null;
+  let globalGenericDelete = null;
 
   // ============================================================
   // 📚 CONSTANTES GLOBAIS
@@ -216,7 +204,25 @@
    */
   function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
-      console.log("✅ Supabase carregado para Automações v11.1.1");
+      console.log("✅ Supabase carregado para Automações v11.1.2");
+      
+      // ✅ ATRIBUIR GLOBALMENTE
+      const {
+        getCurrentSession,
+        getCurrentOrgId,
+        genericSelect,
+        genericInsert,
+        genericUpdate,
+        genericDelete,
+        client,
+      } = window.AlshamSupabase;
+      
+      globalClient = client;
+      globalGenericSelect = genericSelect;
+      globalGenericInsert = genericInsert;
+      globalGenericUpdate = genericUpdate;
+      globalGenericDelete = genericDelete;
+      
       callback();
     } else if (attempt >= maxAttempts) {
       console.error("❌ Supabase não carregou após", maxAttempts, "tentativas");
@@ -309,17 +315,12 @@
     const {
       getCurrentSession,
       getCurrentOrgId,
-      genericSelect,
-      genericInsert,
-      genericUpdate,
-      genericDelete,
-      client,
     } = window.AlshamSupabase;
 
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         toggleLoading(true);
-        console.log("🚀 Iniciando Automações v11.1.1 HOTFIX...");
+        console.log("🚀 Iniciando Automações v11.1.2 HOTFIX...");
 
         // Autenticação
         const authResult = await authenticateUser();
@@ -363,7 +364,7 @@
 
         toggleLoading(false);
         showNotification("Automações carregadas com sucesso!", "success");
-        console.log("✅ Automações v11.1.1 iniciadas completamente - n8n integrado");
+        console.log("✅ Automações v11.1.2 iniciadas completamente - n8n integrado");
         
       } catch (error) {
         console.error("❌ Erro crítico na inicialização:", error);
@@ -467,7 +468,7 @@
      * Carrega regras do banco
      */
     async function loadRules() {
-      const { data, error } = await genericSelect(
+      const { data, error } = await globalGenericSelect(
         "automation_rules",
         { org_id: AutomationState.orgId },
         {
@@ -507,7 +508,7 @@
       }
 
       // FIX: Aplicar filtro de data corretamente
-      let query = client
+      let query = globalClient
         .from('automation_executions')
         .select('*', { count: 'exact' })
         .match(filters)
@@ -554,7 +555,7 @@
     async function loadLogs() {
       const filters = { org_id: AutomationState.orgId };
 
-      const { data, error } = await genericSelect("logs_automacao", filters, {
+      const { data, error } = await globalGenericSelect("logs_automacao", filters, {
         order: { column: "created_at", ascending: false },
         limit: 100,
       });
@@ -1172,7 +1173,7 @@
     function subscribeRealtime() {
       try {
         // Subscribe a automation_rules
-        client
+        globalClient
           .channel("automation_rules_channel")
           .on(
             "postgres_changes",
@@ -1185,7 +1186,7 @@
           .subscribe();
 
         // Subscribe a automation_executions
-        client
+        globalClient
           .channel("automation_executions_channel")
           .on(
             "postgres_changes",
@@ -1198,7 +1199,7 @@
           .subscribe();
 
         // Subscribe a logs_automacao
-        client
+        globalClient
           .channel("automation_logs_channel")
           .on(
             "postgres_changes",
@@ -1299,7 +1300,7 @@
         }
 
         // Insert
-        const { data, error } = await genericInsert("automation_rules", {
+        const { data, error } = await globalGenericInsert("automation_rules", {
           org_id: AutomationState.orgId,
           created_by: AutomationState.user.id,
           ...ruleData,
@@ -1317,7 +1318,7 @@
         showNotification("✅ Regra criada com sucesso!", "success");
 
         // Award points
-        await awardGamificationPoints('create_rule', 'automation');
+        await awardGamificationPoints('create_rule', 10);
 
         return true;
       } catch (error) {
@@ -1346,7 +1347,7 @@
         }
 
         // Update
-        const { error } = await genericUpdate(
+        const { error } = await globalGenericUpdate(
           "automation_rules",
           { ...updates, updated_at: new Date().toISOString() },
           { id: ruleId }
@@ -1361,7 +1362,7 @@
         showNotification("✅ Regra atualizada!", "success");
 
         // Award points
-        await awardGamificationPoints('update_rule', 'automation');
+        await awardGamificationPoints('update_rule', 10);
 
         return true;
       } catch (error) {
@@ -1383,7 +1384,7 @@
           return;
         }
 
-        const { error } = await genericDelete("automation_rules", { id: ruleId });
+        const { error } = await globalGenericDelete("automation_rules", { id: ruleId });
 
         if (error) throw error;
 
@@ -1410,7 +1411,7 @@
 
       try {
         const newStatus = !rule.is_active;
-        await genericUpdate("automation_rules", { is_active: newStatus }, { id: ruleId });
+        await globalGenericUpdate("automation_rules", { is_active: newStatus }, { id: ruleId });
         
         rule.is_active = newStatus;
         calculateKPIs();
@@ -1594,7 +1595,7 @@
       const format = document.getElementById("schedule-format").value;
       
       try {
-        await genericInsert('scheduled_reports', {
+        await globalGenericInsert('scheduled_reports', {
           user_id: AutomationState.user.id,
           org_id: AutomationState.orgId,
           frequency,
@@ -1607,7 +1608,7 @@
         showNotification('✅ Relatório agendado!', "success");
         await loadScheduledReports();
         closeModal();
-        await awardGamificationPoints('schedule_report', 'automation');
+        await awardGamificationPoints('schedule_report', 10);
       } catch (error) {
         showNotification('❌ Erro ao agendar', "error");
       }
@@ -1684,7 +1685,7 @@
       URL.revokeObjectURL(url);
       
       showNotification('✅ CSV exportado', "success");
-      awardGamificationPoints('export_csv', 'export');
+      awardGamificationPoints('export_csv', 10);
     }
 
     /**
@@ -1715,7 +1716,7 @@
       doc.save('automacoes.pdf');
       
       showNotification('✅ PDF exportado', "success");
-      awardGamificationPoints('export_pdf', 'export');
+      awardGamificationPoints('export_pdf', 10);
     }
 
     /**
@@ -1749,7 +1750,7 @@
       XLSX.writeFile(wb, 'automacoes.xlsx');
       
       showNotification('✅ Excel exportado', "success");
-      awardGamificationPoints('export_excel', 'export');
+      awardGamificationPoints('export_excel', 10);
     }
 
     // ============================================================
@@ -1774,7 +1775,7 @@
         console.log('n8n result:', result);
         
         // Log in Supabase
-        await genericInsert('logs_automacao', {
+        await globalGenericInsert('logs_automacao', {
           categoria: 'INFO',
           evento: 'n8n_new_lead',
           referencia_id: leadData.lead_id,
@@ -1830,11 +1831,11 @@
 
     async function awardGamificationPoints(activityType, pointsAwarded = 10) {
       try {
-        await genericInsert('gamification_points', {
+        await globalGenericInsert('gamification_points', {
           user_id: AutomationState.user.id,
           org_id: AutomationState.orgId,
-          activity_type,
-          points_awarded,
+          activity_type: activityType,  // ✅ FIXADO
+          points_awarded: pointsAwarded,
           related_entity_id: AutomationState.modal.data?.id
         });
         
@@ -1911,35 +1912,40 @@
      */
     function setupEventListeners() {
       // Create rule btn
-      document.getElementById("create-rule-btn")?.addEventListener("click", openModalCreateRule);
+      const createBtn = document.getElementById("create-rule-btn");
+      if (createBtn) createBtn.addEventListener("click", openModalCreateRule);
       
       // Export btn (add menu for formats)
-      document.getElementById("export-btn")?.addEventListener("click", () => {
-        exportCSV(); // Default, or show modal for choice
-      });
+      const exportBtn = document.getElementById("export-btn");
+      if (exportBtn) exportBtn.addEventListener("click", () => exportCSV());
       
       // Date range filter
-      document.getElementById("date-range-filter")?.addEventListener("change", (e) => filterByDateRange(e.target.value));
+      const dateFilter = document.getElementById("date-range-filter");
+      if (dateFilter) dateFilter.addEventListener("change", (e) => filterByDateRange(e.target.value));
       
       // Tabs
-      document.getElementById("rules-tab")?.addEventListener("click", () => {
+      const rulesTab = document.getElementById("rules-tab");
+      if (rulesTab) rulesTab.addEventListener("click", () => {
         document.getElementById("rules-section").style.display = 'block';
         document.getElementById("executions-section").style.display = 'none';
         document.getElementById("logs-section").style.display = 'none';
       });
-      document.getElementById("executions-tab")?.addEventListener("click", () => {
+      const executionsTab = document.getElementById("executions-tab");
+      if (executionsTab) executionsTab.addEventListener("click", () => {
         document.getElementById("rules-section").style.display = 'none';
         document.getElementById("executions-section").style.display = 'block';
         document.getElementById("logs-section").style.display = 'none';
       });
-      document.getElementById("logs-tab")?.addEventListener("click", () => {
+      const logsTab = document.getElementById("logs-tab");
+      if (logsTab) logsTab.addEventListener("click", () => {
         document.getElementById("rules-section").style.display = 'none';
         document.getElementById("executions-section").style.display = 'none';
         document.getElementById("logs-section").style.display = 'block';
       });
       
       // Empty state create
-      document.getElementById("create-first-rule")?.addEventListener("click", openModalCreateRule);
+      const createFirstRule = document.getElementById("create-first-rule");
+      if (createFirstRule) createFirstRule.addEventListener("click", openModalCreateRule);
     }
 
     // ============================================================
@@ -1951,7 +1957,7 @@
      */
     function toggleLoading(show) {
       const loader = document.getElementById("loading-screen"); // Align com HTML
-      loader.style.display = show ? 'flex' : 'none';
+      if (loader) loader.style.display = show ? 'flex' : 'none';
     }
 
     /**
@@ -2262,10 +2268,14 @@ function clearFilters() {
   };
   
   // Reset inputs
-  document.getElementById('status-filter').value = 'all';
-  document.getElementById('date-range-filter').value = '7days';
-  document.getElementById('rule-filter').value = '';
-  document.getElementById('log-search').value = '';
+  const statusFilter = document.getElementById('status-filter');
+  if (statusFilter) statusFilter.value = 'all';
+  const dateRangeFilter = document.getElementById('date-range-filter');
+  if (dateRangeFilter) dateRangeFilter.value = '7days';
+  const ruleFilter = document.getElementById('rule-filter');
+  if (ruleFilter) ruleFilter.value = '';
+  const logSearch = document.getElementById('log-search');
+  if (logSearch) logSearch.value = '';
   
   loadData().then(() => {
     renderExecutions();
@@ -2360,7 +2370,8 @@ function addCondition() {
     value: ''
   });
   
-  document.getElementById('conditions-editor').innerHTML = renderConditions();
+  const conditionsEditor = document.getElementById('conditions-editor');
+  if (conditionsEditor) conditionsEditor.innerHTML = renderConditions();
 }
 
 /**
@@ -2372,7 +2383,8 @@ function addAction() {
     params: ''
   });
   
-  document.getElementById('actions-editor').innerHTML = renderActions();
+  const actionsEditor = document.getElementById('actions-editor');
+  if (actionsEditor) actionsEditor.innerHTML = renderActions();
 }
 
 /**
@@ -2380,7 +2392,8 @@ function addAction() {
  */
 function removeCondition(index) {
   AutomationState.editor.conditions.splice(index, 1);
-  document.getElementById('conditions-editor').innerHTML = renderConditions();
+  const conditionsEditor = document.getElementById('conditions-editor');
+  if (conditionsEditor) conditionsEditor.innerHTML = renderConditions();
 }
 
 /**
@@ -2388,7 +2401,8 @@ function removeCondition(index) {
  */
 function removeAction(index) {
   AutomationState.editor.actions.splice(index, 1);
-  document.getElementById('actions-editor').innerHTML = renderActions();
+  const actionsEditor = document.getElementById('actions-editor');
+  if (actionsEditor) actionsEditor.innerHTML = renderActions();
 }
 
 /**
@@ -2464,7 +2478,7 @@ function dryRun(ruleId) {
 
 async function loadGamification() {
   try {
-    const { data } = await genericSelect('gamification_points', {
+    const { data } = await globalGenericSelect('gamification_points', {
       user_id: AutomationState.user.id,
       org_id: AutomationState.orgId
     });
@@ -2479,7 +2493,7 @@ async function loadGamification() {
 
 async function loadScheduledReports() {
   try {
-    const { data } = await genericSelect('scheduled_reports', {
+    const { data } = await globalGenericSelect('scheduled_reports', {
       user_id: AutomationState.user.id,
       org_id: AutomationState.orgId
     });
@@ -2491,91 +2505,74 @@ async function loadScheduledReports() {
   }
 }
 
+    console.log("%c🤖 Automações v11.1.2 HOTFIX carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
 
-    console.log("%c🤖 Automações v11.1.1 HOTFIX carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
+    // ============================================================
+    // 🌐 EXPOSE GLOBAL API (DENTRO DO waitForSupabase, NO FINAL)
+    // ============================================================
+    
+    window.AutomationSystem = {
+      // Básicos
+      refresh,
+      getState: () => ({ ...AutomationState }),
+      toggleRule,
+      
+      // CRUD
+      createRule,
+      updateRule,
+      deleteRule,
+      
+      // Modais
+      openModalCreateRule,
+      openModalEditRule,
+      showRuleDetails,
+      showExecutionDetails,
+      openScheduledReports,
+      closeModal,
+      
+      // Filtros
+      applyFilters,
+      filterByStatus,
+      filterByDateRange,
+      filterByRule,
+      searchLogs,
+      clearFilters,
+      
+      // Paginação
+      changePage,
+      prevPage,
+      nextPage,
+      
+      // Editor
+      addCondition,
+      addAction,
+      removeCondition,
+      removeAction,
+      
+      // Export
+      exportCSV,
+      exportPDF,
+      exportExcel,
+      
+      // Preview/Test
+      previewRule,
+      testRule,
+      dryRun,
+      
+      // n8n
+      triggerN8nNewLead,
+      triggerN8nPRLAnalysis,
+      
+      // Utilitários
+      calculateKPIs,
+      formatTriggerEvent,
+      formatDate,
+      formatStatus,
+      formatExecutionTime,
+      
+      version: "11.1.2-hotfix-critical",
+    };
+    
+    console.log('%c✅ AutomationSystem v11.1.2 READY', 'color:#22c55e;font-weight:bold;');
   });
-})();
-
-// ============================================================
-// 🌐 EXPOSE GLOBAL API (FORA DO waitForSupabase)
-// ============================================================
-
-// Garantir que as funções estejam disponíveis globalmente
-(function exposeGlobalAPI() {
-  'use strict';
-  
-  // Aguardar AutomationSystem estar pronto
-  const checkReady = setInterval(() => {
-    if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
-      clearInterval(checkReady);
-      
-      // Expor API global
-      window.AutomationSystem = {
-        // Básicos
-        refresh,
-        getState: () => ({ ...AutomationState }),
-        toggleRule,
-        
-        // CRUD
-        createRule,
-        updateRule,
-        deleteRule,
-        
-        // Modais
-        openModalCreateRule,
-        openModalEditRule,
-        showRuleDetails,
-        showExecutionDetails,
-        openScheduledReports,
-        closeModal,
-        
-        // Filtros
-        applyFilters,
-        filterByStatus,
-        filterByDateRange,
-        filterByRule,
-        searchLogs,
-        clearFilters,
-        
-        // Paginação
-        changePage,
-        prevPage,
-        nextPage,
-        
-        // Editor
-        addCondition,
-        addAction,
-        removeCondition,
-        removeAction,
-        
-        // Export
-        exportCSV,
-        exportPDF,
-        exportExcel,
-        
-        // Preview/Test
-        previewRule,
-        testRule,
-        dryRun,
-        
-        // n8n
-        triggerN8nNewLead,
-        triggerN8nPRLAnalysis,
-        
-        // Utilitários
-        calculateKPIs,
-        formatTriggerEvent,
-        formatDate,
-        formatStatus,
-        formatExecutionTime,
-        
-        version: "11.1.1-hotfix-final",
-      };
-      
-      console.log('%c✅ AutomationSystem Global API v11.1.1 READY', 'color:#22c55e;font-weight:bold;font-size:14px;');
-      console.log('Métodos disponíveis:', Object.keys(window.AutomationSystem).length);
-    }
-  }, 100);
-  
-  setTimeout(() => clearInterval(checkReady), 10000);
 })();
