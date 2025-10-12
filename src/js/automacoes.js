@@ -243,12 +243,12 @@
         genericInsert,
         genericUpdate,
         genericDelete,
-        client,
+        supabase, // USAR DIRETO, AO INVÉS DE client
       } = window.AlshamSupabase;
       
       window.globalGetCurrentSession = getCurrentSession;
       window.globalGetCurrentOrgId = getCurrentOrgId;
-      window.globalClient = client;
+      window.globalClient = supabase; // Corrigid: usar supabase diretamente
       window.globalGenericSelect = genericSelect;
       window.globalGenericInsert = genericInsert;
       window.globalGenericUpdate = genericUpdate;
@@ -543,7 +543,7 @@
       }
 
       // FIX: Aplicar filtro de data corretamente
-      let query = window.globalClient
+      let query = window.AlshamSupabase.supabase  // Corrigid: usar AlshamSupabase.supabase
         .from('automation_executions')
         .select('*', { count: 'exact' })
         .match(filters)
@@ -665,6 +665,20 @@
       renderExecutions();
       renderLogs();
       renderPagination();
+      populateRuleFilter(); // Novo: popular select de regras
+    }
+
+    /**
+     * Popula select de filtro por regra
+     */
+    function populateRuleFilter() {
+      const ruleFilter = document.getElementById('rule-filter');
+      if (!ruleFilter) return;
+      
+      ruleFilter.innerHTML = '<option value="">Todas as regras</option>' + 
+        AutomationState.rules.map(rule => 
+          `<option value="${rule.id}">${escapeHtml(rule.name)}</option>`
+        ).join('');
     }
 
     /**
@@ -752,7 +766,7 @@
         .map(
           (rule) => `
         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800" role="row">
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${rule.name}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${escapeHtml(rule.name)}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${formatTriggerEvent(rule.trigger_event)}</td>
           <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${rule.conditions ? Object.keys(rule.conditions).length : 0}</td>
           <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${rule.actions ? rule.actions.length : 0}</td>
@@ -799,7 +813,7 @@
       tbody.innerHTML = executions
         .map((e) => {
           const rule = AutomationState.rules.find((r) => r.id === e.rule_id);
-          const ruleName = rule ? rule.name : `Regra #${e.rule_id?.substring(0, 8)}...`;
+          const ruleName = rule ? escapeHtml(rule.name) : `Regra #${e.rule_id?.substring(0, 8)}...`;
           const colors = colorMap[e.status] || { bg: "bg-gray-100 text-gray-800", icon: "?" };
 
           return `
@@ -2289,7 +2303,7 @@ function trapFocus() {
 }
 
 // ============================================================
-// 🎯 FUNÇÕES DE FILTRO (FALTANDO)
+// 🔍 FUNÇÕES DE FILTRO (FALTANDO)
 // ============================================================
 
 function filterByStatus(status) {
@@ -2354,7 +2368,7 @@ function nextPage() {
 
 // ============================================================
 // ✏️ FUNÇÕES DE EDITOR (FALTANDO)
-// ============================================================
+  // ============================================================
 
 /**
  * Renderiza editor de condições
