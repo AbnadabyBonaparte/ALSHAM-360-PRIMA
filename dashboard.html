@@ -591,7 +591,13 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/src/js/supabase-init.js"></script>
+  
+  <!-- Supabase Init Inline (100% autocontido) -->
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+    console.log('✅ Supabase integrado:', Object.keys(window.AlshamSupabase).length, 'funções');
+  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
