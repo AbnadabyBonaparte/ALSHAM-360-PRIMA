@@ -762,7 +762,7 @@ waitForSupabase(() => {
               <th class="p-3 text-left font-semibold text-sm sortable" data-sort="prl">PRL (%)</th>
               <th class="p-3 text-left font-semibold text-sm sortable" data-sort="valor_estimado">Valor Estimado</th>
               <th class="p-3 text-left font-semibold text-sm sortable" data-sort="primeira_interacao">Primeira Interação</th>
-              <th class="p-3 text-left font-semibold text-sm sortable" data-sort="ultima_interacao">Última Interação</th>
+              <th class="p-3 text-left font-medium text-sm sortable" data-sort="ultima_interacao">Última Interação</th>
               <th class="p-3 text-left font-semibold text-sm sortable" data-sort="proxima_acao">Próxima Ação</th>
               <th class="p-3 text-left font-semibold text-sm sortable" data-sort="owner_id">Responsável</th>
               <th class="p-3 text-left font-semibold text-sm sortable" data-sort="equipe">Equipe</th>
@@ -933,10 +933,12 @@ waitForSupabase(() => {
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
-        <h4>${lead.nome}</h4>
-        <p>${lead.email}</p>
-        <p>${lead.empresa}</p>
-        <span class="status-badge">${lead.status}</span>
+        <h4 class="font-semibold">${lead.nome}</h4>
+        <p class="text-sm text-gray-600">${lead.email}</p>
+        <p class="text-sm text-gray-600">${lead.empresa}</p>
+        <span class="status-badge bg-${getStatusColor(lead.status)}-100">
+          ${getStatusLabel(lead.status)}
+        </span>
       `;
       card.addEventListener('click', () => openLeadModal(lead.id));
       container.querySelector('div').appendChild(card);
@@ -1227,18 +1229,6 @@ waitForSupabase(() => {
     }));
   }
 
-  function getStatusColor(status) {
-    return LEADS_CONFIG.statusOptions.find(s => s.value === status)?.color || 'gray';
-  }
-
-  function getStatusLabel(status) {
-    return LEADS_CONFIG.statusOptions.find(s => s.value === status)?.label || status;
-  }
-
-  function getTemperaturaColor(temperatura) {
-    return LEADS_CONFIG.temperaturaOptions.find(t => t.value === temperatura)?.color || 'gray';
-  }
-
   function renderAdvancedAnalytics() {
     const container = document.getElementById("advanced-analytics");
     if (!container) return;
@@ -1314,8 +1304,49 @@ waitForSupabase(() => {
   function openNewAutomationModal() {
     // Adicionado: Modal para criar regra de automação
     const modal = document.createElement('div');
-    modal.innerHTML = /* Formulário com triggers, conditions, actions */;
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+        <h3 class="text-xl font-bold mb-4">Nova Regra de Automação</h3>
+        <form id="automation-form">
+          <label class="block mb-2">Nome da Regra</label>
+          <input type="text" class="border rounded px-3 py-2 w-full mb-4" required>
+          
+          <label class="block mb-2">Trigger (Gatilho)</label>
+          <select class="border rounded px-3 py-2 w-full mb-4">
+            ${LEADS_CONFIG.automations.triggers.map(t => 
+              `<option value="${t}">${t}</option>`
+            ).join('')}
+          </select>
+          
+          <label class="block mb-2">Ação</label>
+          <select class="border rounded px-3 py-2 w-full mb-4">
+            ${LEADS_CONFIG.automations.actions.map(a => 
+              `<option value="${a}">${a}</option>`
+            ).join('')}
+          </select>
+          
+          <div class="flex gap-2">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    `;
     document.body.appendChild(modal);
+    
+    modal.querySelector('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rule = {
+        name: modal.querySelector('input').value,
+        trigger: modal.querySelector('select:first-of-type').value,
+        action: modal.querySelector('select:last-of-type').value
+      };
+      await createAutomationRule(rule);
+      modal.remove();
+      showSuccess('Regra criada!');
+      loadSystemData();
+    });
   }
 
   function renderCollaborationSection() {
@@ -1611,19 +1642,68 @@ waitForSupabase(() => {
   function showPreviewModal(data, callback) {
     // Adicionado: Modal com mapeamento drag & drop, preview table
     const modal = document.createElement('div');
-    modal.innerHTML = /* UI de preview */;
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl font-bold mb-4">Preview da Importação</h3>
+        <p class="mb-4">${data.length} registros encontrados</p>
+        
+        <table class="w-full border-collapse mb-4">
+          <thead>
+            <tr class="bg-gray-100">
+              ${Object.keys(data[0] || {}).map(key => 
+                `<th class="border p-2">${key}</th>`
+              ).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${data.slice(0, 10).map(row => `
+              <tr>
+                ${Object.values(row).map(val => 
+                  `<td class="border p-2">${val}</td>`
+                ).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        
+        ${data.length > 10 ? `<p class="text-sm text-gray-500 mb-4">Mostrando 10 de ${data.length} registros</p>` : ''}
+        
+        <div class="flex gap-2">
+          <button onclick="handleImportConfirm()" class="bg-green-600 text-white px-4 py-2 rounded">Confirmar Importação</button>
+          <button onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+        </div>
+      </div>
+    `;
+    
     document.body.appendChild(modal);
+    
+    window.handleImportConfirm = () => {
+      modal.remove();
+      callback(data);
+    };
   }
 
   function exportToCSV() {
     // Adicionado: Export com campos selecionados, filtros
-    const fields = /* user selected */;
-    const data = leadsState.filteredLeads.map(l => fields.reduce((acc, f) => ({ ...acc, [f]: l[f] }), {}));
+    const fields = ['nome', 'email', 'telefone', 'empresa', 'status', 'temperatura', 'score_ia'];
+    const data = leadsState.filteredLeads.map(l => 
+      fields.reduce((acc, f) => ({ ...acc, [f]: l[f] }), {})
+    );
+    
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
-    XLSX.writeFile(workbook, 'leads.xlsx');
-    await genericInsert("export_history", { format: 'csv', records: data.length });
+    XLSX.writeFile(workbook, `leads_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    genericInsert("export_history", { 
+      format: 'csv', 
+      records: data.length,
+      org_id: leadsState.orgId,
+      user_id: leadsState.user.id
+    });
+    
+    showSuccess(`${data.length} leads exportados com sucesso!`);
   }
 
   function exportToPDF() {
@@ -1748,16 +1828,96 @@ waitForSupabase(() => {
         <h2 class="text-2xl font-bold mb-4">Novo Lead</h2>
         <form id="new-lead-form">
           <!-- Todos os campos do checklist: nome, email, telefone, whatsapp, empresa, cargo, website, linkedin_lead, linkedin_empresa, endereco, cnpj, tamanho_empresa, receita_anual, setor, status, temperatura, prioridade, origem, campanha, utm_params, valor_estimado, proxima_acao, tags, observacoes, consentimento, campos customizados -->
-          <input type="text" id="new-lead-nome" placeholder="Nome Completo" required>
-          <!-- ... mais 30+ inputs -->
-          <button type="submit">Criar</button>
+          <input type="text" id="new-lead-nome" placeholder="Nome Completo" class="border rounded px-3 py-2 w-full mb-3" required>
+          <input type="email" id="new-lead-email" placeholder="Email" class="border rounded px-3 py-2 w-full mb-3" required>
+          <input type="text" id="new-lead-telefone" placeholder="Telefone" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-whatsapp" placeholder="WhatsApp" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-empresa" placeholder="Empresa" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-cargo" placeholder="Cargo" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-website" placeholder="Website da Empresa" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-linkedin-lead" placeholder="LinkedIn do Lead" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-linkedin-empresa" placeholder="LinkedIn da Empresa" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-endereco" placeholder="Endereço" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-cnpj" placeholder="CNPJ" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="number" id="new-lead-tamanho-empresa" placeholder="Tamanho da Empresa (funcionários)" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="number" id="new-lead-receita-anual" placeholder="Receita Anual" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-setor" placeholder="Setor/Indústria" class="border rounded px-3 py-2 w-full mb-3">
+          <select id="new-lead-status" class="border rounded px-3 py-2 w-full mb-3">
+            ${LEADS_CONFIG.statusOptions.map(s => 
+              `<option value="${s.value}">${s.label}</option>`
+            ).join('')}
+          </select>
+          <select id="new-lead-temperatura" class="border rounded px-3 py-2 w-full mb-3">
+            ${LEADS_CONFIG.temperaturaOptions.map(t => 
+              `<option value="${t.value}">${t.label}</option>`
+            ).join('')}
+          </select>
+          <select id="new-lead-prioridade" class="border rounded px-3 py-2 w-full mb-3">
+            ${LEADS_CONFIG.prioridadeOptions.map(p => 
+              `<option value="${p.value}">${p.label}</option>`
+            ).join('')}
+          </select>
+          <select id="new-lead-origem" class="border rounded px-3 py-2 w-full mb-3">
+            ${LEADS_CONFIG.origemOptions.map(o => 
+              `<option value="${o}">${o}</option>`
+            ).join('')}
+          </select>
+          <input type="text" id="new-lead-campanha" placeholder="Campanha de Marketing" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-utm-params" placeholder="UTM Parameters" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="number" id="new-lead-valor-estimado" placeholder="Valor Estimado do Negócio" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-proxima-acao" placeholder="Próxima Ação Agendada" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="new-lead-tags" placeholder="Tags (separadas por vírgula)" class="border rounded px-3 py-2 w-full mb-3">
+          <textarea id="new-lead-observacoes" placeholder="Observações/Notas" class="border rounded px-3 py-2 w-full mb-3" rows="3"></textarea>
+          <label class="flex items-center mb-3">
+            <input type="checkbox" id="new-lead-consentimento" checked class="mr-2">
+            Consentimento LGPD/GDPR
+          </label>
+          <!-- Campos customizados dinâmicos -->
+          ${leadsState.customFields.map(field => `
+            <input type="${field.type}" id="new-lead-${field.name}" placeholder="${field.label}" class="border rounded px-3 py-2 w-full mb-3">
+          `).join('')}
+          <div class="flex gap-2">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Criar Lead</button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+          </div>
         </form>
       </div>
     `;
     document.body.appendChild(modal);
     modal.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = { /* coletar todos */ };
+      const data = {
+        nome: document.getElementById('new-lead-nome').value,
+        email: document.getElementById('new-lead-email').value,
+        telefone: document.getElementById('new-lead-telefone').value,
+        whatsapp: document.getElementById('new-lead-whatsapp').value,
+        empresa: document.getElementById('new-lead-empresa').value,
+        cargo: document.getElementById('new-lead-cargo').value,
+        website: document.getElementById('new-lead-website').value,
+        linkedin_lead: document.getElementById('new-lead-linkedin-lead').value,
+        linkedin_empresa: document.getElementById('new-lead-linkedin-empresa').value,
+        endereco: document.getElementById('new-lead-endereco').value,
+        cnpj: document.getElementById('new-lead-cnpj').value,
+        tamanho_empresa: document.getElementById('new-lead-tamanho-empresa').value,
+        receita_anual: document.getElementById('new-lead-receita-anual').value,
+        setor: document.getElementById('new-lead-setor').value,
+        status: document.getElementById('new-lead-status').value,
+        temperatura: document.getElementById('new-lead-temperatura').value,
+        prioridade: document.getElementById('new-lead-prioridade').value,
+        origem: document.getElementById('new-lead-origem').value,
+        campanha: document.getElementById('new-lead-campanha').value,
+        utm_params: document.getElementById('new-lead-utm-params').value,
+        valor_estimado: document.getElementById('new-lead-valor-estimado').value,
+        proxima_acao: document.getElementById('new-lead-proxima-acao').value,
+        tags: document.getElementById('new-lead-tags').value.split(','),
+        observacoes: document.getElementById('new-lead-observacoes').value,
+        consentimento: document.getElementById('new-lead-consentimento').checked
+      };
+      // Campos customizados
+      leadsState.customFields.forEach(field => {
+        data[field.name] = document.getElementById(`new-lead-${field.name}`).value;
+      });
+      
       await createLead(data);
       modal.remove();
       loadSystemData();
@@ -1833,26 +1993,73 @@ waitForSupabase(() => {
   window.openEditLeadModal = async function(leadId) {
     const lead = leadsState.leads.find(l => l.id === leadId);
     const modal = document.createElement('div');
-    modal.innerHTML = /* Formulário completo com todos os campos preenchidos */;
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+        <h3 class="text-xl font-bold mb-4">Editar Lead</h3>
+        <form id="edit-lead-form">
+          <input type="text" id="edit-nome" value="${lead.nome || ''}" placeholder="Nome" class="border rounded px-3 py-2 w-full mb-3" required>
+          <input type="email" id="edit-email" value="${lead.email || ''}" placeholder="Email" class="border rounded px-3 py-2 w-full mb-3" required>
+          <input type="text" id="edit-telefone" value="${lead.telefone || ''}" placeholder="Telefone" class="border rounded px-3 py-2 w-full mb-3">
+          <input type="text" id="edit-empresa" value="${lead.empresa || ''}" placeholder="Empresa" class="border rounded px-3 py-2 w-full mb-3">
+          
+          <select id="edit-status" class="border rounded px-3 py-2 w-full mb-3">
+            ${LEADS_CONFIG.statusOptions.map(s => 
+              `<option value="${s.value}" ${lead.status === s.value ? 'selected' : ''}>${s.label}</option>`
+            ).join('')}
+          </select>
+          
+          <div class="flex gap-2">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    `;
+    
     document.body.appendChild(modal);
+    
     modal.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = { /* coletar */ };
+      const data = {
+        nome: document.getElementById('edit-nome').value,
+        email: document.getElementById('edit-email').value,
+        telefone: document.getElementById('edit-telefone').value,
+        empresa: document.getElementById('edit-empresa').value,
+        status: document.getElementById('edit-status').value
+      };
       await editLead(leadId, data);
       modal.remove();
-      openLeadModal(leadId);
+      showSuccess('Lead atualizado!');
+      loadSystemData();
     });
   };
 
   window.updateLead = editLead;
 
   window.openDeleteLeadModal = function(leadId) {
+    const lead = leadsState.leads.find(l => l.id === leadId);
     const modal = document.createElement('div');
-    modal.innerHTML = /* Confirmação */;
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-xl font-bold mb-4">Confirmar Exclusão</h3>
+        <p class="mb-4">Tem certeza que deseja excluir o lead <strong>${lead.nome}</strong>?</p>
+        <p class="text-sm text-red-600 mb-4">Esta ação não pode ser desfeita.</p>
+        
+        <div class="flex gap-2">
+          <button id="confirm-delete" class="bg-red-600 text-white px-4 py-2 rounded">Excluir</button>
+          <button onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+        </div>
+      </div>
+    `;
+    
     document.body.appendChild(modal);
+    
     modal.querySelector('#confirm-delete').addEventListener('click', async () => {
       await deleteLead(leadId);
       modal.remove();
+      showSuccess('Lead excluído!');
       loadSystemData();
     });
   };
