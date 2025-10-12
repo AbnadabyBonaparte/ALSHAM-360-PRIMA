@@ -1,457 +1,687 @@
 <!DOCTYPE html>
-<html lang="pt-BR" dir="ltr" class="light scroll-smooth">
+<html lang="pt-BR" class="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- ✅ Theme Init - DEVE ser primeiro script -->
-  <script src="/js/theme-init.js"></script>
-  
-  <!-- Security Headers (6 itens) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://rgvnbtuqtxvfxhrdnkjg.supabase.co; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co; media-src 'self' data:; frame-src 'self';">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="DENY" />
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-  <meta name="referrer" content="strict-origin" />
-  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
+    <!-- 🔒 SECURITY HEADERS -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://rgvnbtuqtxvfxhrdnkjg.supabase.co; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; connect-src 'self' https://rgvnbtuqtxvfxhrdnkjg.supabase.co wss://rgvnbtuqtxvfxhrdnkjg.supabase.co;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
 
-  <!-- SEO & Meta Tags (11 itens) -->
-  <title>Automações — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Gerencie regras de automação, monitore execuções em tempo real e analise logs no CRM inteligente ALSHAM 360° PRIMA. Integre com n8n para workflows avançados." />
-  <meta name="keywords" content="automacoes, crm, ia, regras, workflows, n8n, supabase, leads, pipeline, logs" />
-  <link rel="canonical" href="https://app.alshamglobal.com.br/automacoes.html" />
-  <!-- Open Graph -->
-  <meta property="og:title" content="Automações — ALSHAM 360° PRIMA" />
-  <meta property="og:description" content="Sistema de automações avançadas para CRM com IA." />
-  <meta property="og:image" content="data:image/svg+xml;base64,[base64-logo]" />
-  <meta property="og:url" content="https://app.alshamglobal.com.br/automacoes.html" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="ALSHAM 360° PRIMA" />
-  <!-- Twitter Cards -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Automações — ALSHAM 360° PRIMA" />
-  <meta name="twitter:description" content="Automações inteligentes para seu CRM." />
-  <meta name="twitter:image" content="data:image/svg+xml;base64,[base64-logo]" />
-  <meta name="twitter:site" content="@alshamglobal" />
-  <!-- JSON-LD Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "ALSHAM 360° PRIMA - Automações",
-    "description": "Módulo de automações para CRM com IA",
-    "url": "https://app.alshamglobal.com.br/automacoes.html",
-    "author": {"@type": "Organization", "name": "ALSHAM Global"},
-    "applicationCategory": "BusinessApplication"
-  }
-  </script>
+    <!-- 📱 META TAGS BÁSICAS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Automações - ALSHAM 360° PRIMA | CRM Inteligente com IA</title>
+    <meta name="description" content="Gerencie regras de automação avançadas, monitore execuções em tempo real e analise logs com IA. Automatize seu CRM com n8n e workflows sem código. Enterprise-ready.">
+    <meta name="keywords" content="CRM, automações, IA, n8n, workflows, regras, Supabase, ALSHAM 360">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://app.alshamglobal.com.br/automacoes.html">
 
-  <!-- Branding & Visual (15 itens): Favicon + Apple -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDBDNy4xNjM0IDAgMCA3LjE2MzQgMCAxNlMxLjE2MzQgMzIgMTYgMzJTMzIgMjQuODM2NiAzMiAxNlMyNC44MzY2IDAgMTYgMFpNMTYgMjBDMTAuNjEzIDIwIDYgMTUuMzg3IDYgOUM2IDEwLjYxMyAxMC42MTMgNiAxNiA2UzI2IDEwLjYxMyAyNiAxNlMyMS4zODcgMjAgMTYgMjBaIiBmaWxsPSIjM0I4MkY2Ii8+CjxwYXRoIGQ9Ik0xNiA4QzExLjUyMiA4IDggMTEuNTIyIDggMTZTMTEuNTIyIDI0IDE2IDI0UzI0IDIwLjQ3OCAyNCAxNlMyMC40NzggOCAxNiA4Wk0xNiAxOEMxMi43NDcgMTggOSAxMi43NDcgOSAxNlM5IDkxMi43NDcgMTZDMjAuMjUzIDE5IDI0IDE1LjI1MyAyNCAxMVMyMC4yNTMgMyAxNiAzWiIgZmlsbD0iI0ZGRiIvPgo8L3N2Zz4K" />
-  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz..." /> <!-- Placeholder para full base64 -->
-  <!-- Logo SVG Inline (header/navbar) -->
-  <svg id="logo-svg" class="h-8 w-8 hidden" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M16 0C7.16344 0 0 7.16344 0 16S7.16344 32 16 32S32 24.8366 32 16S24.8366 0 16 0ZM16 20C10.613 20 6 15.387 6 9C6 10.613 10.613 6 16 6S26 10.613 26 16S21.387 20 16 20ZM16 18C12.747 18 9 14.253 9 16S12.747 24 16 24S24 20.253 24 16S19.253 8 16 8Z" fill="#3B82F6"/>
-    <path d="M16 8C11.522 8 8 11.522 8 16S11.522 24 16 24S24 20.478 24 16S20.478 8 16 8ZM16 18C12.747 18 9 14.253 9 16S12.747 24 16 24S24 20.253 24 16S19.253 8 16 8Z" fill="white"/>
-  </svg>
-  <!-- 15+ Ícones SVG Proprietários Inline (exemplos; expanda para todos) -->
-  <svg id="icon-automacoes" class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 7V17L13 22L23 17V7L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11L13 7V17L8 13V11Z" fill="currentColor"/></svg>
-  <svg id="icon-regra" class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2"/><path d="M12 2V22" stroke="currentColor" stroke-width="2"/></svg>
-  <!-- Mais: icon-execucao, icon-log, icon-trigger, icon-action, icon-webhook, icon-email, icon-slack, etc. (adicione 13 mais como placeholders) -->
+    <!-- 🔍 SEO OPEN GRAPH -->
+    <meta property="og:title" content="🤖 Automações - ALSHAM 360° PRIMA">
+    <meta property="og:description" content="Sistema completo de automações com IA para CRM enterprise. Regras, execuções e analytics em tempo real.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://app.alshamglobal.com.br/automacoes.html">
+    <meta property="og:image" content="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI2MzAiIHZpZXdCb3g9IjAgMCAxMjAwIDYzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMEgxMjAwVjYzMEgweiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4K">
+    <meta property="og:site_name" content="ALSHAM 360° PRIMA">
+    <meta property="og:locale" content="pt_BR">
 
-  <!-- PWA (5 itens): Manifest Inline + Apple -->
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQUxTSEFNI tray: 360° PRIMA - Automações\",\"short_name\":\"ALSHAM Automações\",\"icons\":[{\"src\":\"data:image/svg+xml;base64,[logo-base64]\",\"sizes\":\"192x192\",\"type\":\"image/svg+xml\"}],\"theme_color\":\"#3B82F6\",\"background_color\":\"#FFFFFF\",\"display\":\"standalone\",\"start_url\":\"/automacoes.html\"}" />
-  <meta name="theme-color" content="#3B82F6" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="ALSHAM Automações" />
+    <!-- 🐦 TWITTER CARDS -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🤖 Automações - ALSHAM 360° PRIMA">
+    <meta name="twitter:description" content="Automatize seu CRM com regras inteligentes e IA. Monitore tudo em tempo real.">
+    <meta name="twitter:image" content="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI2MzAiIHZpZXdCb3g9IjAgMCAxMjAwIDYzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMEgxMjAwVjYzMEgweiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4K">
+    <meta name="twitter:site" content="@alshamglobal">
 
-  <!-- Styles: Tailwind CDN + Config + Critical CSS Inline (~233 linhas essenciais de tokens/style/animations) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            alsham: {
-              primary: '#3B82F6',
-              secondary: '#6B7280',
-              success: '#10B981',
-              danger: '#EF4444',
-              warning: '#F59E0B',
-              bg: { canvas: '#FFFFFF', surface: '#F9FAFB' },
-              text: { primary: '#111827', secondary: '#6B7280' },
-              border: { default: '#E5E7EB' }
-            }
-          },
-          fontFamily: { inter: ['Inter', 'sans-serif'] },
-          animation: { 'fade-in': 'fadeIn 0.5s ease-in-out', 'slide-up': 'slideUp 0.3s ease-out' },
-          keyframes: {
-            fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
-            slideUp: { '0%': { transform: 'translateY(10px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 } }
-          }
+    <!-- 📄 JSON-LD STRUCTURED DATA -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Automações - ALSHAM 360° PRIMA",
+        "description": "Gerenciamento de automações para CRM com IA",
+        "url": "https://app.alshamglobal.com.br/automacoes.html",
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Dashboard", "item": "https://app.alshamglobal.com.br/"},
+                {"@type": "ListItem", "position": 2, "name": "Automações"}
+            ]
         }
-      },
-      darkMode: 'class',
-      corePlugins: { preflight: false }
     }
-  </script>
-  <link rel="stylesheet" href="/css/tokens.css" />
-  <link rel="stylesheet" href="/css/dark-theme.css" />
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/dashboard-animations.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    </script>
 
-  <!-- Performance: Resource Hints + DNS Prefetch -->
-  <link rel="preconnect" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co" />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
-  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" />
+    <!-- 🎨 FAVICONS & BRANDING -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwIiBmaWxsPSIjMDA4RkZGIi8+Cjx0ZXh0IHg9IjE2IiB5PSIyMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QTwvdGV4dD4KPC9zdmc+Cg==">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjkwIiBjeT0iOTAiIHI9IjkwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjkwIiBjeT0iOTAiIHI9IjgwIiBmaWxsPSIjMDA4RkZGIi8+Cjx0ZXh0IHg9IjkwIiB5PSIxMDUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIzMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkE8L3RleHQ+Cjwvc3ZnPgo=">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQUxTSEFNI traysMcaJ9iwiInNoaXJ0IjoiL3N2ZyIpLCJpY29ucyI6W3sic3JjIjoiL2ljb24tMTkyLnBuZyIsInNpemVzIjoiMTkyeDE5MiJ9XX0=">
 
-  <!-- External Libraries: Chart.js + SheetJS -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
+    <!-- 📱 PWA META TAGS -->
+    <meta name="theme-color" content="#008FF0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ALSHAM Automações">
 
-  <!-- Critical CSS Inline (~233 linhas: resets, cards, buttons, modals, etc. de tokens + style) -->
-  <style>
-    :root { --alsham-bg-canvas: #FFFFFF; --alsham-text-primary: #111827; --alsham-primary: #3B82F6; --alsham-border-default: #E5E7EB; --alsham-shadow-md: 0 1px 3px 0 rgba(0,0,0,0.1); --alsham-radius-lg: 0.75rem; --alsham-space-6: 1.5rem; --alsham-motion-productive: 0.15s; --alsham-ease-productive: ease-out; --alsham-z-sticky: 40; }
-    .dark { --alsham-bg-canvas: #111827; --alsham-text-primary: #F9FAFB; --alsham-primary: #60A5FA; --alsham-border-default: #374151; --alsham-shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Inter', sans-serif; line-height: 1.6; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    .focus\:ring-2:focus { outline: none; ring: 2px solid #3B82F6; }
-    .card { background: var(--alsham-bg-canvas); border: 1px solid var(--alsham-border-default); border-radius: var(--alsham-radius-lg); padding: var(--alsham-space-6); transition: box-shadow var(--alsham-motion-productive), transform var(--alsham-motion-productive); }
-    .card:hover { box-shadow: var(--alsham-shadow-lg); transform: translateY(-0.125rem); }
-    .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
-    .bg-success { background: #10B981; color: white; }
-    .modal { position: fixed; inset: 0; z-50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); animation: fadeIn 0.3s; }
-    .modal-content { background: var(--alsham-bg-canvas); border-radius: var(--alsham-radius-lg); max-width: 90vw; max-height: 90vh; overflow-y: auto; box-shadow: var(--alsham-shadow-xl); }
-    .toast-container { position: fixed; top: 1rem; right: 1rem; z-50; display: flex; flex-direction: column; gap: 0.5rem; }
-    .toast { padding: 1rem; border-radius: 0.5rem; color: white; animation: slideIn 0.3s ease-out; }
-    .animate-slideIn { animation: slideIn 0.3s ease-out; }
-    .animate-slideOut { animation: slideOut 0.3s ease-in forwards; }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes slideOut { to { transform: translateX(100%); opacity: 0; } }
-    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .offline-badge { position: fixed; bottom: 1rem; right: 1rem; background: #EF4444; color: white; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; }
-    .reveal-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal-on-scroll.revealed { opacity: 1; transform: translateY(0); }
-    .counter { font-size: 2rem; font-weight: bold; }
-    .empty-state { text-align: center; padding: 4rem 2rem; }
-    .empty-state svg { width: 6rem; height: 6rem; opacity: 0.5; margin-bottom: 1rem; }
-    .error-fallback { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 0.5rem; padding: 1rem; color: #DC2626; }
-    @media print { .no-print { display: none !important; } body { background: white !important; } }
-    /* Mais ~150 linhas de critical CSS: buttons, forms, tables, modals, etc. (expanda como em dashboard) */
-    button { padding: 0.5rem 1rem; border-radius: 0.375rem; border: 1px solid; cursor: pointer; transition: all 0.2s; }
-    button:hover { transform: translateY(-1px); }
-    input, select, textarea { border: 1px solid var(--alsham-border-default); border-radius: 0.375rem; padding: 0.5rem; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--alsham-border-default); }
-    /* Fim critical CSS */
-  </style>
+    <!-- 🚀 PERFORMANCE HINTS -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
+    <link rel="dns-prefetch" href="https://jsdelivr.net">
+
+    <!-- 🎨 TAILWIND CSS CDN + CONFIG INLINE -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        alsham: {
+                            primary: '#008FF0',
+                            secondary: '#00C4B4',
+                            accent: '#FF6B6B',
+                            neutral: '#F8FAFC',
+                            dark: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                },
+            },
+            corePlugins: { preflight: false }
+        }
+    </script>
+
+    <!-- 💎 CRITICAL CSS INLINE (TOKENS + BASE) -->
+    <style>
+        :root {
+            --alsham-primary: #008FF0;
+            --alsham-secondary: #00C4B4;
+            --alsham-accent: #FF6B6B;
+            --alsham-neutral: #F8FAFC;
+            --alsham-dark: #0F172A;
+            --alsham-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --alsham-border: 1px solid #E2E8F0;
+            --alsham-radius: 0.5rem;
+            --alsham-spacing-xs: 0.25rem;
+            --alsham-spacing-sm: 0.5rem;
+            --alsham-spacing-md: 1rem;
+            --alsham-spacing-lg: 1.5rem;
+            --alsham-spacing-xl: 2rem;
+        }
+        .light { color-scheme: light; }
+        .dark { color-scheme: dark; }
+        body { font-family: 'Inter', sans-serif; background: var(--alsham-neutral); color: var(--alsham-dark); }
+        h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+        .btn-primary { background: var(--alsham-primary); color: white; border-radius: var(--alsham-radius); padding: var(--alsham-spacing-sm) var(--alsham-spacing-md); transition: all 0.2s; }
+        .btn-primary:hover { background: #007ACC; transform: translateY(-1px); }
+        .card { background: white; border: var(--alsham-border); border-radius: var(--alsham-radius); box-shadow: var(--alsham-shadow); padding: var(--alsham-spacing-lg); }
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .animate-slideIn { animation: slideIn 0.3s ease-out; }
+        .animate-slideOut { animation: slideOut 0.3s ease-in; }
+        .focus-visible { outline: 2px solid var(--alsham-primary); outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+        @media print { .no-print { display: none; } body { background: white; } }
+    </style>
+
+    <!-- ♿ SKIP LINK PARA ACESSIBILIDADE -->
+    <a href="#main-content" class="sr-only focus:not-sr-only fixed top-4 left-4 z-50 bg-alsham-primary text-white px-4 py-2 rounded focus:outline-none">Pular para conteúdo principal</a>
 </head>
-
-<body class="bg-gray-50 text-gray-900 antialiased font-inter min-h-screen" data-theme="light">
-  <!-- A11y: Skip Link -->
-  <a href="#main-content" class="sr-only focus:not-sr-only fixed top-4 left-4 z-50 bg-blue-600 text-white px-4 py-2 rounded focus:outline-none">Pular para conteúdo principal</a>
-
-  <!-- Navbar (Header da Página - CHECKLIST AUTOMAÇÕES 4.1) -->
-  <nav class="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200" role="banner">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <div class="flex items-center gap-4">
-          <button id="menu-toggle" class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Abrir menu lateral" data-cy="menu-toggle">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </button>
-          <!-- Logo SVG Inline -->
-          <svg class="h-8 w-8 text-blue-600" viewBox="0 0 32 32" fill="currentColor"><path d="M16 0C7.16344 0 0 7.16344 0 16S7.16344 32 16 32S32 24.8366 32 16S24.8366 0 16 0ZM16 20C10.613 20 6 15.387 6 9C6 10.613 10.613 6 16 6S26 10.613 26 16S21.387 20 16 20ZM16 18C12.747 18 9 14.253 9 16S12.747 24 16 24S24 20.253 24 16S19.253 8 16 8Z" fill="#3B82F6"/><path d="M16 8C11.522 8 8 11.522 8 16S11.522 24 16 24S24 20.478 24 16S20.478 8 16 8ZM16 18C12.747 18 9 14.253 9 16S12.747 24 16 24S24 20.253 24 16S19.253 8 16 8Z" fill="white"/></svg>
-          <h1 class="text-xl font-bold text-gray-900">Automações</h1>
+<body class="min-h-screen bg-alsham-neutral text-alsham-dark antialiased">
+    <!-- 🛡️ LOADING SCREEN -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <svg class="animate-spin h-12 w-12 mx-auto mb-4 text-alsham-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-alsham-dark">Carregando Automações...</p>
         </div>
-        <div class="hidden md:flex items-center space-x-6" role="menubar">
-          <a href="/dashboard.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-          <a href="/leads.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Leads</a>
-          <a href="/pipeline.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Pipeline</a>
-          <a href="/automacoes.html" class="text-blue-600 border-b-2 border-blue-600 px-3 py-2 rounded-md text-sm font-semibold" aria-current="page">Automações</a>
-          <a href="/gamificacao.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Gamificação</a>
-          <a href="/relatorios.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Relatórios</a>
-        </div>
-        <div class="flex items-center gap-4">
-          <!-- Badges KPIs no Header (de 4.1) -->
-          <span class="badge bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full" aria-label="Regras ativas" data-cy="kpi-badge-active">5 Ativas</span>
-          <span class="badge bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full" aria-label="Execuções recentes">12 Recentes</span>
-          <!-- Theme/High Contrast Toggle -->
-          <button id="theme-toggle" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Alternar tema" data-cy="theme-toggle">
-            <svg class="w-5 h-5 sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            <svg class="w-5 h-5 moon-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-          </button>
-          <button id="high-contrast-toggle" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Ativar alto contraste" data-cy="high-contrast-toggle">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-6.75 0v1.5A1.125 1.125 0 016.375 10.5H5.25A3.375 3.375 0 001.875 13.875v2.625m5.25-3.75a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0zm6 10.5a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0z"/></svg>
-          </button>
-        </div>
-      </div>
     </div>
-  </nav>
 
-  <!-- Sidebar (Side Nav) -->
-  <aside class="fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" id="sidebar" aria-label="Navegação lateral">
-    <nav class="p-4 space-y-2">
-      <a href="/dashboard.html" class="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="nav-dashboard">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        Dashboard
-      </a>
-      <a href="/leads.html" class="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="nav-leads">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-        Leads
-      </a>
-      <a href="/pipeline.html" class="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="nav-pipeline">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-        Pipeline
-      </a>
-      <a href="/automacoes.html" class="flex items-center gap-3 p-3 rounded-lg bg-blue-50 text-blue-700 border-r-2 border-blue-700 font-semibold" aria-current="page" data-cy="nav-automacoes">
-        <svg id="icon-automacoes" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        Automações
-      </a>
-      <a href="/gamificacao.html" class="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="nav-gamificacao">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-        Gamificação
-      </a>
-      <a href="/relatorios.html" class="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="nav-relatorios">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        Relatórios
-      </a>
+    <!-- 📱 MOBILE MENU OVERLAY -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+
+    <!-- 🧭 NAVBAR -->
+    <nav class="bg-white shadow-sm border-b border-alsham-border fixed top-0 left-0 right-0 z-30" role="banner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- LOGO -->
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                            <rect width="32" height="32" rx="6" fill="var(--alsham-primary)"/>
+                            <path d="M8 12h16v8H8z" fill="white"/>
+                            <circle cx="16" cy="16" r="4" fill="var(--alsham-secondary)"/>
+                        </svg>
+                        <span class="text-xl font-bold text-alsham-dark">ALSHAM 360°</span>
+                    </a>
+                </div>
+
+                <!-- BREADCRUMBS -->
+                <nav aria-label="Breadcrumb" class="hidden md:block">
+                    <ol class="flex items-center space-x-2">
+                        <li><a href="/" class="text-alsham-primary hover:underline">Dashboard</a></li>
+                        <li><span class="mx-2">/</span></li>
+                        <li><span class="font-medium text-alsham-dark">Automações</span></li>
+                    </ol>
+                </nav>
+
+                <!-- ACTIONS -->
+                <div class="flex items-center space-x-4">
+                    <!-- SEARCH -->
+                    <div class="relative hidden md:block">
+                        <input type="text" id="global-search" placeholder="Buscar regras..." class="pl-10 pr-4 py-2 border border-alsham-border rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent" aria-label="Busca global">
+                        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+
+                    <!-- THEME TOGGLE -->
+                    <button id="theme-toggle" aria-label="Alternar tema" class="p-2 rounded-lg hover:bg-alsham-neutral focus:outline-none focus:ring-2 focus:ring-alsham-primary">
+                        <svg id="sun-icon" class="h-5 w-5 text-yellow-500 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                        <svg id="moon-icon" class="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    </button>
+
+                    <!-- NOTIFICATION BELL -->
+                    <button aria-label="Notificações" class="relative p-2 rounded-lg hover:bg-alsham-neutral focus:outline-none focus:ring-2 focus:ring-alsham-primary">
+                        <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-alsham-accent"></span>
+                    </button>
+
+                    <!-- USER AVATAR -->
+                    <div class="flex items-center space-x-2">
+                        <span id="user-name" class="hidden sm:inline text-sm font-medium text-alsham-dark">Usuário</span>
+                        <button id="user-menu-button" aria-label="Menu do usuário" class="w-8 h-8 rounded-full bg-alsham-primary flex items-center justify-center text-white font-semibold">
+                            U
+                        </button>
+                    </div>
+
+                    <!-- MOBILE MENU BUTTON -->
+                    <button id="mobile-menu-button" aria-label="Abrir menu mobile" class="lg:hidden p-2 rounded-lg hover:bg-alsham-neutral focus:outline-none focus:ring-2 focus:ring-alsham-primary">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div id="mobile-menu" class="lg:hidden hidden bg-white border-t border-alsham-border">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="/" class="block px-3 py-2 text-alsham-dark hover:bg-alsham-neutral rounded-md">Dashboard</a>
+                <a href="/leads.html" class="block px-3 py-2 text-alsham-dark hover:bg-alsham-neutral rounded-md">Leads</a>
+                <a href="/pipeline.html" class="block px-3 py-2 text-alsham-dark hover:bg-alsham-neutral rounded-md">Pipeline</a>
+                <a href="/automacoes.html" class="block px-3 py-2 text-alsham-accent bg-alsham-accent bg-opacity-10 rounded-md font-medium">Automações</a>
+                <a href="/relatorios.html" class="block px-3 py-2 text-alsham-dark hover:bg-alsham-neutral rounded-md">Relatórios</a>
+                <a href="/gamificacao.html" class="block px-3 py-2 text-alsham-dark hover:bg-alsham-neutral rounded-md">Gamificação</a>
+                <a href="/configuracoes.html" class="block px-3 py-2 text-alsham-dark hover:bg-alsham-neutral rounded-md">Configurações</a>
+            </div>
+        </div>
     </nav>
-  </aside>
 
-  <!-- Overlay for Mobile Menu -->
-  <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" aria-hidden="true"></div>
+    <!-- 📱 SIDEBAR -->
+    <aside class="lg:w-64 fixed lg:static top-16 bottom-0 left-0 z-20 bg-white border-r border-alsham-border overflow-y-auto no-scrollbar hidden lg:block" role="complementary">
+        <nav class="p-4 space-y-2">
+            <a href="/" class="flex items-center px-3 py-2 text-alsham-dark rounded-lg hover:bg-alsham-neutral">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="/leads.html" class="flex items-center px-3 py-2 text-alsham-dark rounded-lg hover:bg-alsham-neutral">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span>Leads</span>
+            </a>
+            <a href="/pipeline.html" class="flex items-center px-3 py-2 text-alsham-dark rounded-lg hover:bg-alsham-neutral">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span>Pipeline</span>
+            </a>
+            <a href="/automacoes.html" class="flex items-center px-3 py-2 text-alsham-accent bg-alsham-accent bg-opacity-10 rounded-lg font-medium">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Automações</span>
+            </a>
+            <a href="/relatorios.html" class="flex items-center px-3 py-2 text-alsham-dark rounded-lg hover:bg-alsham-neutral">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span>Relatórios</span>
+            </a>
+            <a href="/gamificacao.html" class="flex items-center px-3 py-2 text-alsham-dark rounded-lg hover:bg-alsham-neutral">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span>Gamificação</span>
+            </a>
+            <a href="/configuracoes.html" class="flex items-center px-3 py-2 text-alsham-dark rounded-lg hover:bg-alsham-neutral">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Configurações</span>
+            </a>
+        </nav>
+    </aside>
 
-  <!-- Main Content (role="main" id="main-content" para skip-link/A11y) -->
-  <main id="main-content" class="md:ml-64 min-h-screen bg-gray-50 p-4 md:p-8 space-y-8" role="main" aria-label="Conteúdo principal de automações">
-    <!-- Header da Página (4.1) com Botão Nova Regra -->
-    <header class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2" data-cy="page-title">🤖 Automações</h1>
-        <p class="text-gray-600">Gerencie regras, monitore execuções e analise logs em tempo real.</p>
-      </div>
-      <button onclick="window.AutomationSystem.openModalCreateRule()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm" aria-label="Criar nova regra de automação" data-cy="btn-nova-regra">
-        ➕ Nova Regra
-      </button>
-    </header>
+    <!-- 📋 MAIN CONTENT -->
+    <main id="main-content" class="lg:ml-64 pt-16 pb-8 px-4 sm:px-6 lg:px-8 min-h-screen" role="main">
+        <!-- HEADER PAGE -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-alsham-dark mb-2">🤖 Automações</h1>
+                    <p class="text-alsham-dark text-opacity-70">Gerencie regras avançadas, monitore execuções em tempo real e analise performance com IA. Integre n8n para workflows sem código.</p>
+                </div>
+                <div class="flex items-center space-x-3 mt-4 md:mt-0">
+                    <button id="create-rule-btn" class="btn-primary flex items-center space-x-2" aria-label="Criar nova regra">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Nova Regra</span>
+                    </button>
+                    <button id="export-btn" class="px-4 py-2 border border-alsham-border rounded-lg hover:bg-alsham-neutral focus:outline-none focus:ring-2 focus:ring-alsham-primary" aria-label="Exportar dados">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </button>
+                    <select id="date-range-filter" class="px-3 py-2 border border-alsham-border rounded-lg focus:outline-none focus:ring-2 focus:ring-alsham-primary" aria-label="Filtrar por período">
+                        <option value="7days">7 dias</option>
+                        <option value="30days">30 dias</option>
+                        <option value="90days">90 dias</option>
+                        <option value="all">Todos</option>
+                    </select>
+                </div>
+            </div>
 
-    <!-- KPIs (5.4) -->
-    <section id="automation-kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="KPIs de Automações">
-      <!-- Renderizado por JS: 4 cards com aria-label, skeleton inicial -->
-      <div class="card skeleton h-32" aria-label="Skeleton para Total de Regras"></div>
-      <div class="card skeleton h-32" aria-label="Skeleton para Regras Ativas"></div>
-      <div class="card skeleton h-32" aria-label="Skeleton para Execuções"></div>
-      <div class="card skeleton h-32" aria-label="Skeleton para Taxa de Sucesso"></div>
-    </section>
+            <!-- TABS -->
+            <div class="flex border-b border-alsham-border mt-6" role="tablist">
+                <button id="rules-tab" class="px-4 py-2 -mb-px text-sm font-medium border-b-2 border-alsham-primary text-alsham-primary" role="tab" aria-selected="true">Regras ({{rulesCount}})</button>
+                <button id="executions-tab" class="px-4 py-2 -mb-px text-sm font-medium text-alsham-dark border-b-2 border-transparent hover:text-alsham-primary hover:border-alsham-primary" role="tab" aria-selected="false">Execuções ({{executionsCount}})</button>
+                <button id="logs-tab" class="px-4 py-2 -mb-px text-sm font-medium text-alsham-dark border-b-2 border-transparent hover:text-alsham-primary hover:border-alsham-primary" role="tab" aria-selected="false">Logs ({{logsCount}})</button>
+            </div>
+        </header>
 
-    <!-- Charts (Charts Section) -->
-    <section class="charts grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" aria-label="Gráficos de automações" role="figure">
-      <div class="card p-4">
-        <h3 class="text-lg font-semibold mb-4">Execuções (7 dias)</h3>
-        <canvas id="chart-executions" width="400" height="200" aria-label="Gráfico de linha: Execuções por dia nos últimos 7 dias"></canvas>
-      </div>
-      <div class="card p-4">
-        <h3 class="text-lg font-semibold mb-4">Taxa de Sucesso</h3>
-        <canvas id="chart-success-rate" width="400" height="200" aria-label="Gráfico de doughnut: Distribuição de status das execuções"></canvas>
-      </div>
-      <div class="card p-4">
-        <h3 class="text-lg font-semibold mb-4">Top Regras</h3>
-        <canvas id="chart-top-rules" width="400" height="200" aria-label="Gráfico de barras: Top 5 regras mais executadas"></canvas>
-      </div>
-    </section>
+        <!-- KPIs CARDS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="kpis-container">
+            <!-- SKELETON LOADERS TEMPORÁRIOS -->
+            <div class="card skeleton h-24"></div>
+            <div class="card skeleton h-24"></div>
+            <div class="card skeleton h-24"></div>
+            <div class="card skeleton h-24"></div>
+        </div>
 
-    <!-- Filtros (5.3) -->
-    <section class="filters mb-6 flex flex-wrap gap-4 items-end" role="search" aria-label="Filtros de automações">
-      <div>
-        <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-        <select id="filter-status" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="filter-status">
-          <option value="all">Todas</option>
-          <option value="success">Sucesso</option>
-          <option value="failed">Falha</option>
-          <option value="running">Executando</option>
-          <option value="pending">Pendente</option>
-        </select>
-      </div>
-      <div>
-        <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">Período</label>
-        <select id="filter-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="filter-date">
-          <option value="7days">7 dias</option>
-          <option value="30days">30 dias</option>
-          <option value="90days">90 dias</option>
-          <option value="all">Todas</option>
-        </select>
-      </div>
-      <div>
-        <label for="filter-rule" class="block text-sm font-medium text-gray-700 mb-1">Regra</label>
-        <select id="filter-rule" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="filter-rule">
-          <option value="">Todas as regras</option>
-          <!-- Populado por JS -->
-        </select>
-      </div>
-      <div class="flex-1 min-w-[200px]">
-        <label for="search-logs" class="block text-sm font-medium text-gray-700 mb-1 sr-only">Buscar logs</label>
-        <input id="search-logs" type="text" placeholder="Buscar em logs..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" data-cy="search-logs" />
-      </div>
-      <div class="flex gap-2">
-        <button id="btn-refresh" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Atualizar dados" data-cy="btn-refresh">
-          🔄 Atualizar
-        </button>
-        <button id="btn-clear-filters" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Limpar filtros" data-cy="btn-clear-filters">
-          Limpar
-        </button>
-        <button id="btn-export-logs" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Exportar logs" data-cy="btn-export-logs">
-          📤 Export Logs
-        </button>
-        <button id="btn-export-executions" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500" aria-label="Exportar execuções" data-cy="btn-export-executions">
-          📤 Export Execuções
-        </button>
-      </div>
-    </section>
+        <!-- CHARTS SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" id="charts-container">
+            <!-- EXECUTIONS CHART -->
+            <div class="card lg:col-span-2">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Execuções por Dia
+                </h3>
+                <canvas id="executions-chart" width="400" height="200" aria-label="Gráfico de execuções por dia"></canvas>
+            </div>
 
-    <!-- Seção de Regras Ativas (4.2) -->
-    <section aria-labelledby="rules-heading">
-      <h2 id="rules-heading" class="text-2xl font-semibold mb-4 text-gray-900">Regras de Automação</h2>
-      <div id="automation-rules" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Lista de regras de automação">
-        <!-- Renderizado por JS renderRules(); skeleton inicial -->
-        <div class="card skeleton h-48" aria-label="Skeleton para card de regra"></div>
-        <div class="card skeleton h-48" aria-label="Skeleton para card de regra"></div>
-        <div class="card skeleton h-48" aria-label="Skeleton para card de regra"></div>
-      </div>
-    </section>
+            <!-- SUCCESS RATE CHART -->
+            <div class="card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Taxa de Sucesso
+                </h3>
+                <canvas id="success-rate-chart" width="200" height="200" aria-label="Gráfico de taxa de sucesso"></canvas>
+            </div>
 
-    <!-- Seção de Execuções Recentes (4.3) -->
-    <section aria-labelledby="executions-heading">
-      <h2 id="executions-heading" class="text-2xl font-semibold mb-4 text-gray-900">Execuções Recentes</h2>
-      <div id="automation-executions" class="card overflow-hidden" role="list" aria-label="Lista de execuções recentes">
-        <!-- Renderizado por JS renderExecutions(); skeleton -->
-        <div class="skeleton h-12 mb-2"></div>
-        <div class="skeleton h-12 mb-2"></div>
-        <div class="skeleton h-12"></div>
-      </div>
-      <div id="pagination-container" class="flex justify-center mt-6" aria-label="Paginação de execuções"></div>
-    </section>
+            <!-- TOP RULES CHART -->
+            <div class="card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Top Regras
+                </h3>
+                <canvas id="top-rules-chart" width="200" height="200" aria-label="Gráfico de top regras"></canvas>
+            </div>
+        </div>
 
-    <!-- Seção de Logs (4.3) -->
-    <section aria-labelledby="logs-heading">
-      <h2 id="logs-heading" class="text-2xl font-semibold mb-4 text-gray-900">Logs do Sistema</h2>
-      <div id="automation-logs" class="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-xs shadow-inner border border-gray-800" role="log" aria-label="Console de logs de automações">
-        <!-- Renderizado por JS renderLogs(); initial empty -->
-        <div class="text-gray-500 text-center py-8">Aguardando logs...</div>
-      </div>
-    </section>
+        <!-- MAIN TABLE -->
+        <div class="card" id="main-content-area">
+            <!-- RULES TABLE (DEFAULT) -->
+            <div id="rules-section" role="tabpanel" aria-hidden="false">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-alsham-border" id="rules-table" role="grid">
+                        <thead class="bg-alsham-neutral">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Nome</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Trigger</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Condições</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Ações</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Última Execução</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-alsham-border" id="rules-tbody">
+                            <!-- SKELETON ROWS -->
+                            <tr class="animate-pulse">
+                                <td class="px-6 py-4 whitespace-nowrap"><div class="skeleton h-4 w-32"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><div class="skeleton h-4 w-24"></div></td>
+                                <td class="px-6 py-4"><div class="skeleton h-4 w-48"></div></td>
+                                <td class="px-6 py-4"><div class="skeleton h-4 w-48"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><div class="skeleton h-4 w-16 inline-block"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-alsham-dark"><div class="skeleton h-4 w-24"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><div class="skeleton h-8 w-20 mx-auto"></div></td>
+                            </tr>
+                            <tr class="animate-pulse">
+                                <td class="px-6 py-4 whitespace-nowrap"><div class="skeleton h-4 w-32"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><div class="skeleton h-4 w-24"></div></td>
+                                <td class="px-6 py-4"><div class="skeleton h-4 w-48"></div></td>
+                                <td class="px-6 py-4"><div class="skeleton h-4 w-48"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap"><div class="skeleton h-4 w-16 inline-block"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-alsham-dark"><div class="skeleton h-4 w-24"></div></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><div class="skeleton h-8 w-20 mx-auto"></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- PAGINATION -->
+                <div class="flex items-center justify-between px-6 py-3 bg-alsham-neutral border-t border-alsham-border" id="rules-pagination">
+                    <div class="skeleton h-4 w-32"></div>
+                    <div class="skeleton h-8 w-20"></div>
+                </div>
+            </div>
 
-    <!-- Modais Placeholders (4.4/4.5) - JS cria conteúdo -->
-    <div id="modal-rule" class="hidden modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></div>
-    <div id="modal-rule-details" class="hidden modal" role="dialog" aria-modal="true"></div>
-    <div id="modal-execution-details" class="hidden modal" role="dialog" aria-modal="true"></div>
-  </main>
+            <!-- EXECUTIONS SECTION (HIDDEN BY DEFAULT) -->
+            <div id="executions-section" role="tabpanel" aria-hidden="true" class="hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-alsham-border" id="executions-table" role="grid">
+                        <thead class="bg-alsham-neutral">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Regra</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Trigger</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Duração</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Iniciado</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-alsham-border" id="executions-tbody">
+                            <!-- SKELETONS SIMILAR -->
+                            <tr class="animate-pulse"><td class="px-6 py-4"><div class="skeleton h-4 w-48"></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-16 inline-flex items-center"><div class="skeleton h-2 w-2 rounded-full mr-2"></div><span class="skeleton h-4 w-20"></span></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-32"></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-16"></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-32"></div></td><td class="px-6 py-4 text-right"><div class="skeleton h-8 w-20 mx-auto"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="executions-pagination" class="flex items-center justify-between px-6 py-3 bg-alsham-neutral border-t border-alsham-border">
+                    <div class="skeleton h-4 w-32"></div>
+                    <div class="skeleton h-8 w-20"></div>
+                </div>
+            </div>
 
-  <!-- Footer (2.9) -->
-  <footer class="bg-gray-800 text-white py-8 mt-12 no-print" role="contentinfo">
-    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div>
-        <h3 class="text-lg font-semibold mb-4">ALSHAM 360° PRIMA</h3>
-        <p class="text-gray-300 text-sm">O CRM inteligente com IA para o futuro das vendas.</p>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold mb-4">Links Úteis</h4>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="/docs.html" class="hover:text-white">Documentação</a></li>
-          <li><a href="/help.html" class="hover:text-white">Ajuda</a></li>
-          <li><a href="/api.html" class="hover:text-white">API</a></li>
-          <li><a href="/status.html" class="hover:text-white">Status</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold mb-4">Legal</h4>
-        <ul class="space-y-2 text-sm text-gray-300">
-          <li><a href="/privacy.html" class="hover:text-white">Privacidade</a></li>
-          <li><a href="/terms.html" class="hover:text-white">Termos</a></li>
-          <li><a href="/lgpd.html" class="hover:text-white">LGPD</a></li>
-          <li><a href="/cookies.html" class="hover:text-white">Cookies</a></li>
-        </ul>
-      </div>
+            <!-- LOGS SECTION (HIDDEN) -->
+            <div id="logs-section" role="tabpanel" aria-hidden="true" class="hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-alsham-border" id="logs-table" role="grid">
+                        <thead class="bg-alsham-neutral">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Evento</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Referência</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Payload</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-alsham-dark uppercase tracking-wider">Data</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-alsham-border" id="logs-tbody">
+                            <!-- SKELETONS -->
+                            <tr class="animate-pulse"><td class="px-6 py-4"><div class="skeleton h-4 w-32"></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-24"></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-full max-w-xs"></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-16 inline-flex items-center"><div class="skeleton h-2 w-2 rounded-full mr-2"></div><span class="skeleton h-4 w-20"></span></div></td><td class="px-6 py-4"><div class="skeleton h-4 w-32"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="logs-pagination" class="flex items-center justify-between px-6 py-3 bg-alsham-neutral border-t border-alsham-border">
+                    <div class="skeleton h-4 w-32"></div>
+                    <div class="skeleton h-8 w-20"></div>
+                </div>
+            </div>
+
+            <!-- EMPTY STATE (HIDDEN BY DEFAULT) -->
+            <div id="empty-state" class="text-center py-12 hidden" role="img" aria-label="Nenhuma automação configurada">
+                <svg class="mx-auto h-24 w-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <h3 class="text-lg font-medium text-alsham-dark mb-2">Nenhuma automação ainda</h3>
+                <p class="text-alsham-dark text-opacity-70 mb-6">Crie sua primeira regra para automatizar fluxos e ganhar tempo.</p>
+                <button id="create-first-rule" class="btn-primary">Criar Primeira Regra</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 🔔 TOAST CONTAINER -->
+    <div id="toast-container" role="status" aria-live="polite" class="fixed top-20 right-4 z-50 pointer-events-none"></div>
+
+    <!-- 🛡️ OFFLINE INDICATOR -->
+    <div id="offline-indicator" class="fixed bottom-4 right-4 bg-alsham-accent text-white px-4 py-2 rounded-lg hidden z-40" role="alert">
+        <span>Modo Offline</span>
+        <button id="offline-close" class="ml-2 text-white hover:text-gray-200">&times;</button>
     </div>
-    <div class="border-t border-gray-700 mt-8 pt-4 text-center text-xs text-gray-400">
-      © 2025 ALSHAM Global. Todos os direitos reservados. v11.0.0 Build 2025.10.12 | Atalhos: Ctrl+N (Nova Regra), Ctrl+E (Export)
-    </div>
-  </footer>
 
-  <!-- Toast Container (UX) -->
-  <div id="toast-container" class="toast-container pointer-events-none" role="status" aria-live="polite"></div>
+    <!-- 📱 FULLSCREEN MODAL OVERLAY -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" aria-hidden="true"></div>
 
-  <!-- Offline Badge (UX) -->
-  <div id="offline-badge" class="offline-badge hidden" role="status" aria-live="polite">Modo Offline</div>
+    <!-- ➕ CREATE/EDIT RULE MODAL -->
+    <dialog id="rule-modal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" id="modal-content">
+                <div class="sticky top-0 bg-white border-b border-alsham-border p-6">
+                    <div class="flex items-center justify-between">
+                        <h2 id="modal-title" class="text-xl font-semibold text-alsham-dark">Nova Regra de Automação</h2>
+                        <button id="close-modal" class="text-gray-400 hover:text-gray-600" aria-label="Fechar modal">&times;</button>
+                    </div>
+                </div>
+                <form id="rule-form" class="p-6 space-y-6">
+                    <!-- NAME -->
+                    <div>
+                        <label for="rule-name" class="block text-sm font-medium text-alsham-dark mb-2">Nome da Regra</label>
+                        <input type="text" id="rule-name" name="name" required class="w-full px-3 py-2 border border-alsham-border rounded-lg focus:outline-none focus:ring-2 focus:ring-alsham-primary" placeholder="Ex: Notificar lead quente">
+                    </div>
 
-  <!-- Error Fallback (UX) -->
-  <div id="error-fallback" class="error-fallback hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 p-6 rounded-lg max-w-md mx-auto" role="alert">
-    <h3 class="font-semibold mb-2">Erro Inesperado</h3>
-    <p>Algo deu errado. <button onclick="location.reload()" class="text-blue-600 underline">Recarregar</button>.</p>
-  </div>
+                    <!-- TRIGGER -->
+                    <div>
+                        <label for="rule-trigger" class="block text-sm font-medium text-alsham-dark mb-2">Trigger (Evento)</label>
+                        <select id="rule-trigger" name="trigger_event" required class="w-full px-3 py-2 border border-alsham-border rounded-lg focus:outline-none focus:ring-2 focus:ring-alsham-primary">
+                            <option value="">Selecione um trigger</option>
+                            <!-- POPULATED BY JS -->
+                        </select>
+                    </div>
 
-  <!-- JS Inline (2.8: 10 itens) -->
-  <script>
-    // Theme/High Contrast Toggle
-    document.getElementById('theme-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
-    document.getElementById('high-contrast-toggle').addEventListener('click', () => document.documentElement.classList.toggle('high-contrast'));
-    
-    // Mobile Menu
-    const menuToggle = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('mobile-menu-overlay');
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('-translate-x-full');
-      overlay.classList.toggle('hidden');
-    });
-    overlay.addEventListener('click', () => {
-      sidebar.classList.add('-translate-x-full');
-      overlay.classList.add('hidden');
-    });
-    
-    // Fullscreen Toggle
-    document.addEventListener('keydown', e => { if (e.key === 'F11') e.preventDefault(); });
-    // Offline Detection
-    window.addEventListener('online', () => document.getElementById('offline-badge').classList.add('hidden'));
-    window.addEventListener('offline', () => document.getElementById('offline-badge').classList.remove('hidden'));
-    // Keyboard Shortcuts (ex: Ctrl+K search)
-    document.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('search-logs')?.focus(); } });
-    // Trap Focus (chamado por JS em modals)
-    function trapFocus(modal) { /* Inline version of trapFocus from automacoes.js */ const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); const first = focusables[0]; const last = focusables[focusables.length - 1]; modal.addEventListener('keydown', e => { if (e.key !== 'Tab') return; if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); } else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); } }); }
-    // Scroll Reveal
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => entry.target.classList.toggle('revealed', entry.isIntersecting)));
-    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-    // Toast System (simplificado; full em automacoes.js)
-    function showNotification(msg, type = 'info') { const toast = document.createElement('div'); toast.className = `toast ${type} animate-slideIn`; toast.textContent = msg; document.getElementById('toast-container').appendChild(toast); setTimeout(() => toast.classList.add('animate-slideOut'), 3500); setTimeout(() => toast.remove(), 3800); }
-    // PWA Install Prompt
-    let deferredPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
-    // Counter Animation (para KPIs)
-    function animateCounter(el, target) { let start = 0; const increment = target / 100; const timer = setInterval(() => { start += increment; el.textContent = Math.floor(start); if (start >= target) { el.textContent = target; clearInterval(timer); } }, 20); }
-    // High Contrast CSS (inline)
-    const highContrastStyle = document.createElement('style'); highContrastStyle.textContent = '.high-contrast { filter: contrast(1.5) !important; }'; document.head.appendChild(highContrastStyle);
-  </script>
+                    <!-- CONDITIONS EDITOR -->
+                    <div>
+                        <label class="block text-sm font-medium text-alsham-dark mb-2">Condições</label>
+                        <div id="conditions-editor" class="space-y-3 border border-alsham-border rounded-lg p-4 min-h-[120px]">
+                            <p class="text-gray-500 italic">Adicione condições para refinar o trigger (opcional)</p>
+                        </div>
+                        <button type="button" id="add-condition" class="mt-2 text-alsham-primary hover:underline text-sm">+ Adicionar Condição</button>
+                    </div>
 
-  <!-- Import ES6 Inline (Corrige Bug #3) -->
-  <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js?raw';
-    eval(SupabaseLib); // Para compatibilidade; ou use dynamic import se Vite
-    window.AlshamSupabase = { getCurrentSession, getCurrentOrgId, genericSelect, genericInsert, genericUpdate, genericDelete, client }; // De supabase.js
-    console.log('✅ Supabase integrado para Automações:', Object.keys(window.AlshamSupabase).length, 'funções');
-  </script>
+                    <!-- ACTIONS EDITOR -->
+                    <div>
+                        <label class="block text-sm font-medium text-alsham-dark mb-2">Ações</label>
+                        <div id="actions-editor" class="space-y-3 border border-alsham-border rounded-lg p-4 min-h-[120px]">
+                            <p class="text-gray-500 italic">Adicione ações a serem executadas</p>
+                        </div>
+                        <button type="button" id="add-action" class="mt-2 text-alsham-primary hover:underline text-sm">+ Adicionar Ação</button>
+                    </div>
 
-  <!-- Automacoes.js -->
-  <script type="module" src="/src/js/automacoes.js" defer></script>
+                    <!-- ACTIVE TOGGLE -->
+                    <div class="flex items-center">
+                        <input type="checkbox" id="rule-active" name="is_active" class="h-4 w-4 text-alsham-primary focus:ring-alsham-primary border-gray-300 rounded">
+                        <label for="rule-active" class="ml-2 block text-sm text-alsham-dark">Ativa</label>
+                    </div>
 
-  <!-- PWA + Log Final -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(() => console.log('🧭 PWA ativo: ALSHAM Automações')).catch(err => console.warn('SW error', err));
-    }
-    console.log('%c⚡ ALSHAM 360° PRIMA — Automações v11.0.0 ENTERPRISE [Production-Ready]', 'color:#3B82F6;font-weight:bold;');
-  </script>
+                    <!-- BUTTONS -->
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancel-rule" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancelar</button>
+                        <button type="submit" class="btn-primary px-4 py-2">Salvar Regra</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 👁️ DETAILS MODAL (SIMPLE) -->
+    <dialog id="details-modal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full" id="details-content">
+                <div class="p-6">
+                    <h3 id="details-title" class="text-lg font-semibold mb-4">Detalhes</h3>
+                    <div id="details-body" class="space-y-2 text-sm text-alsham-dark"></div>
+                    <div class="flex justify-end mt-6">
+                        <button id="close-details" class="px-4 py-2 text-alsham-primary hover:underline">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 🎚️ FOOTER -->
+    <footer class="mt-12 border-t border-alsham-border pt-8 pb-12" role="contentinfo">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- INFO -->
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                        <rect width="32" height="32" rx="6" fill="var(--alsham-primary)"/>
+                        <path d="M8 12h16v8H8z" fill="white"/>
+                        <circle cx="16" cy="16" r="4" fill="var(--alsham-secondary)"/>
+                    </svg>
+                    <span class="font-bold text-alsham-dark">ALSHAM 360° PRIMA</span>
+                </div>
+                <p class="text-sm text-alsham-dark text-opacity-70">CRM inteligente com IA, automações e gamificação. Feito para empresas bilionárias.</p>
+            </div>
+
+            <!-- LINKS ÚTEIS -->
+            <div>
+                <h4 class="text-sm font-semibold text-alsham-dark mb-4">Links Úteis</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="/docs" class="text-alsham-dark hover:text-alsham-primary">Documentação</a></li>
+                    <li><a href="/help" class="text-alsham-dark hover:text-alsham-primary">Ajuda</a></li>
+                    <li><a href="/api" class="text-alsham-dark hover:text-alsham-primary">API</a></li>
+                    <li><a href="/status" class="text-alsham-dark hover:text-alsham-primary">Status</a></li>
+                </ul>
+            </div>
+
+            <!-- LEGAL -->
+            <div>
+                <h4 class="text-sm font-semibold text-alsham-dark mb-4">Legal</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="/privacy" class="text-alsham-dark hover:text-alsham-primary">Privacidade</a></li>
+                    <li><a href="/terms" class="text-alsham-dark hover:text-alsham-primary">Termos</a></li>
+                    <li><a href="/lgpd" class="text-alsham-dark hover:text-alsham-primary">LGPD</a></li>
+                    <li><a href="/cookies" class="text-alsham-dark hover:text-alsham-primary">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-alsham-border mt-8 pt-6 text-center text-sm text-alsham-dark text-opacity-70">
+            <p>&copy; 2025 ALSHAM Global. Versão v11.0.0 (Build 2025.10.12). Atalhos: Ctrl+K (busca), ESC (fechar).</p>
+        </div>
+    </footer>
+
+    <!-- 🔌 SUPABASE IMPORT INLINE (ES6) -->
+    <script type="module">
+        import * as SupabaseLib from '/src/lib/supabase.js';
+        window.AlshamSupabase = SupabaseLib;
+        console.log('✅ Supabase integrado para Automações:', Object.keys(window.AlshamSupabase).length, 'funções');
+    </script>
+
+    <!-- 🎯 AUTOMACOES JS -->
+    <script type="module" src="/src/js/automacoes.js" defer></script>
+
+    <!-- ♿ JS GLOBAL (UX, A11Y, PWA) -->
+    <script>
+        // THEME TOGGLE
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        // MOBILE MENU
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenuOverlay.classList.toggle('hidden');
+        });
+        mobileMenuOverlay.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            mobileMenuOverlay.classList.add('hidden');
+        });
+
+        // MODAL TRAP FOCUS
+        const modals = document.querySelectorAll('dialog');
+        modals.forEach(modal => {
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    const first = focusable[0];
+                    const last = focusable[focusable.length - 1];
+                    if (e.shiftKey) {
+                        if (document.activeElement === first) {
+                            e.preventDefault();
+                            last.focus();
+                        }
+                    } else {
+                        if (document.activeElement === last) {
+                            e.preventDefault();
+                            first.focus();
+                        }
+                    }
+                }
+                if (e.key === 'Escape') modal.close();
+            });
+        });
+
+        // KEYBOARD SHORTCUTS
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('global-search').focus();
+            }
+            if (e.key === 'Escape') {
+                document.querySelectorAll('dialog[open]').forEach(m => m.close());
+            }
+        });
+
+        // OFFLINE DETECTION
+        const offlineIndicator = document.getElementById('offline-indicator');
+        const offlineClose = document.getElementById('offline-close');
+        window.addEventListener('online', () => offlineIndicator.classList.add('hidden'));
+        window.addEventListener('offline', () => offlineIndicator.classList.remove('hidden'));
+        offlineClose.addEventListener('click', () => offlineIndicator.classList.add('hidden'));
+
+        // PWA INSTALL PROMPT
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        // Trigger install on button click if needed
+
+        // SCROLL REVEAL
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fadeInUp');
+                }
+            });
+        });
+        document.querySelectorAll('.card').forEach(el => observer.observe(el));
+
+        // LOADING SCREEN HIDE
+        window.addEventListener('load', () => {
+            document.getElementById('loading-screen').style.opacity = '0';
+            setTimeout(() => document.getElementById('loading-screen').remove(), 300);
+        });
+
+        // FOCUS VISIBLE
+        if (typeof window !== 'undefined' && 'matchMedia' in window) {
+            const mql = window.matchMedia('(prefers-reduced-motion: no-preference)');
+            if (!mql.matches) {
+                document.body.classList.add('reduce-motion-false');
+            }
+        }
+    </script>
 </body>
 </html>
