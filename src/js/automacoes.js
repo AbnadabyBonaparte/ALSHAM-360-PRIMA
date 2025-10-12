@@ -319,7 +319,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         toggleLoading(true);
-        console.log("🚀 Iniciando Automações v11.1.1 HOTFIX...");
+        console.log("🚀 Iniciando Automações v11.1.1...");
 
         // Autenticação
         const authResult = await authenticateUser();
@@ -334,12 +334,6 @@
 
         // Carregar dados iniciais
         await loadData();
-        
-        // Carregar gamificação
-        AutomationState.gamification = await loadGamification();
-        
-        // Carregar scheduled reports
-        await loadScheduledReports();
 
         // Renderizar interface
         renderInterface();
@@ -355,11 +349,6 @@
 
         // Subscribe realtime
         subscribeRealtime();
-
-        // Auto-refresh if enabled
-        if (AutomationState.autoRefresh.enabled) {
-          AutomationState.autoRefresh.timer = setInterval(refresh, AutomationState.autoRefresh.interval);
-        }
 
         toggleLoading(false);
         showNotification("Automações carregadas com sucesso!", "success");
@@ -481,7 +470,7 @@
     }
 
     /**
-     * Carrega execuções com filtros - FIXADO INVALID TIMESTAMP
+     * Carrega execuções com filtros
      */
     async function loadExecutions() {
       const filters = { org_id: AutomationState.orgId };
@@ -506,34 +495,10 @@
         options.offset = (AutomationState.pagination.page - 1) * AutomationState.pagination.perPage;
       }
 
-      // FIX: Aplicar filtro de data corretamente
-      let query = client
-        .from('automation_executions')
-        .select('*', { count: 'exact' })
-        .match(filters)
-        .order('started_at', { ascending: false })
-        .limit(options.limit);
-
-      if (AutomationState.filters.dateRange !== "all") {
-        const now = new Date();
-        let startDate;
-        switch (AutomationState.filters.dateRange) {
-          case "7days":
-            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            break;
-          case "30days":
-            startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-            break;
-          case "90days":
-            startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-            break;
-        }
-        if (startDate) {
-          query = query.gte('started_at', startDate.toISOString());
-        }
-      }
-
-      const { data, error, count } = await query;
+      const { data, error, count } = await genericSelect("automation_executions", filters, {
+        ...options,
+        count: "exact",
+      });
 
       if (error) throw error;
 
@@ -2009,60 +1974,5 @@
       }
     }
 
-    // ============================================================
-    // 🌐 EXPOSE GLOBAL API (FIXADO)
-    // ============================================================
-    window.AutomationSystem = {
-      // Básicos
-      refresh,
-      getState: () => ({ ...AutomationState }),
-      toggleRule,
-      
-      // CRUD
-      createRule,
-      updateRule,
-      deleteRule,
-      
-      // Modais
-      openModalCreateRule,
-      openModalEditRule,
-      showRuleDetails,
-      showExecutionDetails,
-      openScheduledReports,
-      closeModal,
-      
-      // Filtros
-      applyFilters,
-      filterByStatus,
-      filterByDateRange,
-      filterByRule,
-      searchLogs,
-      clearFilters,
-      
-      // Paginação
-      changePage,
-      prevPage,
-      nextPage,
-      
-      // Export
-      exportCSV,
-      exportPDF,
-      exportExcel,
-      
-      // Preview/Test
-      previewRule,
-      testRule,
-      dryRun,
-      
-      // n8n
-      triggerN8nNewLead,
-      triggerN8nPRLAnalysis,
-      
-      // Utilitários
-      calculateKPIs,
-      version: "11.1.1-hotfix",
-    };
-
-    console.log("%c🤖 Automações v11.1.1 HOTFIX carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
   });
 })();
