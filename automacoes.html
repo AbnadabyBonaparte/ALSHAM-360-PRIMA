@@ -47,11 +47,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   
   <!-- PWA Manifest Inline -->
-  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ALSHAM%20360%C2%B0%20PRIMA%22%2C%22short_name%22%3A%22ALSHAM%22%2C%22description%22%3A%22CRM%20Enterprise%20com%20IA%22%2C%22start_url%22%3A%22%2Fautomacoes.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f9fafb%22%2C%22theme_color%22%3A%22%230176D3%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ALSHAM%20360%C2%B0%20PRIMA%20Automations%22%2C%22short_name%22%3A%22ALSHAM%20Auto%22%2C%22description%22%3A%22Enterprise%20Automation%20System%22%2C%22start_url%22%3A%22%2Fautomacoes.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f9fafb%22%2C%22theme_color%22%3A%22%230176D3%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
   <meta name="theme-color" content="#0176D3">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Auto">
   
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -140,6 +140,7 @@
       padding: 8px;
       text-decoration: none;
       z-index: 100;
+      border-radius: 0 0 4px 4px;
     }
     .skip-link:focus {
       top: 0;
@@ -208,25 +209,12 @@
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
     /* Print Styles */
-    @media print {
-      .no-print, nav, aside, button, .modal { display: none !important; }
-      body { background: white; color: black; }
-      .main-content-wrapper { margin-left: 0 !important; }
-      .chart-drilldown { page-break-inside: avoid; }
-    }
+    @media print { .no-print, nav, aside, button, .modal { display: none !important; } body { background: white; color: black; } .main-content-wrapper { margin-left: 0 !important; } .chart-drilldown { page-break-inside: avoid; } }
     
     /* Mobile Responsive */
     @media (max-width: 768px) {
       .side-nav.mobile-hidden { display: none !important; }
-      .side-nav.mobile-visible { 
-        display: block !important;
-        position: fixed;
-        top: 64px;
-        left: 0;
-        width: 100%;
-        height: calc(100vh - 64px);
-        z-index: 50;
-      }
+      .side-nav.mobile-visible { display: block !important; position: fixed; top: 64px; left: 0; width: 100%; height: calc(100vh - 64px); z-index: 50; }
       .main-content-wrapper { margin-left: 0 !important; }
       .grid { grid-template-columns: 1fr !important; }
       .md\:flex { display: none !important; }
@@ -257,6 +245,21 @@
       from { transform: translateX(100px); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+    
+    /* Card Styles */
+    .card {
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: var(--alsham-shadow-sm);
+    }
+    
+    /* Button Styles (Consistency) */
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 
   <!-- JSON-LD Structured Data -->
@@ -264,7 +267,7 @@
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "ALSHAM 360° PRIMA",
+    "name": "ALSHAM 360° PRIMA Automations",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "offers": {
@@ -272,7 +275,7 @@
       "price": "0",
       "priceCurrency": "BRL"
     },
-    "description": "CRM Enterprise com IA para gestão de automações, regras e workflows",
+    "description": "Enterprise automation system with AI GPT-4, n8n workflows, advanced exports and realtime analytics. 60+ world-class features.",
     "publisher": {
       "@type": "Organization",
       "name": "ALSHAM Global"
@@ -280,11 +283,11 @@
   }
   </script>
 
-  <!-- Theme Init Inline -->
+  <!-- Theme Init Inline (CRÍTICO - Previne FOUC) -->
   <script>
     (function() {
-      const savedTheme = localStorage.getItem('alsham-theme');
-      const savedContrast = localStorage.getItem('alsham-contrast');
+      const savedTheme = localStorage.getItem('alsham-theme') || 'light';
+      const savedContrast = localStorage.getItem('alsham-contrast') || 'normal';
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
         document.documentElement.setAttribute('data-theme', 'dark');
@@ -295,7 +298,7 @@
     })();
   </script>
 </head>
-<body class="font-inter min-h-screen">
+<body class="min-h-screen antialiased font-sans">
 
   <!-- Skip Link -->
   <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
@@ -308,12 +311,13 @@
   <!-- Toast Container -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- LOADING INDICATOR -->
-  <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando automações">
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando sistema de automações">
     <div class="text-center">
-      <div class="loading-spinner mb-4"></div>
+      <div class="loading-spinner mb-6" aria-hidden="true"></div>
+      
       <!-- Logo SVG Inline -->
-      <svg width="180" height="60" viewBox="0 0 180 60" xmlns="http://www.w3.org/2000/svg" aria-label="Logo ALSHAM 360° PRIMA">
+      <svg width="180" height="60" viewBox="0 0 180 60" xmlns="http://www.w3.org/2000/svg" aria-label="Logo ALSHAM 360° PRIMA" role="img">
         <defs>
           <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
@@ -325,8 +329,9 @@
         <circle cx="155" cy="30" r="20" fill="none" stroke="url(#logo-gradient)" stroke-width="2"/>
         <path d="M150 30 L160 30 M155 25 L155 35" stroke="url(#logo-gradient)" stroke-width="2" stroke-linecap="round"/>
       </svg>
+      
       <p class="font-medium mt-4" style="color: var(--alsham-text-secondary);">
-        Carregando automações v11.0...
+        Carregando automações v11.1 enterprise...
       </p>
     </div>
   </div>
@@ -336,13 +341,11 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <div class="flex items-center gap-4">
         <button id="menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition" aria-label="Abrir menu" aria-expanded="false">
-          <!-- Menu Icon SVG -->
           <svg class="w-6 h-6" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
-        <!-- Logo SVG Inline -->
-        <svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" aria-label="ALSHAM 360°">
+        <svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" aria-label="ALSHAM 360° logo">
           <defs>
             <linearGradient id="nav-logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
@@ -398,38 +401,38 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
         </svg>
-        Dashboard
+        <span>Dashboard</span>
       </a>
       <a href="/leads.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
-        Leads
+        <span>Leads</span>
       </a>
       <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
-        Pipeline
+        <span>Pipeline</span>
       </a>
       <a href="/automacoes.html" class="font-semibold text-blue-600 p-2 rounded transition flex items-center gap-2" style="background: rgba(59,130,246,0.1);" aria-current="page">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        Automações
+        <span>Automações</span>
       </a>
       <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
         </svg>
-        Gamificação
+        <span>Gamificação</span>
       </a>
       <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
-        Relatórios
+        <span>Relatórios</span>
       </a>
     </nav>
   </aside>
@@ -439,21 +442,144 @@
     <header class="mb-8">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
         <div>
-          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Automações v11.0</h1>
-          <p style="color: var(--alsham-text-secondary);">Gerencie regras, execuções e logs com IA e n8n - Exports completos e animações premium</p>
+          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Automações v11.1 Enterprise</h1>
+          <p style="color: var(--alsham-text-secondary);">Gerencie regras, execuções e logs com IA GPT-4 e n8n workflows ilimitados</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
+          <button id="create-rule-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium inline-flex items-center gap-2 shadow-sm" aria-label="Criar nova regra de automação">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Nova Regra</span>
+          </button>
           <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--alsham-text-secondary);">
-            <input type="checkbox" id="auto-refresh" class="w-4 h-4 cursor-pointer" aria-label="Auto-atualização a cada minuto">
+            <input type="checkbox" id="auto-refresh" class="w-4 h-4 cursor-pointer text-blue-600 rounded focus:ring-2 focus:ring-blue-500" aria-label="Ativar atualização automática a cada minuto">
             <span>🔄 Auto-refresh</span>
           </label>
-          <button onclick="window.AutomationSystem.openScheduledReports()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm" aria-label="Agendar relatórios automáticos">📅 Agendar Relatórios</button>
-          <button id="export-btn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" aria-label="Exportar dados">📤 Exportar</button>
+          <button onclick="window.AutomationSystem.openScheduledReports()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium shadow-sm" aria-label="Agendar relatórios automáticos">
+            📅 Agendar Relatórios
+          </button>
+          <div class="relative inline-block text-left">
+            <button id="export-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium inline-flex items-center gap-2 shadow-sm" aria-haspopup="true" aria-expanded="false">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+              </svg>
+              <span>Exportar</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div id="export-menu" class="hidden absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50" role="menu" aria-orientation="vertical" aria-labelledby="export-btn">
+              <div class="py-2">
+                <button onclick="window.AutomationSystem.exportCSV()" class="block w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-3" role="menuitem">
+                  <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  <div>
+                    <div class="font-medium">Exportar CSV</div>
+                    <div class="text-xs text-gray-500">Arquivo de texto delimitado</div>
+                  </div>
+                </button>
+                <button onclick="window.AutomationSystem.exportPDF()" class="block w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-3" role="menuitem">
+                  <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                  </svg>
+                  <div>
+                    <div class="font-medium">Exportar PDF</div>
+                    <div class="text-xs text-gray-500">Documento com gráficos</div>
+                  </div>
+                </button>
+                <button onclick="window.AutomationSystem.exportExcel()" class="block w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-3" role="menuitem">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                  </svg>
+                  <div>
+                    <div class="font-medium">Exportar Excel</div>
+                    <div class="text-xs text-gray-500">Planilha .xlsx editável</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>
 
     <div id="kpis-container" aria-label="Indicadores principais" class="reveal"></div>
+
+    <div class="mb-6 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border" style="border-color: var(--alsham-border-default);" role="search" aria-label="Filtros de busca">
+      <div class="flex flex-wrap items-center gap-4">
+    
+        <!-- Status Filter -->
+        <div class="flex-1 min-w-[150px]">
+          <label for="status-filter" class="block text-xs font-medium mb-1" style="color: var(--alsham-text-secondary);">Status</label>
+          <select 
+            id="status-filter" 
+            class="w-full px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition-colors"
+            style="border-color: var(--alsham-border-default);"
+            aria-label="Filtrar por status de execução">
+            <option value="all">Todos os status</option>
+            <option value="success">✓ Sucesso</option>
+            <option value="failed">✕ Falha</option>
+            <option value="pending">⏰ Pendente</option>
+            <option value="running">⏳ Executando</option>
+          </select>
+        </div>
+    
+        <!-- Date Range Filter -->
+        <div class="flex-1 min-w-[150px]">
+          <label for="date-range-filter" class="block text-xs font-medium mb-1" style="color: var(--alsham-text-secondary);">Período</label>
+          <select 
+            id="date-range-filter" 
+            class="w-full px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition-colors"
+            style="border-color: var(--alsham-border-default);"
+            aria-label="Filtrar por período de tempo">
+            <option value="7days">📅 Últimos 7 dias</option>
+            <option value="30days">📅 Últimos 30 dias</option>
+            <option value="90days">📅 Últimos 90 dias</option>
+            <option value="all">📅 Todo o período</option>
+          </select>
+        </div>
+    
+        <!-- Rule Filter -->
+        <div class="flex-1 min-w-[150px]">
+          <label for="rule-filter" class="block text-xs font-medium mb-1" style="color: var(--alsham-text-secondary);">Regra Específica</label>
+          <select 
+            id="rule-filter" 
+            class="w-full px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition-colors"
+            style="border-color: var(--alsham-border-default);"
+            aria-label="Filtrar por regra específica">
+            <option value="">Todas as regras</option>
+            <!-- Populado dinamicamente pelo JS -->
+          </select>
+        </div>
+    
+        <!-- Search Logs -->
+        <div class="flex-1 min-w-[200px]">
+          <label for="log-search" class="block text-xs font-medium mb-1" style="color: var(--alsham-text-secondary);">Buscar em Logs</label>
+          <input 
+            type="search" 
+            id="log-search" 
+            placeholder="Buscar mensagem, evento..." 
+            class="w-full px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition-colors"
+            style="border-color: var(--alsham-border-default);"
+            aria-label="Campo de busca textual nos logs">
+        </div>
+    
+        <!-- Clear Filters Button -->
+        <div class="self-end">
+          <button 
+            id="clear-filters-btn"
+            class="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors inline-flex items-center gap-2"
+            aria-label="Limpar todos os filtros aplicados">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            <span>Limpar Filtros</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="flex border-b border-alsham-border mt-6" role="tablist">
       <button id="rules-tab" class="px-4 py-2 -mb-px text-sm font-medium border-b-2 border-alsham-primary text-alsham-primary" role="tab" aria-selected="true">Regras</button>
@@ -543,7 +669,7 @@
         <div>
           <h3 class="font-bold mb-3" style="color: var(--alsham-text-primary);">ALSHAM 360° PRIMA</h3>
           <p class="text-sm" style="color: var(--alsham-text-secondary);">CRM Enterprise com IA</p>
-          <p class="text-xs mt-2" style="color: var(--alsham-text-secondary);">v11.0.0 • Build 2025.10.11</p>
+          <p class="text-xs mt-2" style="color: var(--alsham-text-secondary);">v11.1.0 • Build 2025.10.12</p>
         </div>
         <div>
           <h4 class="font-semibold mb-3" style="color: var(--alsham-text-primary);">Links Úteis</h4>
@@ -695,8 +821,11 @@
         modal.addEventListener('keydown', function(e) {
           if (e.key === 'Tab') {
             const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'));
+            if (focusable.length === 0) return;
+            
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
+            
             if (e.shiftKey && document.activeElement === first) {
               last.focus();
               e.preventDefault();
