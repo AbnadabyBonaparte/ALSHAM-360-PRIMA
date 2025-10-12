@@ -4,10 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- Security Headers - AJUSTADO -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://your-n8n-instance.cloud https://*.cloudflare.com; manifest-src 'self' data:; frame-ancestors 'none';">
+  <!-- Security Headers - AJUSTADO E CORRIGIDO PARA SOURCE MAPS -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://your-n8n-instance.cloud https://*.cloudflare.com; manifest-src 'self'; frame-ancestors 'none'; source-map-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=()">
@@ -45,12 +44,13 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   
-  <!-- PWA Manifest Inline -->
-  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ALSHAM%20360%C2%B0%20PRIMA%20Automations%22%2C%22short_name%22%3A%22ALSHAM%20Auto%22%2C%22description%22%3A%22Enterprise%20Automation%20System%22%2C%22start_url%22%3A%22%2Fautomacoes.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f9fafb%22%2C%22theme_color%22%3A%22%230176D3%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+  <!-- PWA Manifest - MUDADO PARA ARQUIVO EXTERNO (crie manifest-automacoes.json com o conteúdo JSON) -->
+  <link rel="manifest" href="/manifest-automacoes.json">
   <meta name="theme-color" content="#0176D3">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="ALSHAM Auto">
+  <meta name="mobile-web-app-capable" content="yes"> <!-- Adicionado para deprecated -->
   
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -94,7 +94,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Critical CSS -->
+  <!-- Critical CSS - SUBSTITUÍDO COLOR-ADJUST POR PRINT-COLOR-ADJUST -->
   <style>
     :root {
       --alsham-bg-canvas: #f9fafb;
@@ -206,8 +206,8 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    /* Print Styles */
-    @media print { .no-print, nav, aside, button, .modal { display: none !important; } body { background: white; color: black; } .main-content-wrapper { margin-left: 0 !important; } .chart-drilldown { page-break-inside: avoid; } }
+    /* Print Styles - COLOR-ADJUST -> PRINT-COLOR-ADJUST */
+    @media print { .no-print, nav, aside, button, .modal { display: none !important; } body { background: white; color: black; } .main-content-wrapper { margin-left: 0 !important; } .chart-drilldown { page-break-inside: avoid; } .print-color-adjust { print-color-adjust: exact; } }
     
     /* Mobile Responsive */
     @media (max-width: 768px) {
@@ -415,7 +415,7 @@
       </a>
       <a href="/automacoes.html" class="font-semibold text-blue-600 p-2 rounded transition flex items-center gap-2" style="background: rgba(59,130,246,0.1);" aria-current="page">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543-.826-3.31-2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
         <span>Automações</span>
@@ -801,30 +801,6 @@
   </script>
 
     <script type="module" src="/src/js/automacoes.js"></script>
-  
-+ <!-- 🔥 HOTFIX v11.1.1 - Global API Fallback -->
-+ <script>
-+ (function() {
-+   'use strict';
-+   if (!window.AutomationSystem) {
-+     window.AutomationSystem = {
-+       openModalCreateRule: () => { /* ... */ },
-+       // ... outros métodos
-+     };
-+   }
-+ })();
-+ </script>
-+
-+ <!-- Export Dropdown Handler -->
-+ <script>
-+ document.addEventListener('DOMContentLoaded', function() {
-+   const exportBtn = document.getElementById('export-btn');
-+   // ... handler completo
-+ });
-+ </script>
-
-</body>
-</html>
   
 </body>
 </html>
