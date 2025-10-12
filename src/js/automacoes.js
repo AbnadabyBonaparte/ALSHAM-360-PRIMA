@@ -319,7 +319,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         toggleLoading(true);
-        console.log("🚀 Iniciando Automações v11.1.1...");
+        console.log("🚀 Iniciando Automações v11.1.1 HOTFIX...");
 
         // Autenticação
         const authResult = await authenticateUser();
@@ -334,6 +334,12 @@
 
         // Carregar dados iniciais
         await loadData();
+        
+        // Carregar gamificação
+        AutomationState.gamification = await loadGamification();
+        
+        // Carregar scheduled reports
+        await loadScheduledReports();
 
         // Renderizar interface
         renderInterface();
@@ -349,6 +355,11 @@
 
         // Subscribe realtime
         subscribeRealtime();
+
+        // Auto-refresh if enabled
+        if (AutomationState.autoRefresh.enabled) {
+          AutomationState.autoRefresh.timer = setInterval(refresh, AutomationState.autoRefresh.interval);
+        }
 
         toggleLoading(false);
         showNotification("Automações carregadas com sucesso!", "success");
@@ -470,7 +481,7 @@
     }
 
     /**
-     * Carrega execuções com filtros
+     * Carrega execuções com filtros - FIXADO INVALID TIMESTAMP
      */
     async function loadExecutions() {
       const filters = { org_id: AutomationState.orgId };
@@ -495,10 +506,34 @@
         options.offset = (AutomationState.pagination.page - 1) * AutomationState.pagination.perPage;
       }
 
-      const { data, error, count } = await genericSelect("automation_executions", filters, {
-        ...options,
-        count: "exact",
-      });
+      // FIX: Aplicar filtro de data corretamente
+      let query = client
+        .from('automation_executions')
+        .select('*', { count: 'exact' })
+        .match(filters)
+        .order('started_at', { ascending: false })
+        .limit(options.limit);
+
+      if (AutomationState.filters.dateRange !== "all") {
+        const now = new Date();
+        let startDate;
+        switch (AutomationState.filters.dateRange) {
+          case "7days":
+            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            break;
+          case "30days":
+            startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            break;
+          case "90days":
+            startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+            break;
+        }
+        if (startDate) {
+          query = query.gte('started_at', startDate.toISOString());
+        }
+      }
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
 
@@ -1974,5 +2009,573 @@
       }
     }
 
+// ============================================================
+// 📐 FUNÇÕES DE FORMATAÇÃO (FALTANDO)
+// ============================================================
+
+/**
+ * Formata trigger event para exibição
+ */
+function formatTriggerEvent(event) {
+  return AVAILABLE_TRIGGERS[event] || event || 'N/A';
+}
+
+/**
+ * Formata data para pt-BR
+ */
+function formatDate(dateStr) {
+  if (!dateStr) return 'N/A';
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return 'N/A';
+  }
+}
+
+/**
+ * Formata status para exibição
+ */
+function formatStatus(status) {
+  const statusMap = {
+    success: '✓ Sucesso',
+    failed: '✕ Falha',
+    pending: '⏰ Pendente',
+    running: '⏳ Executando'
+  };
+  return statusMap[status] || status;
+}
+
+/**
+ * Formata tempo de execução
+ */
+function formatExecutionTime(ms) {
+  if (!ms || ms < 0) return 'N/A';
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(2)}s`;
+}
+
+/**
+ * Escapa HTML para prevenir XSS
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// ============================================================
+// 🪟 FUNÇÕES DE MODAL (FALTANDO)
+// ============================================================
+
+/**
+ * Mostra detalhes de uma regra
+ */
+function showRuleDetails(ruleId) {
+  const rule = AutomationState.rules.find(r => r.id === ruleId);
+  if (!rule) {
+    showNotification('Regra não encontrada', 'error');
+    return;
+  }
+  
+  AutomationState.modal.type = 'details';
+  AutomationState.modal.data = rule;
+  AutomationState.modal.isOpen = true;
+  
+  const modal = document.getElementById('details-modal');
+  if (!modal) return;
+  
+  modal.innerHTML = `
+    <div class="p-6 space-y-4">
+      <div class="flex justify-between items-start">
+        <h2 class="text-2xl font-bold">${escapeHtml(rule.name)}</h2>
+        <button onclick="window.AutomationSystem.closeModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <strong>Trigger:</strong> ${formatTriggerEvent(rule.trigger_event)}
+        </div>
+        <div>
+          <strong>Status:</strong> ${rule.is_active ? '✅ Ativa' : '❌ Inativa'}
+        </div>
+        <div>
+          <strong>Criada:</strong> ${formatDate(rule.created_at)}
+        </div>
+        <div>
+          <strong>Última atualização:</strong> ${formatDate(rule.updated_at)}
+        </div>
+        <div>
+          <strong>Condições:</strong> ${rule.conditions ? JSON.stringify(rule.conditions, null, 2) : 'Nenhuma'}
+        </div>
+        <div>
+          <strong>Ações:</strong> ${rule.actions ? JSON.stringify(rule.actions, null, 2) : 'Nenhuma'}
+        </div>
+      </div>
+      <div class="flex gap-2 pt-4">
+        <button onclick="window.AutomationSystem.openModalEditRule('${rule.id}')" class="px-4 py-2 bg-blue-600 text-white rounded">Editar</button>
+        <button onclick="window.AutomationSystem.closeModal()" class="px-4 py-2 border rounded">Fechar</button>
+      </div>
+    </div>
+  `;
+  
+  modal.showModal();
+}
+
+/**
+ * Mostra detalhes de uma execução
+ */
+function showExecutionDetails(executionId) {
+  const execution = AutomationState.executions.find(e => e.id === executionId);
+  if (!execution) {
+    showNotification('Execução não encontrada', 'error');
+    return;
+  }
+  
+  const rule = AutomationState.rules.find(r => r.id === execution.rule_id);
+  
+  AutomationState.modal.type = 'details';
+  AutomationState.modal.data = execution;
+  AutomationState.modal.isOpen = true;
+  
+  const modal = document.getElementById('details-modal');
+  if (!modal) return;
+  
+  modal.innerHTML = `
+    <div class="p-6 space-y-4">
+      <div class="flex justify-between items-start">
+        <h2 class="text-2xl font-bold">Execução #${execution.id.substring(0, 8)}</h2>
+        <button onclick="window.AutomationSystem.closeModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <strong>Regra:</strong> ${rule ? escapeHtml(rule.name) : 'N/A'}
+        </div>
+        <div>
+          <strong>Status:</strong> ${formatStatus(execution.status)}
+        </div>
+        <div>
+          <strong>Trigger:</strong> ${formatTriggerEvent(execution.trigger_event)}
+        </div>
+        <div>
+          <strong>Duração:</strong> ${formatExecutionTime(execution.execution_time_ms)}
+        </div>
+        <div>
+          <strong>Iniciado:</strong> ${formatDate(execution.started_at)}
+        </div>
+        <div>
+          <strong>Finalizado:</strong> ${formatDate(execution.completed_at)}
+        </div>
+      </div>
+      <button onclick="window.AutomationSystem.closeModal()" class="w-full px-4 py-2 border rounded">Fechar</button>
+    </div>
+  `;
+  
+  modal.showModal();
+}
+
+/**
+ * Fecha modal aberto
+ */
+function closeModal() {
+  if (!AutomationState.modal.isOpen) return;
+  
+  const modals = ['rule-modal', 'details-modal', 'scheduled-modal'];
+  modals.forEach(id => {
+    const modal = document.getElementById(id);
+    if (modal && modal.open) {
+      modal.close();
+    }
   });
+  
+  AutomationState.modal.isOpen = false;
+  AutomationState.modal.type = null;
+  AutomationState.modal.data = null;
+  
+  // Restore focus
+  if (AutomationState.modal.focusedElement) {
+    AutomationState.modal.focusedElement.focus();
+  }
+}
+
+/**
+ * Trap focus dentro do modal (acessibilidade)
+ */
+function trapFocus() {
+  const modals = document.querySelectorAll('dialog[open]');
+  modals.forEach(modal => {
+    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length === 0) return;
+    
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    
+    first.focus();
+    
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          last.focus();
+          e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    });
+  });
+}
+
+// ============================================================
+// 🎯 FUNÇÕES DE FILTRO (FALTANDO)
+// ============================================================
+
+function filterByStatus(status) {
+  applyFilters({ status });
+}
+
+function filterByRule(ruleId) {
+  applyFilters({ ruleId });
+}
+
+function searchLogs(query) {
+  applyFilters({ searchQuery: query });
+}
+
+function clearFilters() {
+  AutomationState.filters = {
+    status: 'all',
+    dateRange: '7days',
+    ruleId: null,
+    searchQuery: ''
+  };
+  
+  // Reset inputs
+  document.getElementById('status-filter').value = 'all';
+  document.getElementById('date-range-filter').value = '7days';
+  document.getElementById('rule-filter').value = '';
+  document.getElementById('log-search').value = '';
+  
+  loadData().then(() => {
+    renderExecutions();
+    renderLogs();
+    renderPagination();
+  });
+  
+  showNotification('Filtros limpos', 'info');
+}
+
+// ============================================================
+// 📄 FUNÇÕES DE PAGINAÇÃO (FALTANDO)
+// ============================================================
+
+function changePage(page) {
+  AutomationState.pagination.page = page;
+  loadExecutions().then(() => {
+    renderExecutions();
+    renderPagination();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+function prevPage() {
+  if (AutomationState.pagination.page > 1) {
+    changePage(AutomationState.pagination.page - 1);
+  }
+}
+
+function nextPage() {
+  if (AutomationState.pagination.page < AutomationState.pagination.totalPages) {
+    changePage(AutomationState.pagination.page + 1);
+  }
+}
+
+// ============================================================
+// ✏️ FUNÇÕES DE EDITOR (FALTANDO)
+// ============================================================
+
+/**
+ * Renderiza editor de condições
+ */
+function renderConditions() {
+  const conditions = AutomationState.editor.conditions;
+  if (conditions.length === 0) {
+    return '<p class="text-sm text-gray-500">Nenhuma condição adicionada</p>';
+  }
+  
+  return conditions.map((cond, index) => `
+    <div class="flex gap-2 items-center">
+      <input type="text" value="${escapeHtml(cond.field || '')}" placeholder="Campo" class="flex-1 px-2 py-1 border rounded text-sm">
+      <select class="px-2 py-1 border rounded text-sm">
+        ${Object.entries(CONDITION_OPERATORS).map(([key, label]) => 
+          `<option value="${key}" ${cond.operator === key ? 'selected' : ''}>${label}</option>`
+        ).join('')}
+      </select>
+      <input type="text" value="${escapeHtml(cond.value || '')}" placeholder="Valor" class="flex-1 px-2 py-1 border rounded text-sm">
+      <button type="button" onclick="window.AutomationSystem.removeCondition(${index})" class="text-red-600 hover:text-red-800">✕</button>
+    </div>
+  `).join('');
+}
+
+/**
+ * Renderiza editor de ações
+ */
+function renderActions() {
+  const actions = AutomationState.editor.actions;
+  if (actions.length === 0) {
+    return '<p class="text-sm text-gray-500">Nenhuma ação adicionada</p>';
+  }
+  
+  return actions.map((action, index) => `
+    <div class="flex gap-2 items-center">
+      <select class="flex-1 px-2 py-1 border rounded text-sm">
+        ${Object.entries(AVAILABLE_ACTIONS).map(([key, label]) => 
+          `<option value="${key}" ${action.type === key ? 'selected' : ''}>${label}</option>`
+        ).join('')}
+      </select>
+      <input type="text" value="${escapeHtml(action.params || '')}" placeholder="Parâmetros (JSON)" class="flex-1 px-2 py-1 border rounded text-sm">
+      <button type="button" onclick="window.AutomationSystem.removeAction(${index})" class="text-red-600 hover:text-red-800">✕</button>
+    </div>
+  `).join('');
+}
+
+/**
+ * Adiciona nova condição
+ */
+function addCondition() {
+  AutomationState.editor.conditions.push({
+    field: '',
+    operator: 'equals',
+    value: ''
+  });
+  
+  document.getElementById('conditions-editor').innerHTML = renderConditions();
+}
+
+/**
+ * Adiciona nova ação
+ */
+function addAction() {
+  AutomationState.editor.actions.push({
+    type: '',
+    params: ''
+  });
+  
+  document.getElementById('actions-editor').innerHTML = renderActions();
+}
+
+/**
+ * Remove condição
+ */
+function removeCondition(index) {
+  AutomationState.editor.conditions.splice(index, 1);
+  document.getElementById('conditions-editor').innerHTML = renderConditions();
+}
+
+/**
+ * Remove ação
+ */
+function removeAction(index) {
+  AutomationState.editor.actions.splice(index, 1);
+  document.getElementById('actions-editor').innerHTML = renderActions();
+}
+
+/**
+ * Valida regra
+ */
+function validateRule(rule) {
+  const errors = [];
+  
+  if (!rule.name || rule.name.trim() === '') {
+    errors.push('Nome da regra é obrigatório');
+  }
+  
+  if (!rule.trigger_event) {
+    errors.push('Trigger é obrigatório');
+  }
+  
+  if (!rule.actions || rule.actions.length === 0) {
+    errors.push('Pelo menos uma ação é obrigatória');
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Handle submit do form de regra
+ */
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(e.target);
+  const ruleData = {
+    name: formData.get('name'),
+    trigger_event: formData.get('trigger_event'),
+    conditions: AutomationState.editor.conditions,
+    actions: AutomationState.editor.actions,
+    is_active: formData.get('is_active') === 'on'
+  };
+  
+  const isEdit = AutomationState.modal.type === 'edit';
+  
+  if (isEdit) {
+    await updateRule(AutomationState.modal.data.id, ruleData);
+  } else {
+    await createRule(ruleData);
+  }
+}
+
+// ============================================================
+// 🎮 FUNÇÕES DE PREVIEW/TEST (FALTANDO)
+// ============================================================
+
+function previewRule(rule) {
+  showNotification(`Preview: ${rule.name}`, 'info');
+  console.log('Preview rule:', rule);
+}
+
+function testRule(ruleId) {
+  showNotification(`Testando regra ${ruleId}...`, 'info');
+  console.log('Test rule:', ruleId);
+}
+
+function dryRun(ruleId) {
+  showNotification(`Dry run regra ${ruleId}...`, 'info');
+  console.log('Dry run:', ruleId);
+}
+
+// ============================================================
+// 📊 FUNÇÕES DE GAMIFICAÇÃO/SCHEDULED (FALTANDO)
+// ============================================================
+
+async function loadGamification() {
+  try {
+    const { data } = await genericSelect('gamification_points', {
+      user_id: AutomationState.user.id,
+      org_id: AutomationState.orgId
+    });
+    
+    const totalPoints = data?.reduce((sum, p) => sum + (p.points_awarded || 0), 0) || 0;
+    return { points: totalPoints };
+  } catch (error) {
+    console.error('Erro ao carregar gamificação:', error);
+    return { points: 0 };
+  }
+}
+
+async function loadScheduledReports() {
+  try {
+    const { data } = await genericSelect('scheduled_reports', {
+      user_id: AutomationState.user.id,
+      org_id: AutomationState.orgId
+    });
+    
+    AutomationState.scheduledReports = data || [];
+  } catch (error) {
+    console.error('Erro ao carregar scheduled reports:', error);
+    AutomationState.scheduledReports = [];
+  }
+}
+
+
+    console.log("%c🤖 Automações v11.1.1 HOTFIX carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
+  });
+})();
+
+// ============================================================
+// 🌐 EXPOSE GLOBAL API (FORA DO waitForSupabase)
+// ============================================================
+
+// Garantir que as funções estejam disponíveis globalmente
+(function exposeGlobalAPI() {
+  'use strict';
+  
+  // Aguardar AutomationSystem estar pronto
+  const checkReady = setInterval(() => {
+    if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
+      clearInterval(checkReady);
+      
+      // Expor API global
+      window.AutomationSystem = {
+        // Básicos
+        refresh,
+        getState: () => ({ ...AutomationState }),
+        toggleRule,
+        
+        // CRUD
+        createRule,
+        updateRule,
+        deleteRule,
+        
+        // Modais
+        openModalCreateRule,
+        openModalEditRule,
+        showRuleDetails,
+        showExecutionDetails,
+        openScheduledReports,
+        closeModal,
+        
+        // Filtros
+        applyFilters,
+        filterByStatus,
+        filterByDateRange,
+        filterByRule,
+        searchLogs,
+        clearFilters,
+        
+        // Paginação
+        changePage,
+        prevPage,
+        nextPage,
+        
+        // Editor
+        addCondition,
+        addAction,
+        removeCondition,
+        removeAction,
+        
+        // Export
+        exportCSV,
+        exportPDF,
+        exportExcel,
+        
+        // Preview/Test
+        previewRule,
+        testRule,
+        dryRun,
+        
+        // n8n
+        triggerN8nNewLead,
+        triggerN8nPRLAnalysis,
+        
+        // Utilitários
+        calculateKPIs,
+        formatTriggerEvent,
+        formatDate,
+        formatStatus,
+        formatExecutionTime,
+        
+        version: "11.1.1-hotfix-final",
+      };
+      
+      console.log('%c✅ AutomationSystem Global API v11.1.1 READY', 'color:#22c55e;font-weight:bold;font-size:14px;');
+      console.log('Métodos disponíveis:', Object.keys(window.AutomationSystem).length);
+    }
+  }, 100);
+  
+  setTimeout(() => clearInterval(checkReady), 10000);
 })();
