@@ -33,6 +33,7 @@
  * - ✅ Todas as variáveis globais mudadas para window.global* para evitar minificação do Vite
  * - ✅ Todas as referências substituídas
  * - ✅ Debug logs atualizados
+ * - ✅ Sintaxe HTML alinhada - remova códigos soltos no HTML
  */
 
 (function () {
@@ -2289,7 +2290,7 @@ function trapFocus() {
 
 // ============================================================
 // 🎯 FUNÇÕES DE FILTRO (FALTANDO)
- // ============================================================
+// ============================================================
 
 function filterByStatus(status) {
   applyFilters({ status });
