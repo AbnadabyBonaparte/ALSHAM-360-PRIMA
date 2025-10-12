@@ -1,5 +1,5 @@
 /**
- * 🤖 ALSHAM 360° PRIMA — Automações v11.1.3 HOTFIX
+ * 🤖 ALSHAM 360° PRIMA — Automações v11.1.4 FINAL
  * Sistema completo de automações com IA, regras, execuções, logs e analytics
  * 
  * FEATURES (60/60 - 100%):
@@ -29,12 +29,10 @@
  * Autor: ALSHAM Development Team
  * Nota técnica: 10/10 (World-class)
  * 
- * HOTFIX v11.1.3:
- * - ✅ globalClient atribuído antes do DOMContentLoaded
- * - ✅ Verificação em subscribeRealtime
- * - ✅ Proteção em event listeners
- * - ✅ activity_type corrigido
- * - ✅ Debug logs adicionados
+ * HOTFIX v11.1.4:
+ * - ✅ Todas as variáveis globais mudadas para window.global* para evitar minificação do Vite
+ * - ✅ Todas as referências substituídas
+ * - ✅ Debug logs atualizados
  */
 
 (function () {
@@ -44,13 +42,13 @@
   // 🌐 VARIÁVEIS GLOBAIS (FORA DO waitForSupabase)
   // ============================================================
   
-  let globalClient = null;
-  let globalGenericSelect = null;
-  let globalGenericInsert = null;
-  let globalGenericUpdate = null;
-  let globalGenericDelete = null;
-  let globalGetCurrentSession = null;
-  let globalGetCurrentOrgId = null;
+  window.globalClient = null;
+  window.globalGenericSelect = null;
+  window.globalGenericInsert = null;
+  window.globalGenericUpdate = null;
+  window.globalGenericDelete = null;
+  window.globalGetCurrentSession = null;
+  window.globalGetCurrentOrgId = null;
 
   // ============================================================
   // 📚 CONSTANTES GLOBAIS
@@ -174,7 +172,6 @@
    */
   function showNotification(message, type = "info", duration = 3500, onAction = null) {
     const toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) return;
 
     const colors = {
       success: "bg-green-600",
@@ -236,8 +233,8 @@
    */
   function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
-      console.log("✅ Supabase carregado para Automações v11.1.3");
-      
+      console.log("✅ Supabase carregado para Automações v11.1.4");
+
       // ✅ ATRIBUIR GLOBALMENTE IMEDIATAMENTE
       const {
         getCurrentSession,
@@ -249,20 +246,20 @@
         client,
       } = window.AlshamSupabase;
       
-      globalGetCurrentSession = getCurrentSession;
-      globalGetCurrentOrgId = getCurrentOrgId;
-      globalClient = client;
-      globalGenericSelect = genericSelect;
-      globalGenericInsert = genericInsert;
-      globalGenericUpdate = genericUpdate;
-      globalGenericDelete = genericDelete;
+      window.globalGetCurrentSession = getCurrentSession;
+      window.globalGetCurrentOrgId = getCurrentOrgId;
+      window.globalClient = client;
+      window.globalGenericSelect = genericSelect;
+      window.globalGenericInsert = genericInsert;
+      window.globalGenericUpdate = genericUpdate;
+      window.globalGenericDelete = genericDelete;
       
       // ✅ DEBUG COMPLETO
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       console.log("🔍 DEBUG: Atribuições globais");
-      console.log("globalClient:", globalClient);
-      console.log("globalClient.channel:", typeof globalClient?.channel === 'function' ? 'function' : 'undefined');
-      console.log("globalGenericSelect:", typeof globalGenericSelect === 'function' ? 'function' : 'undefined');
+      console.log("window.globalClient:", window.globalClient);
+      console.log("window.globalClient.channel:", typeof window.globalClient?.channel);
+      console.log("window.globalGenericSelect:", typeof window.globalGenericSelect);
       console.log("AlshamSupabase:", window.AlshamSupabase);
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       
@@ -358,7 +355,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         toggleLoading(true);
-        console.log("🚀 Iniciando Automações v11.1.3 HOTFIX...");
+        console.log("🚀 Iniciando Automações v11.1.4 FINAL...");
 
         // Autenticação
         const authResult = await authenticateUser();
@@ -402,7 +399,7 @@
 
         toggleLoading(false);
         showNotification("Automações carregadas com sucesso!", "success");
-        console.log("✅ Automações v11.1.3 iniciadas completamente - n8n integrado");
+        console.log("✅ Automações v11.1.4 iniciadas completamente - n8n integrado");
         
       } catch (error) {
         console.error("❌ Erro crítico na inicialização:", error);
@@ -421,13 +418,13 @@
      */
     async function authenticateUser() {
       try {
-        const session = await globalGetCurrentSession();
+        const session = await window.globalGetCurrentSession();
         if (!session?.user) {
           console.warn("⚠️ Sessão não encontrada");
           return { success: false };
         }
 
-        const orgId = await globalGetCurrentOrgId();
+        const orgId = await window.globalGetCurrentOrgId();
         if (!orgId) {
           console.warn("⚠️ OrgId não encontrado");
           return { success: false };
@@ -506,7 +503,7 @@
      * Carrega regras do banco
      */
     async function loadRules() {
-      const { data, error } = await globalGenericSelect(
+      const { data, error } = await window.globalGenericSelect(
         "automation_rules",
         { org_id: AutomationState.orgId },
         {
@@ -546,7 +543,7 @@
       }
 
       // FIX: Aplicar filtro de data corretamente
-      let query = globalClient
+      let query = window.globalClient
         .from('automation_executions')
         .select('*', { count: 'exact' })
         .match(filters)
@@ -593,7 +590,7 @@
     async function loadLogs() {
       const filters = { org_id: AutomationState.orgId };
 
-      const { data, error } = await globalGenericSelect("logs_automacao", filters, {
+      const { data, error } = await window.globalGenericSelect("logs_automacao", filters, {
         order: { column: "created_at", ascending: false },
         limit: 100,
       });
@@ -871,12 +868,14 @@
      * Renderiza paginação (para rules/executions/logs)
      */
     function renderPagination() {
+      const rulesPag = document.getElementById("rules-pagination");
       const execPag = document.getElementById("executions-pagination");
-      if (!execPag) return;
+      const logsPag = document.getElementById("logs-pagination");
       
+      // Por simplicidade, paginação apenas para executions (expandir se necessário)
       const { page, totalPages } = AutomationState.pagination;
 
-      if (totalPages > 1) {
+      if (execPag && totalPages > 1) {
         execPag.innerHTML = `
           <div class="flex items-center justify-between">
             <button onclick="window.AutomationSystem.prevPage()" ${page === 1 ? 'disabled' : ''} class="px-4 py-2 border rounded ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}">Anterior</button>
@@ -1208,9 +1207,9 @@
      * Subscribe a mudanças em tempo real
      */
     function subscribeRealtime() {
-      // ✅ VERIFICAR SE globalClient ESTÁ DEFINIDO
-      if (!globalClient) {
-        console.error("❌ globalClient não está definido! Pulando realtime.");
+      // ✅ VERIFICAR SE window.globalClient ESTÁ DEFINIDO
+      if (!window.globalClient) {
+        console.error("❌ window.globalClient não está definido! Pulando realtime.");
         showNotification("Realtime não disponível no momento.", "warning");
         return;
       }
@@ -1219,7 +1218,7 @@
         console.log("⚡ Iniciando realtime subscriptions...");
         
         // Subscribe a automation_rules
-        globalClient
+        window.globalClient
           .channel("automation_rules_channel")
           .on(
             "postgres_changes",
@@ -1232,7 +1231,7 @@
           .subscribe();
 
         // Subscribe a automation_executions
-        globalClient
+        window.globalClient
           .channel("automation_executions_channel")
           .on(
             "postgres_changes",
@@ -1245,7 +1244,7 @@
           .subscribe();
 
         // Subscribe a logs_automacao
-        globalClient
+        window.globalClient
           .channel("automation_logs_channel")
           .on(
             "postgres_changes",
@@ -1346,7 +1345,7 @@
         }
 
         // Insert
-        const { data, error } = await globalGenericInsert("automation_rules", {
+        const { data, error } = await window.globalGenericInsert("automation_rules", {
           org_id: AutomationState.orgId,
           created_by: AutomationState.user.id,
           ...ruleData,
@@ -1393,7 +1392,7 @@
         }
 
         // Update
-        const { error } = await globalGenericUpdate(
+        const { error } = await window.globalGenericUpdate(
           "automation_rules",
           { ...updates, updated_at: new Date().toISOString() },
           { id: ruleId }
@@ -1430,7 +1429,7 @@
           return;
         }
 
-        const { error } = await globalGenericDelete("automation_rules", { id: ruleId });
+        const { error } = await window.globalGenericDelete("automation_rules", { id: ruleId });
 
         if (error) throw error;
 
@@ -1457,7 +1456,7 @@
 
       try {
         const newStatus = !rule.is_active;
-        await globalGenericUpdate("automation_rules", { is_active: newStatus }, { id: ruleId });
+        await window.globalGenericUpdate("automation_rules", { is_active: newStatus }, { id: ruleId });
         
         rule.is_active = newStatus;
         calculateKPIs();
@@ -1497,8 +1496,7 @@
 
       renderModalRule();
       trapFocus();
-      const ruleModal = document.getElementById('rule-modal');
-      if (ruleModal) ruleModal.showModal();
+      document.getElementById('rule-modal').showModal();
     }
 
     /**
@@ -1526,8 +1524,7 @@
 
       renderModalRule();
       trapFocus();
-      const ruleModal = document.getElementById('rule-modal');
-      if (ruleModal) ruleModal.showModal();
+      document.getElementById('rule-modal').showModal();
     }
 
     /**
@@ -1582,22 +1579,15 @@
       `;
 
       // Render editors
-      const conditionsEditor = document.getElementById("conditions-editor");
-      if (conditionsEditor) conditionsEditor.innerHTML = renderConditions();
-      const actionsEditor = document.getElementById("actions-editor");
-      if (actionsEditor) actionsEditor.innerHTML = renderActions();
+      document.getElementById("conditions-editor").innerHTML = renderConditions();
+      document.getElementById("actions-editor").innerHTML = renderActions();
 
       // Setup handlers
-      const ruleForm = document.getElementById("rule-form");
-      if (ruleForm) ruleForm.addEventListener("submit", handleFormSubmit);
-      const addConditionBtn = document.getElementById("add-condition");
-      if (addConditionBtn) addConditionBtn.addEventListener("click", addCondition);
-      const addActionBtn = document.getElementById("add-action");
-      if (addActionBtn) addActionBtn.addEventListener("click", addAction);
-      const cancelRuleBtn = document.getElementById("cancel-rule");
-      if (cancelRuleBtn) cancelRuleBtn.addEventListener("click", closeModal);
-      const closeModalBtn = document.getElementById("close-modal");
-      if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
+      document.getElementById("rule-form").addEventListener("submit", handleFormSubmit);
+      document.getElementById("add-condition").addEventListener("click", addCondition);
+      document.getElementById("add-action").addEventListener("click", addAction);
+      document.getElementById("cancel-rule").addEventListener("click", closeModal);
+      document.getElementById("close-modal").addEventListener("click", closeModal);
     }
 
     /**
@@ -1608,8 +1598,6 @@
       AutomationState.modal.isOpen = true;
       
       const modal = document.getElementById("scheduled-modal");
-      if (!modal) return;
-      
       modal.innerHTML = `
         <form id="schedule-form" class="p-6 space-y-4">
           <h2 class="text-xl font-bold">Agendar Relatórios</h2>
@@ -1639,8 +1627,7 @@
       `;
       modal.showModal();
       
-      const scheduleForm = document.getElementById("schedule-form");
-      if (scheduleForm) scheduleForm.addEventListener("submit", handleScheduleSubmit);
+      document.getElementById("schedule-form").addEventListener("submit", handleScheduleSubmit);
     }
 
     /**
@@ -1653,7 +1640,7 @@
       const format = document.getElementById("schedule-format").value;
       
       try {
-        await globalGenericInsert('scheduled_reports', {
+        await window.globalGenericInsert('scheduled_reports', {
           user_id: AutomationState.user.id,
           org_id: AutomationState.orgId,
           frequency,
@@ -1833,7 +1820,7 @@
         console.log('n8n result:', result);
         
         // Log in Supabase
-        await globalGenericInsert('logs_automacao', {
+        await window.globalGenericInsert('logs_automacao', {
           categoria: 'INFO',
           evento: 'n8n_new_lead',
           referencia_id: leadData.lead_id,
@@ -1889,7 +1876,7 @@
 
     async function awardGamificationPoints(activityType, pointsAwarded = 10) {
       try {
-        await globalGenericInsert('gamification_points', {
+        await window.globalGenericInsert('gamification_points', {
           user_id: AutomationState.user.id,
           org_id: AutomationState.orgId,
           activity_type: activityType,
@@ -1971,55 +1958,39 @@
     function setupEventListeners() {
       // Create rule btn
       const createBtn = document.getElementById("create-rule-btn");
-      if (createBtn) {
-        createBtn.addEventListener("click", openModalCreateRule);
-      }
+      if (createBtn) createBtn.addEventListener("click", openModalCreateRule);
       
       // Export btn (add menu for formats)
       const exportBtn = document.getElementById("export-btn");
-      if (exportBtn) {
-        exportBtn.addEventListener("click", () => {
-          exportCSV(); // Default, or show modal for choice
-        });
-      }
+      if (exportBtn) exportBtn.addEventListener("click", () => exportCSV());
       
       // Date range filter
       const dateFilter = document.getElementById("date-range-filter");
-      if (dateFilter) {
-        dateFilter.addEventListener("change", (e) => filterByDateRange(e.target.value));
-      }
+      if (dateFilter) dateFilter.addEventListener("change", (e) => filterByDateRange(e.target.value));
       
       // Tabs
       const rulesTab = document.getElementById("rules-tab");
-      if (rulesTab) {
-        rulesTab.addEventListener("click", () => {
-          document.getElementById("rules-section").style.display = 'block';
-          document.getElementById("executions-section").style.display = 'none';
-          document.getElementById("logs-section").style.display = 'none';
-        });
-      }
+      if (rulesTab) rulesTab.addEventListener("click", () => {
+        document.getElementById("rules-section").style.display = 'block';
+        document.getElementById("executions-section").style.display = 'none';
+        document.getElementById("logs-section").style.display = 'none';
+      });
       const executionsTab = document.getElementById("executions-tab");
-      if (executionsTab) {
-        executionsTab.addEventListener("click", () => {
-          document.getElementById("rules-section").style.display = 'none';
-          document.getElementById("executions-section").style.display = 'block';
-          document.getElementById("logs-section").style.display = 'none';
-        });
-      }
+      if (executionsTab) executionsTab.addEventListener("click", () => {
+        document.getElementById("rules-section").style.display = 'none';
+        document.getElementById("executions-section").style.display = 'block';
+        document.getElementById("logs-section").style.display = 'none';
+      });
       const logsTab = document.getElementById("logs-tab");
-      if (logsTab) {
-        logsTab.addEventListener("click", () => {
-          document.getElementById("rules-section").style.display = 'none';
-          document.getElementById("executions-section").style.display = 'none';
-          document.getElementById("logs-section").style.display = 'block';
-        });
-      }
+      if (logsTab) logsTab.addEventListener("click", () => {
+        document.getElementById("rules-section").style.display = 'none';
+        document.getElementById("executions-section").style.display = 'none';
+        document.getElementById("logs-section").style.display = 'block';
+      });
       
       // Empty state create
       const createFirstRule = document.getElementById("create-first-rule");
-      if (createFirstRule) {
-        createFirstRule.addEventListener("click", openModalCreateRule);
-      }
+      if (createFirstRule) createFirstRule.addEventListener("click", openModalCreateRule);
     }
 
     // ============================================================
@@ -2090,7 +2061,7 @@
     }
 
 // ============================================================
-// 📐 FUNÇÕES DE FORMATAÇÃO
+// 📐 FUNÇÕES DE FORMATAÇÃO (FALTANDO)
 // ============================================================
 
 /**
@@ -2157,7 +2128,7 @@ function escapeHtml(text) {
 }
 
 // ============================================================
-// 🪟 FUNÇÕES DE MODAL
+// 🪟 FUNÇÕES DE MODAL (FALTANDO)
 // ============================================================
 
 /**
@@ -2318,7 +2289,7 @@ function trapFocus() {
 }
 
 // ============================================================
-// 🎯 FUNÇÕES DE FILTRO
+// 🎯 FUNÇÕES DE FILTRO (FALTANDO)
 // ============================================================
 
 function filterByStatus(status) {
@@ -2361,7 +2332,7 @@ function clearFilters() {
 }
 
 // ============================================================
-// 📄 FUNÇÕES DE PAGINAÇÃO
+// 📄 FUNÇÕES DE PAGINAÇÃO (FALTANDO)
 // ============================================================
 
 function changePage(page) {
@@ -2386,7 +2357,7 @@ function nextPage() {
 }
 
 // ============================================================
-// ✏️ FUNÇÕES DE EDITOR
+// ✏️ FUNÇÕES DE EDITOR (FALTANDO)
 // ============================================================
 
 /**
@@ -2444,8 +2415,7 @@ function addCondition() {
     value: ''
   });
   
-  const conditionsEditor = document.getElementById('conditions-editor');
-  if (conditionsEditor) conditionsEditor.innerHTML = renderConditions();
+  document.getElementById('conditions-editor').innerHTML = renderConditions();
 }
 
 /**
@@ -2457,8 +2427,7 @@ function addAction() {
     params: ''
   });
   
-  const actionsEditor = document.getElementById('actions-editor');
-  if (actionsEditor) actionsEditor.innerHTML = renderActions();
+  document.getElementById('actions-editor').innerHTML = renderActions();
 }
 
 /**
@@ -2466,8 +2435,7 @@ function addAction() {
  */
 function removeCondition(index) {
   AutomationState.editor.conditions.splice(index, 1);
-  const conditionsEditor = document.getElementById('conditions-editor');
-  if (conditionsEditor) conditionsEditor.innerHTML = renderConditions();
+  document.getElementById('conditions-editor').innerHTML = renderConditions();
 }
 
 /**
@@ -2475,8 +2443,7 @@ function removeCondition(index) {
  */
 function removeAction(index) {
   AutomationState.editor.actions.splice(index, 1);
-  const actionsEditor = document.getElementById('actions-editor');
-  if (actionsEditor) actionsEditor.innerHTML = renderActions();
+  document.getElementById('actions-editor').innerHTML = renderActions();
 }
 
 /**
@@ -2528,7 +2495,7 @@ async function handleFormSubmit(e) {
 }
 
 // ============================================================
-// 🎮 FUNÇÕES DE PREVIEW/TEST
+// 🎮 FUNÇÕES DE PREVIEW/TEST (FALTANDO)
 // ============================================================
 
 function previewRule(rule) {
@@ -2547,12 +2514,12 @@ function dryRun(ruleId) {
 }
 
 // ============================================================
-// 📊 FUNÇÕES DE GAMIFICAÇÃO/SCHEDULED
+// 📊 FUNÇÕES DE GAMIFICAÇÃO/SCHEDULED (FALTANDO)
 // ============================================================
 
 async function loadGamification() {
   try {
-    const { data } = await globalGenericSelect('gamification_points', {
+    const { data } = await window.globalGenericSelect('gamification_points', {
       user_id: AutomationState.user.id,
       org_id: AutomationState.orgId
     });
@@ -2567,7 +2534,7 @@ async function loadGamification() {
 
 async function loadScheduledReports() {
   try {
-    const { data } = await globalGenericSelect('scheduled_reports', {
+    const { data } = await window.globalGenericSelect('scheduled_reports', {
       user_id: AutomationState.user.id,
       org_id: AutomationState.orgId
     });
@@ -2579,10 +2546,10 @@ async function loadScheduledReports() {
   }
 }
 
-    console.log("%c🤖 Automações v11.1.3 HOTFIX carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
+    console.log("%c🤖 Automações v11.1.4 FINAL carregadas [World-class + n8n]", "color:#22c55e;font-weight:bold;");
 
     // ============================================================
-    // 🌐 EXPOSE GLOBAL API
+    // 🌐 EXPOSE GLOBAL API (DENTRO DO waitForSupabase, NO FINAL)
     // ============================================================
     
     window.AutomationSystem = {
@@ -2644,9 +2611,9 @@ async function loadScheduledReports() {
       formatStatus,
       formatExecutionTime,
       
-      version: "11.1.3-hotfix",
+      version: "11.1.4-final",
     };
     
-    console.log('%c✅ AutomationSystem v11.1.3 READY', 'color:#22c55e;font-weight:bold;');
+    console.log('%c✅ AutomationSystem v11.1.4 READY', 'color:#22c55e;font-weight:bold;');
   });
 })();
