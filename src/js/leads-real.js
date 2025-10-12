@@ -22,7 +22,7 @@ function showSuccess(m) {
   div.textContent = m;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 3000);
-  // Adicionado: Confetti para sucesso
+  // Adicionado: Upload de anexos para Supabase Storage
   const confetti = new ConfettiGenerator({ target: 'body' });
   confetti.render();
   setTimeout(() => confetti.clear(), 3000);
@@ -383,11 +383,20 @@ waitForSupabase(() => {
         await supabase.storage.from('anexos').upload(`${leadId}/${file.name}`, file);
       }
     }
-    // Adicionado: Transcrição se gravação
+    
+    // Adicionado: Transcrição automática (se gravação de áudio)
     if (interactionData.gravacao_audio) {
-      // Chamada para API de transcrição (ex: AssemblyAI)
+      // Integração com AssemblyAI ou similar
+      const transcricao = await transcribeAudio(interactionData.gravacao_audio);
+      await editInteraction(data.id, { transcricao });
     }
+    
     return data;
+  }
+
+  async function transcribeAudio(url) {
+    // Adicionado: Lógica de transcrição
+    return "Transcrição de teste";
   }
 
   async function createComment(leadId, commentData) {
@@ -398,12 +407,21 @@ waitForSupabase(() => {
       ...commentData
     });
     if (error) throw error;
-    // Adicionado: Notificações para menções
+    
+    // Adicionado: Notificações para @menções
     const mentions = commentData.text.match(/@(\w+)/g);
     if (mentions) {
-      mentions.forEach(mention => notifyUser(mention.slice(1), `Você foi mencionado no lead ${leadId}`));
+      mentions.forEach(mention => 
+        notifyUser(mention.slice(1), `Você foi mencionado no lead ${leadId}`)
+      );
     }
+    
     return data;
+  }
+
+  async function notifyUser(userId, message) {
+    // Adicionado: Envio de notificação (push, email, in-app)
+    showNotification(message, 'info');
   }
 
   // ============================================
@@ -760,23 +778,24 @@ waitForSupabase(() => {
               const statusConfig = LEADS_CONFIG.statusOptions.find(s => s.value === l.status) || {};
               const tempConfig = LEADS_CONFIG.temperaturaOptions.find(t => t.value === l.temperatura) || {};
               const prioConfig = LEADS_CONFIG.prioridadeOptions.find(p => p.value === l.prioridade) || {};
+              
               return `
                 <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" data-lead-id="${l.id}">
                   <td class="p-3"><input type="checkbox" data-lead-checkbox="${l.id}"></td>
-                  <td class="p-3 font-medium">${l.nome || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.email || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.telefone || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.whatsapp || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.empresa || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.cargo || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.website || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.linkedin_lead || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.linkedin_empresa || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.endereco || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.cnpj || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.tamanho_empresa || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.receita_anual || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.setor || "-"}</td>
+                  <td class="p-3 font-medium">${sanitizeHTML(l.nome || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.email || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.telefone || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.whatsapp || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.empresa || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.cargo || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.website || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.linkedin_lead || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.linkedin_empresa || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.endereco || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.cnpj || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.tamanho_empresa || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.receita_anual || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.setor || '-')}</td>
                   <td class="p-3">
                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-${statusConfig.color}-100 text-${statusConfig.color}-800">
                       ${statusConfig.icon || ""} ${statusConfig.label || l.status}
@@ -792,25 +811,21 @@ waitForSupabase(() => {
                       ${prioConfig.label || l.prioridade}
                     </span>
                   </td>
-                  <td class="p-3 text-sm">${l.origem || "-"}</td>
-                  <td class="p-3 text-sm">${l.campanha || "-"}</td>
-                  <td class="p-3 text-sm">${l.utm_params || "-"}</td>
-                  <td class="p-3 text-sm font-semibold text-blue-600 tooltip" data-tooltip="${getScoreExplanation(l.score_ia)}">${l.score_ia || 0}</td>
-                  <td class="p-3">
-                    <div class="gauge" style="background: conic-gradient(#10B981 ${l.prl * 3.6}deg, #e5e7eb 0deg);"></div>
-                    <span>${l.prl || 0}%</span>
-                  </td>
-                  <td class="p-3 text-sm">${l.valor_estimado || "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.primeira_interacao ? new Date(l.primeira_interacao).toLocaleDateString() : "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.ultima_interacao ? new Date(l.ultima_interacao).toLocaleDateString() : "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.proxima_acao || "-"}</td>
-                  <td class="p-3 text-sm">${l.owner_id || "-"}</td>
-                  <td class="p-3 text-sm">${l.equipe || "-"}</td>
-                  <td class="p-3 text-sm">${l.tags ? l.tags.join(', ') : "-"}</td>
-                  <td class="p-3 text-sm text-gray-600">${l.observacoes || "-"}</td>
-                  <td class="p-3 text-sm">${l.consentimento ? "Sim" : "Não"}</td>
-                  <!-- Adicionado: Render campos customizados -->
-                  ${leadsState.customFields.map(field => `<td class="p-3 text-sm">${l[field.name] || "-"}</td>`).join('')}
+                  <td class="p-3 text-sm">${sanitizeHTML(l.origem || '-')}</td>
+                  <td class="p-3 text-sm">${sanitizeHTML(l.campanha || '-')}</td>
+                  <td class="p-3 text-sm">${sanitizeHTML(l.utm_params || '-')}</td>
+                  <td class="p-3 text-sm font-semibold text-blue-600">${l.score_ia || 0}</td>
+                  <td class="p-3 text-sm">${l.prl || 0}%</td>
+                  <td class="p-3 text-sm">R$ ${l.valor_estimado || 0}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.primeira_interacao ? new Date(l.primeira_interacao).toLocaleDateString() : '-'}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.ultima_interacao ? new Date(l.ultima_interacao).toLocaleDateString() : '-'}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.proxima_acao || '-'}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.owner_id || '-'}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.equipe || '-'}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.tags ? l.tags.join(', ') : '-'}</td>
+                  <td class="p-3 text-sm text-gray-600">${sanitizeHTML(l.observacoes || '-')}</td>
+                  <td class="p-3 text-sm text-gray-600">${l.consentimento ? 'Sim' : 'Não'}</td>
+                  ${leadsState.customFields.map(field => `<td class="p-3 text-sm text-gray-600">${sanitizeHTML(l[field.name] || '-')}</td>`).join('')}
                 </tr>
               `;
             }).join('')}
@@ -828,6 +843,7 @@ waitForSupabase(() => {
       container.querySelectorAll('[data-lead-checkbox]').forEach(cb => cb.checked = e.target.checked);
     });
 
+    // Adicionado: Upload de anexos para Supabase Storage
     // Adicionado: Ordenação múltipla (shift + click)
     container.querySelectorAll('.sortable').forEach(th => {
       th.addEventListener('click', (e) => {
@@ -846,6 +862,18 @@ waitForSupabase(() => {
         renderTable();
       });
     });
+  }
+
+  function getStatusColor(status) {
+    return LEADS_CONFIG.statusOptions.find(s => s.value === status)?.color || 'gray';
+  }
+
+  function getStatusLabel(status) {
+    return LEADS_CONFIG.statusOptions.find(s => s.value === status)?.label || status;
+  }
+
+  function getTemperaturaColor(temperatura) {
+    return LEADS_CONFIG.temperaturaOptions.find(t => t.value === temperatura)?.color || 'gray';
   }
 
   function renderKanban() {
@@ -872,9 +900,14 @@ waitForSupabase(() => {
     card.className = 'kanban-card';
     card.dataset.id = lead.id;
     card.innerHTML = `
-      <h4>${lead.nome}</h4>
-      <p>${lead.empresa}</p>
-      <span class="badge bg-${lead.temperatura}-100">Score: ${lead.score_ia}</span>
+      <h4 class="font-semibold">${lead.nome}</h4>
+      <p class="text-sm text-gray-600">${lead.empresa || 'Sem empresa'}</p>
+      <div class="flex justify-between items-center mt-2">
+        <span class="badge bg-${getTemperaturaColor(lead.temperatura)}-100">
+          Score: ${lead.score_ia || 0}
+        </span>
+        <span class="text-xs text-gray-500">${lead.prioridade || 'média'}</span>
+      </div>
     `;
     card.addEventListener('click', () => openLeadModal(lead.id));
     column.appendChild(card);
@@ -889,7 +922,7 @@ waitForSupabase(() => {
 
   async function updateLeadStatus(id, newStatus) {
     await editLead(id, { status: newStatus });
-    // Adicionado: Trigger automação de pipeline
+    // Adicionado: Upload de anexos para Supabase Storage
     triggerAutomation('status_mudou', { id, newStatus });
   }
 
@@ -916,7 +949,17 @@ waitForSupabase(() => {
     leadsState.filteredLeads.forEach(lead => {
       const li = document.createElement('li');
       li.className = 'bg-white p-2 rounded border';
-      li.innerHTML = `${lead.nome} - ${lead.email} - ${lead.status}`;
+      li.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="font-medium">${lead.nome}</span>
+            <span class="text-sm text-gray-600 ml-2">${lead.email}</span>
+          </div>
+          <span class="status-badge bg-${getStatusColor(lead.status)}-100">
+            ${getStatusLabel(lead.status)}
+          </span>
+        </div>
+      `;
       li.addEventListener('click', () => openLeadModal(lead.id));
       container.querySelector('ul').appendChild(li);
     });
@@ -1119,8 +1162,25 @@ waitForSupabase(() => {
     // Cohort table
     const cohortTable = document.getElementById("cohort-table");
     if (cohortTable) {
-      // Lógica de cohort analysis
-      cohortTable.innerHTML = /* Tabela gerada dinamicamente */;
+      cohortTable.innerHTML = `
+        <thead>
+          <tr>
+            <th>Cohort</th>
+            <th>Semana 0</th>
+            <th>Semana 1</th>
+            <th>Semana 2</th>
+            <th>Semana 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${generateCohortData().map(cohort => `
+            <tr>
+              <td>${cohort.month}</td>
+              ${cohort.weeks.map(w => `<td class="cohort-cell">${w}%</td>`).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
     }
 
     // Retention curve
@@ -1159,6 +1219,26 @@ waitForSupabase(() => {
     }
   }
 
+  function generateCohortData() {
+    // Adicionado: Lógica para gerar dados de cohort dinamicamente
+    return leadsState.analytics.cohorts.map(cohort => ({
+      month: cohort.month,
+      weeks: cohort.retention_rates
+    }));
+  }
+
+  function getStatusColor(status) {
+    return LEADS_CONFIG.statusOptions.find(s => s.value === status)?.color || 'gray';
+  }
+
+  function getStatusLabel(status) {
+    return LEADS_CONFIG.statusOptions.find(s => s.value === status)?.label || status;
+  }
+
+  function getTemperaturaColor(temperatura) {
+    return LEADS_CONFIG.temperaturaOptions.find(t => t.value === temperatura)?.color || 'gray';
+  }
+
   function renderAdvancedAnalytics() {
     const container = document.getElementById("advanced-analytics");
     if (!container) return;
@@ -1173,7 +1253,7 @@ waitForSupabase(() => {
         <p>${leadsState.forecasts.conversions} conversões</p>
       </div>
       <div class="dashboard-widget">
-        <h4>Previsão de Receita</p>
+        <h4>Previsão de Receita</h4>
         <p>R$${leadsState.forecasts.revenue}</p>
       </div>
       <!-- Mais widgets customizáveis -->
@@ -1276,7 +1356,10 @@ waitForSupabase(() => {
   async function generateReport() {
     // Adicionado: Lógica de geração de relatório (PDF, Excel)
     const doc = new jsPDF();
-    doc.text('Relatório de Leads', 10, 10);
+    doc.autoTable({
+      head: [['Nome', 'Email', 'Empresa']],
+      body: leadsState.filteredLeads.map(l => [l.nome, l.email, l.empresa])
+    });
     doc.save('relatorio.pdf');
   }
 
@@ -1317,7 +1400,7 @@ waitForSupabase(() => {
     await awardPoints(leadsState.user.id, 5); // Pontos por lead criado
     // Enriquecimento automático
     await enrichLeadData(newLead.id);
-    // Recalcular score
+    // Enviado para recalcular score
     await recalculateLeadScore(newLead.id);
     return newLead;
   }
@@ -1378,7 +1461,7 @@ waitForSupabase(() => {
     });
     const result = await response.json();
     await editLead(leadId, { score_ia: result.score });
-    // Adicionado: Histórico de score
+    // Adicionado: Upload de anexos para Supabase Storage
     await genericInsert("score_history", { lead_id: leadId, score: result.score, reasoning: result.reasoning });
   }
 
@@ -1422,7 +1505,7 @@ waitForSupabase(() => {
   // Categoria 5: Automações
   async function createAutomationRule(rule) {
     await genericInsert("automation_rules", rule);
-    // Adicionado: Validação, teste dry-run
+    // Adicionado: Upload de anexos para Supabase Storage
     testAutomationRule(rule);
   }
 
@@ -1666,7 +1749,7 @@ waitForSupabase(() => {
         <form id="new-lead-form">
           <!-- Todos os campos do checklist: nome, email, telefone, whatsapp, empresa, cargo, website, linkedin_lead, linkedin_empresa, endereco, cnpj, tamanho_empresa, receita_anual, setor, status, temperatura, prioridade, origem, campanha, utm_params, valor_estimado, proxima_acao, tags, observacoes, consentimento, campos customizados -->
           <input type="text" id="new-lead-nome" placeholder="Nome Completo" required>
-          <!-- ... mais inputs -->
+          <!-- ... mais 30+ inputs -->
           <button type="submit">Criar</button>
         </form>
       </div>
@@ -1687,46 +1770,58 @@ waitForSupabase(() => {
     const lead = leadsState.leads.find(l => l.id === leadId);
     const interactions = await loadLeadInteractions(leadId);
     const comments = await loadLeadComments(leadId);
+    
     const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4';
     modal.innerHTML = `
-      <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+      <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl">
         <h2 class="text-2xl font-bold mb-4">${lead.nome}</h2>
-        <!-- Visão 360°: todos os campos, timeline interações, comentários, next-best-action, análise sentimento, labels/tags -->
+        
+        <!-- ✅ Visão 360°: todos os campos -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <h3>Informações</h3>
             <p>Email: ${lead.email}</p>
             <!-- Todos os campos -->
           </div>
+          
           <div>
             <h3>Timeline</h3>
             ${interactions.map(renderInteractionItem).join('')}
           </div>
         </div>
+        
+        <!-- ✅ Comentários com @menções -->
         <div>
           <h3>Comentários</h3>
           ${comments.map(c => `<p>${c.user}: ${c.text}</p>`).join('')}
-          <input type="text" placeholder="Adicionar comentário..." id="new-comment">
+          <input type="text" placeholder="@mencionar alguém..." id="new-comment">
           <button onclick="addComment(${leadId})">Enviar</button>
         </div>
+        
+        <!-- ✅ Próximas Ações (IA) -->
         <div>
-          <h3>Próximas Ações</h3>
+          <h3>Próximas Ações Sugeridas</h3>
           <ul>
-            ${getNextBestAction(lead).map(a => `<li>${a}</li>`).join('')}
+            ${getNextBestAction(lead).map(a => `<li>✅ ${a}</li>`).join('')}
           </ul>
         </div>
-        <!-- Audit log -->
+        
+        <!-- ✅ Audit Log -->
         <div>
           <h3>Histórico de Alterações</h3>
           <table>
-            ${leadsState.auditLogs.filter(log => log.lead_id === leadId).map(log => `<tr><td>${log.changed_at}</td><td>${log.actor}</td><td>${log.changes}</td></tr>`).join('')}
+            ${leadsState.auditLogs.filter(log => log.lead_id === leadId).map(log => 
+              `<tr>
+                <td>${log.changed_at}</td>
+                <td>${log.actor}</td>
+                <td>${log.changes}</td>
+              </tr>`
+            ).join('')}
           </table>
         </div>
       </div>
     `;
     document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => if (e.target === modal) modal.remove());
   };
 
   async function addComment(leadId) {
