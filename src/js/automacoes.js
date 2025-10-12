@@ -42,7 +42,7 @@
   // 🌐 VARIÁVEIS GLOBAIS (FORA DO waitForSupabase)
   // ============================================================
   
-  window.globalClient = null;
+  window.globalSupabase = null;  // Changed from client to supabase
   window.globalGenericSelect = null;
   window.globalGenericInsert = null;
   window.globalGenericUpdate = null;
@@ -234,8 +234,7 @@
   function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
     if (window.AlshamSupabase && window.AlshamSupabase.getCurrentSession) {
       console.log("✅ Supabase carregado para Automações v11.1.4");
-
-      // ✅ ATRIBUIR GLOBALMENTE IMEDIATAMENTE
+      
       const {
         getCurrentSession,
         getCurrentOrgId,
@@ -243,12 +242,12 @@
         genericInsert,
         genericUpdate,
         genericDelete,
-        client,
+        supabase,  // Changed from client to supabase
       } = window.AlshamSupabase;
       
       window.globalGetCurrentSession = getCurrentSession;
       window.globalGetCurrentOrgId = getCurrentOrgId;
-      window.globalClient = client;
+      window.globalSupabase = supabase;  // Changed from client to supabase
       window.globalGenericSelect = genericSelect;
       window.globalGenericInsert = genericInsert;
       window.globalGenericUpdate = genericUpdate;
@@ -257,8 +256,8 @@
       // ✅ DEBUG COMPLETO
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       console.log("🔍 DEBUG: Atribuições globais");
-      console.log("window.globalClient:", window.globalClient);
-      console.log("window.globalClient.channel:", typeof window.globalClient?.channel);
+      console.log("window.globalSupabase:", window.globalSupabase);
+      console.log("window.globalSupabase.channel:", typeof window.globalSupabase?.channel);
       console.log("window.globalGenericSelect:", typeof window.globalGenericSelect);
       console.log("AlshamSupabase:", window.AlshamSupabase);
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -543,7 +542,7 @@
       }
 
       // FIX: Aplicar filtro de data corretamente
-      let query = window.globalClient
+      let query = window.globalSupabase  // Changed from globalClient
         .from('automation_executions')
         .select('*', { count: 'exact' })
         .match(filters)
@@ -1207,9 +1206,9 @@
      * Subscribe a mudanças em tempo real
      */
     function subscribeRealtime() {
-      // ✅ VERIFICAR SE window.globalClient ESTÁ DEFINIDO
-      if (!window.globalClient) {
-        console.error("❌ window.globalClient não está definido! Pulando realtime.");
+      // ✅ VERIFICAR SE window.globalSupabase ESTÁ DEFINIDO
+      if (!window.globalSupabase) {
+        console.error("❌ window.globalSupabase não está definido! Pulando realtime.");
         showNotification("Realtime não disponível no momento.", "warning");
         return;
       }
@@ -1218,7 +1217,7 @@
         console.log("⚡ Iniciando realtime subscriptions...");
         
         // Subscribe a automation_rules
-        window.globalClient
+        window.globalSupabase
           .channel("automation_rules_channel")
           .on(
             "postgres_changes",
@@ -1231,7 +1230,7 @@
           .subscribe();
 
         // Subscribe a automation_executions
-        window.globalClient
+        window.globalSupabase
           .channel("automation_executions_channel")
           .on(
             "postgres_changes",
@@ -1244,7 +1243,7 @@
           .subscribe();
 
         // Subscribe a logs_automacao
-        window.globalClient
+        window.globalSupabase
           .channel("automation_logs_channel")
           .on(
             "postgres_changes",
