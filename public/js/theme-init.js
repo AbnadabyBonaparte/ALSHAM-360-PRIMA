@@ -1,12 +1,12 @@
 /**
- * ⚡ ALSHAM 360° PRIMA - Theme Initializer v1.0
- * Garante que o site sempre carregue em modo claro por padrão
+ * ⚡ ALSHAM 360° PRIMA - Theme Initializer v2.0 (CORREÇÃO CRÍTICA)
+ * Garante que o site sempre carregue em modo claro
  * 
- * Funcionalidades:
- * - Remove classe 'dark' do HTML
- * - Define tema 'light' no localStorage
- * - Previne flash de conteúdo não estilizado (FOUC)
- * - Log de inicialização
+ * MUDANÇAS v2.0:
+ * - Aplica !important nos estilos inline
+ * - Força background antes do CSS carregar
+ * - Corrige fontSize para 16px
+ * - Remove estilos inline APENAS após confirmar CSS
  * 
  * Autor: ALSHAM Design Core Team | 2025
  */
@@ -14,20 +14,28 @@
 (function initTheme() {
   'use strict';
   
+  console.log('⚡ Theme Initializer v2.0 carregando...');
+  
   // ========================================
-  // 🎨 FORÇAR MODO CLARO
+  // 🎨 FORÇAR MODO CLARO (CRÍTICO)
   // ========================================
   
-  // Remove dark mode do elemento HTML
   const htmlElement = document.documentElement;
-  htmlElement.classList.remove('dark');
+  const bodyElement = document.body;
   
-  // Remove também do body (caso exista)
-  if (document.body) {
-    document.body.classList.remove('dark');
+  // Remove dark mode
+  htmlElement.classList.remove('dark');
+  if (bodyElement) {
+    bodyElement.classList.remove('dark');
   }
   
-  // Remove o atributo data-theme
+  // Adiciona light mode explicitamente
+  htmlElement.classList.add('light');
+  if (bodyElement) {
+    bodyElement.classList.add('light');
+  }
+  
+  // Remove atributos
   htmlElement.removeAttribute('data-theme');
   
   // ========================================
@@ -35,131 +43,140 @@
   // ========================================
   
   try {
-    // Define tema claro no localStorage
     localStorage.setItem('theme', 'light');
     localStorage.setItem('alsham-theme', 'light');
-    
-    // Remove qualquer preferência de dark mode
     localStorage.removeItem('dark-mode');
     localStorage.removeItem('darkMode');
   } catch (error) {
-    console.warn('⚠️ Não foi possível salvar tema no localStorage:', error);
+    console.warn('⚠️ Não foi possível salvar tema:', error);
   }
   
   // ========================================
-  // 🎯 PREVENIR DETECÇÃO AUTOMÁTICA
+  // 🎯 APLICAR ESTILOS INLINE (FORÇADO)
   // ========================================
   
-  // Adiciona meta tag para forçar color-scheme light
-  const metaColorScheme = document.createElement('meta');
-  metaColorScheme.name = 'color-scheme';
-  metaColorScheme.content = 'light';
+  // CRÍTICO: Usar setAttribute para aplicar com !important via style
+  const criticalStyles = `
+    background-color: #F9FAFB !important;
+    color: #111827 !important;
+    font-size: 16px !important;
+  `;
   
-  // Insere no head se ainda não existir
-  if (!document.querySelector('meta[name="color-scheme"]')) {
-    document.head.appendChild(metaColorScheme);
+  htmlElement.setAttribute('style', criticalStyles);
+  if (bodyElement) {
+    bodyElement.setAttribute('style', criticalStyles);
   }
   
   // ========================================
   // 📊 LOG E VERIFICAÇÃO
   // ========================================
   
-  const isDark = htmlElement.classList.contains('dark');
-  const storedTheme = localStorage.getItem('theme');
-  
   console.log('✅ Theme Initializer carregado');
   console.log('📊 Status do tema:');
-  console.log('  - Dark mode ativo:', isDark);
-  console.log('  - Tema no storage:', storedTheme);
-  console.log('  - Classes HTML:', htmlElement.className || 'nenhuma');
-  
-  if (isDark) {
-    console.warn('⚠️ AVISO: Dark mode ainda está ativo!');
-  } else {
-    console.log('✅ Modo claro ativo com sucesso');
-  }
+  console.log('  - Dark mode ativo:', htmlElement.classList.contains('dark'));
+  console.log('  - Tema no storage:', localStorage.getItem('alsham-theme'));
+  console.log('  - Classes HTML:', htmlElement.className);
+  console.log('✅ Modo claro ativo com sucesso');
   
   // ========================================
   // 🔄 OBSERVADOR DE MUDANÇAS
   // ========================================
   
-  // Observa se alguém tenta adicionar dark mode novamente
   const observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
         if (htmlElement.classList.contains('dark')) {
-          console.warn('⚠️ Tentativa de ativar dark mode bloqueada');
+          console.warn('⚠️ Tentativa de ativar dark mode BLOQUEADA');
           htmlElement.classList.remove('dark');
-          localStorage.setItem('theme', 'light');
+          htmlElement.classList.add('light');
+          localStorage.setItem('alsham-theme', 'light');
         }
       }
     });
   });
   
-  // Inicia observação
   observer.observe(htmlElement, {
     attributes: true,
     attributeFilter: ['class']
   });
   
   // ========================================
-  // 🎨 APLICAR ESTILOS INLINE (fallback)
+  // ✅ VERIFICAR APÓS CSS CARREGAR
   // ========================================
   
-  // Garante background claro mesmo antes do CSS carregar
-  htmlElement.style.backgroundColor = '#F9FAFB';
-  htmlElement.style.color = '#111827';
-  
-  // Remove estilos inline após CSS carregar
   window.addEventListener('load', function() {
     setTimeout(function() {
-      htmlElement.style.backgroundColor = '';
-      htmlElement.style.color = '';
-    }, 100);
+      const bgColor = window.getComputedStyle(document.body).backgroundColor;
+      console.log('🎨 Background após CSS:', bgColor);
+      
+      // Se o background ainda estiver errado, manter os estilos inline
+      if (bgColor === 'rgb(0, 0, 0)' || bgColor === 'rgba(0, 0, 0, 0)') {
+        console.warn('⚠️ CSS não aplicou corretamente, mantendo estilos inline');
+      } else {
+        // Remover estilos inline apenas se o CSS funcionou
+        console.log('✅ CSS carregado corretamente, removendo estilos inline');
+        htmlElement.removeAttribute('style');
+        if (bodyElement) {
+          bodyElement.removeAttribute('style');
+        }
+      }
+    }, 500);
   });
   
 })();
 
 // ========================================
-// 🌐 EXPORTAR FUNÇÕES (opcional)
+// 🌐 API GLOBAL
 // ========================================
 
 window.AlshamTheme = {
-  /**
-   * Força modo claro
-   */
   setLight: function() {
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
+    const html = document.documentElement;
+    const body = document.body;
+    
+    html.classList.remove('dark');
+    html.classList.add('light');
+    
+    if (body) {
+      body.classList.remove('dark');
+      body.classList.add('light');
+    }
+    
+    localStorage.setItem('alsham-theme', 'light');
     console.log('✅ Modo claro ativado manualmente');
   },
   
-  /**
-   * Força modo escuro (se necessário no futuro)
-   */
   setDark: function() {
-    document.documentElement.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-    console.log('🌙 Modo escuro ativado manualmente');
+    console.warn('⚠️ Dark mode ainda não implementado completamente');
+    // Quando implementar, descomentar:
+    // document.documentElement.classList.add('dark');
+    // localStorage.setItem('alsham-theme', 'dark');
   },
   
-  /**
-   * Alterna entre modos
-   */
   toggle: function() {
     const isDark = document.documentElement.classList.contains('dark');
     if (isDark) {
       this.setLight();
     } else {
-      this.setDark();
+      console.warn('⚠️ Dark mode ainda não disponível');
     }
   },
   
-  /**
-   * Obtém tema atual
-   */
   getCurrent: function() {
-    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    return localStorage.getItem('alsham-theme') || 'light';
+  },
+  
+  // NOVA: Forçar correção manual
+  forceLight: function() {
+    const html = document.documentElement;
+    const body = document.body;
+    
+    html.setAttribute('style', 'background-color: #F9FAFB !important; color: #111827 !important; font-size: 16px !important;');
+    if (body) {
+      body.setAttribute('style', 'background-color: #F9FAFB !important; color: #111827 !important; font-size: 16px !important;');
+    }
+    
+    console.log('✅ Light mode forçado com !important');
   }
 };
 
