@@ -1179,4 +1179,4 @@ waitForSupabase(() => {
   window.setupInterface = setupInterface;
 
   console.log("✅ Leads-Real.js v6.1 FINAL carregado com sucesso");
-});
+});"
