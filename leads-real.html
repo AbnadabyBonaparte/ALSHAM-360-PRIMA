@@ -123,6 +123,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Quill for rich text -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" rel="stylesheet">
+  <!-- Leaflet for maps -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+  <!-- Confetti for notifications -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/confetti-js/0.0.18/confetti.min.js"></script>
   <style>
     .loading-spinner {
       display: inline-block;
@@ -417,6 +425,42 @@
       color: #3B82F6;
       font-weight: 600;
     }
+    /* Adicionado: Empty States */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #6b7280;
+    }
+    .empty-state icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    /* Adicionado: Tooltips */
+    .tooltip {
+      position: relative;
+    }
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      white-space: nowrap;
+    }
+    /* Adicionado: Skeleton Loading */
+    .skeleton {
+      background: #e5e7eb;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
 <body class="font-inter min-h-screen" style="background: var(--alsham-bg-canvas);">
@@ -508,64 +552,54 @@
           <canvas id="leads-daily-chart"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Gráfico de Funil de Vendas -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Funil de Vendas</h3>
         <div class="chart-container">
           <canvas id="leads-funnel-chart"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Gráfico de Leads por Origem -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Leads por Origem</h3>
         <div class="chart-container">
           <canvas id="leads-origin-chart"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Gráfico de Temperatura -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição de Temperatura</h3>
         <div class="chart-container">
           <canvas id="leads-temperature-gauge"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Histograma de Score -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição de Score IA</h3>
         <div class="chart-container histogram">
           <canvas id="leads-score-histogram"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Heatmap de Atividades -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Heatmap de Atividades</h3>
         <div id="activity-heatmap" class="heatmap"></div>
       </div>
-      <!-- Adicionado: Mapa Geográfico -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Mapa de Leads</h3>
         <div id="leads-map" class="map-container"></div>
       </div>
-      <!-- Adicionado: Análise de Cohort -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Análise de Cohort</h3>
         <table id="cohort-table" class="cohort-table"></table>
       </div>
-      <!-- Adicionado: Curvas de Retenção -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Curvas de Retenção</h3>
         <div class="chart-container retention-curve">
           <canvas id="retention-curve-chart"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Gráfico de Pipeline Value -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Valor do Pipeline</h3>
         <div class="pipeline-value-chart">
           <canvas id="pipeline-value-chart"></canvas>
         </div>
       </div>
-      <!-- Adicionado: Tabela de Movimentações -->
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Movimentações Recentes</h3>
         <table id="movements-table" class="w-full"></table>
@@ -598,12 +632,10 @@
         <button id="next-page" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm font-medium disabled:opacity-50">Próxima</button>
       </div>
     </div>
-    <!-- Adicionado: Seção de Analytics e KPIs -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Analytics Avançados</h3>
       <div id="advanced-analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </section>
-    <!-- Adicionado: Seção de Gamificação -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Gamificação</h3>
       <div id="gamification-section" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -625,13 +657,11 @@
         </div>
       </div>
     </section>
-    <!-- Adicionado: Seção de Automações -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Automações</h3>
       <div id="automations-section" class="space-y-4"></div>
       <button id="new-automation-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">+ Nova Automação</button>
     </section>
-    <!-- Adicionado: Seção de Colaboração -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Colaboração</h3>
       <div id="collaboration-section">
@@ -641,13 +671,12 @@
         </div>
       </div>
     </section>
-    <!-- Adicionado: Seção de Integrações -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Integrações e Comunicação</h3>
       <div id="integrations-section" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="card">
           <h4 class="font-semibold mb-2">Email</h4>
-          <div id="email-editor" class="email-editor" contenteditable="true">Escreva seu email aqui...</div>
+          <div id="email-editor" class="email-editor" contenteditable="true">Escreva seu email...</div>
           <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Enviar</button>
         </div>
         <div class="card">
@@ -659,16 +688,28 @@
           <h4 class="font-semibold mb-2">Calendário</h4>
           <button class="bg-purple-600 text-white px-4 py-2 rounded">Agendar Reunião</button>
         </div>
+        <!-- Adicionado: Mais integrações -->
+        <div class="card">
+          <h4 class="font-semibold mb-2">SMS</h4>
+          <input type="text" placeholder="Mensagem..." class="w-full border rounded px-2 py-1 mb-2">
+          <button class="bg-indigo-600 text-white px-4 py-2 rounded">Enviar</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2">Telefonia</h4>
+          <button class="bg-red-600 text-white px-4 py-2 rounded">Ligar</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2">Videoconferência</h4>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded">Iniciar Reunião</button>
+        </div>
       </div>
     </section>
-    <!-- Adicionado: Seção de Relatórios -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Relatórios Customizáveis</h3>
       <div id="reports-section">
         <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Gerar Relatório</button>
       </div>
     </section>
-    <!-- Adicionado: Seção de Configurações -->
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Configurações</h3>
       <div id="settings-section" class="space-y-4">
@@ -676,7 +717,15 @@
           <label>Status Customizados</label>
           <input type="text" placeholder="Adicionar novo status..." class="border rounded px-2 py-1">
         </div>
-        <!-- Mais campos de configuração -->
+        <!-- Adicionado: Mais campos de configuração -->
+        <div>
+          <label>Campos Customizados</label>
+          <input type="text" placeholder="Adicionar campo..." class="border rounded px-2 py-1">
+        </div>
+        <div>
+          <label>Regras de Automação</label>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded">Adicionar Regra</button>
+        </div>
       </div>
     </section>
   </main>
