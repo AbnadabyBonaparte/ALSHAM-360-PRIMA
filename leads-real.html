@@ -22,6 +22,14 @@
   </script>
   <!-- ⭐ FIM DA ADIÇÃO ⭐ -->
   
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest-leads.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Leads">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0176D3">
+  
   <style id="dark-theme-critical">
     :root {
       --alsham-text-primary: #111827;
@@ -115,6 +123,394 @@
       border-top-color: var(--alsham-primary, #3B82F6);
       border-radius: 50%;
       animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--alsham-bg-surface);
+      border-radius: var(--alsham-radius-lg);
+      box-shadow: var(--alsham-shadow-md);
+      padding: var(--alsham-space-6);
+      border: 1px solid var(--alsham-border-default);
+      overflow: visible;
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+    .card:hover {
+      box-shadow: var(--alsham-shadow-lg);
+      transform: translateY(-2px);
+    }
+    .kpi-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--alsham-primary), var(--alsham-secondary));
+      opacity: 0;
+      transition: opacity var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+    .kpi-card:hover::before {
+      opacity: 1;
+    }
+    .side-nav {
+      position: fixed;
+      left: 0;
+      top: 64px;
+      width: 220px;
+      height: calc(100vh - 64px);
+      background: var(--alsham-bg-surface);
+      border-right: 1px solid var(--alsham-border-default);
+      padding: var(--alsham-space-4) 0;
+      z-index: var(--alsham-z-sticky);
+      overflow-y: auto;
+    }
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      gap: var(--alsham-space-3);
+      padding: var(--alsham-space-3) var(--alsham-space-6);
+      color: var(--alsham-text-secondary);
+      text-decoration: none;
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+      font-size: var(--alsham-text-sm);
+      font-weight: var(--alsham-font-medium);
+    }
+    .side-nav a:hover {
+      background: var(--alsham-bg-hover);
+      color: var(--alsham-primary);
+    }
+    .side-nav a.active {
+      background: var(--alsham-primary-light);
+      color: var(--alsham-primary);
+      border-right: 3px solid var(--alsham-primary);
+      font-weight: var(--alsham-font-semibold);
+    }
+    .main-content-wrapper {
+      margin-left: 220px;
+    }
+    .theme-toggle-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--alsham-bg-hover);
+      border: 1px solid var(--alsham-border-default);
+      cursor: pointer;
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+    .theme-toggle-btn:hover {
+      background: var(--alsham-primary-light);
+      border-color: var(--alsham-primary);
+      transform: scale(1.05);
+    }
+    .theme-toggle-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--alsham-text-secondary);
+      transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
+    }
+    .theme-toggle-btn:hover svg {
+      color: var(--alsham-primary);
+    }
+    html:not(.dark) .moon-icon { display: none; }
+    html.dark .sun-icon { display: none; }
+    @media (max-width: 768px) {
+      .side-nav {
+        transform: translateX(-100%);
+        transition: transform var(--alsham-motion-expressive) var(--alsham-ease-expressive);
+      }
+      .side-nav.open {
+        transform: translateX(0);
+      }
+      .main-content-wrapper {
+        margin-left: 0;
+      }
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--alsham-radius-full);
+      font-size: var(--alsham-text-xs);
+      font-weight: var(--alsham-font-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    /* CORRIGIDO: chart-container com altura maior e canvas responsivo */
+    .chart-container {
+      position: relative;
+      height: 350px;
+      width: 100%;
+      padding: 1rem 0;
+    }
+    .chart-container canvas {
+      max-height: 100%;
+    }
+    *:focus-visible {
+      outline: 2px solid var(--alsham-primary);
+      outline-offset: 2px;
+      border-radius: var(--alsham-radius-sm);
+    }
+    .text-primary {
+      color: var(--alsham-text-primary);
+    }
+    .text-secondary {
+      color: var(--alsham-text-secondary);
+    }
+    .text-tertiary {
+      color: var(--alsham-text-tertiary);
+    }
+    nav {
+      background: var(--alsham-bg-surface);
+      border-bottom: 1px solid var(--alsham-border-default);
+    }
+  </style>
+</head>
+<body class="font-inter min-h-screen" style="background: var(--alsham-bg-canvas);">
+  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);">
+    <div class="text-center">
+      <div class="loading-spinner mb-4"></div>
+      <h2 class="text-xl font-bold text-primary mb-2">ALSHAM 360° PRIMA</h2>
+      <p class="text-secondary font-medium">Carregando dashboard executivo...</p>
+    </div>
+  </div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+  <nav class="sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <div class="flex items-center gap-4">
+        <button id="menu-toggle" class="md:hidden p-2 hover:bg-hover rounded-lg transition-colors text-secondary" aria-label="Abrir menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+          ALSHAM 360°
+        </h1>
+      </div>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+        <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Leads</a>
+        <a href="/pipeline.html" class="text-secondary hover:text-primary transition-colors">Pipeline</a>
+        <a href="/automacoes.html" class="text-secondary hover:text-primary transition-colors">Automações</a>
+        <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
+        <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
+      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover text-secondary">Dashboard</a>
+      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Leads</a>
+      <a href="/pipeline.html" class="block px-4 py-3 hover:bg-hover text-secondary">Pipeline</a>
+      <a href="/automacoes.html" class="block px-4 py-3 hover:bg-hover text-secondary">Automações</a>
+      <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-hover text-secondary">Gamificação</a>
+      <a href="/relatorios.html" class="block px-4 py-3 hover:bg-hover text-secondary">Relatórios</a>
+    </div>
+  </nav>
+  <aside class="side-nav" id="sidebar">
+    <a href="/dashboard.html">
+      <span>📊</span> Dashboard
+    </a>
+    <a href="/leads-real.html" class="active" aria-current="page">
+      <span>👥</span> Leads
+    </a>
+    <a href="/pipeline.html">
+      <span>🎯</span> Pipeline
+    </a>
+    <a href="/automacoes.html">
+      <span>⚙️</span> Automações
+    </a>
+    <a href="/gamificacao.html">
+      <span>🎮</span> Gamificação
+    </a>
+    <a href="/relatorios.html">
+      <span>📈</span> Relatórios
+    </a>
+    <a href="/configuracoes.html">
+      <span>⚙️</span> Configurações
+    </a>
+  </aside>
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-primary mb-2">Leads</h1>
+      <p class="text-secondary">Gerencie seus leads com eficiência</p>
+    </header>
+    <div id="leads-kpis"></div>
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição por Status</h3>
+        <div class="chart-container">
+          <canvas id="leads-status-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos <span id="current-period">7</span> dias)</h3>
+        <div class="chart-container">
+          <canvas id="leads-daily-chart"></canvas>
+        </div>
+      </div>
+    </section>
+    <div class="mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-primary">Lista de Leads</h3>
+        <button onclick="window.openNewLeadModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">+ Novo Lead</button>
+      </div>
+      <div id="leads-filters" class="mb-4"></div>
+      <div id="leads-table"></div>
+      <div class="flex justify-between mt-4">
+        <button id="prev-page" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm font-medium disabled:opacity-50">Anterior</button>
+        <span class="text-sm text-gray-600">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
+        <button id="next-page" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm font-medium disabled:opacity-50">Próxima</button>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
+  <!-- ⭐ CORRIGIDO: /js/leads-real.js → /src/js/leads-real.js ⭐ -->
+  <script type="module" src="/src/js/leads-real.js"></script>
+</body>
+</html>
+``````html
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- ✅ Theme Init - DEVE ser primeiro script -->
+  <script src="/js/theme-init.js"></script>
+  
+  <meta name="description" content="Dashboard executivo do ALSHAM 360° PRIMA - CRM Enterprise com IA" />
+  <title>Dashboard — ALSHAM 360° PRIMA</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  
+  <!-- ⭐ ADICIONADO: Cleanup de Service Worker ⭐ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(r => r.forEach(x => x.unregister()));
+      caches.keys().then(k => k.forEach(x => caches.delete(x)));
+    }
+  </script>
+  <!-- ⭐ FIM DA ADIÇÃO ⭐ -->
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest-leads.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Leads">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0176D3">
+  
+  <style id="dark-theme-critical">
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #f9fafb;
+      --alsham-bg-surface: #ffffff;
+      --alsham-bg-hover: #f3f4f6;
+      --alsham-border-default: #e5e7eb;
+      --alsham-border-light: #f3f4f6;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-border-default: #334155;
+      --alsham-border-light: #475569;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+    html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; }
+    html.dark .text-blue-800 { color: #93c5fd !important; }
+    html.dark .bg-yellow-100 { background-color: rgba(251, 191, 36, 0.2) !important; }
+    html.dark .text-yellow-800 { color: #fcd34d !important; }
+    html.dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.2) !important; }
+    html.dark .text-purple-800 { color: #c4b5fd !important; }
+    html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.2) !important; }
+    html.dark .text-green-800 { color: #86efac !important; }
+    html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
+    html.dark .text-red-800 { color: #fca5a5 !important; }
+  </style>
+  <!-- Dark Mode Script INLINE para evitar erros de module -->
+  <script>
+  (function() {
+    'use strict';
+ 
+    // Aplicar tema salvo IMEDIATAMENTE (antes do render)
+    const savedTheme = localStorage.getItem('alsham-theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+ 
+    // Função para alternar tema
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+   
+      if (isDark) {
+        html.classList.remove('dark');
+        html.removeAttribute('data-theme');
+        localStorage.setItem('alsham-theme', 'light');
+      } else {
+        html.classList.add('dark');
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('alsham-theme', 'dark');
+      }
+   
+      // Recarregar gráficos se existirem
+      if (window.dashboardCharts?.reload) {
+        window.dashboardCharts.reload();
+      }
+    }
+ 
+    // Adicionar listener quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+    });
+  })();
+  </script>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .loading-spinner {
+      display: inline-block;
+      width: 4rem;
+      height: 4rem;
+      border: 4px solid var(--alsham-primary-light, rgba(59, 130, 246, 0.3));
+      border-top-color: var(--alsham-primary, #3B82F6);
+      border-radius: 50%;
+      animation: alsham-spin var(--alsham-motion-celebratory, 0.6s) linear infinite;
+      margin: 0 auto;
     }
     .card {
       background: var(--alsham-bg-surface);
