@@ -825,43 +825,6 @@ function closeScheduledReports() {
   if (modal) modal.classList.remove('active');
 }
 
-// Setup form submission
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('schedule-form');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const frequency = document.getElementById('schedule-frequency').value;
-      const email = document.getElementById('schedule-email').value;
-      const format = document.getElementById('schedule-format').value;
-      
-      try {
-        // Save to database (scheduled_reports table)
-        await window.AlshamSupabase.genericInsert('scheduled_reports', {
-          user_id: DashboardState.user.id,
-          org_id: DashboardState.orgId,
-          frequency,
-          email,
-          format,
-          is_active: true,
-          next_run: calculateNextRun(frequency)
-        });
-        
-        showAlert('✅ Relatório agendado com sucesso!', 'success');
-        closeScheduledReports();
-        form.reset();
-        
-        await awardGamificationPoints('schedule_report', 'automation');
-        
-      } catch (error) {
-        console.error('❌ Erro ao agendar relatório:', error);
-        showAlert('❌ Erro ao agendar relatório', 'error');
-      }
-    });
-  }
-});
-
 function calculateNextRun(frequency) {
   const now = new Date();
   
@@ -1432,6 +1395,41 @@ function setupEventListeners() {
       } else {
         clearInterval(DashboardState.autoRefresh.timer);
         console.log('❌ Auto-refresh desativado');
+      }
+    });
+  }
+
+  // Handler do form de scheduled reports (ajuste sugerido, agora aqui)
+  const form = document.getElementById('schedule-form');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const frequency = document.getElementById('schedule-frequency').value;
+      const email = document.getElementById('schedule-email').value;
+      const format = document.getElementById('schedule-format').value;
+      
+      try {
+        // Save to database (scheduled_reports table)
+        await window.AlshamSupabase.genericInsert('scheduled_reports', {
+          user_id: DashboardState.user.id,
+          org_id: DashboardState.orgId,
+          frequency,
+          email,
+          format,
+          is_active: true,
+          next_run: calculateNextRun(frequency)
+        });
+        
+        showAlert('✅ Relatório agendado com sucesso!', 'success');
+        closeScheduledReports();
+        form.reset();
+        
+        await awardGamificationPoints('schedule_report', 'automation');
+        
+      } catch (error) {
+        console.error('❌ Erro ao agendar relatório:', error);
+        showAlert('❌ Erro ao agendar relatório', 'error');
       }
     });
   }
