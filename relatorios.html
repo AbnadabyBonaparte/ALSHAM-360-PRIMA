@@ -4,17 +4,47 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <!-- ✅ Theme Init - DEVE ser primeiro script -->
-  <script src="/js/theme-init.js"></script>
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
   
   <title>Relatórios — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Sistema de Relatórios do ALSHAM 360° PRIMA" />
+  <meta name="description" content="Sistema de Relatórios e Analytics - ALSHAM 360° PRIMA CRM Enterprise" />
   
-  <link rel="stylesheet" href="/css/style.css" />
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Relatórios">
+  
+  <!-- Icons -->
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  
+  <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   
+  <!-- Critical CSS Inline -->
   <style id="dark-theme-critical">
     :root {
       --alsham-text-primary: #111827;
@@ -28,8 +58,8 @@
       --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
       --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
       --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
-      --alsham-primary: #3b82f6;
-      --alsham-primary-light: rgba(59,130,246,0.1);
+      --alsham-primary: #0176D3;
+      --alsham-primary-light: rgba(1,118,211,0.1);
     }
     html.dark {
       --alsham-text-primary: #f9fafb;
@@ -47,30 +77,22 @@
     }
   </style>
 
+  <!-- Theme Toggle Script -->
   <script>
   (function() {
     'use strict';
-    const savedTheme = localStorage.getItem('alsham-theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
+    
     function toggleTheme() {
       const html = document.documentElement;
-      const isDark = html.classList.contains('dark');
-      if (isDark) {
-        html.classList.remove('dark');
-        html.removeAttribute('data-theme');
-        localStorage.setItem('alsham-theme', 'light');
-      } else {
-        html.classList.add('dark');
-        html.setAttribute('data-theme', 'dark');
-        localStorage.setItem('alsham-theme', 'dark');
-      }
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
+      
+      // Recarregar gráficos se existirem
       if (window.dashboardCharts?.reload) {
         window.dashboardCharts.reload();
       }
     }
+    
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('theme-toggle');
       if (themeToggle) {
@@ -80,12 +102,14 @@
   })();
   </script>
   
+  <!-- Component Styles -->
   <style>
     body {
       background: var(--alsham-bg-canvas);
       color: var(--alsham-text-primary);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+    
     .side-nav {
       position: fixed;
       left: 0;
@@ -98,6 +122,7 @@
       z-index: 30;
       overflow-y: auto;
     }
+    
     .side-nav a {
       display: block;
       padding: 12px 24px;
@@ -106,23 +131,28 @@
       transition: all 0.2s;
       font-size: 14px;
     }
+    
     .side-nav a:hover {
       background: var(--alsham-bg-hover);
-      color: var(--alsham-primary);
+      color: #0176D3;
     }
+    
     .side-nav a.active {
       background: var(--alsham-primary-light);
-      color: var(--alsham-primary);
-      border-right: 3px solid var(--alsham-primary);
+      color: #0176D3;
+      border-right: 3px solid #0176D3;
       font-weight: 600;
     }
+    
     .main-content-wrapper {
       margin-left: 220px;
     }
+    
     nav {
       background: var(--alsham-bg-surface);
       border-bottom: 1px solid var(--alsham-border-default);
     }
+    
     .theme-toggle-btn {
       width: 2.5rem;
       height: 2.5rem;
@@ -135,41 +165,66 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    
     .theme-toggle-btn:hover {
       background: var(--alsham-primary-light);
-      border-color: var(--alsham-primary);
+      border-color: #0176D3;
       transform: scale(1.05);
     }
+    
     .theme-toggle-btn svg {
       width: 1.25rem;
       height: 1.25rem;
       color: var(--alsham-text-secondary);
     }
+    
     html:not(.dark) .moon-icon { display: none; }
     html.dark .sun-icon { display: none; }
+    
+    .period-filter-btn {
+      transition: all 0.2s;
+    }
+    
+    .period-filter-btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .side-nav {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .main-content-wrapper {
+        margin-left: 0;
+      }
+    }
   </style>
 </head>
 <body class="font-inter min-h-screen">
   
+  <!-- Loading Overlay -->
   <div id="relatorios-loader" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6">
       <div class="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-      <p class="text-gray-700">Carregando...</p>
+      <p class="text-gray-700 dark:text-gray-300">Carregando relatórios...</p>
     </div>
   </div>
   
+  <!-- Top Navigation -->
   <nav class="sticky top-0 z-40">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <h1 class="text-xl font-bold text-blue-600">ALSHAM 360°</h1>
+      <h1 class="text-xl font-bold" style="color: #0176D3;">ALSHAM 360°</h1>
       <div class="hidden md:flex items-center space-x-6">
-        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900">Dashboard</a>
-        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900">Leads</a>
-        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900">Pipeline</a>
-        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900">Automações</a>
-        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900">Gamificação</a>
-        <a href="/relatorios.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Relatórios</a>
+        <a href="/dashboard.html" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Dashboard</a>
+        <a href="/leads-real.html" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Leads</a>
+        <a href="/pipeline.html" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Pipeline</a>
+        <a href="/automacoes.html" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Automações</a>
+        <a href="/gamificacao.html" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Gamificação</a>
+        <a href="/relatorios.html" class="font-semibold border-b-2 pb-1" style="color: #0176D3; border-color: #0176D3;">Relatórios</a>
       </div>
-      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema">
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
         <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
@@ -180,6 +235,7 @@
     </div>
   </nav>
   
+  <!-- Sidebar -->
   <aside class="side-nav">
     <a href="/dashboard.html">📊 Dashboard</a>
     <a href="/leads-real.html">👥 Leads</a>
@@ -190,47 +246,57 @@
     <a href="/configuracoes.html">⚙️ Configurações</a>
   </aside>
   
+  <!-- Main Content -->
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 space-y-8">
     <h1 class="text-3xl font-bold" style="color: var(--alsham-text-primary);">📊 Relatórios</h1>
     
+    <!-- KPI Cards -->
     <section id="kpi-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></section>
     
+    <!-- Evolução de Leads -->
     <section>
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold" style="color: var(--alsham-text-primary);">Evolução de Leads</h2>
         <div class="flex gap-1">
-          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200" data-period="7">7d</button>
-          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-blue-600 text-white font-semibold" data-period="30">30d</button>
-          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200" data-period="90">90d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600" data-period="7">7d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded font-semibold" style="background: #0176D3; color: white;" data-period="30">30d</button>
+          <button class="period-filter-btn px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600" data-period="90">90d</button>
         </div>
       </div>
       <div class="rounded-lg p-6 h-80" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);">
-        <canvas id="leads-chart"></canvas>
+        <canvas id="leads-chart" aria-label="Gráfico de evolução de leads"></canvas>
       </div>
     </section>
     
+    <!-- Charts Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <section>
         <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Leads por Status</h2>
         <div class="rounded-lg p-6 h-80" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);">
-          <canvas id="status-chart"></canvas>
+          <canvas id="status-chart" aria-label="Gráfico de distribuição por status"></canvas>
         </div>
       </section>
       
       <section>
         <h2 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Receita por Mês</h2>
         <div class="rounded-lg p-6 h-80" style="background: var(--alsham-bg-surface); box-shadow: var(--alsham-shadow-md);">
-          <canvas id="revenue-chart"></canvas>
+          <canvas id="revenue-chart" aria-label="Gráfico de receita mensal"></canvas>
         </div>
       </section>
     </div>
   </main>
   
+  <!-- Footer -->
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm" style="color: var(--alsham-text-tertiary);">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise CRM com IA
   </footer>
   
-  <script type="module" src="/src/lib/supabase.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
   <script type="module" src="/src/js/relatorios.js"></script>
 </body>
 </html>
