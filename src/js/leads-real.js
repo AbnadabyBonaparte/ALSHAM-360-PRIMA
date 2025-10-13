@@ -1521,14 +1521,24 @@ waitForSupabase(() => {
   }
 
   // Categoria 3: Pipeline e Funil
-  function calculatePipelineMetrics() {
-    // Adicionado: Cálculo completo de métricas
-    const metrics = {};
-    metrics.tempo_medio_estagio = leadsState.leads.reduce((sum, l) => sum + (l.tempo_estagio || 0), 0) / leadsState.leads.length;
-    metrics.taxa_conversao_estagio = /* cálculo */;
-    // etc.
-    return metrics;
-  }
+ function calculatePipelineMetrics() {
+  // Adicionado: Cálculo completo de métricas
+  const metrics = {};
+  
+  const totalLeads = leadsState.leads.length || 1; // Evitar divisão por zero
+  
+  metrics.tempo_medio_estagio = leadsState.leads.reduce((sum, l) => sum + (l.tempo_estagio || 0), 0) / totalLeads;
+  
+  // ✅ CORRIGIDO: Cálculo real de taxa de conversão
+  const leadsConvertidos = leadsState.leads.filter(l => l.status === 'convertido').length;
+  metrics.taxa_conversao_estagio = totalLeads > 0 ? ((leadsConvertidos / totalLeads) * 100).toFixed(2) : 0;
+  
+  // Outros cálculos
+  metrics.valor_total_pipeline = leadsState.leads.reduce((sum, l) => sum + (l.valor_estimado || 0), 0);
+  metrics.velocidade_pipeline = leadsState.leads.reduce((sum, l) => sum + (l.dias_no_estagio || 0), 0) / totalLeads;
+  
+  return metrics;
+}
 
   // Categoria 4: Interações e Timeline
   // Expandido com anexos, gravações, transcrições
