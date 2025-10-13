@@ -1,7 +1,8 @@
-/* ALSHAM 360° PRIMA - CSS ENTERPRISE V6.0.7 */
-/* Design System NASA 10/10 Enterprise Grade */
+/* ALSHAM 360° PRIMA - CSS ENTERPRISE V6.1.0 */
+/* Design System Enterprise Grade - Corrigido */
 @import './tokens.css';
-@import './dark-theme.css';
+
+/* ✅ REMOVIDO: @import './dark-theme.css'; (arquivo deletado) */
 
 /* RESET E BASE ENTERPRISE */
 *,
@@ -32,6 +33,7 @@ body {
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
 }
+
 /* ACCESSIBILITY IMPROVEMENTS */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -43,6 +45,7 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
 /* FOCUS MANAGEMENT */
 :focus {
   outline: 2px solid var(--alsham-primary);
@@ -51,11 +54,13 @@ body {
 :focus:not(:focus-visible) {
   outline: none;
 }
+
 /* SELECTION STYLING */
 ::selection {
   background-color: var(--alsham-primary);
   color: white;
 }
+
 /* ANIMAÇÕES ENTERPRISE CUSTOMIZADAS */
 .animate-fade-in {
   animation: fade-in 0.5s ease-in-out;
@@ -87,6 +92,7 @@ body {
 .animate-wobble {
   animation: wobble 1s ease-in-out;
 }
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -133,6 +139,7 @@ body {
   75% { transform: translateX(-5%) rotate(-1deg); }
   100% { transform: translateX(0%); }
 }
+
 /* COMPONENTES ENTERPRISE */
 /* Header Premium */
 header {
@@ -140,6 +147,7 @@ header {
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 /* Botões Enterprise */
 .btn {
   display: inline-flex;
@@ -252,7 +260,7 @@ header {
   border: none;
 }
 .btn-ghost:hover {
-  background: var(--alsham-bg-surface-hover);
+  background: var(--alsham-bg-hover);
 }
 .btn-link {
   background: transparent;
@@ -264,6 +272,7 @@ header {
 .btn-link:hover {
   text-decoration: none;
 }
+
 /* Cards Enterprise */
 .card {
   background: var(--alsham-bg-surface);
@@ -303,11 +312,12 @@ header {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
+
 /* Progress Bars Enterprise */
 .progress {
   width: 100%;
   height: 0.75rem;
-  background-color: var(--alsham-bg-surface-hover);
+  background-color: var(--alsham-bg-hover);
   border-radius: var(--alsham-radius-full);
   overflow: hidden;
   position: relative;
@@ -354,9 +364,10 @@ header {
 }
 .progress-primary { background: var(--alsham-primary); }
 .progress-secondary { background: var(--alsham-secondary); }
-.progress-success { background: var(--alsham-success-bg); }
-.progress-warning { background: var(--alsham-warning-bg); }
-.progress-danger { background: var(--alsham-error-bg); }
+.progress-success { background: var(--alsham-success); }
+.progress-warning { background: var(--alsham-warning); }
+.progress-danger { background: var(--alsham-error); }
+
 /* Badges Enterprise */
 .badge {
   display: inline-flex;
@@ -385,8 +396,8 @@ header {
   color: var(--alsham-primary-dark);
 }
 .badge-secondary {
-  background-color: var(--alsham-secondary-light);
-  color: var(--alsham-secondary-dark);
+  background-color: var(--alsham-secondary);
+  color: white;
 }
 .badge-success {
   background-color: var(--alsham-success-bg);
@@ -401,13 +412,14 @@ header {
   color: var(--alsham-error-text);
 }
 .badge-gray {
-  background-color: var(--alsham-bg-surface-hover);
+  background-color: var(--alsham-bg-hover);
   color: var(--alsham-text-primary);
 }
 .badge-outline {
   background-color: transparent;
   border: 1px solid currentColor;
 }
+
 /* Alerts Enterprise */
 .alert {
   padding: 1rem;
@@ -445,6 +457,7 @@ header {
   border-color: var(--alsham-info-border);
   color: var(--alsham-info-text);
 }
+
 /* Inputs Enterprise */
 .form-control {
   display: block;
@@ -465,7 +478,7 @@ header {
   box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
 }
 .form-control:disabled {
-  background-color: var(--alsham-bg-surface-disabled);
+  background-color: var(--alsham-bg-hover);
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -516,7 +529,7 @@ header {
   color: var(--alsham-text-secondary);
   text-align: center;
   white-space: nowrap;
-  background-color: var(--alsham-bg-surface-hover);
+  background-color: var(--alsham-bg-hover);
   border: 1px solid var(--alsham-border-default);
   border-radius: var(--alsham-radius-lg);
 }
@@ -538,6 +551,7 @@ header {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
 /* Checkboxes e Radio Buttons Enterprise */
 .form-check {
   display: block;
@@ -623,6 +637,7 @@ header {
   background-position: right center;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e");
 }
+
 /* Select Enterprise */
 .form-select {
   display: block;
@@ -648,7 +663,7 @@ header {
   box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
 }
 .form-select:disabled {
-  background-color: var(--alsham-bg-surface-disabled);
+  background-color: var(--alsham-bg-hover);
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -664,6 +679,7 @@ header {
   padding-left: 1rem;
   font-size: 1rem;
 }
+
 /* Navegação Enterprise */
 .nav {
   display: flex;
@@ -684,7 +700,7 @@ header {
 .nav-link:hover,
 .nav-link:focus {
   color: var(--alsham-primary);
-  background-color: var(--alsham-bg-surface-hover);
+  background-color: var(--alsham-bg-hover);
 }
 .nav-link.disabled {
   color: var(--alsham-text-disabled);
@@ -693,7 +709,7 @@ header {
 }
 .nav-link.active {
   color: var(--alsham-primary);
-  background-color: var(--alsham-bg-surface-active);
+  background-color: var(--alsham-bg-active);
   font-weight: 600;
 }
 .nav-tabs {
@@ -725,6 +741,7 @@ header {
   color: white;
   background-color: var(--alsham-primary);
 }
+
 /* Dropdown Enterprise */
 .dropdown {
   position: relative;
@@ -784,7 +801,7 @@ header {
 .dropdown-item:hover,
 .dropdown-item:focus {
   color: var(--alsham-primary);
-  background-color: var(--alsham-bg-surface-hover);
+  background-color: var(--alsham-bg-hover);
 }
 .dropdown-item.active {
   color: white;
@@ -804,7 +821,7 @@ header {
   margin: 0.5rem 0;
 }
 
-/* DARK MODE SUPPORT */
+/* ✅ DARK MODE SUPPORT (usa variáveis do tokens.css) */
 @media (prefers-color-scheme: dark) {
   body {
     background: var(--alsham-bg-canvas);
@@ -815,7 +832,9 @@ header {
     border-color: var(--alsham-border-default);
   }
 }
+
+/* ✅ Sobrescrever badge no dark mode (já está no tokens.css, mas mantido aqui para compatibilidade) */
 html.dark .badge-primary {
-  background-color: rgba(59,130,246,0.3);
+  background-color: rgba(59,130,246,0.25);
   color: #bfdbfe;
 }
