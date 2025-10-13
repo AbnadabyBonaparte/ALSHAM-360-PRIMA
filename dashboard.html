@@ -4,15 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- Security Headers -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com; frame-ancestors 'none';">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=()">
-  
-  <!-- ✅ Theme Init Mínimo -->
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
   <script>
     (function() {
       const theme = localStorage.getItem('alsham-theme') || 'light';
@@ -28,6 +20,7 @@
   </script>
   
   <!-- SEO -->
+  <title>Dashboard Executivo v11.0 — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.0 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
   <meta name="keywords" content="CRM, dashboard, leads, pipeline, automação, IA, enterprise, analytics, ROI, gamificação">
   <meta name="author" content="ALSHAM Global">
@@ -50,20 +43,19 @@
   <meta name="twitter:title" content="Dashboard Executivo v11.0 — ALSHAM 360° PRIMA">
   <meta name="twitter:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações">
   <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
-  
-  <title>Dashboard Executivo v11.0 — ALSHAM 360° PRIMA</title>
 
-  <!-- Favicon SVG Inline -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  
-  <!-- PWA Manifest Inline -->
-  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ALSHAM%20360%C2%B0%20PRIMA%22%2C%22short_name%22%3A%22ALSHAM%22%2C%22description%22%3A%22CRM%20Enterprise%20com%20IA%22%2C%22start_url%22%3A%22%2Fdashboard.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f9fafb%22%2C%22theme_color%22%3A%22%230176D3%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -71,7 +63,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
   
-  <!-- ✅ Estilos - ORDEM CORRETA (SEM dark-theme.css) -->
+  <!-- ✅ Estilos (ORDEM CORRETA) -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/dashboard-animations.css" />
@@ -107,7 +99,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- ✅ Critical CSS Mínimo (apenas estilos que NÃO estão em tokens.css) -->
+  <!-- ✅ Critical CSS Inline -->
   <style>
     /* High Contrast Override */
     html.high-contrast {
@@ -268,6 +260,11 @@
   }
   </script>
 </head>
+
+<!-- ===================================================================== -->
+<!-- ✅ DAQUI PRA BAIXO CONTINUA TUDO IGUAL AO SEU ARQUIVO ORIGINAL! -->
+<!-- ===================================================================== -->
+
 <body class="font-inter min-h-screen">
 
   <!-- Skip Link -->
