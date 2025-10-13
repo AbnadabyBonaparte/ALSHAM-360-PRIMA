@@ -12,8 +12,20 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=()">
   
-  <!-- Theme Init -->
-  <script src="/js/theme-init.js"></script>
+  <!-- ✅ Theme Init Mínimo -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
   
   <!-- SEO -->
   <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.0 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
@@ -59,9 +71,8 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
   
-  <!-- Estilos - ORDEM CORRETA -->
+  <!-- ✅ Estilos - ORDEM CORRETA (SEM dark-theme.css) -->
   <link rel="stylesheet" href="/css/tokens.css" />
-  <link rel="stylesheet" href="/css/dark-theme.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/dashboard-animations.css" />
 
@@ -96,25 +107,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Critical CSS -->
+  <!-- ✅ Critical CSS Mínimo (apenas estilos que NÃO estão em tokens.css) -->
   <style>
-    :root {
-      --alsham-bg-canvas: #f9fafb;
-      --alsham-bg-surface: #ffffff;
-      --alsham-border-default: #e5e7eb;
-      --alsham-text-primary: #111827;
-      --alsham-text-secondary: #6b7280;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    html.dark {
-      --alsham-bg-canvas: #0f172a;
-      --alsham-bg-surface: #1e293b;
-      --alsham-border-default: #334155;
-      --alsham-text-primary: #f9fafb;
-      --alsham-text-secondary: #d1d5db;
-      color-scheme: dark;
-    }
+    /* High Contrast Override */
     html.high-contrast {
       --alsham-bg-canvas: #000000;
       --alsham-bg-surface: #1a1a1a;
@@ -124,11 +119,6 @@
     }
     html.high-contrast .text-blue-600 { color: #00ffff !important; }
     html.high-contrast button { border: 2px solid #ffffff !important; }
-    body {
-      background: var(--alsham-bg-canvas);
-      color: var(--alsham-text-primary);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
     
     /* Skip Link */
     .skip-link {
@@ -141,9 +131,7 @@
       text-decoration: none;
       z-index: 100;
     }
-    .skip-link:focus {
-      top: 0;
-    }
+    .skip-link:focus { top: 0; }
     
     /* Loading Spinner */
     .loading-spinner {
@@ -278,21 +266,6 @@
       "name": "ALSHAM Global"
     }
   }
-  </script>
-
-  <!-- Theme Init Inline -->
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('alsham-theme');
-      const savedContrast = localStorage.getItem('alsham-contrast');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-      if (savedContrast === 'high') {
-        document.documentElement.classList.add('high-contrast');
-      }
-    })();
   </script>
 </head>
 <body class="font-inter min-h-screen">
@@ -599,6 +572,7 @@
     console.log('✅ Supabase integrado:', Object.keys(window.AlshamSupabase).length, 'funções');
   </script>
 
+  <!-- ✅ Theme Toggle Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Theme Toggle
@@ -606,15 +580,12 @@
       if (themeToggle) {
         themeToggle.addEventListener('click', function() {
           const html = document.documentElement;
-          const isDark = html.classList.contains('dark');
-          if (isDark) {
-            html.classList.remove('dark');
-            html.removeAttribute('data-theme');
-            localStorage.setItem('alsham-theme', 'light');
-          } else {
-            html.classList.add('dark');
-            html.setAttribute('data-theme', 'dark');
-            localStorage.setItem('alsham-theme', 'dark');
+          const isDark = html.classList.toggle('dark');
+          localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
+          
+          // Atualizar gráficos se existirem
+          if (window.DashboardApp?.updateCharts) {
+            window.DashboardApp.updateCharts();
           }
         });
       }
@@ -624,14 +595,8 @@
       if (contrastToggle) {
         contrastToggle.addEventListener('click', function() {
           const html = document.documentElement;
-          const isHighContrast = html.classList.contains('high-contrast');
-          if (isHighContrast) {
-            html.classList.remove('high-contrast');
-            localStorage.setItem('alsham-contrast', 'normal');
-          } else {
-            html.classList.add('high-contrast');
-            localStorage.setItem('alsham-contrast', 'high');
-          }
+          const isHighContrast = html.classList.toggle('high-contrast');
+          localStorage.setItem('alsham-contrast', isHighContrast ? 'high' : 'normal');
         });
       }
 
@@ -679,11 +644,9 @@
 
       // Keyboard Shortcuts
       document.addEventListener('keydown', (e) => {
-        // ESC closes modals
         if (e.key === 'Escape') {
           document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
         }
-        // Ctrl+K for shortcuts (placeholder)
         if (e.ctrlKey && e.key === 'k') {
           e.preventDefault();
           showToast('Atalhos disponíveis: ESC (fechar), F11 (tela cheia)', 'info');
