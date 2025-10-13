@@ -4,14 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- ✅ Theme Init - PRIMEIRO script -->
-  <script src="/js/theme-init.js"></script>
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
   
   <title>Pipeline de Vendas — ALSHAM 360° PRIMA v9.0</title>
   
   <meta name="description" content="Pipeline de vendas Kanban com drag & drop, filtros, busca e export CSV - ALSHAM 360° PRIMA">
   
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Pipeline">
+  
+  <!-- Icons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- 🎨 Dark Mode Critical CSS -->
   <style id="dark-theme-critical">
@@ -26,8 +48,8 @@
       --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
       --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
       --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
-      --alsham-primary: #3B82F6;
-      --alsham-primary-light: rgba(59,130,246,0.1);
+      --alsham-primary: #0176D3;
+      --alsham-primary-light: rgba(1,118,211,0.1);
       --alsham-radius-lg: 1rem;
       --alsham-radius-full: 9999px;
     }
@@ -66,24 +88,11 @@
   <script>
     (function() {
       'use strict';
-      const savedTheme = localStorage.getItem('alsham-theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
       
       function toggleTheme() {
         const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        if (isDark) {
-          html.classList.remove('dark');
-          html.removeAttribute('data-theme');
-          localStorage.setItem('alsham-theme', 'light');
-        } else {
-          html.classList.add('dark');
-          html.setAttribute('data-theme', 'dark');
-          localStorage.setItem('alsham-theme', 'dark');
-        }
+        const isDark = html.classList.toggle('dark');
+        localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
       }
       
       document.addEventListener('DOMContentLoaded', function() {
@@ -123,7 +132,7 @@
     aside h1 {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #3B82F6;
+      color: #0176D3;
     }
     
     nav {
@@ -147,12 +156,12 @@
     
     nav a:hover {
       background: var(--alsham-bg-hover);
-      color: #3B82F6;
+      color: #0176D3;
     }
     
     nav a.active {
       background: var(--alsham-primary-light);
-      color: #3B82F6;
+      color: #0176D3;
       font-weight: 600;
     }
     
@@ -205,7 +214,7 @@
     
     #theme-toggle:hover {
       background: var(--alsham-primary-light);
-      border-color: #3b82f6;
+      border-color: #0176D3;
       transform: scale(1.05);
     }
     
@@ -304,7 +313,7 @@
     .opportunity-card {
       background: var(--alsham-bg-surface);
       border: 1px solid var(--alsham-border-default);
-      border-left: 4px solid #3B82F6;
+      border-left: 4px solid #0176D3;
       border-radius: 0.5rem;
       padding: 1rem;
       margin-bottom: 0.75rem;
@@ -374,14 +383,7 @@
     <header>
       <div>
         <h1>Pipeline de Vendas</h1>
-        <!-- Botões adicionados dinamicamente pelo JS: 
-             - Busca
-             - Total
-             - Filtros
-             - Export CSV
-             - Nova Oportunidade 
-        -->
-        <button id="theme-toggle">
+        <button id="theme-toggle" aria-label="Alternar tema claro/escuro">
           <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -421,7 +423,7 @@
         font-weight: 600;
         font-size: 0.875rem;
         box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
-        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'};
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#0176D3'};
         color: white;
         animation: slideIn 0.3s ease-out;
       `;
