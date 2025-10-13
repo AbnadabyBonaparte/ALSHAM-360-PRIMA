@@ -4,74 +4,136 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- ✅ Theme Init - DEVE ser primeiro script -->
-  <script src="/js/theme-init.js"></script>
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
   
   <title>Criar Organização — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Ferramenta para criação, verificação e gerenciamento de organizações no ALSHAM 360° PRIMA, integrado ao Supabase multi-tenant." />
-  <!-- ✅ CSP CORRIGIDA -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-    object-src 'none';
-    frame-src 'self';
-    worker-src 'self' blob:;">
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Org">
+  
+  <!-- Icons -->
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  
+  <!-- Critical CSS -->
+  <style>
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-bg-surface: #ffffff;
+      --alsham-border-default: #e5e7eb;
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-bg-surface: #1e293b;
+      --alsham-border-default: #334155;
+      color-scheme: dark;
+    }
+    body {
+      background: linear-gradient(135deg, #0176D3 0%, #7c3aed 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+  </style>
 </head>
-<body class="font-inter bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen flex items-center justify-center p-6">
-  <!-- Toasts -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-  <!-- Card principal -->
-  <main class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8">
-    <h1 class="text-2xl font-bold text-primary mb-6 text-center">🏢 Criar Organização</h1>
+<body class="font-inter min-h-screen flex items-center justify-center p-6">
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+  
+  <!-- Card Principal -->
+  <main class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-8 border" style="border-color: var(--alsham-border-default);">
+    <h1 class="text-2xl font-bold mb-6 text-center" style="color: #0176D3;">🏢 Criar Organização</h1>
+    
     <!-- Seção Criar -->
     <section class="mb-6">
-      <label class="block mb-1 font-medium text-gray-700" for="org-name">Nome da Organização</label>
-      <input id="org-name" class="w-full border rounded-lg p-2 mb-3" placeholder="Nome da organização" value="ALSHAM Global Default" />
-      <label class="block mb-1 font-medium text-gray-700" for="org-id">UUID</label>
-      <input id="org-id" class="w-full border rounded-lg p-2" value="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe" />
-      <button onclick="generateNewUUID()" class="text-xs text-blue-600 mt-1 hover:underline">🔄 Gerar novo</button>
-      <button onclick="createOrganization()" class="w-full bg-primary hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-3">
+      <label class="block mb-1 font-medium" style="color: var(--alsham-text-primary);" for="org-name">Nome da Organização</label>
+      <input 
+        id="org-name" 
+        class="w-full border rounded-lg p-2 mb-3 dark:bg-gray-700 dark:text-white" 
+        style="border-color: var(--alsham-border-default);"
+        placeholder="Nome da organização" 
+        value="ALSHAM Global Default" 
+      />
+      
+      <label class="block mb-1 font-medium" style="color: var(--alsham-text-primary);" for="org-id">UUID</label>
+      <input 
+        id="org-id" 
+        class="w-full border rounded-lg p-2 dark:bg-gray-700 dark:text-white" 
+        style="border-color: var(--alsham-border-default);"
+        value="d2c41372-5b3c-441e-b9cf-b5f89c4b6dfe" 
+      />
+      <button onclick="generateNewUUID()" class="text-xs text-blue-600 dark:text-blue-400 mt-1 hover:underline">
+        🔄 Gerar novo
+      </button>
+      
+      <button onclick="createOrganization()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-3 transition-colors">
         Criar Organização
       </button>
-      <div id="create-status" class="mt-2 text-sm text-gray-600">Aguardando...</div>
+      <div id="create-status" class="mt-2 text-sm" style="color: var(--alsham-text-secondary);">Aguardando...</div>
     </section>
+    
     <!-- Seção Verificar -->
     <section class="mb-6">
-      <button onclick="verifyOrganization()" class="w-full bg-primary hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+      <button onclick="verifyOrganization()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
         Verificar Organização
       </button>
-      <div id="verify-status" class="mt-2 text-sm text-gray-600">Aguardando...</div>
-      <div id="verify-data" class="hidden mt-2 p-3 bg-gray-50 rounded-lg border text-sm"></div>
+      <div id="verify-status" class="mt-2 text-sm" style="color: var(--alsham-text-secondary);">Aguardando...</div>
+      <div id="verify-data" class="hidden mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border text-sm" style="border-color: var(--alsham-border-default);"></div>
     </section>
+    
     <!-- Seção Listar -->
     <section class="mb-6">
-      <button onclick="listOrganizations()" class="w-full bg-primary hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+      <button onclick="listOrganizations()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
         Listar Organizações
       </button>
-      <div id="list-status" class="mt-2 text-sm text-gray-600">Aguardando...</div>
-      <div id="list-data" class="hidden mt-2 p-3 bg-gray-50 rounded-lg border text-sm max-h-48 overflow-y-auto"></div>
+      <div id="list-status" class="mt-2 text-sm" style="color: var(--alsham-text-secondary);">Aguardando...</div>
+      <div id="list-data" class="hidden mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border text-sm max-h-48 overflow-y-auto" style="border-color: var(--alsham-border-default);"></div>
     </section>
+    
     <!-- Setup Completo -->
     <section>
-      <button onclick="setupComplete()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">
+      <button onclick="setupComplete()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
         🚀 Executar Setup Completo
       </button>
-      <div id="complete-status" class="mt-2 text-sm text-gray-600">Aguardando...</div>
+      <div id="complete-status" class="mt-2 text-sm" style="color: var(--alsham-text-secondary);">Aguardando...</div>
     </section>
   </main>
+  
   <!-- Footer -->
-  <footer class="mt-8 text-center text-gray-200 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  <footer class="mt-8 text-center text-white text-sm">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise CRM com IA
   </footer>
-  <!-- ✅ SCRIPTS NA ORDEM CORRETA -->
-  <script type="module" src="/src/lib/supabase.js"></script>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
   <script src="/src/js/create-org.js"></script>
 </body>
 </html>
