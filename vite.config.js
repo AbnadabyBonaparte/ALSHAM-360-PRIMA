@@ -1,7 +1,8 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Vite Config v6.2.0 (CORRIGIDO - CSS NA RAIZ)
- * Data: 2025-01-13
- * Última atualização: 2025-01-13 14:06 UTC
+ * ⚡ ALSHAM 360° PRIMA — Vite Config v9.2.1 ENTERPRISE
+ * Data: 2025-01-13 15:58 UTC
+ * Correção: Service Worker NÃO cacheia CDNs externos (resolve CSP violations)
+ * Autor: @AbnadabyBonaparte
  */
 
 import { defineConfig } from 'vite';
@@ -17,16 +18,22 @@ export default defineConfig({
       additionalLegacyPolyfills: ['regenerator-runtime/runtime']
     }),
 
-    // ✅ PWA com versionamento
+    // ✅ PWA CORRIGIDO - NÃO cacheia CDNs externos
     VitePWA({
       registerType: 'autoUpdate',
+      devOptions: {
+        enabled: false // ✅ Desabilita SW em dev (evita confusão)
+      },
       manifest: {
         name: "ALSHAM 360° PRIMA",
         short_name: "ALSHAM360",
+        description: "CRM Enterprise com IA, Multi-tenant, Segurança CSP Level 3",
         start_url: "/dashboard.html",
         display: "standalone",
+        orientation: "portrait-primary",
         background_color: "#f9fafb",
         theme_color: "#0176D3",
+        categories: ["business", "productivity", "crm"],
         icons: [
           {
             src: "/pwa-192x192.png",
@@ -43,45 +50,96 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,ico,json}'],
+        // ✅ Ignora node_modules e arquivos do próprio SW
         globIgnores: ['**/node_modules/**/*', 'sw.js', 'workbox-*.js'],
+        
+        // ✅ Cache apenas arquivos LOCAIS (mesmo origin)
+        globPatterns: ['**/*.{js,css,html,png,svg,ico,json,woff2}'],
+        
+        // ✅ URLs que o SW deve IGNORAR completamente
+        navigateFallbackDenylist: [
+          /^https:\/\/cdn\./,
+          /^https:\/\/cdnjs\./,
+          /^https:\/\/fonts\./,
+          /^https:\/\/unpkg\./,
+        ],
+        
+        // ✅ Runtime caching SÓ para recursos permitidos no CSP
         runtimeCaching: [
+          // 1. API Supabase - Network First (dados sempre atualizados)
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\//,
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'supabase-api',
-              expiration: { maxEntries: 50, maxAgeSeconds: 300 }
+              cacheName: 'supabase-api-v9.2.1',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 5 * 60 // 5 minutos
+              },
+              networkTimeoutSeconds: 10
             }
           },
+          
+          // 2. Assets LOCAIS (CSS/JS próprios) - Stale While Revalidate
           {
-            urlPattern: /^https:\/\/(cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'cdn-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }
-            }
-          },
-          {
-            urlPattern: /\.(?:css|js)$/,
+            urlPattern: ({ url }) => {
+              // ✅ SÓ cacheia se for do mesmo origin
+              return url.origin === self.location.origin && 
+                     /\.(?:css|js)$/.test(url.pathname);
+            },
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'assets-v6.2.0' // ✅ Versionamento atualizado
+              cacheName: 'local-assets-v9.2.1'
+            }
+          },
+          
+          // 3. Imagens LOCAIS - Cache First
+          {
+            urlPattern: ({ url }) => {
+              return url.origin === self.location.origin && 
+                     /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/.test(url.pathname);
+            },
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'local-images-v9.2.1',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 dias
+              }
+            }
+          },
+          
+          // 4. HTML Pages - Network First (sempre tenta buscar versão nova)
+          {
+            urlPattern: ({ url }) => {
+              return url.origin === self.location.origin && 
+                     /\.html$/.test(url.pathname);
+            },
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-pages-v9.2.1',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60 // 1 dia
+              }
             }
           }
+          
+          // ❌ REMOVIDO: Qualquer padrão que tente cachear CDNs externos
+          // CDNs são carregados diretamente via <script src> no HTML
+          // Não precisam de cache do Service Worker
         ],
-        cleanupOutdatedCaches: true
+        
+        // ✅ Limpa caches antigos automaticamente
+        cleanupOutdatedCaches: true,
+        
+        // ✅ SW ativo imediatamente (sem esperar reload)
+        skipWaiting: true,
+        clientsClaim: true
       }
     }),
 
+    // ✅ Compressão Brotli e Gzip
     compression({ algorithm: 'brotliCompress', ext: '.br' }),
     compression({ algorithm: 'gzip', ext: '.gz' })
   ],
@@ -89,66 +147,86 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'dist',
-    sourcemap: false,
+    sourcemap: false, // ✅ Desabilita sourcemaps em produção (segurança)
     minify: 'esbuild',
-    assetsInlineLimit: 0,
+    assetsInlineLimit: 4096, // ✅ Inline assets < 4KB
+    
     rollupOptions: {
       input: {
-        // ✅ ARQUIVOS CRÍTICOS (10)
+        // ✅ 20 ARQUIVOS HTML (todos os seus arquivos)
         main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'login.html'),
+        register: resolve(__dirname, 'register.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
-        leads: resolve(__dirname, 'leads-real.html'),
+        leadsReal: resolve(__dirname, 'leads-real.html'),
         pipeline: resolve(__dirname, 'pipeline.html'),
         automacoes: resolve(__dirname, 'automacoes.html'),
         gamificacao: resolve(__dirname, 'gamificacao.html'),
         relatorios: resolve(__dirname, 'relatorios.html'),
         configuracoes: resolve(__dirname, 'configuracoes.html'),
-        
-        // ✅ ARQUIVOS SECUNDÁRIOS (11)
-        'auth-dashboard': resolve(__dirname, 'auth-dashboard.html'),
-        'create-org': resolve(__dirname, 'create-org.html'),
+        authDashboard: resolve(__dirname, 'auth-dashboard.html'),
+        createOrg: resolve(__dirname, 'create-org.html'),
         logout: resolve(__dirname, 'logout.html'),
-        register: resolve(__dirname, 'register.html'),
-        'reset-password-confirm': resolve(__dirname, 'reset-password-confirm.html'),
-        'reset-password': resolve(__dirname, 'reset-password.html'),
-        'session-guard': resolve(__dirname, 'session-guard.html'),
-        'test-reset-password': resolve(__dirname, 'test-reset-password.html'),
-        'test-supabase': resolve(__dirname, 'test-supabase.html'),
-        'timeline-test': resolve(__dirname, 'timeline-test.html'),
-        'token-refresh': resolve(__dirname, 'token-refresh.html'),
+        resetPassword: resolve(__dirname, 'reset-password.html'),
+        resetPasswordConfirm: resolve(__dirname, 'reset-password-confirm.html'),
+        sessionGuard: resolve(__dirname, 'session-guard.html'),
+        testResetPassword: resolve(__dirname, 'test-reset-password.html'),
+        testSupabase: resolve(__dirname, 'test-supabase.html'),
+        timelineTest: resolve(__dirname, 'timeline-test.html'),
+        tokenRefresh: resolve(__dirname, 'token-refresh.html')
       },
+      
       output: {
+        // ✅ Code splitting inteligente
         manualChunks: {
           'supabase': ['@supabase/supabase-js'],
           'charts': ['chart.js'],
           'vendor': ['jspdf', 'xlsx']
-        }
+        },
+        
+        // ✅ Nomes de arquivo com hash para cache busting
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   },
 
   publicDir: 'public',
   
-  // ✅ CORRIGIDO: Aliases apontam para /css/ na raiz
+  // ✅ Aliases para imports
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@css': resolve(__dirname, './css'),      // ✅ CORREÇÃO CRÍTICA: CSS na raiz
+      '@css': resolve(__dirname, './css'),
       '@js': resolve(__dirname, './src/js'),
       '@lib': resolve(__dirname, './src/lib'),
       '/js': resolve(__dirname, './src/js'),
-      '/css': resolve(__dirname, './css')       // ✅ CORREÇÃO CRÍTICA: CSS na raiz
+      '/css': resolve(__dirname, './css')
     }
   },
 
+  // ✅ Server config para desenvolvimento
   server: {
     host: '0.0.0.0',
     port: 5173,
     open: true,
+    cors: true,
+    strictPort: false, // ✅ Tenta próxima porta se 5173 ocupada
+    hmr: {
+      overlay: true // ✅ Mostra erros na tela
+    }
+  },
+
+  // ✅ Preview config (após build)
+  preview: {
+    host: '0.0.0.0',
+    port: 4173,
+    open: true,
     cors: true
   },
 
+  // ✅ Otimizações de dependências
   optimizeDeps: {
     include: [
       'chart.js',
