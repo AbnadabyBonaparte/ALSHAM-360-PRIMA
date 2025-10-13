@@ -1,13 +1,6 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Configuração Oficial de Build (v6.0.7)
- * Ambiente: Produção — Node 22.x / Vite 5.4.20
- * Autor: ALSHAM Development Team | 2025
- *
- * Inclui:
- * - Compatibilidade moderna + fallback legacy
- * - PWA autoUpdate + cache inteligente
- * - Compressão Brotli + Gzip
- * - Estrutura multi-página (MPA) e alias enterprise
+ * ⚡ ALSHAM 360° PRIMA — Vite Config v6.1.0 (CORRIGIDO)
+ * Data: 2025-01-13
  */
 
 import { defineConfig } from 'vite';
@@ -22,40 +15,56 @@ export default defineConfig({
       additionalLegacyPolyfills: ['regenerator-runtime/runtime']
     }),
 
-    // Progressive Web App (PWA)
+    // ✅ PWA com versionamento
     VitePWA({
-      srcDir: 'src',
-      filename: 'service-worker.js',
       registerType: 'autoUpdate',
-      manifest: false, // usa o manifest.json externo
-      includeAssets: [
-        'favicon.ico',
-        'apple-touch-icon.png',
-        'icons/icon-192x192.png',
-        'icons/icon-512x512.png'
-      ],
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,ico,json}'],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-        cleanupOutdatedCaches: true,
-        runtimeCaching: [
+      manifest: {
+        name: "ALSHAM 360° PRIMA",
+        short_name: "ALSHAM360",
+        start_url: "/dashboard.html",
+        display: "standalone",
+        background_color: "#f9fafb",
+        theme_color: "#0176D3",
+        icons: [
           {
-            urlPattern: /^https:\/\/api\.supabase\.co\//,
-            handler: 'NetworkFirst',
-            options: { cacheName: 'supabase-api-cache' }
+            src: "/pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable"
           },
           {
-            urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/i,
-            handler: 'CacheFirst',
-            options: { cacheName: 'image-cache' }
+            src: "/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
           }
         ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,png,svg,ico,json}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\//,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-api',
+              expiration: { maxEntries: 50, maxAgeSeconds: 300 }
+            }
+          },
+          {
+            urlPattern: /\.(?:css|js)$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'assets-v6.1.0' // ✅ Versionamento
+            }
+          }
+        ],
+        cleanupOutdatedCaches: true
       }
     }),
 
-    // Compressão Brotli + Gzip
-    compression({ algorithm: 'brotliCompress', ext: '.br', threshold: 10240 }),
-    compression({ algorithm: 'gzip', ext: '.gz', threshold: 10240 })
+    compression({ algorithm: 'brotliCompress', ext: '.br' }),
+    compression({ algorithm: 'gzip', ext: '.gz' })
   ],
 
   build: {
@@ -63,7 +72,6 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     minify: 'esbuild',
-    reportCompressedSize: true,
     rollupOptions: {
       input: {
         main: './index.html',
@@ -75,20 +83,17 @@ export default defineConfig({
         gamificacao: './gamificacao.html',
         relatorios: './relatorios.html',
         configuracoes: './configuracoes.html'
-      },
-      output: {
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   },
 
   publicDir: 'public',
+  
+  // ✅ CORRIGIDO: Aliases apontam para caminhos reais
   resolve: {
     alias: {
       '@': '/src',
-      '/js': '/public/js',
+      '/js': '/src/js',      // ✅ CORREÇÃO CRÍTICA
       '/css': '/public/css'
     }
   },
@@ -96,15 +101,10 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    open: true,
-    strictPort: true
+    open: true
   },
 
   optimizeDeps: {
     include: ['chart.js', '@supabase/supabase-js']
-  },
-
-  define: {
-    __APP_ENV__: JSON.stringify(process.env.NODE_ENV || 'production')
   }
 });
