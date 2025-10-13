@@ -40,88 +40,25 @@
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "Acessar Dashboard Principal com KPIs e Analytics",
-      "url": "/dashboard.html",
-      "icons": [
-        {
-          "src": "/icons/shortcut-dashboard.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/dashboard.html"
     },
     {
       "name": "Leads",
       "short_name": "Leads",
       "description": "Gerenciar Leads e CRM",
-      "url": "/leads-real.html",
-      "icons": [
-        {
-          "src": "/icons/shortcut-leads.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/leads-real.html"
     },
     {
       "name": "Pipeline",
       "short_name": "Pipeline",
       "description": "Visualizar Pipeline de Vendas",
-      "url": "/pipeline.html",
-      "icons": [
-        {
-          "src": "/icons/shortcut-pipeline.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/pipeline.html"
     },
     {
       "name": "Relatórios",
       "short_name": "Relatórios",
       "description": "Analytics e Relatórios Avançados",
-      "url": "/relatorios.html",
-      "icons": [
-        {
-          "src": "/icons/shortcut-reports.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/relatorios.html"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/dashboard-light.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Dashboard Executivo - Modo Claro"
-    },
-    {
-      "src": "/screenshots/dashboard-dark.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Dashboard Executivo - Modo Escuro"
-    },
-    {
-      "src": "/screenshots/leads-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Gestão de Leads - Mobile"
-    }
-  ],
-  "share_target": {
-    "action": "/leads-real.html",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link"
-    }
-  },
-  "related_applications": [],
-  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+  ]
 }
