@@ -1716,16 +1716,21 @@ waitForSupabase(() => {
     showSuccess(`${data.length} leads exportados com sucesso!`);
   }
 
-  function exportToPDF() {
-    const doc = new jsPDF();
-    // Adicionado: Relatório formatado com tabelas
-    doc.autoTable({
-      head: [['Nome', 'Email', 'Empresa']],
-      body: leadsState.filteredLeads.map(l => [l.nome, l.email, l.empresa])
-    });
-    doc.save('leads.pdf');
-    await genericInsert("export_history", { format: 'pdf', records: leadsState.filteredLeads.length });
-  }
+  async function exportToPDF() {  // ✅ Adicionado async
+  const doc = new jsPDF();
+  // Adicionado: Relatório formatado com tabelas
+  doc.autoTable({
+    head: [['Nome', 'Email', 'Empresa']],
+    body: leadsState.filteredLeads.map(l => [l.nome, l.email, l.empresa])
+  });
+  doc.save('leads.pdf');
+  await genericInsert("export_history", { 
+    format: 'pdf', 
+    records: leadsState.filteredLeads.length,
+    org_id: leadsState.orgId,
+    user_id: leadsState.user.id
+  });
+}
 
   document.getElementById('import-leads-btn').addEventListener('click', () => {
     const input = document.createElement('input');
