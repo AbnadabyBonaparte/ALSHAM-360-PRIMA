@@ -20,7 +20,10 @@
   </script>
   
   <title>Timeline Test - ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Página de teste do timeline de interações no ALSHAM 360° PRIMA" />
+  <meta name="description" content="Página de teste do timeline de interações no ALSHAM 360° PRIMA CRM Enterprise" />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -88,6 +91,7 @@
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
+    console.log('✅ Supabase integrado no Timeline Test');
   </script>
   <script type="module" src="/src/js/timeline.js"></script>
   
