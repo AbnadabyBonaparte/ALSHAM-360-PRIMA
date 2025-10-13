@@ -4,16 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- Security Headers - AJUSTADO E CORRIGIDO PARA SOURCE MAPS -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://your-n8n-instance.cloud https://*.cloudflare.com; manifest-src 'self'; frame-ancestors 'none'; source-map-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=()">
-  
-  <!-- Theme Init -->
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
   
   <!-- SEO -->
+  <title>Automações v11.0 — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Automações ALSHAM 360° PRIMA v11.0 - Gerencie regras, execuções e logs com IA e n8n. Exports completos, animações premium e acessibilidade WCAG AAA." />
   <meta name="keywords" content="CRM, automações, regras, n8n, workflows, IA, exports, analytics, ROI, gamificação">
   <meta name="author" content="ALSHAM Global">
@@ -36,32 +43,29 @@
   <meta name="twitter:title" content="Automações v11.0 — ALSHAM 360° PRIMA">
   <meta name="twitter:description" content="Gerencie automações com IA e n8n">
   <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
-  
-  <title>Automações v11.0 — ALSHAM 360° PRIMA</title>
 
-  <!-- Favicon SVG Inline -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  
-  <!-- PWA Manifest - MUDADO PARA ARQUIVO EXTERNO (crie manifest-automacoes.json com o conteúdo JSON) -->
-  <link rel="manifest" href="/manifest-automacoes.json">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="ALSHAM Auto">
-  <meta name="mobile-web-app-capable" content="yes"> <!-- Adicionado para deprecated -->
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   
   <!-- Resource Hints -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="dns-prefetch" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
   
-  <!-- Estilos - ORDEM CORRETA -->
-  <link rel="stylesheet" href="/public/css/tokens.css" />
-  <link rel="stylesheet" href="/public/css/dark-theme.css" />
-  <link rel="stylesheet" href="/public/css/style.css" />
-  <link rel="stylesheet" href="/public/css/dashboard-animations.css" />
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/dashboard-animations.css" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -94,7 +98,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Critical CSS - SUBSTITUÍDO COLOR-ADJUST POR PRINT-COLOR-ADJUST -->
+  <!-- Critical CSS -->
   <style>
     :root {
       --alsham-bg-canvas: #f9fafb;
@@ -128,7 +132,6 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
     
-    /* Skip Link */
     .skip-link {
       position: absolute;
       top: -40px;
@@ -140,23 +143,19 @@
       z-index: 100;
       border-radius: 0 0 4px 4px;
     }
-    .skip-link:focus {
-      top: 0;
-    }
+    .skip-link:focus { top: 0; }
     
-    /* Loading Spinner */
     .loading-spinner {
       width: 4rem; 
       height: 4rem;
-      border: 4px solid rgba(59,130,246,0.3);
-      border-top-color: #3B82F6;
+      border: 4px solid rgba(1,118,211,0.3);
+      border-top-color: #0176D3;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       margin: 0 auto;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Skeleton Loader */
     .skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
@@ -168,7 +167,6 @@
       100% { background-position: -200% 0; }
     }
     
-    /* Toast Notifications */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -184,32 +182,29 @@
       opacity: 0;
       transition: all 0.3s ease;
     }
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-left: 4px solid #22C55E; }
     .toast.error { border-left: 4px solid #EF4444; }
-    .toast.info { border-left: 4px solid #3B82F6; }
+    .toast.info { border-left: 4px solid #0176D3; }
     
-    /* Counter Animation */
     .counter { display: inline-block; transition: all 0.5s ease; }
     
-    /* Scroll Reveal */
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .reveal.active { opacity: 1; transform: translateY(0); }
     
-    /* Modal Styles */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s ease; }
     .modal.active { display: flex; align-items: center; justify-content: center; }
     .modal-content { background: var(--alsham-bg-surface); padding: 2rem; border-radius: 0.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    /* Print Styles - COLOR-ADJUST -> PRINT-COLOR-ADJUST */
-    @media print { .no-print, nav, aside, button, .modal { display: none !important; } body { background: white; color: black; } .main-content-wrapper { margin-left: 0 !important; } .chart-drilldown { page-break-inside: avoid; } .print-color-adjust { print-color-adjust: exact; } }
+    @media print { 
+      .no-print, nav, aside, button, .modal { display: none !important; } 
+      body { background: white; color: black; } 
+      .main-content-wrapper { margin-left: 0 !important; } 
+      .chart-drilldown { page-break-inside: avoid; } 
+    }
     
-    /* Mobile Responsive */
     @media (max-width: 768px) {
       .side-nav.mobile-hidden { display: none !important; }
       .side-nav.mobile-visible { display: block !important; position: fixed; top: 64px; left: 0; width: 100%; height: calc(100vh - 64px); z-index: 50; }
@@ -218,13 +213,11 @@
       .md\:flex { display: none !important; }
     }
     
-    /* Focus Visible */
-    *:focus-visible { outline: 3px solid #3B82F6; outline-offset: 2px; }
+    *:focus-visible { outline: 3px solid #0176D3; outline-offset: 2px; }
     .hidden { display: none !important; }
     .chart-drilldown { cursor: pointer; }
     .chart-drilldown:hover { opacity: 0.8; }
     
-    /* Offline Indicator */
     .offline-badge {
       position: fixed;
       top: 70px;
@@ -244,7 +237,6 @@
       to { transform: translateX(0); opacity: 1; }
     }
     
-    /* Card Styles */
     .card {
       background: var(--alsham-bg-surface);
       border: 1px solid var(--alsham-border-default);
@@ -253,7 +245,6 @@
       box-shadow: var(--alsham-shadow-sm);
     }
     
-    /* Button Styles (Consistency) */
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -279,21 +270,6 @@
       "name": "ALSHAM Global"
     }
   }
-  </script>
-
-  <!-- Theme Init Inline (CRÍTICO - Previne FOUC) -->
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('alsham-theme') || 'light';
-      const savedContrast = localStorage.getItem('alsham-contrast') || 'normal';
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-      if (savedContrast === 'high') {
-        document.documentElement.classList.add('high-contrast');
-      }
-    })();
   </script>
 </head>
 <body class="min-h-screen antialiased font-sans">
