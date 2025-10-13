@@ -1,22 +1,94 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timeline Test - ALSHAM 360°</title>
+  
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
+  
+  <title>Timeline Test - ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Página de teste do timeline de interações no ALSHAM 360° PRIMA" />
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Timeline">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'alsham-primary': '#0176D3',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Critical CSS -->
+  <style>
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-bg-surface: #ffffff;
+      --alsham-border-default: #e5e7eb;
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-bg-surface: #1e293b;
+      --alsham-border-default: #334155;
+      color-scheme: dark;
+    }
+    body {
+      background: #f9fafb;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    html.dark body {
+      background: #0f172a;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 p-8">
+<body class="p-8">
   
   <div class="max-w-3xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6">Timeline de Interações - Teste</h1>
+    <h1 class="text-2xl font-bold mb-6" style="color: var(--alsham-text-primary);">Timeline de Interações - Teste</h1>
     
-    <div id="timeline-container" class="bg-white rounded-lg shadow p-6">
-      <p class="text-gray-500 text-center">Carregando...</p>
+    <div id="timeline-container" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border" style="border-color: var(--alsham-border-default);">
+      <p class="text-center" style="color: var(--alsham-text-secondary);">Carregando timeline...</p>
     </div>
   </div>
-  <!-- ✅ ORDEM CORRETA: Supabase ANTES do Timeline -->
-  <script type="module" src="/src/lib/supabase.js"></script>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+  </script>
   <script type="module" src="/src/js/timeline.js"></script>
   
   <script type="module">
