@@ -20,7 +20,10 @@
   </script>
   
   <title>Session Guard — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Página de diagnóstico do Session Guard do ALSHAM 360° PRIMA. Teste de proteção de rotas com Supabase e autenticação enterprise." />
+  <meta name="description" content="Página de diagnóstico do Session Guard do ALSHAM 360° PRIMA CRM Enterprise. Teste de proteção de rotas com Supabase e autenticação multi-tenant." />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -31,7 +34,7 @@
   <meta name="apple-mobile-web-app-title" content="ALSHAM Guard">
   
   <!-- Icons -->
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- Styles -->
@@ -92,8 +95,8 @@
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
-  </script>
-  <script type="module">
+    console.log('✅ Supabase integrado no Session Guard');
+    
     async function showUser() {
       try {
         const { getCurrentSession } = window.AlshamSupabase;
