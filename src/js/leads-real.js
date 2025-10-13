@@ -1781,7 +1781,7 @@ waitForSupabase(() => {
     container.innerHTML = '<div class="skeleton h-4 w-full mb-2"></div>'.repeat(5);
   }
 
-  // ============================================
+    // ============================================
   // INICIALIZAÇÃO DO DOM
   // ============================================
   document.addEventListener("DOMContentLoaded", async () => {
@@ -1789,32 +1789,60 @@ waitForSupabase(() => {
       console.log("🚀 Inicializando sistema completo de Leads...");
       showLoading(true, "Inicializando Leads...");
       
+      // ✅ CORREÇÃO: Aguardar Supabase estar pronto
+      if (!window.AlshamSupabase) {
+        console.warn("⚠️ Supabase ainda não carregado, aguardando...");
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
       const authResult = await authenticateUser();
       if (!authResult.success) {
+        console.warn("⚠️ Usuário não autenticado, redirecionando para login...");
         redirectToLogin();
         return;
       }
       
+      console.log("✅ Usuário autenticado:", authResult.user.email);
+      
       leadsState.user = authResult.user;
       leadsState.orgId = authResult.orgId;
       
+      console.log("📥 Carregando dados do sistema...");
       await loadSystemData();
+      
+      console.log("🎨 Configurando interface...");
       setupInterface();
+      
+      console.log("🔄 Configurando realtime...");
       setupRealtime();
       
       showLoading(false);
-      showSuccess("Sistema completo carregado!");
-    } catch (e) {
+      showSuccess("✅ Sistema de Leads carregado com sucesso!");
+      console.log("✅ Leads-Real.js v7.0 COMPLETE inicializado");
+      
+    } catch (error) {
+      console.error("❌ Erro ao inicializar sistema de Leads:", error);
       showLoading(false);
-      showError("Falha ao carregar sistema");
+      showError("Falha ao carregar sistema: " + error.message);
     }
   });
 
   function setupRealtime() {
-    if (!LEADS_CONFIG.realtime.enabled) return;
-    subscribeToTable("leads_crm", leadsState.orgId, loadSystemData);
-    subscribeToTable("lead_interactions", leadsState.orgId, loadSystemData);
-    // Subs para outras tabelas
+    if (!LEADS_CONFIG.realtime.enabled) {
+      console.log("ℹ️ Realtime desabilitado");
+      return;
+    }
+    
+    console.log("🔄 Configurando subscriptions Supabase...");
+    subscribeToTable("leads_crm", leadsState.orgId, () => {
+      console.log("📥 Realtime: leads_crm atualizado");
+      loadSystemData();
+    });
+    
+    subscribeToTable("lead_interactions", leadsState.orgId, () => {
+      console.log("📥 Realtime: lead_interactions atualizado");
+      loadSystemData();
+    });
   }
 
   // Função debounce
@@ -1833,200 +1861,193 @@ waitForSupabase(() => {
     renderCharts();
   }
 
-  // Funções globais
+  // ============================================
+  // FUNÇÕES GLOBAIS (window)
+  // ============================================
+  
   window.openNewLeadModal = function() {
-    // Adicionado: Formulário completo com todos os campos
+    console.log("📝 Abrindo modal de novo lead...");
+    
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4';
     modal.innerHTML = `
       <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
-        <h2 class="text-2xl font-bold mb-4">Novo Lead</h2>
-        <form id="new-lead-form">
-          <!-- Todos os campos do checklist: nome, email, telefone, whatsapp, empresa, cargo, website, linkedin_lead, linkedin_empresa, endereco, cnpj, tamanho_empresa, receita_anual, setor, status, temperatura, prioridade, origem, campanha, utm_params, valor_estimado, proxima_acao, tags, observacoes, consentimento, campos customizados -->
-          <input type="text" id="new-lead-nome" placeholder="Nome Completo" class="border rounded px-3 py-2 w-full mb-3" required>
-          <input type="email" id="new-lead-email" placeholder="Email" class="border rounded px-3 py-2 w-full mb-3" required>
-          <input type="text" id="new-lead-telefone" placeholder="Telefone" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-whatsapp" placeholder="WhatsApp" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-empresa" placeholder="Empresa" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-cargo" placeholder="Cargo" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-website" placeholder="Website da Empresa" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-linkedin-lead" placeholder="LinkedIn do Lead" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-linkedin-empresa" placeholder="LinkedIn da Empresa" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-endereco" placeholder="Endereço" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-cnpj" placeholder="CNPJ" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="number" id="new-lead-tamanho-empresa" placeholder="Tamanho da Empresa (funcionários)" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="number" id="new-lead-receita-anual" placeholder="Receita Anual" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-setor" placeholder="Setor/Indústria" class="border rounded px-3 py-2 w-full mb-3">
-          <select id="new-lead-status" class="border rounded px-3 py-2 w-full mb-3">
-            ${LEADS_CONFIG.statusOptions.map(s => 
-              `<option value="${s.value}">${s.label}</option>`
-            ).join('')}
-          </select>
-          <select id="new-lead-temperatura" class="border rounded px-3 py-2 w-full mb-3">
-            ${LEADS_CONFIG.temperaturaOptions.map(t => 
-              `<option value="${t.value}">${t.label}</option>`
-            ).join('')}
-          </select>
-          <select id="new-lead-prioridade" class="border rounded px-3 py-2 w-full mb-3">
-            ${LEADS_CONFIG.prioridadeOptions.map(p => 
-              `<option value="${p.value}">${p.label}</option>`
-            ).join('')}
-          </select>
-          <select id="new-lead-origem" class="border rounded px-3 py-2 w-full mb-3">
-            ${LEADS_CONFIG.origemOptions.map(o => 
-              `<option value="${o}">${o}</option>`
-            ).join('')}
-          </select>
-          <input type="text" id="new-lead-campanha" placeholder="Campanha de Marketing" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-utm-params" placeholder="UTM Parameters" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="number" id="new-lead-valor-estimado" placeholder="Valor Estimado do Negócio" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-proxima-acao" placeholder="Próxima Ação Agendada" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="new-lead-tags" placeholder="Tags (separadas por vírgula)" class="border rounded px-3 py-2 w-full mb-3">
-          <textarea id="new-lead-observacoes" placeholder="Observações/Notas" class="border rounded px-3 py-2 w-full mb-3" rows="3"></textarea>
-          <label class="flex items-center mb-3">
-            <input type="checkbox" id="new-lead-consentimento" checked class="mr-2">
-            Consentimento LGPD/GDPR
-          </label>
-          <!-- Campos customizados dinâmicos -->
-          ${leadsState.customFields.map(field => `
-            <input type="${field.type}" id="new-lead-${field.name}" placeholder="${field.label}" class="border rounded px-3 py-2 w-full mb-3">
-          `).join('')}
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold">Novo Lead</h2>
+          <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        
+        <form id="new-lead-form" class="space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <input type="text" id="new-lead-nome" placeholder="Nome Completo *" class="border rounded px-3 py-2" required>
+            <input type="email" id="new-lead-email" placeholder="Email *" class="border rounded px-3 py-2" required>
+            <input type="text" id="new-lead-telefone" placeholder="Telefone" class="border rounded px-3 py-2">
+            <input type="text" id="new-lead-whatsapp" placeholder="WhatsApp" class="border rounded px-3 py-2">
+            <input type="text" id="new-lead-empresa" placeholder="Empresa" class="border rounded px-3 py-2">
+            <input type="text" id="new-lead-cargo" placeholder="Cargo" class="border rounded px-3 py-2">
+          </div>
+          
+          <div class="grid grid-cols-3 gap-3">
+            <select id="new-lead-status" class="border rounded px-3 py-2">
+              ${LEADS_CONFIG.statusOptions.map(s => 
+                `<option value="${s.value}">${s.label}</option>`
+              ).join('')}
+            </select>
+            
+            <select id="new-lead-temperatura" class="border rounded px-3 py-2">
+              ${LEADS_CONFIG.temperaturaOptions.map(t => 
+                `<option value="${t.value}">${t.label}</option>`
+              ).join('')}
+            </select>
+            
+            <select id="new-lead-prioridade" class="border rounded px-3 py-2">
+              ${LEADS_CONFIG.prioridadeOptions.map(p => 
+                `<option value="${p.value}">${p.label}</option>`
+              ).join('')}
+            </select>
+          </div>
+          
+          <textarea id="new-lead-observacoes" placeholder="Observações" class="border rounded px-3 py-2 w-full" rows="3"></textarea>
+          
           <div class="flex gap-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Criar Lead</button>
-            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+              Criar Lead
+            </button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">
+              Cancelar
+            </button>
           </div>
         </form>
       </div>
     `;
+    
     document.body.appendChild(modal);
+    
     modal.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = {
-        nome: document.getElementById('new-lead-nome').value,
-        email: document.getElementById('new-lead-email').value,
-        telefone: document.getElementById('new-lead-telefone').value,
-        whatsapp: document.getElementById('new-lead-whatsapp').value,
-        empresa: document.getElementById('new-lead-empresa').value,
-        cargo: document.getElementById('new-lead-cargo').value,
-        website: document.getElementById('new-lead-website').value,
-        linkedin_lead: document.getElementById('new-lead-linkedin-lead').value,
-        linkedin_empresa: document.getElementById('new-lead-linkedin-empresa').value,
-        endereco: document.getElementById('new-lead-endereco').value,
-        cnpj: document.getElementById('new-lead-cnpj').value,
-        tamanho_empresa: document.getElementById('new-lead-tamanho-empresa').value,
-        receita_anual: document.getElementById('new-lead-receita-anual').value,
-        setor: document.getElementById('new-lead-setor').value,
-        status: document.getElementById('new-lead-status').value,
-        temperatura: document.getElementById('new-lead-temperatura').value,
-        prioridade: document.getElementById('new-lead-prioridade').value,
-        origem: document.getElementById('new-lead-origem').value,
-        campanha: document.getElementById('new-lead-campanha').value,
-        utm_params: document.getElementById('new-lead-utm-params').value,
-        valor_estimado: document.getElementById('new-lead-valor-estimado').value,
-        proxima_acao: document.getElementById('new-lead-proxima-acao').value,
-        tags: document.getElementById('new-lead-tags').value.split(','),
-        observacoes: document.getElementById('new-lead-observacoes').value,
-        consentimento: document.getElementById('new-lead-consentimento').checked
-      };
-      // Campos customizados
-      leadsState.customFields.forEach(field => {
-        data[field.name] = document.getElementById(`new-lead-${field.name}`).value;
-      });
       
-      await createLead(data);
-      modal.remove();
-      loadSystemData();
+      try {
+        showLoading(true, "Criando lead...");
+        
+        const data = {
+          nome: document.getElementById('new-lead-nome').value,
+          email: document.getElementById('new-lead-email').value,
+          telefone: document.getElementById('new-lead-telefone').value || null,
+          whatsapp: document.getElementById('new-lead-whatsapp').value || null,
+          empresa: document.getElementById('new-lead-empresa').value || null,
+          cargo: document.getElementById('new-lead-cargo').value || null,
+          status: document.getElementById('new-lead-status').value,
+          temperatura: document.getElementById('new-lead-temperatura').value,
+          prioridade: document.getElementById('new-lead-prioridade').value,
+          observacoes: document.getElementById('new-lead-observacoes').value || null
+        };
+        
+        console.log("📤 Criando novo lead:", data);
+        await createLead(data);
+        
+        modal.remove();
+        showLoading(false);
+        showSuccess("✅ Lead criado com sucesso!");
+        
+        await loadSystemData();
+        
+      } catch (error) {
+        console.error("❌ Erro ao criar lead:", error);
+        showLoading(false);
+        showError("Erro ao criar lead: " + error.message);
+      }
     });
   };
 
-  window.createNewLead = createLead;
-
   window.openLeadModal = async function(leadId) {
+    console.log("👁️ Abrindo modal do lead:", leadId);
+    
     const lead = leadsState.leads.find(l => l.id === leadId);
-    const interactions = await loadLeadInteractions(leadId);
-    const comments = await loadLeadComments(leadId);
+    if (!lead) {
+      showError("Lead não encontrado");
+      return;
+    }
     
     const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4';
     modal.innerHTML = `
-      <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl">
-        <h2 class="text-2xl font-bold mb-4">${lead.nome}</h2>
+      <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold">${lead.nome}</h2>
+          <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
         
-        <!-- ✅ Visão 360°: todos os campos -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <h3>Informações</h3>
-            <p>Email: ${lead.email}</p>
-            <!-- Todos os campos -->
+            <p class="text-sm text-gray-600">Email</p>
+            <p class="font-medium mb-2">${lead.email || '-'}</p>
+            
+            <p class="text-sm text-gray-600">Telefone</p>
+            <p class="font-medium mb-2">${lead.telefone || '-'}</p>
+            
+            <p class="text-sm text-gray-600">Empresa</p>
+            <p class="font-medium mb-2">${lead.empresa || '-'}</p>
+            
+            <p class="text-sm text-gray-600">Status</p>
+            <p class="font-medium mb-2">${getStatusLabel(lead.status)}</p>
+            
+            <p class="text-sm text-gray-600">Temperatura</p>
+            <p class="font-medium mb-2">${lead.temperatura || '-'}</p>
+            
+            <p class="text-sm text-gray-600">Score IA</p>
+            <p class="font-medium mb-2">${lead.score_ia || 0}/100</p>
           </div>
           
           <div>
-            <h3>Timeline</h3>
-            ${interactions.map(renderInteractionItem).join('')}
+            <h3 class="font-semibold mb-2">Ações Rápidas</h3>
+            <div class="flex flex-col gap-2">
+              <button onclick="window.openEditLeadModal('${leadId}')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                ✏️ Editar
+              </button>
+              <button onclick="window.recalculateLeadScore('${leadId}')" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                🧮 Recalcular Score
+              </button>
+              <button onclick="window.openDeleteLeadModal('${leadId}')" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                🗑️ Excluir
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <!-- ✅ Comentários com @menções -->
-        <div>
-          <h3>Comentários</h3>
-          ${comments.map(c => `<p>${c.user}: ${c.text}</p>`).join('')}
-          <input type="text" placeholder="@mencionar alguém..." id="new-comment">
-          <button onclick="addComment(${leadId})">Enviar</button>
-        </div>
-        
-        <!-- ✅ Próximas Ações (IA) -->
-        <div>
-          <h3>Próximas Ações Sugeridas</h3>
-          <ul>
-            ${getNextBestAction(lead).map(a => `<li>✅ ${a}</li>`).join('')}
-          </ul>
-        </div>
-        
-        <!-- ✅ Audit Log -->
-        <div>
-          <h3>Histórico de Alterações</h3>
-          <table>
-            ${leadsState.auditLogs.filter(log => log.lead_id === leadId).map(log => 
-              `<tr>
-                <td>${log.changed_at}</td>
-                <td>${log.actor}</td>
-                <td>${log.changes}</td>
-              </tr>`
-            ).join('')}
-          </table>
         </div>
       </div>
     `;
+    
     document.body.appendChild(modal);
   };
 
-  async function addComment(leadId) {
-    const text = document.getElementById('new-comment').value;
-    await createComment(leadId, { text });
-    openLeadModal(leadId);
-  }
-
   window.openEditLeadModal = async function(leadId) {
+    console.log("✏️ Abrindo modal de edição:", leadId);
+    
     const lead = leadsState.leads.find(l => l.id === leadId);
+    if (!lead) {
+      showError("Lead não encontrado");
+      return;
+    }
+    
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4';
     modal.innerHTML = `
       <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
         <h3 class="text-xl font-bold mb-4">Editar Lead</h3>
-        <form id="edit-lead-form">
-          <input type="text" id="edit-nome" value="${lead.nome || ''}" placeholder="Nome" class="border rounded px-3 py-2 w-full mb-3" required>
-          <input type="email" id="edit-email" value="${lead.email || ''}" placeholder="Email" class="border rounded px-3 py-2 w-full mb-3" required>
-          <input type="text" id="edit-telefone" value="${lead.telefone || ''}" placeholder="Telefone" class="border rounded px-3 py-2 w-full mb-3">
-          <input type="text" id="edit-empresa" value="${lead.empresa || ''}" placeholder="Empresa" class="border rounded px-3 py-2 w-full mb-3">
+        <form id="edit-lead-form" class="space-y-3">
+          <input type="text" id="edit-nome" value="${lead.nome || ''}" placeholder="Nome" class="border rounded px-3 py-2 w-full" required>
+          <input type="email" id="edit-email" value="${lead.email || ''}" placeholder="Email" class="border rounded px-3 py-2 w-full" required>
+          <input type="text" id="edit-telefone" value="${lead.telefone || ''}" placeholder="Telefone" class="border rounded px-3 py-2 w-full">
+          <input type="text" id="edit-empresa" value="${lead.empresa || ''}" placeholder="Empresa" class="border rounded px-3 py-2 w-full">
           
-          <select id="edit-status" class="border rounded px-3 py-2 w-full mb-3">
+          <select id="edit-status" class="border rounded px-3 py-2 w-full">
             ${LEADS_CONFIG.statusOptions.map(s => 
               `<option value="${s.value}" ${lead.status === s.value ? 'selected' : ''}>${s.label}</option>`
             ).join('')}
           </select>
           
           <div class="flex gap-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
-            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Salvar</button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
           </div>
         </form>
       </div>
@@ -2036,24 +2057,44 @@ waitForSupabase(() => {
     
     modal.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = {
-        nome: document.getElementById('edit-nome').value,
-        email: document.getElementById('edit-email').value,
-        telefone: document.getElementById('edit-telefone').value,
-        empresa: document.getElementById('edit-empresa').value,
-        status: document.getElementById('edit-status').value
-      };
-      await editLead(leadId, data);
-      modal.remove();
-      showSuccess('Lead atualizado!');
-      loadSystemData();
+      
+      try {
+        showLoading(true, "Salvando alterações...");
+        
+        const data = {
+          nome: document.getElementById('edit-nome').value,
+          email: document.getElementById('edit-email').value,
+          telefone: document.getElementById('edit-telefone').value || null,
+          empresa: document.getElementById('edit-empresa').value || null,
+          status: document.getElementById('edit-status').value
+        };
+        
+        console.log("📤 Atualizando lead:", leadId, data);
+        await editLead(leadId, data);
+        
+        modal.remove();
+        showLoading(false);
+        showSuccess('✅ Lead atualizado!');
+        
+        await loadSystemData();
+        
+      } catch (error) {
+        console.error("❌ Erro ao atualizar lead:", error);
+        showLoading(false);
+        showError("Erro ao atualizar: " + error.message);
+      }
     });
   };
 
-  window.updateLead = editLead;
-
   window.openDeleteLeadModal = function(leadId) {
+    console.log("🗑️ Abrindo modal de exclusão:", leadId);
+    
     const lead = leadsState.leads.find(l => l.id === leadId);
+    if (!lead) {
+      showError("Lead não encontrado");
+      return;
+    }
+    
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50';
     modal.innerHTML = `
@@ -2063,8 +2104,8 @@ waitForSupabase(() => {
         <p class="text-sm text-red-600 mb-4">Esta ação não pode ser desfeita.</p>
         
         <div class="flex gap-2">
-          <button id="confirm-delete" class="bg-red-600 text-white px-4 py-2 rounded">Excluir</button>
-          <button onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+          <button id="confirm-delete" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Excluir</button>
+          <button onclick="this.closest('.fixed').remove()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
         </div>
       </div>
     `;
@@ -2072,53 +2113,26 @@ waitForSupabase(() => {
     document.body.appendChild(modal);
     
     modal.querySelector('#confirm-delete').addEventListener('click', async () => {
-      await deleteLead(leadId);
-      modal.remove();
-      showSuccess('Lead excluído!');
-      loadSystemData();
+      try {
+        showLoading(true, "Excluindo lead...");
+        
+        console.log("🗑️ Excluindo lead:", leadId);
+        await deleteLead(leadId);
+        
+        modal.remove();
+        showLoading(false);
+        showSuccess('✅ Lead excluído!');
+        
+        await loadSystemData();
+        
+      } catch (error) {
+        console.error("❌ Erro ao excluir lead:", error);
+        showLoading(false);
+        showError("Erro ao excluir: " + error.message);
+      }
     });
   };
 
-  window.deleteLead = deleteLead;
+  console.log("✅ Leads-Real.js v7.0 COMPLETE carregado - aguardando DOM...");
 
-  window.showAddInteractionForm = function(leadId) {
-    const container = document.getElementById("interaction-form-container");
-    container.classList.remove("hidden");
-    container.innerHTML = `
-      <h4>Adicionar Interação</h4>
-      <form id="new-interaction-form">
-        <select id="interaction-type">
-          ${LEADS_CONFIG.interactionTypes.map(t => `<option value="${t.value}">${t.label}</option>`).join('')}
-        </select>
-        <textarea id="interaction-notes" placeholder="Notas"></textarea>
-        <input type="number" id="interaction-duration" placeholder="Duração (min)">
-        <select id="interaction-outcome">
-          <option value="positivo">Positivo</option>
-          <option value="neutro">Neutro</option>
-          <option value="negativo">Negativo</option>
-        </select>
-        <input type="text" id="interaction-next-action" placeholder="Próxima Ação">
-        <input type="file" id="interaction-anexos" multiple>
-        <button type="submit">Salvar</button>
-      </form>
-    `;
-    container.querySelector('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        interaction_type: document.getElementById("interaction-type").value,
-        notes: document.getElementById("interaction-notes").value,
-        duration_minutes: parseInt(document.getElementById("interaction-duration").value) || null,
-        outcome: document.getElementById("interaction-outcome").value,
-        next_action: document.getElementById("interaction-next-action").value,
-        anexos: Array.from(document.getElementById("interaction-anexos").files)
-      };
-      await createInteraction(leadId, data);
-      container.classList.add("hidden");
-      openLeadModal(leadId);
-    });
-  };
-
-  window.recalculateLeadScore = recalculateLeadScore;
-
-  console.log("✅ Leads-Real.js v7.0 COMPLETE carregado com sucesso");
-});
+}); // ← FIM DO waitForSupabase() - SÓ FECHA AQUI!
