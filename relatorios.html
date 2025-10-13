@@ -20,7 +20,10 @@
   </script>
   
   <title>Relatórios — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Sistema de Relatórios e Analytics - ALSHAM 360° PRIMA CRM Enterprise" />
+  <meta name="description" content="Sistema de Relatórios e Analytics Avançado - ALSHAM 360° PRIMA CRM Enterprise com IA. Visualize métricas, KPIs, evolução de leads e receita em tempo real." />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -31,11 +34,13 @@
   <meta name="apple-mobile-web-app-title" content="ALSHAM Relatórios">
   
   <!-- Icons -->
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Styles -->
   <link rel="stylesheet" href="/css/tokens.css" />
@@ -194,6 +199,10 @@
       .side-nav {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+      }
+      
+      .side-nav.mobile-open {
+        transform: translateX(0);
       }
       
       .main-content-wrapper {
