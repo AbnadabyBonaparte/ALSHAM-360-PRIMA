@@ -4,64 +4,69 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <!-- ✅ Theme Init - DEVE ser primeiro script -->
-  <script src="/js/theme-init.js"></script>
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
   
   <title>ALSHAM 360° PRIMA</title>
+  
   <!-- 🧠 PWA Essentials -->
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#3B82F6" />
+  <meta name="theme-color" content="#0176D3" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <!-- 🔐 Security CSP (atualizada) -->
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';
-                 script-src 'self' 'unsafe-inline' 'unsafe-eval'
-                            https://cdn.jsdelivr.net
-                            https://cdnjs.cloudflare.com
-                            https://cdn.tailwindcss.com
-                            https://apis.google.com;
-                 style-src 'self' 'unsafe-inline'
-                            https://fonts.googleapis.com
-                            https://cdn.tailwindcss.com;
-                 font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com;
-                 connect-src 'self'
-                             https://*.supabase.co
-                             wss://*.supabase.co
-                             https://api.openai.com;
-                 img-src 'self' data: blob: https:;
-                 worker-src 'self' blob:;
-                 manifest-src 'self';
-                 object-src 'none';">
+  
   <!-- 🎨 Styles -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
   <!-- 🔔 Notificações -->
-  <div id="toast-container"></div>
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+  
   <!-- ⏳ Tela de Carregamento -->
-  <main class="text-center animate-fade-in">
-    <div class="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-    <h1 class="text-xl font-bold text-blue-800">Carregando...</h1>
+  <main class="text-center animate-fade-in" role="main">
+    <div class="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" aria-label="Carregando"></div>
+    <h1 class="text-xl font-bold text-blue-800">Carregando ALSHAM 360°...</h1>
   </main>
+  
   <!-- 🧭 Roteamento de Sessão -->
   <script type="module">
     import { getCurrentSession } from "/src/lib/supabase.js";
+    
     async function routeUser() {
       try {
         const session = await getCurrentSession();
-        window.location.replace(session?.user ? "/dashboard.html" : "/login.html");
+        
+        if (session?.user) {
+          window.location.replace("/dashboard.html");
+        } else {
+          window.location.replace("/login.html");
+        }
       } catch (err) {
-        console.error("Erro ao obter sessão:", err);
+        console.error("❌ Erro ao obter sessão:", err);
         window.location.replace("/login.html");
       }
     }
+    
     routeUser();
   </script>
-  <!-- ⚙️ Scripts Principais - ✅ TODOS OS PATHS CORRIGIDOS -->
+  
+  <!-- ⚙️ Scripts Principais -->
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/utils/notifications.js"></script>
-  <script type="module" src="/src/js/pipeline.js"></script>
+  
   <!-- 🧠 Registro do Service Worker -->
   <script type="module" src="/src/js/sw-register.js"></script>
 </body>
