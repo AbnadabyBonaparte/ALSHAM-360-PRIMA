@@ -27,6 +27,9 @@
   <meta name="robots" content="index, follow">
   <meta name="language" content="pt-BR">
   <link rel="canonical" href="https://app.alshamglobal.com.br/dashboard">
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
@@ -261,10 +264,6 @@
   </script>
 </head>
 
-<!-- ===================================================================== -->
-<!-- ✅ DAQUI PRA BAIXO CONTINUA TUDO IGUAL AO SEU ARQUIVO ORIGINAL! -->
-<!-- ===================================================================== -->
-
 <body class="font-inter min-h-screen">
 
   <!-- Skip Link -->
@@ -357,6 +356,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
           </svg>
         </button>
+        
+        <!-- Settings Link -->
+        <a href="/configuracoes.html" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Configurações" title="Configurações">
+          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </a>
       </div>
     </div>
   </nav>
@@ -456,7 +463,7 @@
         <div>
           <h3 class="font-bold mb-3" style="color: var(--alsham-text-primary);">ALSHAM 360° PRIMA</h3>
           <p class="text-sm" style="color: var(--alsham-text-secondary);">CRM Enterprise com IA</p>
-          <p class="text-xs mt-2" style="color: var(--alsham-text-secondary);">v11.0.0 • Build 2025.10.11</p>
+          <p class="text-xs mt-2" style="color: var(--alsham-text-secondary);">v11.0.0 • Build 2025.10.13</p>
         </div>
         <div>
           <h4 class="font-semibold mb-3" style="color: var(--alsham-text-primary);">Links Úteis</h4>
@@ -491,7 +498,7 @@
     <div class="modal-content" role="document">
       <div class="flex justify-between items-center mb-4">
         <h2 id="status-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Filtrar por Status</h2>
-        <button onclick="window.DashboardApp.closeStatusFilter()" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
+        <button onclick="window.DashboardApp.closeStatusFilter()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" aria-label="Fechar modal">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -500,7 +507,7 @@
       <div id="status-checkboxes" class="space-y-2"></div>
       <div class="mt-4 flex gap-2">
         <button onclick="window.DashboardApp.applyStatusFilter()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
-        <button onclick="window.DashboardApp.closeStatusFilter()" class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancelar</button>
+        <button onclick="window.DashboardApp.closeStatusFilter()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Cancelar</button>
       </div>
     </div>
   </div>
@@ -509,7 +516,7 @@
     <div class="modal-content" role="document">
       <div class="flex justify-between items-center mb-4">
         <h2 id="origem-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Filtrar por Origem</h2>
-        <button onclick="window.DashboardApp.closeOrigemFilter()" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
+        <button onclick="window.DashboardApp.closeOrigemFilter()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" aria-label="Fechar modal">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -518,7 +525,7 @@
       <div id="origem-checkboxes" class="space-y-2"></div>
       <div class="mt-4 flex gap-2">
         <button onclick="window.DashboardApp.applyOrigemFilter()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
-        <button onclick="window.DashboardApp.closeOrigemFilter()" class="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancelar</button>
+        <button onclick="window.DashboardApp.closeOrigemFilter()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Cancelar</button>
       </div>
     </div>
   </div>
@@ -527,7 +534,7 @@
     <div class="modal-content" role="document">
       <div class="flex justify-between items-center mb-4">
         <h2 id="scheduled-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Agendar Relatórios Automáticos</h2>
-        <button onclick="window.DashboardApp.closeScheduledReports()" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
+        <button onclick="window.DashboardApp.closeScheduledReports()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" aria-label="Fechar modal">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -536,7 +543,7 @@
       <form id="schedule-form" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Frequência</label>
-          <select id="schedule-frequency" class="w-full px-3 py-2 border rounded" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
+          <select id="schedule-frequency" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
             <option value="daily">Diário</option>
             <option value="weekly">Semanal</option>
             <option value="monthly">Mensal</option>
@@ -544,11 +551,11 @@
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Email de destino</label>
-          <input type="email" id="schedule-email" placeholder="seu@email.com" class="w-full px-3 py-2 border rounded" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);" required>
+          <input type="email" id="schedule-email" placeholder="seu@email.com" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);" required>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Formato</label>
-          <select id="schedule-format" class="w-full px-3 py-2 border rounded" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
+          <select id="schedule-format" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
             <option value="pdf">PDF</option>
             <option value="excel">Excel</option>
             <option value="both">Ambos</option>
@@ -562,7 +569,7 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Supabase Init Inline (100% autocontido) -->
+  <!-- Supabase Init Inline -->
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
