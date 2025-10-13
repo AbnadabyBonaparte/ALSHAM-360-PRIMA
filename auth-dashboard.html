@@ -20,7 +20,10 @@
   </script>
   
   <title>Auth Dashboard — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Painel unificado de diagnóstico de autenticação: sessão, guard e refresh no ALSHAM 360° PRIMA." />
+  <meta name="description" content="Painel unificado de diagnóstico de autenticação: sessão, guard e refresh no ALSHAM 360° PRIMA CRM Enterprise." />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -31,7 +34,7 @@
   <meta name="apple-mobile-web-app-title" content="ALSHAM Auth">
 
   <!-- Icons -->
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- Styles -->
@@ -60,6 +63,9 @@
       background: linear-gradient(135deg, var(--alsham-bg-canvas) 0%, #dbeafe 100%);
       color: var(--alsham-text-primary);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    html.dark body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     }
   </style>
 </head>
@@ -143,7 +149,8 @@
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
+    console.log('✅ Supabase integrado no Auth Dashboard');
   </script>
-  <script src="/src/js/auth-dashboard.js"></script>
+  <script type="module" src="/src/js/auth-dashboard.js"></script>
 </body>
 </html>
