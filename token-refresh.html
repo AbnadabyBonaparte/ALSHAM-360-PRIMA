@@ -20,7 +20,10 @@
   </script>
   
   <title>Token Refresh — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Diagnóstico do sistema de renovação automática de tokens do ALSHAM 360° PRIMA." />
+  <meta name="description" content="Diagnóstico do sistema de renovação automática de tokens do ALSHAM 360° PRIMA CRM Enterprise com segurança multi-tenant." />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -31,7 +34,7 @@
   <meta name="apple-mobile-web-app-title" content="ALSHAM Token">
   
   <!-- Icons -->
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- Styles -->
@@ -99,8 +102,9 @@
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
+    console.log('✅ Supabase integrado no Token Refresh - ÚLTIMO ARQUIVO!');
   </script>
-  <script src="/src/js/token-refresh.js"></script>
+  <script type="module" src="/src/js/token-refresh.js"></script>
   
   <script>
     async function showSession() {
