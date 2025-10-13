@@ -26,42 +26,102 @@
                              https://*.supabase.co
                              wss://*.supabase.co
                              https://api.openai.com;
-                 img-src 'self' data: blob: https:;
-                 worker-src 'self' blob:;
-                 manifest-src 'self';
-                 object-src 'none';">
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+      
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
+  
+  <title>Registro — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Crie sua conta no ALSHAM 360° PRIMA. Sistema de registro enterprise com multi-step, segurança avançada e integração Supabase." />
 
-  <!-- 🎨 CSS -->
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Registro">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  
+  <!-- Critical CSS -->
+  <style>
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-bg-surface: #ffffff;
+      --alsham-border-default: #e5e7eb;
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-bg-surface: #1e293b;
+      --alsham-border-default: #334155;
+      color-scheme: dark;
+    }
+    body {
+      background: linear-gradient(135deg, #f9fafb 0%, #dbeafe 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    html.dark body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+  </style>
 </head>
 
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col justify-center">
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+<body class="font-inter min-h-screen flex flex-col justify-center">
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
 
-  <main class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100 w-full transition-all duration-300">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">Criar Conta</h1>
+  <!-- Main Form -->
+  <main class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full transition-all duration-300 border" style="border-color: var(--alsham-border-default);">
+    <h1 class="text-2xl font-bold mb-6 text-center" style="color: var(--alsham-text-primary);">Criar Conta</h1>
 
     <form id="registration-form" class="space-y-6">
       <!-- STEP 1: Dados pessoais -->
       <div class="step" data-step="0">
         <div>
-          <label for="first-name" class="block text-sm font-medium mb-1">Nome</label>
+          <label for="first-name" class="block text-sm font-medium mb-1" style="color: var(--alsham-text-primary);">Nome</label>
           <input id="first-name" type="text"
-                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+                 style="border-color: var(--alsham-border-default);"
                  placeholder="Seu nome" required />
         </div>
         <div>
-          <label for="last-name" class="block text-sm font-medium mb-1">Sobrenome</label>
+          <label for="last-name" class="block text-sm font-medium mb-1 mt-4" style="color: var(--alsham-text-primary);">Sobrenome</label>
           <input id="last-name" type="text"
-                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+                 style="border-color: var(--alsham-border-default);"
                  placeholder="Seu sobrenome" required />
         </div>
         <div>
-          <label for="email" class="block text-sm font-medium mb-1">E-mail</label>
+          <label for="email" class="block text-sm font-medium mb-1 mt-4" style="color: var(--alsham-text-primary);">E-mail</label>
           <input id="email" type="email"
-                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+                 style="border-color: var(--alsham-border-default);"
                  placeholder="seu@email.com" required />
         </div>
       </div>
@@ -69,51 +129,55 @@
       <!-- STEP 2: Senha -->
       <div class="step hidden" data-step="1">
         <div>
-          <label for="password" class="block text-sm font-medium mb-1">Senha</label>
+          <label for="password" class="block text-sm font-medium mb-1" style="color: var(--alsham-text-primary);">Senha</label>
           <input id="password" type="password"
-                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+                 style="border-color: var(--alsham-border-default);"
                  placeholder="••••••••" required minlength="8" />
         </div>
         <div>
-          <label for="confirm-password" class="block text-sm font-medium mb-1">Confirmar Senha</label>
+          <label for="confirm-password" class="block text-sm font-medium mb-1 mt-4" style="color: var(--alsham-text-primary);">Confirmar Senha</label>
           <input id="confirm-password" type="password"
-                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+                 style="border-color: var(--alsham-border-default);"
                  placeholder="••••••••" required minlength="8" />
         </div>
       </div>
 
       <!-- STEP 3: Organização -->
       <div class="step hidden" data-step="2">
-        <p class="text-gray-600">Criação de organização é opcional neste momento.</p>
-        <p class="text-sm text-gray-500">Você poderá configurar sua organização depois nas configurações.</p>
+        <p style="color: var(--alsham-text-secondary);">Criação de organização é opcional neste momento.</p>
+        <p class="text-sm mt-2" style="color: var(--alsham-text-secondary);">Você poderá configurar sua organização depois nas configurações.</p>
       </div>
 
       <!-- STEP 4: Verificação -->
       <div class="step hidden" data-step="3">
-        <label for="verification-code" class="block text-sm font-medium mb-1">Código de Verificação</label>
+        <label for="verification-code" class="block text-sm font-medium mb-1" style="color: var(--alsham-text-primary);">Código de Verificação</label>
         <input id="verification-code" type="text" maxlength="6"
-               class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+               class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+               style="border-color: var(--alsham-border-default);"
                placeholder="000000" />
       </div>
 
-      <!-- Submit -->
+      <!-- Submit Button -->
       <button id="submit-button" type="submit"
               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
         Criar conta
       </button>
     </form>
 
-    <p class="mt-4 text-center text-sm text-gray-600">
+    <p class="mt-4 text-center text-sm" style="color: var(--alsham-text-secondary);">
       Já tem uma conta?
-      <a href="/login.html" class="text-blue-600 font-semibold hover:underline">Fazer login</a>
+      <a href="/login.html" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Fazer login</a>
     </p>
   </main>
 
-  <footer class="mt-8 text-center text-gray-500 text-sm">
-    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise
+  <!-- Footer -->
+  <footer class="mt-8 text-center text-sm" style="color: var(--alsham-text-secondary);">
+    © 2025 ALSHAM 360° PRIMA — Sistema Enterprise CRM com IA
   </footer>
 
-  <!-- 🧩 Scripts -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
