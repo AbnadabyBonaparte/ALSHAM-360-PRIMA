@@ -19,8 +19,11 @@
     })();
   </script>
   
-  <meta name="description" content="Gestão Completa de Leads - ALSHAM 360° PRIMA CRM Enterprise com IA" />
   <title>Leads — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Gestão Completa de Leads - ALSHAM 360° PRIMA CRM Enterprise com IA, kanban board, analytics avançados e gamificação integrada." />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
   
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
@@ -31,22 +34,20 @@
   <meta name="apple-mobile-web-app-title" content="ALSHAM Leads">
   
   <!-- Icons -->
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- Styles -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   
-  <!-- ⭐ REMOVIDO: Service Worker cleanup (não é necessário no head) ⭐ -->
-  
   <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" rel="stylesheet">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -224,32 +225,61 @@
     html.dark .sun-icon { display: none; }
     
     .kanban-board { display: flex; overflow-x: auto; gap: 1rem; }
-    .kanban-column { min-width: 250px; background: #f8f9fa; border-radius: 8px; padding: 1rem; }
-    .kanban-card { background: white; border: 1px solid #e5e7eb; border-radius: 4px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: move; }
-    .leaderboard { background: white; border-radius: 8px; padding: 1rem; }
+    .kanban-column { min-width: 250px; background: var(--alsham-bg-hover); border-radius: 8px; padding: 1rem; }
+    .kanban-card { background: var(--alsham-bg-surface); border: 1px solid var(--alsham-border-default); border-radius: 4px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: move; }
+    .leaderboard { background: var(--alsham-bg-surface); border-radius: 8px; padding: 1rem; }
     .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
     .heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
-    .heatmap-cell { width: 20px; height: 20px; background: #e5e7eb; border-radius: 4px; }
-    .empty-state { text-align: center; padding: 2rem; color: #6b7280; }
-    .skeleton { background: #e5e7eb; animation: pulse 1.5s infinite; }
+    .heatmap-cell { width: 20px; height: 20px; background: var(--alsham-bg-hover); border-radius: 4px; }
+    .empty-state { text-align: center; padding: 2rem; color: var(--alsham-text-secondary); }
+    .skeleton { background: var(--alsham-bg-hover); animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--alsham-border-default);
+      background: var(--alsham-bg-surface);
+      color: var(--alsham-text-secondary);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover { background: var(--alsham-bg-hover); }
+    .tab-btn.active {
+      background: #0176D3;
+      color: white;
+      border-color: #0176D3;
+    }
+    
+    input[type="text"], input[type="email"] {
+      background: var(--alsham-bg-surface);
+      color: var(--alsham-text-primary);
+      border-color: var(--alsham-border-default);
+    }
+    
+    .email-editor {
+      min-height: 100px;
+      border: 1px solid var(--alsham-border-default);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      background: var(--alsham-bg-surface);
+      color: var(--alsham-text-primary);
+    }
   </style>
 </head>
 
-<!-- ===================================================================== -->
-<!-- ✅ DAQUI PRA BAIXO CONTINUA TUDO IGUAL AO SEU ARQUIVO ORIGINAL! -->
-<!-- ===================================================================== -->
-
-<!-- (Restante do body fica EXATAMENTE IGUAL ao seu arquivo) -->
 <body class="font-inter min-h-screen" style="background: var(--alsham-bg-canvas);">
   <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
       <h2 class="text-xl font-bold text-primary mb-2">ALSHAM 360° PRIMA</h2>
-      <p class="text-secondary font-medium">Carregando dashboard executivo...</p>
+      <p class="text-secondary font-medium">Carregando gestão de leads...</p>
     </div>
   </div>
+  
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+  
   <nav class="sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <div class="flex items-center gap-4">
@@ -264,7 +294,7 @@
       </div>
       <div class="hidden md:flex items-center space-x-6">
         <a href="/dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
-        <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Leads</a>
+        <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1" aria-current="page">Leads</a>
         <a href="/pipeline.html" class="text-secondary hover:text-primary transition-colors">Pipeline</a>
         <a href="/automacoes.html" class="text-secondary hover:text-primary transition-colors">Automações</a>
         <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
@@ -281,13 +311,14 @@
     </div>
     <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
       <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover text-secondary">Dashboard</a>
-      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600">Leads</a>
+      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600" aria-current="page">Leads</a>
       <a href="/pipeline.html" class="block px-4 py-3 hover:bg-hover text-secondary">Pipeline</a>
       <a href="/automacoes.html" class="block px-4 py-3 hover:bg-hover text-secondary">Automações</a>
       <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-hover text-secondary">Gamificação</a>
       <a href="/relatorios.html" class="block px-4 py-3 hover:bg-hover text-secondary">Relatórios</a>
     </div>
   </nav>
+  
   <aside class="side-nav" id="sidebar">
     <a href="/dashboard.html">
       <span>📊</span> Dashboard
@@ -311,12 +342,15 @@
       <span>⚙️</span> Configurações
     </a>
   </aside>
+  
   <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
     <header class="mb-8">
       <h1 class="text-3xl font-bold text-primary mb-2">Leads</h1>
       <p class="text-secondary">Gerencie seus leads com eficiência</p>
     </header>
+    
     <div id="leads-kpis"></div>
+    
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição por Status</h3>
@@ -360,11 +394,11 @@
       </div>
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Mapa de Leads</h3>
-        <div id="leads-map" class="map-container"></div>
+        <div id="leads-map" class="map-container" style="height: 350px;"></div>
       </div>
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Análise de Cohort</h3>
-        <table id="cohort-table" class="cohort-table"></table>
+        <table id="cohort-table" class="cohort-table w-full"></table>
       </div>
       <div class="card">
         <h3 class="text-lg font-semibold mb-4 text-primary">Curvas de Retenção</h3>
@@ -383,6 +417,7 @@
         <table id="movements-table" class="w-full"></table>
       </div>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Visualizações Alternativas</h3>
       <div class="tabs">
@@ -393,6 +428,7 @@
       </div>
       <div id="leads-view-container"></div>
     </section>
+    
     <div class="mb-6">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold text-primary">Lista de Leads</h3>
@@ -405,111 +441,145 @@
       <div id="leads-filters" class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4"></div>
       <div id="leads-table"></div>
       <div class="flex justify-between mt-4">
-        <button id="prev-page" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm font-medium disabled:opacity-50">Anterior</button>
-        <span class="text-sm text-gray-600">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
-        <button id="next-page" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm font-medium disabled:opacity-50">Próxima</button>
+        <button id="prev-page" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium disabled:opacity-50 text-primary">Anterior</button>
+        <span class="text-sm text-secondary">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
+        <button id="next-page" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium disabled:opacity-50 text-primary">Próxima</button>
       </div>
     </div>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Analytics Avançados</h3>
       <div id="advanced-analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Gamificação</h3>
       <div id="gamification-section" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="leaderboard">
-          <h4 class="font-semibold mb-2">Leaderboard</h4>
+        <div class="leaderboard card">
+          <h4 class="font-semibold mb-2 text-primary">Leaderboard</h4>
           <table id="leaderboard-table" class="w-full"></table>
         </div>
-        <div>
-          <h4 class="font-semibold mb-2">Seus Badges</h4>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Seus Badges</h4>
           <div id="badges-showcase" class="flex flex-wrap gap-2"></div>
         </div>
-        <div>
-          <h4 class="font-semibold mb-2">Missões</h4>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Missões</h4>
           <div id="missions-list" class="space-y-2"></div>
         </div>
-        <div>
-          <h4 class="font-semibold mb-2">Catálogo de Prêmios</h4>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Catálogo de Prêmios</h4>
           <div id="prize-catalog" class="prize-catalog"></div>
         </div>
       </div>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Automações</h3>
       <div id="automations-section" class="space-y-4"></div>
       <button id="new-automation-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">+ Nova Automação</button>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Colaboração</h3>
-      <div id="collaboration-section">
+      <div id="collaboration-section" class="card">
         <div class="activity-feed">
-          <h4 class="font-semibold mb-2">Feed de Atividades</h4>
+          <h4 class="font-semibold mb-2 text-primary">Feed de Atividades</h4>
           <div id="activity-list" class="space-y-2"></div>
         </div>
       </div>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Integrações e Comunicação</h3>
       <div id="integrations-section" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="card">
-          <h4 class="font-semibold mb-2">Email</h4>
+          <h4 class="font-semibold mb-2 text-primary">Email</h4>
           <div id="email-editor" class="email-editor" contenteditable="true">Escreva seu email...</div>
           <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Enviar</button>
         </div>
         <div class="card">
-          <h4 class="font-semibold mb-2">WhatsApp</h4>
+          <h4 class="font-semibold mb-2 text-primary">WhatsApp</h4>
           <input type="text" placeholder="Mensagem..." class="w-full border rounded px-2 py-1 mb-2">
           <button class="bg-green-600 text-white px-4 py-2 rounded">Enviar</button>
         </div>
         <div class="card">
-          <h4 class="font-semibold mb-2">Calendário</h4>
+          <h4 class="font-semibold mb-2 text-primary">Calendário</h4>
           <button class="bg-purple-600 text-white px-4 py-2 rounded">Agendar Reunião</button>
         </div>
         <div class="card">
-          <h4 class="font-semibold mb-2">SMS</h4>
+          <h4 class="font-semibold mb-2 text-primary">SMS</h4>
           <input type="text" placeholder="Mensagem..." class="w-full border rounded px-2 py-1 mb-2">
           <button class="bg-indigo-600 text-white px-4 py-2 rounded">Enviar</button>
         </div>
         <div class="card">
-          <h4 class="font-semibold mb-2">Telefonia</h4>
+          <h4 class="font-semibold mb-2 text-primary">Telefonia</h4>
           <button class="bg-red-600 text-white px-4 py-2 rounded">Ligar</button>
         </div>
         <div class="card">
-          <h4 class="font-semibold mb-2">Videoconferência</h4>
+          <h4 class="font-semibold mb-2 text-primary">Videoconferência</h4>
           <button class="bg-blue-600 text-white px-4 py-2 rounded">Iniciar Reunião</button>
         </div>
       </div>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Relatórios Customizáveis</h3>
-      <div id="reports-section">
+      <div id="reports-section" class="card">
         <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Gerar Relatório</button>
       </div>
     </section>
+    
     <section class="mb-8">
       <h3 class="text-lg font-semibold mb-4 text-primary">Configurações</h3>
-      <div id="settings-section" class="space-y-4">
+      <div id="settings-section" class="card space-y-4">
         <div>
-          <label>Status Customizados</label>
-          <input type="text" placeholder="Adicionar novo status..." class="border rounded px-2 py-1">
+          <label class="text-primary">Status Customizados</label>
+          <input type="text" placeholder="Adicionar novo status..." class="border rounded px-2 py-1 w-full">
         </div>
         <div>
-          <label>Campos Customizados</label>
-          <input type="text" placeholder="Adicionar campo..." class="border rounded px-2 py-1">
+          <label class="text-primary">Campos Customizados</label>
+          <input type="text" placeholder="Adicionar campo..." class="border rounded px-2 py-1 w-full">
         </div>
         <div>
-          <label>Regras de Automação</label>
+          <label class="text-primary">Regras de Automação</label>
           <button class="bg-blue-600 text-white px-4 py-2 rounded">Adicionar Regra</button>
         </div>
       </div>
     </section>
   </main>
+  
+  <!-- Scripts -->
   <script type="module">
     import * as SupabaseLib from '/src/lib/supabase.js';
     window.AlshamSupabase = SupabaseLib;
+    console.log('✅ Supabase integrado no Leads:', Object.keys(window.AlshamSupabase).length, 'funções');
   </script>
-  <!-- ⭐ CORRIGIDO: /js/leads-real.js → /src/js/leads-real.js ⭐ -->
+  
   <script type="module" src="/src/js/leads-real.js"></script>
+  
+  <!-- Theme Toggle -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const html = document.documentElement;
+          const isDark = html.classList.toggle('dark');
+          localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
+        });
+      }
+      
+      const menuToggle = document.getElementById('menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const sidebar = document.getElementById('sidebar');
+      if (menuToggle && (mobileMenu || sidebar)) {
+        menuToggle.addEventListener('click', function() {
+          if (mobileMenu) mobileMenu.classList.toggle('hidden');
+          if (sidebar) sidebar.classList.toggle('open');
+        });
+      }
+    });
+  </script>
 </body>
 </html>
