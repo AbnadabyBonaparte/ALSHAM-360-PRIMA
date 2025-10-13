@@ -1,16 +1,16 @@
 {
-  "name": "ALSHAM 360° PRIMA",
+  "name": "ALSHAM 360° PRIMA - CRM Enterprise com IA",
   "short_name": "ALSHAM360",
   "lang": "pt-BR",
-  "description": "CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads e vendas.",
-  "start_url": ".",
-  "scope": "./",
+  "description": "CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads, pipeline de vendas e analytics avançados.",
+  "start_url": "/dashboard.html",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0f172a",
-  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "background_color": "#F9FAFB",
+  "theme_color": "#0176D3",
   "prefer_related_applications": false,
-  "categories": ["business", "productivity", "crm", "automation"],
+  "categories": ["business", "productivity", "crm", "sales", "automation", "analytics"],
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -34,5 +34,94 @@
       "sizes": "180x180",
       "type": "image/png"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Acessar Dashboard Principal com KPIs e Analytics",
+      "url": "/dashboard.html",
+      "icons": [
+        {
+          "src": "/icons/shortcut-dashboard.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Leads",
+      "short_name": "Leads",
+      "description": "Gerenciar Leads e CRM",
+      "url": "/leads-real.html",
+      "icons": [
+        {
+          "src": "/icons/shortcut-leads.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pipeline",
+      "short_name": "Pipeline",
+      "description": "Visualizar Pipeline de Vendas",
+      "url": "/pipeline.html",
+      "icons": [
+        {
+          "src": "/icons/shortcut-pipeline.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "short_name": "Relatórios",
+      "description": "Analytics e Relatórios Avançados",
+      "url": "/relatorios.html",
+      "icons": [
+        {
+          "src": "/icons/shortcut-reports.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard-light.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Dashboard Executivo - Modo Claro"
+    },
+    {
+      "src": "/screenshots/dashboard-dark.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Dashboard Executivo - Modo Escuro"
+    },
+    {
+      "src": "/screenshots/leads-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Gestão de Leads - Mobile"
+    }
+  ],
+  "share_target": {
+    "action": "/leads-real.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link"
+    }
+  },
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
 }
