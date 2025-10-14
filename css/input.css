@@ -1,0 +1,20 @@
+# Passo a passo completo:
+
+# 1. Criar arquivo
+cat > css/input.css << 'EOF'
+[COPIAR TODO O CÓDIGO DO PASSO 1]
+EOF
+
+# 2. Gerar CSS
+npx tailwindcss -i ./css/input.css -o ./css/tailwind.min.css --minify
+
+# 3. Verificar geração (deve ter ~50KB)
+ls -lh css/tailwind.min.css
+
+# 4. Commit
+git add css/input.css css/tailwind.min.css
+git commit -m "Add Tailwind CSS build configuration and compiled output"
+git push origin main
+
+# 5. Aguardar deploy
+# Build deve passar em ~45s ✅
