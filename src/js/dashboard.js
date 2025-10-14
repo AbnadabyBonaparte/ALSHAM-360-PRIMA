@@ -742,82 +742,60 @@ function drilldownStatus(event) {
     perdido: leads.filter(l => l.status === 'perdido').length
   };
   
-  const details = Object.entries(statusCounts)
-    .map(([status, count]) => `${status}: ${count}`)
-    .join('\n');
-  
-  showAlert(`📊 Distribuição por Status:\n\n${details}`, 'info');
+  const details = Object.entries(statusCounts).map(([status, count]) => `${status}: ${count}`).join('\n');
+  showAlert('Distribuição por Status:\n' + details, 'info');
 }
 
 function drilldownDaily(event) {
   event.stopPropagation();
   const leads = DashboardState.filteredLeads;
-  const last7Days = [];
-  
+  const last7days = {};
   for (let i = 6; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    const count = leads.filter(l => l.created_at && l.created_at.startsWith(dateStr)).length;
-    last7Days.push({ date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }), count });
+    const dateStr = date.toLocaleDateString('pt-BR');
+    last7days[dateStr] = leads.filter(l => new Date(l.created_at).toLocaleDateString('pt-BR') === dateStr).length;
   }
   
-  const details = last7Days
-    .map(d => `${d.date}: ${d.count} leads`)
-    .join('\n');
-  
-  showAlert(`📈 Novos Leads (7 dias):\n\n${details}`, 'info');
+  const details = Object.entries(last7days).map(([date, count]) => `${date}: ${count} leads`).join('\n');
+  showAlert('Novos Leads por Dia:\n' + details, 'info');
 }
 
 function drilldownFunnel(event) {
   event.stopPropagation();
   const leads = DashboardState.filteredLeads;
-  const funnelData = {
-    'Total': leads.length,
-    'Em Contato': leads.filter(l => ['em_contato', 'qualificado', 'proposta', 'convertido'].includes(l.status)).length,
-    'Qualificado': leads.filter(l => ['qualificado', 'proposta', 'convertido'].includes(l.status)).length,
-    'Proposta': leads.filter(l => ['proposta', 'convertido'].includes(l.status)).length,
-    'Convertido': leads.filter(l => l.status === 'convertido').length
+  const funnel = {
+    total: leads.length,
+    contato: leads.filter(l => ['em_contato', 'qualificado', 'proposta', 'convertido'].includes(l.status)).length,
+    qualificado: leads.filter(l => ['qualificado', 'proposta', 'convertido'].includes(l.status)).length,
+    proposta: leads.filter(l => ['proposta', 'convertido'].includes(l.status)).length,
+    convertido: leads.filter(l => l.status === 'convertido').length
   };
   
-  const details = Object.entries(funnelData)
-    .map(([stage, count]) => `${stage}: ${count}`)
-    .join('\n');
-  
-  showAlert(`🔄 Funil de Conversão:\n\n${details}`, 'info');
+  const details = Object.entries(funnel).map(([stage, count]) => `${stage}: ${count}`).join('\n');
+  showAlert('Funil de Conversão:\n' + details, 'info');
 }
 
 function drilldownOrigem(event) {
   event.stopPropagation();
   const leads = DashboardState.filteredLeads;
   const origens = {};
-  
   leads.forEach(l => {
     const origem = l.origem || 'Não informado';
     origens[origem] = (origens[origem] || 0) + 1;
   });
   
-  const details = Object.entries(origens)
-    .sort((a, b) => b[1] - a[1])
-    .map(([origem, count]) => `${origem}: ${count}`)
-    .join('\n');
-  
-  showAlert(`🌐 Leads por Origem:\n\n${details}`, 'info');
+  const details = Object.entries(origens).map(([origem, count]) => `${origem}: ${count}`).join('\n');
+  showAlert('Leads por Origem:\n' + details, 'info');
 }
 
 // ============================================================================
-// SCHEDULED REPORTS
+// AGENDAMENTO DE RELATÓRIOS
 // ============================================================================
 
 function openScheduledReports() {
   const modal = document.getElementById('scheduled-reports-modal');
   if (modal) modal.classList.add('active');
-  
-  // Load user email if available
-  const emailInput = document.getElementById('schedule-email');
-  if (emailInput && DashboardState.user?.email) {
-    emailInput.value = DashboardState.user.email;
-  }
 }
 
 function closeScheduledReports() {
@@ -827,87 +805,55 @@ function closeScheduledReports() {
 
 function calculateNextRun(frequency) {
   const now = new Date();
-  
-  switch(frequency) {
+  switch (frequency) {
     case 'daily':
       now.setDate(now.getDate() + 1);
+      now.setHours(8, 0, 0, 0); // 8h manhã
       break;
     case 'weekly':
-      now.setDate(now.getDate() + 7);
+      now.setDate(now.getDate() + (7 - now.getDay() + 1) % 7); // Próxima segunda
+      now.setHours(8, 0, 0, 0);
       break;
     case 'monthly':
       now.setMonth(now.getMonth() + 1);
+      now.setDate(1);
+      now.setHours(8, 0, 0, 0);
       break;
   }
-  
   return now.toISOString();
 }
 
 // ============================================================================
-// NUMBER COUNTER ANIMATION
+// RENDERIZAÇÃO - FILTROS
 // ============================================================================
-
-function animateCounter(element, start, end, duration = 1000) {
-  if (!element) return;
-  
-  const range = end - start;
-  const increment = range / (duration / 16);
-  let current = start;
-  
-  const timer = setInterval(() => {
-    current += increment;
-    if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-      current = end;
-      clearInterval(timer);
-    }
-    element.textContent = Math.floor(current);
-  }, 16);
-}
-
-// ============================================================================
-// RENDERIZAÇÃO
-// ============================================================================
-
-function renderDashboard() {
-  renderFilters();
-  renderKPIs();
-  renderGoals();
-  renderROI();
-  renderStatusChart();
-  renderDailyChart();
-  renderFunnelChart();
-  renderOrigemChart();
-  renderLeadsTable();
-}
 
 function renderFilters() {
   const container = document.getElementById('dashboard-filters');
   if (!container) return;
   
-  const statusOptions = ['novo', 'em_contato', 'qualificado', 'proposta', 'convertido', 'perdido'];
-  const origemOptions = [...new Set(DashboardState.leads.map(l => l.origem).filter(Boolean))];
-  
   container.innerHTML = `
-    <div class="bg-white dark:bg-[#1e293b] p-4 rounded-lg shadow mb-6 border border-gray-200 dark:border-gray-700">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Busca -->
-        <div>
-          <input type="text" 
-                 id="search-input" 
-                 placeholder="🔍 Buscar leads..."
-                 value="${DashboardState.filters.search}"
-                 oninput="handleSearch(this.value)"
-                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100"
-                 aria-label="Campo de busca">
-        </div>
-        
-        <!-- Data -->
+    <div class="bg-white dark:bg-[#1e293b] rounded-lg shadow p-6 mb-8">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Filtros</h3>
+      
+      <!-- Busca -->
+      <div class="mb-4">
+        <input id="search-input" 
+               type="text" 
+               placeholder="Buscar por nome, email ou empresa..." 
+               oninput="handleSearch(this.value)"
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500"
+               aria-label="Buscar leads">
+      </div>
+      
+      <!-- Filtros Principais -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Data Range -->
         <div>
           <select id="date-filter" 
-                  onchange="window.DashboardApp.applyDateFilter(this.value)"
                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100"
+                  onchange="window.DashboardApp.applyDateFilter(this.value)"
                   aria-label="Filtro de período">
-            <option value="all" ${DashboardState.filters.dateRange === 'all' ? 'selected' : ''}>📅 Todos os períodos</option>
+            <option value="all" ${DashboardState.filters.dateRange === 'all' ? 'selected' : ''}>Todo o período</option>
             <option value="7d" ${DashboardState.filters.dateRange === '7d' ? 'selected' : ''}>Últimos 7 dias</option>
             <option value="30d" ${DashboardState.filters.dateRange === '30d' ? 'selected' : ''}>Últimos 30 dias</option>
             <option value="90d" ${DashboardState.filters.dateRange === '90d' ? 'selected' : ''}>Últimos 90 dias</option>
@@ -1436,7 +1382,49 @@ function setupEventListeners() {
 }
 
 // ============================================================================
-// API PÚBLICA
+// FUNÇÕES ADICIONAIS PARA COMPATIBILIDADE COM HTML
+// ============================================================================
+
+/**
+ * Atualizar todos os gráficos (chamado quando tema muda)
+ */
+function updateAllCharts() {
+  console.log('🔄 Atualizando gráficos...');
+  try {
+    renderStatusChart();
+    renderDailyChart();
+    renderFunnelChart();
+    renderOrigemChart();
+  } catch (error) {
+    console.error('❌ Erro ao atualizar gráficos:', error);
+  }
+}
+
+/**
+ * Iniciar auto-refresh manual
+ */
+function startAutoRefresh() {
+  if (DashboardState.autoRefresh.timer) {
+    clearInterval(DashboardState.autoRefresh.timer);
+  }
+  DashboardState.autoRefresh.enabled = true;
+  DashboardState.autoRefresh.timer = setInterval(refreshDashboard, DashboardState.autoRefresh.interval);
+  console.log('✅ Auto-refresh iniciado (1min)');
+}
+
+/**
+ * Parar auto-refresh
+ */
+function stopAutoRefresh() {
+  if (DashboardState.autoRefresh.timer) {
+    clearInterval(DashboardState.autoRefresh.timer);
+  }
+  DashboardState.autoRefresh.enabled = false;
+  console.log('❌ Auto-refresh parado');
+}
+
+// ============================================================================
+// API PÚBLICA - COMPLETO
 // ============================================================================
 window.DashboardApp = {
   state: DashboardState,
@@ -1460,6 +1448,9 @@ window.DashboardApp = {
   drilldownDaily,
   drilldownFunnel,
   drilldownOrigem,
+  updateCharts: updateAllCharts,
+  startAutoRefresh,
+  stopAutoRefresh,
   applyDateFilter: (range) => {
     DashboardState.filters.dateRange = range;
     applyFilters();
@@ -1473,9 +1464,14 @@ window.DashboardApp = {
   },
   clearFilters: () => {
     DashboardState.filters = { dateRange: 'all', status: [], origem: [], search: '' };
-    document.getElementById('search-input').value = '';
-    document.getElementById('date-filter').value = 'all';
-    document.getElementById('comparison-toggle').checked = false;
+    const searchInput = document.getElementById('search-input');
+    const dateFilter = document.getElementById('date-filter');
+    const comparisonToggle = document.getElementById('comparison-toggle');
+    
+    if (searchInput) searchInput.value = '';
+    if (dateFilter) dateFilter.value = 'all';
+    if (comparisonToggle) comparisonToggle.checked = false;
+    
     DashboardState.comparison.enabled = false;
     applyFilters();
     renderDashboard();
