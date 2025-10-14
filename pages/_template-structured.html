@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ===================================================== -->
+  <!-- 🔵 ALSHAM 360° PRIMA — TEMPLATE ESTRUTURADO CORPORATIVO -->
+  <!-- ===================================================== -->
+  <title>{{PAGE_TITLE}} — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="{{PAGE_DESCRIPTION}}">
+  <meta name="keywords" content="CRM, IA, automação, analytics, supabase, enterprise, ALSHAM">
+  <meta name="author" content="ALSHAM Global">
+  <meta name="robots" content="index,follow">
+  <meta name="language" content="pt-BR">
+  <link rel="canonical" href="https://app.alshamglobal.com.br/{{PAGE_SLUG}}">
+
+  <!-- ========================================== -->
+  <!-- 🌐 Internationalization -->
+  <!-- ========================================== -->
+  <link rel="alternate" hreflang="pt-BR" href="https://app.alshamglobal.com.br/{{PAGE_SLUG}}">
+  <link rel="alternate" hreflang="en-US" href="https://app.alshamglobal.com/en/{{PAGE_SLUG}}">
+  <link rel="alternate" hreflang="es-ES" href="https://app.alshamglobal.com/es/{{PAGE_SLUG}}">
+  <link rel="alternate" hreflang="x-default" href="https://app.alshamglobal.com.br/{{PAGE_SLUG}}">
+
+  <!-- ========================================== -->
+  <!-- 🔒 Security & Policies -->
+  <!-- ========================================== -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com;
+                 style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com;
+                 font-src 'self' data: https://fonts.gstatic.com;
+                 img-src 'self' data: blob: https:;
+                 connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com;
+                 frame-src 'self';
+                 object-src 'none';
+                 base-uri 'self';
+                 form-action 'self';
+                 worker-src 'self' blob:;">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy"
+        content="geolocation=(self), microphone=(), camera=(), payment=(self)">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+  <!-- ========================================== -->
+  <!-- 📱 PWA Manifest -->
+  <!-- ========================================== -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Icons -->
+  <link rel="icon" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <!-- ========================================== -->
+  <!-- 📊 Analytics & Monitoring -->
+  <!-- ========================================== -->
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXX', { anonymize_ip: true });
+  </script>
+
+  <!-- PostHog -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){
+    function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]);t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},n="capture identify alias people.set people.set_once people.unset".split(" "),p=0;p<n.length;p++)g(u,n[p]);e._i.push([i,s,a])},e.__SV=1.2,t.createElement&&(o=t.createElement("script"),o.type="text/javascript",o.async=!0,o.src="https://cdn.posthog.com/posthog.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(o,r)))}(document,window.posthog||[]);
+    posthog.init('phc_xxxxxxxxxxxxxxxxxxxxx', { api_host: 'https://app.posthog.com' });
+  </script>
+
+  <!-- Sentry -->
+  <script src="https://browser.sentry-cdn.com/7.81.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
+  <script>
+    Sentry.init({
+      dsn: "https://xxxxxxxxxxxxxxxxxxxxxxxx.ingest.sentry.io/xxxxxxx",
+      integrations: [new Sentry.BrowserTracing()],
+      tracesSampleRate: 1.0,
+    });
+  </script>
+
+  <!-- ========================================== -->
+  <!-- 🧩 Core Styles -->
+  <!-- ========================================== -->
+  <link rel="preload" href="/css/tokens.css" as="style">
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/tailwind.min.css" />
+  <link rel="stylesheet" href="/css/dashboard-animations.css" />
+
+</head>
+
+<body class="font-inter min-h-screen bg-white dark:bg-gray-900">
+  <!-- ========================================== -->
+  <!-- NAVBAR & SIDENAV (herdado do dashboard) -->
+  <!-- ========================================== -->
+  <nav id="navbar">{{NAVBAR}}</nav>
+  <aside id="sidenav">{{SIDENAV}}</aside>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT AREA (módulos estruturados) -->
+  <!-- ========================================== -->
+  <main id="main-content" class="max-w-7xl mx-auto px-4 py-8 md:ml-56" role="main">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{PAGE_TITLE}}</h1>
+      <p class="text-gray-500 dark:text-gray-400">{{PAGE_DESCRIPTION}}</p>
+    </header>
+
+    <!-- === MÓDULOS PRINCIPAIS DO SISTEMA === -->
+    <section id="{{MODULE_LEADS}}" aria-label="Gestão de Leads"></section>
+    <section id="{{MODULE_PIPELINE}}" aria-label="Pipeline de Vendas"></section>
+    <section id="{{MODULE_AUTOMATIONS}}" aria-label="Automações Inteligentes"></section>
+    <section id="{{MODULE_REPORTS}}" aria-label="Relatórios e Analytics"></section>
+    <section id="{{MODULE_GAMIFICATION}}" aria-label="Gamificação e Metas"></section>
+    <section id="{{MODULE_AI}}" aria-label="IA Assistiva e Insights"></section>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FOOTER -->
+  <!-- ========================================== -->
+  <footer class="border-t mt-16 py-6 text-sm text-center text-gray-500 dark:text-gray-400">
+    © 2025 ALSHAM Global • v11.0 • All Rights Reserved
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- 🔗 Core Scripts -->
+  <!-- ========================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+    console.log("✅ Supabase inicializado");
+  </script>
+
+  <!-- Theme & Contrast Toggles -->
+  <script>
+    (function(){
+      const html=document.documentElement;
+      const t=localStorage.getItem('alsham-theme');
+      const c=localStorage.getItem('alsham-contrast');
+      if(t==='dark')html.classList.add('dark');
+      if(c==='high')html.classList.add('high-contrast');
+    })();
+  </script>
+
+  <!-- Service Worker -->
+  <script>
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg=>console.log('✅ SW registrado:',reg.scope))
+        .catch(err=>console.error('❌ SW erro:',err));
+    }
+  </script>
+
+  <!-- Performance / Web Vitals -->
+  <script>
+    window.addEventListener('load',()=>{
+      const t=performance.now();
+      gtag&&gtag('event','page_timing',{value:Math.round(t),event_category:'Performance'});
+      console.log('⚡ Load time:',t,'ms');
+    });
+  </script>
+</body>
+</html>
