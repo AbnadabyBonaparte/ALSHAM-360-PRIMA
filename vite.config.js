@@ -1,39 +1,28 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.0 PERFORMANCE
- * Data: 2025-10-14 21:04 UTC
- * Otimização: Lazy loading + Tree shaking + Code splitting avançado
+ * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.1 HOTFIX
+ * Data: 2025-10-14 21:08 UTC
+ * Fix: Removed duplicate manualChunks + visualizer dependency
  * Autor: @AbnadabyBonaparte
- * 
- * CHANGELOG v11.1.0:
- * - ✅ Code splitting otimizado (charts, export-pdf, export-excel separados)
- * - ✅ Lazy loading automático para bibliotecas pesadas
- * - ✅ Tree shaking agressivo
- * - ✅ Compression Brotli + Gzip
- * - ✅ Bundle analysis preparado
- * - ✅ Preload hints otimizados
  */
 
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
 import { VitePWA } from 'vite-plugin-pwa';
 import compression from 'vite-plugin-compression';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [
-    // ✅ Legacy Browser Support (opcional - remover para performance máxima)
     legacy({
       targets: ['defaults', 'not IE 11'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-      renderLegacyChunks: false // ✅ Desabilita chunks legacy (economia de 30%)
+      renderLegacyChunks: false
     }),
 
-    // ✅ PWA Otimizado
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: false // ✅ Desabilita SW em dev
+        enabled: false
       },
       manifest: {
         name: "ALSHAM 360° PRIMA",
@@ -72,7 +61,6 @@ export default defineConfig({
         ],
         
         runtimeCaching: [
-          // 1. Supabase API - Network First
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/,
             handler: 'NetworkFirst',
@@ -85,8 +73,6 @@ export default defineConfig({
               networkTimeoutSeconds: 10
             }
           },
-          
-          // 2. Assets Locais - Stale While Revalidate
           {
             urlPattern: ({ url }) => {
               return url.origin === self.location.origin && 
@@ -97,8 +83,6 @@ export default defineConfig({
               cacheName: 'local-assets-v11.1'
             }
           },
-          
-          // 3. Imagens - Cache First
           {
             urlPattern: ({ url }) => {
               return url.origin === self.location.origin && 
@@ -113,8 +97,6 @@ export default defineConfig({
               }
             }
           },
-          
-          // 4. HTML Pages - Network First
           {
             urlPattern: ({ url }) => {
               return url.origin === self.location.origin && 
@@ -137,50 +119,33 @@ export default defineConfig({
       }
     }),
 
-    // ✅ Compression Brotli (melhor compressão)
     compression({ 
       algorithm: 'brotliCompress', 
       ext: '.br',
-      threshold: 1024, // Apenas arquivos > 1KB
-      compressionOptions: { level: 11 } // Máxima compressão
+      threshold: 1024,
+      compressionOptions: { level: 11 }
     }),
     
-    // ✅ Compression Gzip (fallback)
     compression({ 
       algorithm: 'gzip', 
       ext: '.gz',
       threshold: 1024,
       compressionOptions: { level: 9 }
-    }),
-
-    // ✅ Bundle Analyzer (descomente para analisar)
-    // visualizer({
-    //   filename: 'stats.html',
-    //   open: true,
-    //   gzipSize: true,
-    //   brotliSize: true
-    // })
+    })
   ],
 
   build: {
     target: 'esnext',
     outDir: 'dist',
-    sourcemap: false, // ✅ Sem sourcemaps em produção (segurança + performance)
-    minify: 'esbuild', // ✅ esbuild é 20x mais rápido que terser
-    
-    // ✅ Otimizações CSS
+    sourcemap: false,
+    minify: 'esbuild',
     cssMinify: true,
     cssCodeSplit: true,
-    
-    // ✅ Inline assets pequenos (< 4KB)
     assetsInlineLimit: 4096,
-    
-    // ✅ Chunk size warnings
-    chunkSizeWarningLimit: 500, // Avisa se chunk > 500KB
+    chunkSizeWarningLimit: 500,
     
     rollupOptions: {
       input: {
-        // ✅ Páginas principais
         main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'login.html'),
         register: resolve(__dirname, 'register.html'),
@@ -191,16 +156,12 @@ export default defineConfig({
         gamificacao: resolve(__dirname, 'gamificacao.html'),
         relatorios: resolve(__dirname, 'relatorios.html'),
         configuracoes: resolve(__dirname, 'configuracoes.html'),
-        
-        // ✅ Páginas de autenticação
         authDashboard: resolve(__dirname, 'auth-dashboard.html'),
         createOrg: resolve(__dirname, 'create-org.html'),
         logout: resolve(__dirname, 'logout.html'),
         resetPassword: resolve(__dirname, 'reset-password.html'),
         resetPasswordConfirm: resolve(__dirname, 'reset-password-confirm.html'),
         sessionGuard: resolve(__dirname, 'session-guard.html'),
-        
-        // ✅ Páginas de teste (opcional - remover em produção)
         testResetPassword: resolve(__dirname, 'test-reset-password.html'),
         testSupabase: resolve(__dirname, 'test-supabase.html'),
         timelineTest: resolve(__dirname, 'timeline-test.html'),
@@ -208,42 +169,40 @@ export default defineConfig({
       },
       
       output: {
-        // ✅ CODE SPLITTING OTIMIZADO v11.1
+        // ✅ CODE SPLITTING OTIMIZADO (sem duplicação)
         manualChunks: (id) => {
-          // 1. Supabase (essencial - sempre carrega)
+          // 1. Supabase
           if (id.includes('@supabase/supabase-js')) {
             return 'supabase';
           }
           
-          // 2. Chart.js (lazy load - chunk separado)
+          // 2. Chart.js
           if (id.includes('chart.js')) {
             return 'charts';
           }
           
-          // 3. jsPDF (lazy load - apenas quando exportar PDF)
+          // 3. jsPDF
           if (id.includes('jspdf')) {
             return 'export-pdf';
           }
           
-          // 4. XLSX (lazy load - apenas quando exportar Excel)
+          // 4. XLSX
           if (id.includes('xlsx')) {
             return 'export-excel';
           }
           
-          // 5. Confetti (lazy load - apenas em gamificação)
+          // 5. Confetti
           if (id.includes('canvas-confetti')) {
             return 'confetti';
           }
           
-          // 6. Node modules restantes (vendor comum)
+          // 6. Vendor comum
           if (id.includes('node_modules')) {
             return 'vendor';
           }
         },
         
-        // ✅ Nomes de arquivo com hash (cache busting)
         chunkFileNames: (chunkInfo) => {
-          // Chunks lazy-loaded não precisam de hash complexo
           const name = chunkInfo.name;
           if (name === 'charts' || name === 'export-pdf' || name === 'export-excel') {
             return 'assets/lazy/[name]-[hash].js';
@@ -252,51 +211,30 @@ export default defineConfig({
         },
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
-          // CSS separado por tipo
           if (assetInfo.name.endsWith('.css')) {
             return 'assets/css/[name]-[hash][extname]';
           }
-          // Fontes
           if (/\.(woff2?|ttf|eot)$/.test(assetInfo.name)) {
             return 'assets/fonts/[name]-[hash][extname]';
           }
-          // Imagens
           if (/\.(png|jpe?g|svg|gif|webp|ico)$/.test(assetInfo.name)) {
             return 'assets/images/[name]-[hash][extname]';
           }
           return 'assets/[name]-[hash][extname]';
-        },
-        
-        // ✅ Preload automático para chunks críticos
-        manualChunks(id) {
-          if (id.includes('src/lib/supabase')) {
-            return 'lib-supabase';
-          }
         }
       },
       
-      // ✅ Otimizações Rollup
       treeshake: {
         preset: 'recommended',
         moduleSideEffects: false
       }
     },
     
-    // ✅ Reportar compressed size
-    reportCompressedSize: true,
-    
-    // ✅ Terser options (se minify: 'terser')
-    // terserOptions: {
-    //   compress: {
-    //     drop_console: true,
-    //     drop_debugger: true
-    //   }
-    // }
+    reportCompressedSize: true
   },
 
   publicDir: 'public',
   
-  // ✅ Aliases para imports limpos
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -308,7 +246,6 @@ export default defineConfig({
     }
   },
 
-  // ✅ Server config para desenvolvimento
   server: {
     host: '0.0.0.0',
     port: 5173,
@@ -317,18 +254,9 @@ export default defineConfig({
     strictPort: false,
     hmr: {
       overlay: true
-    },
-    // ✅ Proxy para API (se necessário)
-    // proxy: {
-    //   '/api': {
-    //     target: 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, '')
-    //   }
-    // }
+    }
   },
 
-  // ✅ Preview config
   preview: {
     host: '0.0.0.0',
     port: 4173,
@@ -336,38 +264,30 @@ export default defineConfig({
     cors: true
   },
 
-  // ✅ Otimizações de dependências (pré-bundle)
   optimizeDeps: {
     include: [
-      '@supabase/supabase-js',
-      // Chart.js e exports NÃO incluídos (lazy load)
+      '@supabase/supabase-js'
     ],
     exclude: [
       '@vite/client', 
       '@vite/env',
-      'chart.js', // ✅ Lazy load
-      'jspdf',    // ✅ Lazy load
-      'xlsx'      // ✅ Lazy load
+      'chart.js',
+      'jspdf',
+      'xlsx'
     ],
-    // ✅ Force esbuild para deps
     esbuildOptions: {
       target: 'esnext'
     }
   },
 
-  // ✅ CSS Processing
   css: {
-    preprocessorOptions: {
-      // PostCSS será processado automaticamente
-    },
-    devSourcemap: true, // Sourcemap apenas em dev
+    devSourcemap: true,
     modules: {
       localsConvention: 'camelCase'
     }
   },
 
-  // ✅ JSON import optimization
   json: {
-    stringify: true // Converte JSON para string (menor bundle)
+    stringify: true
   }
 });
