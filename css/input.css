@@ -1,29 +1,16 @@
 /**
  * ⚡ ALSHAM 360° PRIMA — Tailwind CSS Source File
  * 
- * Este é o arquivo FONTE que gera o tailwind.min.css
- * Não editar o .min.css diretamente - sempre editar este arquivo.
- * 
- * Build: npm run build:css
- * Watch: npm run watch:css
- * 
  * @version 2.0.4
  * @author ALSHAM Global Design System Team
  * @enterprise-grade
  */
 
-/* ========================================
- * 🎨 TAILWIND IMPORTS
- * ======================================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ========================================
- * 🎨 DESIGN SYSTEM - BASE LAYER
- * ======================================== */
 @layer base {
-  /* Reset para consistência cross-browser */
   *,
   *::before,
   *::after {
@@ -34,7 +21,6 @@
     @apply scroll-smooth antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
   
   body {
@@ -44,13 +30,11 @@
     min-height: 100vh;
   }
   
-  /* Heading styles */
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold;
     color: var(--alsham-text-primary);
   }
   
-  /* Link styles */
   a {
     @apply transition-colors duration-200;
     color: var(--alsham-primary);
@@ -61,118 +45,43 @@
   }
 }
 
-/* ========================================
- * 🧩 DESIGN SYSTEM - COMPONENTS
- * ======================================== */
 @layer components {
-  /* ==================
-   * BUTTONS
-   * ================== */
   .btn {
     @apply inline-flex items-center justify-center 
            px-4 py-2 font-medium rounded-md
            transition-all duration-200 ease-in-out
            focus:outline-none focus:ring-2 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed
-           select-none;
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .btn-primary {
     @apply btn bg-primary text-white
            hover:bg-primary-hover active:bg-primary-dark
-           focus:ring-primary
-           shadow-sm hover:shadow-md;
+           focus:ring-primary shadow-sm hover:shadow-md;
   }
   
   .btn-secondary {
     @apply btn border border-border bg-surface text-text-primary
-           hover:bg-surface-hover
-           focus:ring-primary;
+           hover:bg-surface-hover focus:ring-primary;
   }
   
-  .btn-ghost {
-    @apply btn bg-transparent text-text-primary
-           hover:bg-surface-hover
-           focus:ring-primary;
-  }
-  
-  .btn-danger {
-    @apply btn bg-error text-white
-           hover:opacity-90
-           focus:ring-error;
-  }
-  
-  .btn-sm {
-    @apply px-3 py-1.5 text-sm;
-  }
-  
-  .btn-lg {
-    @apply px-6 py-3 text-lg;
-  }
-  
-  /* ==================
-   * CARDS
-   * ================== */
   .card {
     @apply bg-surface border border-border rounded-lg shadow-md p-6
-           transition-shadow duration-200 ease-in-out;
+           transition-shadow duration-200 ease-in-out hover:shadow-lg;
   }
   
-  .card-hover {
-    @apply card hover:shadow-lg hover:border-primary;
-  }
-  
-  .card-interactive {
-    @apply card-hover cursor-pointer
-           active:scale-[0.98];
-  }
-  
-  /* ==================
-   * FORMS
-   * ================== */
   .input {
     @apply w-full px-3 py-2 
            bg-surface border border-border rounded-md
            text-text-primary placeholder-text-tertiary
            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-hover
+           disabled:opacity-50 disabled:cursor-not-allowed
            transition-all duration-200 ease-in-out;
   }
   
-  .input-error {
-    @apply input border-error focus:ring-error;
-  }
-  
-  .label {
-    @apply block text-sm font-medium text-text-secondary mb-1;
-  }
-  
-  .select {
-    @apply input appearance-none cursor-pointer;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-  }
-  
-  .checkbox {
-    @apply w-4 h-4 rounded border-border
-           text-primary focus:ring-2 focus:ring-primary
-           transition-colors duration-200;
-  }
-  
-  .radio {
-    @apply checkbox rounded-full;
-  }
-  
-  /* ==================
-   * BADGES
-   * ================== */
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 
-           rounded-full text-xs font-medium
-           transition-colors duration-200 ease-in-out;
+           rounded-full text-xs font-medium;
   }
   
   .badge-success {
@@ -190,100 +99,12 @@
   .badge-info {
     @apply badge bg-info-bg text-info-text border border-info-border;
   }
-  
-  .badge-primary {
-    @apply badge bg-primary text-white;
-  }
-  
-  /* ==================
-   * ALERTS
-   * ================== */
-  .alert {
-    @apply rounded-lg p-4 border;
-  }
-  
-  .alert-success {
-    @apply alert bg-success-bg text-success-text border-success-border;
-  }
-  
-  .alert-warning {
-    @apply alert bg-warning-bg text-warning-text border-warning-border;
-  }
-  
-  .alert-error {
-    @apply alert bg-error-bg text-error-text border-error-border;
-  }
-  
-  .alert-info {
-    @apply alert bg-info-bg text-info-text border-info-border;
-  }
-  
-  /* ==================
-   * MODALS
-   * ================== */
-  .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 
-           flex items-center justify-center z-modal
-           backdrop-blur-sm;
-  }
-  
-  .modal-content {
-    @apply bg-surface rounded-lg shadow-2xl 
-           max-w-lg w-full mx-4 p-6
-           transform transition-all duration-300;
-  }
-  
-  /* ==================
-   * TABLES
-   * ================== */
-  .table {
-    @apply w-full border-collapse;
-  }
-  
-  .table-header {
-    @apply bg-surface-hover border-b border-border;
-  }
-  
-  .table-row {
-    @apply border-b border-border hover:bg-surface-hover
-           transition-colors duration-150;
-  }
-  
-  .table-cell {
-    @apply px-4 py-3 text-sm text-text-primary;
-  }
-  
-  /* ==================
-   * NAVIGATION
-   * ================== */
-  .nav-link {
-    @apply px-3 py-2 rounded-md text-sm font-medium
-           text-text-secondary hover:text-text-primary hover:bg-surface-hover
-           transition-all duration-200;
-  }
-  
-  .nav-link-active {
-    @apply nav-link text-primary bg-primary bg-opacity-10;
-  }
 }
 
-/* ========================================
- * 🎨 DESIGN SYSTEM - UTILITIES
- * ======================================== */
 @layer utilities {
-  /* Scrollbar customizado */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: var(--alsham-border-default) transparent;
-  }
-  
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
@@ -291,63 +112,13 @@
     border-radius: 3px;
   }
   
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: var(--alsham-border-strong);
-  }
-  
-  /* Text utilities */
   .text-gradient {
     background: linear-gradient(to right, var(--alsham-primary), var(--alsham-accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  /* Backdrop utilities */
-  .backdrop-blur-glass {
-    backdrop-filter: blur(12px) saturate(180%);
-    background: rgba(255, 255, 255, 0.1);
-  }
-  
-  .dark .backdrop-blur-glass {
-    background: rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Animation utilities */
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  .animate-slide-up {
-    animation: slideUp 0.6s ease-out;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 }
 
-/* ========================================
- * ♿ ACCESSIBILITY ENHANCEMENTS
- * ======================================== */
-
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -355,28 +126,14 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  :root {
-    --alsham-bg-canvas: #000000 !important;
-    --alsham-bg-surface: #1a1a1a !important;
-    --alsham-text-primary: #ffffff !important;
-    --alsham-border-default: #ffffff !important;
-  }
-}
-
-/* Focus visible (teclado) */
 :focus-visible {
   outline: 2px solid var(--alsham-primary);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
-/* Screen reader only */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -390,5 +147,23 @@
 }
 
 .sr-only-focusable:focus {
-  *
-
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
