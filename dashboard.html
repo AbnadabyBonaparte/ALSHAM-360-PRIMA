@@ -206,11 +206,11 @@
   <!-- Tailwind Compiled CSS -->
   <link rel="stylesheet" href="/css/tailwind.min.css" />
 
-  <!-- External Scripts with SRI -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqzcCzwFZvxiCBq8jCrVFhFCQjA7TeDgJIEAslHFaGUUc1P4G1xG0yVvPFYvPQQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAQ7V1u9krcw2g+q9eE9JqwgfO1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-r22gChDnGvBylk90+2e/ycr+equTRdRVZ2AVBnWk5bgVJABo5p9Q2ePwxUSULZ9JxaQVGAg9YvQ1d9K/uJTb6w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" integrity="sha256-Bkp8PKY8YFvKcSLQCi7UhPwP0C5xQH7LlBf6yMXlQkU=" crossorigin="anonymous"></script>
+  <!-- External Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <!-- ✅ Critical CSS Inline -->
   <style>
@@ -587,121 +587,6 @@
   <!-- Color Scheme (Native Dark Mode) -->
   <meta name="color-scheme" content="light dark">
 
-  <!-- ========================================== -->
-  <!-- ANALYTICS E MONITORING -->
-  <!-- ========================================== -->
-
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX', {
-      page_title: 'Dashboard Executivo v11.0',
-      page_location: window.location.href,
-      page_path: window.location.pathname,
-      send_page_view: true,
-      anonymize_ip: true, // LGPD compliance
-      cookie_flags: 'SameSite=None;Secure'
-    });
-  </script>
-
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
-
-  <!-- PostHog (Product Analytics) -->
-  <script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('YOUR_POSTHOG_KEY', {
-      api_host: 'https://app.posthog.com',
-      autocapture: true,
-      capture_pageview: true,
-      capture_pageleave: true,
-      session_recording: {
-        maskAllInputs: true, // LGPD compliance
-        maskTextSelector: '.sensitive'
-      }
-    });
-  </script>
-
-  <!-- Hotjar (Heatmaps & Session Recording) -->
-  <script>
-    (function(h,o,t,j,a,r){
-      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-      h._hjSettings={hjid:YOUR_HOTJAR_ID,hjsv:6};
-      a=o.getElementsByTagName('head')[0];
-      r=o.createElement('script');r.async=1;
-      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-      a.appendChild(r);
-    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-  </script>
-
-  <!-- Sentry (Error Tracking) -->
-  <script src="https://js.sentry-cdn.com/YOUR_PROJECT_ID.min.js" crossorigin="anonymous"></script>
-  <script>
-    Sentry.init({
-      dsn: 'YOUR_SENTRY_DSN',
-      environment: 'production',
-      release: 'alsham-dashboard@11.0.0',
-      beforeSend(event, hint) {
-        // Filtrar dados sensíveis
-        if (event.request) {
-          delete event.request.cookies;
-          delete event.request.headers['Authorization'];
-        }
-        return event;
-      },
-      tracesSampleRate: 0.2, // 20% das transações
-      integrations: [
-        new Sentry.BrowserTracing(),
-        new Sentry.Replay({
-          maskAllText: true,
-          blockAllMedia: true,
-        })
-      ],
-    });
-  </script>
-
-  <!-- Cookie Consent (LGPD) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" integrity="sha384-0E8Y8IkYkmW2dK3w5taV8g6vZOFI4Siu1V7sSp0QRMq6bYok2a5Wa7r2f4gKG5lE" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" integrity="sha384-Bz1s5m0DMoZq3jK3QdO9Q4VTk7iWv2nGyvGnQLS0g5OtuR7ZwBoJ3h2WQY6QRYH" crossorigin="anonymous"></script>
-  <script>
-    window.addEventListener('load', function() {
-      window.cookieconsent.initialise({
-        palette: {
-          popup: { background: "#0176D3", text: "#ffffff" },
-          button: { background: "#22C55E", text: "#ffffff" }
-        },
-        theme: "classic",
-        position: "bottom-right",
-        type: "opt-in",
-        content: {
-          message: "Este site usa cookies para melhorar sua experiência e análise de uso.",
-          dismiss: "Aceitar",
-          deny: "Recusar",
-          link: "Saiba mais",
-          href: "/privacy-policy.html",
-          policy: "Política de Privacidade"
-        },
-        onInitialise: function(status) {
-          if (this.hasConsented()) {
-            // Já carregado acima
-          }
-        },
-        onStatusChange: function(status) {
-          if (this.hasConsented()) {
-            // Recarregar analytics se usuário mudou de ideia
-            window.location.reload();
-          }
-        }
-      });
-    });
-  </script>
 </head>
 
 <body class="font-inter min-h-screen">
@@ -715,10 +600,6 @@
       </a>
     </div>
   </noscript>
-
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- Skip Link -->
   <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
@@ -1146,7 +1027,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" integrity="sha384-8h+WhrF8hQ6c1K1hOHW7shG7zQdHByYH2baWN8xBKuY1TDG5D9ePzx+5VieF77M" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
   
   <!-- Supabase Init Inline -->
   <script type="module">
