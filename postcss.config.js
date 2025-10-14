@@ -1,43 +1,23 @@
 /**
  * ⚡ ALSHAM 360° PRIMA — PostCSS Configuration
  * 
- * Configuração do processador CSS para Tailwind e otimizações.
+ * Configuração minimalista e funcional do PostCSS.
+ * 
+ * Plugins:
+ * - tailwindcss: Processa diretivas @tailwind
+ * - autoprefixer: Adiciona prefixos vendor automaticamente
+ * 
+ * Nota: Minificação é feita pelo Tailwind CLI (--minify flag)
+ * Nota: cssnano removido (causa erro no Vercel build)
  * 
  * @version 2.0.4
  * @enterprise-grade
+ * @author AbnadabyBonaparte
  */
 
 export default {
   plugins: {
-    // Tailwind CSS processing
     tailwindcss: {},
-    
-    // Autoprefixer para compatibilidade cross-browser
-    autoprefixer: {
-      overrideBrowserslist: [
-        '>0.2%',
-        'not dead',
-        'not op_mini all',
-        'last 2 versions',
-        'iOS >= 12',
-        'Safari >= 12'
-      ],
-      grid: 'autoplace'
-    },
-    
-    // Minificação em produção
-    ...(process.env.NODE_ENV === 'production' ? {
-      cssnano: {
-        preset: ['default', {
-          discardComments: {
-            removeAll: true,
-          },
-          normalizeWhitespace: true,
-          colormin: true,
-          minifyFontValues: true,
-          minifyGradients: true,
-        }]
-      }
-    } : {})
+    autoprefixer: {}
   }
 };
