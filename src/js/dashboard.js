@@ -191,6 +191,32 @@ function getPeriodDays() {
 }
 
 // ============================================================================
+// RENDERIZAÇÃO PRINCIPAL
+// ============================================================================
+
+/**
+ * Renderizar todo o dashboard (função principal)
+ */
+function renderDashboard() {
+  console.log('🎨 Renderizando dashboard completo...');
+  try {
+    renderFilters();
+    renderKPIs();
+    renderGoals();
+    renderROI();
+    renderStatusChart();
+    renderDailyChart();
+    renderFunnelChart();
+    renderOrigemChart();
+    renderLeadsTable();
+    console.log('✅ Dashboard renderizado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao renderizar dashboard:', error);
+    showError('Erro ao renderizar dashboard: ' + error.message);
+  }
+}
+
+// ============================================================================
 // FILTROS & BUSCA
 // ============================================================================
 function applyFilters() {
@@ -1424,7 +1450,7 @@ function stopAutoRefresh() {
 }
 
 // ============================================================================
-// API PÚBLICA - COMPLETO
+// API PÚBLICA
 // ============================================================================
 window.DashboardApp = {
   state: DashboardState,
@@ -1464,14 +1490,9 @@ window.DashboardApp = {
   },
   clearFilters: () => {
     DashboardState.filters = { dateRange: 'all', status: [], origem: [], search: '' };
-    const searchInput = document.getElementById('search-input');
-    const dateFilter = document.getElementById('date-filter');
-    const comparisonToggle = document.getElementById('comparison-toggle');
-    
-    if (searchInput) searchInput.value = '';
-    if (dateFilter) dateFilter.value = 'all';
-    if (comparisonToggle) comparisonToggle.checked = false;
-    
+    document.getElementById('search-input').value = '';
+    document.getElementById('date-filter').value = 'all';
+    document.getElementById('comparison-toggle').checked = false;
     DashboardState.comparison.enabled = false;
     applyFilters();
     renderDashboard();
