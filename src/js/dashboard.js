@@ -217,6 +217,34 @@ function renderDashboard() {
 }
 
 // ============================================================================
+// NUMBER COUNTER ANIMATION
+// ============================================================================
+
+/**
+ * Anima contadores numericamente (efeito de incremento)
+ * @param {HTMLElement} element - Elemento DOM que contém o número
+ * @param {number} start - Valor inicial
+ * @param {number} end - Valor final
+ * @param {number} duration - Duração da animação em ms
+ */
+function animateCounter(element, start, end, duration = 1000) {
+  if (!element) return;
+  
+  const range = end - start;
+  const increment = range / (duration / 16); // 60 FPS
+  let current = start;
+  
+  const timer = setInterval(() => {
+    current += increment;
+    if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+      current = end;
+      clearInterval(timer);
+    }
+    element.textContent = Math.floor(current);
+  }, 16);
+}
+
+// ============================================================================
 // FILTROS & BUSCA
 // ============================================================================
 function applyFilters() {
