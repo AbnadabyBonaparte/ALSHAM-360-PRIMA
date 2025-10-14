@@ -17,9 +17,9 @@
   <!-- ========================================== -->
   <!-- SEO ESSENCIAL -->
   <!-- ========================================== -->
-  <title>Dashboard Executivo v12.0.2 — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v12.0.2 - CRM Enterprise com IA, Performance 99/100, TBT 110ms, exports completos, animações premium e acessibilidade WCAG AAA" />
-  <meta name="keywords" content="CRM, dashboard, leads, pipeline, automação, IA, enterprise, analytics, ROI, gamificação, performance">
+  <title>Dashboard Executivo v11.1 — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.1 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
+  <meta name="keywords" content="CRM, dashboard, leads, pipeline, automação, IA, enterprise, analytics, ROI, gamificação">
   <meta name="author" content="ALSHAM Global">
   <meta name="robots" content="index, follow">
   <meta name="language" content="pt-BR">
@@ -28,10 +28,10 @@
   <!-- ========================================== -->
   <!-- DUBLIN CORE METADATA -->
   <!-- ========================================== -->
-  <meta name="DC.title" content="Dashboard Executivo v12.0.2 — ALSHAM 360° PRIMA">
+  <meta name="DC.title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
   <meta name="DC.creator" content="ALSHAM Global">
   <meta name="DC.subject" content="CRM, Vendas, Automação">
-  <meta name="DC.description" content="Dashboard executivo ALSHAM 360° PRIMA v12.0.2">
+  <meta name="DC.description" content="Dashboard executivo ALSHAM 360° PRIMA v11.1">
   <meta name="DC.publisher" content="ALSHAM Global">
   <meta name="DC.contributor" content="AbnadabyBonaparte">
   <meta name="DC.date" content="2025-10-14">
@@ -52,8 +52,8 @@
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
-  <!-- ✅ CSP CORRIGIDO v12.0.2 - Permite Google APIs para Supabase Auth -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://accounts.google.com; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
+  <!-- ✅ CSP OTIMIZADO (Removido unsafe-inline/eval para scripts externos) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
 
   <!-- Permissions Policy -->
   <meta http-equiv="Permissions-Policy" content="geolocation=(self), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self)">
@@ -89,8 +89,8 @@
   <!-- ========================================== -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://app.alshamglobal.com.br/dashboard">
-  <meta property="og:title" content="Dashboard Executivo v12.0.1 — ALSHAM 360° PRIMA">
-  <meta property="og:description" content="CRM Enterprise com IA - Performance 99/100, TBT 110ms">
+  <meta property="og:title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
+  <meta property="og:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações com inteligência artificial">
   <meta property="og:image" content="https://app.alshamglobal.com.br/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -105,8 +105,8 @@
   <!-- ========================================== -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://app.alshamglobal.com.br/dashboard">
-  <meta name="twitter:title" content="Dashboard Executivo v12.0.1 — ALSHAM 360° PRIMA">
-  <meta name="twitter:description" content="CRM Enterprise com IA - Performance 99/100">
+  <meta name="twitter:title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
+  <meta name="twitter:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações">
   <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
   <meta name="twitter:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
   <meta name="twitter:site" content="@alshamglobal">
@@ -189,7 +189,7 @@
   <!-- PRELOAD CRITICAL RESOURCES -->
   <!-- ========================================== -->
   <link rel="preload" href="/css/tokens.css" as="style">
-  <!-- ✅ REMOVIDO preload inter-var.woff2 (404 error) -->
+  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
   
   <!-- ✅ MODULEPRELOAD para ES6 modules -->
   <link rel="modulepreload" href="/src/lib/supabase.js">
@@ -526,10 +526,10 @@
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web, iOS, Android",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
-    "softwareVersion": "12.0.1",
+    "softwareVersion": "11.1.0",
     "datePublished": "2025-01-01",
     "dateModified": "2025-10-14",
-    "description": "CRM Enterprise com IA para gestão de leads, pipeline, automações e relatórios avançados. Performance 99/100, TBT 110ms.",
+    "description": "CRM Enterprise com IA para gestão de leads, pipeline, automações e relatórios avançados",
     "screenshot": "https://app.alshamglobal.com.br/screenshots/dashboard.png",
     "offers": {
       "@type": "Offer",
@@ -539,8 +539,8 @@
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "ratingCount": "150",
+      "ratingValue": "4.8",
+      "ratingCount": "127",
       "bestRating": "5",
       "worstRating": "1"
     },
@@ -564,14 +564,185 @@
       "Gamificação",
       "Integrações API",
       "Dark Mode",
-      "Acessibilidade WCAG AAA",
-      "Performance 99/100",
-      "PWA Offline-First"
+      "Acessibilidade WCAG AAA"
     ]
   }
   </script>
 
 </head>
+
+<body class="font-inter min-h-screen">
+
+  <!-- Noscript Warning -->
+  <noscript>
+    <div class="noscript-warning" style="display: block !important;">
+      ⚠️ JavaScript está desabilitado. Este sistema requer JavaScript para funcionar corretamente.
+      <a href="https://www.enable-javascript.com/pt/" target="_blank" style="color: #0176D3; text-decoration: underline; margin-left: 10px;">
+        Como habilitar JavaScript?
+      </a>
+    </div>
+  </noscript>
+
+  <!-- Skip Link (A11y) -->
+  <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
+
+  <!-- Offline Indicator -->
+  <div id="offline-indicator" class="offline-badge hidden" role="alert" aria-live="assertive">
+    🔴 Sem conexão
+  </div>
+
+  <!-- ARIA Live Regions (A11y) -->
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <div role="alert" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- LOADING INDICATOR -->
+  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando dashboard">
+    <div class="text-center">
+      <div class="loading-spinner mb-4"></div>
+      <!-- Logo SVG Inline -->
+      <svg width="180" height="60" viewBox="0 0 180 60" xmlns="http://www.w3.org/2000/svg" aria-label="Logo ALSHAM 360° PRIMA">
+        <defs>
+          <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <text x="10" y="35" font-family="Poppins, sans-serif" font-size="28" font-weight="700" fill="url(#logo-gradient)">ALSHAM</text>
+        <text x="10" y="52" font-family="Inter, sans-serif" font-size="12" fill="#6b7280">360° PRIMA</text>
+        <circle cx="155" cy="30" r="20" fill="none" stroke="url(#logo-gradient)" stroke-width="2"/>
+        <path d="M150 30 L160 30 M155 25 L155 35" stroke="url(#logo-gradient)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p class="font-medium mt-4" style="color: var(--alsham-text-secondary);">
+        Carregando dashboard executivo v11.1...
+      </p>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-40 shadow-sm border-b no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" role="navigation" aria-label="Navegação principal">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <div class="flex items-center gap-4">
+        <button id="menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Abrir menu" aria-expanded="false">
+          <svg class="w-6 h-6" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" aria-label="ALSHAM 360°">
+          <defs>
+            <linearGradient id="nav-logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <text x="5" y="25" font-family="Poppins, sans-serif" font-size="20" font-weight="700" fill="url(#nav-logo-gradient)">ALSHAM 360°</text>
+        </svg>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-6" role="menubar">
+        <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1" role="menuitem" aria-current="page">Dashboard</a>
+        <a href="/leads-real.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Leads</a>
+        <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Pipeline</a>
+        <a href="/automacoes.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Automações</a>
+        <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Gamificação</a>
+        <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Relatórios</a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="contrast-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar modo de alto contraste" title="Alto Contraste">
+          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+        
+        <button id="theme-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar tema claro/escuro" title="Tema">
+          <svg class="sun-icon w-5 h-5 dark:hidden" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <svg class="moon-icon w-5 h-5 hidden dark:block" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+        
+        <button id="fullscreen-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition hidden md:block" style="border-color: var(--alsham-border-default);" aria-label="Tela cheia" title="Tela Cheia">
+          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+          </svg>
+        </button>
+        
+        <a href="/configuracoes.html" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Configurações" title="Configurações">
+          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- SIDENAV -->
+  <aside id="sidenav" class="side-nav mobile-hidden md:block fixed left-0 top-16 w-56 h-[calc(100vh-64px)] border-r p-4 overflow-y-auto no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" role="navigation" aria-label="Navegação lateral">
+    <nav class="flex flex-col space-y-2">
+      <a href="/dashboard.html" class="font-semibold text-blue-600 p-2 rounded transition flex items-center gap-2" style="background: rgba(59,130,246,0.1);" aria-current="page">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="/leads-real.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        Leads
+      </a>
+      <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Pipeline
+      </a>
+      <a href="/automacoes.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Automações
+      </a>
+      <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
+        </svg>
+        Gamificação
+      </a>
+      <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Relatórios
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 md:ml-56" role="main">
+    <header class="mb-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+        <div>
+          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Dashboard Executivo v11.1</h1>
+          <p style="color: var(--alsham-text-secondary);">CRM Enterprise com IA - Exports completos, animações premium e acessibilidade WCAG AAA</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--alsham-text-secondary);">
+            <input type="checkbox" id="auto-refresh" class="w-4 h-4 cursor-pointer" aria-label="Auto-atualização a cada minuto">
+            <span>🔄 Auto-refresh</span>
+          </label>
+          <button onclick="window.DashboardApp.openScheduledReports()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm" aria-label="Agendar relatórios automáticos">📅 Agendar Relatórios</button>
+        </div>
+      </div>
+    </header>
 
     <div id="dashboard-filters" aria-label="Filtros do dashboard"></div>
     <div id="dashboard-kpis" aria-label="Indicadores principais" class="reveal"></div>
