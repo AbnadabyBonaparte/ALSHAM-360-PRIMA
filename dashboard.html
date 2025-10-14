@@ -4,35 +4,34 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <!-- ✅ Theme Init Inline (Evita FOUC) - CRITICAL -->
   <script>
     (function() {
       const theme = localStorage.getItem('alsham-theme') || 'light';
       const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-      if (contrast === 'high') {
-        document.documentElement.classList.add('high-contrast');
-      }
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+      if (contrast === 'high') document.documentElement.classList.add('high-contrast');
     })();
   </script>
   
-  <!-- SEO -->
-  <title>Dashboard Executivo v11.0 — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.0 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
+  <!-- ========================================== -->
+  <!-- SEO ESSENCIAL -->
+  <!-- ========================================== -->
+  <title>Dashboard Executivo v11.1 — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.1 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
   <meta name="keywords" content="CRM, dashboard, leads, pipeline, automação, IA, enterprise, analytics, ROI, gamificação">
   <meta name="author" content="ALSHAM Global">
   <meta name="robots" content="index, follow">
   <meta name="language" content="pt-BR">
   <link rel="canonical" href="https://app.alshamglobal.com.br/dashboard">
 
-  <!-- Dublin Core Metadata (opcional mas recomendado) -->
-  <meta name="DC.title" content="Dashboard Executivo v11.0 — ALSHAM 360° PRIMA">
+  <!-- ========================================== -->
+  <!-- DUBLIN CORE METADATA -->
+  <!-- ========================================== -->
+  <meta name="DC.title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
   <meta name="DC.creator" content="ALSHAM Global">
   <meta name="DC.subject" content="CRM, Vendas, Automação">
-  <meta name="DC.description" content="Dashboard executivo ALSHAM 360° PRIMA v11.0">
+  <meta name="DC.description" content="Dashboard executivo ALSHAM 360° PRIMA v11.1">
   <meta name="DC.publisher" content="ALSHAM Global">
   <meta name="DC.contributor" content="AbnadabyBonaparte">
   <meta name="DC.date" content="2025-10-14">
@@ -43,37 +42,41 @@
   <meta name="DC.coverage" content="Brasil">
   <meta name="DC.rights" content="© 2025 ALSHAM Global">
 
-  <!-- Verificação de proprietário -->
-  <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE">
-  <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE">
-  <meta name="yandex-verification" content="YOUR_YANDEX_CODE">
-  <meta name="facebook-domain-verification" content="YOUR_FB_CODE">
-
-  <!-- ✅ CSP COMPLETO -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
-
   <!-- ========================================== -->
-  <!-- META TAGS AVANÇADAS (FALTANDO) -->
+  <!-- SECURITY & COMPATIBILITY -->
   <!-- ========================================== -->
-
-  <!-- IE Compatibility (ainda relevante para empresas) -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
+  <!-- ✅ CSP OTIMIZADO (Removido unsafe-inline/eval para scripts externos) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
 
-  <!-- Format Detection -->
+  <!-- Permissions Policy -->
+  <meta http-equiv="Permissions-Policy" content="geolocation=(self), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self)">
+
+  <!-- ========================================== -->
+  <!-- FORMAT & GEOGRAPHIC -->
+  <!-- ========================================== -->
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
-
-  <!-- Geographic Tags -->
   <meta name="geo.region" content="BR">
   <meta name="geo.placename" content="São Paulo">
   <meta name="geo.position" content="-23.550520;-46.633308">
   <meta name="ICBM" content="-23.550520, -46.633308">
 
-  <!-- Business Contact -->
+  <!-- ========================================== -->
+  <!-- BUSINESS CONTACT -->
+  <!-- ========================================== -->
   <meta name="contact" content="contato@alshamglobal.com.br">
   <meta name="copyright" content="© 2025 ALSHAM Global. Todos os direitos reservados.">
   <meta name="reply-to" content="suporte@alshamglobal.com.br">
 
-  <!-- SEO Avançado -->
+  <!-- ========================================== -->
+  <!-- SEO AVANÇADO -->
+  <!-- ========================================== -->
   <meta name="rating" content="general">
   <meta name="revisit-after" content="7 days">
   <meta name="distribution" content="global">
@@ -81,26 +84,52 @@
   <meta name="googlebot" content="index, follow, max-image-preview:large">
   <meta name="bingbot" content="index, follow">
 
-  <!-- Open Graph ADICIONAL -->
+  <!-- ========================================== -->
+  <!-- OPEN GRAPH -->
+  <!-- ========================================== -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://app.alshamglobal.com.br/dashboard">
+  <meta property="og:title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
+  <meta property="og:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações com inteligência artificial">
+  <meta property="og:image" content="https://app.alshamglobal.com.br/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
+  <meta property="og:site_name" content="ALSHAM 360° PRIMA">
+  <meta property="og:locale" content="pt_BR">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:locale:alternate" content="es_ES">
 
-  <!-- Twitter Card ADICIONAL -->
+  <!-- ========================================== -->
+  <!-- TWITTER CARD -->
+  <!-- ========================================== -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://app.alshamglobal.com.br/dashboard">
+  <meta name="twitter:title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
+  <meta name="twitter:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações">
+  <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
+  <meta name="twitter:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
   <meta name="twitter:site" content="@alshamglobal">
   <meta name="twitter:creator" content="@alshamglobal">
-  <meta name="twitter:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
 
-  <!-- LinkedIn -->
+  <!-- ========================================== -->
+  <!-- LINKEDIN & PINTEREST -->
+  <!-- ========================================== -->
   <meta property="linkedin:owner" content="ALSHAM Global">
-
-  <!-- Pinterest -->
   <meta name="pinterest" content="nopin" description="Esta página não pode ser pinada no Pinterest">
 
-  <!-- Apple-Specific META (além dos já presentes) -->
+  <!-- ========================================== -->
+  <!-- PWA & MOBILE -->
+  <!-- ========================================== -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="color-scheme" content="light dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="ALSHAM">
+  
+  <!-- Microsoft Tiles -->
   <meta name="msapplication-TileColor" content="#0176D3">
   <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
   <meta name="msapplication-config" content="/browserconfig.xml">
@@ -108,111 +137,91 @@
   <meta name="msapplication-starturl" content="/">
   <meta name="msapplication-navbutton-color" content="#0176D3">
 
-  <!-- Alternate Languages (i18n) -->
+  <!-- ========================================== -->
+  <!-- ICONS (OTIMIZADO) -->
+  <!-- ========================================== -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="shortcut icon" href="/favicon.ico">
+  
+  <!-- Favicons principais -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png">
+  
+  <!-- Android Icons -->
+  <link rel="icon" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="icon" sizes="512x512" href="/android-icon-512x512.png">
+
+  <!-- ========================================== -->
+  <!-- ALTERNATE LANGUAGES -->
+  <!-- ========================================== -->
   <link rel="alternate" hreflang="pt-BR" href="https://app.alshamglobal.com.br/dashboard">
   <link rel="alternate" hreflang="en-US" href="https://app.alshamglobal.com/en/dashboard">
   <link rel="alternate" hreflang="es-ES" href="https://app.alshamglobal.com/es/dashboard">
   <link rel="alternate" hreflang="x-default" href="https://app.alshamglobal.com.br/dashboard">
 
-  <!-- RSS/Atom -->
+  <!-- ========================================== -->
+  <!-- RSS/ATOM & SEARCH -->
+  <!-- ========================================== -->
   <link rel="alternate" type="application/rss+xml" title="ALSHAM Blog RSS" href="/rss.xml">
   <link rel="alternate" type="application/atom+xml" title="ALSHAM Blog Atom" href="/atom.xml">
-
-  <!-- Search -->
   <link rel="search" type="application/opensearchdescription+xml" title="Buscar ALSHAM" href="/opensearch.xml">
-
-  <!-- Sitemap -->
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
 
-  <!-- Additional Icons -->
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png">
-  <link rel="icon" sizes="192x192" href="/android-icon-192x192.png">
-  <link rel="icon" sizes="512x512" href="/android-icon-512x512.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <!-- ========================================== -->
+  <!-- DNS PREFETCH & PRECONNECT (OTIMIZADO) -->
+  <!-- ========================================== -->
+  <link rel="preconnect" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 
-  <!-- Preload Critical Assets (ORDEM IMPORTA!) -->
+  <!-- ========================================== -->
+  <!-- PRELOAD CRITICAL RESOURCES -->
+  <!-- ========================================== -->
   <link rel="preload" href="/css/tokens.css" as="style">
   <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/js/dashboard.js" as="script">
+  
+  <!-- ✅ MODULEPRELOAD para ES6 modules -->
   <link rel="modulepreload" href="/src/lib/supabase.js">
+  <link rel="modulepreload" href="/src/lib/chart-loader.js">
 
-  <!-- Prefetch Next Pages -->
+  <!-- ========================================== -->
+  <!-- PREFETCH NEXT PAGES -->
+  <!-- ========================================== -->
   <link rel="prefetch" href="/leads-real.html">
   <link rel="prefetch" href="/pipeline.html">
   <link rel="prefetch" href="/automacoes.html">
 
-  <!-- DNS Prefetch ADICIONAL -->
-  <link rel="dns-prefetch" href="//fonts.googleapis.com">
-  <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  <link rel="dns-prefetch" href="//api.openai.com">
-  <link rel="dns-prefetch" href="//app.posthog.com">
-
-  <!-- Preconnect COMPLETO -->
-  <link rel="preconnect" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://app.alshamglobal.com.br/dashboard">
-  <meta property="og:title" content="Dashboard Executivo v11.0 — ALSHAM 360° PRIMA">
-  <meta property="og:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações com inteligência artificial">
-  <meta property="og:image" content="https://app.alshamglobal.com.br/og-image.png">
-  <meta property="og:site_name" content="ALSHAM 360° PRIMA">
-  <meta property="og:locale" content="pt_BR">
-  
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://app.alshamglobal.com.br/dashboard">
-  <meta name="twitter:title" content="Dashboard Executivo v11.0 — ALSHAM 360° PRIMA">
-  <meta name="twitter:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações">
-  <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
-
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0176D3">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
-  
-  <!-- Icons -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  
-  <!-- Resource Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="dns-prefetch" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co">
-  
-  <!-- ✅ Estilos (ORDEM CORRETA) -->
+  <!-- ========================================== -->
+  <!-- CSS (ORDEM OTIMIZADA) -->
+  <!-- ========================================== -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/dashboard-animations.css" />
-
-  <!-- Tailwind Compiled CSS -->
+  <link rel="stylesheet" href="/css/dashboard-improvements.css" />
   <link rel="stylesheet" href="/css/tailwind.min.css" />
 
-  <!-- External Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- ========================================== -->
+  <!-- ⚡ LAZY LOADED EXTERNAL SCRIPTS (DEFER) -->
+  <!-- ========================================== -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- ✅ Critical CSS Inline -->
+  <!-- ========================================== -->
+  <!-- ✅ CRITICAL CSS INLINE (< 14KB) -->
+  <!-- ========================================== -->
   <style>
     /* High Contrast Override */
     html.high-contrast {
@@ -225,7 +234,7 @@
     html.high-contrast .text-blue-600 { color: #00ffff !important; }
     html.high-contrast button { border: 2px solid #ffffff !important; }
     
-    /* Skip Link */
+    /* Skip Link (A11y) */
     .skip-link {
       position: absolute;
       top: -40px;
@@ -278,10 +287,7 @@
       opacity: 0;
       transition: all 0.3s ease;
     }
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { border-left: 4px solid #22C55E; }
     .toast.error { border-left: 4px solid #EF4444; }
     .toast.info { border-left: 4px solid #3B82F6; }
@@ -299,37 +305,6 @@
     .modal-content { background: var(--alsham-bg-surface); padding: 2rem; border-radius: 0.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    
-    /* Print Styles */
-    @media print {
-      .no-print, nav, aside, button, .modal { display: none !important; }
-      body { background: white; color: black; }
-      .main-content-wrapper { margin-left: 0 !important; }
-      .chart-drilldown { page-break-inside: avoid; }
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .side-nav.mobile-hidden { display: none !important; }
-      .side-nav.mobile-visible { 
-        display: block !important;
-        position: fixed;
-        top: 64px;
-        left: 0;
-        width: 100%;
-        height: calc(100vh - 64px);
-        z-index: 50;
-      }
-      .main-content-wrapper { margin-left: 0 !important; }
-      .grid { grid-template-columns: 1fr !important; }
-      .md\:flex { display: none !important; }
-    }
-    
-    /* Focus Visible */
-    *:focus-visible { outline: 3px solid #3B82F6; outline-offset: 2px; }
-    .hidden { display: none !important; }
-    .chart-drilldown { cursor: pointer; }
-    .chart-drilldown:hover { opacity: 0.8; }
     
     /* Offline Indicator */
     .offline-badge {
@@ -351,15 +326,59 @@
       to { transform: translateX(0); opacity: 1; }
     }
 
+    /* Focus Visible */
+    *:focus-visible { outline: 3px solid #3B82F6; outline-offset: 2px; }
+    .hidden { display: none !important; }
+    .chart-drilldown { cursor: pointer; }
+    .chart-drilldown:hover { opacity: 0.8; }
+    
+    /* Screen Reader Only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    .sr-only-focusable:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: inherit;
+      margin: inherit;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
+
     /* ========================================== */
-    /* ADICIONAR DENTRO DO STYLE EXISTENTE */
+    /* RESPONSIVE & ACCESSIBILITY */
     /* ========================================== */
 
-    /* Reduced Motion Support (A11y) */
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .side-nav.mobile-hidden { display: none !important; }
+      .side-nav.mobile-visible { 
+        display: block !important;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 64px);
+        z-index: 50;
+      }
+      .main-content-wrapper { margin-left: 0 !important; }
+      .grid { grid-template-columns: 1fr !important; }
+      .md\:flex { display: none !important; }
+    }
+
+    /* Reduced Motion (A11y) */
     @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
+      *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
@@ -377,7 +396,7 @@
       }
     }
 
-    /* Dark Mode Colors (prefers-color-scheme) */
+    /* Dark Mode (prefers-color-scheme) */
     @media (prefers-color-scheme: dark) {
       :root:not(.light) {
         --alsham-text-primary: #f9fafb;
@@ -387,12 +406,13 @@
       }
     }
 
-    /* Print Optimization */
+    /* Print Styles */
     @media print {
-      @page { 
-        margin: 2cm;
-        size: A4;
-      }
+      .no-print, nav, aside, button, .modal { display: none !important; }
+      body { background: white; color: black; }
+      .main-content-wrapper { margin-left: 0 !important; }
+      .chart-drilldown { page-break-inside: avoid; page-break-after: always; }
+      @page { margin: 2cm; size: A4; }
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -402,30 +422,9 @@
         font-size: 0.8em;
         color: #666;
       }
-      .chart-drilldown {
-        page-break-inside: avoid;
-        page-break-after: always;
-      }
     }
 
-    /* Focus Visible Polyfill */
-    .js-focus-visible :focus:not(.focus-visible) {
-      outline: none;
-    }
-    :focus-visible {
-      outline: 3px solid #3B82F6;
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-
-    /* Container Queries (Modern CSS) */
-    @container (min-width: 768px) {
-      .responsive-card {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Noscript Styles */
+    /* Noscript Warning */
     .noscript-warning {
       display: none;
       position: fixed;
@@ -441,7 +440,11 @@
     }
   </style>
 
-  <!-- JSON-LD Structured Data -->
+  <!-- ========================================== -->
+  <!-- JSON-LD STRUCTURED DATA -->
+  <!-- ========================================== -->
+  
+  <!-- SoftwareApplication Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -462,7 +465,7 @@
   }
   </script>
 
-  <!-- Breadcrumb Structured Data -->
+  <!-- Breadcrumb Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -481,7 +484,7 @@
   }
   </script>
 
-  <!-- Organization Structured Data -->
+  <!-- Organization Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -513,7 +516,7 @@
   }
   </script>
 
-  <!-- WebApplication Structured Data (COMPLETO) -->
+  <!-- WebApplication Schema (Completo) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -523,9 +526,9 @@
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web, iOS, Android",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
-    "softwareVersion": "11.0.0",
+    "softwareVersion": "11.1.0",
     "datePublished": "2025-01-01",
-    "dateModified": "2025-10-13",
+    "dateModified": "2025-10-14",
     "description": "CRM Enterprise com IA para gestão de leads, pipeline, automações e relatórios avançados",
     "screenshot": "https://app.alshamglobal.com.br/screenshots/dashboard.png",
     "offers": {
@@ -566,28 +569,6 @@
   }
   </script>
 
-  <!-- Additional Security Headers -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-  <meta http-equiv="Permissions-Policy" content="
-    geolocation=(self),
-    microphone=(),
-    camera=(),
-    payment=(self),
-    usb=(),
-    magnetometer=(),
-    gyroscope=(),
-    accelerometer=(),
-    fullscreen=(self)
-  ">
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-
-  <!-- Color Scheme (Native Dark Mode) -->
-  <meta name="color-scheme" content="light dark">
-  <link rel="stylesheet" href="/css/dashboard-improvements.css">
-
 </head>
 
 <body class="font-inter min-h-screen">
@@ -602,7 +583,7 @@
     </div>
   </noscript>
 
-  <!-- Skip Link -->
+  <!-- Skip Link (A11y) -->
   <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
 
   <!-- Offline Indicator -->
@@ -611,37 +592,8 @@
   </div>
 
   <!-- ARIA Live Regions (A11y) -->
-  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only">
-    <!-- Anúncios para leitores de tela -->
-  </div>
-  <div role="alert" aria-live="assertive" aria-atomic="true" class="sr-only">
-    <!-- Alertas urgentes -->
-  </div>
-
-  <!-- Screen Reader Only Utility -->
-  <style>
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      white-space: nowrap;
-      border-width: 0;
-    }
-    .sr-only-focusable:focus {
-      position: static;
-      width: auto;
-      height: auto;
-      padding: inherit;
-      margin: inherit;
-      overflow: visible;
-      clip: auto;
-      white-space: normal;
-    }
-  </style>
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <div role="alert" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
 
   <!-- Toast Container -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
@@ -664,7 +616,7 @@
         <path d="M150 30 L160 30 M155 25 L155 35" stroke="url(#logo-gradient)" stroke-width="2" stroke-linecap="round"/>
       </svg>
       <p class="font-medium mt-4" style="color: var(--alsham-text-secondary);">
-        Carregando dashboard executivo v11.0...
+        Carregando dashboard executivo v11.1...
       </p>
     </div>
   </div>
@@ -674,12 +626,10 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
       <div class="flex items-center gap-4">
         <button id="menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Abrir menu" aria-expanded="false">
-          <!-- Menu Icon SVG -->
           <svg class="w-6 h-6" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
-        <!-- Logo SVG Inline -->
         <svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" aria-label="ALSHAM 360°">
           <defs>
             <linearGradient id="nav-logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -701,7 +651,6 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- High Contrast Toggle -->
         <button id="contrast-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar modo de alto contraste" title="Alto Contraste">
           <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -709,7 +658,6 @@
           </svg>
         </button>
         
-        <!-- Theme Toggle -->
         <button id="theme-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar tema claro/escuro" title="Tema">
           <svg class="sun-icon w-5 h-5 dark:hidden" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -719,14 +667,12 @@
           </svg>
         </button>
         
-        <!-- Fullscreen Toggle -->
         <button id="fullscreen-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition hidden md:block" style="border-color: var(--alsham-border-default);" aria-label="Tela cheia" title="Tela Cheia">
           <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
           </svg>
         </button>
         
-        <!-- Settings Link -->
         <a href="/configuracoes.html" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Configurações" title="Configurações">
           <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -785,7 +731,7 @@
     <header class="mb-8">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
         <div>
-          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Dashboard Executivo v11.0</h1>
+          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Dashboard Executivo v11.1</h1>
           <p style="color: var(--alsham-text-secondary);">CRM Enterprise com IA - Exports completos, animações premium e acessibilidade WCAG AAA</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
