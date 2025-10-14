@@ -1,0 +1,581 @@
+/**
+ * ⚡ ALSHAM 360° PRIMA - Dashboard Improvements v1.0
+ * Melhorias visuais premium para transformar o dashboard em nível bilionário
+ * 
+ * @author @AbnadabyBonaparte
+ * @date 2025-10-14
+ * @version 1.0.0
+ * @license Proprietary - ALSHAM Global
+ * 
+ * INSTRUÇÕES:
+ * 1. Adicione este arquivo DEPOIS dos outros CSS no dashboard.html
+ * 2. <link rel="stylesheet" href="/css/dashboard-improvements.css">
+ * 3. Reinicie o servidor de desenvolvimento
+ * 4. Limpe o cache do navegador (Ctrl+Shift+R)
+ */
+
+/* ============================================================================
+   🎨 MELHORIAS GERAIS
+   ============================================================================ */
+
+/* === BODY & ROOT === */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* === SCROLL SMOOTH === */
+html {
+  scroll-behavior: smooth !important;
+}
+
+/* === SCROLLBAR CUSTOM === */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--alsham-bg-hover);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--alsham-border-strong);
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--alsham-primary);
+}
+
+/* Dark mode scrollbar */
+html.dark ::-webkit-scrollbar-track {
+  background: var(--alsham-bg-surface);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--alsham-border-default);
+}
+
+/* ============================================================================
+   🏛️ NAVBAR PREMIUM
+   ============================================================================ */
+
+nav {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease !important;
+  border-bottom: 1px solid rgba(1, 118, 211, 0.08) !important;
+}
+
+html.dark nav {
+  background: rgba(15, 23, 42, 0.95) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Logo hover effect */
+nav .logo {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+nav .logo:hover {
+  transform: scale(1.05) rotate(-2deg) !important;
+}
+
+/* ============================================================================
+   🎨 SIDEBAR PREMIUM (GLASSMORPHISM)
+   ============================================================================ */
+
+.side-nav {
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(249, 250, 251, 0.98) 100%
+  ) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 4px 0 24px rgba(1, 118, 211, 0.08) !important;
+  border-right: 1px solid rgba(1, 118, 211, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+html.dark .side-nav {
+  background: linear-gradient(180deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.98) 100%
+  ) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+  border-right: 1px solid rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Efeito brilho sutil na sidebar */
+.side-nav::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -50% !important;
+  left: -50% !important;
+  width: 200% !important;
+  height: 200% !important;
+  background: radial-gradient(
+    circle,
+    rgba(1, 118, 211, 0.05) 0%,
+    transparent 70%
+  ) !important;
+  animation: sidebar-glow 8s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+@keyframes sidebar-glow {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+}
+
+/* === SIDEBAR ITEMS PREMIUM === */
+.side-nav a,
+.side-nav nav a,
+aside nav a {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 12px !important;
+  margin: 6px 12px !important;
+  padding: 14px 18px !important;
+  font-weight: 600 !important;
+  font-size: 0.9375rem !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.side-nav a::before,
+.side-nav nav a::before,
+aside nav a::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100% !important;
+  width: 4px !important;
+  background: var(--alsham-gradient-primary) !important;
+  transform: scaleY(0) !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 0 4px 4px 0 !important;
+}
+
+.side-nav a:hover,
+.side-nav nav a:hover,
+aside nav a:hover {
+  background: rgba(1, 118, 211, 0.08) !important;
+  transform: translateX(6px) !important;
+  box-shadow: 0 4px 12px rgba(1, 118, 211, 0.15) !important;
+}
+
+html.dark .side-nav a:hover,
+html.dark .side-nav nav a:hover,
+html.dark aside nav a:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+
+.side-nav a[aria-current="page"],
+.side-nav nav a[aria-current="page"],
+aside nav a[aria-current="page"] {
+  background: linear-gradient(135deg, 
+    rgba(1, 118, 211, 0.12), 
+    rgba(59, 130, 246, 0.08)
+  ) !important;
+  color: #0176D3 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px rgba(1, 118, 211, 0.2) !important;
+}
+
+.side-nav a[aria-current="page"]::before,
+.side-nav nav a[aria-current="page"]::before,
+aside nav a[aria-current="page"]::before {
+  transform: scaleY(1) !important;
+}
+
+html.dark .side-nav a[aria-current="page"],
+html.dark .side-nav nav a[aria-current="page"],
+html.dark aside nav a[aria-current="page"] {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.18), 
+    rgba(99, 102, 241, 0.12)
+  ) !important;
+  color: #60A5FA !important;
+}
+
+.side-nav a svg,
+.side-nav nav a svg,
+aside nav a svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.side-nav a:hover svg,
+.side-nav nav a:hover svg,
+aside nav a:hover svg {
+  transform: scale(1.15) rotate(5deg) !important;
+}
+
+/* ============================================================================
+   📊 HEADER PREMIUM
+   ============================================================================ */
+
+/* === HEADER TITLE COM GRADIENTE === */
+header h1,
+h1.text-3xl,
+.dashboard-title {
+  font-weight: 800 !important;
+  background: var(--alsham-gradient-primary) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-size: 2.25rem !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+  position: relative !important;
+}
+
+/* Brilho sutil no título */
+header h1::after,
+h1.text-3xl::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -5px !important;
+  left: -5px !important;
+  right: -5px !important;
+  bottom: -5px !important;
+  background: var(--alsham-gradient-primary) !important;
+  filter: blur(20px) !important;
+  opacity: 0.15 !important;
+  z-index: -1 !important;
+}
+
+header p,
+.dashboard-subtitle {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  opacity: 0.8 !important;
+}
+
+/* ============================================================================
+   💎 CARDS PREMIUM
+   ============================================================================ */
+
+/* === CARDS GERAIS === */
+.rounded-lg.shadow-md,
+.card,
+.bg-white.rounded-lg {
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(1, 118, 211, 0.05) !important;
+}
+
+/* Barra superior colorida */
+.rounded-lg.shadow-md::before,
+.card::before,
+.bg-white.rounded-lg::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 4px !important;
+  background: var(--alsham-gradient-primary) !important;
+  opacity: 0 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.rounded-lg.shadow-md:hover::before,
+.card:hover::before,
+.bg-white.rounded-lg:hover::before {
+  opacity: 1 !important;
+}
+
+.rounded-lg.shadow-md:hover,
+.card:hover,
+.bg-white.rounded-lg:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(1, 118, 211, 0.15) !important;
+}
+
+html.dark .rounded-lg.shadow-md,
+html.dark .card,
+html.dark .bg-white.rounded-lg {
+  background: var(--alsham-bg-surface) !important;
+  border-color: rgba(59, 130, 246, 0.08) !important;
+}
+
+html.dark .rounded-lg.shadow-md:hover,
+html.dark .card:hover,
+html.dark .bg-white.rounded-lg:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* ============================================================================
+   🏷️ BADGES PREMIUM
+   ============================================================================ */
+
+/* === BADGES COM GRADIENTES === */
+.bg-blue-100,
+span[class*="bg-blue-"] {
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.bg-blue-100:hover,
+span[class*="bg-blue-"]:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+}
+
+.bg-yellow-100,
+span[class*="bg-yellow-"] {
+  background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3) !important;
+}
+
+.bg-purple-100,
+span[class*="bg-purple-"] {
+  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+.bg-green-100,
+span[class*="bg-green-"] {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+.bg-red-100,
+span[class*="bg-red-"] {
+  background: linear-gradient(135deg, #EF4444 0%, #F87171 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+}
+
+.bg-orange-100,
+span[class*="bg-orange-"] {
+  background: linear-gradient(135deg, #F97316 0%, #FB923C 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3) !important;
+}
+
+.bg-indigo-100,
+span[class*="bg-indigo-"] {
+  background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%) !important;
+  color: white !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* ============================================================================
+   📊 TABELAS PREMIUM
+   ============================================================================ */
+
+/* === TABELA HOVER EFFECTS === */
+table tbody tr {
+  transition: all 0.3s ease !important;
+}
+
+table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(1, 118, 211, 0.03) 0%, rgba(1, 118, 211, 0.01) 100%) !important;
+  transform: scale(1.005) !important;
+  box-shadow: 0 2px 8px rgba(1, 118, 211, 0.08) !important;
+}
+
+html.dark table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%) !important;
+}
+
+table thead th {
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-size: 0.75rem !important;
+  color: var(--alsham-text-secondary) !important;
+}
+
+/* ============================================================================
+   🔘 BOTÕES PREMIUM
+   ============================================================================ */
+
+/* === BOTÃO PRIMÁRIO === */
+.bg-blue-600,
+button[class*="bg-blue-"] {
+  background: var(--alsham-gradient-primary) !important;
+  box-shadow: 0 4px 12px rgba(1, 118, 211, 0.3) !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+}
+
+.bg-blue-600:hover,
+button[class*="bg-blue-"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(1, 118, 211, 0.4) !important;
+}
+
+.bg-blue-600:active,
+button[class*="bg-blue-"]:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 12px rgba(1, 118, 211, 0.3) !important;
+}
+
+/* === BOTÃO SECUNDÁRIO === */
+.bg-purple-600,
+button[class*="bg-purple-"] {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+}
+
+.bg-purple-600:hover,
+button[class*="bg-purple-"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* === BOTÃO SUCCESS === */
+.bg-green-600,
+button[class*="bg-green-"] {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.bg-green-600:hover,
+button[class*="bg-green-"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* ============================================================================
+   🎯 RESPONSIVIDADE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Header mobile */
+  header h1,
+  h1.text-3xl,
+  .dashboard-title {
+    font-size: 1.75rem !important;
+  }
+  
+  /* Sidebar mobile */
+  .side-nav a,
+  .side-nav nav a,
+  aside nav a {
+    padding: 12px 16px !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Cards mobile */
+  .rounded-lg.shadow-md,
+  .card,
+  .bg-white.rounded-lg {
+    border-radius: 16px !important;
+  }
+  
+  /* Hover desabilitado no mobile */
+  .rounded-lg.shadow-md:hover,
+  .card:hover,
+  .bg-white.rounded-lg:hover {
+    transform: none !important;
+  }
+}
+
+/* ============================================================================
+   ⚡ PERFORMANCE OPTIMIZATION
+   ============================================================================ */
+
+/* GPU Acceleration */
+.side-nav a,
+.rounded-lg.shadow-md,
+.card,
+table tbody tr,
+.bg-blue-600,
+.bg-purple-600 {
+  will-change: transform, box-shadow !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ============================================================================
+   ♿ ACESSIBILIDADE
+   ============================================================================ */
+
+/* Focus visible */
+*:focus-visible {
+  outline: 3px solid var(--alsham-primary) !important;
+  outline-offset: 3px !important;
+  border-radius: 4px !important;
+}
+
+/* High contrast mode */
+html.high-contrast .side-nav a:hover {
+  border: 2px solid currentColor !important;
+}
+
+html.high-contrast .rounded-lg.shadow-md,
+html.high-contrast .card {
+  border: 2px solid currentColor !important;
+}
+
+/* ============================================================================
+   END OF FILE - dashboard-improvements.css v1.0
+   Melhorias premium aplicadas com sucesso! ✅
+   ============================================================================ */
