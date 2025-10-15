@@ -1,7 +1,7 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.2 HOTFIX
- * Data: 2025-10-15 01:13 UTC
- * Fix: Workbox otimizado + public/sw.js desabilitado para evitar conflito
+ * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.3 HOTFIX ENTERPRISE FINAL
+ * Data: 2025-10-15 02:12 UTC
+ * Fix: Registro PWA 100% funcional + SW raiz copiado automaticamente
  * Autor: @AbnadabyBonaparte
  */
 
@@ -10,388 +10,187 @@ import legacy from '@vitejs/plugin-legacy';
 import { VitePWA } from 'vite-plugin-pwa';
 import compression from 'vite-plugin-compression';
 import { resolve } from 'path';
+import fs from 'fs';
+import path from 'path';
 
 export default defineConfig({
   plugins: [
+    // 🔹 Suporte a navegadores antigos
     legacy({
       targets: ['defaults', 'not IE 11'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
       renderLegacyChunks: false
     }),
 
+    // 🔹 Progressive Web App (PWA)
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {
-        enabled: false
-      },
+      injectRegister: false, // ✅ corrigido (sem injeção automática)
+      devOptions: { enabled: false },
       manifest: {
         name: "ALSHAM 360° PRIMA",
         short_name: "ALSHAM360",
-        description: "CRM Enterprise com IA - v11.1.2 Service Worker Otimizado",
+        description: "CRM Enterprise com IA, automações e gamificação.",
         start_url: "/dashboard.html",
         display: "standalone",
         orientation: "portrait-primary",
         background_color: "#f9fafb",
         theme_color: "#0176D3",
-        categories: ["business", "productivity", "crm"],
+        lang: "pt-BR",
+        categories: ["business", "productivity", "crm", "automation", "analytics"],
         icons: [
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable"
-          }
+          { src: "/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+          { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
         ],
         screenshots: [
-          {
-            src: "/screenshots/dashboard.png",
-            sizes: "1280x720",
-            type: "image/png",
-            label: "Dashboard Principal"
-          }
+          { src: "/screenshots/dashboard.png", sizes: "1280x720", type: "image/png", label: "Dashboard Principal" }
         ],
         shortcuts: [
-          {
-            name: "Dashboard",
-            short_name: "Dashboard",
-            description: "Acesso rápido ao dashboard",
-            url: "/dashboard.html",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
-          },
-          {
-            name: "Leads",
-            short_name: "Leads",
-            description: "Gerenciar leads",
-            url: "/leads-real.html",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
-          },
-          {
-            name: "Pipeline",
-            short_name: "Pipeline",
-            description: "Visualizar pipeline",
-            url: "/pipeline.html",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
-          }
+          { name: "Dashboard", short_name: "Dashboard", description: "Acesso rápido ao dashboard", url: "/dashboard.html", icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }] },
+          { name: "Leads", short_name: "Leads", description: "Gerenciar leads", url: "/leads-real.html", icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }] },
+          { name: "Pipeline", short_name: "Pipeline", description: "Visualizar pipeline", url: "/pipeline.html", icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }] }
         ]
       },
       workbox: {
-        // ✅ IGNORA public/sw.js para evitar conflito
-        globIgnores: [
-          '**/node_modules/**/*',
-          'sw.js',
-          'workbox-*.js',
-          'service-worker.js' // ✅ ADICIONADO
-        ],
         globPatterns: ['**/*.{js,css,html,png,svg,ico,json,woff2}'],
-        
-        // ✅ NAVEGAÇÃO FALLBACK
+        globIgnores: ['**/node_modules/**/*', 'sw-backup-manual.js', 'service-worker.js'],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [
-          /^\/api\//,
-          /^https:\/\/cdn\./,
-          /^https:\/\/cdnjs\./,
-          /^https:\/\/fonts\./,
-          /^https:\/\/unpkg\./,
-        ],
-        
-        // ✅ RUNTIME CACHING ENTERPRISE
+        navigateFallbackDenylist: [/^\/api\//, /^https:\/\/cdn\./, /^https:\/\/cdnjs\./, /^https:\/\/fonts\./, /^https:\/\/unpkg\./],
         runtimeCaching: [
-          // Supabase API
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/,
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-api-v11.1.2',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 5 * 60 // 5 minutos
-              },
-              networkTimeoutSeconds: 10,
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+            options: { cacheName: 'supabase-api-v11.1.3', expiration: { maxEntries: 50, maxAgeSeconds: 300 }, networkTimeoutSeconds: 10, cacheableResponse: { statuses: [0, 200] } }
           },
-          
-          // Google Fonts
           {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/,
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache-v11.1.2',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 ano
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+            options: { cacheName: 'google-fonts-styles-v11.1.3', expiration: { maxEntries: 10, maxAgeSeconds: 31536000 }, cacheableResponse: { statuses: [0, 200] } }
           },
-          
-          // Google Fonts (Webfonts)
           {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/,
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache-v11.1.2',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 ano
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+            options: { cacheName: 'google-fonts-files-v11.1.3', expiration: { maxEntries: 20, maxAgeSeconds: 31536000 }, cacheableResponse: { statuses: [0, 200] } }
           },
-          
-          // CDN JS (Chart.js, jsPDF, etc)
           {
-            urlPattern: /^https:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net)\/.*/,
+            urlPattern: /^https:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net)\/.*/i,
             handler: 'CacheFirst',
-            options: {
-              cacheName: 'cdn-libs-cache-v11.1.2',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 dias
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+            options: { cacheName: 'cdn-libs-v11.1.3', expiration: { maxEntries: 50, maxAgeSeconds: 2592000 }, cacheableResponse: { statuses: [0, 200] } }
           },
-          
-          // CSS e JS Locais
           {
-            urlPattern: ({ url }) => {
-              return url.origin === self.location.origin && 
-                     /\.(?:css|js)$/.test(url.pathname);
-            },
+            urlPattern: ({ url }) => url.origin === self.location.origin && /\.(?:css|js)$/.test(url.pathname),
             handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'local-assets-v11.1.2',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 dias
-              }
-            }
+            options: { cacheName: 'local-assets-v11.1.3', expiration: { maxEntries: 100, maxAgeSeconds: 604800 } }
           },
-          
-          // Imagens Locais
           {
-            urlPattern: ({ url }) => {
-              return url.origin === self.location.origin && 
-                     /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/.test(url.pathname);
-            },
+            urlPattern: ({ url }) => url.origin === self.location.origin && /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/.test(url.pathname),
             handler: 'CacheFirst',
-            options: {
-              cacheName: 'local-images-v11.1.2',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 dias
-              }
-            }
+            options: { cacheName: 'local-images-v11.1.3', expiration: { maxEntries: 100, maxAgeSeconds: 2592000 } }
           },
-          
-          // HTML Pages
           {
-            urlPattern: ({ url }) => {
-              return url.origin === self.location.origin && 
-                     /\.html$/.test(url.pathname);
-            },
+            urlPattern: ({ url }) => url.origin === self.location.origin && /\.html$/.test(url.pathname),
             handler: 'NetworkFirst',
-            options: {
-              cacheName: 'html-pages-v11.1.2',
-              networkTimeoutSeconds: 5,
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 24 * 60 * 60 // 1 dia
-              }
-            }
+            options: { cacheName: 'html-pages-v11.1.3', networkTimeoutSeconds: 5, expiration: { maxEntries: 50, maxAgeSeconds: 86400 } }
           }
         ],
-        
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true
       }
     }),
 
-    compression({ 
-      algorithm: 'brotliCompress', 
-      ext: '.br',
-      threshold: 1024,
-      compressionOptions: { level: 11 }
-    }),
-    
-    compression({ 
-      algorithm: 'gzip', 
-      ext: '.gz',
-      threshold: 1024,
-      compressionOptions: { level: 9 }
-    })
+    // 🔹 Compressão Brotli + Gzip
+    compression({ algorithm: 'brotliCompress', ext: '.br', threshold: 1024, compressionOptions: { level: 11 } }),
+    compression({ algorithm: 'gzip', ext: '.gz', threshold: 1024, compressionOptions: { level: 9 } }),
+
+    // 🔹 Copia o SW da dist para a raiz pública
+    {
+      name: 'copy-sw-root',
+      closeBundle() {
+        const src = path.resolve(process.cwd(), 'dist', 'sw.js');
+        const dest = path.resolve(process.cwd(), 'public', 'sw.js');
+        try {
+          if (fs.existsSync(src)) {
+            fs.copyFileSync(src, dest);
+            console.log('⚡ [ALSHAM BUILD] sw.js copiado para /public com sucesso!');
+          } else {
+            console.warn('⚠️ [ALSHAM BUILD] sw.js não encontrado em /dist.');
+          }
+        } catch (error) {
+          console.error('❌ [ALSHAM BUILD] Erro ao copiar sw.js:', error);
+        }
+      }
+    }
   ],
 
   build: {
     target: 'esnext',
     outDir: 'dist',
-    sourcemap: false,
     minify: 'esbuild',
     cssMinify: true,
-    cssCodeSplit: true,
     assetsInlineLimit: 4096,
     chunkSizeWarningLimit: 500,
-    
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        login: resolve(__dirname, 'login.html'),
-        register: resolve(__dirname, 'register.html'),
-        dashboard: resolve(__dirname, 'dashboard.html'),
-        leadsReal: resolve(__dirname, 'leads-real.html'),
-        pipeline: resolve(__dirname, 'pipeline.html'),
-        automacoes: resolve(__dirname, 'automacoes.html'),
-        gamificacao: resolve(__dirname, 'gamificacao.html'),
-        relatorios: resolve(__dirname, 'relatorios.html'),
-        configuracoes: resolve(__dirname, 'configuracoes.html'),
-        authDashboard: resolve(__dirname, 'auth-dashboard.html'),
-        createOrg: resolve(__dirname, 'create-org.html'),
-        logout: resolve(__dirname, 'logout.html'),
-        resetPassword: resolve(__dirname, 'reset-password.html'),
-        resetPasswordConfirm: resolve(__dirname, 'reset-password-confirm.html'),
-        sessionGuard: resolve(__dirname, 'session-guard.html'),
-        testResetPassword: resolve(__dirname, 'test-reset-password.html'),
-        testSupabase: resolve(__dirname, 'test-supabase.html'),
-        timelineTest: resolve(__dirname, 'timeline-test.html'),
-        tokenRefresh: resolve(__dirname, 'token-refresh.html')
+        main: resolve(process.cwd(), 'index.html'),
+        dashboard: resolve(process.cwd(), 'dashboard.html'),
+        leadsReal: resolve(process.cwd(), 'leads-real.html'),
+        pipeline: resolve(process.cwd(), 'pipeline.html'),
+        automacoes: resolve(process.cwd(), 'automacoes.html'),
+        gamificacao: resolve(process.cwd(), 'gamificacao.html'),
+        relatorios: resolve(process.cwd(), 'relatorios.html'),
+        configuracoes: resolve(process.cwd(), 'configuracoes.html'),
+        login: resolve(process.cwd(), 'login.html'),
+        register: resolve(process.cwd(), 'register.html'),
+        authDashboard: resolve(process.cwd(), 'auth-dashboard.html'),
+        createOrg: resolve(process.cwd(), 'create-org.html'),
+        logout: resolve(process.cwd(), 'logout.html'),
+        resetPassword: resolve(process.cwd(), 'reset-password.html'),
+        resetPasswordConfirm: resolve(process.cwd(), 'reset-password-confirm.html'),
+        sessionGuard: resolve(process.cwd(), 'session-guard.html'),
+        testResetPassword: resolve(process.cwd(), 'test-reset-password.html'),
+        testSupabase: resolve(process.cwd(), 'test-supabase.html'),
+        timelineTest: resolve(process.cwd(), 'timeline-test.html'),
+        tokenRefresh: resolve(process.cwd(), 'token-refresh.html')
       },
-      
       output: {
-        // ✅ CODE SPLITTING OTIMIZADO (sem duplicação)
-        manualChunks: (id) => {
-          // 1. Supabase
-          if (id.includes('@supabase/supabase-js')) {
-            return 'supabase';
-          }
-          
-          // 2. Chart.js
-          if (id.includes('chart.js')) {
-            return 'charts';
-          }
-          
-          // 3. jsPDF
-          if (id.includes('jspdf')) {
-            return 'export-pdf';
-          }
-          
-          // 4. XLSX
-          if (id.includes('xlsx')) {
-            return 'export-excel';
-          }
-          
-          // 5. Confetti
-          if (id.includes('canvas-confetti')) {
-            return 'confetti';
-          }
-          
-          // 6. Vendor comum
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+        manualChunks: id => {
+          if (id.includes('@supabase/supabase-js')) return 'supabase';
+          if (id.includes('chart.js')) return 'charts';
+          if (id.includes('jspdf')) return 'export-pdf';
+          if (id.includes('xlsx')) return 'export-excel';
+          if (id.includes('canvas-confetti')) return 'confetti';
+          if (id.includes('node_modules')) return 'vendor';
         },
-        
-        chunkFileNames: (chunkInfo) => {
-          const name = chunkInfo.name;
-          if (name === 'charts' || name === 'export-pdf' || name === 'export-excel') {
-            return 'assets/lazy/[name]-[hash].js';
-          }
-          return 'assets/[name]-[hash].js';
-        },
+        chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name.endsWith('.css')) {
-            return 'assets/css/[name]-[hash][extname]';
-          }
-          if (/\.(woff2?|ttf|eot)$/.test(assetInfo.name)) {
-            return 'assets/fonts/[name]-[hash][extname]';
-          }
-          if (/\.(png|jpe?g|svg|gif|webp|ico)$/.test(assetInfo.name)) {
-            return 'assets/images/[name]-[hash][extname]';
-          }
+        assetFileNames: assetInfo => {
+          if (assetInfo.name.endsWith('.css')) return 'assets/css/[name]-[hash][extname]';
+          if (/\.(woff2?|ttf|eot)$/.test(assetInfo.name)) return 'assets/fonts/[name]-[hash][extname]';
+          if (/\.(png|jpe?g|svg|gif|webp|ico)$/.test(assetInfo.name)) return 'assets/images/[name]-[hash][extname]';
           return 'assets/[name]-[hash][extname]';
         }
       },
-      
-      treeshake: {
-        preset: 'recommended',
-        moduleSideEffects: false
-      }
+      treeshake: { preset: 'recommended', moduleSideEffects: false }
     },
-    
     reportCompressedSize: true
   },
 
   publicDir: 'public',
-  
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@css': resolve(__dirname, './css'),
-      '@js': resolve(__dirname, './src/js'),
-      '@lib': resolve(__dirname, './src/lib'),
-      '/js': resolve(__dirname, './src/js'),
-      '/css': resolve(__dirname, './css')
+      '@': resolve(process.cwd(), './src'),
+      '@css': resolve(process.cwd(), './css'),
+      '@js': resolve(process.cwd(), './src/js'),
+      '@lib': resolve(process.cwd(), './src/lib'),
+      '/js': resolve(process.cwd(), './src/js'),
+      '/css': resolve(process.cwd(), './css')
     }
   },
 
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-    open: true,
-    cors: true,
-    strictPort: false,
-    hmr: {
-      overlay: true
-    }
-  },
-
-  preview: {
-    host: '0.0.0.0',
-    port: 4173,
-    open: true,
-    cors: true
-  },
-
-  optimizeDeps: {
-    include: [
-      '@supabase/supabase-js'
-    ],
-    exclude: [
-      '@vite/client', 
-      '@vite/env',
-      'chart.js',
-      'jspdf',
-      'xlsx'
-    ],
-    esbuildOptions: {
-      target: 'esnext'
-    }
-  },
-
-  css: {
-    devSourcemap: true,
-    modules: {
-      localsConvention: 'camelCase'
-    }
-  },
-
-  json: {
-    stringify: true
-  }
+  server: { host: '0.0.0.0', port: 5173, open: true, cors: true, strictPort: false, hmr: { overlay: true } },
+  preview: { host: '0.0.0.0', port: 4173, open: true, cors: true },
+  optimizeDeps: { include: ['@supabase/supabase-js'], exclude: ['@vite/client', '@vite/env', 'chart.js', 'jspdf', 'xlsx'], esbuildOptions: { target: 'esnext' } },
+  css: { devSourcemap: true, modules: { localsConvention: 'camelCase' } },
+  json: { stringify: true }
 });
