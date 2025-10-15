@@ -1,7 +1,7 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.1 HOTFIX
- * Data: 2025-10-14 21:08 UTC
- * Fix: Removed duplicate manualChunks + visualizer dependency
+ * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.2 HOTFIX
+ * Data: 2025-10-15 01:13 UTC
+ * Fix: Workbox otimizado + public/sw.js desabilitado para evitar conflito
  * Autor: @AbnadabyBonaparte
  */
 
@@ -27,7 +27,7 @@ export default defineConfig({
       manifest: {
         name: "ALSHAM 360° PRIMA",
         short_name: "ALSHAM360",
-        description: "CRM Enterprise com IA - v11.1 Performance Optimized",
+        description: "CRM Enterprise com IA - v11.1.2 Service Worker Otimizado",
         start_url: "/dashboard.html",
         display: "standalone",
         orientation: "portrait-primary",
@@ -47,32 +47,127 @@ export default defineConfig({
             type: "image/png",
             purpose: "any maskable"
           }
+        ],
+        screenshots: [
+          {
+            src: "/screenshots/dashboard.png",
+            sizes: "1280x720",
+            type: "image/png",
+            label: "Dashboard Principal"
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Dashboard",
+            short_name: "Dashboard",
+            description: "Acesso rápido ao dashboard",
+            url: "/dashboard.html",
+            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Leads",
+            short_name: "Leads",
+            description: "Gerenciar leads",
+            url: "/leads-real.html",
+            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Pipeline",
+            short_name: "Pipeline",
+            description: "Visualizar pipeline",
+            url: "/pipeline.html",
+            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+          }
         ]
       },
       workbox: {
-        globIgnores: ['**/node_modules/**/*', 'sw.js', 'workbox-*.js'],
+        // ✅ IGNORA public/sw.js para evitar conflito
+        globIgnores: [
+          '**/node_modules/**/*',
+          'sw.js',
+          'workbox-*.js',
+          'service-worker.js' // ✅ ADICIONADO
+        ],
         globPatterns: ['**/*.{js,css,html,png,svg,ico,json,woff2}'],
         
+        // ✅ NAVEGAÇÃO FALLBACK
+        navigateFallback: '/index.html',
         navigateFallbackDenylist: [
+          /^\/api\//,
           /^https:\/\/cdn\./,
           /^https:\/\/cdnjs\./,
           /^https:\/\/fonts\./,
           /^https:\/\/unpkg\./,
         ],
         
+        // ✅ RUNTIME CACHING ENTERPRISE
         runtimeCaching: [
+          // Supabase API
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'supabase-api-v11.1',
+              cacheName: 'supabase-api-v11.1.2',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 5 * 60
+                maxAgeSeconds: 5 * 60 // 5 minutos
               },
-              networkTimeoutSeconds: 10
+              networkTimeoutSeconds: 10,
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
             }
           },
+          
+          // Google Fonts
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache-v11.1.2',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 ano
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          
+          // Google Fonts (Webfonts)
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gstatic-fonts-cache-v11.1.2',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 ano
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          
+          // CDN JS (Chart.js, jsPDF, etc)
+          {
+            urlPattern: /^https:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net)\/.*/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'cdn-libs-cache-v11.1.2',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 dias
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          
+          // CSS e JS Locais
           {
             urlPattern: ({ url }) => {
               return url.origin === self.location.origin && 
@@ -80,9 +175,15 @@ export default defineConfig({
             },
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'local-assets-v11.1'
+              cacheName: 'local-assets-v11.1.2',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 dias
+              }
             }
           },
+          
+          // Imagens Locais
           {
             urlPattern: ({ url }) => {
               return url.origin === self.location.origin && 
@@ -90,13 +191,15 @@ export default defineConfig({
             },
             handler: 'CacheFirst',
             options: {
-              cacheName: 'local-images-v11.1',
+              cacheName: 'local-images-v11.1.2',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 30 * 24 * 60 * 60
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 dias
               }
             }
           },
+          
+          // HTML Pages
           {
             urlPattern: ({ url }) => {
               return url.origin === self.location.origin && 
@@ -104,10 +207,11 @@ export default defineConfig({
             },
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'html-pages-v11.1',
+              cacheName: 'html-pages-v11.1.2',
+              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 24 * 60 * 60
+                maxAgeSeconds: 24 * 60 * 60 // 1 dia
               }
             }
           }
