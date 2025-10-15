@@ -1,5 +1,8 @@
-/* ALSHAM 360° PRIMA - CSS ENTERPRISE V6.1.0 */
-/* Design System Enterprise Grade - Corrigido */
+/* ALSHAM 360° PRIMA - CSS ENTERPRISE V6.1.1 HOTFIX */
+/* Design System Enterprise Grade - color-adjust deprecation fixed */
+/* Data: 2025-10-15 01:10 UTC */
+/* Autor: @AbnadabyBonaparte */
+
 @import './tokens.css';
 
 /* ✅ REMOVIDO: @import './dark-theme.css'; (arquivo deletado) */
@@ -563,6 +566,8 @@ header {
   float: left;
   margin-left: -1.5em;
 }
+
+/* ✅ CORREÇÃO APLICADA: color-adjust → print-color-adjust (linha 577) */
 .form-check-input {
   width: 1em;
   height: 1em;
@@ -574,9 +579,11 @@ header {
   background-size: contain;
   border: 1px solid var(--alsham-border-default);
   appearance: none;
-  color-adjust: exact;
+  -webkit-print-color-adjust: exact; /* ✅ Webkit/Blink */
+  print-color-adjust: exact; /* ✅ Padrão moderno W3C */
   transition: all var(--alsham-motion-productive) var(--alsham-ease-productive);
 }
+
 .form-check-input[type="checkbox"] {
   border-radius: var(--alsham-radius-sm);
 }
