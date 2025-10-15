@@ -3,28 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+
   <!-- ✅ Theme Init Inline (Evita FOUC) -->
   <script>
     (function() {
       const theme = localStorage.getItem('alsham-theme') || 'light';
       const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-      if (contrast === 'high') {
-        document.documentElement.classList.add('high-contrast');
-      }
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+      if (contrast === 'high') document.documentElement.classList.add('high-contrast');
     })();
   </script>
-  
+
   <title>ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema CRM Enterprise com IA, automações avançadas e gamificação. ALSHAM 360° PRIMA - A evolução do seu negócio." />
-  
-  <!-- ✅ CSP COMPLETO -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
-  
+
+  <!-- ✅ CSP FINAL OTIMIZADA (sem bloqueio de Google API nem Supabase) -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com
+      https://unpkg.com https://apis.google.com https://accounts.google.com;
+    style-src 'self' 'unsafe-inline'
+      https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com;
+    font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co
+      https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com
+      https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://apis.google.com;
+    frame-src 'self' https://accounts.google.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    manifest-src 'self';
+    worker-src 'self' blob:;
+  ">
+
   <!-- 🧠 PWA Essentials -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0176D3" />
@@ -34,118 +47,96 @@
   <meta name="apple-mobile-web-app-title" content="ALSHAM 360°" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  
+
   <!-- 🎨 Styles -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
-  
-  <!-- ✅ Service Worker Cleanup -->
+
+  <!-- ✅ Service Worker Cleanup (atualizado para log estruturado) -->
   <script>
-    /* ============================================================
-     🛡️ ALSHAM 360° PRIMA — Service Worker Cleanup v1.0
-     Remove registros antigos do SW manual para evitar conflitos
-     Data: 2025-10-15
-     Autor: @AbnadabyBonaparte
-    ============================================================ */
-    
-    (function() {
+    (async function() {
       'use strict';
+      console.log('%c🧹 [ALSHAM] Limpando Service Workers antigos...', 'color:#3B82F6;font-weight:bold;');
+      if (!('serviceWorker' in navigator)) return console.warn('⚠️ [ALSHAM] SW não suportado neste navegador.');
 
-      console.log('🧹 [ALSHAM] Iniciando limpeza de Service Workers...');
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        let removed = 0;
 
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          let cleanedCount = 0;
-          
-          registrations.forEach(function(registration) {
-            const scriptURL = registration.active ? registration.active.scriptURL : '';
-            
-            // Remove apenas o SW manual antigo (/sw.js e /sw-backup-manual.js)
-            if ((scriptURL.includes('/sw.js') || scriptURL.includes('/sw-backup-manual.js')) && !scriptURL.includes('workbox')) {
-              console.log('🗑️ [ALSHAM] Removendo SW manual antigo:', scriptURL);
-              registration.unregister().then(function(success) {
-                if (success) {
-                  console.log('✅ [ALSHAM] SW manual removido com sucesso!');
-                  cleanedCount++;
-                  
-                  // Limpa caches antigos
-                  caches.keys().then(function(cacheNames) {
-                    return Promise.all(
-                      cacheNames.map(function(cacheName) {
-                        if (cacheName.includes('alsham360-v11.0')) {
-                          console.log('🗑️ [ALSHAM] Removendo cache antigo:', cacheName);
-                          return caches.delete(cacheName);
-                        }
-                      })
-                    );
-                  }).then(function() {
-                    console.log('✅ [ALSHAM] Caches antigos limpos!');
-                  });
-                }
-              });
-            } else if (scriptURL.includes('workbox')) {
-              console.log('✅ [ALSHAM] SW Workbox mantido:', scriptURL);
+        for (const reg of regs) {
+          const script = reg.active?.scriptURL || '';
+          if ((script.includes('/sw.js') || script.includes('/sw-backup-manual.js')) && !script.includes('workbox')) {
+            console.log('🗑️ [ALSHAM] Removendo SW antigo:', script);
+            await reg.unregister();
+            removed++;
+            const cachesToDelete = await caches.keys();
+            for (const cacheName of cachesToDelete) {
+              if (cacheName.includes('alsham360-v11.0')) {
+                await caches.delete(cacheName);
+                console.log('🗑️ [ALSHAM] Cache removido:', cacheName);
+              }
             }
-          });
+          }
+        }
 
-          setTimeout(function() {
-            if (cleanedCount === 0) {
-              console.log('✅ [ALSHAM] Nenhum SW antigo encontrado. Sistema limpo!');
-            } else {
-              console.log('🎉 [ALSHAM] Cleanup concluído! ' + cleanedCount + ' SW(s) removido(s).');
-              console.log('🔄 [ALSHAM] Recarregando página em 2 segundos...');
-              setTimeout(function() {
-                window.location.reload();
-              }, 2000);
-            }
-          }, 1000);
-        }).catch(function(error) {
-          console.error('❌ [ALSHAM] Erro ao limpar SWs:', error);
-        });
-      } else {
-        console.warn('⚠️ [ALSHAM] Service Workers não suportados neste navegador.');
+        if (removed === 0)
+          console.log('✅ [ALSHAM] Nenhum SW antigo encontrado. Sistema limpo!');
+        else {
+          console.log(`🎉 [ALSHAM] Cleanup concluído! ${removed} SW(s) removido(s).`);
+          setTimeout(() => location.reload(), 1500);
+        }
+      } catch (err) {
+        console.error('❌ [ALSHAM] Erro ao limpar SWs:', err);
       }
     })();
   </script>
 </head>
+
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
   <!-- 🔔 Notificações -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
-  
+
   <!-- ⏳ Tela de Carregamento -->
   <main class="text-center animate-fade-in" role="main">
     <div class="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" aria-label="Carregando"></div>
     <h1 class="text-xl font-bold text-blue-800">Carregando ALSHAM 360°...</h1>
   </main>
-  
+
   <!-- 🧭 Roteamento de Sessão -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
+    // 🔧 Patch LockManager Warning (para evitar o log do Supabase)
+    if (!('locks' in navigator)) navigator.locks = { request: async (_, cb) => cb() };
+
     import { getCurrentSession } from "/src/lib/supabase.js";
-    
+
     async function routeUser() {
       try {
         const session = await getCurrentSession();
-        
-        if (session?.user) {
-          window.location.replace("/dashboard.html");
-        } else {
-          window.location.replace("/login.html");
-        }
+        if (session?.user) window.location.replace("/dashboard.html");
+        else window.location.replace("/login.html");
       } catch (err) {
         console.error("❌ Erro ao obter sessão:", err);
         window.location.replace("/login.html");
       }
     }
-    
+
     routeUser();
   </script>
-  
+
   <!-- ⚙️ Scripts Principais -->
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/utils/notifications.js"></script>
-  
-  <!-- ❌ REMOVIDO: Registro manual do Service Worker -->
-  <!-- O Vite PWA gerencia automaticamente via registerSW.js -->
+
+  <!-- ✅ Registro automático do PWA via Vite -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('✅ [ALSHAM] SW ativo:', reg.scope))
+          .catch(err => console.error('❌ [ALSHAM] Falha no registro do SW:', err));
+      });
+    }
+  </script>
 </body>
 </html>
