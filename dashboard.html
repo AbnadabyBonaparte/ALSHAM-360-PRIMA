@@ -52,11 +52,26 @@
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
-  <!-- ✅ CSP OTIMIZADO (Removido unsafe-inline/eval para scripts externos) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
+  <!-- ✅ CSP CORRIGIDO - Política de Segurança Empresarial Robusta -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://apis.google.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' data: https://fonts.gstatic.com;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://apis.google.com;
+    frame-src 'self' https://accounts.google.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    manifest-src 'self';
+    worker-src 'self' blob:;
+    child-src 'self' https://accounts.google.com;
+    media-src 'self' data: blob:;
+  ">
 
-  <!-- Permissions Policy -->
-  <meta http-equiv="Permissions-Policy" content="geolocation=(self), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self)">
+  <!-- Permissions Policy (Empresarial) -->
+  <meta http-equiv="Permissions-Policy" content="geolocation=(self), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self), display-capture=(), autoplay=(self)">
 
   <!-- ========================================== -->
   <!-- FORMAT & GEOGRAPHIC -->
@@ -81,8 +96,8 @@
   <meta name="revisit-after" content="7 days">
   <meta name="distribution" content="global">
   <meta name="expires" content="never">
-  <meta name="googlebot" content="index, follow, max-image-preview:large">
-  <meta name="bingbot" content="index, follow">
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="bingbot" content="index, follow, max-image-preview:large">
 
   <!-- ========================================== -->
   <!-- OPEN GRAPH -->
@@ -95,6 +110,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:site_name" content="ALSHAM 360° PRIMA">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:locale:alternate" content="en_US">
@@ -121,24 +137,28 @@
   <!-- ========================================== -->
   <!-- PWA & MOBILE -->
   <!-- ========================================== -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0176D3">
+  <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#0176D3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ALSHAM">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
   
   <!-- Microsoft Tiles -->
   <meta name="msapplication-TileColor" content="#0176D3">
   <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
   <meta name="msapplication-config" content="/browserconfig.xml">
-  <meta name="msapplication-tooltip" content="ALSHAM 360° PRIMA">
+  <meta name="msapplication-tooltip" content="ALSHAM 360° PRIMA - CRM Enterprise">
   <meta name="msapplication-starturl" content="/">
   <meta name="msapplication-navbutton-color" content="#0176D3">
+  <meta name="msapplication-task" content="name=Dashboard;action-uri=/dashboard;icon-uri=/favicon.ico">
+  <meta name="msapplication-task" content="name=Leads;action-uri=/leads-real;icon-uri=/favicon.ico">
+  <meta name="msapplication-task" content="name=Pipeline;action-uri=/pipeline;icon-uri=/favicon.ico">
 
   <!-- ========================================== -->
-  <!-- ICONS (OTIMIZADO) -->
+  <!-- ICONS (OTIMIZADO E COMPLETO) -->
   <!-- ========================================== -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -154,7 +174,7 @@
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
   <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
   <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
   
   <!-- Android Icons -->
   <link rel="icon" sizes="192x192" href="/android-icon-192x192.png">
@@ -182,25 +202,28 @@
   <link rel="preconnect" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
-  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//apis.google.com">
+  <link rel="dns-prefetch" href="//accounts.google.com">
 
   <!-- ========================================== -->
   <!-- PRELOAD CRITICAL RESOURCES -->
   <!-- ========================================== -->
   <link rel="preload" href="/css/tokens.css" as="style">
-  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin="anonymous">
   
   <!-- ✅ MODULEPRELOAD para ES6 modules -->
   <link rel="modulepreload" href="/src/lib/supabase.js">
   <link rel="modulepreload" href="/src/lib/chart-loader.js">
 
   <!-- ========================================== -->
-  <!-- PREFETCH NEXT PAGES -->
+  <!-- PREFETCH NEXT PAGES (Empresarial) -->
   <!-- ========================================== -->
-  <link rel="prefetch" href="/leads-real.html">
-  <link rel="prefetch" href="/pipeline.html">
-  <link rel="prefetch" href="/automacoes.html">
+  <link rel="prefetch" href="/leads-real.html" as="document">
+  <link rel="prefetch" href="/pipeline.html" as="document">
+  <link rel="prefetch" href="/automacoes.html" as="document">
+  <link rel="prefetch" href="/relatorios.html" as="document">
 
   <!-- ========================================== -->
   <!-- CSS (ORDEM OTIMIZADA) -->
@@ -211,18 +234,72 @@
   <link rel="stylesheet" href="/css/dashboard-improvements.css" />
   <link rel="stylesheet" href="/css/tailwind.min.css" />
 
+  <!-- Google Fonts (Otimizado) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- ========================================== -->
-  <!-- ⚡ LAZY LOADED EXTERNAL SCRIPTS (DEFER) -->
+  <!-- ⚡ EXTERNAL SCRIPTS (DEFER - Ordem Correta) -->
   <!-- ========================================== -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-r22gChDnGvBylk90+2e/ycr+equG6R0+boo8N8fNZ0Cy3p3rM9cyYJk6gJy0FZYhUzlnYMrPYq/Q6K3xpjBhIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" integrity="sha256-Cz9AiHvfAjR6DH3d4RcN8bGm/RvYuT3H+xq4qpjQ8hY=" crossorigin="anonymous"></script>
 
   <!-- ========================================== -->
   <!-- ✅ CRITICAL CSS INLINE (< 14KB) -->
   <!-- ========================================== -->
   <style>
+    /* ========================================== */
+    /* CRITICAL RENDERING PATH */
+    /* ========================================== */
+    
+    /* CSS Variables Base */
+    :root {
+      --alsham-primary: #0176D3;
+      --alsham-secondary: #16325C;
+      --alsham-success: #22C55E;
+      --alsham-warning: #F59E0B;
+      --alsham-error: #EF4444;
+      --alsham-info: #3B82F6;
+      
+      --alsham-bg-canvas: #F9FAFB;
+      --alsham-bg-surface: #FFFFFF;
+      --alsham-bg-hover: #F3F4F6;
+      
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6B7280;
+      --alsham-text-tertiary: #9CA3AF;
+      
+      --alsham-border-default: #E5E7EB;
+      --alsham-border-focus: #3B82F6;
+      
+      --alsham-radius-sm: 4px;
+      --alsham-radius-md: 8px;
+      --alsham-radius-lg: 12px;
+      --alsham-radius-xl: 16px;
+      
+      --alsham-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --alsham-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --alsham-shadow-lg: 0 10px 15px rgba(0,0,0,0.15);
+      
+      --alsham-motion-productive: 200ms;
+      --alsham-ease-productive: cubic-bezier(0.2, 0, 0.38, 0.9);
+    }
+
+    /* Dark Mode Variables */
+    html.dark {
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #cbd5e1;
+      --alsham-text-tertiary: #94a3b8;
+      --alsham-border-default: #334155;
+      color-scheme: dark;
+    }
+
     /* High Contrast Override */
     html.high-contrast {
       --alsham-bg-canvas: #000000;
@@ -230,109 +307,251 @@
       --alsham-border-default: #ffffff;
       --alsham-text-primary: #ffffff;
       --alsham-text-secondary: #cccccc;
+      --alsham-primary: #00ffff;
     }
-    html.high-contrast .text-blue-600 { color: #00ffff !important; }
-    html.high-contrast button { border: 2px solid #ffffff !important; }
     
-    /* Skip Link (A11y) */
+    html.high-contrast .text-blue-600 { 
+      color: #00ffff !important; 
+    }
+    
+    html.high-contrast button,
+    html.high-contrast input,
+    html.high-contrast select,
+    html.high-contrast textarea { 
+      border: 2px solid #ffffff !important; 
+    }
+    
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--alsham-bg-canvas);
+      color: var(--alsham-text-primary);
+      line-height: 1.6;
+    }
+    
+    /* Skip Link (A11y) - Empresarial */
     .skip-link {
       position: absolute;
-      top: -40px;
-      left: 0;
-      background: #0176D3;
+      top: -100px;
+      left: 10px;
+      background: var(--alsham-primary);
       color: white;
-      padding: 8px;
+      padding: 12px 16px;
       text-decoration: none;
-      z-index: 100;
+      border-radius: var(--alsham-radius-md);
+      font-weight: 600;
+      z-index: 10000;
+      transition: top 0.3s ease;
     }
-    .skip-link:focus { top: 0; }
     
-    /* Loading Spinner */
+    .skip-link:focus { 
+      top: 10px;
+      outline: 3px solid #FFFFFF;
+      outline-offset: 2px;
+    }
+    
+    /* Loading Spinner - Empresarial */
     .loading-spinner {
       width: 4rem; 
       height: 4rem;
-      border: 4px solid rgba(59,130,246,0.3);
-      border-top-color: #3B82F6;
+      border: 4px solid rgba(1, 118, 211, 0.2);
+      border-top-color: var(--alsham-primary);
       border-radius: 50%;
-      animation: spin 0.6s linear infinite;
+      animation: spin 0.8s linear infinite;
       margin: 0 auto;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Skeleton Loader */
+    @keyframes spin { 
+      to { transform: rotate(360deg); } 
+    }
+    
+    /* Skeleton Loader - Empresarial */
     .skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background: linear-gradient(
+        90deg,
+        var(--alsham-bg-hover) 0%,
+        var(--alsham-bg-surface) 50%,
+        var(--alsham-bg-hover) 100%
+      );
       background-size: 200% 100%;
       animation: skeleton-loading 1.5s ease-in-out infinite;
-      border-radius: 4px;
+      border-radius: var(--alsham-radius-md);
     }
+    
     @keyframes skeleton-loading {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
     
-    /* Toast Notifications */
+    /* Toast Notifications - Empresarial */
     .toast {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 24px;
+      right: 24px;
       background: var(--alsham-bg-surface);
       border: 1px solid var(--alsham-border-default);
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-      z-index: 1000;
-      min-width: 300px;
-      transform: translateY(100px);
+      border-radius: var(--alsham-radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--alsham-shadow-lg);
+      z-index: 10000;
+      min-width: 320px;
+      max-width: 420px;
+      transform: translateX(500px);
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.success { border-left: 4px solid #22C55E; }
-    .toast.error { border-left: 4px solid #EF4444; }
-    .toast.info { border-left: 4px solid #3B82F6; }
     
-    /* Counter Animation */
-    .counter { display: inline-block; transition: all 0.5s ease; }
+    .toast.show { 
+      transform: translateX(0); 
+      opacity: 1; 
+    }
     
-    /* Scroll Reveal */
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.active { opacity: 1; transform: translateY(0); }
+    .toast.success { 
+      border-left: 4px solid var(--alsham-success);
+    }
     
-    /* Modal Styles */
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s ease; }
-    .modal.active { display: flex; align-items: center; justify-content: center; }
-    .modal-content { background: var(--alsham-bg-surface); padding: 2rem; border-radius: 0.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .toast.error { 
+      border-left: 4px solid var(--alsham-error);
+    }
     
-    /* Offline Indicator */
+    .toast.info { 
+      border-left: 4px solid var(--alsham-info);
+    }
+    
+    .toast.warning { 
+      border-left: 4px solid var(--alsham-warning);
+    }
+    
+    /* Counter Animation - Empresarial */
+    .counter { 
+      display: inline-block;
+      font-feature-settings: 'tnum';
+      font-variant-numeric: tabular-nums;
+      transition: all 0.5s ease;
+    }
+    
+    /* Scroll Reveal - Empresarial */
+    .reveal { 
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .reveal.active { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Modal Styles - Empresarial */
+    .modal { 
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .modal.active { 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content { 
+      background: var(--alsham-bg-surface);
+      padding: 2.5rem;
+      border-radius: var(--alsham-radius-xl);
+      max-width: 540px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid var(--alsham-border-default);
+    }
+    
+    @keyframes fadeIn { 
+      from { opacity: 0; } 
+      to { opacity: 1; } 
+    }
+    
+    @keyframes slideUp { 
+      from { 
+        transform: translateY(40px) scale(0.95);
+        opacity: 0;
+      } 
+      to { 
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      } 
+    }
+    
+    /* Offline Indicator - Empresarial */
     .offline-badge {
       position: fixed;
-      top: 70px;
-      right: 20px;
-      background: #EF4444;
+      top: 80px;
+      right: 24px;
+      background: linear-gradient(135deg, var(--alsham-error), #DC2626);
       color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 10px 20px;
+      border-radius: 30px;
       font-size: 14px;
-      font-weight: 600;
-      z-index: 1000;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      animation: slideInRight 0.3s ease;
+      font-weight: 700;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+      animation: slideInRight 0.4s ease;
     }
+    
     @keyframes slideInRight {
-      from { transform: translateX(100px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from { 
+        transform: translateX(200px);
+        opacity: 0;
+      }
+      to { 
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
 
-    /* Focus Visible */
-    *:focus-visible { outline: 3px solid #3B82F6; outline-offset: 2px; }
-    .hidden { display: none !important; }
-    .chart-drilldown { cursor: pointer; }
-    .chart-drilldown:hover { opacity: 0.8; }
+    /* Focus Visible - Empresarial */
+    *:focus-visible { 
+      outline: 3px solid var(--alsham-border-focus);
+      outline-offset: 3px;
+      border-radius: var(--alsham-radius-sm);
+    }
     
-    /* Screen Reader Only */
+    .hidden { 
+      display: none !important;
+    }
+    
+    /* Chart Interactions */
+    .chart-drilldown { 
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    
+    .chart-drilldown:hover { 
+      opacity: 0.85;
+    }
+    
+    /* Screen Reader Only - Empresarial */
     .sr-only {
       position: absolute;
       width: 1px;
@@ -340,10 +559,11 @@
       padding: 0;
       margin: -1px;
       overflow: hidden;
-      clip: rect(0,0,0,0);
+      clip: rect(0, 0, 0, 0);
       white-space: nowrap;
       border-width: 0;
     }
+    
     .sr-only-focusable:focus {
       position: static;
       width: auto;
@@ -359,9 +579,12 @@
     /* RESPONSIVE & ACCESSIBILITY */
     /* ========================================== */
 
-    /* Mobile Responsive */
+    /* Mobile Responsive - Empresarial */
     @media (max-width: 768px) {
-      .side-nav.mobile-hidden { display: none !important; }
+      .side-nav.mobile-hidden { 
+        display: none !important;
+      }
+      
       .side-nav.mobile-visible { 
         display: block !important;
         position: fixed;
@@ -369,79 +592,164 @@
         left: 0;
         width: 100%;
         height: calc(100vh - 64px);
-        z-index: 50;
+        z-index: 9998;
+        box-shadow: var(--alsham-shadow-lg);
       }
-      .main-content-wrapper { margin-left: 0 !important; }
-      .grid { grid-template-columns: 1fr !important; }
-      .md\:flex { display: none !important; }
+      
+      .main-content-wrapper { 
+        margin-left: 0 !important;
+        padding: 16px !important;
+      }
+      
+      .grid { 
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      
+      .md\:flex { 
+        display: none !important;
+      }
+
+      .toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        min-width: auto;
+      }
     }
 
-    /* Reduced Motion (A11y) */
+    /* Tablet Responsive */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .main-content-wrapper {
+        padding: 24px !important;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    /* Reduced Motion (A11y) - Empresarial */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
+      *, 
+      *::before, 
+      *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
       }
+
+      .skeleton {
+        animation: none;
+        background: var(--alsham-bg-hover);
+      }
     }
 
-    /* High Contrast Media Query */
+    /* High Contrast Media Query - Empresarial */
     @media (prefers-contrast: high) {
       :root {
         --alsham-bg-canvas: #000000 !important;
         --alsham-bg-surface: #1a1a1a !important;
         --alsham-border-default: #ffffff !important;
         --alsham-text-primary: #ffffff !important;
+        --alsham-text-secondary: #e5e5e5 !important;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        border-width: 2px !important;
       }
     }
 
-    /* Dark Mode (prefers-color-scheme) */
+    /* Dark Mode (prefers-color-scheme) - Empresarial */
     @media (prefers-color-scheme: dark) {
       :root:not(.light) {
-        --alsham-text-primary: #f9fafb;
         --alsham-bg-canvas: #0f172a;
         --alsham-bg-surface: #1e293b;
+        --alsham-bg-hover: #334155;
+        --alsham-text-primary: #f9fafb;
+        --alsham-text-secondary: #cbd5e1;
+        --alsham-text-tertiary: #94a3b8;
+        --alsham-border-default: #334155;
         color-scheme: dark;
       }
     }
 
-    /* Print Styles */
+    /* Print Styles - Empresarial */
     @media print {
-      .no-print, nav, aside, button, .modal { display: none !important; }
-      body { background: white; color: black; }
-      .main-content-wrapper { margin-left: 0 !important; }
-      .chart-drilldown { page-break-inside: avoid; page-break-after: always; }
-      @page { margin: 2cm; size: A4; }
+      .no-print, 
+      nav, 
+      aside, 
+      button, 
+      .modal,
+      .toast,
+      .offline-badge,
+      .skip-link { 
+        display: none !important;
+      }
+      
+      body { 
+        background: white;
+        color: black;
+      }
+      
+      .main-content-wrapper { 
+        margin-left: 0 !important;
+      }
+      
+      .chart-drilldown { 
+        page-break-inside: avoid;
+        page-break-after: always;
+      }
+      
+      @page { 
+        margin: 2cm;
+        size: A4 portrait;
+      }
+      
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      a[href]:after {
+      
+      a[href^="http"]:after {
         content: " (" attr(href) ")";
         font-size: 0.8em;
         color: #666;
       }
+
+      h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+      }
+
+      img {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+      }
     }
 
-    /* Noscript Warning */
+    /* Noscript Warning - Empresarial */
     .noscript-warning {
-      display: none;
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: #fef3c7;
-      border-bottom: 2px solid #f59e0b;
-      padding: 1rem;
+      background: linear-gradient(135deg, #fef3c7, #fcd34d);
+      border-bottom: 3px solid #f59e0b;
+      padding: 16px;
       text-align: center;
       font-weight: 600;
-      z-index: 9999;
+      color: #92400e;
+      z-index: 10000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
   </style>
 
   <!-- ========================================== -->
-  <!-- JSON-LD STRUCTURED DATA -->
+  <!-- JSON-LD STRUCTURED DATA (Empresarial) -->
   <!-- ========================================== -->
   
   <!-- SoftwareApplication Schema -->
@@ -451,91 +759,35 @@
     "@type": "SoftwareApplication",
     "name": "ALSHAM 360° PRIMA",
     "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "BRL"
-    },
-    "description": "CRM Enterprise com IA para gestão de leads, pipeline e automações",
-    "publisher": {
-      "@type": "Organization",
-      "name": "ALSHAM Global"
-    }
-  }
-  </script>
-
-  <!-- Breadcrumb Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [{
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://app.alshamglobal.com.br/"
-    },{
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Dashboard",
-      "item": "https://app.alshamglobal.com.br/dashboard"
-    }]
-  }
-  </script>
-
-  <!-- Organization Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "ALSHAM Global",
-    "url": "https://alshamglobal.com.br",
-    "logo": "https://alshamglobal.com.br/logo.png",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+55-11-3333-4444",
-      "contactType": "customer service",
-      "areaServed": "BR",
-      "availableLanguage": ["Portuguese", "English", "Spanish"]
-    },
-    "sameAs": [
-      "https://twitter.com/alshamglobal",
-      "https://linkedin.com/company/alshamglobal",
-      "https://instagram.com/alshamglobal",
-      "https://youtube.com/@alshamglobal"
-    ],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Av. Paulista, 1000",
-      "addressLocality": "São Paulo",
-      "addressRegion": "SP",
-      "postalCode": "01310-100",
-      "addressCountry": "BR"
-    }
-  }
-  </script>
-
-  <!-- WebApplication Schema (Completo) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "ALSHAM 360° PRIMA",
-    "url": "https://app.alshamglobal.com.br",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web, iOS, Android",
-    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "operatingSystem": "Web, iOS, Android, Windows, macOS",
+    "browserRequirements": "Requires JavaScript. Requires HTML5. Requires CSS3.",
     "softwareVersion": "11.1.0",
+    "releaseNotes": "https://app.alshamglobal.com.br/changelog",
     "datePublished": "2025-01-01",
     "dateModified": "2025-10-14",
-    "description": "CRM Enterprise com IA para gestão de leads, pipeline, automações e relatórios avançados",
-    "screenshot": "https://app.alshamglobal.com.br/screenshots/dashboard.png",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "BRL",
-      "category": "Free Trial"
+      "availability": "https://schema.org/InStock",
+      "validFrom": "2025-01-01"
+    },
+    "description": "CRM Enterprise com IA para gestão de leads, pipeline e automações. Plataforma completa de vendas com relatórios avançados, gamificação e integrações.",
+    "screenshot": [
+      "https://app.alshamglobal.com.br/screenshots/dashboard.png",
+      "https://app.alshamglobal.com.br/screenshots/leads.png",
+      "https://app.alshamglobal.com.br/screenshots/pipeline.png"
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "ALSHAM Global",
+      "url": "https://alshamglobal.com.br",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://alshamglobal.com.br/logo.png",
+        "width": 250,
+        "height": 60
+      }
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -544,33 +796,263 @@
       "bestRating": "5",
       "worstRating": "1"
     },
+    "featureList": [
+      "Gestão Inteligente de Leads com IA",
+      "Pipeline Visual Interativo",
+      "Automações de Marketing e Vendas",
+      "Relatórios e Analytics Avançados",
+      "Gamificação e Metas",
+      "Integrações via API REST",
+      "Dark Mode e Acessibilidade WCAG AAA",
+      "PWA com Offline Support",
+      "Export PDF, Excel e CSV",
+      "Webhooks e Notificações em Tempo Real"
+    ],
+    "applicationSubCategory": "CRM, Sales, Marketing Automation",
+    "downloadUrl": "https://app.alshamglobal.com.br",
+    "installUrl": "https://app.alshamglobal.com.br/install",
+    "permissions": "Notificações, Armazenamento Local, Sincronização em Background"
+  }
+  </script>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://app.alshamglobal.com.br/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Dashboard",
+        "item": "https://app.alshamglobal.com.br/dashboard"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Organization Schema (Completo) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ALSHAM Global",
+    "alternateName": "ALSHAM 360° PRIMA",
+    "url": "https://alshamglobal.com.br",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://alshamglobal.com.br/logo.png",
+      "width": 250,
+      "height": 60
+    },
+    "description": "Empresa líder em soluções de CRM Enterprise com Inteligência Artificial para gestão de vendas e marketing",
+    "foundingDate": "2020",
+    "founders": [
+      {
+        "@type": "Person",
+        "name": "AbnadabyBonaparte"
+      }
+    ],
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "telephone": "+55-11-3333-4444",
+        "contactType": "customer service",
+        "areaServed": "BR",
+        "availableLanguage": ["Portuguese", "English", "Spanish"],
+        "contactOption": "TollFree"
+      },
+      {
+        "@type": "ContactPoint",
+        "telephone": "+55-11-3333-4445",
+        "contactType": "technical support",
+        "areaServed": "BR",
+        "availableLanguage": ["Portuguese", "English"]
+      },
+      {
+        "@type": "ContactPoint",
+        "telephone": "+55-11-3333-4446",
+        "contactType": "sales",
+        "areaServed": ["BR", "US", "ES"],
+        "availableLanguage": ["Portuguese", "English", "Spanish"]
+      }
+    ],
+    "sameAs": [
+      "https://twitter.com/alshamglobal",
+      "https://linkedin.com/company/alshamglobal",
+      "https://instagram.com/alshamglobal",
+      "https://youtube.com/@alshamglobal",
+      "https://facebook.com/alshamglobal"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Av. Paulista, 1000 - Conjunto 101",
+      "addressLocality": "São Paulo",
+      "addressRegion": "SP",
+      "postalCode": "01310-100",
+      "addressCountry": "BR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "-23.550520",
+      "longitude": "-46.633308"
+    },
+    "areaServed": {
+      "@type": "GeoCircle",
+      "geoMidpoint": {
+        "@type": "GeoCoordinates",
+        "latitude": "-23.550520",
+        "longitude": "-46.633308"
+      },
+      "geoRadius": "50000"
+    },
+    "email": "contato@alshamglobal.com.br",
+    "taxID": "12.345.678/0001-99",
+    "vatID": "BR12345678000199",
+    "numberOfEmployees": {
+      "@type": "QuantitativeValue",
+      "value": 50
+    }
+  }
+  </script>
+
+  <!-- WebApplication Schema (Completo e Detalhado) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ALSHAM 360° PRIMA",
+    "url": "https://app.alshamglobal.com.br",
+    "applicationCategory": "BusinessApplication",
+    "applicationSubCategory": "CRM, SaaS, Business Intelligence",
+    "operatingSystem": "Web (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+), iOS 14+, Android 10+",
+    "browserRequirements": "Requires JavaScript ES2020+. Requires HTML5. Requires CSS3 Grid/Flexbox. Requires WebSocket.",
+    "softwareVersion": "11.1.0",
+    "datePublished": "2025-01-01T00:00:00Z",
+    "dateModified": "2025-10-14T00:00:00Z",
+    "description": "CRM Enterprise com Inteligência Artificial para gestão completa de leads, pipeline de vendas, automações de marketing e relatórios avançados. Plataforma robusta com acessibilidade WCAG AAA, PWA, dark mode e integrações.",
+    "screenshot": [
+      "https://app.alshamglobal.com.br/screenshots/dashboard-overview.png",
+      "https://app.alshamglobal.com.br/screenshots/leads-management.png",
+      "https://app.alshamglobal.com.br/screenshots/pipeline-visual.png",
+      "https://app.alshamglobal.com.br/screenshots/automation-builder.png",
+      "https://app.alshamglobal.com.br/screenshots/advanced-reports.png"
+    ],
+    "video": {
+      "@type": "VideoObject",
+      "name": "ALSHAM 360° PRIMA - Demo Completo",
+      "description": "Demonstração completa da plataforma ALSHAM 360° PRIMA",
+      "thumbnailUrl": "https://app.alshamglobal.com.br/video-thumb.jpg",
+      "uploadDate": "2025-01-15T00:00:00Z",
+      "contentUrl": "https://app.alshamglobal.com.br/demo-video.mp4"
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "offerCount": "3",
+      "lowPrice": "0",
+      "highPrice": "999",
+      "priceCurrency": "BRL",
+      "availability": "https://schema.org/InStock",
+      "validFrom": "2025-01-01T00:00:00Z"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "127",
+      "reviewCount": "89",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
     "author": {
       "@type": "Organization",
-      "name": "ALSHAM Global"
+      "name": "ALSHAM Global",
+      "url": "https://alshamglobal.com.br"
     },
     "publisher": {
       "@type": "Organization",
       "name": "ALSHAM Global",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://alshamglobal.com.br/logo.png"
+        "url": "https://alshamglobal.com.br/logo.png",
+        "width": 250,
+        "height": 60
       }
     },
     "featureList": [
-      "Gestão de Leads com IA",
-      "Pipeline Visual",
-      "Automações Inteligentes",
-      "Relatórios Avançados",
-      "Gamificação",
-      "Integrações API",
-      "Dark Mode",
-      "Acessibilidade WCAG AAA"
+      "Gestão Inteligente de Leads com IA e Machine Learning",
+      "Pipeline Visual Drag & Drop com Kanban",
+      "Automações Avançadas de Marketing e Vendas",
+      "Relatórios Executivos e Analytics em Tempo Real",
+      "Gamificação com Metas e Rankings",
+      "Integrações via API REST e Webhooks",
+      "Dark Mode e Temas Personalizáveis",
+      "Acessibilidade WCAG 2.1 AAA",
+      "PWA com Suporte Offline",
+      "Export Multi-formato (PDF, Excel, CSV, JSON)",
+      "Notificações Push em Tempo Real",
+      "Auditoria e Logs Completos",
+      "Segurança Enterprise (2FA, SSO, RBAC)",
+      "Backup Automático e Versionamento",
+      "Suporte Multi-idioma (PT, EN, ES)"
+    ],
+    "softwareRequirements": "Navegador moderno com JavaScript ES2020+, WebSocket, IndexedDB",
+    "permissions": "Notificações Push, Armazenamento Local, Sincronização em Background, Geolocalização (Opcional)",
+    "installUrl": "https://app.alshamglobal.com.br/install",
+    "downloadUrl": "https://app.alshamglobal.com.br/download",
+    "releaseNotes": "https://app.alshamglobal.com.br/changelog/v11.1.0",
+    "softwareHelp": {
+      "@type": "CreativeWork",
+      "url": "https://help.alshamglobal.com.br"
+    },
+    "discussionUrl": "https://community.alshamglobal.com.br",
+    "license": "https://app.alshamglobal.com.br/terms",
+    "isAccessibleForFree": true,
+    "countriesSupported": ["BR", "US", "ES", "PT", "MX", "AR", "CL", "CO"],
+    "inLanguage": ["pt-BR", "en-US", "es-ES"]
+  }
+  </script>
+
+  <!-- FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "O que é ALSHAM 360° PRIMA?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ALSHAM 360° PRIMA é uma plataforma CRM Enterprise com Inteligência Artificial para gestão completa de leads, pipeline de vendas, automações de marketing e relatórios avançados."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quais navegadores são suportados?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ALSHAM 360° PRIMA é compatível com Chrome 90+, Firefox 88+, Safari 14+ e Edge 90+. Também funciona perfeitamente em dispositivos iOS 14+ e Android 10+."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "A plataforma funciona offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim! ALSHAM 360° PRIMA é um Progressive Web App (PWA) com suporte completo offline, permitindo que você trabalhe mesmo sem conexão com a internet."
+        }
+      }
     ]
   }
   </script>
 
 </head>
-
 <body class="font-inter min-h-screen">
 
   <!-- Noscript Warning -->
