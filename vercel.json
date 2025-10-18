@@ -24,6 +24,23 @@
       ]
     },
     {
+      "source": "/service-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
       "source": "/workbox-(.*).js",
       "headers": [
         {
@@ -51,10 +68,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=600"
-        },
-        {
-          "key": "Content-Type",
-          "value": "application/javascript; charset=utf-8"
         }
       ]
     },
@@ -102,18 +115,10 @@
     }
   ],
 
-  "routes": [
-    {
-      "src": "/sw.js",
-      "dest": "/sw.js"
-    },
-    {
-      "src": "/workbox-(.*).js",
-      "dest": "/workbox-$1.js"
-    }
-  ],
-
   "rewrites": [
+    { "source": "/sw.js", "destination": "/sw.js" },
+    { "source": "/service-worker.js", "destination": "/service-worker.js" },
+    { "source": "/workbox-(.*).js", "destination": "/workbox-$1.js" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/leads", "destination": "/leads-real.html" },
     { "source": "/pipeline", "destination": "/pipeline.html" },
@@ -123,7 +128,12 @@
     { "source": "/configuracoes", "destination": "/configuracoes.html" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/register", "destination": "/register.html" },
+    { "source": "/reset-password", "destination": "/reset-password.html" },
+    { "source": "/reset-password-confirm", "destination": "/reset-password-confirm.html" },
     { "source": "/create-org", "destination": "/create-org.html" },
-    { "source": "/manifest", "destination": "/manifest.json" }
+    { "source": "/auth-dashboard", "destination": "/auth-dashboard.html" },
+    { "source": "/timeline-test", "destination": "/timeline-test.html" },
+    { "source": "/manifest", "destination": "/manifest.json" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
