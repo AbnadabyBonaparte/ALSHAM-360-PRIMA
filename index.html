@@ -17,227 +17,338 @@
   <title>ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema CRM Enterprise com IA" />
 
-  <!-- ✅ CSP RELAXADA PARA DEBUG -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:;
-    style-src 'self' 'unsafe-inline' https:;
-    font-src 'self' data: https:;
-    img-src 'self' data: blob: https:;
-    connect-src 'self' https: wss:;
-    frame-src 'self' https:;
-    worker-src 'self' blob:;
-  ">
+  <!-- ❌ CSP REMOVIDO TEMPORARIAMENTE PARA DEBUG -->
+  <!-- A CSP estava bloqueando Google Fonts, APIs e outros recursos -->
 
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="/css/tokens.css" />
-  <link rel="stylesheet" href="/css/style.css" />
-
+  
+  <!-- ✅ Estilos básicos inline -->
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      margin: 0;
-    }
-    .loader {
-      text-align: center;
       color: white;
     }
+    
+    .loader {
+      text-align: center;
+      max-width: 600px;
+      padding: 40px;
+    }
+    
     .spinner {
-      width: 60px;
-      height: 60px;
-      border: 6px solid rgba(255,255,255,0.3);
+      width: 80px;
+      height: 80px;
+      border: 8px solid rgba(255,255,255,0.3);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      margin: 0 auto 30px;
     }
+    
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    
+    h1 {
+      font-size: 42px;
+      margin: 0 0 20px;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+    
+    #status-text {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+    
+    #debug-info {
+      margin-top: 30px;
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.8;
+      font-family: 'Courier New', monospace;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .debug-line {
+      margin: 5px 0;
+    }
+    
+    .debug-success { color: #4ade80; }
+    .debug-error { color: #f87171; }
+    .debug-warning { color: #fbbf24; }
+    .debug-info { color: #60a5fa; }
+    
     .error-box {
       background: white;
+      color: #1f2937;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      max-width: 500px;
-      margin: 20px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      margin-top: 30px;
+      text-align: left;
     }
+    
     .error-box h2 {
-      color: #e74c3c;
-      margin: 0 0 15px;
+      color: #ef4444;
+      margin-bottom: 15px;
+      font-size: 24px;
     }
+    
     .error-box pre {
-      background: #f8f9fa;
+      background: #f3f4f6;
       padding: 15px;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow-x: auto;
       font-size: 12px;
+      margin-top: 15px;
     }
+    
     .btn {
       display: inline-block;
-      padding: 12px 24px;
-      background: #667eea;
-      color: white;
+      padding: 14px 28px;
+      background: white;
+      color: #667eea;
       text-decoration: none;
-      border-radius: 6px;
-      margin-top: 15px;
+      border-radius: 8px;
+      margin: 10px 5px;
       cursor: pointer;
       border: none;
       font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+    
     .btn:hover {
-      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
   </style>
 </head>
 
 <body>
-  <div id="toast-container" aria-live="polite"></div>
-
-  <main class="loader" id="main-loader" role="main">
-    <div class="spinner" aria-label="Carregando"></div>
-    <h1 style="font-size: 28px; margin: 0 0 10px;">ALSHAM 360°</h1>
-    <p id="status-text" style="opacity: 0.9;">Inicializando sistema...</p>
+  <main class="loader" id="main-loader">
+    <div class="spinner"></div>
+    <h1>ALSHAM 360° PRIMA</h1>
+    <p id="status-text">Inicializando sistema sem CSP...</p>
+    <div id="debug-info"></div>
   </main>
 
-  <!-- ✅ SCRIPT DE ROTEAMENTO ROBUSTO -->
   <script>
-    // Patch LockManager (evita warning)
-    if (!('locks' in navigator)) {
-      navigator.locks = { request: async (_, cb) => cb() };
-    }
-
-    // Função de log com timestamp
-    function log(msg, type = 'info') {
-      const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : '📝';
-      console.log(`${emoji} [${new Date().toISOString().split('T')[1]}] ${msg}`);
+    // Sistema de debug avançado
+    const debugLog = [];
+    const debugEl = document.getElementById('debug-info');
+    
+    function addLog(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString('pt-BR');
+      const emoji = {
+        'info': 'ℹ️',
+        'success': '✅',
+        'error': '❌',
+        'warning': '⚠️'
+      }[type] || 'ℹ️';
+      
+      const logMsg = `[${timestamp}] ${emoji} ${message}`;
+      debugLog.push(logMsg);
+      console.log(logMsg);
+      
+      if (debugEl) {
+        debugEl.innerHTML = debugLog
+          .slice(-10)
+          .map(msg => `<div class="debug-line debug-${type}">${msg}</div>`)
+          .join('');
+        debugEl.scrollTop = debugEl.scrollHeight;
+      }
       
       const statusEl = document.getElementById('status-text');
-      if (statusEl) statusEl.textContent = msg;
+      if (statusEl) statusEl.textContent = message;
+    }
+
+    // Patch LockManager
+    if (!('locks' in navigator)) {
+      navigator.locks = { request: async (_, cb) => cb() };
+      addLog('LockManager patch aplicado', 'warning');
     }
 
     // Função de erro
     function showError(title, message, details = '') {
-      log(title + ': ' + message, 'error');
+      addLog(`${title}: ${message}`, 'error');
       
       document.getElementById('main-loader').innerHTML = `
+        <div class="spinner" style="display: none;"></div>
+        <h1>ALSHAM 360°</h1>
         <div class="error-box">
           <h2>🚨 ${title}</h2>
           <p>${message}</p>
           ${details ? `<pre>${details}</pre>` : ''}
-          <button class="btn" onclick="location.reload()">🔄 Tentar Novamente</button>
-          <a href="/login.html" class="btn" style="background: #27ae60; margin-left: 10px;">
-            🔐 Ir para Login
-          </a>
+          <div style="margin-top: 20px;">
+            <button class="btn" onclick="location.reload()">🔄 Tentar Novamente</button>
+            <a href="/login.html" class="btn">🔐 Ir para Login</a>
+            <a href="/dashboard.html" class="btn">📊 Dashboard</a>
+          </div>
         </div>
+        <div id="debug-info" style="margin-top: 20px; color: white;">${debugLog.map(log => `<div>${log}</div>`).join('')}</div>
       `;
     }
 
-    // Função principal de roteamento
+    // Função principal
     async function routeUser() {
       try {
-        log('Verificando sessão...');
+        addLog('🚀 Iniciando roteamento...', 'info');
+        addLog('🔓 CSP desabilitado (modo debug)', 'warning');
 
-        // Timeout de 5 segundos
+        // Verificar conexão
+        if (!navigator.onLine) {
+          throw new Error('Sem conexão com a internet');
+        }
+        addLog('🌐 Conexão ativa', 'success');
+
+        // Timeout global
+        const TIMEOUT = 8000;
         const timeout = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout: Supabase demorou mais de 5s')), 5000)
+          setTimeout(() => reject(new Error(`Timeout após ${TIMEOUT/1000}s`)), TIMEOUT)
         );
 
-        // Tentar carregar Supabase
-        log('Aguardando Supabase CDN...');
+        // Carregar Supabase CDN
+        addLog('📦 Carregando Supabase CDN...', 'info');
         await Promise.race([
-          new Promise(resolve => {
-            if (window.supabase) resolve();
-            else {
-              const script = document.createElement('script');
-              script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-              script.onload = resolve;
-              script.onerror = () => reject(new Error('Falha ao carregar Supabase CDN'));
-              document.head.appendChild(script);
+          new Promise((resolve, reject) => {
+            if (window.supabase?.createClient) {
+              addLog('Supabase já estava carregado', 'success');
+              resolve();
+              return;
             }
+            
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+            
+            script.onload = () => {
+              addLog('✅ Supabase CDN carregado', 'success');
+              resolve();
+            };
+            
+            script.onerror = (e) => {
+              addLog('❌ Falha ao carregar Supabase CDN', 'error');
+              reject(new Error('Falha no CDN do Supabase'));
+            };
+            
+            document.head.appendChild(script);
           }),
           timeout
         ]);
 
-        log('Supabase CDN carregado');
+        // Aguardar 500ms para garantir que o CDN inicializou
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Aguardar módulo local
-        log('Carregando módulo de autenticação...');
+        // Carregar módulo local
+        addLog('📂 Carregando módulo local...', 'info');
         let SupabaseLib;
         
         try {
-          SupabaseLib = await import('/src/lib/supabase.js');
-          log('Módulo carregado com sucesso');
+          SupabaseLib = await Promise.race([
+            import('/src/lib/supabase.js'),
+            timeout
+          ]);
+          addLog('✅ Módulo local carregado', 'success');
         } catch (importError) {
-          console.warn('⚠️ Erro ao importar módulo:', importError);
-          throw new Error('Falha ao carregar módulo de autenticação: ' + importError.message);
+          addLog('❌ Erro ao importar módulo', 'error');
+          throw new Error(`Módulo não encontrado: ${importError.message}`);
         }
 
-        // Verificar se getCurrentSession existe
+        // Validar funções
         if (typeof SupabaseLib.getCurrentSession !== 'function') {
           throw new Error('getCurrentSession não encontrado no módulo');
         }
+        addLog('✅ Funções validadas', 'success');
 
-        log('Verificando sessão ativa...');
+        // Verificar sessão
+        addLog('🔍 Verificando sessão...', 'info');
         const session = await Promise.race([
           SupabaseLib.getCurrentSession(),
           timeout
         ]);
 
         if (session?.user) {
-          log('✅ Sessão encontrada! Redirecionando para dashboard...', 'success');
+          addLog('✅ Sessão encontrada!', 'success');
+          addLog(`👤 Usuário: ${session.user.email || session.user.id}`, 'info');
+          addLog('🔄 Redirecionando para dashboard...', 'info');
+          
+          // Aguardar 1s para o usuário ver as mensagens
+          await new Promise(resolve => setTimeout(resolve, 1000));
           window.location.replace('/dashboard.html');
         } else {
-          log('Nenhuma sessão ativa. Redirecionando para login...');
-          setTimeout(() => {
-            window.location.replace('/login.html');
-          }, 500);
+          addLog('📭 Nenhuma sessão ativa', 'info');
+          addLog('🔄 Redirecionando para login...', 'info');
+          
+          await new Promise(resolve => setTimeout(resolve, 800));
+          window.location.replace('/login.html');
         }
 
       } catch (error) {
-        console.error('❌ Erro no roteamento:', error);
+        console.error('❌ Erro crítico:', error);
+        addLog(`Erro: ${error.message}`, 'error');
         
-        // Mostrar erro amigável
         showError(
-          'Erro ao Carregar',
-          'Não foi possível inicializar o sistema.',
-          `Detalhes técnicos:\n${error.message}\n\nStack:\n${error.stack || 'N/A'}`
+          'Erro ao Carregar Sistema',
+          'Não foi possível inicializar o ALSHAM 360°.',
+          `Detalhes técnicos:\n${error.message}\n\nStack:\n${error.stack || 'N/A'}\n\n` +
+          `Logs:\n${debugLog.join('\n')}`
         );
       }
     }
 
-    // Executar quando DOM estiver pronto
+    // Executar
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', routeUser);
     } else {
       routeUser();
     }
 
-    // Fallback: Se após 10s não redirecionou, mostrar opções manuais
+    // Fallback: Se após 15s não redirecionou, mostrar erro
     setTimeout(() => {
       if (document.getElementById('main-loader')) {
-        log('⏱️ Timeout atingido. Oferecendo navegação manual.', 'error');
         showError(
-          'Sistema Demorado',
-          'O carregamento está demorando mais que o esperado.',
-          'Tente acessar diretamente:'
+          'Timeout Atingido',
+          'O sistema demorou mais de 15 segundos para carregar.',
+          'Possíveis causas:\n- Conexão lenta\n- Servidor fora do ar\n- Recursos bloqueados\n\n' +
+          `Logs:\n${debugLog.join('\n')}`
         );
       }
-    }, 10000);
+    }, 15000);
+
+    // Capturar erros globais
+    window.addEventListener('error', (e) => {
+      addLog(`Erro global: ${e.message}`, 'error');
+    });
+
+    window.addEventListener('unhandledrejection', (e) => {
+      addLog(`Promise rejeitada: ${e.reason}`, 'error');
+    });
   </script>
 
-  <!-- Service Worker -->
+  <!-- Service Worker (opcional) -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('✅ SW ativo:', reg.scope))
+          .then(reg => console.log('✅ SW registrado:', reg.scope))
           .catch(err => console.warn('⚠️ SW falhou:', err));
       });
     }
