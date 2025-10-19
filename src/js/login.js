@@ -1,7 +1,6 @@
-// public/js/login.js
 /**
- * ALSHAM 360° PRIMA - Enterprise Login v5.4.0
- * CORRIGIDO: Aguarda Supabase com retry e timeout
+ * ALSHAM 360° PRIMA - Enterprise Login v5.5.0
+ * ✅ CORRIGIDO: Verifica sessão antes de mostrar login
  */
 
 // Aguarda window.AlshamSupabase estar disponível
@@ -16,6 +15,27 @@ function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
       "Erro ao carregar sistema. Recarregue a página.";
   } else {
     setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
+  }
+}
+
+// ✅ VERIFICA SE JÁ ESTÁ LOGADO
+async function checkExistingSession() {
+  try {
+    const { getCurrentSession } = window.AlshamSupabase || {};
+    if (!getCurrentSession) return false;
+
+    const session = await getCurrentSession();
+    
+    if (session?.user) {
+      console.log("✅ Sessão ativa detectada, redirecionando...");
+      window.location.href = "/dashboard.html";
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error("❌ Erro ao verificar sessão:", error);
+    return false;
   }
 }
 
@@ -112,8 +132,11 @@ const LoginSystem = {
   }
 };
 
-// Aguarda Supabase antes de expor globalmente
-waitForSupabase(() => {
+// Aguarda Supabase e verifica sessão existente
+waitForSupabase(async () => {
   window.LoginSystem = LoginSystem;
-  console.log("✅ LoginSystem READY v5.4.0");
+  console.log("✅ LoginSystem READY v5.5.0");
+  
+  // ✅ VERIFICA SE JÁ ESTÁ LOGADO
+  await checkExistingSession();
 });
