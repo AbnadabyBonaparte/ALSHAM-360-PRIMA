@@ -4,40 +4,33 @@
 // - ✅ JSDoc completo em todas funções principais
 // - ✅ Limpeza automática de cache expirado
 // - ✅ TypeScript types hints
-
-// Import seguro (sem hardcode)
-import { createClient } from '@supabase/supabase-js';
-
+// - ✅ v6.2: Supabase via CDN (sem npm import)
+// ✅ Import do CDN (carregado via <script> no HTML)
+const { createClient } = window.supabase;
 // Load env (para produção, use process.env ou import.meta.env)
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 const DEFAULT_ORG_ID = import.meta.env.VITE_DEFAULT_ORG_ID || 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
-
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('Supabase env vars missing');
 console.log('✅ Supabase configurado:', SUPABASE_URL);
-
 // Inicialização do cliente Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true, flowType: 'pkce' },
-  global: { 
-    headers: { 
-      'X-Client-Info': 'alsham-360-prima@unified-6.1', 
-      'X-Environment': typeof window !== 'undefined' ? window.location.hostname : 'server' 
-    } 
+  global: {
+    headers: {
+      'X-Client-Info': 'alsham-360-prima@unified-6.2-cdn',
+      'X-Environment': typeof window !== 'undefined' ? window.location.hostname : 'server'
+    }
   },
   realtime: { params: { eventsPerSecond: 10 } }
 });
-
 // ============================================================================
 // CONSTANTES
 // ============================================================================
-
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
-
 // ============================================================================
 // HELPERS E UTILIDADES
 // ============================================================================
-
 /**
  * Normaliza e loga erros do Supabase
  * @param {Error} err - Erro capturado
@@ -45,17 +38,16 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
  * @returns {object} Erro normalizado com code, message, details
  */
 function handleError(err, context = 'supabase_operation') {
-  const normalized = { 
-    message: err?.message || 'Unknown', 
-    code: err?.code, 
-    details: err?.details, 
-    hint: err?.hint, 
-    context 
+  const normalized = {
+    message: err?.message || 'Unknown',
+    code: err?.code,
+    details: err?.details,
+    hint: err?.hint,
+    context
   };
   console.error('❌ Supabase Error:', normalized);
   return normalized;
 }
-
 /**
  * Executa operação com retry automático (exponential backoff)
  * @param {Function} operation - Função async a executar
@@ -65,15 +57,14 @@ function handleError(err, context = 'supabase_operation') {
  */
 async function retryOperation(operation, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
-    try { 
-      return await operation(); 
+    try {
+      return await operation();
     } catch (err) {
       if (i === maxRetries - 1) throw err;
       await new Promise(r => setTimeout(r, 1000 * (i + 1))); // 1s, 2s, 3s
     }
   }
 }
-
 /**
  * Valida se string é UUID v4 válido
  * @param {string} uuid - String a validar
@@ -82,7 +73,6 @@ async function retryOperation(operation, maxRetries = 3) {
 function isValidUUID(uuid) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
 }
-
 /**
  * Gera UUID v4 aleatório
  * @returns {string} UUID v4
@@ -94,7 +84,6 @@ function generateUUID() {
     return v.toString(16);
   });
 }
-
 /**
  * Formata data para padrão brasileiro
  * @param {Date|string} date - Data a formatar
@@ -108,7 +97,6 @@ function formatDateBR(date, options = {}) {
   const defaultOptions = { year: 'numeric', month: '2-digit', day: '2-digit', ...options };
   return d.toLocaleDateString('pt-BR', defaultOptions);
 }
-
 /**
  * Converte data em string relativa (ex: "há 2 horas")
  * @param {Date|string} date - Data a converter
@@ -126,7 +114,6 @@ function formatTimeAgo(date) {
   if (s < 2592000) return `${Math.floor(s / 86400)} dias atrás`;
   return `${Math.floor(s / 2592000)} meses atrás`;
 }
-
 /**
  * Sanitiza input contra XSS e injections
  * @param {any} input - Input a sanitizar
@@ -143,7 +130,6 @@ function sanitizeInput(input, opts = {}) {
   if (opts.toLowerCase) v = v.toLowerCase();
   return v;
 }
-
 /**
  * Salva dados no cache localStorage com timestamp
  * @private
@@ -159,7 +145,6 @@ function saveToCache(key, data) {
     }
   }
 }
-
 /**
  * Recupera dados do cache localStorage (com TTL)
  * @private
@@ -184,11 +169,9 @@ function getFromCache(key) {
   }
   return null;
 }
-
 // ============================================================================
 // AUTENTICAÇÃO E SESSÃO (com retry e MFA)
 // ============================================================================
-
 /**
  * Obtém sessão atual do Supabase Auth
  * @returns {Promise<object|null>} Sessão ou null se não autenticado
@@ -200,7 +183,6 @@ async function getCurrentSession() {
     return data?.session || null;
   });
 }
-
 /**
  * Obtém usuário atual (com validação MFA se configurado)
  * @returns {Promise<object|null>} User object ou null
@@ -214,7 +196,6 @@ async function getCurrentUser() {
     return data?.user || null;
   });
 }
-
 /**
  * Desloga usuário atual
  * @returns {Promise<{success: boolean, error?: object}>}
@@ -226,7 +207,6 @@ async function signOut() {
     return { success: true };
   }).catch(err => ({ success: false, error: handleError(err, 'signOut') }));
 }
-
 /**
  * Registra callback para mudanças no estado de autenticação
  * @param {Function} callback - Callback(event, session)
@@ -234,14 +214,13 @@ async function signOut() {
  */
 function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange((event, session) => {
-    try { 
-      callback(event, session); 
-    } catch (e) { 
-      console.error('onAuth callback error', e); 
+    try {
+      callback(event, session);
+    } catch (e) {
+      console.error('onAuth callback error', e);
     }
   });
 }
-
 /**
  * Cadastra novo usuário com email/senha
  * @param {string} email - Email do usuário
@@ -255,7 +234,6 @@ async function signUpWithEmail(email, password) {
     return { data, success: true };
   }).catch(err => ({ success: false, error: handleError(err, 'signUpWithEmail') }));
 }
-
 /**
  * Envia email de recuperação de senha
  * @param {string} email - Email do usuário
@@ -270,7 +248,6 @@ async function resetPassword(email) {
     return { data, success: true };
   }).catch(err => ({ success: false, error: handleError(err, 'resetPassword') }));
 }
-
 /**
  * Autentica usuário com email/senha
  * @param {string} email - Email do usuário
@@ -287,7 +264,6 @@ async function genericSignIn(email, password) {
     return { data, success: true };
   }).catch(err => ({ success: false, error: handleError(err, 'genericSignIn') }));
 }
-
 /**
  * Verifica se email já existe no sistema
  * @param {string} email - Email a verificar
@@ -303,7 +279,6 @@ async function checkEmailExists(email) {
     return false;
   });
 }
-
 /**
  * Cria perfil de usuário
  * @param {object} profile - Dados do perfil (user_id, first_name, last_name, email)
@@ -327,11 +302,9 @@ async function createUserProfile(profile, orgId = null) {
     return { success: true, data };
   }).catch(err => ({ success: false, error: handleError(err, 'createUserProfile') }));
 }
-
 // ============================================================================
 // ORGANIZAÇÃO (org_id) com retry
 // ============================================================================
-
 /**
  * Retorna org_id padrão do sistema
  * @returns {string} UUID da org padrão
@@ -339,7 +312,6 @@ async function createUserProfile(profile, orgId = null) {
 function getDefaultOrgId() {
   return DEFAULT_ORG_ID;
 }
-
 /**
  * Obtém org_id do usuário autenticado (com fallback para default)
  * @returns {Promise<string>} UUID da organização
@@ -354,11 +326,9 @@ async function getCurrentOrgId() {
     return data.org_id;
   }).catch(() => getDefaultOrgId());
 }
-
 // ============================================================================
 // CRUD GENÉRICO (com cache TTL, batch insert, retry)
 // ============================================================================
-
 /**
  * Select genérico com cache e filtros
  * @param {string} table - Nome da tabela
@@ -370,28 +340,27 @@ async function getCurrentOrgId() {
  */
 async function genericSelect(table, filters = {}, options = {}) {
   const cacheKey = `cache_${table}_${JSON.stringify(filters)}`;
-  
+ 
   // Tentar cache
   const cached = getFromCache(cacheKey);
   if (cached) return { data: cached };
-  
+ 
   return retryOperation(async () => {
     let q = supabase.from(table).select(options.select || '*');
-    Object.entries(filters).forEach(([k, v]) => { 
-      if (v !== null && v !== undefined) q = q.eq(k, v); 
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== null && v !== undefined) q = q.eq(k, v);
     });
     if (options.order) q = q.order(options.order.column, { ascending: !!options.order.ascending });
     if (options.limit) q = q.limit(options.limit);
     const { data, error } = await q;
     if (error) throw error;
-    
+   
     // Salvar em cache
     if (data) saveToCache(cacheKey, data);
-    
+   
     return { data };
   }).catch(err => ({ data: null, error: handleError(err, `select:${table}`) }));
 }
-
 /**
  * Insert em batch (múltiplos registros de uma vez)
  * @param {string} table - Nome da tabela
@@ -407,7 +376,6 @@ async function genericBatchInsert(table, payloads, orgId = null) {
     return { success: true, data };
   }).catch(err => ({ success: false, error: handleError(err, `batchInsert:${table}`) }));
 }
-
 /**
  * Insert genérico (single)
  * @param {string} table - Nome da tabela
@@ -420,7 +388,6 @@ async function genericBatchInsert(table, payloads, orgId = null) {
 async function genericInsert(table, payload, orgId = null) {
   return genericBatchInsert(table, [payload], orgId);
 }
-
 /**
  * Update genérico
  * @param {string} table - Nome da tabela
@@ -447,7 +414,6 @@ async function genericUpdate(table, filter, updates, orgId = null) {
     return { success: true, data };
   }).catch(err => ({ success: false, error: handleError(err, `update:${table}`) }));
 }
-
 /**
  * Delete genérico
  * @param {string} table - Nome da tabela
@@ -464,11 +430,9 @@ async function genericDelete(table, id, orgId = null) {
     return { success: true, data };
   }).catch(err => ({ success: false, error: handleError(err, `delete:${table}`) }));
 }
-
 // ============================================================================
 // DOMÍNIOS ESPECÍFICOS ALSHAM (KPIs, ROI, AI scoring, n8n)
 // ============================================================================
-
 /**
  * Obtém KPIs do dashboard
  * @param {string} [orgIdParam] - org_id customizado
@@ -505,7 +469,6 @@ async function getDashboardKPIs(orgIdParam = null) {
     error: handleError(err, 'getDashboardKPIs')
   }));
 }
-
 /**
  * Obtém ROI mensal mais recente
  * @param {string} [orgIdParam] - org_id customizado
@@ -519,7 +482,6 @@ async function getROI(orgIdParam = null) {
     return data?.[0] || { revenue: 0, spend: 0, roi: 0 };
   }).catch(err => ({ revenue: 0, spend: 0, roi: 0, error: handleError(err, 'getROI') }));
 }
-
 /**
  * Recalcula score de lead usando Edge Function
  * @param {string} leadId - UUID do lead
@@ -529,14 +491,13 @@ async function getROI(orgIdParam = null) {
 async function recalculateLeadScore(leadId, orgIdParam = null) {
   return retryOperation(async () => {
     const orgId = orgIdParam || await getCurrentOrgId();
-    const { data, error } = await supabase.functions.invoke('calculate-lead-score', { 
-      body: { lead_id: leadId, org_id: orgId } 
+    const { data, error } = await supabase.functions.invoke('calculate-lead-score', {
+      body: { lead_id: leadId, org_id: orgId }
     });
     if (error) throw error;
     return data;
   }).catch(err => ({ score: null, error: handleError(err, 'recalculateLeadScore') }));
 }
-
 /**
  * Dispara webhook n8n
  * @param {string} endpoint - URL do webhook n8n
@@ -545,20 +506,18 @@ async function recalculateLeadScore(leadId, orgIdParam = null) {
  */
 async function triggerN8n(endpoint, payload) {
   return retryOperation(async () => {
-    const response = await fetch(endpoint, { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' }, 
-      body: JSON.stringify(payload) 
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   }).catch(err => ({ error: handleError(err, 'triggerN8n') }));
 }
-
 // ============================================================================
 // CRUD E DOMÍNIOS EXTRA (leads, audit log, user profile)
 // ============================================================================
-
 /**
  * Lista leads com paginação
  * @param {number} [limit=50] - Limite de registros
@@ -573,7 +532,6 @@ async function getLeads(limit = 50, orgIdParam = null) {
     return { data };
   }).catch(err => ({ data: null, error: handleError(err, 'getLeads') }));
 }
-
 /**
  * Cria novo lead
  * @param {object} payload - Dados do lead
@@ -583,7 +541,6 @@ async function getLeads(limit = 50, orgIdParam = null) {
 async function createLead(payload, orgIdParam = null) {
   return genericInsert('leads_crm', payload, orgIdParam || (await getCurrentOrgId()));
 }
-
 /**
  * Cria log de auditoria
  * @param {string} action - Ação executada (ex: 'login', 'update_lead')
@@ -596,17 +553,16 @@ async function createAuditLog(action, details, userId = null, orgIdParam = null)
   return retryOperation(async () => {
     const org_id = orgIdParam || (await getCurrentOrgId());
     const { data, error } = await supabase.from('audit_log').insert({
-      action, 
-      details, 
-      user_id: userId, 
-      org_id, 
+      action,
+      details,
+      user_id: userId,
+      org_id,
       created_at: new Date().toISOString()
     }).select();
     if (error) throw error;
     return { success: true, data };
   }).catch(err => ({ success: false, error: handleError(err, 'auditLog') }));
 }
-
 /**
  * Obtém perfil de usuário
  * @param {string} userId - UUID do usuário
@@ -621,7 +577,6 @@ async function getUserProfile(userId, orgIdParam = null) {
     return { data };
   }).catch(err => ({ data: null, error: handleError(err, 'getUserProfile') }));
 }
-
 /**
  * Atualiza perfil de usuário
  * @param {string} userId - UUID do usuário
@@ -637,11 +592,9 @@ async function updateUserProfile(userId, updates, orgIdParam = null) {
     return { success: true, data };
   }).catch(err => ({ success: false, error: handleError(err, 'updateUserProfile') }));
 }
-
 // ============================================================================
 // REALTIME (com retry em subscribe)
 // ============================================================================
-
 /**
  * Subscreve a mudanças em tabela via Realtime
  * @param {string} table - Nome da tabela
@@ -660,7 +613,6 @@ function subscribeToTable(table, orgId, callback) {
     return { error: handleError(err, 'subscribeToTable') };
   }
 }
-
 /**
  * Remove subscription de Realtime
  * @param {object} subscription - Subscription retornado por subscribeToTable
@@ -674,11 +626,9 @@ function unsubscribeFromTable(subscription) {
     return { success: false, error: handleError(err, 'unsubscribeFromTable') };
   }
 }
-
 // ============================================================================
 // NOTIFICAÇÕES / UI
 // ============================================================================
-
 /**
  * Exibe toast notification (se disponível no frontend)
  * @param {string} message - Mensagem a exibir
@@ -693,11 +643,9 @@ function showNotification(message, type = 'info') {
   console.log(`[${type.toUpperCase()}] ${message}`);
   return { success: true };
 }
-
 // ============================================================================
 // EXPOSIÇÃO NO WINDOW PARA USO GLOBAL NO BROWSER
 // ============================================================================
-
 if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
   window.AlshamSupabase = window.AlshamSupabase || {};
@@ -742,11 +690,9 @@ if (typeof window !== 'undefined') {
   });
   console.log('✅ window.AlshamSupabase disponível:', Object.keys(window.AlshamSupabase));
 }
-
 // ============================================================================
 // EXPORT MODERNO (ESM)
 // ============================================================================
-
 export {
   supabase,
   supabase as client, // ✅ ALIAS PARA COMPATIBILIDADE
@@ -786,5 +732,4 @@ export {
   handleError,
   retryOperation
 };
-
 export default supabase;
