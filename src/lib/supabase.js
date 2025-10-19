@@ -1,32 +1,64 @@
-// src/lib/supabase.js - ALSHAM 360° PRIMA Supabase Unified Client v6.1 (Otimizado, Auditado, Completo)
-// Changelog v6.1 (2025-10-12):
-// - ✅ Cache com TTL de 5 minutos
-// - ✅ JSDoc completo em todas funções principais
-// - ✅ Limpeza automática de cache expirado
-// - ✅ TypeScript types hints
-// - ✅ v6.2: Supabase via CDN (sem npm import)
+// src/lib/supabase.js - ALSHAM 360° PRIMA Supabase Unified Client v6.2 (CDN)
+// Changelog v6.2 (2025-10-19):
+// - ✅ Supabase via CDN (sem npm import)
+// - ✅ Fallback para import.meta.env undefined
+// - ✅ Hardcoded env vars como backup
+
 // ✅ Import do CDN (carregado via <script> no HTML)
 const { createClient } = window.supabase;
-// Load env (para produção, use process.env ou import.meta.env)
-const SUPABASE_URL = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY2MzYyOTIsImV4cCI6MjA1MjIxMjI5Mn0.qX4cC9Y0PVfYZxqd-NvHKLr_PgP0kzw5XL5qNa6TTeA';
-const DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('Supabase env vars missing');
+
+// ✅ Load env com fallback robusto
+const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) 
+  || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+
+const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY)
+  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY2MzYyOTIsImV4cCI6MjA1MjIxMjI5Mn0.qX4cC9Y0PVfYZxqd-NvHKLr_PgP0kzw5XL5qNa6TTeA';
+
+const DEFAULT_ORG_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEFAULT_ORG_ID)
+  || 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error('Supabase env vars missing');
+}
+
 console.log('✅ Supabase configurado:', SUPABASE_URL);
+console.log('📍 Default Org ID:', DEFAULT_ORG_ID);
+
 // Inicialização do cliente Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true, flowType: 'pkce' },
-  global: {
-    headers: {
-      'X-Client-Info': 'alsham-360-prima@unified-6.2-cdn',
-      'X-Environment': typeof window !== 'undefined' ? window.location.hostname : 'server'
-    }
+  auth: { 
+    autoRefreshToken: true, 
+    persistSession: true, 
+    detectSessionInUrl: true, 
+    flowType: 'pkce' 
   },
-  realtime: { params: { eventsPerSecond: 10 } }
+  global: { 
+    headers: { 
+      'X-Client-Info': 'alsham-360-prima@unified-6.2-cdn', 
+      'X-Environment': typeof window !== 'undefined' ? window.location.hostname : 'server' 
+    } 
+  },
+  realtime: { 
+    params: { eventsPerSecond: 10 } 
+  }
 });
+
 // ============================================================================
 // CONSTANTES
 // ============================================================================
+
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+// ... resto do código continua igual ...
+```
+
+---
+
+## 📋 **COMMIT URGENTE**
+
+**Mensagem:**
+```
+fix: add fallback for import.meta.env in supabase.js
 // ============================================================================
 // HELPERS E UTILIDADES
 // ============================================================================
