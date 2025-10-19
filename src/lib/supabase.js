@@ -1,24 +1,38 @@
-// src/lib/supabase.js - ALSHAM 360° PRIMA Supabase Unified Client v6.2 (CDN)
+// src/lib/supabase.js - ALSHAM 360° PRIMA Supabase Unified Client v6.2
 // Changelog v6.2 (2025-10-19):
-// - ✅ Supabase via CDN (sem npm import)
-// - ✅ Fallback para import.meta.env undefined
-// - ✅ Hardcoded env vars como backup
+// - ✅ Supabase via CDN (window.supabase)
+// - ✅ Env vars com fallback seguro
+// - ✅ Produção-ready para Vercel
+
+// ============================================================================
+// INICIALIZAÇÃO DO SUPABASE CLIENT
+// ============================================================================
 
 // ✅ Import do CDN (carregado via <script> no HTML)
+if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+  throw new Error('Supabase CDN não foi carregado. Adicione <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> no HTML.');
+}
+
 const { createClient } = window.supabase;
 
-// ✅ Load env com fallback robusto
-const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) 
-  || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+// ✅ Configuração de ambiente (com fallback para produção)
+const getEnvVar = (key, fallback) => {
+  // Tenta pegar do Vite (import.meta.env)
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+    return import.meta.env[key];
+  }
+  
+  // Fallback para valor hardcoded
+  return fallback;
+};
 
-const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY)
-  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY2MzYyOTIsImV4cCI6MjA1MjIxMjI5Mn0.qX4cC9Y0PVfYZxqd-NvHKLr_PgP0kzw5XL5qNa6TTeA';
+const SUPABASE_URL = getEnvVar('VITE_SUPABASE_URL', 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co');
+const SUPABASE_ANON_KEY = getEnvVar('VITE_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY2MzYyOTIsImV4cCI6MjA1MjIxMjI5Mn0.qX4cC9Y0PVfYZxqd-NvHKLr_PgP0kzw5XL5qNa6TTeA');
+const DEFAULT_ORG_ID = getEnvVar('VITE_DEFAULT_ORG_ID', 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe');
 
-const DEFAULT_ORG_ID = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEFAULT_ORG_ID)
-  || 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
-
+// Validação obrigatória
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error('Supabase env vars missing');
+  throw new Error('Supabase: URL e ANON_KEY são obrigatórios');
 }
 
 console.log('✅ Supabase configurado:', SUPABASE_URL);
@@ -49,19 +63,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
-// ... resto do código continua igual ...
-```
-
----
-
-## 📋 **COMMIT URGENTE**
-
-**Mensagem:**
-```
-fix: add fallback for import.meta.env in supabase.js
 // ============================================================================
 // HELPERS E UTILIDADES
 // ============================================================================
+
 /**
  * Normaliza e loga erros do Supabase
  * @param {Error} err - Erro capturado
@@ -69,12 +74,12 @@ fix: add fallback for import.meta.env in supabase.js
  * @returns {object} Erro normalizado com code, message, details
  */
 function handleError(err, context = 'supabase_operation') {
-  const normalized = {
-    message: err?.message || 'Unknown',
-    code: err?.code,
-    details: err?.details,
-    hint: err?.hint,
-    context
+  const normalized = { 
+    message: err?.message || 'Unknown', 
+    code: err?.code, 
+    details: err?.details, 
+    hint: err?.hint, 
+    context 
   };
   console.error('❌ Supabase Error:', normalized);
   return normalized;
