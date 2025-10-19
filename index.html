@@ -23,6 +23,9 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   
+  <!-- ✅ SUPABASE CDN - DEVE VIR ANTES DE QUALQUER SCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <!-- ✅ Estilos básicos inline -->
   <style>
     * {
@@ -147,7 +150,7 @@
   <main class="loader" id="main-loader">
     <div class="spinner"></div>
     <h1>ALSHAM 360° PRIMA</h1>
-    <p id="status-text">Inicializando sistema sem CSP...</p>
+    <p id="status-text">Inicializando sistema...</p>
     <div id="debug-info"></div>
   </main>
 
@@ -212,7 +215,6 @@
     async function routeUser() {
       try {
         addLog('🚀 Iniciando roteamento...', 'info');
-        addLog('🔓 CSP desabilitado (modo debug)', 'warning');
 
         // Verificar conexão
         if (!navigator.onLine) {
@@ -220,45 +222,20 @@
         }
         addLog('🌐 Conexão ativa', 'success');
 
+        // Verificar se Supabase CDN foi carregado
+        if (!window.supabase?.createClient) {
+          throw new Error('Supabase CDN não foi carregado. Verifique a conexão.');
+        }
+        addLog('✅ Supabase CDN detectado', 'success');
+
         // Timeout global
         const TIMEOUT = 8000;
         const timeout = new Promise((_, reject) => 
           setTimeout(() => reject(new Error(`Timeout após ${TIMEOUT/1000}s`)), TIMEOUT)
         );
 
-        // Carregar Supabase CDN
-        addLog('📦 Carregando Supabase CDN...', 'info');
-        await Promise.race([
-          new Promise((resolve, reject) => {
-            if (window.supabase?.createClient) {
-              addLog('Supabase já estava carregado', 'success');
-              resolve();
-              return;
-            }
-            
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-            
-            script.onload = () => {
-              addLog('✅ Supabase CDN carregado', 'success');
-              resolve();
-            };
-            
-            script.onerror = (e) => {
-              addLog('❌ Falha ao carregar Supabase CDN', 'error');
-              reject(new Error('Falha no CDN do Supabase'));
-            };
-            
-            document.head.appendChild(script);
-          }),
-          timeout
-        ]);
-
-        // Aguardar 500ms para garantir que o CDN inicializou
-        await new Promise(resolve => setTimeout(resolve, 500));
-
         // Carregar módulo local
-        addLog('📂 Carregando módulo local...', 'info');
+        addLog('📂 Carregando módulo Supabase...', 'info');
         let SupabaseLib;
         
         try {
@@ -266,7 +243,7 @@
             import('/src/lib/supabase.js'),
             timeout
           ]);
-          addLog('✅ Módulo local carregado', 'success');
+          addLog('✅ Módulo Supabase carregado', 'success');
         } catch (importError) {
           addLog('❌ Erro ao importar módulo', 'error');
           throw new Error(`Módulo não encontrado: ${importError.message}`);
@@ -290,8 +267,8 @@
           addLog(`👤 Usuário: ${session.user.email || session.user.id}`, 'info');
           addLog('🔄 Redirecionando para dashboard...', 'info');
           
-          // Aguardar 1s para o usuário ver as mensagens
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Aguardar 800ms para o usuário ver as mensagens
+          await new Promise(resolve => setTimeout(resolve, 800));
           window.location.replace('/dashboard.html');
         } else {
           addLog('📭 Nenhuma sessão ativa', 'info');
