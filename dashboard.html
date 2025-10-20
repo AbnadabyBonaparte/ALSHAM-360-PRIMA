@@ -339,6 +339,39 @@
   </script>
 
   <!-- ========================================== -->
+  <!-- 📦 BIBLIOTECAS ADICIONAIS (FEATURES AVANÇADAS) -->
+  <!-- ========================================== -->
+
+  <!-- Gridstack.js - Drag & Drop Widgets -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.4.0/dist/gridstack.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.4.0/dist/gridstack-extra.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/gridstack@8.4.0/dist/gridstack-all.js"></script>
+
+  <!-- Leaflet.js - Mapas Geográficos -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+
+  <!-- Peity.js - Sparklines -->
+  <script defer src="https://cdn.jsdelivr.net/npm/peity@3.3.0/jquery.peity.min.js"></script>
+
+  <!-- PptxGenJS - Export PowerPoint -->
+  <script defer src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <!-- ApexCharts - Gráficos Avançados (alternativa ao Chart.js para alguns casos) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
+
+  <!-- Moment.js + Timezone -->
+  <script defer src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.43/builds/moment-timezone-with-data.min.js"></script>
+
+  <!-- Date Range Picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.min.js"></script>
+
+  <!-- Heatmap.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
+
+  <!-- ========================================== -->
   <!-- ✅ CRITICAL CSS INLINE (< 14KB) -->
   <!-- ========================================== -->
   <style>
@@ -848,6 +881,535 @@
       z-index: 10000;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
+    /* ========================================== */
+    /* FEATURES AVANÇADAS - DASHBOARD */
+    /* ========================================== */
+
+    /* Gridstack - Drag & Drop */
+    .grid-stack {
+      background: transparent;
+    }
+
+    .grid-stack-item {
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-lg);
+      box-shadow: var(--alsham-shadow-sm);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .grid-stack-item:hover {
+      box-shadow: var(--alsham-shadow-md);
+    }
+
+    .grid-stack-item-content {
+      padding: 1.5rem;
+      overflow: auto;
+    }
+
+    .grid-stack-item .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--alsham-border-default);
+    }
+
+    .grid-stack-item .widget-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+    }
+
+    .grid-stack-item .widget-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .grid-stack-item .widget-action-btn {
+      padding: 0.25rem;
+      border: none;
+      background: transparent;
+      color: var(--alsham-text-secondary);
+      cursor: pointer;
+      border-radius: var(--alsham-radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .grid-stack-item .widget-action-btn:hover {
+      background: var(--alsham-bg-hover);
+      color: var(--alsham-text-primary);
+    }
+
+    /* Dashboard Switcher */
+    .dashboard-switcher {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dashboard-switcher-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-md);
+      color: var(--alsham-text-primary);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dashboard-switcher-btn:hover {
+      background: var(--alsham-bg-hover);
+      border-color: var(--alsham-primary);
+    }
+
+    .dashboard-switcher-dropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      min-width: 250px;
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-lg);
+      box-shadow: var(--alsham-shadow-lg);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-switcher-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dashboard-switcher-dropdown .dashboard-item {
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--alsham-text-primary);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border-bottom: 1px solid var(--alsham-border-default);
+    }
+
+    .dashboard-switcher-dropdown .dashboard-item:last-child {
+      border-bottom: none;
+    }
+
+    .dashboard-switcher-dropdown .dashboard-item:hover {
+      background: var(--alsham-bg-hover);
+    }
+
+    .dashboard-switcher-dropdown .dashboard-item.active {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--alsham-primary);
+      font-weight: 600;
+    }
+
+    .dashboard-switcher-dropdown .dashboard-item .dashboard-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Notification Bell */
+    .notification-bell {
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -0.25rem;
+      right: -0.25rem;
+      min-width: 1.25rem;
+      height: 1.25rem;
+      padding: 0 0.35rem;
+      background: var(--alsham-error);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .notifications-dropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      width: 380px;
+      max-height: 500px;
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-lg);
+      box-shadow: var(--alsham-shadow-lg);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notifications-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .notifications-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--alsham-border-default);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notifications-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+    }
+
+    .notifications-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid var(--alsham-border-default);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .notification-item:hover {
+      background: var(--alsham-bg-hover);
+    }
+
+    .notification-item.unread {
+      background: rgba(59, 130, 246, 0.05);
+      border-left: 3px solid var(--alsham-primary);
+    }
+
+    .notification-item .notification-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .notification-item .notification-message {
+      font-size: 0.8rem;
+      color: var(--alsham-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .notification-item .notification-time {
+      font-size: 0.75rem;
+      color: var(--alsham-text-tertiary);
+    }
+
+    /* Sparklines */
+    .sparkline-container {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Currency & Timezone Selector */
+    .global-settings {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .setting-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-md);
+      font-size: 0.875rem;
+    }
+
+    .setting-selector select {
+      border: none;
+      background: transparent;
+      color: var(--alsham-text-primary);
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* Widget Gallery Modal */
+    .widget-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .widget-gallery-item {
+      padding: 1.5rem;
+      background: var(--alsham-bg-surface);
+      border: 2px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .widget-gallery-item:hover {
+      border-color: var(--alsham-primary);
+      background: rgba(59, 130, 246, 0.05);
+      transform: translateY(-2px);
+      box-shadow: var(--alsham-shadow-md);
+    }
+
+    .widget-gallery-item .widget-icon {
+      width: 3rem;
+      height: 3rem;
+      margin: 0 auto 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--alsham-primary);
+      color: white;
+      border-radius: var(--alsham-radius-md);
+      font-size: 1.5rem;
+    }
+
+    .widget-gallery-item .widget-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .widget-gallery-item .widget-description {
+      font-size: 0.75rem;
+      color: var(--alsham-text-secondary);
+    }
+
+    /* Saved Filters */
+    .saved-filters-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .saved-filter-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--alsham-bg-surface);
+      border: 1px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-md);
+      font-size: 0.875rem;
+      color: var(--alsham-text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .saved-filter-tag:hover {
+      border-color: var(--alsham-primary);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .saved-filter-tag.active {
+      background: var(--alsham-primary);
+      color: white;
+      border-color: var(--alsham-primary);
+    }
+
+    .saved-filter-tag .remove-filter {
+      margin-left: 0.25rem;
+      padding: 0;
+      background: transparent;
+      border: none;
+      color: currentColor;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .saved-filter-tag .remove-filter:hover {
+      opacity: 1;
+    }
+
+    /* Cohort Analysis Table */
+    .cohort-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .cohort-table th,
+    .cohort-table td {
+      padding: 0.75rem;
+      text-align: center;
+      border: 1px solid var(--alsham-border-default);
+    }
+
+    .cohort-table th {
+      background: var(--alsham-bg-hover);
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+    }
+
+    .cohort-table td {
+      color: var(--alsham-text-secondary);
+    }
+
+    .cohort-table .cohort-cell {
+      position: relative;
+    }
+
+    .cohort-table .cohort-cell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .cohort-table .cohort-high::before { background: #22C55E; }
+    .cohort-table .cohort-medium::before { background: #F59E0B; }
+    .cohort-table .cohort-low::before { background: #EF4444; }
+
+    /* Heatmap Container */
+    .heatmap-container {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      border-radius: var(--alsham-radius-lg);
+      overflow: hidden;
+    }
+
+    /* Drill-down Modal Enhanced */
+    .drill-down-modal {
+      max-width: 900px;
+      width: 95%;
+    }
+
+    .drill-down-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: var(--alsham-text-secondary);
+    }
+
+    .drill-down-breadcrumb a {
+      color: var(--alsham-primary);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .drill-down-breadcrumb a:hover {
+      opacity: 0.8;
+    }
+
+    .drill-down-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .drill-down-table thead {
+      background: var(--alsham-bg-hover);
+    }
+
+    .drill-down-table th {
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+      border-bottom: 2px solid var(--alsham-border-default);
+    }
+
+    .drill-down-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--alsham-border-default);
+      color: var(--alsham-text-secondary);
+    }
+
+    .drill-down-table tbody tr:hover {
+      background: var(--alsham-bg-hover);
+    }
+
+    /* Layout Templates Selector */
+    .layout-templates {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .layout-template-card {
+      padding: 1rem;
+      background: var(--alsham-bg-surface);
+      border: 2px solid var(--alsham-border-default);
+      border-radius: var(--alsham-radius-lg);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .layout-template-card:hover {
+      border-color: var(--alsham-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--alsham-shadow-md);
+    }
+
+    .layout-template-card.active {
+      border-color: var(--alsham-primary);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .layout-template-preview {
+      width: 100%;
+      height: 100px;
+      background: var(--alsham-bg-hover);
+      border-radius: var(--alsham-radius-md);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .layout-template-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--alsham-text-primary);
+    }
+
   </style>
 
   <!-- ========================================== -->
@@ -975,7 +1537,8 @@
         "telephone": "+55-11-3333-4445",
         "contactType": "technical support",
         "areaServed": "BR",
-        "availableLanguage": ["Portuguese", "English"]
+        "availableLanguage": ["Portuguese", "English"
+      }
       },
       {
         "@type": "ContactPoint",
@@ -1171,19 +1734,15 @@
   <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
 
   <!-- Offline Indicator -->
-  <div id="offline-indicator" class="offline-badge hidden" role="alert" aria-live="assertive">
-    🔴 Sem conexão
+  <div id="offline-indicator" class="offline-badge hidden" aria-live="assertive">
+    Offline - Alguns recursos limitados
   </div>
 
-  <!-- ARIA Live Regions (A11y) -->
-  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-  <div role="alert" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
-
   <!-- Toast Container -->
-  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2" aria-live="polite"></div>
 
-  <!-- LOADING INDICATOR -->
-  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando dashboard">
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando dashboard">
     <div class="text-center">
       <div class="loading-spinner mb-4"></div>
       <!-- Logo SVG Inline -->
@@ -1554,6 +2113,284 @@
         </div>
         <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Agendar Relatório</button>
       </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- COMPONENTES AVANÇADOS - DASHBOARD -->
+  <!-- ========================================== -->
+
+  <!-- Dashboard Switcher & Global Settings -->
+  <div id="dashboard-toolbar" class="hidden fixed top-20 left-0 right-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex justify-between items-center md:ml-56">
+      <!-- Dashboard Switcher -->
+      <div class="dashboard-switcher">
+        <button class="dashboard-switcher-btn" onclick="window.DashboardAdvanced.toggleDashboardDropdown()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+          </svg>
+          <span id="current-dashboard-name">Dashboard Principal</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        
+        <div class="dashboard-switcher-dropdown" id="dashboard-dropdown">
+          <div class="dashboard-item active" onclick="window.DashboardAdvanced.switchDashboard('main')">
+            <span class="dashboard-icon">📊</span>
+            <span>Dashboard Principal</span>
+          </div>
+          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('sales')">
+            <span class="dashboard-icon">💰</span>
+            <span>Dashboard de Vendas</span>
+          </div>
+          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('marketing')">
+            <span class="dashboard-icon">📢</span>
+            <span>Dashboard de Marketing</span>
+          </div>
+          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('executive')">
+            <span class="dashboard-icon">👔</span>
+            <span>Dashboard Executivo</span>
+          </div>
+          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('forecast')">
+            <span class="dashboard-icon">📈</span>
+            <span>Forecast & Analytics</span>
+          </div>
+          <div class="dashboard-item" style="border-top: 2px solid var(--alsham-border-default);" onclick="window.DashboardAdvanced.openDashboardManager()">
+            <span class="dashboard-icon">⚙️</span>
+            <span>Gerenciar Dashboards</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Global Settings -->
+      <div class="global-settings">
+        <!-- Currency Selector -->
+        <div class="setting-selector">
+          <span>💱</span>
+          <select id="currency-selector" onchange="window.DashboardAdvanced.changeCurrency(this.value)">
+            <option value="BRL">BRL (R$)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+        
+        <!-- Timezone Selector -->
+        <div class="setting-selector">
+          <span>🌍</span>
+          <select id="timezone-selector" onchange="window.DashboardAdvanced.changeTimezone(this.value)">
+            <option value="America/Sao_Paulo">São Paulo (BRT)</option>
+            <option value="America/New_York">New York (EST)</option>
+            <option value="Europe/London">London (GMT)</option>
+            <option value="Asia/Tokyo">Tokyo (JST)</option>
+          </select>
+        </div>
+        
+        <!-- Notification Bell -->
+        <div class="notification-bell">
+          <button class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800" onclick="window.DashboardAdvanced.toggleNotifications()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notification-badge" id="notification-badge">5</span>
+          </button>
+          
+          <div class="notifications-dropdown" id="notifications-dropdown">
+            <div class="notifications-header">
+              <h3>Notificações</h3>
+              <button class="text-sm text-blue-600 hover:underline" onclick="window.DashboardAdvanced.markAllAsRead()">
+                Marcar todas como lidas
+              </button>
+            </div>
+            <div class="notifications-list" id="notifications-list">
+              <!-- Notificações carregadas dinamicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gridstack Container (substitui o grid atual) -->
+  <div id="gridstack-container" class="hidden">
+    <div class="grid-stack" id="main-grid">
+      <!-- Widgets adicionados dinamicamente -->
+    </div>
+  </div>
+
+  <!-- Widget Gallery Modal -->
+  <div id="widget-gallery-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Galeria de Widgets</h2>
+        <button onclick="window.DashboardAdvanced.closeWidgetGallery()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="widget-gallery-grid" id="widget-gallery-grid">
+        <!-- Widgets disponíveis -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Manager Modal -->
+  <div id="dashboard-manager-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Gerenciar Dashboards</h2>
+        <button onclick="window.DashboardAdvanced.closeDashboardManager()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <button onclick="window.DashboardAdvanced.createNewDashboard()" class="w-full mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        ➕ Criar Novo Dashboard
+      </button>
+      
+      <div id="dashboards-list" class="space-y-2">
+        <!-- Lista de dashboards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Filters -->
+  <div id="saved-filters-container" class="hidden">
+    <div class="flex justify-between items-center mb-2">
+      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Filtros Salvos</h4>
+      <button onclick="window.DashboardAdvanced.saveCurrentFilters()" class="text-sm text-blue-600 hover:underline">
+        💾 Salvar filtros atuais
+      </button>
+    </div>
+    <div class="saved-filters-list" id="saved-filters-list">
+      <!-- Filtros salvos -->
+    </div>
+  </div>
+
+  <!-- Drill-down Modal Enhanced -->
+  <div id="drill-down-modal" class="modal">
+    <div class="modal-content drill-down-modal">
+      <div class="drill-down-breadcrumb" id="drill-down-breadcrumb">
+        <!-- Breadcrumb -->
+      </div>
+      
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold" id="drill-down-title">Detalhes</h2>
+        <button onclick="window.DashboardAdvanced.closeDrillDown()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div id="drill-down-content">
+        <!-- Conteúdo carregado dinamicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout Templates Modal -->
+  <div id="layout-templates-modal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Templates de Layout</h2>
+        <button onclick="window.DashboardAdvanced.closeLayoutTemplates()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="layout-templates">
+        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('sales')">
+          <div class="layout-template-preview">
+            💰
+          </div>
+          <div class="layout-template-name">Vendas</div>
+        </div>
+        
+        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('marketing')">
+          <div class="layout-template-preview">
+            📢
+          </div>
+          <div class="layout-template-name">Marketing</div>
+        </div>
+        
+        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('executive')">
+          <div class="layout-template-preview">
+            👔
+          </div>
+          <div class="layout-template-name">Executivo</div>
+        </div>
+        
+        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('analytics')">
+          <div class="layout-template-preview">
+            📊
+          </div>
+          <div class="layout-template-name">Analytics</div>
+        </div>
+        
+        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('custom')">
+          <div class="layout-template-preview">
+            ⚙️
+          </div>
+          <div class="layout-template-name">Personalizado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cohort Analysis Modal -->
+  <div id="cohort-modal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Análise de Cohort</h2>
+        <button onclick="window.DashboardAdvanced.closeCohortModal()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div id="cohort-table-container">
+        <!-- Tabela de cohort -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Modal -->
+  <div id="map-modal" class="modal">
+    <div class="modal-content" style="max-width: 1000px;">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Mapa de Leads</h2>
+        <button onclick="window.DashboardAdvanced.closeMapModal()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div id="map-container" style="height: 500px; border-radius: 8px;"></div>
+    </div>
+  </div>
+
+  <!-- Heatmap Modal -->
+  <div id="heatmap-modal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Heatmap de Atividades</h2>
+        <button onclick="window.DashboardAdvanced.closeHeatmapModal()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="heatmap-container" id="heatmap-container"></div>
     </div>
   </div>
 
@@ -1943,5 +2780,80 @@
     lazyImages.forEach(img => imageObserver.observe(img));
   }
   </script>
+
+  <!-- ========================================== -->
+  <!-- 🚀 DASHBOARD ADVANCED FEATURES -->
+  <!-- ========================================== -->
+  <script type="module" src="/src/js/dashboard-advanced.js"></script>
+
+  <script>
+  // Inicializar features avançadas após dashboard base carregar
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Aguardar dashboard base inicializar
+    await new Promise(resolve => {
+      const checkInterval = setInterval(() => {
+        if (window.DashboardApp && window.DashboardState) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+    });
+    
+    // Aguardar 1 segundo adicional para garantir que tudo carregou
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Inicializar features avançadas
+    if (window.DashboardAdvanced) {
+      await window.DashboardAdvanced.init();
+    }
+  });
+
+  // Adicionar botões de features avançadas no header
+  window.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('main header .flex');
+    if (header) {
+      const advancedButtons = `
+        <button onclick="window.DashboardAdvanced?.openWidgetGallery()" 
+                class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                title="Adicionar Widget">
+          ➕ Widget
+        </button>
+        
+        <button onclick="window.DashboardAdvanced?.openLayoutTemplates()" 
+                class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
+                title="Templates de Layout">
+          🎨 Templates
+        </button>
+        
+        <button onclick="window.DashboardAdvanced?.openCohortModal()" 
+                class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm"
+                title="Análise de Cohort">
+          📊 Cohort
+        </button>
+        
+        <button onclick="window.DashboardAdvanced?.openMapModal()" 
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                title="Mapa de Leads">
+          🗺️ Mapa
+        </button>
+        
+        <button onclick="window.DashboardAdvanced?.openHeatmapModal()" 
+                class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm"
+                title="Heatmap">
+          🔥 Heatmap
+        </button>
+        
+        <button onclick="window.DashboardAdvanced?.exportPowerPoint()" 
+                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                title="Export PowerPoint">
+          📊 PPT
+        </button>
+      `;
+      
+      header.insertAdjacentHTML('beforeend', advancedButtons);
+    }
+  });
+  </script>
+
 </body>
 </html>
