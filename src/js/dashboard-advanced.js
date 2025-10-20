@@ -320,58 +320,57 @@ function openDrillDown(title, data, breadcrumb = []) {
     console.warn('⚠️ Modal drill-down não encontrado');
     return;
   }
- 
+
   // Breadcrumb
   const breadcrumbContainer = document.getElementById('drill-down-breadcrumb');
   if (breadcrumbContainer) {
     breadcrumbContainer.innerHTML = breadcrumb.map((item, index) => {
       if (index === breadcrumb.length - 1) {
-        return `<span class="text-gray-900 dark:text-gray-100">${item}</span>`;
+        return `<span class="font-bold">${item}</span>`;
       }
-      return `<a href="#" class="text-blue-600 hover:underline" onclick="event.preventDefault()">${item}</a> <span class="text-gray-400">/</span>`;
+      return `<a href="#" class="text-blue-600 hover:underline">${item}</a> /`;
     }).join(' ');
   }
- 
+
   // Título
   const titleEl = document.getElementById('drill-down-title');
   if (titleEl) titleEl.textContent = title;
- 
+
   // Conteúdo
   const contentEl = document.getElementById('drill-down-content');
   if (!contentEl) return;
- 
+
   if (!data || data.length === 0) {
-    contentEl.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhum dado disponível</p>';
+    contentEl.innerHTML = `<p class="text-gray-500">Nenhum dado disponível</p>`;
   } else {
     // Gerar tabela
     const headers = Object.keys(data[0]);
-   
     const tableHTML = `
       <div class="overflow-x-auto">
-        <table class="drill-down-table">
-          <thead>
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
             <tr>
-              ${headers.map(h => `<th>${h}</th>`).join('')}
+              ${headers.map(h => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">${h}</th>`).join('')}
             </tr>
           </thead>
-          <tbody>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             ${data.map(row => `
               <tr>
-                ${headers.map(h => `<td>${row[h] || 'N/A'}</td>`).join('')}
+                ${headers.map(h => `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${row[h] || 'N/A'}</td>`).join('')}
               </tr>
             `).join('')}
           </tbody>
         </table>
       </div>
     `;
-   
     contentEl.innerHTML = tableHTML;
   }
- 
+
   // Abrir modal
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
 }
+
 function closeDrillDown() {
   const modal = document.getElementById('drill-down-modal');
   if (modal) {
@@ -379,18 +378,19 @@ function closeDrillDown() {
     modal.setAttribute('aria-hidden', 'true');
   }
 }
+
 // ============================================================================
 // DASHBOARD SWITCHER
 // ============================================================================
 function toggleDashboardDropdown() {
   const dropdown = document.getElementById('dashboard-dropdown');
   if (!dropdown) return;
- 
   dropdown.classList.toggle('active');
 }
+
 function switchDashboard(dashboardId) {
   DashboardAdvancedState.currentDashboard = dashboardId;
- 
+
   // Atualizar nome no botão
   const nameEl = document.getElementById('current-dashboard-name');
   if (nameEl) {
@@ -403,447 +403,395 @@ function switchDashboard(dashboardId) {
     };
     nameEl.textContent = names[dashboardId] || 'Dashboard';
   }
- 
+
   // Fechar dropdown
   toggleDashboardDropdown();
- 
+
   // Atualizar active state
   document.querySelectorAll('.dashboard-item').forEach(item => {
     item.classList.remove('active');
   });
   event?.target?.closest('.dashboard-item')?.classList.add('active');
- 
+
   // Recarregar widgets para novo dashboard
   loadWidgetsForCurrentDashboard();
- 
+
   console.log(`📊 Trocando para dashboard: ${dashboardId}`);
   showToast(`Dashboard "${names[dashboardId]}" carregado`, 'success');
 }
+
 function openDashboardManager() {
   const modal = document.getElementById('dashboard-manager-modal');
   if (!modal) return;
- 
+
   // Renderizar lista de dashboards
   const listContainer = document.getElementById('dashboards-list');
   if (listContainer) {
     if (DashboardAdvancedState.dashboards.length === 0) {
-      listContainer.innerHTML = '<p class="text-center text-gray-500 py-4">Nenhum dashboard salvo</p>';
+      listContainer.innerHTML = `<p class="text-gray-500">Nenhum dashboard salvo</p>`;
     } else {
       listContainer.innerHTML = DashboardAdvancedState.dashboards.map(dash => `
-        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div class="flex items-center justify-between p-4 border-b">
           <div>
-            <h4 class="font-semibold text-gray-900 dark:text-gray-100">${dash.name}</h4>
-            <p class="text-xs text-gray-500">${new Date(dash.created_at).toLocaleDateString('pt-BR')}</p>
+            <h4 class="font-semibold">${dash.name}</h4>
+            <p class="text-sm text-gray-500">${new Date(dash.created_at).toLocaleDateString('pt-BR')}</p>
           </div>
-          <div class="flex gap-2">
-            <button onclick="window.DashboardAdvanced.loadDashboard('${dash.id}')"
-                    class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
-              Carregar
-            </button>
-            <button onclick="window.DashboardAdvanced.deleteDashboard('${dash.id}')"
-                    class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
-              Deletar
-            </button>
-          </div>
+          <button onclick="window.DashboardAdvanced.deleteDashboard('${dash.id}')" class="text-red-600 hover:text-red-800">Excluir</button>
         </div>
       `).join('');
     }
   }
- 
+
   modal.classList.add('active');
 }
+
 function closeDashboardManager() {
   const modal = document.getElementById('dashboard-manager-modal');
   if (modal) modal.classList.remove('active');
 }
+
 async function createNewDashboard() {
-  const name = prompt('Nome do novo dashboard:');
-  if (!name) return;
- 
+  const nameInput = document.getElementById('new-dashboard-name');
+  if (!nameInput || !nameInput.value.trim()) {
+    showToast('Nome do dashboard obrigatório', 'error');
+    return;
+  }
+
+  const name = nameInput.value.trim();
+
   try {
-    await window.AlshamSupabase.genericInsert('saved_dashboards', {
-      name,
-      user_id: window.DashboardApp.state.user.id,
+    const { data } = await window.AlshamSupabase.genericInsert('saved_dashboards', {
       org_id: window.DashboardApp.state.orgId,
-      layout: {},
-      is_default: false
+      user_id: window.DashboardApp.state.user.id,
+      name,
+      layout: [] // Layout vazio inicialmente
     });
-   
-    showToast('✅ Dashboard criado com sucesso!', 'success');
-    await loadAdvancedData();
-    openDashboardManager();
-   
+
+    DashboardAdvancedState.dashboards.push(data[0]);
+    showToast(`Dashboard "${name}" criado!`, 'success');
+    closeDashboardManager();
+    nameInput.value = '';
+
+    // Atualizar lista se modal aberto
+    openDashboardManager(); // Re-render
+
   } catch (error) {
     console.error('❌ Erro ao criar dashboard:', error);
-    showToast('❌ Erro ao criar dashboard', 'error');
+    showToast('Erro ao criar dashboard', 'error');
   }
 }
+
 async function deleteDashboard(dashboardId) {
-  if (!confirm('Tem certeza que deseja deletar este dashboard?')) return;
- 
+  if (!confirm('Excluir este dashboard?')) return;
+
   try {
     await window.AlshamSupabase.genericDelete('saved_dashboards', { id: dashboardId });
-   
-    showToast('✅ Dashboard deletado', 'success');
-    await loadAdvancedData();
-    openDashboardManager();
-   
+    DashboardAdvancedState.dashboards = DashboardAdvancedState.dashboards.filter(d => d.id !== dashboardId);
+    showToast('Dashboard excluído', 'success');
+    openDashboardManager(); // Re-render
+
   } catch (error) {
-    console.error('❌ Erro ao deletar dashboard:', error);
-    showToast('❌ Erro ao deletar dashboard', 'error');
+    console.error('❌ Erro ao excluir dashboard:', error);
+    showToast('Erro ao excluir dashboard', 'error');
   }
 }
+
 // ============================================================================
 // WIDGET GALLERY
 // ============================================================================
 function openWidgetGallery() {
   const modal = document.getElementById('widget-gallery-modal');
   if (!modal) return;
- 
-  const grid = document.getElementById('widget-gallery-grid');
-  if (grid) {
-    grid.innerHTML = DashboardAdvancedState.availableWidgets.map(widget => `
-      <div class="widget-gallery-item" onclick="window.DashboardAdvanced.addWidget('${widget.id}')">
+
+  // Renderizar gallery
+  const galleryContainer = document.getElementById('widget-gallery');
+  if (galleryContainer) {
+    galleryContainer.innerHTML = DashboardAdvancedState.availableWidgets.map(widget => `
+      <div class="widget-card" onclick="window.DashboardAdvanced.addWidgetFromGallery('${widget.id}')">
         <div class="widget-icon">${widget.icon}</div>
-        <div class="widget-name">${widget.name}</div>
-        <div class="widget-description">${widget.type}</div>
+        <h3 class="widget-name">${widget.name}</h3>
       </div>
     `).join('');
   }
- 
+
   modal.classList.add('active');
 }
+
 function closeWidgetGallery() {
   const modal = document.getElementById('widget-gallery-modal');
   if (modal) modal.classList.remove('active');
 }
+
+function addWidgetFromGallery(widgetId) {
+  console.log(`➕ Adicionando widget: ${widgetId}`);
+  closeWidgetGallery();
+  addWidget(widgetId); // Chama a função principal de addWidget
+}
+
 // ============================================================================
-// NOTIFICATIONS CENTER
+// NOTIFICAÇÕES
 // ============================================================================
+function setupNotifications() {
+  updateNotificationBadge();
+}
+
 function toggleNotifications() {
   const dropdown = document.getElementById('notifications-dropdown');
   if (!dropdown) return;
- 
+
   dropdown.classList.toggle('active');
- 
-  // Renderizar notificações
-  const listEl = document.getElementById('notifications-list');
-  if (listEl) {
-    if (DashboardAdvancedState.notifications.length === 0) {
-      listEl.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhuma notificação</p>';
-    } else {
-      listEl.innerHTML = DashboardAdvancedState.notifications.map(notif => `
-        <div class="notification-item ${notif.is_read ? '' : 'unread'}">
-          <div class="notification-title">${notif.title}</div>
-          <div class="notification-message">${notif.message}</div>
-          <div class="notification-time">${getRelativeTime(notif.created_at)}</div>
+
+  if (dropdown.classList.contains('active')) {
+    renderNotifications();
+  }
+}
+
+function renderNotifications() {
+  const listContainer = document.getElementById('notifications-list');
+  if (!listContainer) return;
+
+  if (DashboardAdvancedState.notifications.length === 0) {
+    listContainer.innerHTML = `<p class="p-4 text-gray-500">Nenhuma notificação</p>`;
+  } else {
+    listContainer.innerHTML = DashboardAdvancedState.notifications.map(notif => `
+      <div class="p-4 border-b flex items-start">
+        <div class="flex-1">
+          <h4 class="font-semibold">${notif.title}</h4>
+          <p class="text-sm text-gray-600">${notif.message}</p>
+          <p class="text-xs text-gray-400 mt-1">${new Date(notif.created_at).toLocaleString('pt-BR')}</p>
         </div>
-      `).join('');
-    }
+        <button onclick="markAsRead('${notif.id}')" class="ml-4 text-blue-600 hover:text-blue-800 text-sm">Marcar lida</button>
+      </div>
+    `).join('');
   }
 }
-function updateNotificationBadge() {
-  const badge = document.getElementById('notification-badge');
-  if (badge) {
-    const unreadCount = DashboardAdvancedState.notifications.filter(n => !n.is_read).length;
-    badge.textContent = unreadCount;
-    badge.style.display = unreadCount > 0 ? 'flex' : 'none';
-  }
-}
+
 async function markAllAsRead() {
   try {
-    const userId = window.DashboardApp.state.user?.id;
-    if (!userId) return;
-   
-    await window.AlshamSupabase.supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('user_id', userId)
-      .eq('is_read', false);
-   
-    DashboardAdvancedState.notifications.forEach(n => n.is_read = true);
+    await window.AlshamSupabase.genericUpdate('notifications', { is_read: true }, {
+      user_id: window.DashboardApp.state.user.id,
+      is_read: false
+    });
+    DashboardAdvancedState.notifications = [];
     updateNotificationBadge();
-    toggleNotifications();
-    showToast('✅ Todas as notificações marcadas como lidas', 'success');
-   
+    renderNotifications();
+    showToast('Todas notificações marcadas como lidas', 'success');
   } catch (error) {
-    console.error('❌ Erro ao marcar notificações:', error);
+    console.error('❌ Erro ao marcar como lidas:', error);
   }
 }
-function getRelativeTime(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / 60000);
- 
-  if (diffMins < 1) return 'Agora';
-  if (diffMins < 60) return `${diffMins}m atrás`;
- 
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}h atrás`;
- 
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return `${diffDays}d atrás`;
- 
-  return date.toLocaleDateString('pt-BR');
+
+function updateNotificationBadge() {
+  const badge = document.getElementById('notifications-badge');
+  if (!badge) return;
+
+  const count = DashboardAdvancedState.notifications.length;
+  badge.textContent = count > 0 ? count : '';
+  badge.classList.toggle('hidden', count === 0);
 }
+
 // ============================================================================
 // CURRENCY & TIMEZONE
 // ============================================================================
 function changeCurrency(currency) {
   DashboardAdvancedState.currency = currency;
-  console.log(`💱 Moeda alterada para: ${currency}`);
- 
-  // Salvar preferência
-  localStorage.setItem('alsham-currency', currency);
- 
-  // Recarregar dashboard com nova moeda
-  if (window.DashboardApp?.refresh) {
-    window.DashboardApp.refresh();
-  }
- 
+  // Atualizar todos os valores monetários no dashboard
+  document.querySelectorAll('[data-currency]').forEach(el => {
+    const value = parseFloat(el.dataset.value);
+    el.textContent = formatCurrency(value, currency);
+  });
   showToast(`Moeda alterada para ${currency}`, 'success');
 }
+
 function changeTimezone(timezone) {
   DashboardAdvancedState.timezone = timezone;
-  console.log(`🌍 Timezone alterado para: ${timezone}`);
- 
-  // Salvar preferência
-  localStorage.setItem('alsham-timezone', timezone);
- 
-  // Recarregar dashboard com novo timezone
-  if (window.DashboardApp?.refresh) {
-    window.DashboardApp.refresh();
-  }
- 
-  showToast(`Timezone alterado para ${timezone}`, 'success');
+  // Atualizar datas
+  document.querySelectorAll('[data-timestamp]').forEach(el => {
+    const timestamp = parseInt(el.dataset.timestamp);
+    el.textContent = new Date(timestamp).toLocaleString('pt-BR', { timeZone: timezone });
+  });
+  showToast(`Fuso horário alterado para ${timezone}`, 'success');
 }
 
 // ============================================================================
 // SAVED FILTERS
 // ============================================================================
 async function saveCurrentFilters() {
-  const name = prompt('Nome do filtro:');
+  const name = prompt('Nome para o filtro salvo:');
   if (!name) return;
- 
+
   try {
-    const filters = window.DashboardApp.state.filters;
-   
-    await window.AlshamSupabase.genericInsert('saved_filters', {
-      name,
-      user_id: window.DashboardApp.state.user.id,
+    const { data } = await window.AlshamSupabase.genericInsert('saved_filters', {
       org_id: window.DashboardApp.state.orgId,
-      filters: JSON.stringify(filters)
+      user_id: window.DashboardApp.state.user.id,
+      name,
+      filters: DashboardState.filters // Do dashboard principal
     });
-   
-    showToast('✅ Filtro salvo com sucesso!', 'success');
-    await loadAdvancedData();
-    renderSavedFilters();
-   
+
+    DashboardAdvancedState.savedFilters.push(data[0]);
+    showToast(`Filtro "${name}" salvo!`, 'success');
   } catch (error) {
     console.error('❌ Erro ao salvar filtro:', error);
-    showToast('❌ Erro ao salvar filtro', 'error');
   }
 }
-function renderSavedFilters() {
-  const container = document.getElementById('saved-filters-list');
-  if (!container) return;
- 
-  const filtersContainer = document.getElementById('saved-filters-container');
-  if (filtersContainer && DashboardAdvancedState.savedFilters.length > 0) {
-    filtersContainer.classList.remove('hidden');
-  }
- 
-  if (DashboardAdvancedState.savedFilters.length === 0) {
-    container.innerHTML = '';
-    return;
-  }
- 
-  container.innerHTML = DashboardAdvancedState.savedFilters.map(filter => `
-    <div class="saved-filter-tag" onclick="window.DashboardAdvanced.applySavedFilter('${filter.id}')">
-      <span>${filter.name}</span>
-      <button class="remove-filter" onclick="event.stopPropagation(); window.DashboardAdvanced.deleteSavedFilter('${filter.id}')">
-        ✕
-      </button>
-    </div>
-  `).join('');
-}
-async function applySavedFilter(filterId) {
+
+function applySavedFilter(filterId) {
   const filter = DashboardAdvancedState.savedFilters.find(f => f.id === filterId);
   if (!filter) return;
- 
-  try {
-    const filters = JSON.parse(filter.filters);
-    window.DashboardApp.state.filters = filters;
-   
-    // Atualizar UI
-    if (filters.dateRange) {
-      const dateSelect = document.getElementById('date-filter');
-      if (dateSelect) dateSelect.value = filters.dateRange;
-    }
-   
-    if (filters.search) {
-      const searchInput = document.getElementById('search-input');
-      if (searchInput) searchInput.value = filters.search;
-    }
-   
-    // Aplicar e renderizar
-    if (window.DashboardApp.refresh) {
-      await window.DashboardApp.refresh();
-    }
-   
-    showToast(`✅ Filtro "${filter.name}" aplicado`, 'success');
-   
-  } catch (error) {
-    console.error('❌ Erro ao aplicar filtro:', error);
-    showToast('❌ Erro ao aplicar filtro', 'error');
-  }
+
+  DashboardState.filters = filter.filters;
+  applyFilters(); // Do dashboard principal
+  renderDashboard();
+  showToast(`Filtro "${filter.name}" aplicado`, 'success');
 }
+
 async function deleteSavedFilter(filterId) {
-  if (!confirm('Deletar este filtro salvo?')) return;
- 
+  if (!confirm('Excluir este filtro?')) return;
+
   try {
     await window.AlshamSupabase.genericDelete('saved_filters', { id: filterId });
-   
-    showToast('✅ Filtro deletado', 'success');
-    await loadAdvancedData();
-    renderSavedFilters();
-   
+    DashboardAdvancedState.savedFilters = DashboardAdvancedState.savedFilters.filter(f => f.id !== filterId);
+    showToast('Filtro excluído', 'success');
   } catch (error) {
-    console.error('❌ Erro ao deletar filtro:', error);
+    console.error('❌ Erro ao excluir filtro:', error);
   }
 }
+
 // ============================================================================
-// COHORT ANALYSIS
+// ANÁLISE DE COHORT
 // ============================================================================
 function openCohortModal() {
   const modal = document.getElementById('cohort-modal');
   if (!modal) return;
- 
-  // Calcular cohort
-  const cohortData = calculateCohort();
- 
-  // Renderizar tabela
-  const container = document.getElementById('cohort-table-container');
-  if (container) {
-    container.innerHTML = renderCohortTable(cohortData);
-  }
- 
+
+  renderCohortAnalysis();
   modal.classList.add('active');
 }
+
 function closeCohortModal() {
   const modal = document.getElementById('cohort-modal');
   if (modal) modal.classList.remove('active');
 }
-function calculateCohort() {
-  const leads = window.DashboardApp?.state?.leads || [];
-  const cohorts = {};
- 
-  // Agrupar por mês de criação
-  leads.forEach(lead => {
-    const cohortMonth = new Date(lead.created_at).toISOString().slice(0, 7); // YYYY-MM
-    if (!cohorts[cohortMonth]) {
-      cohorts[cohortMonth] = {
-        total: 0,
-        retained: {}
-      };
-    }
-    cohorts[cohortMonth].total++;
-  });
- 
-  // Calcular retenção (simplificado - assumindo lead ativo = não perdido)
-  Object.keys(cohorts).forEach(cohortMonth => {
-    const cohortLeads = leads.filter(l =>
-      new Date(l.created_at).toISOString().slice(0, 7) === cohortMonth
-    );
-   
-    for (let month = 0; month <= 6; month++) {
-      const activeLeads = cohortLeads.filter(l => l.status !== 'perdido').length;
-      cohorts[cohortMonth].retained[month] = Math.round((activeLeads / cohorts[cohortMonth].total) * 100);
-    }
-  });
- 
-  return cohorts;
+
+async function renderCohortAnalysis() {
+  const container = document.getElementById('cohort-table');
+  if (!container) return;
+
+  try {
+    // Buscar dados de cohort do Supabase (simulado por agora)
+    const cohortData = await getCohortData();
+    container.innerHTML = generateCohortTable(cohortData);
+  } catch (error) {
+    console.error('❌ Erro ao renderizar cohort:', error);
+    container.innerHTML = '<p>Erro ao carregar análise</p>';
+  }
 }
-function renderCohortTable(cohortData) {
-  const cohortMonths = Object.keys(cohortData).sort().reverse().slice(0, 12); // Últimos 12 meses
- 
-  if (cohortMonths.length === 0) {
-    return '<p class="text-center text-gray-500 py-8">Dados insuficientes para análise de cohort</p>';
-  }
- 
-  let html = '<table class="cohort-table"><thead><tr>';
-  html += '<th>Cohort</th>';
-  for (let i = 0; i <= 6; i++) {
-    html += `<th>Mês ${i}</th>`;
-  }
-  html += '</tr></thead><tbody>';
- 
-  cohortMonths.forEach(cohortMonth => {
-    const data = cohortData[cohortMonth];
-    html += `<tr><td><strong>${formatCohortMonth(cohortMonth)}</strong><br><small>${data.total} leads</small></td>`;
-   
+
+async function getCohortData() {
+  // Em produção: Query Supabase para cohort retention
+  // Simulado:
+  return [
+    { month: '2025-01', size: 100, retained: [100, 80, 60, 50, 40, 30, 25] },
+    { month: '2025-02', size: 120, retained: [100, 85, 65, 55, 45, 35] },
+    { month: '2025-03', size: 150, retained: [100, 90, 70, 60, 50] },
+    { month: '2025-04', size: 180, retained: [100, 82, 62, 52] },
+    { month: '2025-05', size: 200, retained: [100, 78, 58] },
+    { month: '2025-06', size: 220, retained: [100, 75] },
+    { month: '2025-07', size: 250, retained: [100] }
+  ];
+}
+
+function generateCohortTable(data) {
+  let html = `
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead>
+        <tr>
+          <th class="px-4 py-2">Cohort</th>
+          <th class="px-4 py-2">Tamanho</th>
+          <th class="px-4 py-2">Mês 0</th>
+          <th class="px-4 py-2">Mês 1</th>
+          <th class="px-4 py-2">Mês 2</th>
+          <th class="px-4 py-2">Mês 3</th>
+          <th class="px-4 py-2">Mês 4</th>
+          <th class="px-4 py-2">Mês 5</th>
+          <th class="px-4 py-2">Mês 6</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  data.forEach(cohort => {
+    html += `
+      <tr>
+        <td class="px-4 py-2">${formatCohortMonth(cohort.month)}</td>
+        <td class="px-4 py-2">${cohort.size}</td>
+    `;
+
     for (let i = 0; i <= 6; i++) {
-      const value = data.retained[i] || 0;
+      const value = cohort.retained[i] || 0;
       const colorClass = value >= 80 ? 'cohort-high' : value >= 50 ? 'cohort-medium' : 'cohort-low';
       html += `<td class="cohort-cell ${colorClass}">${value}%</td>`;
     }
-   
+
     html += '</tr>';
   });
- 
+
   html += '</tbody></table>';
   return html;
 }
+
 function formatCohortMonth(monthStr) {
   const [year, month] = monthStr.split('-');
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
   return `${months[parseInt(month) - 1]} ${year}`;
 }
+
 // ============================================================================
 // MAPAS GEOGRÁFICOS (LEAFLET.JS)
 // ============================================================================
 function openMapModal() {
   const modal = document.getElementById('map-modal');
   if (!modal) return;
- 
+
   modal.classList.add('active');
- 
+
   // Aguardar modal abrir antes de inicializar mapa
   setTimeout(() => {
     initializeMap();
   }, 100);
 }
+
 function closeMapModal() {
   const modal = document.getElementById('map-modal');
   if (modal) modal.classList.remove('active');
 }
+
 function initializeMap() {
   if (typeof L === 'undefined') {
     console.error('❌ Leaflet.js não carregado');
     showToast('❌ Biblioteca de mapas não disponível', 'error');
     return;
   }
- 
+
   const container = document.getElementById('map-container');
   if (!container) return;
- 
+
   // Limpar mapa anterior se existir
   container.innerHTML = '';
- 
+
   // Criar mapa centrado no Brasil
   const map = L.map('map-container').setView([-15.7801, -47.9292], 4);
- 
+
   // Adicionar tiles
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 18
   }).addTo(map);
- 
+
   // Adicionar markers dos leads
   const leads = window.DashboardApp?.state?.filteredLeads || [];
   const markersData = getLeadsGeoData(leads);
- 
+
   markersData.forEach(location => {
     const marker = L.marker([location.lat, location.lng]).addTo(map);
     marker.bindPopup(`
@@ -851,13 +799,14 @@ function initializeMap() {
       ${location.count} lead(s)
     `);
   });
- 
+
   // Cluster se muitos markers
   if (markersData.length > 0) {
     const bounds = L.latLngBounds(markersData.map(loc => [loc.lat, loc.lng]));
     map.fitBounds(bounds);
   }
 }
+
 function getLeadsGeoData(leads) {
   // Dados fictícios para demonstração (em produção, buscar do banco ou API)
   const cities = {
@@ -867,14 +816,14 @@ function getLeadsGeoData(leads) {
     'Belo Horizonte': { lat: -19.9167, lng: -43.9345, count: 0 },
     'Fortaleza': { lat: -3.7172, lng: -38.5433, count: 0 }
   };
- 
+
   // Distribuir leads ficticiamente entre as cidades
   leads.forEach((lead, index) => {
     const cityKeys = Object.keys(cities);
     const randomCity = cityKeys[index % cityKeys.length];
     cities[randomCity].count++;
   });
- 
+
   return Object.entries(cities)
     .filter(([_, data]) => data.count > 0)
     .map(([city, data]) => ({
@@ -884,36 +833,39 @@ function getLeadsGeoData(leads) {
       count: data.count
     }));
 }
+
 // ============================================================================
 // HEATMAPS
 // ============================================================================
 function openHeatmapModal() {
   const modal = document.getElementById('heatmap-modal');
   if (!modal) return;
- 
+
   modal.classList.add('active');
- 
+
   setTimeout(() => {
     initializeHeatmap();
   }, 100);
 }
+
 function closeHeatmapModal() {
   const modal = document.getElementById('heatmap-modal');
   if (modal) modal.classList.remove('active');
 }
+
 function initializeHeatmap() {
   if (typeof h337 === 'undefined') {
     console.error('❌ Heatmap.js não carregado');
     showToast('❌ Biblioteca de heatmap não disponível', 'error');
     return;
   }
- 
+
   const container = document.getElementById('heatmap-container');
   if (!container) return;
- 
+
   // Limpar container
   container.innerHTML = '';
- 
+
   // Criar heatmap
   const heatmapInstance = h337.create({
     container: container,
@@ -922,22 +874,23 @@ function initializeHeatmap() {
     minOpacity: 0.1,
     blur: 0.75
   });
- 
+
   // Gerar dados de atividades (simulado)
   const leads = window.DashboardApp?.state?.filteredLeads || [];
   const points = generateHeatmapData(leads, container.offsetWidth, container.offsetHeight);
- 
+
   heatmapInstance.setData({
     max: Math.max(...points.map(p => p.value)),
     data: points
   });
 }
+
 function generateHeatmapData(leads, width, height) {
   // Gerar pontos baseados em atividades dos leads (simulado)
   const points = [];
   const hoursInDay = 24;
   const daysInWeek = 7;
- 
+
   // Criar grid de horas x dias
   for (let day = 0; day < daysInWeek; day++) {
     for (let hour = 0; hour < hoursInDay; hour++) {
@@ -954,9 +907,10 @@ function generateHeatmapData(leads, width, height) {
       });
     }
   }
- 
+
   return points;
 }
+
 // ============================================================================
 // LAYOUT TEMPLATES
 // ============================================================================
@@ -964,30 +918,33 @@ function openLayoutTemplates() {
   const modal = document.getElementById('layout-templates-modal');
   if (modal) modal.classList.add('active');
 }
+
 function closeLayoutTemplates() {
   const modal = document.getElementById('layout-templates-modal');
   if (modal) modal.classList.remove('active');
 }
+
 function applyLayoutTemplate(templateId) {
   const template = DashboardAdvancedState.layoutTemplates[templateId];
   if (!template) return;
- 
+
   console.log(`🎨 Aplicando template: ${template.name}`);
   showToast(`✅ Template "${template.name}" aplicado`, 'success');
   closeLayoutTemplates();
- 
+
   // Limpar grid
   DashboardAdvancedState.gridstack.removeAll();
   DashboardAdvancedState.widgets = [];
- 
+
   // Adicionar widgets do template
   template.widgets.forEach(widgetId => {
     addWidget(widgetId);
   });
- 
+
   // Salvar novo layout
   saveCurrentLayout();
 }
+
 // ============================================================================
 // EXPORT POWERPOINT (já implementado no dashboard.js)
 // ============================================================================
@@ -999,13 +956,14 @@ async function exportPowerPoint() {
     showToast('⚠️ Export PowerPoint não disponível', 'warning');
   }
 }
+
 // ============================================================================
 // KEYBOARD SHORTCUTS
 // ============================================================================
 function setupKeyboardShortcuts() {
   let lastKey = '';
   let lastKeyTime = 0;
- 
+
   document.addEventListener('keydown', (e) => {
     const now = Date.now();
     const timeSinceLastKey = now - lastKeyTime;
@@ -1055,19 +1013,21 @@ function setupKeyboardShortcuts() {
     lastKey = e.key.toLowerCase();
     lastKeyTime = now;
   });
- 
+
   console.log('⌨️ Keyboard shortcuts ativados');
 }
+
 function closeAllModals() {
   document.querySelectorAll('.modal.active').forEach(modal => {
     modal.classList.remove('active');
   });
- 
+
   // Fechar dropdowns também
   document.querySelectorAll('.dashboard-switcher-dropdown.active, .notifications-dropdown.active').forEach(dropdown => {
     dropdown.classList.remove('active');
   });
 }
+
 // ============================================================================
 // UTILITIES
 // ============================================================================
@@ -1096,6 +1056,7 @@ window.DashboardAdvanced = {
   openWidgetGallery,
   closeWidgetGallery,
   addWidget,
+  addWidgetFromGallery,
   toggleNotifications,
   markAllAsRead,
   changeCurrency,
