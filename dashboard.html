@@ -51,66 +51,47 @@
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
- <!-- ========================================== -->
+<!-- ========================================== -->
 <!-- ⚠️ CONTENT SECURITY POLICY -->
 <!-- ========================================== -->
 <!-- 
-  CSP DESABILITADO NO HTML - GERENCIADO EXCLUSIVAMENTE PELO vercel.json
-  
-  ❌ Motivo: Meta tags CSP conflitam com headers HTTP do servidor
-  ✅ Solução: CSP configurado apenas no vercel.json (fonte única)
-  
-  Quando CSP é definido em ambos os lugares:
-  1. Browser aplica o CSP da meta tag PRIMEIRO
-  2. Headers HTTP do vercel.json são ignorados/conflitam
-  3. Recursos são bloqueados incorretamente
-  
-  Mantendo apenas no vercel.json:
-  - Headers HTTP têm prioridade e controle total
-  - Sem conflitos entre HTML e servidor
-  - Mais fácil de manter (um único arquivo)
-  - Permite hot-reload sem rebuild do HTML
-  
-  Referência: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
-  
-  CSP ORIGINAL (MOVIDO PARA vercel.json):
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-      https://cdnjs.cloudflare.com 
-      https://cdn.jsdelivr.net 
-      https://code.jquery.com
-      https://apis.google.com
-      https://accounts.google.com;
-    style-src 'self' 'unsafe-inline' 
-      https://fonts.googleapis.com 
-      https://cdnjs.cloudflare.com
-      https://cdn.jsdelivr.net;
-    font-src 'self' data: 
-      https://fonts.gstatic.com 
-      https://cdnjs.cloudflare.com;
-    img-src 'self' data: blob: https:;
-    connect-src 'self' 
-      https://*.supabase.co 
-      wss://*.supabase.co 
-      https://code.jquery.com
-      https://apis.google.com 
-      https://fonts.googleapis.com 
-      https://fonts.gstatic.com 
-      https://cdnjs.cloudflare.com 
-      https://cdn.jsdelivr.net
-      https://app.posthog.com
-      https://us-assets.i.posthog.com
-      https://api.openai.com;
-    frame-src 'self' https://accounts.google.com;
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    manifest-src 'self';
-    worker-src 'self' blob:;
-    child-src 'self' https://accounts.google.com;
-    media-src 'self' data: blob:;
-  ">
+  NOTA: CSP configurado exclusivamente no vercel.json
+  Meta tags CSP foram removidas para evitar conflitos com headers HTTP
+-->
+
+<!-- Report-To API -->
+<meta http-equiv="Report-To" content='{"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"https://alshamglobal.report-uri.com/a/d/g"}],"include_subdomains":true}'>
+
+<!-- Permissions Policy (Empresarial) -->
+<meta http-equiv="Permissions-Policy" content="
+  accelerometer=(),
+  ambient-light-sensor=(),
+  autoplay=(self),
+  battery=(),
+  camera=(),
+  cross-origin-isolated=(),
+  display-capture=(),
+  document-domain=(),
+  encrypted-media=(self),
+  execution-while-not-rendered=(),
+  execution-while-out-of-viewport=(),
+  fullscreen=(self),
+  geolocation=(),
+  gyroscope=(),
+  keyboard-map=(),
+  magnetometer=(),
+  microphone=(),
+  midi=(),
+  navigation-override=(),
+  payment=(self),
+  picture-in-picture=(self),
+  publickey-credentials-get=(),
+  screen-wake-lock=(),
+  sync-xhr=(),
+  usb=(),
+  web-share=(self),
+  xr-spatial-tracking=()
+">
 
   <!-- Report-To API -->
   <meta http-equiv="Report-To" content='{"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"https://alshamglobal.report-uri.com/a/d/g"}],"include_subdomains":true}'>
