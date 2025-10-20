@@ -46,10 +46,55 @@ const DashboardState = {
 };
 
 // ============================================================================
+// ⏱️ TIMEOUT DE SEGURANÇA - SE LOADING FICAR PRESO
+// ============================================================================
+let loadingTimeout;
+
+function showLoading(show) {
+  const loader = document.getElementById('loading-indicator');
+  if (!loader) return;
+  
+  if (show) {
+    loader.style.display = 'flex';
+    
+    // Se não desaparecer em 15s, forçar erro
+    loadingTimeout = setTimeout(() => {
+      console.error('⏱️ TIMEOUT: Dashboard não carregou em 15s');
+      showLoading(false);
+      showError('Dashboard demorou muito para carregar. Tente recarregar a página.');
+    }, 15000);
+  } else {
+    loader.style.display = 'none';
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
+      loadingTimeout = null;
+    }
+  }
+}
+
+// ============================================================================
 // INICIALIZAÇÃO
 // ============================================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 DOM carregado, iniciando dashboard v11.0...');
+  console.log('🚀 DOM carregado, aguardando Supabase...');
+  
+  // ✅ ESPERAR até 10 segundos por AlshamSupabase
+  let attempts = 0;
+  const maxAttempts = 100; // 100 x 100ms = 10s
+  
+  while (!window.AlshamSupabase && attempts < maxAttempts) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  if (!window.AlshamSupabase) {
+    console.error('❌ AlshamSupabase não carregou após 10s');
+    showLoading(false);
+    showError('Erro ao carregar sistema. Recarregue a página.');
+    return;
+  }
+  
+  console.log(`✅ AlshamSupabase carregado após ${attempts * 100}ms`);
   await initDashboard();
 });
 
