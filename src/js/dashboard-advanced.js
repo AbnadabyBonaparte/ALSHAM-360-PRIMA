@@ -181,7 +181,6 @@ async function loadWidgetsForCurrentDashboard() {
       'dashboard_layouts',
       { dashboard_id: DashboardAdvancedState.currentDashboard, user_id: window.DashboardApp.state.user.id }
     );
-   
     const layout = layouts?.[0]?.layout || [];
    
     layout.forEach(widgetData => {
@@ -517,13 +516,6 @@ function openWidgetGallery() {
 function closeWidgetGallery() {
   const modal = document.getElementById('widget-gallery-modal');
   if (modal) modal.classList.remove('active');
-}
-function addWidget(widgetId) {
-  console.log(`➕ Adicionando widget: ${widgetId}`);
-  closeWidgetGallery();
-  showToast(`Widget "${widgetId}" adicionado`, 'success');
- 
-  // TODO: Implementar lógica de adicionar widget ao grid
 }
 // ============================================================================
 // NOTIFICATIONS CENTER
