@@ -48,7 +48,6 @@
   <!-- ========================================== -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <!-- ❌ REMOVIDO: X-Frame-Options (deve ser HTTP header, não meta) -->
   <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -226,7 +225,9 @@
   <!-- PRELOAD CRITICAL RESOURCES -->
   <!-- ========================================== -->
   <link rel="preload" href="/css/tokens.css" as="style">
-  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- ✅ MODULEPRELOAD para ES6 modules -->
   <link rel="modulepreload" href="/src/lib/supabase.js">
@@ -259,9 +260,9 @@
   <!-- ========================================== -->
   <!-- ✅ INTEGRITY REMOVIDO - Usar versões mais recentes -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@latest/dist/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@latest/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest/dist/confetti.browser.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- ========================================== -->
   <!-- ✅ CRITICAL CSS INLINE (< 14KB) -->
   <!-- ========================================== -->
@@ -1695,12 +1696,16 @@
   window.addEventListener('load', function() {
     if (window.performance && window.performance.timing) {
       const perfData = window.performance.timing;
-      const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+      const pageLoadTime = Math.max(0, perfData.loadEventEnd - perfData.navigationStart);
       const connectTime = perfData.responseEnd - perfData.requestStart;
       const renderTime = perfData.domComplete - perfData.domLoading;
       
+      if (pageLoadTime < 0 || pageLoadTime > 60000) {
+        console.warn('⚠️ Page load time inválido, pulando métrica');
+      } else {
+        console.log('⚡ Page Load:', pageLoadTime + 'ms');
+      }
       console.log('⚡ Performance Metrics:');
-      console.log('  Page Load:', pageLoadTime + 'ms');
       console.log('  Connect:', connectTime + 'ms');
       console.log('  Render:', renderTime + 'ms');
       
@@ -1739,7 +1744,7 @@
       const totalMemory = performance.memory.totalJSHeapSize;
       const percentage = (usedMemory / totalMemory) * 100;
       
-      if (percentage > 90) {
+      if (percentage > 97) {
         console.warn('⚠️ Uso de memória alto:', percentage.toFixed(2) + '%');
         if (window.Sentry) {
           Sentry.captureMessage('High memory usage: ' + percentage.toFixed(2) + '%', 'warning');
