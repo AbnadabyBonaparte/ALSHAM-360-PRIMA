@@ -51,7 +51,7 @@ const DashboardState = {
 let loadingTimeout;
 
 function showLoading(show) {
-  const loader = document.getElementById('loading-indicator');
+  const loader = document.getElementById('loading-overlay');
   if (!loader) return;
   
   if (show) {
@@ -594,10 +594,90 @@ async function exportExcel() {
 }
 
 /**
- * Export PowerPoint - PLACEHOLDER (futuro)
+ * Export PowerPoint - IMPLEMENTAÇÃO COMPLETA COM PptxGenJS
  */
-function exportPowerPoint() {
-  showAlert('📊 Export PowerPoint será implementado na próxima versão', 'info');
+async function exportPowerPoint() {
+  try {
+    showAlert('📊 Gerando PowerPoint...', 'info');
+    
+    if (typeof PptxGenJS === 'undefined') {
+      throw new Error('PptxGenJS não carregado');
+    }
+    
+    const pptx = new PptxGenJS();
+    
+    // Slide 1: Título
+    const slide1 = pptx.addSlide();
+    slide1.background = { color: '0176D3' };
+    slide1.addText('ALSHAM 360° PRIMA', {
+      x: 0.5,
+      y: 2,
+      w: 9,
+      h: 1,
+      fontSize: 44,
+      bold: true,
+      color: 'FFFFFF',
+      align: 'center'
+    });
+    slide1.addText('Dashboard Executivo - Relatório', {
+      x: 0.5,
+      y: 3,
+      w: 9,
+      h: 0.5,
+      fontSize: 24,
+      color: 'FFFFFF',
+      align: 'center'
+    });
+    slide1.addText(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, {
+      x: 0.5,
+      y: 5.5,
+      w: 9,
+      h: 0.3,
+      fontSize: 14,
+      color: 'E0E0E0',
+      align: 'center'
+    });
+    
+    // Slide 2: KPIs
+    const slide2 = pptx.addSlide();
+    slide2.addText('KPIs Principais', {
+      x: 0.5,
+      y: 0.5,
+      w: 9,
+      h: 0.5,
+      fontSize: 32,
+      bold: true,
+      color: '0176D3'
+    });
+    
+    const kpis = DashboardState.kpis;
+    const kpiRows = [
+      ['Métrica', 'Valor'],
+      ['Total de Leads', (kpis.total_leads || 0).toString()],
+      ['Novos Hoje', (kpis.new_leads_today || 0).toString()],
+      ['Qualificados', (kpis.qualified_leads || 0).toString()],
+      ['Taxa de Conversão', `${kpis.conversion_rate || 0}%`]
+    ];
+    
+    slide2.addTable(kpiRows, {
+      x: 1,
+      y: 1.5,
+      w: 8,
+      h: 3,
+      fontSize: 16,
+      fill: { color: 'F3F4F6' },
+      border: { pt: 1, color: 'CCCCCC' }
+    });
+    
+    // Salvar
+    await pptx.writeFile({ fileName: `dashboard_${new Date().toISOString().split('T')[0]}.pptx` });
+    
+    showAlert('✅ PowerPoint gerado com sucesso!', 'success');
+    
+  } catch (error) {
+    console.error('❌ Erro ao gerar PowerPoint:', error);
+    showAlert('❌ Erro ao gerar PowerPoint', 'error');
+  }
 }
 
 // ============================================================================
@@ -747,23 +827,7 @@ function openStatusFilter() {
   }).join('');
   
   modal.classList.add('active');
-}
-
-function toggleStatusFilter(status, checked) {
-  if (checked) {
-    if (!DashboardState.filters.status.includes(status)) {
-      DashboardState.filters.status.push(status);
-    }
-  } else {
-    DashboardState.filters.status = DashboardState.filters.status.filter(s => s !== status);
-  }
-}
-
-function applyStatusFilter() {
-  closeStatusFilter();
-  applyFilters();
-  renderDashboard();
-  showAlert('✅ Filtros de status aplicados', 'success');
+  modal.focus();
 }
 
 function closeStatusFilter() {
@@ -771,53 +835,45 @@ function closeStatusFilter() {
   if (modal) modal.classList.remove('active');
 }
 
-/**
- * Abrir modal de filtros de Origem
- */
+function toggleStatusFilter(status, checked) {
+  if (checked) {
+    DashboardState.filters.status.push(status);
+  } else {
+    DashboardState.filters.status = DashboardState.filters.status.filter(s => s !== status);
+  }
+}
+
+function applyStatusFilter() {
+  applyFilters();
+  renderDashboard();
+  closeStatusFilter();
+}
+
 function openOrigemFilter() {
   const modal = document.getElementById('origem-filter-modal');
   const container = document.getElementById('origem-checkboxes');
   
   if (!modal || !container) return;
   
-  const origemOptions = [...new Set(DashboardState.leads.map(l => l.origem).filter(Boolean))];
+  // Obter origens únicas
+  const origens = [...new Set(DashboardState.leads.map(l => l.origem || 'Não informado'))];
   
-  if (origemOptions.length === 0) {
-    container.innerHTML = '<p class="text-gray-500">Nenhuma origem disponível</p>';
-  } else {
-    container.innerHTML = origemOptions.map(origem => {
-      const checked = DashboardState.filters.origem.includes(origem) ? 'checked' : '';
-      return `
-        <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
-          <input type="checkbox" 
-                 value="${origem}" 
-                 ${checked}
-                 class="w-4 h-4 cursor-pointer"
-                 onchange="window.DashboardApp.toggleOrigemFilter('${origem}', this.checked)">
-          <span style="color: var(--alsham-text-primary);">${origem}</span>
-        </label>
-      `;
-    }).join('');
-  }
+  container.innerHTML = origens.map(origem => {
+    const checked = DashboardState.filters.origem.includes(origem) ? 'checked' : '';
+    return `
+      <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
+        <input type="checkbox" 
+               value="${origem}" 
+               ${checked}
+               class="w-4 h-4 cursor-pointer"
+               onchange="window.DashboardApp.toggleOrigemFilter('${origem}', this.checked)">
+        <span style="color: var(--alsham-text-primary);">${origem}</span>
+      </label>
+    `;
+  }).join('');
   
   modal.classList.add('active');
-}
-
-function toggleOrigemFilter(origem, checked) {
-  if (checked) {
-    if (!DashboardState.filters.origem.includes(origem)) {
-      DashboardState.filters.origem.push(origem);
-    }
-  } else {
-    DashboardState.filters.origem = DashboardState.filters.origem.filter(o => o !== origem);
-  }
-}
-
-function applyOrigemFilter() {
-  closeOrigemFilter();
-  applyFilters();
-  renderDashboard();
-  showAlert('✅ Filtros de origem aplicados', 'success');
+  modal.focus();
 }
 
 function closeOrigemFilter() {
@@ -825,71 +881,75 @@ function closeOrigemFilter() {
   if (modal) modal.classList.remove('active');
 }
 
+function toggleOrigemFilter(origem, checked) {
+  if (checked) {
+    DashboardState.filters.origem.push(origem);
+  } else {
+    DashboardState.filters.origem = DashboardState.filters.origem.filter(o => o !== origem);
+  }
+}
+
+function applyOrigemFilter() {
+  applyFilters();
+  renderDashboard();
+  closeOrigemFilter();
+}
+
 // ============================================================================
-// DRILL-DOWN NOS GRÁFICOS
+// DRILL-DOWN
 // ============================================================================
 
 function drilldownStatus(event) {
-  event.stopPropagation();
-  const leads = DashboardState.filteredLeads;
-  const statusCounts = {
-    novo: leads.filter(l => l.status === 'novo').length,
-    em_contato: leads.filter(l => l.status === 'em_contato').length,
-    qualificado: leads.filter(l => l.status === 'qualificado').length,
-    proposta: leads.filter(l => l.status === 'proposta').length,
-    convertido: leads.filter(l => l.status === 'convertido').length,
-    perdido: leads.filter(l => l.status === 'perdido').length
-  };
-  
-  const details = Object.entries(statusCounts).map(([status, count]) => `${status}: ${count}`).join('\n');
-  showAlert('Distribuição por Status:\n' + details, 'info');
+  if (event.target.tagName === 'CANVAS') {
+    const title = 'Detalhes por Status';
+    const data = DashboardState.filteredLeads.map(l => ({
+      Nome: l.nome,
+      Email: l.email,
+      Status: l.status,
+      Data: new Date(l.created_at).toLocaleDateString('pt-BR')
+    }));
+    window.DashboardAdvanced.openDrillDown(title, data, ['Distribuição por Status']);
+  }
 }
 
 function drilldownDaily(event) {
-  event.stopPropagation();
-  const leads = DashboardState.filteredLeads;
-  const last7days = {};
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toLocaleDateString('pt-BR');
-    last7days[dateStr] = leads.filter(l => new Date(l.created_at).toLocaleDateString('pt-BR') === dateStr).length;
+  if (event.target.tagName === 'CANVAS') {
+    const title = 'Detalhes de Novos Leads';
+    const data = DashboardState.filteredLeads.map(l => ({
+      Nome: l.nome,
+      Email: l.email,
+      Data: new Date(l.created_at).toLocaleDateString('pt-BR')
+    }));
+    window.DashboardAdvanced.openDrillDown(title, data, ['Novos Leads']);
   }
-  
-  const details = Object.entries(last7days).map(([date, count]) => `${date}: ${count} leads`).join('\n');
-  showAlert('Novos Leads por Dia:\n' + details, 'info');
 }
 
 function drilldownFunnel(event) {
-  event.stopPropagation();
-  const leads = DashboardState.filteredLeads;
-  const funnel = {
-    total: leads.length,
-    contato: leads.filter(l => ['em_contato', 'qualificado', 'proposta', 'convertido'].includes(l.status)).length,
-    qualificado: leads.filter(l => ['qualificado', 'proposta', 'convertido'].includes(l.status)).length,
-    proposta: leads.filter(l => ['proposta', 'convertido'].includes(l.status)).length,
-    convertido: leads.filter(l => l.status === 'convertido').length
-  };
-  
-  const details = Object.entries(funnel).map(([stage, count]) => `${stage}: ${count}`).join('\n');
-  showAlert('Funil de Conversão:\n' + details, 'info');
+  if (event.target.tagName === 'CANVAS') {
+    const title = 'Detalhes do Funil';
+    const data = DashboardState.filteredLeads.map(l => ({
+      Nome: l.nome,
+      Status: l.status,
+      Data: new Date(l.created_at).toLocaleDateString('pt-BR')
+    }));
+    window.DashboardAdvanced.openDrillDown(title, data, ['Funil de Conversão']);
+  }
 }
 
 function drilldownOrigem(event) {
-  event.stopPropagation();
-  const leads = DashboardState.filteredLeads;
-  const origens = {};
-  leads.forEach(l => {
-    const origem = l.origem || 'Não informado';
-    origens[origem] = (origens[origem] || 0) + 1;
-  });
-  
-  const details = Object.entries(origens).map(([origem, count]) => `${origem}: ${count}`).join('\n');
-  showAlert('Leads por Origem:\n' + details, 'info');
+  if (event.target.tagName === 'CANVAS') {
+    const title = 'Detalhes por Origem';
+    const data = DashboardState.filteredLeads.map(l => ({
+      Nome: l.nome,
+      Origem: l.origem,
+      Data: new Date(l.created_at).toLocaleDateString('pt-BR')
+    }));
+    window.DashboardAdvanced.openDrillDown(title, data, ['Leads por Origem']);
+  }
 }
 
 // ============================================================================
-// AGENDAMENTO DE RELATÓRIOS
+// SCHEDULED REPORTS
 // ============================================================================
 
 function openScheduledReports() {
@@ -905,21 +965,10 @@ function closeScheduledReports() {
 function calculateNextRun(frequency) {
   const now = new Date();
   switch (frequency) {
-    case 'daily':
-      now.setDate(now.getDate() + 1);
-      now.setHours(8, 0, 0, 0); // 8h manhã
-      break;
-    case 'weekly':
-      now.setDate(now.getDate() + (7 - now.getDay() + 1) % 7); // Próxima segunda
-      now.setHours(8, 0, 0, 0);
-      break;
-    case 'monthly':
-      now.setMonth(now.getMonth() + 1);
-      now.setDate(1);
-      now.setHours(8, 0, 0, 0);
-      break;
+    case 'daily': return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    case 'weekly': return new Date(now.getFullYear(), now.getMonth(), now.getDate() + (7 - now.getDay()), 0, 0, 0);
+    case 'monthly': return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
   }
-  return now.toISOString();
 }
 
 // ============================================================================
@@ -931,59 +980,34 @@ function renderFilters() {
   if (!container) return;
   
   container.innerHTML = `
-    <div class="bg-white dark:bg-[#1e293b] rounded-lg shadow p-6 mb-8">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Filtros</h3>
-      
-      <!-- Busca -->
-      <div class="mb-4">
-        <input id="search-input" 
-               type="text" 
-               placeholder="Buscar por nome, email ou empresa..." 
-               oninput="handleSearch(this.value)"
-               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500"
-               aria-label="Buscar leads">
-      </div>
-      
-      <!-- Filtros Principais -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Data Range -->
-        <div>
-          <select id="date-filter" 
-                  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100"
-                  onchange="window.DashboardApp.applyDateFilter(this.value)"
-                  aria-label="Filtro de período">
-            <option value="all" ${DashboardState.filters.dateRange === 'all' ? 'selected' : ''}>Todo o período</option>
-            <option value="7d" ${DashboardState.filters.dateRange === '7d' ? 'selected' : ''}>Últimos 7 dias</option>
-            <option value="30d" ${DashboardState.filters.dateRange === '30d' ? 'selected' : ''}>Últimos 30 dias</option>
-            <option value="90d" ${DashboardState.filters.dateRange === '90d' ? 'selected' : ''}>Últimos 90 dias</option>
-          </select>
+    <div class="bg-white dark:bg-[#1e293b] rounded-lg shadow p-4 mb-6">
+      <div class="flex flex-wrap gap-4 items-center">
+        <div class="flex-1 min-w-[200px]">
+          <input id="search-input" type="text" placeholder="Buscar por nome, email ou empresa..." 
+                 class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 oninput="window.handleSearch(this.value)">
         </div>
         
-        <!-- Status -->
-        <div>
-          <button onclick="window.DashboardApp.openStatusFilter()" 
-                  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
-                  aria-label="Abrir filtro de status">
-            📊 Status (${DashboardState.filters.status.length})
-          </button>
-        </div>
+        <select id="date-filter" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onchange="window.DashboardApp.applyDateFilter(this.value)">
+          <option value="all">Todo período</option>
+          <option value="7d">Últimos 7 dias</option>
+          <option value="30d">Últimos 30 dias</option>
+          <option value="90d">Últimos 90 dias</option>
+        </select>
         
-        <!-- Origem -->
-        <div>
-          <button onclick="window.DashboardApp.openOrigemFilter()" 
-                  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
-                  aria-label="Abrir filtro de origem">
-            🌐 Origem (${DashboardState.filters.origem.length})
-          </button>
-        </div>
-      </div>
-      
-      <!-- Comparação -->
-      <div class="mt-4 flex items-center gap-4">
+        <button onclick="window.DashboardApp.openStatusFilter()" 
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Filtrar Status
+        </button>
+        
+        <button onclick="window.DashboardApp.openOrigemFilter()" 
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Filtrar Origem
+        </button>
+        
         <label class="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" 
-                 id="comparison-toggle"
-                 ${DashboardState.comparison.enabled ? 'checked' : ''}
+          <input type="checkbox" id="comparison-toggle" 
                  onchange="window.DashboardApp.toggleComparison(this.checked)"
                  class="w-4 h-4"
                  aria-label="Comparar com período anterior">
@@ -1367,11 +1391,6 @@ function getTemperaturaBadge(temp) {
     frio: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">❄️ Frio</span>'
   };
   return badges[temp] || '';
-}
-
-function showLoading(show) {
-  const loader = document.getElementById('loading-indicator');
-  if (loader) loader.style.display = show ? 'flex' : 'none';
 }
 
 function showError(message) {
