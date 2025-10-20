@@ -85,10 +85,43 @@
     worker-src 'self' blob:;
     child-src 'self' https://accounts.google.com;
     media-src 'self' data: blob:;
+    report-uri https://alshamglobal.report-uri.com/r/d/csp/enforce;
+    report-to csp-endpoint;
   ">
 
+  <!-- Report-To API -->
+  <meta http-equiv="Report-To" content='{"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"https://alshamglobal.report-uri.com/a/d/g"}],"include_subdomains":true}'>
+
   <!-- Permissions Policy (Empresarial) -->
-  <meta http-equiv="Permissions-Policy" content="geolocation=(self), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self), display-capture=(), autoplay=(self)">
+  <meta http-equiv="Permissions-Policy" content="
+    accelerometer=(),
+    ambient-light-sensor=(),
+    autoplay=(self),
+    battery=(),
+    camera=(),
+    cross-origin-isolated=(),
+    display-capture=(),
+    document-domain=(),
+    encrypted-media=(self),
+    execution-while-not-rendered=(),
+    execution-while-out-of-viewport=(),
+    fullscreen=(self),
+    geolocation=(),
+    gyroscope=(),
+    keyboard-map=(),
+    magnetometer=(),
+    microphone=(),
+    midi=(),
+    navigation-override=(),
+    payment=(self),
+    picture-in-picture=(self),
+    publickey-credentials-get=(),
+    screen-wake-lock=(),
+    sync-xhr=(),
+    usb=(),
+    web-share=(self),
+    xr-spatial-tracking=()
+  ">
 
   <!-- ========================================== -->
   <!-- FORMAT & GEOGRAPHIC -->
@@ -192,6 +225,21 @@
   <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
   <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
   <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
+  <!-- Apple Splash Screens para diferentes resoluções -->
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
   
   <!-- Android Icons -->
   <link rel="icon" sizes="192x192" href="/android-icon-192x192.png">
@@ -235,6 +283,7 @@
   <!-- ✅ MODULEPRELOAD para ES6 modules -->
   <link rel="modulepreload" href="/src/lib/supabase.js">
   <link rel="modulepreload" href="/src/lib/chart-loader.js">
+  <link rel="modulepreload" href="/src/js/dashboard.js">
 
   <!-- ========================================== -->
   <!-- PREFETCH NEXT PAGES (Empresarial) -->
@@ -261,11 +310,34 @@
   <!-- ========================================== -->
   <!-- ⚡ EXTERNAL SCRIPTS (DEFER - Ordem Correta) -->
   <!-- ========================================== -->
-  <!-- ✅ INTEGRITY REMOVIDO - Usar versões mais recentes -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@latest/dist/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@latest/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest/dist/confetti.browser.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer 
+    src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" 
+    integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer">
+  </script>
+
+  <script defer 
+    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" 
+    integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer">
+  </script>
+
+  <script defer 
+    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" 
+    integrity="sha512-r22gChDnGvBylk90+2e/ycr+equG0L6JNTYomZcZY3Zo7kZJvEoZKr2t+dxNqvsvKtHpMPqvl/nPJaXmL6g==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer">
+  </script>
+
+  <script defer 
+    src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" 
+    integrity="sha512-P50jB0z6dKI5oKOayxiHWp9mJYOhMFySIbkT1I/yb4R0eMSLLzp5BwUTFKE+T+xRtQAwNrK43CqIZcD0EpDKA==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer">
+  </script>
+
   <!-- ========================================== -->
   <!-- ✅ CRITICAL CSS INLINE (< 14KB) -->
   <!-- ========================================== -->
@@ -702,21 +774,27 @@
       .no-print, 
       nav, 
       aside, 
-      button, 
+      button:not(.print-btn), 
       .modal,
       .toast,
       .offline-badge,
-      .skip-link { 
+      .skip-link,
+      #back-to-top,
+      #theme-toggle,
+      #contrast-toggle,
+      #fullscreen-toggle,
+      #menu-toggle { 
         display: none !important;
       }
       
       body { 
-        background: white;
-        color: black;
+        background: white !important;
+        color: black !important;
       }
       
       .main-content-wrapper { 
         margin-left: 0 !important;
+        padding: 0 !important;
       }
       
       .chart-drilldown { 
@@ -742,8 +820,13 @@
 
       h1, h2, h3, h4, h5, h6 {
         page-break-after: avoid;
+        page-break-inside: avoid;
       }
-
+      
+      table, figure, img {
+        page-break-inside: avoid;
+      }
+      
       img {
         max-width: 100% !important;
         page-break-inside: avoid;
@@ -1085,7 +1168,7 @@
     </div>
   </noscript>
 
-  <!-- Skip Link (A11y) -->
+  <!-- Skip to Content (A11y) -->
   <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
 
   <!-- Offline Indicator -->
@@ -1382,7 +1465,7 @@
     <div class="modal-content" role="document">
       <div class="flex items-start gap-4">
         <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 rounded text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
         </div>
