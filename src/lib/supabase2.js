@@ -13330,6 +13330,170 @@ export const SupportModule = {
   },
 };
 
+ // ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA - PARTE 9D: MÓDULO COMMUNICATION SUPREMO
+// ════════════════════════════════════════════════════════════════════════
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.2-COMMUNICATION-EXPANSION
+// 🧠 Responsável: CITIZEN SUPREMO X.1
+// 🚀 Missão: Integrar WhatsApp, E-mail, Chamadas e Reuniões
+// ════════════════════════════════════════════════════════════════════════
+
+export const CommunicationModule = {
+  // ─── WHATSAPP MESSAGES ────────────────────────────────────────────────
+  async listWhatsAppMessages(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('communication_whatsapp')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listWhatsAppMessages failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async sendWhatsAppMessage(message) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...message,
+        org_id,
+        channel: 'whatsapp',
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('communication_whatsapp')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('💬 WhatsApp message logged:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('sendWhatsAppMessage failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── EMAIL MESSAGES ───────────────────────────────────────────────────
+  async listEmails(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('communication_email')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('sent_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listEmails failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async sendEmail(email) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...email,
+        org_id,
+        sent_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('communication_email')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('📧 E-mail registrado:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('sendEmail failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── CALL LOGS ────────────────────────────────────────────────────────
+  async listCalls(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('communication_calls')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('started_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listCalls failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async insertCall(call) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...call,
+        org_id,
+        started_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('communication_calls')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('📞 Chamada registrada:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('insertCall failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── MEETINGS ─────────────────────────────────────────────────────────
+  async listMeetings(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('communication_meetings')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('scheduled_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listMeetings failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async scheduleMeeting(meeting) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...meeting,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('communication_meetings')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('📅 Reunião agendada:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('scheduleMeeting failed:', err);
+      return response(false, null, err);
+    }
+  },
+};
+   
     
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 10/10 - EXPORTS FINAIS + METADATA
@@ -13614,6 +13778,9 @@ export const ALSHAM_FULL = {
   
   // ============ SUPPORT MODULE (NOVO BLOCO SUPREMO) ============
   ...SupportModule, // ✅ Parte 9C integrada
+
+  // ============ COMMUNICATION MODULE (NOVO BLOCO SUPREMO) ============
+  ...CommunicationModule, // ✅ Parte 9D integrada
 };
 
 
