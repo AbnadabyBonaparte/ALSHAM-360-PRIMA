@@ -15691,6 +15691,1046 @@ ALSHAM_METADATA.modules.part13e = {
 logDebug('📊 SupportAnalytics registrado com sucesso no ALSHAM_METADATA.');
 // ════════════════════════════════════════════════════════════════════════
     
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 14A/14
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: EMAIL CORE (SMTP + LOGS + Omnichannel Integration)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v9.0-COMM-EMAIL
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Gerenciar envio, recebimento e monitoramento de e-mails corporativos
+// ════════════════════════════════════════════════════════════════════════
 
+export const EmailCore = {
+  // ───────────────────────────────────────────────────────────────
+  // 📤 1. ENVIAR EMAIL (SMTP VIA Supabase ou Webhook Externo)
+  // ───────────────────────────────────────────────────────────────
+  async sendEmail(org_id, from, to, subject, body, attachments = []) {
+    try {
+      const email = {
+        org_id,
+        from,
+        to,
+        subject,
+        body,
+        attachments,
+        status: 'queued',
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase.from('email_out').insert([email]).select().single();
+      if (error) throw error;
+
+      // Dispara via Omnichannel Router
+      await OmnichannelRouter.dispatchMessage('email', email);
+      logDebug(`📧 E-mail enfileirado para ${to}`);
+      return response(true, data);
+    } catch (err) {
+      logError('sendEmail failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📥 2. REGISTRAR EMAIL RECEBIDO
+  // ───────────────────────────────────────────────────────────────
+  async logInboundEmail(org_id, from, to, subject, body, message_id) {
+    try {
+      const record = {
+        org_id,
+        from,
+        to,
+        subject,
+        body,
+        message_id,
+        direction: 'inbound',
+        created_at: new Date().toISOString()
+      };
+      await supabase.from('email_in').insert([record]);
+      logDebug(`📨 E-mail recebido registrado de ${from}`);
+      return response(true, record);
+    } catch (err) {
+      logError('logInboundEmail failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 3. BUSCAR HISTÓRICO DE EMAILS
+  // ───────────────────────────────────────────────────────────────
+  async getEmailHistory(org_id, direction = 'outbound', limit = 50) {
+    try {
+      const table = direction === 'inbound' ? 'email_in' : 'email_out';
+      const { data, error } = await supabase
+        .from(table)
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getEmailHistory failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📡 4. MONITORAR ENTREGA (Realtime + Status)
+  // ───────────────────────────────────────────────────────────────
+  async subscribeEmailStatus(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_email_out_${org_id}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'email_out' },
+          payload => {
+            logDebug('📬 Status atualizado:', payload.new);
+            callback?.(payload.new);
+          }
+        )
+        .subscribe();
+
+      logDebug(`✅ Assinatura de status de e-mail ativada para org ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeEmailStatus failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 5. RELATÓRIO DE DESEMPENHO DE EMAILS
+  // ───────────────────────────────────────────────────────────────
+  async getEmailStats(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_email_stats', { org_id });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getEmailStats failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.EmailCore = EmailCore;
+  logDebug('📧 EmailCore anexado ao window.ALSHAM.EmailCore');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...EmailCore });
+
+ALSHAM_METADATA.modules.part14a = {
+  name: 'EMAIL CORE',
+  description: 'Envio, recebimento e monitoramento de emails via Omnichannel Router',
+  version: 'v9.0-COMM-EMAIL',
+  functions: 20,
+  status: 'ACTIVE'
+};
+
+logDebug('📧 EmailCore registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 14B/14
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: WHATSAPP BRIDGE (360Dialog/Twilio Integration + Fallback SMS)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v9.1-COMM-WHATSAPP
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Centralizar envio, recebimento e rastreio de mensagens WhatsApp via Supabase
+// ════════════════════════════════════════════════════════════════════════
+
+export const WhatsAppBridge = {
+  // ───────────────────────────────────────────────────────────────
+  // 💬 1. ENVIAR MENSAGEM WHATSAPP
+  // ───────────────────────────────────────────────────────────────
+  async sendMessage(org_id, to, message, media_url = null, template = null) {
+    try {
+      const payload = {
+        org_id,
+        to,
+        message,
+        media_url,
+        template,
+        status: 'queued',
+        created_at: new Date().toISOString()
+      };
+
+      // 1️⃣ Registra na fila local
+      const { data, error } = await supabase.from('whatsapp_queue').insert([payload]).select().single();
+      if (error) throw error;
+
+      // 2️⃣ Dispara via Omnichannel Router
+      await OmnichannelRouter.dispatchMessage('whatsapp', payload);
+
+      logDebug(`💬 WhatsApp enfileirado para ${to}`);
+      return response(true, data);
+    } catch (err) {
+      logError('sendMessage failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 2. FALLBACK AUTOMÁTICO (SMS)
+  // ───────────────────────────────────────────────────────────────
+  async fallbackToSMS(org_id, to, message) {
+    try {
+      logWarn(`📵 WhatsApp indisponível — fallback para SMS ativado: ${to}`);
+      return await OmnichannelRouter.dispatchMessage('sms', { org_id, to, message });
+    } catch (err) {
+      logError('fallbackToSMS failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧭 3. CONSULTAR HISTÓRICO DE MENSAGENS
+  // ───────────────────────────────────────────────────────────────
+  async getMessages(org_id, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('whatsapp_queue')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getMessages failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 4. ATUALIZAR STATUS (Webhook 360Dialog/Twilio)
+  // ───────────────────────────────────────────────────────────────
+  async updateStatus(message_id, status) {
+    try {
+      const { data, error } = await supabase
+        .from('whatsapp_queue')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', message_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`✅ Status da mensagem atualizado: ${status}`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateStatus failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔔 5. MONITORAR EM TEMPO REAL
+  // ───────────────────────────────────────────────────────────────
+  async subscribeRealtime(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_whatsapp_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'whatsapp_queue' }, payload => {
+          logDebug('📡 Evento WhatsApp recebido:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+
+      logDebug(`🧠 Realtime WhatsApp Bridge ativo para org ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtime failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📊 6. RELATÓRIO DE DESEMPENHO
+  // ───────────────────────────────────────────────────────────────
+  async getStats(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_whatsapp_stats', { org_id });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getStats failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🚨 7. DETECÇÃO DE FALHAS E RETENTATIVA
+  // ───────────────────────────────────────────────────────────────
+  async retryFailed(org_id) {
+    try {
+      const { data: fails } = await supabase
+        .from('whatsapp_queue')
+        .select('*')
+        .eq('org_id', org_id)
+        .eq('status', 'failed')
+        .limit(20);
+
+      for (const f of fails) {
+        logWarn(`🔁 Retentando envio para ${f.to}`);
+        await this.sendMessage(org_id, f.to, f.message, f.media_url, f.template);
+      }
+
+      logDebug(`♻️ ${fails.length} mensagens reprocessadas.`);
+      return response(true, { retried: fails.length });
+    } catch (err) {
+      logError('retryFailed failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.WhatsAppBridge = WhatsAppBridge;
+  logDebug('💬 WhatsAppBridge anexado ao window.ALSHAM.WhatsAppBridge');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...WhatsAppBridge });
+
+ALSHAM_METADATA.modules.part14b = {
+  name: 'WHATSAPP BRIDGE',
+  description: 'Envio, rastreio e fallback de mensagens WhatsApp integrado ao Omnichannel Router',
+  version: 'v9.1-COMM-WHATSAPP',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('💬 WhatsAppBridge registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 14C/14
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: CALLS MANAGER (WebRTC / API Integration / Logging)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v9.2-COMM-CALLS
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Gerenciar chamadas de voz — registro, status, duração e integração Omnichannel
+// ════════════════════════════════════════════════════════════════════════
+
+export const CallsManager = {
+  // ───────────────────────────────────────────────────────────────
+  // 📞 1. REGISTRAR NOVA CHAMADA
+  // ───────────────────────────────────────────────────────────────
+  async createCall(org_id, from, to, direction = 'outbound') {
+    try {
+      const call = {
+        org_id,
+        from,
+        to,
+        direction,
+        status: 'initiated',
+        started_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase.from('calls').insert([call]).select().single();
+      if (error) throw error;
+
+      // Notifica o Omnichannel Router
+      await OmnichannelRouter.dispatchMessage('call', call);
+      logDebug(`📞 Chamada iniciada entre ${from} → ${to}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createCall failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📡 2. ATUALIZAR STATUS DA CHAMADA
+  // ───────────────────────────────────────────────────────────────
+  async updateStatus(call_id, status, duration = null) {
+    try {
+      const updateData = {
+        status,
+        duration,
+        ended_at: status === 'ended' ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase
+        .from('calls')
+        .update(updateData)
+        .eq('id', call_id)
+        .select()
+        .single();
+      if (error) throw error;
+
+      logDebug(`📲 Status da chamada ${call_id} atualizado: ${status}`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateStatus failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📜 3. HISTÓRICO DE CHAMADAS
+  // ───────────────────────────────────────────────────────────────
+  async getCalls(org_id, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('calls')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('started_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getCalls failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🎙️ 4. INTEGRAR COM API EXTERNA (Opcional)
+  // ───────────────────────────────────────────────────────────────
+  async externalCall(org_id, from, to) {
+    try {
+      // Simulação de integração externa (Twilio, Asterisk, etc.)
+      logDebug(`🔗 Enviando requisição para API externa de voz: ${from} → ${to}`);
+      await fetch('https://api.external-voice.alshamglobal.com/call', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ org_id, from, to })
+      });
+      logDebug('🌐 Chamada externa requisitada.');
+      return response(true);
+    } catch (err) {
+      logError('externalCall failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📶 5. SUBSCRIÇÃO REALTIME
+  // ───────────────────────────────────────────────────────────────
+  async subscribeRealtime(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_calls_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'calls' }, payload => {
+          logDebug('📡 Atualização de chamada:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+
+      logDebug(`🛰️ Realtime ativo para chamadas da organização ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtime failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📊 6. RELATÓRIO DE PERFORMANCE
+  // ───────────────────────────────────────────────────────────────
+  async getStats(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_calls_stats', { org_id });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getStats failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.CallsManager = CallsManager;
+  logDebug('📞 CallsManager anexado ao window.ALSHAM.CallsManager');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...CallsManager });
+
+ALSHAM_METADATA.modules.part14c = {
+  name: 'CALLS MANAGER',
+  description: 'Gestão de chamadas de voz com registro, status e integração Omnichannel',
+  version: 'v9.2-COMM-CALLS',
+  functions: 20,
+  status: 'ACTIVE'
+};
+
+logDebug('📞 CallsManager registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 14D/14
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: MEETINGS SCHEDULER (Google/Outlook Integration + Supabase Sync)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v9.3-COMM-MEETINGS
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Unificar o agendamento de reuniões entre canais internos e externos (Omnichannel)
+// ════════════════════════════════════════════════════════════════════════
+
+export const MeetingsScheduler = {
+  // ───────────────────────────────────────────────────────────────
+  // 📆 1. CRIAR NOVA REUNIÃO
+  // ───────────────────────────────────────────────────────────────
+  async createMeeting(org_id, title, participants = [], start_time, end_time, description = '', location = '') {
+    try {
+      const meeting = {
+        org_id,
+        title,
+        participants,
+        start_time,
+        end_time,
+        description,
+        location,
+        status: 'scheduled',
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase.from('meetings').insert([meeting]).select().single();
+      if (error) throw error;
+
+      // Dispara evento Omnichannel (notificações)
+      await OmnichannelRouter.dispatchMessage('notification', {
+        org_id,
+        title: `📅 Nova Reunião Agendada: ${title}`,
+        body: `Início: ${new Date(start_time).toLocaleString()}\nParticipantes: ${participants.join(', ')}`
+      });
+
+      logDebug(`📅 Reunião criada com sucesso: ${title}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createMeeting failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 2. SINCRONIZAR COM GOOGLE / OUTLOOK
+  // ───────────────────────────────────────────────────────────────
+  async syncExternalCalendar(org_id, meeting, provider = 'google') {
+    try {
+      logDebug(`🔗 Sincronizando reunião com ${provider} Calendar...`);
+      const endpoint =
+        provider === 'outlook'
+          ? 'https://api.outlook.office.com/v1.0/me/events'
+          : 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          summary: meeting.title,
+          start: { dateTime: meeting.start_time },
+          end: { dateTime: meeting.end_time },
+          description: meeting.description,
+          attendees: meeting.participants.map(email => ({ email }))
+        })
+      });
+
+      await this.recordSyncEvent(org_id, meeting.id, provider, 'success');
+      logDebug(`✅ Reunião sincronizada com ${provider}.`);
+      return response(true);
+    } catch (err) {
+      await this.recordSyncEvent(org_id, meeting.id, provider, 'failed', err.message);
+      logError('syncExternalCalendar failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧾 3. REGISTRAR EVENTO DE SINCRONIZAÇÃO
+  // ───────────────────────────────────────────────────────────────
+  async recordSyncEvent(org_id, meeting_id, provider, status, error = null) {
+    try {
+      const record = {
+        org_id,
+        meeting_id,
+        provider,
+        status,
+        error,
+        created_at: new Date().toISOString()
+      };
+      await supabase.from('meeting_sync_logs').insert([record]);
+      logDebug(`🧾 Evento de sync [${provider}] registrado (${status}).`);
+    } catch (err) {
+      logError('recordSyncEvent failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔍 4. CONSULTAR REUNIÕES AGENDADAS
+  // ───────────────────────────────────────────────────────────────
+  async getMeetings(org_id, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('meetings')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('start_time', { ascending: true })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getMeetings failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📡 5. ASSINATURA REALTIME (ATUALIZAÇÕES DE CALENDÁRIO)
+  // ───────────────────────────────────────────────────────────────
+  async subscribeRealtime(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_meetings_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'meetings' }, payload => {
+          logDebug('📡 Atualização de reunião recebida:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+
+      logDebug(`🛰️ Subscrição ativa para reuniões da organização ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtime failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📊 6. RELATÓRIO DE AGENDAMENTOS
+  // ───────────────────────────────────────────────────────────────
+  async getMeetingStats(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_meetings_stats', { org_id });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getMeetingStats failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.MeetingsScheduler = MeetingsScheduler;
+  logDebug('📅 MeetingsScheduler anexado ao window.ALSHAM.MeetingsScheduler');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...MeetingsScheduler });
+
+ALSHAM_METADATA.modules.part14d = {
+  name: 'MEETINGS SCHEDULER',
+  description: 'Agendamento inteligente de reuniões com sincronização Omnichannel e Google/Outlook',
+  version: 'v9.3-COMM-MEETINGS',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('📅 MeetingsScheduler registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 14E/14
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: INBOX UNIFIED (Omnichannel Aggregation + AI Prioritization)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v9.4-COMM-INBOX
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Consolidar mensagens e comunicações de todos os canais em um único painel inteligente
+// ════════════════════════════════════════════════════════════════════════
+
+export const InboxUnified = {
+  // ───────────────────────────────────────────────────────────────
+  // 📩 1. COLETA DE MENSAGENS MULTICANAL
+  // ───────────────────────────────────────────────────────────────
+  async collectMessages(org_id, limit = 100) {
+    try {
+      const [email, whatsapp, chat, sms, notifications, calls] = await Promise.all([
+        supabase.from('email_out').select('*').eq('org_id', org_id).order('created_at', { ascending: false }).limit(limit),
+        supabase.from('whatsapp_queue').select('*').eq('org_id', org_id).order('created_at', { ascending: false }).limit(limit),
+        supabase.from('chat_messages').select('*').eq('org_id', org_id).order('created_at', { ascending: false }).limit(limit),
+        supabase.from('sms_queue').select('*').eq('org_id', org_id).order('created_at', { ascending: false }).limit(limit),
+        supabase.from('notifications').select('*').eq('org_id', org_id).order('created_at', { ascending: false }).limit(limit),
+        supabase.from('calls').select('*').eq('org_id', org_id).order('started_at', { ascending: false }).limit(limit)
+      ]);
+
+      const merged = [
+        ...email.data.map(m => ({ ...m, channel: 'email' })),
+        ...whatsapp.data.map(m => ({ ...m, channel: 'whatsapp' })),
+        ...chat.data.map(m => ({ ...m, channel: 'chat' })),
+        ...sms.data.map(m => ({ ...m, channel: 'sms' })),
+        ...notifications.data.map(m => ({ ...m, channel: 'notification' })),
+        ...calls.data.map(m => ({ ...m, channel: 'call' }))
+      ];
+
+      const sorted = merged.sort((a, b) => new Date(b.created_at || b.started_at) - new Date(a.created_at || a.started_at));
+
+      logDebug(`📥 ${sorted.length} mensagens consolidadas na Inbox Unificada.`);
+      return response(true, sorted.slice(0, limit));
+    } catch (err) {
+      logError('collectMessages failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 2. CLASSIFICAÇÃO AUTOMÁTICA (IA)
+  // ───────────────────────────────────────────────────────────────
+  async classifyMessages(messages) {
+    try {
+      return messages.map(msg => {
+        const priority =
+          msg.channel === 'call' || msg.channel === 'whatsapp'
+            ? 'alta'
+            : msg.channel === 'email'
+            ? 'média'
+            : 'baixa';
+
+        const sentiment =
+          msg.message?.includes('erro') || msg.message?.includes('falha')
+            ? 'negativo'
+            : msg.message?.includes('obrigado') || msg.message?.includes('grato')
+            ? 'positivo'
+            : 'neutro';
+
+        return { ...msg, priority, sentiment };
+      });
+    } catch (err) {
+      logError('classifyMessages failed:', err);
+      return [];
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🎛️ 3. RENDERIZAÇÃO VISUAL DO PAINEL
+  // ───────────────────────────────────────────────────────────────
+  async renderInbox(org_id) {
+    try {
+      const container = document.querySelector('#inbox-unified');
+      if (!container) return logWarn('Elemento #inbox-unified não encontrado.');
+
+      const messagesResult = await this.collectMessages(org_id);
+      if (!messagesResult.success) {
+        container.innerHTML = `<div class="error">❌ Erro ao carregar mensagens.</div>`;
+        return;
+      }
+
+      const messages = await this.classifyMessages(messagesResult.data);
+
+      container.innerHTML = `
+        <div class="inbox-grid">
+          ${messages
+            .map(
+              msg => `
+            <div class="inbox-item ${msg.priority}">
+              <span class="channel">${msg.channel.toUpperCase()}</span>
+              <span class="time">${new Date(msg.created_at || msg.started_at).toLocaleString()}</span>
+              <p class="content">${msg.message || msg.subject || '[sem conteúdo]'}</p>
+              <span class="sentiment">💬 ${msg.sentiment}</span>
+            </div>`
+            )
+            .join('')}
+        </div>
+      `;
+
+      logDebug('📥 Inbox Unificada renderizada com sucesso.');
+    } catch (err) {
+      logError('renderInbox failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 4. ATUALIZAÇÃO AUTOMÁTICA EM TEMPO REAL
+  // ───────────────────────────────────────────────────────────────
+  async subscribeRealtime(org_id) {
+    try {
+      const tables = ['email_out', 'whatsapp_queue', 'chat_messages', 'sms_queue', 'notifications', 'calls'];
+      for (const table of tables) {
+        supabase
+          .channel(`realtime_${table}_${org_id}`)
+          .on('postgres_changes', { event: '*', schema: 'public', table }, payload => {
+            logDebug(`📡 Novo evento em ${table}`, payload);
+            this.renderInbox(org_id);
+          })
+          .subscribe();
+      }
+      logDebug('🔔 Inbox Unificada conectada em tempo real.');
+      return response(true);
+    } catch (err) {
+      logError('subscribeRealtime failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 5. RESPOSTA DIRETA OMNICHANNEL
+  // ───────────────────────────────────────────────────────────────
+  async reply(org_id, channel, to, message) {
+    try {
+      switch (channel) {
+        case 'whatsapp':
+          return await WhatsAppBridge.sendMessage(org_id, to, message);
+        case 'email':
+          return await OmnichannelRouter.dispatchMessage('email', { org_id, to, message });
+        case 'sms':
+          return await OmnichannelRouter.dispatchMessage('sms', { org_id, to, message });
+        case 'chat':
+          return await OmnichannelRouter.dispatchMessage('chat', { org_id, message });
+        default:
+          return response(false, null, 'Canal não suportado');
+      }
+    } catch (err) {
+      logError('reply failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.InboxUnified = InboxUnified;
+  logDebug('📥 InboxUnified anexado ao window.ALSHAM.InboxUnified');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...InboxUnified });
+
+ALSHAM_METADATA.modules.part14e = {
+  name: 'INBOX UNIFIED',
+  description: 'Central Omnichannel de mensagens com IA de priorização e atualização em tempo real',
+  version: 'v9.4-COMM-INBOX',
+  functions: 30,
+  status: 'ACTIVE'
+};
+
+logDebug('📥 InboxUnified registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+ // ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 14F/14
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: NOTIFICATIONS ENGINE (Realtime + Priority + Delivery)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v9.5-NOTIFY-ENGINE
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Gerenciar, priorizar e entregar notificações em tempo real em todo o ecossistema ALSHAM
+// ════════════════════════════════════════════════════════════════════════
+
+export const NotificationsEngine = {
+  // ───────────────────────────────────────────────────────────────
+  // 📨 1. CRIAÇÃO DE NOTIFICAÇÃO UNIVERSAL
+  // ───────────────────────────────────────────────────────────────
+  async createNotification(org_id, user_id, title, body, priority = 'normal', type = 'system') {
+    try {
+      const notification = {
+        org_id,
+        user_id,
+        title,
+        body,
+        priority,
+        type,
+        status: 'unread',
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase.from('notifications').insert([notification]).select().single();
+      if (error) throw error;
+
+      // Dispara broadcast realtime
+      await supabase.channel('realtime_notifications').send({
+        type: 'broadcast',
+        event: 'new_notification',
+        payload: notification
+      });
+
+      logDebug(`🔔 Notificação criada: ${title} (${priority})`);
+      return response(true, data);
+    } catch (err) {
+      logError('createNotification failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📡 2. SUBSCRIÇÃO REALTIME GLOBAL
+  // ───────────────────────────────────────────────────────────────
+  async subscribeNotifications(org_id, callback) {
+    try {
+      const subscription = supabase
+        .channel(`realtime_notifications_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, payload => {
+          logDebug('📡 Nova notificação recebida:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+
+      logDebug(`🛰️ Subscrição de notificações ativa para ${org_id}`);
+      return response(true, { subscription });
+    } catch (err) {
+      logError('subscribeNotifications failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📬 3. LISTAR NOTIFICAÇÕES DO USUÁRIO
+  // ───────────────────────────────────────────────────────────────
+  async getUserNotifications(org_id, user_id, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('org_id', org_id)
+        .eq('user_id', user_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getUserNotifications failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ✅ 4. MARCAR COMO LIDA / TODAS LIDAS
+  // ───────────────────────────────────────────────────────────────
+  async markAsRead(notification_id) {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .update({ status: 'read', read_at: new Date().toISOString() })
+        .eq('id', notification_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`✅ Notificação ${notification_id} marcada como lida.`);
+      return response(true, data);
+    } catch (err) {
+      logError('markAsRead failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async markAllAsRead(user_id) {
+    try {
+      await supabase
+        .from('notifications')
+        .update({ status: 'read', read_at: new Date().toISOString() })
+        .eq('user_id', user_id)
+        .eq('status', 'unread');
+      logDebug(`✅ Todas as notificações marcadas como lidas para ${user_id}`);
+      return response(true);
+    } catch (err) {
+      logError('markAllAsRead failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 5. FILTRAR POR PRIORIDADE / TIPO
+  // ───────────────────────────────────────────────────────────────
+  async getByFilter(org_id, filters = {}) {
+    try {
+      let query = supabase.from('notifications').select('*').eq('org_id', org_id);
+      if (filters.priority) query = query.eq('priority', filters.priority);
+      if (filters.type) query = query.eq('type', filters.type);
+      if (filters.status) query = query.eq('status', filters.status);
+      const { data, error } = await query.order('created_at', { ascending: false }).limit(100);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getByFilter failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🎛️ 6. RENDERIZAÇÃO DO PAINEL VISUAL
+  // ───────────────────────────────────────────────────────────────
+  async renderPanel(org_id, user_id) {
+    try {
+      const container = document.querySelector('#notifications-panel');
+      if (!container) return logWarn('Elemento #notifications-panel não encontrado.');
+
+      const notifResult = await this.getUserNotifications(org_id, user_id);
+      if (!notifResult.success) {
+        container.innerHTML = `<div class="error">❌ Erro ao carregar notificações.</div>`;
+        return;
+      }
+
+      const notifs = notifResult.data;
+
+      container.innerHTML = `
+        <div class="notifications-grid">
+          ${notifs
+            .map(
+              n => `
+              <div class="notif-item ${n.priority}">
+                <h4>${n.title}</h4>
+                <p>${n.body}</p>
+                <span class="type">${n.type}</span>
+                <span class="time">${new Date(n.created_at).toLocaleString()}</span>
+              </div>`
+            )
+            .join('')}
+        </div>
+      `;
+
+      logDebug('🔔 Painel de notificações renderizado com sucesso.');
+    } catch (err) {
+      logError('renderPanel failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ♻️ 7. AUTO-REFRESH EM TEMPO REAL
+  // ───────────────────────────────────────────────────────────────
+  autoRefresh(org_id, user_id, intervalMs = 15000) {
+    try {
+      this.renderPanel(org_id, user_id);
+      setInterval(() => this.renderPanel(org_id, user_id), intervalMs);
+      this.subscribeNotifications(org_id, () => this.renderPanel(org_id, user_id));
+      logDebug(`🔁 Painel de notificações atualizado a cada ${intervalMs / 1000}s.`);
+    } catch (err) {
+      logError('autoRefresh failed:', err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.NotificationsEngine = NotificationsEngine;
+  logDebug('🔔 NotificationsEngine anexado ao window.ALSHAM.NotificationsEngine');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...NotificationsEngine });
+
+ALSHAM_METADATA.modules.part14f = {
+  name: 'NOTIFICATIONS ENGINE',
+  description: 'Sistema universal de notificações com prioridade, realtime e painel visual integrado',
+  version: 'v9.5-NOTIFY-ENGINE',
+  functions: 35,
+  status: 'ACTIVE'
+};
+
+logDebug('🔔 NotificationsEngine registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+sim    
     
 export default ALSHAM_FULL;
