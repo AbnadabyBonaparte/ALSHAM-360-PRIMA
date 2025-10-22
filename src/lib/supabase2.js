@@ -14862,4 +14862,43 @@ if (typeof window !== 'undefined' && window.ALSHAM) {
 // ✅ Registro visual
 logDebug('✅ Omnichannel Governance & Audit System inicializado.');
 
+// ════════════════════════════════════════════════════════════════════════
+// ⚙️ INTEGRAÇÃO FINAL — REGISTRO DO MÓDULO 12F NO NÚCLEO SUPREMO
+// ════════════════════════════════════════════════════════════════════════
+
+try {
+  // 🔗 Une os módulos ao objeto global de exportações
+  Object.assign(ALSHAM_FULL, {
+    ...OmnichannelGovernance,
+    ...OmnichannelAuditPanel,
+  });
+
+  // 📜 Registra tabelas e estruturas relacionadas à auditoria
+  ALSHAM_METADATA.tables.audit = [
+    'communications_audit_log',
+    'communications_retries',
+    'communications_alerts',
+    'communications_anomalies'
+  ];
+
+  // 🧩 Adiciona referência de módulo ao metadado principal
+  ALSHAM_METADATA.modules.part12f = {
+    name: 'OMNICHANNEL GOVERNANCE & AUDIT',
+    description: 'Monitoramento, auditoria e alertas automáticos do Omnichannel Supremo',
+    version: 'v7.7-AUDIT-INTEGRITY',
+    functions: 25,
+    status: 'COMPLETE'
+  };
+
+  logDebug('🧭 Integração do módulo 12F registrada no ALSHAM_METADATA com sucesso.');
+} catch (err) {
+  logError('❌ Falha ao registrar módulo 12F no ALSHAM_METADATA:', err);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ✅ FIM DA PARTE 12F — OMNICHANNEL GOVERNANCE & AUDIT
+// ⚜️ SUPABASE ALSHAM 360° PRIMA v7.7-AUDIT-INTEGRITY
+// ════════════════════════════════════════════════════════════════════════
+
+    
 export default ALSHAM_FULL;
