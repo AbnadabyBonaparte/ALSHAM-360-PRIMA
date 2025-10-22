@@ -14620,7 +14620,8 @@ export const OmnichannelPerformanceDashboard = {
         (whatsapp.data?.failed || 0) +
         (sms.data?.failed || 0);
 
-      const deliveryRate = totalSent > 0 ? ((totalSent - totalFailed) / totalSent) * 100 : 0;
+      const deliveryRate =
+        totalSent > 0 ? ((totalSent - totalFailed) / totalSent) * 100 : 0;
 
       return response(true, {
         totalSent,
@@ -14648,7 +14649,8 @@ export const OmnichannelPerformanceDashboard = {
 
       const kpi = await this.getKPIs(org_id);
       if (!kpi.success) {
-        container.innerHTML = '<div class="error">❌ Erro ao carregar KPIs Omnichannel.</div>';
+        container.innerHTML =
+          '<div class="error">❌ Erro ao carregar KPIs Omnichannel.</div>';
         return;
       }
 
@@ -14656,32 +14658,15 @@ export const OmnichannelPerformanceDashboard = {
 
       container.innerHTML = `
         <div class="performance-grid">
-          <div class="metric-card">
-            <h3>📨 Total Enviadas</h3>
-            <p>${totalSent}</p>
-          </div>
-          <div class="metric-card">
-            <h3>⚠️ Falhas</h3>
-            <p>${totalFailed}</p>
-          </div>
-          <div class="metric-card">
-            <h3>📊 Taxa de Entrega</h3>
-            <p>${deliveryRate.toFixed(2)}%</p>
-          </div>
-          <div class="metric-card">
-            <h3>⏱️ Tempo Médio de Resposta</h3>
-            <p>${avgResponseTime.toFixed(1)}s</p>
-          </div>
-          <div class="metric-card">
-            <h3>🔔 Notificações Enviadas</h3>
-            <p>${totalNotifications}</p>
-          </div>
+          <div class="metric-card"><h3>📨 Total Enviadas</h3><p>${totalSent}</p></div>
+          <div class="metric-card"><h3>⚠️ Falhas</h3><p>${totalFailed}</p></div>
+          <div class="metric-card"><h3>📊 Taxa de Entrega</h3><p>${deliveryRate.toFixed(2)}%</p></div>
+          <div class="metric-card"><h3>⏱️ Tempo Médio de Resposta</h3><p>${avgResponseTime.toFixed(1)}s</p></div>
+          <div class="metric-card"><h3>🔔 Notificações Enviadas</h3><p>${totalNotifications}</p></div>
         </div>
-
         <canvas id="chart-delivery-rate" width="600" height="200"></canvas>
       `;
 
-      // Cria gráfico se Chart.js estiver disponível
       if (typeof Chart !== 'undefined') {
         const ctx = document.getElementById('chart-delivery-rate');
         new Chart(ctx, {
@@ -14689,10 +14674,7 @@ export const OmnichannelPerformanceDashboard = {
           data: {
             labels: ['Entregues', 'Falhas'],
             datasets: [
-              {
-                data: [deliveryRate, 100 - deliveryRate],
-                backgroundColor: ['#22c55e', '#ef4444']
-              }
+              { data: [deliveryRate, 100 - deliveryRate], backgroundColor: ['#22c55e', '#ef4444'] }
             ]
           },
           options: {
@@ -14734,6 +14716,7 @@ if (typeof window !== 'undefined' && window.ALSHAM) {
 // Registro visual
 logDebug('📊 Painel Executivo de Performance Omnichannel Supremo carregado.');
 
+
 // ════════════════════════════════════════════════════════════════════════
 // ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12F/12
 // ════════════════════════════════════════════════════════════════════════
@@ -14745,17 +14728,10 @@ logDebug('📊 Painel Executivo de Performance Omnichannel Supremo carregado.');
 // ════════════════════════════════════════════════════════════════════════
 
 export const OmnichannelGovernance = {
-  // ───────────────────────────────────────────────────────────────
   // 🧾 1. REGISTRO DE EVENTOS DE AUDITORIA
-  // ───────────────────────────────────────────────────────────────
   async recordAuditEvent(type, details, org_id) {
     try {
-      const entry = {
-        org_id,
-        type,
-        details,
-        created_at: new Date().toISOString()
-      };
+      const entry = { org_id, type, details, created_at: new Date().toISOString() };
       await supabase.from('communications_audit_log').insert([entry]);
       logDebug(`🧾 Evento auditado [${type}]`);
       return response(true, entry);
@@ -14765,9 +14741,7 @@ export const OmnichannelGovernance = {
     }
   },
 
-  // ───────────────────────────────────────────────────────────────
   // 🔍 2. CONSULTA DE TRILHAS DE AUDITORIA
-  // ───────────────────────────────────────────────────────────────
   async getAuditTrail(org_id, filters = {}) {
     try {
       let query = supabase.from('communications_audit_log').select('*').eq('org_id', org_id);
@@ -14783,9 +14757,7 @@ export const OmnichannelGovernance = {
     }
   },
 
-  // ───────────────────────────────────────────────────────────────
   // 🚨 3. DETECÇÃO DE ANOMALIAS
-  // ───────────────────────────────────────────────────────────────
   async detectAnomalies(org_id) {
     try {
       const { data: fails } = await supabase
@@ -14793,7 +14765,7 @@ export const OmnichannelGovernance = {
         .select('*')
         .eq('org_id', org_id)
         .eq('status', 'failed')
-        .gte('created_at', new Date(Date.now() - 3600 * 1000).toISOString()); // última hora
+        .gte('created_at', new Date(Date.now() - 3600 * 1000).toISOString());
 
       if (fails.length > 10) {
         const alert = {
@@ -14812,9 +14784,7 @@ export const OmnichannelGovernance = {
     }
   },
 
-  // ───────────────────────────────────────────────────────────────
   // ♻️ 4. REPROCESSAMENTO AUTOMÁTICO DE FALHAS
-  // ───────────────────────────────────────────────────────────────
   async retryFailedMessages(org_id) {
     try {
       const { data: fails } = await supabase
@@ -14841,9 +14811,7 @@ export const OmnichannelGovernance = {
   }
 };
 
-// ───────────────────────────────────────────────────────────────
 // 📊 5. PAINEL DE AUDITORIA VISUAL
-// ───────────────────────────────────────────────────────────────
 export const OmnichannelAuditPanel = {
   async render(org_id) {
     try {
@@ -14858,16 +14826,12 @@ export const OmnichannelAuditPanel = {
 
       container.innerHTML = `
         <div class="audit-grid">
-          ${logs.data
-            .map(
-              l => `
+          ${logs.data.map(l => `
             <div class="audit-entry">
               <span class="time">${new Date(l.created_at).toLocaleString()}</span>
               <span class="type">${l.type}</span>
               <span class="details">${l.details?.message || JSON.stringify(l.details)}</span>
-            </div>`
-            )
-            .join('')}
+            </div>`).join('')}
         </div>
       `;
       logDebug('📊 Painel de Auditoria renderizado com sucesso.');
@@ -14888,16 +14852,14 @@ export const OmnichannelAuditPanel = {
   }
 };
 
-// Vinculação ao namespace global
+// 🔗 Vinculação ao namespace global
 if (typeof window !== 'undefined' && window.ALSHAM) {
   window.ALSHAM.OmnichannelGovernance = OmnichannelGovernance;
   window.ALSHAM.OmnichannelAuditPanel = OmnichannelAuditPanel;
   logDebug('🧾 OmnichannelGovernance e AuditPanel anexados ao window.ALSHAM.');
 }
 
-// Registro visual
+// ✅ Registro visual
 logDebug('✅ Omnichannel Governance & Audit System inicializado.');
 
-
-    
 export default ALSHAM_FULL;
