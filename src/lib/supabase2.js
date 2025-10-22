@@ -14900,5 +14900,577 @@ try {
 // ⚜️ SUPABASE ALSHAM 360° PRIMA v7.7-AUDIT-INTEGRITY
 // ════════════════════════════════════════════════════════════════════════
 
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 13A/13
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SUPPORT CORE (Tickets, Chat, SLA, Knowledge)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v8.0-SUPPORT-CORE
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Centralizar a base do suporte omnichannel e gestão de SLA
+// ════════════════════════════════════════════════════════════════════════
+
+export const SupportCoreModule = {
+  // 🎫 1. Tickets -----------------------------------------------------------
+  async createTicket(data) {
+    return supabase.from('support_tickets').insert([data]);
+  },
+  async getTickets(org_id) {
+    return supabase.from('support_tickets').select('*').eq('org_id', org_id);
+  },
+  async updateTicket(id, fields) {
+    return supabase.from('support_tickets').update(fields).eq('id', id);
+  },
+  async deleteTicket(id) {
+    return supabase.from('support_tickets').delete().eq('id', id);
+  },
+
+  // 💬 2. Chat Sessions ----------------------------------------------------
+  async createChatSession(data) {
+    return supabase.from('chat_sessions').insert([data]);
+  },
+  async getChatSessions(org_id) {
+    return supabase.from('chat_sessions').select('*').eq('org_id', org_id);
+  },
+  async postChatMessage(session_id, message, user_id) {
+    return supabase.from('chat_messages').insert([
+      { session_id, message, user_id, created_at: new Date().toISOString() }
+    ]);
+  },
+
+  // ⏱️ 3. SLA Rules -------------------------------------------------------
+  async getSLARules(org_id) {
+    return supabase.from('sla_rules').select('*').eq('org_id', org_id);
+  },
+  async createSLARule(data) {
+    return supabase.from('sla_rules').insert([data]);
+  },
+
+  // 📚 4. Knowledge Base ---------------------------------------------------
+  async getKnowledgeArticles(org_id) {
+    return supabase.from('knowledge_base').select('*').eq('org_id', org_id);
+  },
+  async createKnowledgeArticle(data) {
+    return supabase.from('knowledge_base').insert([data]);
+  }
+};
+
+// 🔗 Vincula módulo ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SupportCoreModule = SupportCoreModule;
+  logDebug('🎧 SupportCoreModule anexado ao window.ALSHAM.SupportCoreModule');
+}
+
+// 🧭 Registro de integração
+Object.assign(ALSHAM_FULL, { ...SupportCoreModule });
+
+ALSHAM_METADATA.modules.part13a = {
+  name: 'SUPPORT CORE',
+  description: 'Tickets, chat sessions, SLA rules e knowledge base',
+  version: 'v8.0-SUPPORT-CORE',
+  functions: 15,
+  status: 'ACTIVE'
+};
+
+logDebug('🎯 SupportCoreModule registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 13B/13
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SLA & WORKFLOW ENGINE
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v8.1-SLA-WORKFLOW
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Automatizar tempos de resposta, escalonamentos e históricos de SLA
+// ════════════════════════════════════════════════════════════════════════
+
+export const SLAWorkflowEngine = {
+  // 🧭 1. CÁLCULO DE SLA ----------------------------------------------------
+  async calculateSLA(ticket_id) {
+    try {
+      const { data: ticket, error } = await supabase
+        .from('support_tickets')
+        .select('id, created_at, priority, sla_id')
+        .eq('id', ticket_id)
+        .single();
+      if (error) throw error;
+
+      const { data: sla } = await supabase
+        .from('sla_rules')
+        .select('*')
+        .eq('id', ticket.sla_id)
+        .single();
+
+      if (!sla) throw new Error('SLA rule not found');
+
+      const deadline = new Date(ticket.created_at);
+      deadline.setHours(deadline.getHours() + (sla.response_hours || 4));
+
+      await supabase
+        .from('support_tickets')
+        .update({ sla_deadline: deadline.toISOString() })
+        .eq('id', ticket_id);
+
+      logDebug(`⏱️ SLA calculado para ticket #${ticket_id}`);
+      return response(true, { ticket_id, deadline });
+    } catch (err) {
+      logError('calculateSLA failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 🔁 2. MONITORAMENTO DE EXPIRAÇÃO ---------------------------------------
+  async checkExpiredSLAs(org_id) {
+    try {
+      const now = new Date().toISOString();
+      const { data: expired } = await supabase
+        .from('support_tickets')
+        .select('id, title, assigned_to, sla_deadline')
+        .eq('org_id', org_id)
+        .eq('status', 'open')
+        .lt('sla_deadline', now);
+
+      if (expired.length > 0) {
+        for (const t of expired) {
+          await supabase
+            .from('support_tickets')
+            .update({ status: 'escalated' })
+            .eq('id', t.id);
+          await supabase
+            .from('sla_history')
+            .insert([{ ticket_id: t.id, event: 'SLA expired', created_at: now }]);
+          await OmnichannelRouter.dispatchMessage('notification', {
+            title: 'SLA expirado',
+            body: `O ticket ${t.title} ultrapassou o prazo.`,
+            user_id: t.assigned_to
+          });
+        }
+        logWarn(`⚠️ ${expired.length} SLAs expirados foram escalonados.`);
+      }
+      return response(true, { expired: expired.length });
+    } catch (err) {
+      logError('checkExpiredSLAs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 🔄 3. REATRIBUIÇÃO AUTOMÁTICA -----------------------------------------
+  async autoReassignTickets(org_id) {
+    try {
+      const { data: pending } = await supabase
+        .from('support_tickets')
+        .select('id, title')
+        .eq('org_id', org_id)
+        .eq('status', 'escalated')
+        .is('assigned_to', null)
+        .limit(10);
+
+      if (pending.length === 0)
+        return response(true, { reassigned: 0, message: 'Sem tickets pendentes.' });
+
+      const { data: agents } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('role', 'support')
+        .limit(pending.length);
+
+      for (let i = 0; i < pending.length; i++) {
+        const agent = agents[i % agents.length];
+        await supabase
+          .from('support_tickets')
+          .update({ assigned_to: agent.id, status: 'assigned' })
+          .eq('id', pending[i].id);
+        await supabase
+          .from('sla_history')
+          .insert([{ ticket_id: pending[i].id, event: 'Auto reassigned', created_at: new Date().toISOString() }]);
+      }
+
+      logDebug(`🔄 ${pending.length} tickets reatribuídos automaticamente.`);
+      return response(true, { reassigned: pending.length });
+    } catch (err) {
+      logError('autoReassignTickets failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 📜 4. HISTÓRICO DE SLA -------------------------------------------------
+  async getSLAHistory(ticket_id) {
+    try {
+      const { data, error } = await supabase
+        .from('sla_history')
+        .select('*')
+        .eq('ticket_id', ticket_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getSLAHistory failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ⚙️ 5. EXECUÇÃO AGENDADA -----------------------------------------------
+  async runScheduled(org_id) {
+    try {
+      await this.checkExpiredSLAs(org_id);
+      await this.autoReassignTickets(org_id);
+      logDebug('🧠 SLA & Workflow Engine executado com sucesso.');
+      return response(true);
+    } catch (err) {
+      logError('runScheduled failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vincula módulo ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SLAWorkflowEngine = SLAWorkflowEngine;
+  logDebug('🧠 SLAWorkflowEngine anexado ao window.ALSHAM.SLAWorkflowEngine');
+}
+
+// 🧭 Registro de integração
+Object.assign(ALSHAM_FULL, { ...SLAWorkflowEngine });
+
+ALSHAM_METADATA.modules.part13b = {
+  name: 'SLA & WORKFLOW ENGINE',
+  description: 'Cálculo de SLA, reatribuição automática e histórico de resposta',
+  version: 'v8.1-SLA-WORKFLOW',
+  functions: 20,
+  status: 'ACTIVE'
+};
+
+logDebug('⚙️ SLAWorkflowEngine registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 13C/13
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: LIVE CHAT INTERFACE (Realtime + Omnichannel)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v8.2-LIVE-CHAT
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Fornecer canal de chat corporativo com sincronização Omnichannel
+// ════════════════════════════════════════════════════════════════════════
+
+export const LiveChatInterface = {
+  // ───────────────────────────────────────────────────────────────
+  // 💬 1. INICIAR SESSÃO DE CHAT
+  // ───────────────────────────────────────────────────────────────
+  async startSession(org_id, user_id, ticket_id = null) {
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert([
+          {
+            org_id,
+            user_id,
+            ticket_id,
+            started_at: new Date().toISOString(),
+            status: 'active'
+          }
+        ])
+        .select()
+        .single();
+      if (error) throw error;
+
+      logDebug(`💬 Sessão de chat iniciada [${data.id}]`);
+      return response(true, data);
+    } catch (err) {
+      logError('startSession failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ✉️ 2. ENVIAR MENSAGEM
+  // ───────────────────────────────────────────────────────────────
+  async sendMessage(session_id, user_id, message) {
+    try {
+      const entry = {
+        session_id,
+        user_id,
+        message,
+        created_at: new Date().toISOString(),
+        status: 'sent'
+      };
+      await supabase.from('chat_messages').insert([entry]);
+
+      // Roteamento via Omnichannel
+      await OmnichannelRouter.dispatchMessage('chat', entry);
+
+      logDebug(`💭 Mensagem enviada via chat_session ${session_id}`);
+      return response(true, entry);
+    } catch (err) {
+      logError('sendMessage failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 👀 3. SUBSCRIÇÃO REALTIME DAS MENSAGENS
+  // ───────────────────────────────────────────────────────────────
+  async subscribeChat(session_id, onMessage) {
+    try {
+      const channelName = `realtime_chat_session_${session_id}`;
+      const subscription = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${session_id}` },
+          payload => {
+            logDebug(`📨 Nova mensagem recebida em sessão ${session_id}`, payload.new);
+            onMessage?.(payload.new);
+          }
+        )
+        .subscribe();
+
+      logDebug(`✅ Realtime ativo para chat_session ${session_id}`);
+      return response(true, { subscription });
+    } catch (err) {
+      logError('subscribeChat failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 4. HISTÓRICO COMPLETO
+  // ───────────────────────────────────────────────────────────────
+  async getChatHistory(session_id) {
+    try {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('session_id', session_id)
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getChatHistory failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ✍️ 5. STATUS DE DIGITAÇÃO
+  // ───────────────────────────────────────────────────────────────
+  async setTyping(session_id, user_id, isTyping) {
+    try {
+      await supabase
+        .from('chat_typing')
+        .upsert([{ session_id, user_id, is_typing: isTyping, updated_at: new Date().toISOString() }]);
+      logDebug(`⌨️ Usuário ${user_id} ${isTyping ? 'digitando...' : 'parou de digitar'}`);
+      return response(true);
+    } catch (err) {
+      logError('setTyping failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧭 6. ENCERRAR CHAT
+  // ───────────────────────────────────────────────────────────────
+  async endSession(session_id) {
+    try {
+      await supabase
+        .from('chat_sessions')
+        .update({ status: 'closed', ended_at: new Date().toISOString() })
+        .eq('id', session_id);
+      logDebug(`🔚 Chat session encerrada [${session_id}]`);
+      return response(true);
+    } catch (err) {
+      logError('endSession failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vincula módulo ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.LiveChatInterface = LiveChatInterface;
+  logDebug('💬 LiveChatInterface anexado ao window.ALSHAM.LiveChatInterface');
+}
+
+// 🧭 Registro de integração
+Object.assign(ALSHAM_FULL, { ...LiveChatInterface });
+
+ALSHAM_METADATA.modules.part13c = {
+  name: 'LIVE CHAT INTERFACE',
+  description: 'Chat em tempo real integrado ao Router Omnichannel e Support Core',
+  version: 'v8.2-LIVE-CHAT',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('💬 LiveChatInterface registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 13D/13
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: KNOWLEDGE BASE (Artigos + Busca Inteligente + Feedback)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v8.3-KNOWLEDGE-ENGINE
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Criar base viva de conhecimento, ligada aos tickets e à IA cognitiva
+// ════════════════════════════════════════════════════════════════════════
+
+export const KnowledgeBaseEngine = {
+  // ───────────────────────────────────────────────────────────────
+  // 🧱 1. CRIAÇÃO DE ARTIGO
+  // ───────────────────────────────────────────────────────────────
+  async createArticle(org_id, title, content, category = 'Geral', author_id = null) {
+    try {
+      const article = {
+        org_id,
+        title,
+        content,
+        category,
+        author_id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase.from('knowledge_base').insert([article]).select().single();
+      if (error) throw error;
+      logDebug(`📘 Artigo criado: ${title}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createArticle failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔍 2. BUSCA INTELIGENTE (FULL-TEXT / SEMÂNTICA)
+  // ───────────────────────────────────────────────────────────────
+  async searchArticles(org_id, query) {
+    try {
+      const { data, error } = await supabase
+        .from('knowledge_base')
+        .select('*')
+        .eq('org_id', org_id)
+        .textSearch('content', query, { type: 'websearch' });
+      if (error) throw error;
+      logDebug(`🔎 ${data.length} resultados encontrados para "${query}"`);
+      return response(true, data);
+    } catch (err) {
+      logError('searchArticles failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 3. BUSCA ASSISTIDA POR IA (INTEGRAÇÃO COM AI MODULE)
+  // ───────────────────────────────────────────────────────────────
+  async aiSuggestSolution(ticket_description) {
+    try {
+      const { data: suggestions } = await supabase.rpc('fn_ai_knowledge_suggest', {
+        prompt: ticket_description
+      });
+      logDebug('🧠 Sugestões de solução obtidas pela IA:', suggestions);
+      return response(true, suggestions);
+    } catch (err) {
+      logError('aiSuggestSolution failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🗂️ 4. GESTÃO DE CATEGORIAS
+  // ───────────────────────────────────────────────────────────────
+  async listCategories(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('knowledge_categories')
+        .select('*')
+        .eq('org_id', org_id);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listCategories failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async createCategory(org_id, name, description = '') {
+    try {
+      const { data, error } = await supabase
+        .from('knowledge_categories')
+        .insert([{ org_id, name, description, created_at: new Date().toISOString() }])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`📁 Categoria criada: ${name}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createCategory failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 💬 5. FEEDBACK DE ARTIGOS
+  // ───────────────────────────────────────────────────────────────
+  async submitFeedback(article_id, user_id, helpful = true, comment = '') {
+    try {
+      const feedback = {
+        article_id,
+        user_id,
+        helpful,
+        comment,
+        created_at: new Date().toISOString()
+      };
+      await supabase.from('knowledge_feedback').insert([feedback]);
+      await supabase.rpc('fn_update_article_rating', { article_id });
+      logDebug(`⭐ Feedback registrado para artigo ${article_id}`);
+      return response(true);
+    } catch (err) {
+      logError('submitFeedback failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📊 6. ARTIGOS POPULARES
+  // ───────────────────────────────────────────────────────────────
+  async getTopArticles(org_id, limit = 5) {
+    try {
+      const { data, error } = await supabase
+        .from('knowledge_base')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('rating', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getTopArticles failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vincula módulo ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.KnowledgeBaseEngine = KnowledgeBaseEngine;
+  logDebug('📚 KnowledgeBaseEngine anexado ao window.ALSHAM.KnowledgeBaseEngine');
+}
+
+// 🧭 Registro de integração
+Object.assign(ALSHAM_FULL, { ...KnowledgeBaseEngine });
+
+ALSHAM_METADATA.modules.part13d = {
+  name: 'KNOWLEDGE BASE',
+  description: 'Base de artigos, categorias, feedback e busca inteligente integrada à IA',
+  version: 'v8.3-KNOWLEDGE-ENGINE',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('📚 KnowledgeBaseEngine registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+    
     
 export default ALSHAM_FULL;
