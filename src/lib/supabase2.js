@@ -12993,6 +12993,136 @@ export async function testWebhookConfig(configId) {
   }
 }
 
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA - PARTE 9B: MÓDULO MARKETING SUPREMO
+// ════════════════════════════════════════════════════════════════════════
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.0-MARKETING-EXPANSION
+// 🧠 Responsável: CITIZEN SUPREMO X.1
+// 🚀 Missão: Integrar Campanhas, Landing Pages, Ads e Conteúdo
+// ════════════════════════════════════════════════════════════════════════
+
+export const MarketingModule = {
+  // ─── CAMPANHAS DE MARKETING ─────────────────────────────
+  async listCampaigns(org_id) {
+    return supabase.from('campaigns').select('*').eq('org_id', org_id);
+  },
+  async getCampaignById(id, org_id) {
+    return supabase.from('campaigns').select('*').eq('id', id).eq('org_id', org_id).single();
+  },
+  async insertCampaign(data) {
+    return supabase.from('campaigns').insert(data).select();
+  },
+  async updateCampaign(id, data, org_id) {
+    return supabase.from('campaigns').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteCampaign(id, org_id) {
+    return supabase.from('campaigns').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── EMAIL CAMPAIGNS ─────────────────────────────────────
+  async listEmailCampaigns(org_id) {
+    return supabase.from('email_campaigns').select('*').eq('org_id', org_id);
+  },
+  async insertEmailCampaign(data) {
+    return supabase.from('email_campaigns').insert(data).select();
+  },
+  async updateEmailCampaign(id, data, org_id) {
+    return supabase.from('email_campaigns').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteEmailCampaign(id, org_id) {
+    return supabase.from('email_campaigns').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── LANDING PAGES ───────────────────────────────────────
+  async listLandingPages(org_id) {
+    return supabase.from('landing_pages').select('*').eq('org_id', org_id);
+  },
+  async getLandingPage(id, org_id) {
+    return supabase.from('landing_pages').select('*').eq('id', id).eq('org_id', org_id).single();
+  },
+  async insertLandingPage(data) {
+    return supabase.from('landing_pages').insert(data).select();
+  },
+  async updateLandingPage(id, data, org_id) {
+    return supabase.from('landing_pages').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteLandingPage(id, org_id) {
+    return supabase.from('landing_pages').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── FORMULÁRIOS ─────────────────────────────────────────
+  async listForms(org_id) {
+    return supabase.from('forms').select('*').eq('org_id', org_id);
+  },
+  async insertForm(data) {
+    return supabase.from('forms').insert(data).select();
+  },
+  async updateForm(id, data, org_id) {
+    return supabase.from('forms').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteForm(id, org_id) {
+    return supabase.from('forms').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── SOCIAL MEDIA ────────────────────────────────────────
+  async listSocialPosts(org_id) {
+    return supabase.from('social_media').select('*').eq('org_id', org_id);
+  },
+  async insertSocialPost(data) {
+    return supabase.from('social_media').insert(data).select();
+  },
+  async updateSocialPost(id, data, org_id) {
+    return supabase.from('social_media').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteSocialPost(id, org_id) {
+    return supabase.from('social_media').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── SEO & ANALYTICS ─────────────────────────────────────
+  async listSeoReports(org_id) {
+    return supabase.from('seo').select('*').eq('org_id', org_id);
+  },
+  async insertSeoReport(data) {
+    return supabase.from('seo').insert(data).select();
+  },
+  async updateSeoReport(id, data, org_id) {
+    return supabase.from('seo').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteSeoReport(id, org_id) {
+    return supabase.from('seo').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── ADS MANAGER ─────────────────────────────────────────
+  async listAds(org_id) {
+    return supabase.from('ads_manager').select('*').eq('org_id', org_id);
+  },
+  async insertAd(data) {
+    return supabase.from('ads_manager').insert(data).select();
+  },
+  async updateAd(id, data, org_id) {
+    return supabase.from('ads_manager').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteAd(id, org_id) {
+    return supabase.from('ads_manager').delete().eq('id', id).eq('org_id', org_id);
+  },
+
+  // ─── CONTENT LIBRARY ─────────────────────────────────────
+  async listContents(org_id) {
+    return supabase.from('content_library').select('*').eq('org_id', org_id);
+  },
+  async insertContent(data) {
+    return supabase.from('content_library').insert(data).select();
+  },
+  async updateContent(id, data, org_id) {
+    return supabase.from('content_library').update(data).eq('id', id).eq('org_id', org_id);
+  },
+  async deleteContent(id, org_id) {
+    return supabase.from('content_library').delete().eq('id', id).eq('org_id', org_id);
+  },
+};
+
+    
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 10/10 - EXPORTS FINAIS + METADATA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -13000,7 +13130,6 @@ export async function testWebhookConfig(configId) {
 // ============================================================================
 // EXPORT COMPLETO - TODAS AS FUNÇÕES ORGANIZADAS
 // ============================================================================
-
 export const ALSHAM_FULL = {
   // ============ CORE & AUTH ============
   supabase,
@@ -13198,7 +13327,7 @@ export const ALSHAM_FULL = {
   updateAdsManager,
   deleteAdsManager,
   subscribeAdsManager,
-  
+
   // ============ ANALYTICS & REPORTS ============
   createAnalyticsEvent,
   getAnalyticsEvents,
@@ -13220,77 +13349,7 @@ export const ALSHAM_FULL = {
   createSentimentAnalysis,
   getSentimentAnalysis,
   subscribeSentimentAnalysis,
-  
-  // ============ VIEWS - TODAS AS 40+ ============
-  getViewCRMOverview,
-  getViewLeadsHealth,
-  getViewLeadsWithLabels,
-  getViewLeadConversionForecast,
-  getViewExecutiveOverview,
-  getViewSystemHealth,
-  getDashboardKPIs,
-  getDashboardSummary,
-  getViewGamificationSummary,
-  getViewGamificationRank,
-  getViewGamificationUserSummary,
-  getViewRewardsRecent,
-  getViewAIEthicsSummary,
-  getViewAIRecommendationsSummary,
-  getViewAIBlueprintsSummary,
-  getViewAILearningSummary,
-  getViewSystemConsciousness,
-  getViewInfinitumOverview,
-  getViewAeonOverview,
-  getViewSolState,
-  getViewLuxNetworkState,
-  getViewNoesisSummary,
-  getViewPneumaReflections,
-  getViewAuroraReflections,
-  getViewLuminaInsight,
-  getViewAuditRecent,
-  getViewAuditAIAnomalies,
-  getViewSystemAutocureSummary,
-  getViewCronStatus,
-  getViewROIMonthly,
-  getViewAERecent,
-  getViewAEKPIs7d,
-  getViewAEFailRate7d,
-  
-  // ============ AI - TODAS AS 22 TABELAS ============
-  createAIPrediction,
-  getAIPredictions,
-  createAIMemory,
-  getAIMemory,
-  createAIConsciousnessState,
-  getAIConsciousnessState,
-  createAICollectiveMemory,
-  getAICollectiveMemory,
-  createAIInfinitumField,
-  getAIInfinitumField,
-  createAISolarReflection,
-  getAISolarReflections,
-  createAIFunctionBlueprint,
-  getAIFunctionBlueprints,
-  createAIInference,
-  getAIInferences,
-  createAIMetaInsight,
-  getAIMetaInsights,
-  createAIRecommendation,
-  getAIRecommendations,
-  createAIEthicsAudit,
-  getAIEthicsAudit,
-  getAIAeonEvents,
-  getAIAeonTimeline,
-  getAINetworkNodes,
-  getAINetworkSync,
-  getAISolarFlux,
-  getAIVisualCorrelations,
-  getAIVisualEmbeddings,
-  getAIVisualInterpretations,
-  getAIInfinitumResonance,
-  getAINetworkReflections,
-  getAICollectiveLinks,
-  
+
   // ============ GAMIFICATION - COMPLETO ============
   createGamificationBadge,
   getGamificationBadges,
@@ -13341,6 +13400,9 @@ export const ALSHAM_FULL = {
   subscribeIntegrationConfigs,
   triggerWebhooks,
   testWebhookConfig,
+
+  // ============ MARKETING MODULE (NOVO BLOCO SUPREMO) ============
+  ...MarketingModule, // ✅ Inserção final — Parte 9B integrada
 };
 
 // ============================================================================
