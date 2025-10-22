@@ -1,8 +1,3 @@
-Com certeza. Seguirei as instruções críticas para consolidar os 10 arquivos em um único `supabase-alsham.js`, preservando toda a lógica, comentários e estrutura, sem remover ou otimizar nada.
-
-Aqui está o arquivo unificado:
-
-```javascript
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ⚜️ SUPABASE ALSHAM 360° PRIMA v6.4-GRAAL-COMPLIANT+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
