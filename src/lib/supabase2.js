@@ -13005,124 +13005,85 @@ export async function testWebhookConfig(configId) {
 export const MarketingModule = {
   // ─── CAMPANHAS DE MARKETING ─────────────────────────────
   async listCampaigns(org_id) {
-    return supabase.from('campaigns').select('*').eq('org_id', org_id);
-  },
-  async getCampaignById(id, org_id) {
-    return supabase.from('campaigns').select('*').eq('id', id).eq('org_id', org_id).single();
-  },
-  async insertCampaign(data) {
-    return supabase.from('campaigns').insert(data).select();
-  },
-  async updateCampaign(id, data, org_id) {
-    return supabase.from('campaigns').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteCampaign(id, org_id) {
-    return supabase.from('campaigns').delete().eq('id', id).eq('org_id', org_id);
-  },
-
-  // ─── EMAIL CAMPAIGNS ─────────────────────────────────────
-  async listEmailCampaigns(org_id) {
-    return supabase.from('email_campaigns').select('*').eq('org_id', org_id);
-  },
-  async insertEmailCampaign(data) {
-    return supabase.from('email_campaigns').insert(data).select();
-  },
-  async updateEmailCampaign(id, data, org_id) {
-    return supabase.from('email_campaigns').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteEmailCampaign(id, org_id) {
-    return supabase.from('email_campaigns').delete().eq('id', id).eq('org_id', org_id);
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listCampaigns failed:', err);
+      return response(false, null, err);
+    }
   },
 
-  // ─── LANDING PAGES ───────────────────────────────────────
-  async listLandingPages(org_id) {
-    return supabase.from('landing_pages').select('*').eq('org_id', org_id);
-  },
-  async getLandingPage(id, org_id) {
-    return supabase.from('landing_pages').select('*').eq('id', id).eq('org_id', org_id).single();
-  },
-  async insertLandingPage(data) {
-    return supabase.from('landing_pages').insert(data).select();
-  },
-  async updateLandingPage(id, data, org_id) {
-    return supabase.from('landing_pages').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteLandingPage(id, org_id) {
-    return supabase.from('landing_pages').delete().eq('id', id).eq('org_id', org_id);
-  },
-
-  // ─── FORMULÁRIOS ─────────────────────────────────────────
-  async listForms(org_id) {
-    return supabase.from('forms').select('*').eq('org_id', org_id);
-  },
-  async insertForm(data) {
-    return supabase.from('forms').insert(data).select();
-  },
-  async updateForm(id, data, org_id) {
-    return supabase.from('forms').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteForm(id, org_id) {
-    return supabase.from('forms').delete().eq('id', id).eq('org_id', org_id);
+  async createCampaign(campaign) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...campaign,
+        org_id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase.from('campaigns').insert([payload]).select().single();
+      if (error) throw error;
+      logDebug('Campaign created:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('createCampaign failed:', err);
+      return response(false, null, err);
+    }
   },
 
-  // ─── SOCIAL MEDIA ────────────────────────────────────────
-  async listSocialPosts(org_id) {
-    return supabase.from('social_media').select('*').eq('org_id', org_id);
-  },
-  async insertSocialPost(data) {
-    return supabase.from('social_media').insert(data).select();
-  },
-  async updateSocialPost(id, data, org_id) {
-    return supabase.from('social_media').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteSocialPost(id, org_id) {
-    return supabase.from('social_media').delete().eq('id', id).eq('org_id', org_id);
-  },
-
-  // ─── SEO & ANALYTICS ─────────────────────────────────────
-  async listSeoReports(org_id) {
-    return supabase.from('seo').select('*').eq('org_id', org_id);
-  },
-  async insertSeoReport(data) {
-    return supabase.from('seo').insert(data).select();
-  },
-  async updateSeoReport(id, data, org_id) {
-    return supabase.from('seo').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteSeoReport(id, org_id) {
-    return supabase.from('seo').delete().eq('id', id).eq('org_id', org_id);
+  // ─── POSTS & SOCIAL MEDIA ─────────────────────────────
+  async getSocialPosts(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('social_media')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('scheduled_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getSocialPosts failed:', err);
+      return response(false, null, err);
+    }
   },
 
-  // ─── ADS MANAGER ─────────────────────────────────────────
-  async listAds(org_id) {
-    return supabase.from('ads_manager').select('*').eq('org_id', org_id);
-  },
-  async insertAd(data) {
-    return supabase.from('ads_manager').insert(data).select();
-  },
-  async updateAd(id, data, org_id) {
-    return supabase.from('ads_manager').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteAd(id, org_id) {
-    return supabase.from('ads_manager').delete().eq('id', id).eq('org_id', org_id);
+  async scheduleSocialPost(post) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...post,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase.from('social_media').insert([payload]).select().single();
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('scheduleSocialPost failed:', err);
+      return response(false, null, err);
+    }
   },
 
-  // ─── CONTENT LIBRARY ─────────────────────────────────────
-  async listContents(org_id) {
-    return supabase.from('content_library').select('*').eq('org_id', org_id);
-  },
-  async insertContent(data) {
-    return supabase.from('content_library').insert(data).select();
-  },
-  async updateContent(id, data, org_id) {
-    return supabase.from('content_library').update(data).eq('id', id).eq('org_id', org_id);
-  },
-  async deleteContent(id, org_id) {
-    return supabase.from('content_library').delete().eq('id', id).eq('org_id', org_id);
+  // ─── SEO ─────────────────────────────
+  async getSEOConfigs(org_id) {
+    try {
+      const { data, error } = await supabase.from('seo').select('*').eq('org_id', org_id);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getSEOConfigs failed:', err);
+      return response(false, null, err);
+    }
   },
 };
 
-    
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 10/10 - EXPORTS FINAIS + METADATA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
