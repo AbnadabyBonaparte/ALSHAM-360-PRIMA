@@ -13084,6 +13084,253 @@ export const MarketingModule = {
   },
 };
 
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA - PARTE 9C: MÓDULO SUPPORT SUPREMO
+// ════════════════════════════════════════════════════════════════════════
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.1-SUPPORT-EXPANSION
+// 🧠 Responsável: CITIZEN SUPREMO X.1
+// 🚀 Missão: Integrar Tickets, SLA, Chat, Base de Conhecimento e Feedback
+// ════════════════════════════════════════════════════════════════════════
+
+export const SupportModule = {
+  // ─── SUPPORT TICKETS ─────────────────────────────────────
+  async listTickets(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listTickets failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async getTicketById(id, org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('id', id)
+        .eq('org_id', org_id)
+        .single();
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getTicketById failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async createTicket(ticket) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...ticket,
+        org_id,
+        status: ticket.status || 'open',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('🎫 Novo ticket criado:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('createTicket failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async updateTicket(id, data, org_id) {
+    try {
+      const { error } = await supabase
+        .from('support_tickets')
+        .update({ ...data, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('org_id', org_id);
+      if (error) throw error;
+      logDebug('🎫 Ticket atualizado:', id);
+      return response(true, { id, ...data });
+    } catch (err) {
+      logError('updateTicket failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async deleteTicket(id, org_id) {
+    try {
+      const { error } = await supabase
+        .from('support_tickets')
+        .delete()
+        .eq('id', id)
+        .eq('org_id', org_id);
+      if (error) throw error;
+      logDebug('🗑️ Ticket removido:', id);
+      return response(true, { deleted: id });
+    } catch (err) {
+      logError('deleteTicket failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── SLA MANAGEMENT ──────────────────────────────────────
+  async listSLA(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('support_sla')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('priority', { ascending: true });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listSLA failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async createSLA(data) {
+    try {
+      const org_id = await getActiveOrganization();
+      const { data: result, error } = await supabase
+        .from('support_sla')
+        .insert([{ ...data, org_id }])
+        .select()
+        .single();
+      if (error) throw error;
+      return response(true, result);
+    } catch (err) {
+      logError('createSLA failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── CHAT / MENSAGENS ────────────────────────────────────
+  async listMessages(ticket_id, org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('support_messages')
+        .select('*')
+        .eq('ticket_id', ticket_id)
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listMessages failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async sendMessage(message) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...message,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('support_messages')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('💬 Nova mensagem registrada:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('sendMessage failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── KNOWLEDGE BASE ──────────────────────────────────────
+  async listArticles(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('knowledge_base')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listArticles failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async createArticle(article) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...article,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('knowledge_base')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('📚 Artigo criado:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('createArticle failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── FEEDBACK E AVALIAÇÕES ───────────────────────────────
+  async listFeedbacks(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('support_feedback')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listFeedbacks failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async insertFeedback(feedback) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...feedback,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('support_feedback')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('⭐ Novo feedback adicionado:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('insertFeedback failed:', err);
+      return response(false, null, err);
+    }
+  },
+};
+
+    
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 10/10 - EXPORTS FINAIS + METADATA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -13362,9 +13609,13 @@ export const ALSHAM_FULL = {
   triggerWebhooks,
   testWebhookConfig,
 
-  // ============ MARKETING MODULE (NOVO BLOCO SUPREMO) ============
-  ...MarketingModule, // ✅ Inserção final — Parte 9B integrada
+    // ============ MARKETING MODULE (NOVO BLOCO SUPREMO) ============
+  ...MarketingModule, // ✅ Parte 9B integrada
+  
+  // ============ SUPPORT MODULE (NOVO BLOCO SUPREMO) ============
+  ...SupportModule, // ✅ Parte 9C integrada
 };
+
 
 // ============================================================================
 // METADATA COMPLETO DO SISTEMA
