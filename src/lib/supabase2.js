@@ -14217,4 +14217,687 @@ if (typeof window !== 'undefined' && window.ALSHAM) {
 }
 
 // ───────────────────────────────────────────────────────────────
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12B/12
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SYNC ENGINE OMNICHANNEL (Realtime + UI)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.4-OMNICHANNEL-SYNC
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Sincronizar eventos em tempo real entre Supabase e Frontend
+// ════════════════════════════════════════════════════════════════════════
+
+export const OmnichannelSyncEngine = {
+  // ───────────────────────────────────────────────────────────────
+  // ⚡ 1. INICIALIZADOR PRINCIPAL
+  // ───────────────────────────────────────────────────────────────
+  async initRealtimeSync(onEvent) {
+    try {
+      logDebug('🔄 Iniciando sincronização realtime omnichannel...');
+
+      const channels = [
+        { name: 'realtime_email_out', table: 'email_out' },
+        { name: 'realtime_whatsapp_queue', table: 'whatsapp_queue' },
+        { name: 'realtime_sms_queue', table: 'sms_queue' },
+        { name: 'realtime_chat_sessions', table: 'chat_messages' },
+        { name: 'realtime_notifications', table: 'notifications' },
+        { name: 'realtime_calls', table: 'calls' }
+      ];
+
+      for (const { name, table } of channels) {
+        supabase
+          .channel(name)
+          .on('postgres_changes', { event: '*', schema: 'public', table }, payload => {
+            logDebug(`💬 Evento recebido em ${table}:`, payload);
+            onEvent?.(table, payload);
+
+            // Atualiza DOM se existir área vinculada
+            const container = document.querySelector(`[data-channel="${table}"]`);
+            if (container) {
+              const msg = document.createElement('div');
+              msg.className = 'message-realtime';
+              msg.textContent = `[${table}] ${payload.new?.message || payload.new?.body || '[sem conteúdo]'}`;
+              container.prepend(msg);
+            }
+          })
+          .subscribe();
+
+        logDebug(`✅ Sync ativo para tabela: ${table}`);
+      }
+
+      logDebug('🧭 OmnichannelSyncEngine inicializado.');
+      return response(true, { syncedTables: channels.map(c => c.table) });
+    } catch (err) {
+      logError('initRealtimeSync failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 2. PROCESSADOR DE REFLEXÕES (LOOPBACK AUTOMÁTICO)
+  // ───────────────────────────────────────────────────────────────
+  async reflectEvent(payload) {
+    try {
+      const eventType = payload?.table;
+      if (!eventType) return;
+
+      // Reflete automaticamente nos canais conectados
+      switch (eventType) {
+        case 'email_out':
+          await OmnichannelRouter.sendNotification(null, 'Novo e-mail enviado', payload.new.subject);
+          break;
+        case 'whatsapp_queue':
+          await OmnichannelRouter.sendNotification(null, 'Nova mensagem WhatsApp', payload.new.message);
+          break;
+        case 'sms_queue':
+          await OmnichannelRouter.sendNotification(null, 'Novo SMS enviado', payload.new.message);
+          break;
+        case 'chat_messages':
+          await OmnichannelRouter.sendNotification(null, 'Nova mensagem no chat', payload.new.message);
+          break;
+        case 'notifications':
+          logDebug('📩 Notificação recebida:', payload.new.title);
+          break;
+      }
+
+      logDebug(`🔁 Reflexão processada para ${eventType}`);
+      return response(true);
+    } catch (err) {
+      logError('reflectEvent failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 3. VINCULAÇÃO SIMPLIFICADA (DOM READY)
+  // ───────────────────────────────────────────────────────────────
+  autoBindRealtimeUI() {
+    try {
+      document.addEventListener('DOMContentLoaded', () => {
+        const syncArea = document.querySelectorAll('[data-channel]');
+        if (syncArea.length > 0) {
+          this.initRealtimeSync((table, payload) => {
+            this.reflectEvent({ table, new: payload.new });
+          });
+          logDebug('🌐 Realtime UI vinculada automaticamente aos elementos DOM.');
+        }
+      });
+    } catch (err) {
+      logError('autoBindRealtimeUI failed:', err);
+    }
+  }
+};
+
+// Registro visual de ativação
+logDebug('🧠 OmnichannelSyncEngine (Realtime + UI) carregado com sucesso.');
+
+// Vincula ao escopo global ALSHAM
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.OmnichannelSyncEngine = OmnichannelSyncEngine;
+  logDebug('🔗 OmnichannelSyncEngine anexado ao window.ALSHAM.OmnichannelSyncEngine');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12C/12
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: OMNICHANNEL CONTROL PANEL (Dashboard Monitor)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.4-OMNICHANNEL-CONTROL
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Exibir status e métricas em tempo real dos canais Omnichannel
+// ════════════════════════════════════════════════════════════════════════
+
+export const OmnichannelControlPanel = {
+  // ───────────────────────────────────────────────────────────────
+  // 🩺 1. CAPTURA DE STATUS GERAL
+  // ───────────────────────────────────────────────────────────────
+  async getOverallStatus(org_id) {
+    try {
+      const [email, whatsapp, sms, chats, calls] = await Promise.all([
+        supabase.from('email_out').select('status, count(*)').eq('org_id', org_id).group('status'),
+        supabase.from('whatsapp_queue').select('status, count(*)').eq('org_id', org_id).group('status'),
+        supabase.from('sms_queue').select('status, count(*)').eq('org_id', org_id).group('status'),
+        supabase.from('chat_messages').select('count(*)').eq('org_id', org_id),
+        supabase.from('calls').select('count(*)').eq('org_id', org_id)
+      ]);
+
+      return response(true, {
+        email: email.data,
+        whatsapp: whatsapp.data,
+        sms: sms.data,
+        chats: chats.data[0]?.count || 0,
+        calls: calls.data[0]?.count || 0
+      });
+    } catch (err) {
+      logError('getOverallStatus failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 2. VISUALIZAÇÃO NO DASHBOARD
+  // ───────────────────────────────────────────────────────────────
+  async renderDashboard(org_id) {
+    try {
+      logDebug('🎛️ Renderizando Painel Omnichannel Supremo...');
+      const root = document.querySelector('#omnichannel-dashboard');
+      if (!root) {
+        logWarn('Elemento #omnichannel-dashboard não encontrado.');
+        return;
+      }
+
+      const status = await this.getOverallStatus(org_id);
+      if (!status.success) {
+        root.innerHTML = '<div class="error">Erro ao carregar status Omnichannel.</div>';
+        return;
+      }
+
+      const { email, whatsapp, sms, chats, calls } = status.data;
+
+      root.innerHTML = `
+        <div class="omnichannel-grid">
+          <div class="panel-card email">
+            <h3>📧 E-mails</h3>
+            <p>Ativos: ${email?.find(s => s.status === 'sent')?.count || 0}</p>
+            <p>Falhas: ${email?.find(s => s.status === 'failed')?.count || 0}</p>
+          </div>
+          <div class="panel-card whatsapp">
+            <h3>💬 WhatsApp</h3>
+            <p>Fila: ${whatsapp?.find(s => s.status === 'queued')?.count || 0}</p>
+            <p>Enviadas: ${whatsapp?.find(s => s.status === 'sent')?.count || 0}</p>
+          </div>
+          <div class="panel-card sms">
+            <h3>📱 SMS</h3>
+            <p>Fila: ${sms?.find(s => s.status === 'queued')?.count || 0}</p>
+            <p>Enviadas: ${sms?.find(s => s.status === 'sent')?.count || 0}</p>
+          </div>
+          <div class="panel-card chat">
+            <h3>💭 Chats Ativos</h3>
+            <p>${chats}</p>
+          </div>
+          <div class="panel-card calls">
+            <h3>📞 Chamadas</h3>
+            <p>${calls}</p>
+          </div>
+        </div>
+      `;
+
+      logDebug('✅ Painel Omnichannel renderizado com sucesso.');
+    } catch (err) {
+      logError('renderDashboard failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 3. AUTO-ATUALIZAÇÃO EM TEMPO REAL
+  // ───────────────────────────────────────────────────────────────
+  autoRefresh(intervalMs = 10000) {
+    try {
+      const org_id = getCurrentOrgId();
+      this.renderDashboard(org_id);
+      setInterval(() => this.renderDashboard(org_id), intervalMs);
+      logDebug(`♻️ Atualização automática ativada (${intervalMs / 1000}s).`);
+    } catch (err) {
+      logError('autoRefresh failed:', err);
+    }
+  }
+};
+
+// Vinculação automática ao namespace ALSHAM
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.OmnichannelControlPanel = OmnichannelControlPanel;
+  logDebug('🎯 OmnichannelControlPanel anexado ao window.ALSHAM.OmnichannelControlPanel');
+}
+
+// Registro visual
+logDebug('📊 Omnichannel Control Panel Supremo carregado e monitorando canais.');
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12D/12
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: OMNICHANNEL DIAGNOSTICS & LOGS PANEL
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.5-OMNICHANNEL-DIAGNOSTICS
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Monitorar falhas, filas e entregas em tempo real dos canais de comunicação
+// ════════════════════════════════════════════════════════════════════════
+
+export const OmnichannelDiagnostics = {
+  // ───────────────────────────────────────────────────────────────
+  // 📡 1. OBTÉM LOGS RECENTES
+  // ───────────────────────────────────────────────────────────────
+  async getRecentLogs(org_id, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('communications_log')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getRecentLogs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ⚠️ 2. OBTÉM FALHAS PENDENTES
+  // ───────────────────────────────────────────────────────────────
+  async getFailedMessages(org_id) {
+    try {
+      const [emails, whatsapp, sms] = await Promise.all([
+        supabase.from('email_out').select('*').eq('org_id', org_id).eq('status', 'failed'),
+        supabase.from('whatsapp_queue').select('*').eq('org_id', org_id).eq('status', 'failed'),
+        supabase.from('sms_queue').select('*').eq('org_id', org_id).eq('status', 'failed')
+      ]);
+
+      return response(true, {
+        email: emails.data,
+        whatsapp: whatsapp.data,
+        sms: sms.data
+      });
+    } catch (err) {
+      logError('getFailedMessages failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 3. RENDERIZAÇÃO VISUAL DOS LOGS
+  // ───────────────────────────────────────────────────────────────
+  async renderDiagnostics(org_id) {
+    try {
+      const container = document.querySelector('#omnichannel-logs');
+      if (!container) {
+        logWarn('Elemento #omnichannel-logs não encontrado.');
+        return;
+      }
+
+      const [logs, fails] = await Promise.all([
+        this.getRecentLogs(org_id),
+        this.getFailedMessages(org_id)
+      ]);
+
+      if (!logs.success || !fails.success) {
+        container.innerHTML = `<div class="error">❌ Erro ao carregar logs.</div>`;
+        return;
+      }
+
+      const renderSection = (title, items) => `
+        <div class="log-section">
+          <h3>${title}</h3>
+          <div class="log-items">
+            ${items.length === 0
+              ? '<p class="empty">Nenhum registro encontrado</p>'
+              : items
+                  .map(
+                    i => `
+              <div class="log-item ${i.status || ''}">
+                <span class="time">${new Date(i.created_at).toLocaleTimeString()}</span>
+                <span class="channel">${i.channel || i.type || '—'}</span>
+                <span class="message">${i.message || i.subject || i.error || '—'}</span>
+              </div>`
+                  )
+                  .join('')}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        <div class="diagnostics-grid">
+          ${renderSection('📡 Últimos Logs', logs.data)}
+          ${renderSection('⚠️ Falhas Detectadas (Email/WhatsApp/SMS)', [
+            ...fails.data.email,
+            ...fails.data.whatsapp,
+            ...fails.data.sms
+          ])}
+        </div>
+      `;
+
+      logDebug('🩺 Painel de Diagnóstico renderizado com sucesso.');
+    } catch (err) {
+      logError('renderDiagnostics failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 4. ATUALIZAÇÃO AUTOMÁTICA
+  // ───────────────────────────────────────────────────────────────
+  autoRefresh(intervalMs = 10000) {
+    try {
+      const org_id = getCurrentOrgId();
+      this.renderDiagnostics(org_id);
+      setInterval(() => this.renderDiagnostics(org_id), intervalMs);
+      logDebug(`🔁 Diagnóstico automático ativado (${intervalMs / 1000}s).`);
+    } catch (err) {
+      logError('autoRefresh failed:', err);
+    }
+  }
+};
+
+// Vinculação ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.OmnichannelDiagnostics = OmnichannelDiagnostics;
+  logDebug('🩺 OmnichannelDiagnostics anexado ao window.ALSHAM.OmnichannelDiagnostics');
+}
+
+// Registro visual
+logDebug('📋 Painel de Logs & Diagnóstico Omnichannel Supremo carregado.');
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12E/12
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: OMNICHANNEL PERFORMANCE DASHBOARD
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.6-OMNICHANNEL-PERFORMANCE
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Exibir KPIs de performance e eficiência do sistema Omnichannel
+// ════════════════════════════════════════════════════════════════════════
+
+export const OmnichannelPerformanceDashboard = {
+  // ───────────────────────────────────────────────────────────────
+  // 📈 1. AGREGA MÉTRICAS DE PERFORMANCE
+  // ───────────────────────────────────────────────────────────────
+  async getKPIs(org_id) {
+    try {
+      const [emails, whatsapp, sms, notifications] = await Promise.all([
+        supabase.rpc('fn_omnichannel_kpi_emails', { org_id }),
+        supabase.rpc('fn_omnichannel_kpi_whatsapp', { org_id }),
+        supabase.rpc('fn_omnichannel_kpi_sms', { org_id }),
+        supabase.rpc('fn_omnichannel_kpi_notifications', { org_id })
+      ]);
+
+      const totalSent =
+        (emails.data?.sent || 0) +
+        (whatsapp.data?.sent || 0) +
+        (sms.data?.sent || 0);
+
+      const totalFailed =
+        (emails.data?.failed || 0) +
+        (whatsapp.data?.failed || 0) +
+        (sms.data?.failed || 0);
+
+      const deliveryRate = totalSent > 0 ? ((totalSent - totalFailed) / totalSent) * 100 : 0;
+
+      return response(true, {
+        totalSent,
+        totalFailed,
+        deliveryRate,
+        avgResponseTime: whatsapp.data?.avg_response_time || 0,
+        totalNotifications: notifications.data?.total || 0
+      });
+    } catch (err) {
+      logError('getKPIs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧭 2. RENDERIZAÇÃO VISUAL
+  // ───────────────────────────────────────────────────────────────
+  async renderDashboard(org_id) {
+    try {
+      const container = document.querySelector('#omnichannel-performance');
+      if (!container) {
+        logWarn('Elemento #omnichannel-performance não encontrado.');
+        return;
+      }
+
+      const kpi = await this.getKPIs(org_id);
+      if (!kpi.success) {
+        container.innerHTML = '<div class="error">❌ Erro ao carregar KPIs Omnichannel.</div>';
+        return;
+      }
+
+      const { totalSent, totalFailed, deliveryRate, avgResponseTime, totalNotifications } = kpi.data;
+
+      container.innerHTML = `
+        <div class="performance-grid">
+          <div class="metric-card">
+            <h3>📨 Total Enviadas</h3>
+            <p>${totalSent}</p>
+          </div>
+          <div class="metric-card">
+            <h3>⚠️ Falhas</h3>
+            <p>${totalFailed}</p>
+          </div>
+          <div class="metric-card">
+            <h3>📊 Taxa de Entrega</h3>
+            <p>${deliveryRate.toFixed(2)}%</p>
+          </div>
+          <div class="metric-card">
+            <h3>⏱️ Tempo Médio de Resposta</h3>
+            <p>${avgResponseTime.toFixed(1)}s</p>
+          </div>
+          <div class="metric-card">
+            <h3>🔔 Notificações Enviadas</h3>
+            <p>${totalNotifications}</p>
+          </div>
+        </div>
+
+        <canvas id="chart-delivery-rate" width="600" height="200"></canvas>
+      `;
+
+      // Cria gráfico se Chart.js estiver disponível
+      if (typeof Chart !== 'undefined') {
+        const ctx = document.getElementById('chart-delivery-rate');
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Entregues', 'Falhas'],
+            datasets: [
+              {
+                data: [deliveryRate, 100 - deliveryRate],
+                backgroundColor: ['#22c55e', '#ef4444']
+              }
+            ]
+          },
+          options: {
+            plugins: {
+              legend: { position: 'bottom' },
+              title: { display: true, text: 'Taxa de Entrega Global' }
+            }
+          }
+        });
+      }
+
+      logDebug('📊 Painel de Performance Omnichannel renderizado com sucesso.');
+    } catch (err) {
+      logError('renderDashboard failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 3. AUTO-REFRESH
+  // ───────────────────────────────────────────────────────────────
+  autoRefresh(intervalMs = 30000) {
+    try {
+      const org_id = getCurrentOrgId();
+      this.renderDashboard(org_id);
+      setInterval(() => this.renderDashboard(org_id), intervalMs);
+      logDebug(`♻️ Painel de performance atualizado a cada ${intervalMs / 1000}s.`);
+    } catch (err) {
+      logError('autoRefresh failed:', err);
+    }
+  }
+};
+
+// Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.OmnichannelPerformanceDashboard = OmnichannelPerformanceDashboard;
+  logDebug('📈 OmnichannelPerformanceDashboard anexado ao window.ALSHAM.OmnichannelPerformanceDashboard');
+}
+
+// Registro visual
+logDebug('📊 Painel Executivo de Performance Omnichannel Supremo carregado.');
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12F/12
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: GOVERNANÇA & AUDITORIA OMNICHANNEL
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.7-AUDIT-INTEGRITY
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Monitorar, auditar e gerar alertas sobre comunicações Omnichannel
+// ════════════════════════════════════════════════════════════════════════
+
+export const OmnichannelGovernance = {
+  // ───────────────────────────────────────────────────────────────
+  // 🧾 1. REGISTRO DE EVENTOS DE AUDITORIA
+  // ───────────────────────────────────────────────────────────────
+  async recordAuditEvent(type, details, org_id) {
+    try {
+      const entry = {
+        org_id,
+        type,
+        details,
+        created_at: new Date().toISOString()
+      };
+      await supabase.from('communications_audit_log').insert([entry]);
+      logDebug(`🧾 Evento auditado [${type}]`);
+      return response(true, entry);
+    } catch (err) {
+      logError('recordAuditEvent failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔍 2. CONSULTA DE TRILHAS DE AUDITORIA
+  // ───────────────────────────────────────────────────────────────
+  async getAuditTrail(org_id, filters = {}) {
+    try {
+      let query = supabase.from('communications_audit_log').select('*').eq('org_id', org_id);
+      if (filters.type) query = query.eq('type', filters.type);
+      if (filters.dateStart) query = query.gte('created_at', filters.dateStart);
+      if (filters.dateEnd) query = query.lte('created_at', filters.dateEnd);
+      const { data, error } = await query.order('created_at', { ascending: false }).limit(200);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getAuditTrail failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🚨 3. DETECÇÃO DE ANOMALIAS
+  // ───────────────────────────────────────────────────────────────
+  async detectAnomalies(org_id) {
+    try {
+      const { data: fails } = await supabase
+        .from('communications_log')
+        .select('*')
+        .eq('org_id', org_id)
+        .eq('status', 'failed')
+        .gte('created_at', new Date(Date.now() - 3600 * 1000).toISOString()); // última hora
+
+      if (fails.length > 10) {
+        const alert = {
+          org_id,
+          message: `🚨 ${fails.length} falhas detectadas na última hora.`,
+          created_at: new Date().toISOString()
+        };
+        await supabase.from('communications_alerts').insert([alert]);
+        await this.recordAuditEvent('alert_generated', alert, org_id);
+        logWarn(alert.message);
+      }
+      return response(true, { anomalies: fails.length });
+    } catch (err) {
+      logError('detectAnomalies failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ♻️ 4. REPROCESSAMENTO AUTOMÁTICO DE FALHAS
+  // ───────────────────────────────────────────────────────────────
+  async retryFailedMessages(org_id) {
+    try {
+      const { data: fails } = await supabase
+        .from('communications_log')
+        .select('*')
+        .eq('org_id', org_id)
+        .eq('status', 'failed')
+        .limit(20);
+
+      for (const f of fails) {
+        await supabase.from('communications_retries').insert([
+          { org_id, original_id: f.id, channel: f.channel, created_at: new Date().toISOString() }
+        ]);
+        await OmnichannelRouter.dispatchMessage(f.channel, f);
+      }
+
+      await this.recordAuditEvent('retries_executed', { count: fails.length }, org_id);
+      logDebug(`♻️ ${fails.length} mensagens reprocessadas.`);
+      return response(true, { retried: fails.length });
+    } catch (err) {
+      logError('retryFailedMessages failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// ───────────────────────────────────────────────────────────────
+// 📊 5. PAINEL DE AUDITORIA VISUAL
+// ───────────────────────────────────────────────────────────────
+export const OmnichannelAuditPanel = {
+  async render(org_id) {
+    try {
+      const container = document.querySelector('#omnichannel-audit');
+      if (!container) return logWarn('Elemento #omnichannel-audit não encontrado.');
+
+      const logs = await OmnichannelGovernance.getAuditTrail(org_id);
+      if (!logs.success) {
+        container.innerHTML = '<div class="error">Erro ao carregar trilha de auditoria.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="audit-grid">
+          ${logs.data
+            .map(
+              l => `
+            <div class="audit-entry">
+              <span class="time">${new Date(l.created_at).toLocaleString()}</span>
+              <span class="type">${l.type}</span>
+              <span class="details">${l.details?.message || JSON.stringify(l.details)}</span>
+            </div>`
+            )
+            .join('')}
+        </div>
+      `;
+      logDebug('📊 Painel de Auditoria renderizado com sucesso.');
+    } catch (err) {
+      logError('renderAuditPanel failed:', err);
+    }
+  },
+
+  autoRefresh(intervalMs = 15000) {
+    try {
+      const org_id = getCurrentOrgId();
+      this.render(org_id);
+      setInterval(() => this.render(org_id), intervalMs);
+      logDebug(`🔁 Atualização automática de auditoria a cada ${intervalMs / 1000}s.`);
+    } catch (err) {
+      logError('autoRefresh failed:', err);
+    }
+  }
+};
+
+// Vinculação ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.OmnichannelGovernance = OmnichannelGovernance;
+  window.ALSHAM.OmnichannelAuditPanel = OmnichannelAuditPanel;
+  logDebug('🧾 OmnichannelGovernance e AuditPanel anexados ao window.ALSHAM.');
+}
+
+// Registro visual
+logDebug('✅ Omnichannel Governance & Audit System inicializado.');
+
+
+    
 export default ALSHAM_FULL;
