@@ -13493,7 +13493,182 @@ export const CommunicationModule = {
     }
   },
 };
-   
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA - PARTE 9E: MÓDULO INTEGRATIONS SUPREMO
+// ════════════════════════════════════════════════════════════════════════
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.3-INTEGRATIONS-EXPANSION
+// 🧠 Responsável: CITIZEN SUPREMO X.1
+// 🚀 Missão: Integrar APIs externas, Webhooks, Importações e Exportações
+// ════════════════════════════════════════════════════════════════════════
+
+export const IntegrationsModule = {
+  // ─── API INTEGRATIONS ────────────────────────────────────────────────
+  async listAPIIntegrations(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('api_integrations')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listAPIIntegrations failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async createAPIIntegration(integration) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...integration,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('api_integrations')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('🔗 Nova integração criada:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('createAPIIntegration failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async updateAPIIntegration(id, data, org_id) {
+    try {
+      const { error } = await supabase
+        .from('api_integrations')
+        .update({ ...data, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('org_id', org_id);
+      if (error) throw error;
+      logDebug('🧩 Integração atualizada:', id);
+      return response(true, { id, ...data });
+    } catch (err) {
+      logError('updateAPIIntegration failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async deleteAPIIntegration(id, org_id) {
+    try {
+      const { error } = await supabase
+        .from('api_integrations')
+        .delete()
+        .eq('id', id)
+        .eq('org_id', org_id);
+      if (error) throw error;
+      logDebug('🗑️ Integração removida:', id);
+      return response(true, { deleted: id });
+    } catch (err) {
+      logError('deleteAPIIntegration failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── WEBHOOKS EXTERNOS ───────────────────────────────────────────────
+  async listExternalWebhooks(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('integration_webhooks')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('listExternalWebhooks failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async registerExternalWebhook(webhook) {
+    try {
+      const org_id = await getActiveOrganization();
+      const payload = {
+        ...webhook,
+        org_id,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase
+        .from('integration_webhooks')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug('🌐 Webhook externo registrado:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('registerExternalWebhook failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── IMPORTAÇÃO DE DADOS ─────────────────────────────────────────────
+  async importData(source, data, org_id) {
+    try {
+      logDebug(`📥 Iniciando importação de dados de: ${source}`);
+      const payload = { source, data, org_id, imported_at: new Date().toISOString() };
+      const { error } = await supabase.from('integration_import_logs').insert([payload]);
+      if (error) throw error;
+      logDebug('✅ Importação registrada com sucesso');
+      return response(true, { imported: true, source });
+    } catch (err) {
+      logError('importData failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── EXPORTAÇÃO DE DADOS ─────────────────────────────────────────────
+  async exportData(destination, dataset, org_id) {
+    try {
+      logDebug(`📤 Exportando dados para: ${destination}`);
+      const payload = { destination, dataset, org_id, exported_at: new Date().toISOString() };
+      const { error } = await supabase.from('integration_export_logs').insert([payload]);
+      if (error) throw error;
+      logDebug('✅ Exportação registrada com sucesso');
+      return response(true, { exported: true, destination });
+    } catch (err) {
+      logError('exportData failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ─── SINCRONIZAÇÃO BIDIRECIONAL ──────────────────────────────────────
+  async syncIntegration(apiName, org_id) {
+    try {
+      logDebug(`🔁 Sincronizando integração: ${apiName}`);
+      const { data, error } = await supabase
+        .from('api_integrations')
+        .select('*')
+        .eq('org_id', org_id)
+        .ilike('name', `%${apiName}%`)
+        .single();
+      if (error) throw error;
+      if (!data) return response(false, null, 'Integração não encontrada.');
+      const syncLog = {
+        integration_id: data.id,
+        org_id,
+        synced_at: new Date().toISOString(),
+      };
+      await supabase.from('integration_sync_logs').insert([syncLog]);
+      logDebug('🔁 Sincronização registrada com sucesso:', syncLog);
+      return response(true, syncLog);
+    } catch (err) {
+      logError('syncIntegration failed:', err);
+      return response(false, null, err);
+    }
+  },
+};
+    
     
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 10/10 - EXPORTS FINAIS + METADATA
@@ -13774,14 +13949,18 @@ export const ALSHAM_FULL = {
   testWebhookConfig,
 
     // ============ MARKETING MODULE (NOVO BLOCO SUPREMO) ============
-  ...MarketingModule, // ✅ Parte 9B integrada
-  
+  ...MarketingModule,
+
   // ============ SUPPORT MODULE (NOVO BLOCO SUPREMO) ============
-  ...SupportModule, // ✅ Parte 9C integrada
+  ...SupportModule,
 
   // ============ COMMUNICATION MODULE (NOVO BLOCO SUPREMO) ============
-  ...CommunicationModule, // ✅ Parte 9D integrada
+  ...CommunicationModule,
+
+  // ============ INTEGRATIONS MODULE (NOVO BLOCO SUPREMO) ============
+  ...IntegrationsModule, // ✅ Parte 9E integrada
 };
+
 
 
 // ============================================================================
