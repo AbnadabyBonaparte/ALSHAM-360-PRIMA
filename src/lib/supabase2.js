@@ -8632,3 +8632,191 @@ export const ALSHAM_METADATA = {
 
 logDebug('🜂 ALSHAM 360° PRIMA - 100% ELEVADO: 118 TABLES, INFINITUM SELADO');
 console.log('🌟 Todos schemas integrados - Evolução eterna ativa.');
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🆕 PARTE 1/10 - ACCOUNTS & CONTACTS (CRUD Completo)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ============================================================================
+// TABELA: ACCOUNTS - Contas Comerciais (RLS: 4 policies, 2 triggers)
+// ============================================================================
+
+/**
+ * Cria uma conta comercial
+ * @param {Object} accountData - Dados da conta (nome, tipo, etc.)
+ * @returns {Promise<Object>}
+ */
+export async function createAccount(accountData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('accounts')
+      .insert([{ ...accountData, org_id }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('🏢 Conta criada:', data.id);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createAccount:', err);
+    return response(false, null, err);
+  }
+}
+
+/**
+ * Busca contas com filtros
+ * @param {string} orgId - ID da organização
+ * @param {Object} filters - Filtros (status, tipo, limit)
+ * @returns {Promise<Object>}
+ */
+export async function getAccounts(orgId, filters = { limit: 50 }) {
+  return await withCache(`accounts_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('accounts')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+    
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.type) query = query.eq('type', filters.type);
+    if (filters.industry) query = query.eq('industry', filters.industry);
+    
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 120);
+}
+
+/**
+ * Atualiza conta
+ * @param {string} id - ID da conta
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateAccount(id, updateData) {
+  const { data, error } = await supabase
+    .from('accounts')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Conta atualizada:', id);
+  return response(true, data);
+}
+
+/**
+ * Deleta conta
+ * @param {string} id - ID da conta
+ * @returns {Promise<Object>}
+ */
+export async function deleteAccount(id) {
+  const { error } = await supabase.from('accounts').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Conta deletada:', id);
+  return response(true, { id });
+}
+
+/**
+ * Subscreve a mudanças em accounts
+ * @param {Function} onChange - Callback para mudanças
+ * @returns {RealtimeChannel}
+ */
+export function subscribeAccounts(onChange) {
+  return supabase
+    .channel('realtime_accounts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, onChange)
+    .subscribe();
+}
+
+// ============================================================================
+// TABELA: CONTACTS - Contatos (RLS: 5 policies, 2 triggers)
+// ============================================================================
+
+/**
+ * Cria contato
+ * @param {Object} contactData - Dados do contato
+ * @returns {Promise<Object>}
+ */
+export async function createContact(contactData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('contacts')
+      .insert([{ ...contactData, org_id }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('👤 Contato criado:', data.id);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createContact:', err);
+    return response(false, null, err);
+  }
+}
+
+/**
+ * Busca contatos
+ * @param {string} orgId - ID da organização
+ * @param {Object} filters - Filtros
+ * @returns {Promise<Object>}
+ */
+export async function getContacts(orgId, filters = { limit: 50 }) {
+  return await withCache(`contacts_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('contacts')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+    
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.account_id) query = query.eq('account_id', filters.account_id);
+    if (filters.lead_id) query = query.eq('lead_id', filters.lead_id);
+    
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 120);
+}
+
+/**
+ * Atualiza contato
+ * @param {string} id - ID do contato
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateContact(id, updateData) {
+  const { data, error } = await supabase
+    .from('contacts')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Contato atualizado:', id);
+  return response(true, data);
+}
+
+/**
+ * Deleta contato
+ * @param {string} id - ID do contato
+ * @returns {Promise<Object>}
+ */
+export async function deleteContact(id) {
+  const { error } = await supabase.from('contacts').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Contato deletado:', id);
+  return response(true, { id });
+}
+
+/**
+ * Subscreve a mudanças em contacts
+ * @param {Function} onChange - Callback
+ * @returns {RealtimeChannel}
+ */
+export function subscribeContacts(onChange) {
+  return supabase
+    .channel('realtime_contacts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
+    .subscribe();
+}
