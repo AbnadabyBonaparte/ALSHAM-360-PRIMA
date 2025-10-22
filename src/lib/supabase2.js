@@ -13744,14 +13744,158 @@ console.log('');
 // VALIDAÇÃO FINAL
 // ============================================================================
 
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 11/11
+// ════════════════════════════════════════════════════════════════════════
+// 📁 INDEX UNIVERSAL DE PÁGINAS DO ECOSSISTEMA ALSHAM
+// 📅 Data : 2025-10-22
+// 🧩 Versão : v7.0-UNIVERSAL-INDEX-97PAGES
+// 🧠 Autoridade : CITIZEN SUPREMO X.1
+// 🚀 Missão : Registrar todas as páginas oficiais para referência global do coração Supabase
+// ════════════════════════════════════════════════════════════════════════
+
+export const ALSHAM_PAGES = [
+  // ⚙️ CORE & SISTEMA BASE
+  'login.html',
+  'register.html',
+  'reset-password.html',
+  'reset-password-confirm.html',
+  'dashboard.html',
+  'auth-dashboard.html',
+  'create-org.html',
+  'timeline-test.html',
+  'logout.html',
+  'settings.html',
+  'configuracoes.html',
+  'system-health.html',
+  'audit.html',
+  'logs.html',
+  'notifications.html',
+
+  // 👥 VENDAS & CRM
+  'leads-real.html',
+  'pipeline.html',
+  'contacts.html',
+  'accounts.html',
+  'opportunities.html',
+  'deals.html',
+  'quotes.html',
+  'contracts.html',
+  'invoices.html',
+  'products.html',
+  'price-lists.html',
+  'sales-forecasting.html',
+
+  // 💼 MARKETING
+  'campaigns.html',
+  'email-campaigns.html',
+  'landing-pages.html',
+  'forms.html',
+  'social-media.html',
+  'seo.html',
+  'ads-manager.html',
+  'content-library.html',
+
+  // 💬 ATENDIMENTO & SUPORTE
+  'tickets.html',
+  'knowledge-base.html',
+  'live-chat.html',
+  'service-level-agreements.html',
+  'case-management.html',
+  'customer-portal.html',
+  'feedback.html',
+
+  // 📞 COMUNICAÇÃO UNIFICADA
+  'inbox.html',
+  'email.html',
+  'calls.html',
+  'meetings.html',
+  'sms.html',
+  'whatsapp.html',
+
+  // 📊 ANALYTICS & BI
+  'analytics.html',
+  'forecasting.html',
+  'roi-calculator.html',
+  'cohort-analysis.html',
+  'attribution.html',
+  'executive-dashboard.html',
+
+  // ⚡ AUTOMAÇÃO & WORKFLOWS
+  'automacoes.html',
+  'workflows.html',
+  'sequences.html',
+  'playbooks.html',
+  'tasks.html',
+  'calendar.html',
+
+  // 🧩 GESTÃO DE EQUIPE
+  'team.html',
+  'users.html',
+  'roles-permissions.html',
+  'territories.html',
+  'commissions.html',
+  'goals.html',
+  'leaderboards.html',
+
+  // 🔌 INTEGRAÇÕES & APPS
+  'integrations.html',
+  'app-marketplace.html',
+  'api-console.html',
+  'webhooks.html',
+  'data-import-export.html',
+
+  // ⚙️ CONFIGURAÇÕES AVANÇADAS
+  'settings-account.html',
+  'settings-security.html',
+  'settings-notifications.html',
+  'settings-email.html',
+  'settings-billing.html',
+  'settings-branding.html',
+  'settings-custom-fields.html',
+  'settings-data-privacy.html',
+
+  // 📱 MOBILE & EXTRAS
+  'mobile-app.html',
+  'help-center.html',
+  'whats-new.html',
+  'resources.html',
+  'community.html',
+
+  // 🧭 PROCESSOS E ONBOARDING
+  'onboarding.html',
+  'guided-tour.html',
+  'setup-wizard.html',
+  'data-migration.html',
+  'success-stories.html',
+
+  // 🤖 INOVAÇÕES E DIFERENCIAIS
+  'ai-assistant.html',
+  'copilot.html',
+  'voice-commands.html',
+  'video-calls.html',
+  'virtual-office.html',
+  'blockchain-verify.html',
+  'nft-rewards.html',
+  'metaverse.html',
+  'sustainability.html',
+  'diversity-inclusion.html'
+];
+
+// Registro visual no log Supremo
+logDebug(`📜 Páginas indexadas no núcleo Supabase (ALSHAM_PAGES): ${ALSHAM_PAGES.length}`);
+
+    
 if (typeof window !== 'undefined') {
-  window.ALSHAM = {
-    ...ALSHAM_FULL,
-    METADATA: ALSHAM_METADATA,
-    version: ALSHAM_METADATA.version,
-    initialized: true,
-    initTimestamp: new Date().toISOString()
-  };
+ window.ALSHAM = {
+  ...ALSHAM_FULL,
+  PAGES: ALSHAM_PAGES, // ✅ referência direta das 97 páginas
+  METADATA: ALSHAM_METADATA,
+  version: ALSHAM_METADATA.version,
+  initialized: true,
+  initTimestamp: new Date().toISOString()
+};
+
   
   logDebug('✅ ALSHAM 360° anexado ao window.ALSHAM');
 }
