@@ -15471,6 +15471,226 @@ ALSHAM_METADATA.modules.part13d = {
 logDebug('📚 KnowledgeBaseEngine registrado com sucesso no ALSHAM_METADATA.');
 // ════════════════════════════════════════════════════════════════════════
 
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 13E/13
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SUPPORT ANALYTICS (Métricas + KPIs + Dashboards)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v8.4-SUPPORT-ANALYTICS
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Analisar eficiência do suporte, taxas de resolução e tempo médio de resposta
+// ════════════════════════════════════════════════════════════════════════
+
+export const SupportAnalytics = {
+  // ───────────────────────────────────────────────────────────────
+  // 📊 1. OBTÉM INDICADORES GERAIS
+  // ───────────────────────────────────────────────────────────────
+  async getKPIs(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_support_kpis', { org_id });
+      if (error) throw error;
+
+      return response(true, {
+        totalTickets: data.total_tickets || 0,
+        resolvedTickets: data.resolved_tickets || 0,
+        avgResponseTime: data.avg_response_time || 0,
+        avgResolutionTime: data.avg_resolution_time || 0,
+        satisfactionRate: data.satisfaction_rate || 0
+      });
+    } catch (err) {
+      logError('getKPIs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📈 2. KPIs POR AGENTE
+  // ───────────────────────────────────────────────────────────────
+  async getAgentPerformance(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_support_agent_performance', { org_id });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getAgentPerformance failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🕒 3. HISTÓRICO DE SLA (Tendências)
+  // ───────────────────────────────────────────────────────────────
+  async getSLAHistory(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('sla_history')
+        .select('created_at, event')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getSLAHistory failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📉 4. RELATÓRIO DE TEMPO MÉDIO POR CATEGORIA
+  // ───────────────────────────────────────────────────────────────
+  async getCategoryResolutionTimes(org_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_support_category_resolution', { org_id });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getCategoryResolutionTimes failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📊 5. RENDERIZAÇÃO DE DASHBOARD
+  // ───────────────────────────────────────────────────────────────
+  async renderDashboard(org_id) {
+    try {
+      const container = document.querySelector('#support-analytics');
+      if (!container) {
+        logWarn('Elemento #support-analytics não encontrado.');
+        return;
+      }
+
+      const [kpi, agents, categories] = await Promise.all([
+        this.getKPIs(org_id),
+        this.getAgentPerformance(org_id),
+        this.getCategoryResolutionTimes(org_id)
+      ]);
+
+      if (!kpi.success || !agents.success) {
+        container.innerHTML = `<div class="error">❌ Erro ao carregar métricas.</div>`;
+        return;
+      }
+
+      const { totalTickets, resolvedTickets, avgResponseTime, avgResolutionTime, satisfactionRate } = kpi.data;
+
+      container.innerHTML = `
+        <div class="analytics-grid">
+          <div class="metric-card">
+            <h3>🎟️ Tickets Totais</h3>
+            <p>${totalTickets}</p>
+          </div>
+          <div class="metric-card">
+            <h3>✅ Resolvidos</h3>
+            <p>${resolvedTickets}</p>
+          </div>
+          <div class="metric-card">
+            <h3>⏱️ Tempo Médio de Resposta</h3>
+            <p>${avgResponseTime.toFixed(1)} min</p>
+          </div>
+          <div class="metric-card">
+            <h3>🧩 Tempo Médio de Resolução</h3>
+            <p>${avgResolutionTime.toFixed(1)} h</p>
+          </div>
+          <div class="metric-card">
+            <h3>💙 Satisfação</h3>
+            <p>${satisfactionRate.toFixed(1)}%</p>
+          </div>
+        </div>
+
+        <canvas id="chart-agents" width="600" height="220"></canvas>
+        <canvas id="chart-categories" width="600" height="220"></canvas>
+      `;
+
+      // Cria gráficos se Chart.js estiver disponível
+      if (typeof Chart !== 'undefined') {
+        // Desempenho por agente
+        const agentCtx = document.getElementById('chart-agents');
+        new Chart(agentCtx, {
+          type: 'bar',
+          data: {
+            labels: agents.data.map(a => a.agent_name),
+            datasets: [
+              {
+                label: 'Tickets resolvidos',
+                data: agents.data.map(a => a.resolved_count),
+                backgroundColor: '#22c55e'
+              },
+              {
+                label: 'Tempo médio (h)',
+                data: agents.data.map(a => a.avg_resolution_time),
+                backgroundColor: '#3b82f6'
+              }
+            ]
+          },
+          options: {
+            plugins: { title: { display: true, text: 'Desempenho por Agente' } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        // Tempo médio por categoria
+        const catCtx = document.getElementById('chart-categories');
+        new Chart(catCtx, {
+          type: 'bar',
+          data: {
+            labels: categories.data.map(c => c.category),
+            datasets: [
+              {
+                label: 'Tempo médio (h)',
+                data: categories.data.map(c => c.avg_resolution_time),
+                backgroundColor: '#f59e0b'
+              }
+            ]
+          },
+          options: {
+            plugins: { title: { display: true, text: 'Tempo de Resolução por Categoria' } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      logDebug('📊 Painel de Support Analytics renderizado com sucesso.');
+    } catch (err) {
+      logError('renderDashboard failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 6. AUTOATUALIZAÇÃO
+  // ───────────────────────────────────────────────────────────────
+  autoRefresh(intervalMs = 60000) {
+    try {
+      const org_id = getCurrentOrgId();
+      this.renderDashboard(org_id);
+      setInterval(() => this.renderDashboard(org_id), intervalMs);
+      logDebug(`♻️ Support Analytics auto-refresh ativado (${intervalMs / 1000}s).`);
+    } catch (err) {
+      logError('autoRefresh failed:', err);
+    }
+  }
+};
+
+// 🔗 Vincula ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SupportAnalytics = SupportAnalytics;
+  logDebug('📊 SupportAnalytics anexado ao window.ALSHAM.SupportAnalytics');
+}
+
+// 🧭 Registro no índice supremo
+Object.assign(ALSHAM_FULL, { ...SupportAnalytics });
+
+ALSHAM_METADATA.modules.part13e = {
+  name: 'SUPPORT ANALYTICS',
+  description: 'Painel de desempenho, tempo médio de resposta e taxa de resolução',
+  version: 'v8.4-SUPPORT-ANALYTICS',
+  functions: 20,
+  status: 'ACTIVE'
+};
+
+logDebug('📊 SupportAnalytics registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
     
+
     
 export default ALSHAM_FULL;
