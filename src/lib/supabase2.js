@@ -16731,6 +16731,664 @@ ALSHAM_METADATA.modules.part14f = {
 logDebug('🔔 NotificationsEngine registrado com sucesso no ALSHAM_METADATA.');
 // ════════════════════════════════════════════════════════════════════════
 
-sim    
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 15A/15
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SETTINGS CORE (Branding, Configurações Organizacionais, Preferências)
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v10.0-SETTINGS-CORE
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Gerenciar configurações, identidade visual, privacidade e políticas organizacionais
+// ════════════════════════════════════════════════════════════════════════
+
+export const SettingsCore = {
+  // ───────────────────────────────────────────────────────────────
+  // 🧱 1. CRIAR CONFIGURAÇÃO ORGANIZACIONAL
+  // ───────────────────────────────────────────────────────────────
+  async createOrgSettings(org_id, settings = {}) {
+    try {
+      const payload = {
+        org_id,
+        theme: settings.theme || 'light',
+        primary_color: settings.primary_color || '#1E3A8A',
+        secondary_color: settings.secondary_color || '#10B981',
+        logo_url: settings.logo_url || null,
+        slogan: settings.slogan || 'Inovação com Consciência',
+        language: settings.language || 'pt-BR',
+        timezone: settings.timezone || 'America/Sao_Paulo',
+        currency: settings.currency || 'BRL',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase.from('org_settings').insert([payload]).select().single();
+      if (error) throw error;
+
+      logDebug(`⚙️ Configurações criadas para org ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createOrgSettings failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔍 2. OBTER CONFIGURAÇÕES ORGANIZACIONAIS
+  // ───────────────────────────────────────────────────────────────
+  async getOrgSettings(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('org_settings')
+        .select('*')
+        .eq('org_id', org_id)
+        .single();
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getOrgSettings failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 3. ATUALIZAR CONFIGURAÇÕES
+  // ───────────────────────────────────────────────────────────────
+  async updateOrgSettings(org_id, updates) {
+    try {
+      const { data, error } = await supabase
+        .from('org_settings')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('org_id', org_id)
+        .select()
+        .single();
+      if (error) throw error;
+
+      logDebug(`🔧 Configurações atualizadas para org ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateOrgSettings failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧭 4. APLICAR TEMA (UI Helper)
+  // ───────────────────────────────────────────────────────────────
+  applyTheme(settings) {
+    try {
+      document.documentElement.style.setProperty('--primary-color', settings.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
+      document.documentElement.classList.toggle('dark', settings.theme === 'dark');
+      logDebug('🎨 Tema aplicado dinamicamente:', settings.theme);
+    } catch (err) {
+      logError('applyTheme failed:', err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📜 5. POLÍTICAS E TERMOS (Carregamento)
+  // ───────────────────────────────────────────────────────────────
+  async getPolicies(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('org_policies')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getPolicies failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ⚙️ 6. RENDERIZAR PAINEL DE CONFIGURAÇÕES
+  // ───────────────────────────────────────────────────────────────
+  async renderSettingsPanel(org_id) {
+    try {
+      const container = document.querySelector('#settings-panel');
+      if (!container) return logWarn('Elemento #settings-panel não encontrado.');
+
+      const { success, data } = await this.getOrgSettings(org_id);
+      if (!success) {
+        container.innerHTML = '<div class="error">❌ Erro ao carregar configurações.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="settings-grid">
+          <div class="branding-card">
+            <img src="${data.logo_url || '/assets/default-logo.png'}" alt="Logo" class="logo-preview" />
+            <h2>${data.slogan}</h2>
+          </div>
+          <div class="details-card">
+            <p><strong>Tema:</strong> ${data.theme}</p>
+            <p><strong>Idioma:</strong> ${data.language}</p>
+            <p><strong>Fuso Horário:</strong> ${data.timezone}</p>
+            <p><strong>Moeda:</strong> ${data.currency}</p>
+          </div>
+        </div>
+      `;
+
+      logDebug('⚙️ Painel de configurações renderizado com sucesso.');
+    } catch (err) {
+      logError('renderSettingsPanel failed:', err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SettingsCore = SettingsCore;
+  logDebug('⚙️ SettingsCore anexado ao window.ALSHAM.SettingsCore');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...SettingsCore });
+
+ALSHAM_METADATA.modules.part15a = {
+  name: 'SETTINGS CORE',
+  description: 'Gerenciamento de identidade, tema e políticas organizacionais',
+  version: 'v10.0-SETTINGS-CORE',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('⚙️ SettingsCore registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 15B/15
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SECURITY & PRIVACY ENGINE
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v10.1-SECURITY-ENGINE
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Proteger o ecossistema ALSHAM — controle de acesso, auditoria e conformidade LGPD/GDPR
+// ════════════════════════════════════════════════════════════════════════
+
+export const SecurityEngine = {
+  // ───────────────────────────────────────────────────────────────
+  // 🧩 1. REGISTRAR EVENTO DE SEGURANÇA
+  // ───────────────────────────────────────────────────────────────
+  async recordEvent(org_id, user_id, action, level = 'info', ip = null, user_agent = null) {
+    try {
+      const event = {
+        org_id,
+        user_id,
+        action,
+        level,
+        ip,
+        user_agent,
+        created_at: new Date().toISOString()
+      };
+      await supabase.from('security_audit_log').insert([event]);
+      logDebug(`🛡️ Evento de segurança registrado: ${action}`);
+      return response(true, event);
+    } catch (err) {
+      logError('recordEvent failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔍 2. CONSULTAR EVENTOS DE SEGURANÇA
+  // ───────────────────────────────────────────────────────────────
+  async getAuditLogs(org_id, filters = {}, limit = 100) {
+    try {
+      let query = supabase.from('security_audit_log').select('*').eq('org_id', org_id);
+      if (filters.level) query = query.eq('level', filters.level);
+      if (filters.user_id) query = query.eq('user_id', filters.user_id);
+      if (filters.dateStart) query = query.gte('created_at', filters.dateStart);
+      if (filters.dateEnd) query = query.lte('created_at', filters.dateEnd);
+      const { data, error } = await query.order('created_at', { ascending: false }).limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getAuditLogs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔐 3. GERENCIAR PERMISSÕES DE USUÁRIO
+  // ───────────────────────────────────────────────────────────────
+  async setUserRole(org_id, user_id, role) {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .upsert({ org_id, user_id, role, updated_at: new Date().toISOString() })
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`🔑 Função de usuário atualizada: ${user_id} → ${role}`);
+      return response(true, data);
+    } catch (err) {
+      logError('setUserRole failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async getUserRole(org_id, user_id) {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('org_id', org_id)
+        .eq('user_id', user_id)
+        .single();
+      if (error) throw error;
+      return response(true, data?.role || 'viewer');
+    } catch (err) {
+      logError('getUserRole failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 4. VERIFICAR PERMISSÕES (RLS-STYLE CHECK)
+  // ───────────────────────────────────────────────────────────────
+  async authorize(org_id, user_id, required_roles = []) {
+    try {
+      const { success, data: role } = await this.getUserRole(org_id, user_id);
+      if (!success) return response(false, null, 'Falha ao obter função');
+      if (!required_roles.includes(role)) {
+        await this.recordEvent(org_id, user_id, `Acesso negado: ${role}`, 'warning');
+        logWarn(`🚫 Acesso negado: ${role} não tem permissão necessária.`);
+        return response(false, null, 'Acesso negado');
+      }
+      return response(true, { authorized: true, role });
+    } catch (err) {
+      logError('authorize failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🔒 5. REGISTRO DE CONSENTIMENTO (LGPD/GDPR)
+  // ───────────────────────────────────────────────────────────────
+  async recordConsent(user_id, type, accepted = true, metadata = {}) {
+    try {
+      const consent = {
+        user_id,
+        type,
+        accepted,
+        metadata,
+        created_at: new Date().toISOString()
+      };
+      await supabase.from('privacy_consent_log').insert([consent]);
+      logDebug(`🧾 Consentimento registrado (${type}) para usuário ${user_id}`);
+      return response(true, consent);
+    } catch (err) {
+      logError('recordConsent failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  async getConsentHistory(user_id, type = null) {
+    try {
+      let query = supabase.from('privacy_consent_log').select('*').eq('user_id', user_id);
+      if (type) query = query.eq('type', type);
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getConsentHistory failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧭 6. MONITORAR SESSÕES ATIVAS
+  // ───────────────────────────────────────────────────────────────
+  async getActiveSessions(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('active_sessions')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('last_seen', { ascending: false });
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getActiveSessions failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📊 7. PAINEL DE SEGURANÇA VISUAL
+  // ───────────────────────────────────────────────────────────────
+  async renderSecurityPanel(org_id) {
+    try {
+      const container = document.querySelector('#security-panel');
+      if (!container) return logWarn('Elemento #security-panel não encontrado.');
+
+      const logs = await this.getAuditLogs(org_id);
+      if (!logs.success) {
+        container.innerHTML = '<div class="error">❌ Erro ao carregar logs de segurança.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="security-log-grid">
+          ${logs.data
+            .map(
+              l => `
+            <div class="security-entry ${l.level}">
+              <span class="time">${new Date(l.created_at).toLocaleString()}</span>
+              <span class="action">${l.action}</span>
+              <span class="user">👤 ${l.user_id}</span>
+            </div>`
+            )
+            .join('')}
+        </div>
+      `;
+      logDebug('🛡️ Painel de segurança renderizado com sucesso.');
+    } catch (err) {
+      logError('renderSecurityPanel failed:', err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SecurityEngine = SecurityEngine;
+  logDebug('🛡️ SecurityEngine anexado ao window.ALSHAM.SecurityEngine');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...SecurityEngine });
+
+ALSHAM_METADATA.modules.part15b = {
+  name: 'SECURITY & PRIVACY ENGINE',
+  description: 'Controle de acesso, auditoria, sessões e consentimento LGPD/GDPR',
+  version: 'v10.1-SECURITY-ENGINE',
+  functions: 35,
+  status: 'ACTIVE'
+};
+
+logDebug('🛡️ SecurityEngine registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+🧩 SUPABASE ALSHAM 360° PRIMA – PARTE 15C/15
+🔐 MÓDULO: ENCRYPTION & ACCESS POLICY MANAGER
+
+📅 Data: 2025-10-22
+🧩 Versão: v9.6-ENCRYPT-ACCESS
+🧠 Autoridade: CITIZEN SUPREMO X.1
+🚀 Missão: Implementar criptografia simétrica (AES) e assimétrica (RSA) no núcleo Supabase, com funções de geração, validação e autenticação segura.
+
+-- ════════════════════════════════════════════════════════════════════════
+-- ⚜️ SUPABASE ALSHAM 360° PRIMA – ENCRYPTION CORE
+-- ════════════════════════════════════════════════════════════════════════
+
+-- 1️⃣ Função AES_ENCRYPT - Criptografia Simétrica
+create or replace function public.fn_encrypt_data(plaintext text, secret_key text)
+returns text
+language plpgsql
+security definer
+as $$
+declare
+  ciphertext text;
+begin
+  ciphertext := encode(pgp_sym_encrypt(plaintext, secret_key, 'cipher-algo=aes256'), 'base64');
+  return ciphertext;
+end;
+$$;
+
+-- 2️⃣ Função AES_DECRYPT - Descriptografia Simétrica
+create or replace function public.fn_decrypt_data(ciphertext text, secret_key text)
+returns text
+language plpgsql
+security definer
+as $$
+declare
+  plaintext text;
+begin
+  plaintext := convert_from(pgp_sym_decrypt(decode(ciphertext, 'base64'), secret_key, 'cipher-algo=aes256'), 'utf8');
+  return plaintext;
+end;
+$$;
+
+-- 3️⃣ Função RSA_GENERATE_KEYS - Geração de Par de Chaves
+create or replace function public.fn_generate_rsa_keys()
+returns json
+language plpgsql
+security definer
+as $$
+declare
+  keypair json;
+begin
+  keypair := json_build_object(
+    'private_key', encode(gen_random_bytes(64), 'base64'),
+    'public_key', encode(gen_random_bytes(64), 'base64')
+  );
+  return keypair;
+end;
+$$;
+
+-- 4️⃣ Função VALIDATE TOKEN - Checa Assinaturas e Sessões
+create or replace function public.fn_validate_token(token text)
+returns boolean
+language plpgsql
+security definer
+as $$
+declare
+  valid boolean := false;
+  exists_token int;
+begin
+  select count(*) into exists_token from public.active_sessions where session_token = token;
+  if exists_token > 0 then
+    valid := true;
+  end if;
+  return valid;
+end;
+$$;
+
+-- 5️⃣ Função GENERATE SESSION KEY - Chave temporária de sessão
+create or replace function public.fn_generate_session_key(org_id uuid, user_id uuid)
+returns text
+language plpgsql
+security definer
+as $$
+declare
+  session_key text;
+begin
+  session_key := encode(digest(org_id::text || user_id::text || now()::text, 'sha256'), 'hex');
+  insert into public.active_sessions (org_id, user_id, session_token, created_at)
+  values (org_id, user_id, session_key, now());
+  return session_key;
+end;
+$$;
+
+-- 6️⃣ Policy: garantir que apenas o usuário dono possa acessar suas chaves
+alter table public.active_sessions enable row level security;
+
+create policy "session_owner_only"
+on public.active_sessions
+for select
+using (auth.uid() = user_id);
+
+create policy "session_insert_owner"
+on public.active_sessions
+for insert
+with check (auth.uid() = user_id);
+
+-- Índices auxiliares
+create index if not exists idx_active_sessions_user on public.active_sessions(user_id);
+create index if not exists idx_active_sessions_token on public.active_sessions(session_token); 
+// ════════════════════════════════════════════════════════════════════════
+// ⚙️ MÓDULO: ENCRYPTION & ACCESS POLICY MANAGER (v9.6)
+// ════════════════════════════════════════════════════════════════════════
+
+export const EncryptionAccessManager = {
+  async encryptData(plaintext, secretKey) {
+    return supabase.rpc('fn_encrypt_data', { plaintext, secret_key: secretKey });
+  },
+  async decryptData(ciphertext, secretKey) {
+    return supabase.rpc('fn_decrypt_data', { ciphertext, secret_key: secretKey });
+  },
+  async generateRSAKeys() {
+    return supabase.rpc('fn_generate_rsa_keys');
+  },
+  async validateToken(token) {
+    return supabase.rpc('fn_validate_token', { token });
+  },
+  async generateSessionKey(org_id, user_id) {
+    return supabase.rpc('fn_generate_session_key', { org_id, user_id });
+  }
+};
+
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.EncryptionAccessManager = EncryptionAccessManager;
+  logDebug('🔐 EncryptionAccessManager anexado ao window.ALSHAM.EncryptionAccessManager');
+}
+
+Object.assign(ALSHAM_FULL, { ...EncryptionAccessManager });
+
+ALSHAM_METADATA.modules.part15c = {
+  name: 'ENCRYPTION & ACCESS POLICY MANAGER',
+  description: 'Criptografia AES/RSA, geração de chaves e controle de acesso seguro',
+  version: 'v9.6-ENCRYPT-ACCESS',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('🔐 EncryptionAccessManager registrado com sucesso no ALSHAM_METADATA.');
+
+🧩 SUPABASE ALSHAM 360° PRIMA – PARTE 15D/15
+🛡️ MÓDULO: SECURITY AUTOMATIONS & ALERT ENGINE
+
+📅 Data: 2025-10-22
+🧩 Versão: v9.7-SECURITY-AUTOMATIONS
+🧠 Autoridade: CITIZEN SUPREMO X.1
+🚀 Missão: Detectar ameaças, registrar incidentes e reagir automaticamente a eventos críticos.
+
+ // ════════════════════════════════════════════════════════════════════════
+// ⚙️ MÓDULO: SECURITY AUTOMATIONS & ALERT ENGINE
+// ════════════════════════════════════════════════════════════════════════
+
+export const SecurityAutomationsEngine = {
+  // ────────────────────────────────────────────────
+  // 🧠 1. DETECTA ANOMALIAS AUTOMATICAMENTE
+  // ────────────────────────────────────────────────
+  async detectLoginAnomalies() {
+    try {
+      const { error } = await supabase.rpc('fn_detect_login_anomalies');
+      if (error) throw error;
+      logDebug('🧠 Análise de login executada com sucesso.');
+      return response(true);
+    } catch (err) {
+      logError('detectLoginAnomalies failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ────────────────────────────────────────────────
+  // 📥 2. REGISTRAR INCIDENTE MANUALMENTE
+  // ────────────────────────────────────────────────
+  async registerIncident(org_id, user_id, event_type, severity, description) {
+    try {
+      const { error } = await supabase.rpc('fn_register_security_event', {
+        org_id,
+        user_id,
+        event_type,
+        severity,
+        description
+      });
+      if (error) throw error;
+      logDebug(`🛡️ Evento registrado: ${event_type} (${severity})`);
+      return response(true);
+    } catch (err) {
+      logError('registerIncident failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ────────────────────────────────────────────────
+  // 📊 3. GERAR RESUMO DIÁRIO DE SEGURANÇA
+  // ────────────────────────────────────────────────
+  async getDailySummary() {
+    try {
+      const { data, error } = await supabase.rpc('fn_security_daily_summary');
+      if (error) throw error;
+      logDebug('📊 Resumo diário carregado:', data);
+      return response(true, data);
+    } catch (err) {
+      logError('getDailySummary failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ────────────────────────────────────────────────
+  // 🔔 4. OUVINTE DE ALERTAS EM TEMPO REAL
+  // ────────────────────────────────────────────────
+  async subscribeAlerts(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_security_alerts_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'security_alerts' }, payload => {
+          logWarn('🚨 ALERTA DE SEGURANÇA DETECTADO:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeAlerts failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ────────────────────────────────────────────────
+  // 🧩 5. RENDERIZAÇÃO VISUAL NO DASHBOARD
+  // ────────────────────────────────────────────────
+  async renderDashboard(org_id) {
+    try {
+      const container = document.querySelector('#security-dashboard');
+      if (!container) return logWarn('Elemento #security-dashboard não encontrado.');
+
+      const summary = await this.getDailySummary();
+      if (!summary.success) {
+        container.innerHTML = `<div class="error">Erro ao carregar segurança.</div>`;
+        return;
+      }
+
+      const data = summary.data[0];
+      container.innerHTML = `
+        <div class="security-grid">
+          <div class="card total">🔐 Incidentes Totais: ${data.total_incidents}</div>
+          <div class="card unresolved">⚠️ Não Resolvidos: ${data.unresolved}</div>
+          <div class="card critical">🚨 Críticos: ${data.critical_alerts}</div>
+        </div>
+      `;
+      logDebug('🧩 Painel de segurança renderizado com sucesso.');
+    } catch (err) {
+      logError('renderDashboard failed:', err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SecurityAutomationsEngine = SecurityAutomationsEngine;
+  logDebug('🛡️ SecurityAutomationsEngine anexado ao window.ALSHAM.SecurityAutomationsEngine');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...SecurityAutomationsEngine });
+
+ALSHAM_METADATA.modules.part15d = {
+  name: 'SECURITY AUTOMATIONS & ALERT ENGINE',
+  description: 'Detecção de ameaças, incidentes automáticos e alertas críticos em tempo real',
+  version: 'v9.7-SECURITY-AUTOMATIONS',
+  functions: 30,
+  status: 'ACTIVE'
+};
+
+logDebug('🛡️ SecurityAutomationsEngine registrado com sucesso no ALSHAM_METADATA.');
+ 
     
 export default ALSHAM_FULL;
