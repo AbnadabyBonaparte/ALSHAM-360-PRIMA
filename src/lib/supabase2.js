@@ -14061,7 +14061,160 @@ if (typeof window !== 'undefined') {
   logDebug('✅ ALSHAM 360° anexado ao window.ALSHAM');
 }
 
-export default ALSHAM_FULL;
-```
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 12A/12
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: ROUTER OMNICHANNEL SUPREMO
+// 📅 Data: 2025-10-22
+// 🧩 Versão: v7.4-OMNICHANNEL-ROUTER
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Unificar e despachar comunicações entre canais
+// ════════════════════════════════════════════════════════════════════════
 
----
+export const OmnichannelRouter = {
+  // ───────────────────────────────────────────────────────────────
+  // 🔗 1. DISPATCHER UNIVERSAL
+  // ───────────────────────────────────────────────────────────────
+  async dispatchMessage(channel, payload) {
+    try {
+      const org_id = await getCurrentOrgId();
+      const message = {
+        ...payload,
+        org_id,
+        channel,
+        created_at: new Date().toISOString()
+      };
+
+      // Grava log unificado
+      await supabase.from('communications_log').insert([message]);
+
+      // Roteia conforme o canal
+      switch (channel) {
+        case 'email':
+          await supabase.from('email_out').insert([message]);
+          break;
+        case 'whatsapp':
+          await supabase.from('whatsapp_queue').insert([message]);
+          break;
+        case 'sms':
+          await supabase.from('sms_queue').insert([message]);
+          break;
+        case 'chat':
+          await supabase.from('chat_messages').insert([message]);
+          break;
+        case 'call':
+          await supabase.from('calls').insert([message]);
+          break;
+        case 'notification':
+          await supabase.from('notifications').insert([message]);
+          break;
+        default:
+          logWarn(`Canal desconhecido: ${channel}`);
+      }
+
+      logDebug(`📡 Mensagem roteada com sucesso via canal ${channel}`);
+      return response(true, { channel, payload });
+    } catch (err) {
+      logError('dispatchMessage failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 👂 2. SUBSCRIÇÃO GLOBAL (REALTIME)
+  // ───────────────────────────────────────────────────────────────
+  async subscribeAllChannels(callback) {
+    try {
+      const channels = [
+        'realtime_notifications',
+        'realtime_email_out',
+        'realtime_whatsapp_queue',
+        'realtime_sms_queue',
+        'realtime_chat_sessions',
+        'realtime_calls'
+      ];
+
+      for (const ch of channels) {
+        const subscription = supabase.channel(ch)
+          .on('postgres_changes', { event: '*', schema: 'public' }, payload => {
+            logDebug(`🔔 Evento recebido de ${ch}`, payload);
+            callback?.(ch, payload);
+          })
+          .subscribe();
+
+        logDebug(`✅ Canal Realtime subscrito: ${ch}`);
+      }
+
+      return response(true, { subscribed: channels.length });
+    } catch (err) {
+      logError('subscribeAllChannels failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 🧠 3. MONITOR ESTRUTURADO (LOGS)
+  // ───────────────────────────────────────────────────────────────
+  async getCommunicationLogs(org_id, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('communications_log')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return response(true, data);
+    } catch (err) {
+      logError('getCommunicationLogs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // 📞 4. DISPATCHERS ESPECÍFICOS
+  // ───────────────────────────────────────────────────────────────
+  async sendEmail(to, subject, body, attachments = []) {
+    return this.dispatchMessage('email', { to, subject, body, attachments });
+  },
+  async sendWhatsApp(to, message) {
+    return this.dispatchMessage('whatsapp', { to, message });
+  },
+  async sendSMS(to, message) {
+    return this.dispatchMessage('sms', { to, message });
+  },
+  async sendNotification(user_id, title, body) {
+    return this.dispatchMessage('notification', { user_id, title, body });
+  },
+  async sendChatMessage(session_id, message, user_id) {
+    return this.dispatchMessage('chat', { session_id, message, user_id });
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // ⚙️ 5. STATUS E MANUTENÇÃO
+  // ───────────────────────────────────────────────────────────────
+  async getQueueStatus(org_id) {
+    try {
+      const [email, whatsapp, sms] = await Promise.all([
+        supabase.from('email_out').select('status, count(*)').eq('org_id', org_id).group('status'),
+        supabase.from('whatsapp_queue').select('status, count(*)').eq('org_id', org_id).group('status'),
+        supabase.from('sms_queue').select('status, count(*)').eq('org_id', org_id).group('status')
+      ]);
+      return response(true, { email: email.data, whatsapp: whatsapp.data, sms: sms.data });
+    } catch (err) {
+      logError('getQueueStatus failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+logDebug('🛰️ Omnichannel Router Supremo inicializado e pronto.');
+
+// 🔗 Vincula automaticamente ao namespace global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.OmnichannelRouter = OmnichannelRouter;
+  logDebug('🛰️ Omnichannel Router Supremo anexado ao window.ALSHAM.OmnichannelRouter');
+}
+
+// ───────────────────────────────────────────────────────────────
+export default ALSHAM_FULL;
