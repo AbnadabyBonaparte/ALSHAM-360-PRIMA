@@ -8820,3 +8820,306 @@ export function subscribeContacts(onChange) {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
     .subscribe();
 }
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🆕 PARTE 2/10 - SUPPORT TICKETS & TASKS (CRUD Completo)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ============================================================================
+// TABELA: SUPPORT_TICKETS - Sistema de Tickets (RLS: 4 policies, 2 triggers)
+// ============================================================================
+
+/**
+ * Cria ticket de suporte
+ * @param {Object} ticketData - Dados do ticket (titulo, descricao, prioridade, etc.)
+ * @returns {Promise<Object>}
+ */
+export async function createSupportTicket(ticketData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .insert([{ ...ticketData, org_id, status: ticketData.status || 'open' }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('🎫 Ticket criado:', data.id, 'Prioridade:', data.priority);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createSupportTicket:', err);
+    return response(false, null, err);
+  }
+}
+
+/**
+ * Busca tickets de suporte
+ * @param {string} orgId - ID da organização
+ * @param {Object} filters - Filtros (status, prioridade, assigned_to, limit)
+ * @returns {Promise<Object>}
+ */
+export async function getSupportTickets(orgId, filters = { limit: 50 }) {
+  return await withCache(`support_tickets_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('support_tickets')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+    
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.priority) query = query.eq('priority', filters.priority);
+    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
+    if (filters.category) query = query.eq('category', filters.category);
+    
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 60); // Cache 60s (tickets mudam rápido)
+}
+
+/**
+ * Atualiza ticket de suporte
+ * @param {string} id - ID do ticket
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateSupportTicket(id, updateData) {
+  const { data, error } = await supabase
+    .from('support_tickets')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Ticket atualizado:', id, 'Status:', data.status);
+  return response(true, data);
+}
+
+/**
+ * Deleta ticket de suporte
+ * @param {string} id - ID do ticket
+ * @returns {Promise<Object>}
+ */
+export async function deleteSupportTicket(id) {
+  const { error } = await supabase.from('support_tickets').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Ticket deletado:', id);
+  return response(true, { id });
+}
+
+/**
+ * Subscreve a mudanças em support_tickets
+ * @param {Function} onChange - Callback
+ * @returns {RealtimeChannel}
+ */
+export function subscribeSupportTickets(onChange) {
+  return supabase
+    .channel('realtime_support_tickets')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, (payload) => {
+      logDebug('🎫 Ticket evento:', payload.eventType, payload.new?.id);
+      if (onChange) onChange(payload);
+    })
+    .subscribe();
+}
+
+// ============================================================================
+// TABELA: TASKS - Gestão de Tarefas (RLS: 4 policies, 3 triggers)
+// ============================================================================
+
+/**
+ * Cria tarefa
+ * @param {Object} taskData - Dados da tarefa (titulo, descricao, prazo, etc.)
+ * @returns {Promise<Object>}
+ */
+export async function createTask(taskData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert([{ ...taskData, org_id, status: taskData.status || 'pending' }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('✅ Tarefa criada:', data.id, 'Status:', data.status);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createTask:', err);
+    return response(false, null, err);
+  }
+}
+
+/**
+ * Busca tarefas
+ * @param {string} orgId - ID da organização
+ * @param {Object} filters - Filtros (status, assigned_to, priority, due_date, limit)
+ * @returns {Promise<Object>}
+ */
+export async function getTasks(orgId, filters = { limit: 50 }) {
+  return await withCache(`tasks_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('tasks')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+    
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
+    if (filters.priority) query = query.eq('priority', filters.priority);
+    if (filters.due_date_from) query = query.gte('due_date', filters.due_date_from);
+    if (filters.due_date_to) query = query.lte('due_date', filters.due_date_to);
+    
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 60);
+}
+
+/**
+ * Atualiza tarefa
+ * @param {string} id - ID da tarefa
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateTask(id, updateData) {
+  const { data, error } = await supabase
+    .from('tasks')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Tarefa atualizada:', id, 'Status:', data.status);
+  return response(true, data);
+}
+
+/**
+ * Deleta tarefa
+ * @param {string} id - ID da tarefa
+ * @returns {Promise<Object>}
+ */
+export async function deleteTask(id) {
+  const { error } = await supabase.from('tasks').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Tarefa deletada:', id);
+  return response(true, { id });
+}
+
+/**
+ * Marca tarefa como concluída
+ * @param {string} id - ID da tarefa
+ * @returns {Promise<Object>}
+ */
+export async function completeTask(id) {
+  return await updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
+}
+
+/**
+ * Subscreve a mudanças em tasks
+ * @param {Function} onChange - Callback
+ * @returns {RealtimeChannel}
+ */
+export function subscribeTasks(onChange) {
+  return supabase
+    .channel('realtime_tasks')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
+      logDebug('✅ Task evento:', payload.eventType, payload.new?.id);
+      if (onChange) onChange(payload);
+    })
+    .subscribe();
+}
+
+// ============================================================================
+// TABELA: COMMENTS - Comentários (0 policies - needs RLS!, 1 trigger)
+// ============================================================================
+
+/**
+ * Cria comentário
+ * @param {Object} commentData - Dados do comentário (entity_type, entity_id, content)
+ * @returns {Promise<Object>}
+ */
+export async function createComment(commentData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('comments')
+      .insert([{ ...commentData, org_id }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('💬 Comentário criado:', data.id);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createComment:', err);
+    return response(false, null, err);
+  }
+}
+
+/**
+ * Busca comentários de uma entidade
+ * @param {string} entityType - Tipo da entidade (lead, ticket, task, etc.)
+ * @param {string} entityId - ID da entidade
+ * @returns {Promise<Object>}
+ */
+export async function getComments(entityType, entityId) {
+  return await withCache(`comments_${entityType}_${entityId}`, async () => {
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('entity_type', entityType)
+      .eq('entity_id', entityId)
+      .order('created_at', { ascending: true });
+    
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 30);
+}
+
+/**
+ * Atualiza comentário
+ * @param {string} id - ID do comentário
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateComment(id, updateData) {
+  const { data, error } = await supabase
+    .from('comments')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Comentário atualizado:', id);
+  return response(true, data);
+}
+
+/**
+ * Deleta comentário
+ * @param {string} id - ID do comentário
+ * @returns {Promise<Object>}
+ */
+export async function deleteComment(id) {
+  const { error } = await supabase.from('comments').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Comentário deletado:', id);
+  return response(true, { id });
+}
+
+/**
+ * Subscreve a mudanças em comments
+ * @param {string} entityType - Tipo da entidade
+ * @param {string} entityId - ID da entidade
+ * @param {Function} onChange - Callback
+ * @returns {RealtimeChannel}
+ */
+export function subscribeComments(entityType, entityId, onChange) {
+  return supabase
+    .channel(`realtime_comments_${entityType}_${entityId}`)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'comments',
+      filter: `entity_type=eq.${entityType},entity_id=eq.${entityId}`
+    }, (payload) => {
+      logDebug('💬 Comentário evento:', payload.eventType);
+      if (onChange) onChange(payload);
+    })
+    .subscribe();
+}
