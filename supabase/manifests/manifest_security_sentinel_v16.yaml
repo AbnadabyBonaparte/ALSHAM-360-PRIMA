@@ -1,113 +1,78 @@
-# ════════════════════════════════════════════════════════════════════════
-# ⚜️ MANIFESTO SUPREMO — SECURITY SENTINEL (v16A–v16E)
-# ════════════════════════════════════════════════════════════════════════
-id: manifest_security_sentinel_v16
-name: 🛡️ Security Sentinel — ALSHAM 360° PRIMA
-version: v16.5-STABLE
-category: Security / Governance / Intelligence
-author: CITIZEN_SUPREMO_X1
-created_at: 2025-10-23T13:40:00Z
-description: >
-  Conjunto completo de módulos de segurança autônoma e integração cognitiva.
-  O Security Sentinel é o sistema imunológico do ecossistema ALSHAM 360° PRIMA.
-  Ele detecta, reage e correlaciona ameaças, incidentes e anomalias em tempo real,
-  integrando Supabase, n8n e Watchtower sob a filosofia da segurança viva.
-  
-modules:
-  16A:
-    name: Sentinel Anomaly Detector
-    description: >
-      Workflow n8n para detecção automática de anomalias de login.
-      Executa `fn_detect_login_anomalies()` e gera alertas críticos.
-    version: v16A-1.0
-    type: n8n
-    workflow_file: workflow_security_sentinel_16A.json
-    supabase_functions:
-      - fn_detect_login_anomalies
-      - fn_create_security_alert
-    status: ACTIVE
+-- ════════════════════════════════════════════════════════════════════════
+-- ⚜️ ALSHAM 360° PRIMA — SYSTEM MANIFESTS REGISTRY v1.0
+-- ════════════════════════════════════════════════════════════════════════
+-- 📅 Data: 2025-10-23
+-- 🧠 Autoridade: CITIZEN SUPREMO X.1
+-- 🛡️ Missão: Registrar metadados, manifests e estados de módulos do sistema
+-- ════════════════════════════════════════════════════════════════════════
 
-  16B:
-    name: Sentinel Alert Dispatcher
-    description: >
-      Módulo responsável por escalar alertas para Telegram e Email corporativo.
-      Conecta-se à tabela `security_alerts` e usa `priority=critical`.
-    version: v16B-1.0
-    type: n8n
-    workflow_file: workflow_security_alert_dispatcher_16B.json
-    supabase_views:
-      - vw_security_alerts_unack
-    channels:
-      - Telegram
-      - Email
-    status: ACTIVE
+create table if not exists public.system_manifests (
+  id text primary key,
+  name text not null,
+  version text not null,
+  category text,
+  description text,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
-  16C:
-    name: AI Correlation Layer
-    description: >
-      Camada cognitiva que correlaciona alertas, incidentes e padrões de auditoria.
-      Utiliza inferência contextual para prever e reagir a ameaças.
-    version: v16C-1.0
-    type: supabase + AI
-    supabase_functions:
-      - fn_analyze_audit_patterns
-      - fn_generate_correlation_context
-    watchtower_endpoint: https://api.alsham-watchtower.com/correlation
-    status: ACTIVE
+comment on table public.system_manifests is 'Repositório central de manifests e metadados dos módulos ALSHAM.';
 
-  16D:
-    name: Security SOC Dashboard
-    description: >
-      Painel operacional centralizado para o time de segurança ALSHAM.
-      Exibe métricas de incidentes, alertas, status e execução dos módulos Sentinel.
-    version: v16D-1.0
-    type: dashboard
-    front_components:
-      - security_dashboard.html
-      - dashboard_metrics.js
-      - dashboard_watchtower.js
-    status: ACTIVE
+-- Índices auxiliares
+create index if not exists idx_system_manifests_category on public.system_manifests(category);
+create index if not exists idx_system_manifests_version on public.system_manifests(version);
 
-  16E:
-    name: Integration Shield
-    description: >
-      Camada de integração contínua entre Supabase, n8n e Watchtower.
-      Garante rastreabilidade e sincronização bidirecional dos alertas.
-    version: v16E-1.0
-    type: supabase + n8n
-    workflow_file: workflow_integration_shield_v16E.json
-    supabase_functions:
-      - fn_register_integration_event
-      - fn_update_integration_status
-    tables:
-      - integration_logs
-    views:
-      - vw_integration_pending
-    status: ACTIVE
+-- Atualiza timestamp automaticamente
+create or replace function public.fn_update_timestamp_system_manifests()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
 
-validation:
-  last_check: 2025-10-23T13:35:00Z
-  verified_by: SYSTEM_SENTINEL_X.0
-  integrity_score: 100.00
-  checksum: SHA256:f5a3d1b490bcde7df9112e11cbca3d8926b1c09e29fdbe924472d4121e8018a5
+create trigger trg_update_system_manifests
+before update on public.system_manifests
+for each row
+execute function public.fn_update_timestamp_system_manifests();
 
-dependencies:
-  requires:
-    - part15a_settings_core
-    - part15b_security_engine
-    - part15c_encryption_access
-    - part15d_security_automations
-  provides:
-    - sentinel_global_security
-    - integration_feedback_loop
-    - cognitive_alert_correlation
+-- Políticas RLS
+alter table public.system_manifests enable row level security;
 
-governance:
-  maintainer: ALSHAM GLOBAL SECURITY UNIT
-  backup_policy: Daily Snapshot + Redundant Sync (Watchtower / Supabase)
-  escalation_matrix:
-    level1: "alert@alsham.com"
-    level2: "security@alsham.com"
-    level3: "citizen.supremo@alshamglobal.com"
+create policy org_select_system_manifests
+  on public.system_manifests
+  for select
+  using (auth.role() = 'authenticated' or auth.role() = 'service_role');
 
-# ════════════════════════════════════════════════════════════════════════
+create policy org_insert_system_manifests
+  on public.system_manifests
+  for insert
+  with check (auth.role() = 'service_role');
+
+create policy org_update_system_manifests
+  on public.system_manifests
+  for update
+  using (auth.role() = 'service_role');
+
+-- ════════════════════════════════════════════════════════════════════════
+-- 🧪 Teste inicial
+-- ════════════════════════════════════════════════════════════════════════
+insert into public.system_manifests (id, name, version, category, description, payload)
+values (
+  'test_manifest',
+  'Manifesto de Teste',
+  'v1.0',
+  'Governance',
+  'Teste de inicialização do registro de manifests',
+  '{"ok": true}'::jsonb
+)
+on conflict (id) do update set
+  version = excluded.version,
+  payload = excluded.payload,
+  updated_at = now();
+
+select * from public.system_manifests;
+-- ════════════════════════════════════════════════════════════════════════
