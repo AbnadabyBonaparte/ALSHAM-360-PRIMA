@@ -1,11 +1,13 @@
 -- ════════════════════════════════════════════════════════════════════════
--- ⚜️ ALSHAM 360° PRIMA — SYSTEM MANIFESTS REGISTRY v1.0
+-- ⚜️ ALSHAM 360° PRIMA — SYSTEM MANIFESTS REGISTRY (v1.0)
 -- ════════════════════════════════════════════════════════════════════════
 -- 📅 Data: 2025-10-23
 -- 🧠 Autoridade: CITIZEN SUPREMO X.1
--- 🛡️ Missão: Registrar metadados, manifests e estados de módulos do sistema
+-- 🏛️ Módulo: Governance Core
+-- 🧩 Missão: Criar o registro central de manifests e metadados dos módulos
 -- ════════════════════════════════════════════════════════════════════════
 
+-- 1️⃣ Criação da tabela
 create table if not exists public.system_manifests (
   id text primary key,
   name text not null,
@@ -17,13 +19,14 @@ create table if not exists public.system_manifests (
   updated_at timestamptz default now()
 );
 
-comment on table public.system_manifests is 'Repositório central de manifests e metadados dos módulos ALSHAM.';
+comment on table public.system_manifests is
+  'Repositório central de manifests e metadados dos módulos ALSHAM 360° PRIMA.';
 
--- Índices auxiliares
+-- 2️⃣ Índices auxiliares
 create index if not exists idx_system_manifests_category on public.system_manifests(category);
 create index if not exists idx_system_manifests_version on public.system_manifests(version);
 
--- Atualiza timestamp automaticamente
+-- 3️⃣ Trigger e função de atualização automática
 create or replace function public.fn_update_timestamp_system_manifests()
 returns trigger
 language plpgsql
@@ -34,32 +37,32 @@ begin
 end;
 $$;
 
+drop trigger if exists trg_update_system_manifests on public.system_manifests;
+
 create trigger trg_update_system_manifests
 before update on public.system_manifests
 for each row
 execute function public.fn_update_timestamp_system_manifests();
 
--- Políticas RLS
+-- 4️⃣ Row Level Security
 alter table public.system_manifests enable row level security;
 
-create policy org_select_system_manifests
+create policy if not exists org_select_system_manifests
   on public.system_manifests
   for select
-  using (auth.role() = 'authenticated' or auth.role() = 'service_role');
+  using (auth.role() in ('authenticated', 'service_role'));
 
-create policy org_insert_system_manifests
+create policy if not exists org_insert_system_manifests
   on public.system_manifests
   for insert
   with check (auth.role() = 'service_role');
 
-create policy org_update_system_manifests
+create policy if not exists org_update_system_manifests
   on public.system_manifests
   for update
   using (auth.role() = 'service_role');
 
--- ════════════════════════════════════════════════════════════════════════
--- 🧪 Teste inicial
--- ════════════════════════════════════════════════════════════════════════
+-- 5️⃣ Teste inicial
 insert into public.system_manifests (id, name, version, category, description, payload)
 values (
   'test_manifest',
@@ -74,5 +77,12 @@ on conflict (id) do update set
   payload = excluded.payload,
   updated_at = now();
 
-select * from public.system_manifests;
+-- 6️⃣ Verificação final
+select * from public.system_manifests order by created_at desc;
+
+-- ════════════════════════════════════════════════════════════════════════
+-- ✅ Resultado esperado:
+-- id              | name                 | version | category   | updated_at
+-- ----------------|----------------------|----------|-------------|-----------------
+-- test_manifest   | Manifesto de Teste   | v1.0     | Governance  | 2025-10-23 ...
 -- ════════════════════════════════════════════════════════════════════════
