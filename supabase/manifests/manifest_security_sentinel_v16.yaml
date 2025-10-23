@@ -1,32 +1,37 @@
 -- ════════════════════════════════════════════════════════════════════════
--- ⚜️ ALSHAM 360° PRIMA — SYSTEM MANIFESTS REGISTRY (v1.0)
+-- ⚜️ ALSHAM 360° PRIMA — SYSTEM MANIFESTS REGISTRY (v1.0 ABSOLUTO)
 -- ════════════════════════════════════════════════════════════════════════
 -- 📅 Data: 2025-10-23
 -- 🧠 Autoridade: CITIZEN SUPREMO X.1
--- 🏛️ Módulo: Governance Core
--- 🧩 Missão: Criar o registro central de manifests e metadados dos módulos
+-- 🛡️ Missão: Criar o registro central de manifests e metadados dos módulos
 -- ════════════════════════════════════════════════════════════════════════
 
--- 1️⃣ Criação da tabela
+-- 1️⃣ Garantir schema público ativo
+set search_path to public;
+
+-- 2️⃣ Criar extensão necessária para UUIDs (se ainda não existir)
+create extension if not exists "pgcrypto";
+
+-- 3️⃣ Criar tabela
 create table if not exists public.system_manifests (
-  id text primary key,
-  name text not null,
-  version text not null,
-  category text,
-  description text,
-  payload jsonb not null default '{}'::jsonb,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+    id text primary key,
+    name text not null,
+    version text not null,
+    category text,
+    description text,
+    payload jsonb not null default '{}'::jsonb,
+    created_at timestamptz default now(),
+    updated_at timestamptz default now()
 );
 
 comment on table public.system_manifests is
-  'Repositório central de manifests e metadados dos módulos ALSHAM 360° PRIMA.';
+'Registro central de manifests e metadados do ecossistema ALSHAM 360° PRIMA.';
 
--- 2️⃣ Índices auxiliares
+-- 4️⃣ Índices auxiliares
 create index if not exists idx_system_manifests_category on public.system_manifests(category);
 create index if not exists idx_system_manifests_version on public.system_manifests(version);
 
--- 3️⃣ Trigger e função de atualização automática
+-- 5️⃣ Função de atualização automática de timestamp
 create or replace function public.fn_update_timestamp_system_manifests()
 returns trigger
 language plpgsql
@@ -37,6 +42,7 @@ begin
 end;
 $$;
 
+-- 6️⃣ Trigger vinculada à função
 drop trigger if exists trg_update_system_manifests on public.system_manifests;
 
 create trigger trg_update_system_manifests
@@ -44,32 +50,37 @@ before update on public.system_manifests
 for each row
 execute function public.fn_update_timestamp_system_manifests();
 
--- 4️⃣ Row Level Security
+-- 7️⃣ Ativar segurança por linha
 alter table public.system_manifests enable row level security;
 
-create policy if not exists org_select_system_manifests
+-- 8️⃣ Políticas básicas de acesso
+drop policy if exists org_select_system_manifests on public.system_manifests;
+drop policy if exists org_insert_system_manifests on public.system_manifests;
+drop policy if exists org_update_system_manifests on public.system_manifests;
+
+create policy org_select_system_manifests
   on public.system_manifests
   for select
   using (auth.role() in ('authenticated', 'service_role'));
 
-create policy if not exists org_insert_system_manifests
+create policy org_insert_system_manifests
   on public.system_manifests
   for insert
   with check (auth.role() = 'service_role');
 
-create policy if not exists org_update_system_manifests
+create policy org_update_system_manifests
   on public.system_manifests
   for update
   using (auth.role() = 'service_role');
 
--- 5️⃣ Teste inicial
+-- 9️⃣ Inserção de teste
 insert into public.system_manifests (id, name, version, category, description, payload)
 values (
   'test_manifest',
   'Manifesto de Teste',
   'v1.0',
   'Governance',
-  'Teste de inicialização do registro de manifests',
+  'Teste de criação do registro de manifests.',
   '{"ok": true}'::jsonb
 )
 on conflict (id) do update set
@@ -77,12 +88,7 @@ on conflict (id) do update set
   payload = excluded.payload,
   updated_at = now();
 
--- 6️⃣ Verificação final
+-- 🔟 Verificação final
+select '✅ Tabela system_manifests criada com sucesso.' as status_message;
 select * from public.system_manifests order by created_at desc;
-
--- ════════════════════════════════════════════════════════════════════════
--- ✅ Resultado esperado:
--- id              | name                 | version | category   | updated_at
--- ----------------|----------------------|----------|-------------|-----------------
--- test_manifest   | Manifesto de Teste   | v1.0     | Governance  | 2025-10-23 ...
 -- ════════════════════════════════════════════════════════════════════════
