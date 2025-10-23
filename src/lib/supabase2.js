@@ -17181,6 +17181,117 @@ ALSHAM_METADATA.modules.part15d = {
 };
 
 logDebug('🛡️ SecurityAutomationsEngine registrado com sucesso no ALSHAM_METADATA.');
+// ════════════════════════════════════════════════════════════════════════
+
+
+// ════════════════════════════════════════════════════════════════════════
+// ⚜️ SUPABASE ALSHAM 360° PRIMA – PARTE 16/21
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SECURITY SENTINEL CLUSTER (16A–16D)
+// 📅 Data: 2025-10-23
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Conectar o núcleo Supabase ao Sentinel, Alert Layer, Dashboard e Realtime Watchtower.
+// ════════════════════════════════════════════════════════════════════════
+
+export const SecuritySentinelCluster = {
+  // 16A — EXECUTAR VERIFICAÇÃO DE ANOMALIAS (RPC)
+  async runSentinelScan() {
+    try {
+      const { error } = await supabase.rpc('fn_detect_login_anomalies');
+      if (error) throw error;
+      logDebug('🧠 Security Sentinel Scan executado com sucesso.');
+      return response(true, { status: 'ok', origin: 'fn_detect_login_anomalies' });
+    } catch (err) {
+      logError('runSentinelScan failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 16B — ENVIAR ALERTA CRÍTICO PARA WORKFLOW n8n (WEBHOOK)
+  async sendCriticalAlert(alertData) {
+    try {
+      const endpoint = 'https://YOUR_N8N_URL/webhook/alert_critical';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(alertData)
+      });
+      logDebug('📡 Alerta crítico enviado ao n8n Alert Layer.');
+      return response(true, await res.json());
+    } catch (err) {
+      logError('sendCriticalAlert failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 16C — SINCRONIZAR DASHBOARD DE SEGURANÇA
+  async syncSecurityDashboard() {
+    try {
+      const { data, error } = await supabase.rpc('fn_security_daily_summary');
+      if (error) throw error;
+      logDebug('📊 Dados do dashboard sincronizados.', data);
+      return response(true, data);
+    } catch (err) {
+      logError('syncSecurityDashboard failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 16D — ASSINAR ALERTAS EM TEMPO REAL
+  subscribeRealtimeSecurity(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_security_watch_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'security_alerts' }, payload => {
+          logWarn('🚨 ALERTA TEMPO REAL DETECTADO:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+      logDebug('🛰️ Realtime Sentinel ativo para org:', org_id);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeSecurity failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 16E — UTILITÁRIOS DE SEGURANÇA
+  async acknowledgeIncident(incident_id) {
+    try {
+      const { data, error } = await supabase
+        .from('security_incidents')
+        .update({ status: 'acknowledged', acknowledged_at: new Date().toISOString() })
+        .eq('id', incident_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`✅ Incidente ${incident_id} marcado como reconhecido.`);
+      return response(true, data);
+    } catch (err) {
+      logError('acknowledgeIncident failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SecuritySentinelCluster = SecuritySentinelCluster;
+  logDebug('🛡️ SecuritySentinelCluster anexado ao window.ALSHAM.SecuritySentinelCluster');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...SecuritySentinelCluster });
+
+ALSHAM_METADATA.modules.part16 = {
+  name: 'SECURITY SENTINEL CLUSTER',
+  description: 'Cluster completo de segurança (Sentinel, Alert Layer, Dashboard e Realtime)',
+  version: 'v10.0-SECURITY-SENTINEL',
+  functions: 40,
+  status: 'ACTIVE'
+};
+
+logDebug('🛡️ SecuritySentinelCluster registrado com sucesso no ALSHAM_METADATA.');
 
 export default ALSHAM_FULL;
 // ════════════════════════════════════════════════════════════════════════
