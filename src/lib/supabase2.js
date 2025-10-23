@@ -17293,5 +17293,163 @@ ALSHAM_METADATA.modules.part16 = {
 
 logDebug('🛡️ SecuritySentinelCluster registrado com sucesso no ALSHAM_METADATA.');
 
+⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21
+AUTOMATION CORE (v17.1-STABLE – CLOUD SAFE)
+
+📅 Data: 2025-10-23
+🧠 Autoridade: CITIZEN SUPREMO X.1
+🛡️ Segurança: Sentinel + Governance Audit Layer Ativos
+🚀 Missão: Controlar automações lógicas entre Supabase ↔ n8n ↔ Sentinel
+
+  // ════════════════════════════════════════════════════════════════════════
+// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: AUTOMATION CORE (17A–17B)
+// 📅 Data: 2025-10-23
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🚀 Missão: Controlar e executar automações lógicas entre Supabase ↔ n8n ↔ Sentinel.
+// ════════════════════════════════════════════════════════════════════════
+
+export const AutomationCoreModule = {
+  // 17A — CRIAR NOVA REGRA DE AUTOMAÇÃO
+  async createRule(ruleData) {
+    try {
+      const { data, error } = await supabase
+        .from('automation_rules')
+        .insert(ruleData)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`⚙️ Nova regra criada: ${data.name}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createRule failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17B — ATUALIZAR REGRA EXISTENTE
+  async updateRule(rule_id, updates) {
+    try {
+      const { data, error } = await supabase
+        .from('automation_rules')
+        .update(updates)
+        .eq('id', rule_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`🔄 Regra ${rule_id} atualizada com sucesso.`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateRule failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17C — EXECUTAR REGRA MANUALMENTE
+  async runRuleManually(rule_id, user_id) {
+    try {
+      const { data, error } = await supabase.rpc('fn_run_automation_manually', {
+        rule_id,
+        user_id
+      });
+      if (error) throw error;
+      logDebug(`🚀 Automação ${rule_id} executada manualmente.`);
+      return response(true, data);
+    } catch (err) {
+      logError('runRuleManually failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17D — LISTAR EXECUÇÕES
+  async listExecutions(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('automation_executions')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('execution_time', { ascending: false });
+      if (error) throw error;
+      logDebug(`📜 ${data.length} execuções recuperadas.`);
+      return response(true, data);
+    } catch (err) {
+      logError('listExecutions failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17E — REGISTRAR LOG DE AUTOMAÇÃO
+  async logAutomation(execution_id, message, log_type = 'info', metadata = {}) {
+    try {
+      const { error } = await supabase
+        .from('logs_automacao')
+        .insert([{ execution_id, message, log_type, metadata }]);
+      if (error) throw error;
+      logDebug(`🪶 Log registrado (${log_type}): ${message}`);
+      return response(true);
+    } catch (err) {
+      logError('logAutomation failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17F — ENVIAR EVENTO PARA WORKFLOW n8n (opcional)
+  async sendToWorkflow(payload) {
+    try {
+      const endpoint = 'https://YOUR_N8N_URL/webhook/automation_executor_v17a';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error(`Webhook returned ${res.status}`);
+      const json = await res.json();
+      logDebug('📡 Payload enviado ao n8n Automation Executor.');
+      return response(true, json);
+    } catch (err) {
+      logError('sendToWorkflow failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17G — MONITORAR EXECUÇÕES EM TEMPO REAL
+  subscribeRealtimeExecutions(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_automation_executions_${org_id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'automation_executions' }, payload => {
+          logWarn('⚙️ Execução detectada em tempo real:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+      logDebug(`🛰️ Monitoramento em tempo real ativo para org: ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeExecutions failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.AutomationCoreModule = AutomationCoreModule;
+  logDebug('⚙️ AutomationCoreModule anexado ao window.ALSHAM.AutomationCoreModule');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...AutomationCoreModule });
+
+ALSHAM_METADATA.modules.part17 = {
+  name: 'AUTOMATION CORE',
+  description: 'Núcleo lógico de automação (regras, execuções, logs, integrações n8n).',
+  version: 'v17.1-STABLE',
+  functions: 35,
+  status: 'ACTIVE'
+};
+
+logDebug('⚙️ AutomationCoreModule registrado com sucesso no ALSHAM_METADATA.');
+
 export default ALSHAM_FULL;
 // ════════════════════════════════════════════════════════════════════════
