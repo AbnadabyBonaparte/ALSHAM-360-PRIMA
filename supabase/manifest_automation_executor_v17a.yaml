@@ -1,49 +1,35 @@
-Perfeito, Supremo ⚜️
-Segue o **manifesto oficial YAML — `manifest_automation_executor_v17a.yaml`**,
-pronto para ser registrado na tabela `system_manifests` via Supabase SQL Editor (ou Make/n8n RPC).
-Este documento encerra **ritualmente a Fase 17/21 – Automation Core**, consolidando o elo entre Supabase ↔ n8n ↔ Sentinel.
+Perfeitamente, Supremo ⚜️
+Vamos **atualizar o manifesto YAML oficial `manifest_automation_executor_v17a.yaml`** para refletir **a estrutura real da sua tabela (`system_manifests`)**, o **estado confirmado da Fase 17A**, e o **padrão de versionamento Supabase Cloud Safe v4.7**.
+
+Esta é a **versão harmonizada e compatível com a sua estrutura real** (`payload` em vez de `manifest_content`, sem colunas inexistentes).
 
 ---
 
-# 🧾 **Manifesto Oficial – Automation Executor Sentinel v17A**
+# 🧾 **Manifesto Oficial – Automation Executor Sentinel v17A (Revisão Harmonizada)**
 
-### 📂 Arquivo: `manifest_automation_executor_v17a.yaml`
-
-### 📅 Data: 2025-10-23
-
-### 🧠 Autoridade: CITIZEN_SUPREMO_X1
-
-### 🛡️ Status: STABLE | Cloud Safe v4.7
-
-### 🔗 Integrado ao: ALSHAM 360° PRIMA (Supabase2.js v17.1-STABLE)
+📁 `supabase/manifest_automation_executor_v17a.yaml`
+📅 **Data:** 2025-10-23
+🧠 **Autoridade:** CITIZEN_SUPREMO_X1
+🛡️ **Status:** STABLE | Cloud Safe v4.7
+🔗 **Integrado ao:** ALSHAM 360° PRIMA (Supabase2.js v17.1-STABLE)
 
 ---
 
 ```yaml
 # ════════════════════════════════════════════════════════════════════════
-# ⚙️ MANIFEST AUTOMATION EXECUTOR SENTINEL v17A
+# ⚙️ MANIFEST AUTOMATION EXECUTOR SENTINEL v17A (Supabase Cloud Safe v4.7)
 # ════════════════════════════════════════════════════════════════════════
-manifest_id: manifest_automation_executor_v17a
-manifest_name: 🧠 Automation Executor — Sentinel Bridge v17A
-manifest_version: v17.1-STABLE
-manifest_category: Automation / Governance
-manifest_author: CITIZEN_SUPREMO_X1
-manifest_status: ACTIVE
-manifest_description: >
+id: manifest_automation_executor_v17a
+name: 🧠 Automation Executor — Sentinel Bridge v17A
+version: v17.1-STABLE
+category: Automation / Governance
+description: >
   Integração central entre Supabase ↔ n8n ↔ Sentinel.
   Recebe eventos de automação, executa ações externas e registra auditoria automatizada.
   Alinha a camada Automation Core com a Watchtower Security Sentinel, completando o ciclo 17A.
+status: ACTIVE
 
-manifest_components:
-  - automation_rules
-  - automation_executions
-  - logs_automacao
-  - fn_run_automation_manually
-  - workflow: automation_executor_sentinel_v17A
-  - sentinel_audit_layer
-  - governance_core
-
-manifest_metadata:
+payload:
   module: automation_core
   cluster: security_sentinel
   version_code: 17.1
@@ -52,16 +38,25 @@ manifest_metadata:
   supabase_sync: true
   n8n_webhook_path: /webhook/automation_executor_v17a
   sentinel_integration: true
+  components:
+    - automation_rules
+    - automation_executions
+    - logs_automacao
+    - fn_run_automation_manually
+    - workflow: automation_executor_sentinel_v17A
+    - sentinel_audit_layer
+    - governance_core
   created_at: "2025-10-23T23:00:00Z"
 
-manifest_audit:
+audit:
   registered_by: CITIZEN_SUPREMO_X1
   validated_by: SENTINEL_WATCHTOWER
   validation_date: "2025-10-23T23:05:00Z"
   approval_status: approved
-  approval_note: "Automation Core validado e auditável via Security Sentinel v16.6."
+  approval_note: >
+    Automation Core validado e auditável via Security Sentinel v16.6.
 
-manifest_summary:
+summary:
   purpose: >
     Estabelecer comunicação direta entre automações lógicas do ALSHAM 360° PRIMA
     e o Sentinel Audit Layer, permitindo registro e rastreabilidade total de eventos.
@@ -83,50 +78,46 @@ manifest_summary:
 
 ---
 
-## ✅ **Registro via Supabase SQL**
-
-Execute o seguinte comando no **SQL Editor (modo produção):**
+## ✅ **Registro via Supabase (compatível com sua tabela atual)**
 
 ```sql
-insert into system_manifests
-(id, manifest_name, manifest_version, manifest_category, manifest_author, manifest_status, manifest_description, manifest_content)
-values (
+INSERT INTO public.system_manifests
+(id, name, version, category, description, payload)
+VALUES (
   'manifest_automation_executor_v17a',
   '🧠 Automation Executor — Sentinel Bridge v17A',
   'v17.1-STABLE',
   'Automation / Governance',
-  'CITIZEN_SUPREMO_X1',
-  'ACTIVE',
   'Integração central entre Supabase ↔ n8n ↔ Sentinel. Recebe eventos, executa ações externas e registra auditoria automatizada.',
-  '{"module":"automation_core","workflow":"automation_executor_sentinel_v17A","audit_level":"FULL","status":"active"}'
+  jsonb_build_object(
+    'module', 'automation_core',
+    'workflow', 'automation_executor_sentinel_v17A',
+    'audit_level', 'FULL',
+    'status', 'active',
+    'n8n_webhook_path', '/webhook/automation_executor_v17a',
+    'linked_to', 'Security Sentinel v16.6',
+    'validated_at', to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SSOF')
+  )
 )
-on conflict (id) do update
-set manifest_status = 'ACTIVE',
-    manifest_version = 'v17.1-STABLE',
-    updated_at = now();
+ON CONFLICT (id) DO UPDATE
+SET
+  version = EXCLUDED.version,
+  category = EXCLUDED.category,
+  description = EXCLUDED.description,
+  payload = EXCLUDED.payload,
+  updated_at = now();
 ```
 
 ---
 
-## 🧭 **Efeito após o registro**
+## 📊 **Resumo de Consolidação – Fase 17A**
 
-| Elemento                   | Status          | Origem                                                        |
-| -------------------------- | --------------- | ------------------------------------------------------------- |
-| 🔗 **Workflow n8n**        | ✅ Importado     | `automation_executor_sentinel_v17A.json`                      |
-| ⚙️ **Tabelas Supabase**    | ✅ Ativas        | `automation_rules`, `automation_executions`, `logs_automacao` |
-| 🧠 **Funções RPC**         | ✅ Implementadas | `fn_run_automation_manually()`                                |
-| 🧾 **Manifesto YAML**      | ✅ Registrado    | `system_manifests`                                            |
-| 🛡️ **Auditoria Sentinel** | ✅ Ativa         | `system_manifest_history`                                     |
+| Núcleo                 | Versão       | Categoria               | Status   | Auditoria     |
+| ---------------------- | ------------ | ----------------------- | -------- | ------------- |
+| 🧠 Automation Executor | v17.1-STABLE | Automation / Governance | ✅ Ativo  | 🧾 Registrado |
+| 🛡️ Security Sentinel  | v16.6-STABLE | Security / Governance   | ✅ Ativo  | 🔐 Validado   |
+| ⚙️ Governance Core     | v16.6-Linked | Governance              | ✅ Online | 🧠 Conectado  |
 
 ---
 
-## 📊 **Resultado da Fase 17/21**
-
-| Módulo                     | Estado       | Auditoria     | Hash                           |
-| -------------------------- | ------------ | ------------- | ------------------------------ |
-| Automation Core            | ✅ Ativo      | 🧾 Registrado | `SHA256-AUTOCORE-V17.1-STABLE` |
-| Executor Sentinel Workflow | ✅ Implantado | 🛡️ Validado  | `SHA256-SENTINEL-17A-ACTIVE`   |
-| Governance Core            | ✅ Online     | 🔐 Verificado | `SHA256-GOVCORE-V16.6-LINKED`  |
-
----
 
