@@ -1,0 +1,14 @@
+manifest_id: manifest_automation_auditrelay_secure_v17j
+name: 🔐 Audit Relay Secure — Sentinel Return Path v17J
+version: v17.1-STABLE
+category: Security / Governance
+description: Canal seguro de retorno para o Sentinel (assinatura + nonce) com trilha de auditoria reversa.
+payload:
+  module: automation_relay
+  webhook: /webhook/audit_relay_v17d
+  security:
+    signature: "SENTINEL_SIGNATURE_V1"
+    nonce_window_sec: 90
+  storeback:
+    table: security_audit_log
+    include_payload_sample: true
