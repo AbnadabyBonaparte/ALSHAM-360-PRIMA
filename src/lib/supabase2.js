@@ -17301,13 +17301,13 @@ AUTOMATION CORE (v17.1-STABLE – CLOUD SAFE)
 🛡️ Segurança: Sentinel + Governance Audit Layer Ativos
 🚀 Missão: Controlar automações lógicas entre Supabase ↔ n8n ↔ Sentinel
 
-  // ════════════════════════════════════════════════════════════════════════
-// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21
 // ════════════════════════════════════════════════════════════════════════
-// 📁 MÓDULO: AUTOMATION CORE (17A–17B)
+// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21 + PARTE 17H–17K
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: AUTOMATION CORE (17A–17B) + AUTOMATION INTELLIGENCE CLUSTER (17H–17K)
 // 📅 Data: 2025-10-23
 // 🧠 Autoridade: CITIZEN SUPREMO X.1
-// 🚀 Missão: Controlar e executar automações lógicas entre Supabase ↔ n8n ↔ Sentinel.
+// 🚀 Missão: Controlar, executar e aprimorar automações lógicas entre Supabase ↔ n8n ↔ Sentinel, incluindo auditoria, logs e feedback neural.
 // ════════════════════════════════════════════════════════════════════════
 
 export const AutomationCoreModule = {
@@ -17432,14 +17432,135 @@ export const AutomationCoreModule = {
   }
 };
 
+export const AutomationIntelligenceCluster = {
+  // 17H — AUDITLINK: Sincronização de auditorias Supabase ↔ Sentinel
+  async syncAuditTrail(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('system_manifest_history')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('changed_at', { ascending: false });
+      if (error) throw error;
+      logDebug(`🧾 Auditoria sincronizada: ${data.length} eventos.`);
+      return response(true, data);
+    } catch (err) {
+      logError('syncAuditTrail failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17I — LOGS GATEWAY: Consolidação de logs e erros das automações
+  async consolidateLogs(limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('logs_automacao')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      logDebug(`📊 Logs consolidados (${data.length}) recuperados com sucesso.`);
+      return response(true, data);
+    } catch (err) {
+      logError('consolidateLogs failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17J — AUDIT RELAY: Envio reverso para Sentinel (WebHook seguro)
+  async sendAuditRelay(eventPayload) {
+    try {
+      const endpoint = 'https://YOUR_N8N_URL/webhook/audit_relay_v17d';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventPayload)
+      });
+      if (!res.ok) throw new Error(`Webhook returned ${res.status}`);
+      const json = await res.json();
+      logDebug('🛡️ Audit Relay enviado ao Sentinel com sucesso.');
+      return response(true, json);
+    } catch (err) {
+      logError('sendAuditRelay failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17K — NEURAL FEEDBACK: Registro de aprendizado e otimização contínua
+  async registerNeuralFeedback(execution_id, success_rate, error_rate, notes = '') {
+    try {
+      const feedback = {
+        execution_id,
+        success_rate,
+        error_rate,
+        notes,
+        created_at: new Date().toISOString()
+      };
+      const { error } = await supabase.from('ai_automation_feedback').insert([feedback]);
+      if (error) throw error;
+      logDebug(`🧠 Feedback neural registrado para execução ${execution_id}.`);
+      return response(true, feedback);
+    } catch (err) {
+      logError('registerNeuralFeedback failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17K.1 — Treinamento do modelo de aprendizado
+  async trainNeuralModel() {
+    try {
+      const { data, error } = await supabase.rpc('fn_train_feedback_model');
+      if (error) throw error;
+      logDebug('🤖 Modelo neural treinado com sucesso.', data);
+      return response(true, data);
+    } catch (err) {
+      logError('trainNeuralModel failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17K.2 — Aplicar otimização automática
+  async applyOptimization() {
+    try {
+      const { data, error } = await supabase.rpc('fn_apply_automation_optimization');
+      if (error) throw error;
+      logDebug('⚙️ Otimizações automáticas aplicadas com sucesso.', data);
+      return response(true, data);
+    } catch (err) {
+      logError('applyOptimization failed:', err);
+      return response(false, null, err);
+    }
+  },
+
+  // 17K.3 — Monitoramento de feedback em tempo real
+  subscribeRealtimeFeedback(callback) {
+    try {
+      const channel = supabase
+        .channel('realtime_ai_automation_feedback')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ai_automation_feedback' }, payload => {
+          logWarn('🧩 Novo feedback neural detectado:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+      logDebug('🛰️ Realtime feedback listener ativo.');
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeFeedback failed:', err);
+      return response(false, null, err);
+    }
+  }
+};
+
 // 🔗 Vinculação global
 if (typeof window !== 'undefined' && window.ALSHAM) {
   window.ALSHAM.AutomationCoreModule = AutomationCoreModule;
   logDebug('⚙️ AutomationCoreModule anexado ao window.ALSHAM.AutomationCoreModule');
+  window.ALSHAM.AutomationIntelligenceCluster = AutomationIntelligenceCluster;
+  logDebug('🧠 AutomationIntelligenceCluster anexado ao window.ALSHAM.AutomationIntelligenceCluster');
 }
 
 // 🧭 Registro no índice Supremo
-Object.assign(ALSHAM_FULL, { ...AutomationCoreModule });
+Object.assign(ALSHAM_FULL, { ...AutomationCoreModule, ...AutomationIntelligenceCluster });
 
 ALSHAM_METADATA.modules.part17 = {
   name: 'AUTOMATION CORE',
@@ -17448,8 +17569,16 @@ ALSHAM_METADATA.modules.part17 = {
   functions: 35,
   status: 'ACTIVE'
 };
+ALSHAM_METADATA.modules.part17b = {
+  name: 'AUTOMATION INTELLIGENCE CLUSTER',
+  description: 'Camada cognitiva do núcleo de automação (AuditLink, LogsGateway, Relay e Neural Feedback).',
+  version: 'v17.1-STABLE',
+  functions: 42,
+  status: 'ACTIVE'
+};
 
 logDebug('⚙️ AutomationCoreModule registrado com sucesso no ALSHAM_METADATA.');
+logDebug('🧠 AutomationIntelligenceCluster registrado com sucesso no ALSHAM_METADATA.');
 
 export default ALSHAM_FULL;
 // ════════════════════════════════════════════════════════════════════════
