@@ -1,0 +1,18 @@
+manifest_id: manifest_automation_logsgateway_consolidator_v17i
+name: 📊 LogsGateway Consolidator — ETL v17I
+version: v17.1-STABLE
+category: Observability / Automation
+description: Consolidação ETL dos logs de automação (logs_automacao) com agregações para métricas e SLO.
+payload:
+  module: automation_logsgateway
+  source_table: logs_automacao
+  aggregations:
+    - name: last_24h
+      window: "24h"
+      metrics: ["count","error_rate","p95_duration_ms"]
+    - name: last_7d
+      window: "7d"
+      metrics: ["count","error_rate","top_rules"]
+  exports:
+    - table: analytics_audit
+    - view: v_ae_kpis_7d
