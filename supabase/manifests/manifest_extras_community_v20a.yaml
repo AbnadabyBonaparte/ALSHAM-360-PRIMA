@@ -1,0 +1,19 @@
+manifest_id: manifest_extras_community_v20a
+manifest_name: 🌐 Extras & Community — ALSHAM 360° PRIMA
+manifest_version: v20.0-STABLE
+manifest_category: Resources / Knowledge
+manifest_author: CITIZEN_SUPREMO_X1
+manifest_status: ACTIVE
+manifest_description: >
+  Registra o Help Center, Docs AI e Changelog Community.
+manifest_components:
+  - tables: [help_center, community_changelog, ai_docs]
+  - view: vw_docs_summary
+  - view: vw_help_feedback
+manifest_metadata:
+  module: extras_community
+  version_code: 20.0
+  schema: public
+  audit_level: NORMAL
+  supabase_sync: true
+  created_at: "2025-10-24T00:45:00Z"
