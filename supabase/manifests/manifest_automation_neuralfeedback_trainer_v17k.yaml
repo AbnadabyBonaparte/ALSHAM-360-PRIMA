@@ -1,0 +1,15 @@
+manifest_id: manifest_automation_neuralfeedback_trainer_v17k
+name: 🧠 Neural Feedback Trainer — Auto-Optimize v17K
+version: v17.1-STABLE
+category: Automation / Intelligence
+description: Treino e aplicação de otimizações com base em ai_automation_feedback (fn_train_feedback_model / fn_apply_automation_optimization).
+payload:
+  module: automation_intelligence
+  tables:
+    feedback: ai_automation_feedback
+  rpc:
+    train: fn_train_feedback_model
+    apply: fn_apply_automation_optimization
+  cadence:
+    train_cron: "0 */6 * * *"   # a cada 6h
+    apply_cron: "15 */6 * * *"
