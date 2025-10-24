@@ -1,0 +1,16 @@
+manifest_id: manifest_automation_realtime_executions_v17g
+name: 🛰️ Automation Realtime Executions — Bridge v17G
+version: v17.1-STABLE
+category: Automation / Realtime
+description: Canal Realtime para execuções (automation_executions) com fan-out para dashboards e alertas.
+payload:
+  module: automation_core
+  realtime:
+    channel: "realtime_automation_executions_*"
+    table: automation_executions
+    events: ["INSERT","UPDATE"]
+  sinks:
+    - type: dashboard
+      target: security_dashboard
+    - type: webhook
+      target: /webhook/automation_executor_v17a
