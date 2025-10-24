@@ -10455,27 +10455,6 @@ export async function getDashboardKPIs(orgId) {
   }, 120);
 }
 
-// ============================================================================
-// VIEW: DASHBOARD_SUMMARY - Resumo do Dashboard
-// ============================================================================
-
-/**
- * Busca resumo do dashboard
- * @param {string} orgId - ID da organização
- * @returns {Promise<Object>}
- */
-export async function getDashboardSummary(orgId) {
-  return await withCache(`dashboard_summary_${orgId}`, async () => {
-    const { data, error } = await supabase
-      .from('dashboard_summary')
-      .select('*')
-      .eq('org_id', orgId)
-      .single();
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
 
 // ============================================================================
 // VIEW: V_GAMIFICATION_SUMMARY - Resumo de Gamificação
