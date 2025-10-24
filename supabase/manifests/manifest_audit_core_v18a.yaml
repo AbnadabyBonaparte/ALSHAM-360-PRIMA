@@ -1,0 +1,35 @@
+manifest_id: manifest_audit_core_v18a
+manifest_name: 🛡️ Audit Core — ALSHAM 360° PRIMA
+manifest_version: v18.0-STABLE
+manifest_category: Security / Governance
+manifest_author: CITIZEN_SUPREMO_X1
+manifest_status: ACTIVE
+manifest_description: >
+  Núcleo de auditoria avançada que conecta automação, segurança e políticas.
+  Monitora dados críticos e executa rastreamento de incidentes em tempo real.
+manifest_components:
+  - tables: [audit_log, data_audits, system_audit_matrix]
+  - rpc: fn_register_audit_event
+  - rpc: fn_generate_compliance_report
+  - view: vw_audit_core_summary
+manifest_metadata:
+  module: audit_core
+  cluster: security_sentinel
+  version_code: 18.0
+  schema: public
+  audit_level: EXTREME
+  supabase_sync: true
+  sentinel_integration: true
+  created_at: "2025-10-24T00:15:00Z"
+manifest_audit:
+  registered_by: CITIZEN_SUPREMO_X1
+  validated_by: SENTINEL_WATCHTOWER
+  validation_date: "2025-10-24T00:16:00Z"
+manifest_summary:
+  purpose: >
+    Garantir rastreabilidade total de auditorias críticas.
+  benefits:
+    - Conformidade completa com o Sentinel
+    - Logs de auditoria imutáveis
+    - Rastreio em tempo real
+    - Painel consolidado no Governance Dashboard
