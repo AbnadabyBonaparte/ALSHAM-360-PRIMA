@@ -1,0 +1,58 @@
+# ════════════════════════════════════════════════════════════════════════
+# 🧠 MANIFEST AUTOMATION INTELLIGENCE CLUSTER — v17F
+# ════════════════════════════════════════════════════════════════════════
+manifest_id: manifest_automation_intelligencecluster_v17f
+manifest_name: 🧠 Automation Intelligence Cluster — ALSHAM 360° PRIMA
+manifest_version: v17.1-STABLE
+manifest_category: Automation / Intelligence
+manifest_author: CITIZEN_SUPREMO_X1
+manifest_status: ACTIVE
+manifest_description: >
+  Cluster neural responsável pela sinergia entre automação lógica,
+  auditoria, logs, relay reverso e feedback neural de aprendizado contínuo.
+  Conecta o módulo Core (17A–17B) ao Sentinel (v16.6).
+
+manifest_components:
+  - auditlink
+  - logs_gateway
+  - audit_relay
+  - neural_feedback
+  - rpc: fn_train_feedback_model
+  - rpc: fn_apply_automation_optimization
+  - table: ai_automation_feedback
+  - realtime: realtime_ai_automation_feedback
+
+manifest_metadata:
+  module: automation_intelligence
+  cluster: automation_core
+  version_code: 17.1
+  schema: public
+  audit_level: FULL
+  supabase_sync: true
+  n8n_webhook_path: /webhook/audit_relay_v17d
+  sentinel_integration: true
+  created_at: "2025-10-23T23:59:00Z"
+
+manifest_audit:
+  registered_by: CITIZEN_SUPREMO_X1
+  validated_by: SENTINEL_WATCHTOWER
+  validation_date: "2025-10-23T23:59:59Z"
+  approval_status: approved
+  approval_note: "Cluster de inteligência neural validado e sincronizado com Sentinel v16.6."
+
+manifest_summary:
+  purpose: >
+    Integrar o ciclo completo de aprendizado neural e automação lógica.
+  benefits:
+    - Feedback contínuo do Sentinel
+    - Registro em tempo real
+    - Auditoria automatizada
+    - Otimização de regras
+  dependencies:
+    - system_manifests
+    - system_manifest_history
+    - automation_rules
+    - automation_executions
+    - ai_automation_feedback
+  result: >
+    Núcleo de automação cognitiva ativo e auditável.
