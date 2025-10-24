@@ -7668,6 +7668,20 @@ export async function setUserPresence(userId, status, metadata = {}) {
       .from('user_presence')
       .upsert({
         user_id: userId,
+        status: status,
+        last_seen: now,
+        metadata: metadata,
+        updated_at: now
+      })
+      .select()
+      .single();
+
+    if (error) return response(false, null, error);
+    
+    logDebug('👤 Presença atualizada:', userId, status);
+    return response(true, data);
+  });
+}
 
 // ============================================================================
 // PARTE 7 COMPLETA: COLABORAÇÃO (Continuação)
