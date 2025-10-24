@@ -1,0 +1,22 @@
+manifest_id: manifest_governance_billing_v19a
+manifest_name: 💰 Governance & Billing Core — ALSHAM 360° PRIMA
+manifest_version: v19.0-STABLE
+manifest_category: Finance / Governance
+manifest_author: CITIZEN_SUPREMO_X1
+manifest_status: ACTIVE
+manifest_description: >
+  Estabelece o módulo financeiro e de governança com rastreio e automação de billing.
+manifest_components:
+  - tables: [billing, invoices, financial_logs, payment_events]
+  - rpc: fn_calculate_billing_cycle
+  - rpc: fn_sync_invoices
+  - view: vw_billing_summary
+manifest_metadata:
+  module: governance_finance
+  cluster: core_enterprise
+  version_code: 19.0
+  schema: public
+  audit_level: HIGH
+  supabase_sync: true
+  sentinel_integration: true
+  created_at: "2025-10-24T00:30:00Z"
