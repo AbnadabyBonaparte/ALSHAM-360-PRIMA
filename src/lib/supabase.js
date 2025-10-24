@@ -5633,18 +5633,21 @@ export function subscribeKPIs(onChange) {
 // ============================================================================
 
 /**
- * Busca resumo do dashboard com cache
+ * Busca resumo do dashboard com cache e suporte opcional a orgId
  */
-export async function getDashboardSummary() {
+export async function getDashboardSummary(orgId = null) {
   try {
-    // Cache check
-    const cacheKey = 'dashboard_summary';
+    const cacheKey = `dashboard_summary_${orgId || 'default'}`;
     const cached = getCachedData(cacheKey);
     if (cached) return response(true, cached);
-    
-    const { data, error } = await supabase
-      .from('dashboard_summary')
-      .select('*')
+
+    let query = supabase.from('dashboard_summary').select('*');
+
+    if (orgId) {
+      query = query.eq('org_id', orgId);
+    }
+
+    const { data, error } = await query
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -5653,15 +5656,14 @@ export async function getDashboardSummary() {
       return response(false, null, error);
     }
 
-    // Cache resultado
     if (data) {
-      setCachedData(cacheKey, data, ANALYTICS_CONFIG.CACHE_TTL.DASHBOARD_SUMMARY);
+      setCachedData(cacheKey, data, ANALYTICS_CONFIG.CACHE_TTL?.DASHBOARD_SUMMARY || 120);
     }
-    
+
     return response(true, data);
-  } catch (error) {
-    logError('Exceção ao buscar resumo do dashboard:', error);
-    return response(false, null, error);
+  } catch (err) {
+    logError('getDashboardSummary exception:', err);
+    return response(false, null, err);
   }
 }
 
