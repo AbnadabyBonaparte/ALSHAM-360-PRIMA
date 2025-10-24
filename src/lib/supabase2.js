@@ -17781,5 +17781,569 @@ ALSHAM_METADATA.modules.part18 = {
 
 logDebug('💠 SettingsBillingModule registrado com sucesso no ALSHAM_METADATA.');
 
+
+// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 19/21
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: COMMUNITY & EXTRAS (19A–19D)
+// 📅 Data: 2025-10-24
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🌍 Missão: Criar o ecossistema de comunidade e colaboração interna (posts, comentários, reações e notificações).
+// ════════════════════════════════════════════════════════════════════════
+
+export const CommunityModule = {
+  // 19A — CRIAR POSTAGEM NA COMUNIDADE
+  async createPost(org_id, author_id, content, attachments = []) {
+    try {
+      const payload = {
+        org_id,
+        author_id,
+        content,
+        attachments,
+        created_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase
+        .from('community_posts')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`📝 Novo post criado por ${author_id} na org ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createPost failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19B — LISTAR POSTS
+  async listPosts(org_id, limit = 20) {
+    try {
+      const { data, error } = await supabase
+        .from('community_posts')
+        .select('*, author:user_profiles(*), comments:community_comments(count)')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      logDebug(`📜 ${data.length} posts carregados para org ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('listPosts failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19C — DELETAR POST
+  async deletePost(post_id, org_id) {
+    try {
+      const { error } = await supabase
+        .from('community_posts')
+        .delete()
+        .eq('id', post_id)
+        .eq('org_id', org_id);
+      if (error) throw error;
+      logDebug(`🗑️ Post ${post_id} removido da comunidade.`);
+      return response(true);
+    } catch (err) {
+      logError('deletePost failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19D — COMENTAR POSTAGEM
+  async addComment(post_id, author_id, content) {
+    try {
+      const payload = {
+        post_id,
+        author_id,
+        content,
+        created_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase
+        .from('community_comments')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`💬 Novo comentário criado em post ${post_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('addComment failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19E — LISTAR COMENTÁRIOS DE UM POST
+  async listComments(post_id) {
+    try {
+      const { data, error } = await supabase
+        .from('community_comments')
+        .select('*, author:user_profiles(*)')
+        .eq('post_id', post_id)
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      logDebug(`💭 ${data.length} comentários carregados para o post ${post_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('listComments failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19F — CURTIR / REAGIR A UM POST
+  async toggleLike(post_id, user_id) {
+    try {
+      const { data: existing, error: findError } = await supabase
+        .from('community_likes')
+        .select('*')
+        .eq('post_id', post_id)
+        .eq('user_id', user_id)
+        .single();
+
+      if (findError && findError.code !== 'PGRST116') throw findError;
+
+      if (existing) {
+        await supabase
+          .from('community_likes')
+          .delete()
+          .eq('id', existing.id);
+        logDebug(`💔 Like removido por ${user_id} em ${post_id}`);
+        return response(true, { liked: false });
+      } else {
+        const { data, error } = await supabase
+          .from('community_likes')
+          .insert([{ post_id, user_id, created_at: new Date().toISOString() }])
+          .select()
+          .single();
+        if (error) throw error;
+        logDebug(`❤️ Like adicionado por ${user_id} em ${post_id}`);
+        return response(true, { liked: true, data });
+      }
+    } catch (err) {
+      logError('toggleLike failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19G — GERAR NOTIFICAÇÃO DE INTERAÇÃO
+  async createNotification(recipient_id, message, type = 'system', metadata = {}) {
+    try {
+      const payload = {
+        recipient_id,
+        message,
+        type,
+        metadata,
+        read: false,
+        created_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase
+        .from('community_notifications')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`🔔 Notificação enviada a ${recipient_id}: ${message}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createNotification failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19H — LISTAR NOTIFICAÇÕES DE UM USUÁRIO
+  async listNotifications(user_id, onlyUnread = false) {
+    try {
+      let query = supabase
+        .from('community_notifications')
+        .select('*')
+        .eq('recipient_id', user_id)
+        .order('created_at', { ascending: false });
+
+      if (onlyUnread) query = query.eq('read', false);
+
+      const { data, error } = await query;
+      if (error) throw error;
+      logDebug(`🔔 ${data.length} notificações carregadas para o usuário ${user_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('listNotifications failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19I — MARCAR NOTIFICAÇÃO COMO LIDA
+  async markNotificationAsRead(notification_id) {
+    try {
+      const { data, error } = await supabase
+        .from('community_notifications')
+        .update({ read: true })
+        .eq('id', notification_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`📩 Notificação ${notification_id} marcada como lida.`);
+      return response(true, data);
+    } catch (err) {
+      logError('markNotificationAsRead failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19J — REALTIME: MONITORAR POSTAGENS
+  subscribeRealtimePosts(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_community_posts_${org_id}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'community_posts' },
+          payload => {
+            logWarn('📡 Mudança em community_posts:', payload.new);
+            callback?.(payload.new);
+          }
+        )
+        .subscribe();
+      logDebug(`🛰️ Realtime posts ativo para org: ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimePosts failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 19K — REALTIME: MONITORAR COMENTÁRIOS
+  subscribeRealtimeComments(callback) {
+    try {
+      const channel = supabase
+        .channel('realtime_community_comments')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'community_comments' },
+          payload => {
+            logWarn('💬 Novo comentário detectado:', payload.new);
+            callback?.(payload.new);
+          }
+        )
+        .subscribe();
+      logDebug('🛰️ Realtime comments listener ativo.');
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeComments failed:', err);
+      return response(false, null, err.message);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.CommunityModule = CommunityModule;
+  logDebug('🌍 CommunityModule anexado ao window.ALSHAM.CommunityModule');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...CommunityModule });
+
+ALSHAM_METADATA.modules.part19 = {
+  name: 'COMMUNITY & EXTRAS',
+  description: 'Sistema de postagens, comentários, curtidas e notificações em tempo real para a comunidade interna.',
+  version: 'v19.0-STABLE',
+  functions: 40,
+  status: 'ACTIVE'
+};
+
+logDebug('🌍 CommunityModule registrado com sucesso no ALSHAM_METADATA.');
+
+// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 20/21
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: ANALYTICS & BI DEEP EXPANSION (20A–20D)
+// 📅 Data: 2025-10-24
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 📊 Missão: Consolidar métricas, relatórios e inteligência preditiva.
+// ════════════════════════════════════════════════════════════════════════
+
+export const AnalyticsModule = {
+  // 20A — REGISTRAR EVENTO ANALÍTICO
+  async registerEvent(org_id, user_id, category, action, label = '', value = 1, metadata = {}) {
+    try {
+      const payload = { org_id, user_id, category, action, label, value, metadata, created_at: new Date().toISOString() };
+      const { data, error } = await supabase.from('analytics_events').insert([payload]).select().single();
+      if (error) throw error;
+      logDebug(`📈 Evento registrado: ${category}/${action}`);
+      return response(true, data);
+    } catch (err) {
+      logError('registerEvent failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 20B — RESUMO DE MÉTRICAS
+  async getSummary(org_id, period = '7d') {
+    try {
+      const { data, error } = await supabase.rpc('fn_get_analytics_summary', { p_org_id: org_id, p_period: period });
+      if (error) throw error;
+      logDebug(`📊 Resumo analítico obtido (${period}) para org: ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('getSummary failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 20C — INSIGHTS GERADOS POR IA
+  async generateAIInsights(org_id, period = '7d') {
+    try {
+      const { data, error } = await supabase.rpc('fn_generate_ai_insights', { p_org_id: org_id, p_period: period });
+      if (error) throw error;
+      logDebug('🤖 Insights de IA gerados com sucesso.', data);
+      return response(true, data);
+    } catch (err) {
+      logError('generateAIInsights failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 20D — EXPORTAR RELATÓRIO CSV
+  async exportAnalyticsCSV(org_id, period = '30d') {
+    try {
+      const { data, error } = await supabase.rpc('fn_export_analytics_csv', { p_org_id: org_id, p_period: period });
+      if (error) throw error;
+      logDebug('🧾 Relatório CSV exportado com sucesso.');
+      return response(true, data);
+    } catch (err) {
+      logError('exportAnalyticsCSV failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 20E — SUBSCRIÇÃO REALTIME DE EVENTOS
+  subscribeRealtimeAnalytics(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_analytics_events_${org_id}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'analytics_events' }, payload => {
+          logWarn('📡 Novo evento analítico detectado:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+      logDebug(`🛰️ Realtime analytics ativo para org: ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeAnalytics failed:', err);
+      return response(false, null, err.message);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.AnalyticsModule = AnalyticsModule;
+  logDebug('📊 AnalyticsModule anexado ao window.ALSHAM.AnalyticsModule');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...AnalyticsModule });
+
+ALSHAM_METADATA.modules.part20 = {
+  name: 'ANALYTICS & BI DEEP EXPANSION',
+  description: 'Módulo de métricas, dashboards, exportações e inteligência de dados via IA.',
+  version: 'v20.0-STABLE',
+  functions: 25,
+  status: 'ACTIVE'
+};
+
+logDebug('📊 AnalyticsModule registrado com sucesso no ALSHAM_METADATA.');
+
+
+  // ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 21/21
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: TEAM MODULE ENHANCEMENT (21A–21D)
+// 📅 Data: 2025-10-24
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🫱 Missão: Governança total de equipes, papéis e metas corporativas.
+// ════════════════════════════════════════════════════════════════════════
+
+export const TeamModule = {
+  // 21A — CRIAR NOVO TIME
+  async createTeam(org_id, name, description = '', leader_id = null) {
+    try {
+      const payload = { org_id, name, description, leader_id, created_at: new Date().toISOString() };
+      const { data, error } = await supabase.from('teams').insert([payload]).select().single();
+      if (error) throw error;
+      logDebug(`👥 Novo time criado: ${name}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createTeam failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21B — LISTAR TIMES DA ORGANIZAÇÃO
+  async listTeams(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*, leader:user_profiles(*)')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      logDebug(`👥 ${data.length} times carregados para org ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('listTeams failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21C — ADICIONAR MEMBRO AO TIME
+  async addMember(team_id, user_id, role = 'member') {
+    try {
+      const payload = { team_id, user_id, role, joined_at: new Date().toISOString() };
+      const { data, error } = await supabase.from('team_members').insert([payload]).select().single();
+      if (error) throw error;
+      logDebug(`🧩 Membro ${user_id} adicionado ao time ${team_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('addMember failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21D — REMOVER MEMBRO
+  async removeMember(team_id, user_id) {
+    try {
+      const { error } = await supabase
+        .from('team_members')
+        .delete()
+        .eq('team_id', team_id)
+        .eq('user_id', user_id);
+      if (error) throw error;
+      logDebug(`🗑️ Membro ${user_id} removido do time ${team_id}`);
+      return response(true);
+    } catch (err) {
+      logError('removeMember failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21E — DEFINIR META DE TIME
+  async setTeamGoal(team_id, title, target_value, deadline, metric = 'generic') {
+    try {
+      const payload = { team_id, title, target_value, deadline, metric, status: 'active', created_at: new Date().toISOString() };
+      const { data, error } = await supabase.from('team_goals').insert([payload]).select().single();
+      if (error) throw error;
+      logDebug(`🎯 Nova meta definida: ${title}`);
+      return response(true, data);
+    } catch (err) {
+      logError('setTeamGoal failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21F — ATUALIZAR PROGRESSO DA META
+  async updateGoalProgress(goal_id, progress_value, notes = '') {
+    try {
+      const { data, error } = await supabase
+        .from('team_goals')
+        .update({ progress_value, notes, updated_at: new Date().toISOString() })
+        .eq('id', goal_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`📈 Progresso atualizado (${progress_value}%) para meta ${goal_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateGoalProgress failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21G — LISTAR METAS ATIVAS
+  async listActiveGoals(org_id, limit = 20) {
+    try {
+      const { data, error } = await supabase
+        .from('team_goals')
+        .select('*, team:teams(name)')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      logDebug(`🎯 ${data.length} metas ativas listadas.`);
+      return response(true, data);
+    } catch (err) {
+      logError('listActiveGoals failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21H — GERENCIAR PERMISSÕES DE EQUIPE
+  async setPermission(team_id, permission_key, allowed = true) {
+    try {
+      const payload = { team_id, permission_key, allowed, updated_at: new Date().toISOString() };
+      const { data, error } = await supabase
+        .from('team_permissions')
+        .upsert([payload], { onConflict: ['team_id', 'permission_key'] })
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`🔐 Permissão ${permission_key} ajustada para time ${team_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('setPermission failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21I — CONSULTAR PERMISSÕES DE TIME
+  async getTeamPermissions(team_id) {
+    try {
+      const { data, error } = await supabase.from('team_permissions').select('*').eq('team_id', team_id);
+      if (error) throw error;
+      logDebug(`🔍 ${data.length} permissões retornadas para time ${team_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('getTeamPermissions failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 21J — REALTIME: MONITORAR METAS
+  subscribeRealtimeGoals(callback) {
+    try {
+      const channel = supabase
+        .channel('realtime_team_goals')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'team_goals' }, payload => {
+          logWarn('🎯 Atualização de meta detectada:', payload.new);
+          callback?.(payload.new);
+        })
+        .subscribe();
+      logDebug('🛰️ Realtime goals ativo.');
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeGoals failed:', err);
+      return response(false, null, err.message);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.TeamModule = TeamModule;
+  logDebug('👥 TeamModule anexado ao window.ALSHAM.TeamModule');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...TeamModule });
+
+ALSHAM_METADATA.modules.part21 = {
+  name: 'TEAM MODULE ENHANCEMENT',
+  description: 'Gestão de times, membros, metas e permissões dinâmicas com monitoramento em tempo real.',
+  version: 'v21.0-STABLE',
+  functions: 35,
+  status: 'ACTIVE'
+};
+
+logDebug('👥 TeamModule registrado com sucesso no ALSHAM_METADATA.');
+
 export default ALSHAM_FULL;
 // ════════════════════════════════════════════════════════════════════════
+                       
