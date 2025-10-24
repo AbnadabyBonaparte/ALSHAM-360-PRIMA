@@ -1,0 +1,15 @@
+manifest_id: manifest_automation_auditlink_watch_v17h
+name: 🧾 AuditLink Watch — Sentinel Mirror v17H
+version: v17.1-STABLE
+category: Governance / Security
+description: Espelhamento de eventos de auditoria do Sentinel com deduplicação e carimbo de tempo confiável.
+payload:
+  module: automation_auditlink
+  sources:
+    - table: system_manifest_history
+      mode: tail
+  dedup:
+    by: ["manifest_id","new_version","changed_at"]
+  time_authority: "SENTINEL_WATCHTOWER"
+  export:
+    view: vw_manifests_dashboard
