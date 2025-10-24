@@ -1,0 +1,19 @@
+manifest_id: manifest_team_enhancement_v21a
+manifest_name: 👥 Team Enhancement — ALSHAM 360° PRIMA
+manifest_version: v21.0-STABLE
+manifest_category: HR / Productivity
+manifest_author: CITIZEN_SUPREMO_X1
+manifest_status: ACTIVE
+manifest_description: >
+  Módulo final da linha 21A — expande as capacidades de equipe, metas e territórios.
+manifest_components:
+  - tables: [team_goals, team_commissions, team_territories]
+  - rpc: fn_calculate_commissions
+  - rpc: fn_assign_territories
+  - view: vw_team_performance
+manifest_metadata:
+  module: team_core
+  version_code: 21.0
+  schema: public
+  audit_level: HIGH
+  created_at: "2025-10-24T01:00:00Z"
