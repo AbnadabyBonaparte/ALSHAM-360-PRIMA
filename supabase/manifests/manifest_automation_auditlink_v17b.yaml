@@ -1,0 +1,12 @@
+manifest_id: manifest_automation_auditlink_v17b
+name: ⚙️ Automation AuditLink — Sentinel Sync v17B
+version: v17.1-STABLE
+category: Automation / Governance
+description: Camada de sincronização contínua de auditorias entre Supabase e Security Sentinel (watch em system_manifest_history).
+payload:
+  module: automation_auditlink
+  watch_table: system_manifest_history
+  dashboard_view: vw_manifests_dashboard
+  audit_mode: continuous
+  linked_to: manifest_automation_executor_v17a
+  validated_at: "2025-10-24T00:00:00Z"
