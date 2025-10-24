@@ -17580,5 +17580,206 @@ ALSHAM_METADATA.modules.part17b = {
 logDebug('⚙️ AutomationCoreModule registrado com sucesso no ALSHAM_METADATA.');
 logDebug('🧠 AutomationIntelligenceCluster registrado com sucesso no ALSHAM_METADATA.');
 
+// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 18/21
+// ════════════════════════════════════════════════════════════════════════
+// 📁 MÓDULO: SETTINGS & BILLING ADVANCED (18A–18E)
+// 📅 Data: 2025-10-24
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 💠 Missão: Gerenciar configurações organizacionais e billing inteligente integrado ao Supabase e Stripe.
+// ════════════════════════════════════════════════════════════════════════
+
+export const SettingsBillingModule = {
+  // 18A — OBTER CONFIGURAÇÕES DA ORGANIZAÇÃO
+  async getOrgSettings(org_id) {
+    try {
+      const { data, error } = await supabase
+        .from('org_settings')
+        .select('*')
+        .eq('org_id', org_id)
+        .single();
+      if (error) throw error;
+      logDebug(`⚙️ Configurações carregadas para org_id: ${org_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('getOrgSettings failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18B — ATUALIZAR CONFIGURAÇÕES DA ORGANIZAÇÃO
+  async updateOrgSettings(org_id, updates) {
+    try {
+      const { data, error } = await supabase
+        .from('org_settings')
+        .update(updates)
+        .eq('org_id', org_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`🔄 Configurações da organização ${org_id} atualizadas com sucesso.`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateOrgSettings failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18C — GERENCIAR PREFERÊNCIAS DO USUÁRIO
+  async getUserPreferences(user_id) {
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user_id)
+        .single();
+      if (error) throw error;
+      logDebug(`🎛️ Preferências carregadas para user_id: ${user_id}`);
+      return response(true, data);
+    } catch (err) {
+      logError('getUserPreferences failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  async updateUserPreferences(user_id, updates) {
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .update(updates)
+        .eq('user_id', user_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`🧩 Preferências do usuário ${user_id} atualizadas com sucesso.`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateUserPreferences failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18D — GERAR FATURA (Stripe ou sistema interno)
+  async createInvoice(org_id, amount, description = 'Serviço ALSHAM 360°') {
+    try {
+      const payload = {
+        org_id,
+        amount,
+        description,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from('billing_invoices')
+        .insert([payload])
+        .select()
+        .single();
+      if (error) throw error;
+
+      logDebug(`💰 Fatura criada para org_id ${org_id}: R$${amount}`);
+      return response(true, data);
+    } catch (err) {
+      logError('createInvoice failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18E — ATUALIZAR STATUS DE FATURA (pós-pagamento)
+  async updateInvoiceStatus(invoice_id, status) {
+    try {
+      const { data, error } = await supabase
+        .from('billing_invoices')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', invoice_id)
+        .select()
+        .single();
+      if (error) throw error;
+      logDebug(`📄 Fatura ${invoice_id} atualizada para status: ${status}`);
+      return response(true, data);
+    } catch (err) {
+      logError('updateInvoiceStatus failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18F — LISTAR HISTÓRICO DE COBRANÇAS
+  async listBillingHistory(org_id, limit = 20) {
+    try {
+      const { data, error } = await supabase
+        .from('billing_invoices')
+        .select('*')
+        .eq('org_id', org_id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      logDebug(`📜 Histórico de faturamento recuperado (${data.length} registros).`);
+      return response(true, data);
+    } catch (err) {
+      logError('listBillingHistory failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18G — ENVIAR FATURA PARA WEBHOOK (integração externa)
+  async sendInvoiceToWebhook(invoiceData) {
+    try {
+      const endpoint = 'https://YOUR_N8N_URL/webhook/invoice_dispatch_v18';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(invoiceData)
+      });
+      if (!res.ok) throw new Error(`Webhook returned ${res.status}`);
+      const json = await res.json();
+      logDebug('📤 Fatura enviada ao webhook externo.');
+      return response(true, json);
+    } catch (err) {
+      logError('sendInvoiceToWebhook failed:', err);
+      return response(false, null, err.message);
+    }
+  },
+
+  // 18H — MONITORAR FATURAS EM TEMPO REAL
+  subscribeRealtimeBilling(org_id, callback) {
+    try {
+      const channel = supabase
+        .channel(`realtime_billing_invoices_${org_id}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'billing_invoices' },
+          payload => {
+            logWarn('💡 Atualização de fatura detectada:', payload.new);
+            callback?.(payload.new);
+          }
+        )
+        .subscribe();
+      logDebug(`🛰️ Realtime billing ativo para org: ${org_id}`);
+      return response(true, { channel });
+    } catch (err) {
+      logError('subscribeRealtimeBilling failed:', err);
+      return response(false, null, err.message);
+    }
+  }
+};
+
+// 🔗 Vinculação global
+if (typeof window !== 'undefined' && window.ALSHAM) {
+  window.ALSHAM.SettingsBillingModule = SettingsBillingModule;
+  logDebug('💠 SettingsBillingModule anexado ao window.ALSHAM.SettingsBillingModule');
+}
+
+// 🧭 Registro no índice Supremo
+Object.assign(ALSHAM_FULL, { ...SettingsBillingModule });
+
+ALSHAM_METADATA.modules.part18 = {
+  name: 'SETTINGS & BILLING ADVANCED',
+  description: 'Gerenciamento de configurações organizacionais, preferências e sistema de billing integrado.',
+  version: 'v18.0-STABLE',
+  functions: 28,
+  status: 'ACTIVE'
+};
+
+logDebug('💠 SettingsBillingModule registrado com sucesso no ALSHAM_METADATA.');
+
 export default ALSHAM_FULL;
 // ════════════════════════════════════════════════════════════════════════
