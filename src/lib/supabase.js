@@ -8235,7 +8235,6 @@ export const ALSHAM_METADATA = {
 logDebug('✅ ALSHAM 360° PRIMA FULL CARREGADO - 141 ENTRIES INTEGRADAS');
 console.log('📦 Todos os módulos e CRUDs genéricos estão disponíveis.');
 console.log('🚀 Sistema pronto - INFINITUM MODE: ONLINE');
-import { supabase, response, logDebug, logError, getCurrentOrgId, getCurrentUser, withCache, withRetry } from './supabase-core.js';  // Core já definido
 
 // ============================================================================
 // SCHEMA: AUTH - Wrappers Seguros (19 Tables - Sem Full CRUD, Supabase Gerencia)
