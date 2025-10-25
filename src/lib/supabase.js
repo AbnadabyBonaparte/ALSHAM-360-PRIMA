@@ -8730,7 +8730,6 @@ export function subscribeAccounts(onChange) {
 // ============================================================================
 // TABELA: CONTACTS - Contatos (RLS: 5 policies, 2 triggers)
 // ============================================================================
-
 /**
  * Cria contato
  * @param {Object} contactData - Dados do contato
