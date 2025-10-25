@@ -8943,21 +8943,6 @@ export async function completeTask(id) {
   return await updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
 }
 
-/**
- * Subscreve a mudanças em tasks
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeTasks(onChange) {
-  return supabase
-    .channel('realtime_tasks')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
-      logDebug('✅ Task evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: COMMENTS - Comentários (0 policies - needs RLS!, 1 trigger)
 // ============================================================================
@@ -9034,28 +9019,6 @@ export async function deleteComment(id) {
   return response(true, { id });
 }
 
-/**
- * Subscreve a mudanças em comments
- * @param {string} entityType - Tipo da entidade
- * @param {string} entityId - ID da entidade
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeComments(entityType, entityId, onChange) {
-  return supabase
-    .channel(`realtime_comments_${entityType}_${entityId}`)
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'comments',
-      filter: `entity_type=eq.${entityType},entity_id=eq.${entityId}`
-    }, (payload) => {
-      logDebug('💬 Comentário evento:', payload.eventType);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-    
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 3/10 - BILLING & CAMPAIGNS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9232,21 +9195,6 @@ export async function deleteCampaign(id) {
   if (error) return response(false, null, error);
   logDebug('🗑️ Campanha deletada:', id);
   return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em campaigns
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeCampaigns(onChange) {
-  return supabase
-    .channel('realtime_campaigns')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, (payload) => {
-      logDebug('📣 Campanha evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
 }
 
 // ============================================================================
@@ -9868,21 +9816,6 @@ export async function getAnalyticsEvents(orgId, filters = { limit: 100 }) {
     if (error) return response(false, null, error);
     return response(true, data);
   }, 60);
-}
-
-/**
- * Subscreve a mudanças em analytics_events
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeAnalyticsEvents(onChange) {
-  return supabase
-    .channel('realtime_analytics_events')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'analytics_events' }, (payload) => {
-      logDebug('📊 Analytics evento:', payload.eventType, payload.new?.event_name);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
 }
 
 // ============================================================================
