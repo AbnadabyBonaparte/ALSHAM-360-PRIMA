@@ -8041,7 +8041,6 @@ async function getView(viewName, filters = {}, ttl = 180) {
 
 // Gerando uma função 'get' para cada uma das 41 views
 export const getDashboardKpis = (filters) => getView('dashboard_kpis', filters);
-export const getDashboardSummary = (filters) => getView('dashboard_summary', filters);
 export const getLeadsByStatusView = (filters) => getView('leads_by_status_view', filters);
 export const getLeadsCrmWithLabels = (filters) => getView('leads_crm_with_labels', filters);
 export const getLeadsPorOrigem = (filters) => getView('leads_por_origem', filters);
@@ -8216,23 +8215,6 @@ export async function deleteRecord(tableName, id) {
 // ============================================================================
 // EXPORTS FINAIS E METADADOS
 // ============================================================================
-
-export const ALSHAM_METADATA = {
-  system: {
-    name: 'ALSHAM 360° PRIMA',
-    version: 'v6.4-INFINITUM',
-    releaseCode: 'SUPREMO_STABLE_X.4',
-    buildDate: '2025-10-22',
-    author: 'CITIZEN SUPREMO X.1'
-  },
-  statistics: {
-    totalTables: 100,
-    totalViews: 41,
-    totalRealtimeChannels: 79,
-    totalFunctions: 400 + 41 + 79 + 50, // Aprox. 4 CRUDs/tabela + gets/views + subs + helpers
-    totalLines: "~8850"
-  }
-};
 
 logDebug('✅ ALSHAM 360° PRIMA FULL CARREGADO - 141 ENTRIES INTEGRADAS');
 console.log('📦 Todos os módulos e CRUDs genéricos estão disponíveis.');
