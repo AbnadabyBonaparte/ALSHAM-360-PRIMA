@@ -8564,16 +8564,72 @@ export async function createAiPredictions(predictionData) {
   }
 }
 
-// ... (Repita padrão pra top 20: accounts, contacts, gamification_points, automation_rules, etc. – programador loopa)
+// ============================================================================
+// CRUD GENÉRICO - Para todas as 118 tabelas (com schema prefix)
+// ============================================================================
 
-// Genérico expandido pra todos 118 (com schema prefix se não public)
+/**
+ * Cria registro em qualquer tabela
+ * @param {string} table - Nome da tabela
+ * @param {Object} data - Dados a inserir
+ * @param {string} schema - Schema do banco (default: 'public')
+ * @returns {Promise<Object>}
+ */
 export async function createRecord(table, data, schema = 'public') {
   const fullTable = schema !== 'public' ? `${schema}.${table}` : table;
   return universalCRUD(fullTable, 'insert', data, {}, { injectOrg: true });
 }
 
-// Similar pra get/update/delete/subscribe, com schema param
+/**
+ * Busca registros em qualquer tabela
+ * @param {string} table - Nome da tabela
+ * @param {Object} filters - Filtros de busca
+ * @param {string} schema - Schema do banco (default: 'public')
+ * @returns {Promise<Object>}
+ */
+export async function getRecords(table, filters = {}, schema = 'public') {
+  const fullTable = schema !== 'public' ? `${schema}.${table}` : table;
+  return universalCRUD(fullTable, 'select', {}, filters);
+}
 
+/**
+ * Atualiza registro em qualquer tabela
+ * @param {string} table - Nome da tabela
+ * @param {string} id - ID do registro
+ * @param {Object} data - Dados a atualizar
+ * @param {string} schema - Schema do banco (default: 'public')
+ * @returns {Promise<Object>}
+ */
+export async function updateRecord(table, id, data, schema = 'public') {
+  const fullTable = schema !== 'public' ? `${schema}.${table}` : table;
+  return universalCRUD(fullTable, 'update', data, { id });
+}
+
+/**
+ * Deleta registro em qualquer tabela
+ * @param {string} table - Nome da tabela
+ * @param {string} id - ID do registro
+ * @param {string} schema - Schema do banco (default: 'public')
+ * @returns {Promise<Object>}
+ */
+export async function deleteRecord(table, id, schema = 'public') {
+  const fullTable = schema !== 'public' ? `${schema}.${table}` : table;
+  return universalCRUD(fullTable, 'delete', {}, { id });
+}
+
+/**
+ * Subscreve a mudanças em qualquer tabela
+ * @param {string} table - Nome da tabela
+ * @param {Function} onChange - Callback
+ * @param {string} schema - Schema do banco (default: 'public')
+ * @returns {RealtimeChannel}
+ */
+export function subscribeToTable(table, onChange, schema = 'public') {
+  return supabase
+    .channel(`realtime_${table}`)
+    .on('postgres_changes', { event: '*', schema, table }, onChange)
+    .subscribe();
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 1/10 - ACCOUNTS & CONTACTS (CRUD Completo)
@@ -8695,6 +8751,72 @@ export async function createContact(contactData) {
     logError('Erro createContact:', err);
     return response(false, null, err);
   }
+}
+
+/**
+ * Busca contatos
+ * @param {string} orgId - ID da organização
+ * @param {Object} filters - Filtros
+ * @returns {Promise<Object>}
+ */
+export async function getContacts(orgId, filters = { limit: 50 }) {
+  return await withCache(`contacts_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('contacts')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+    
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.account_id) query = query.eq('account_id', filters.account_id);
+    if (filters.lead_id) query = query.eq('lead_id', filters.lead_id);
+    
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 120);
+}
+
+/**
+ * Atualiza contato
+ * @param {string} id - ID do contato
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateContact(id, updateData) {
+  const { data, error } = await supabase
+    .from('contacts')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Contato atualizado:', id);
+  return response(true, data);
+}
+
+/**
+ * Deleta contato
+ * @param {string} id - ID do contato
+ * @returns {Promise<Object>}
+ */
+export async function deleteContact(id) {
+  const { error } = await supabase.from('contacts').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Contato deletado:', id);
+  return response(true, { id });
+}
+
+/**
+ * Subscreve a mudanças em contacts
+ * @param {Function} onChange - Callback
+ * @returns {RealtimeChannel}
+ */
+export function subscribeContacts(onChange) {
+  return supabase
+    .channel('realtime_contacts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
+    .subscribe();
 }
 
 /**
