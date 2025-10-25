@@ -17216,10 +17216,10 @@ logDebug('🛡️ SecuritySentinelCluster registrado com sucesso no ALSHAM_METAD
 // ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21
 // AUTOMATION CORE (v17.1-STABLE – CLOUD SAFE)
 
-📅 Data: 2025-10-23
-🧠 Autoridade: CITIZEN SUPREMO X.1
-🛡️ Segurança: Sentinel + Governance Audit Layer Ativos
-🚀 Missão: Controlar automações lógicas entre Supabase ↔ n8n ↔ Sentinel
+// 📅 Data: 2025-10-23
+// 🧠 Autoridade: CITIZEN SUPREMO X.1
+// 🛡️ Segurança: Sentinel + Governance Audit Layer Ativos
+// 🚀 Missão: Controlar automações lógicas entre Supabase ↔ n8n ↔ Sentinel
 
 // ════════════════════════════════════════════════════════════════════════
 // ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21 + PARTE 17H–17K
