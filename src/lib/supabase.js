@@ -12528,7 +12528,7 @@ export async function createWebhookConfig(configData) {
       .select()
       .single();
     if (error) return response(false, null, error);
-    logDebug('⚙️ Config webhook criada:', data.id, data.name);
+    logDebug('[Configuração] Webhook criada:', data.id, data.name);
     return response(true, data);
   } catch (err) {
     logError('Erro createWebhookConfig:', err);
