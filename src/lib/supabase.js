@@ -8574,63 +8574,8 @@ export async function createRecord(table, data, schema = 'public') {
 
 // Similar pra get/update/delete/subscribe, com schema param
 
-// ============================================================================
-// EXPORTS FINAIS ATUALIZADOS (100% Cobertura)
-// ============================================================================
 
-export const ALSHAM_FULL = {
-  // ... (todos de antes + novos)
-  // Auth
-  getAuthUser,
-  createAuthSession,
-  revokeAuthSession,
-  getAuthTable,
-  subscribeAuthSessions,
-  // Realtime
-  getRealtimeMessages,
-  sendRealtimeMessage,
-  subscribeRealtimeMessages,
-  getRealtimeSubscription,
-  // Storage
-  uploadToStorage,
-  getStorageObjects,
-  deleteStorageObject,
-  subscribeStorageObjects,
-  getStorageBuckets,
-  // Vault
-  getVaultSecret,
-  storeVaultSecret,
-  subscribeVaultSecrets,
-  // Key Tables
-  createLeadsCrm,
-  getLeadsCrm,
-  updateLeadsCrm,
-  deleteLeadsCrm,
-  subscribeLeadsCrm,
-  createAiPredictions,
-  // ... (adicione outros específicos)
-  // Genéricos
-  createRecord,
-  getRecords,
-  updateRecord,
-  deleteRecord,
-  subscribeRecord
-};
-
-export const ALSHAM_METADATA = {
-  ...ALSHAM_METADATA,  // Merge anterior
-  statistics: {
-    ...ALSHAM_METADATA.statistics,
-    totalTables: 118,  // Full schemas
-    totalRealtimeChannels: 89,  // Com triggers + realtime.messages
-    totalFunctions: 600  // + extras pra schemas
-  }
-};
-
-logDebug('🜂 ALSHAM 360° PRIMA - 100% ELEVADO: 118 TABLES, INFINITUM SELADO');
-console.log('🌟 Todos schemas integrados - Evolução eterna ativa.');
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 1/10 - ACCOUNTS & CONTACTS (CRUD Completo)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
