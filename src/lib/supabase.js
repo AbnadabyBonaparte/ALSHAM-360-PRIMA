@@ -13594,9 +13594,10 @@ export const IntegrationsModule = {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // ============================================================================
-// EXPORT COMPLETO - TODAS AS FUNÇÕES ORGANIZADAS
+// 🚀 EXPORT COMPLETO - TODAS AS FUNÇÕES ORGANIZADAS (USO INTERNO + DEFAULT)
 // ============================================================================
-export const ALSHAM_FULL = {
+
+const ALSHAM_FULL = {
   // ============ CORE & AUTH ============
   supabase,
   response,
