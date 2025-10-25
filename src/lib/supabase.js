@@ -17213,8 +17213,8 @@ ALSHAM_METADATA.modules.part16 = {
 
 logDebug('🛡️ SecuritySentinelCluster registrado com sucesso no ALSHAM_METADATA.');
 
-⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21
-AUTOMATION CORE (v17.1-STABLE – CLOUD SAFE)
+// ⚙️ SUPABASE ALSHAM 360° PRIMA – PARTE 17/21
+// AUTOMATION CORE (v17.1-STABLE – CLOUD SAFE)
 
 📅 Data: 2025-10-23
 🧠 Autoridade: CITIZEN SUPREMO X.1
