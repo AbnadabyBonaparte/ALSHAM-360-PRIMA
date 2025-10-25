@@ -8751,6 +8751,7 @@ export function subscribeContacts(onChange) {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
     .subscribe();
 }
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 2/10 - SUPPORT TICKETS & TASKS (CRUD Completo)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -8960,6 +8961,7 @@ export function subscribeTasks(onChange) {
 // ============================================================================
 // TABELA: COMMENTS - Comentários (0 policies - needs RLS!, 1 trigger)
 // ============================================================================
+
 /**
  * Cria comentário
  * @param {Object} commentData - Dados do comentário (entity_type, entity_id, content)
