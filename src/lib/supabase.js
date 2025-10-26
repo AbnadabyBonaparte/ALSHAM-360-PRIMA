@@ -126,7 +126,8 @@ export async function getCurrentSession() {
   }
 }
 
-export const supabase = getSupabaseClient();
+const supabaseClient = supabase;
+export { supabaseClient as supabase };
 
 // ---------------------------------------------------------------------------
 // CONSTANTES
