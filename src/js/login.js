@@ -10,10 +10,26 @@ function getAuthServices() {
   return window.AlshamSupabase || {};
 }
 
+function resolveSupabaseAuth(services) {
+  if (!services) return null;
+  if (services.supabase?.auth) return services.supabase.auth;
+  if (services.auth?.signInWithPassword) return services.auth;
+  if (typeof services.signInWithPassword === 'function') {
+    return {
+      signInWithPassword: services.signInWithPassword,
+      getSession: services.getSession || services.getCurrentSession,
+      signOut: services.signOut
+    };
+  }
+  return null;
+}
+
 async function waitForAuthServices(attempt = 0) {
   const services = getAuthServices();
-  if (services.genericSignIn && services.createAuditLog) {
-    return services;
+  const supabaseAuth = resolveSupabaseAuth(services);
+
+  if (supabaseAuth?.signInWithPassword) {
+    return { supabaseAuth, createAuditLog: services.createAuditLog };
   }
 
   if (attempt >= MAX_ATTEMPTS) {
@@ -44,11 +60,15 @@ function hideMessages(...elements) {
 async function checkExistingSession() {
   try {
     const services = getAuthServices();
-    if (typeof services.getCurrentSession !== 'function') {
+    const supabaseAuth = resolveSupabaseAuth(services);
+    const sessionFetcher =
+      supabaseAuth?.getSession || services.getSession || services.getCurrentSession;
+
+    if (typeof sessionFetcher !== 'function') {
       return false;
     }
 
-    const result = await services.getCurrentSession();
+    const result = await sessionFetcher();
     const session = result?.session || result?.data?.session || null;
 
     if (session?.user) {
@@ -82,11 +102,11 @@ async function handleLoginSubmit(event) {
   }
 
   try {
-    const { genericSignIn, createAuditLog } = await waitForAuthServices();
-    const response = await genericSignIn(email, password);
+    const { supabaseAuth, createAuditLog } = await waitForAuthServices();
+    const { data, error } = await supabaseAuth.signInWithPassword({ email, password });
 
-    const authError = response?.error || (response?.success === false ? new Error('Falha no login') : null);
-    const user = response?.data?.user || response?.user || null;
+    const authError = error || null;
+    const user = data?.user || null;
 
     if (authError || !user) {
       const reason = authError?.message || 'Credenciais inválidas';
@@ -154,6 +174,9 @@ if (document.readyState === 'loading') {
 }
 
 window.LoginSystem = {
-  login: (email, password) => waitForAuthServices().then(({ genericSignIn }) => genericSignIn(email, password)),
+  login: (email, password) =>
+    waitForAuthServices().then(({ supabaseAuth }) =>
+      supabaseAuth.signInWithPassword({ email, password })
+    ),
   guard: robustAuthGuard
 };
