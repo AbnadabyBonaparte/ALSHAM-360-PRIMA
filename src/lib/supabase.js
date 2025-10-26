@@ -15,6 +15,27 @@ const supabaseModule =
 
 const { createClient } = supabaseModule;
 
+if (typeof window !== 'undefined') {
+  window.ALSHAM = window.ALSHAM || {};
+  window.ALSHAM.METADATA = window.ALSHAM.METADATA || {};
+  if (typeof window.ALSHAM.registerModule !== 'function') {
+    window.ALSHAM.registerModule = (id, module = {}) => {
+      if (!id) return;
+      const registry = window.ALSHAM.METADATA;
+      registry[id] = registry[id] || {};
+      registry[id].audit = module.audit || {};
+      registry[id].tables = module.tables || registry[id].tables || {};
+      if (module.metadata) {
+        registry[id].metadata = {
+          ...(registry[id].metadata || {}),
+          ...module.metadata
+        };
+      }
+      console.log(`Módulo ${id} registrado com sucesso.`);
+    };
+  }
+}
+
 if (typeof createClient !== 'function') {
   throw new Error('Supabase client factory not available.');
 }
@@ -104,6 +125,9 @@ export async function getCurrentSession() {
     throw err;
   }
 }
+
+const supabaseClient = supabase;
+export { supabaseClient as supabase };
 
 // ---------------------------------------------------------------------------
 // CONSTANTES
@@ -12992,7 +13016,13 @@ if (typeof window !== 'undefined') {
     ...existingAlsham,
     ...ALSHAM_FULL,
     PAGES: ALSHAM_PAGES, // ✅ referência direta das 97 páginas
-    METADATA: ALSHAM_METADATA,
+    METADATA: {
+      ...window.ALSHAM.METADATA,
+      core: {
+        ...(window.ALSHAM.METADATA?.core || {}),
+        version: ALSHAM_METADATA.version
+      }
+    },
     version: ALSHAM_METADATA.version,
     initialized: true,
     initTimestamp: new Date().toISOString()
@@ -13003,13 +13033,23 @@ if (typeof window !== 'undefined') {
       throw new Error('Module id is required to register metadata.');
     }
 
-    const entry = {
-      ...(ALSHAM_METADATA.modulesRegistry[id] || {}),
-      ...module
+    const registry = window.ALSHAM.METADATA;
+    const current = {
+      ...(registry[id] || {}),
+      ...(ALSHAM_METADATA.modulesRegistry[id] || {})
     };
 
-    ALSHAM_METADATA.modulesRegistry[id] = entry;
-    window.ALSHAM.METADATA[id] = entry;
+    const normalized = {
+      ...current,
+      ...module,
+      audit: {
+        ...(current.audit || {}),
+        ...(module.audit || {})
+      }
+    };
+
+    registry[id] = normalized;
+    ALSHAM_METADATA.modulesRegistry[id] = normalized;
 
     if (module.tables) {
       ALSHAM_METADATA.tables[id] = module.tables;

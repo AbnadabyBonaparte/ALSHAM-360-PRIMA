@@ -1,207 +1,129 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- ✅ Theme Init Inline (Evita FOUC) -->
-  <script>
-    (function() {
-      const theme = localStorage.getItem('alsham-theme') || 'light';
-      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-      if (contrast === 'high') {
-        document.documentElement.classList.add('high-contrast');
-      }
-    })();
-  </script>
-  
-  <title>Login — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Acesse o ALSHAM 360° PRIMA com segurança empresarial" />
-
-  <!-- 🧠 PWA Essentials -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0176D3" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <!-- 🎨 Styles -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - ALSHAM 360°</title>
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-</head>
-
-<body class="font-inter bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center">
-
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
-
-  <main class="w-full max-w-md bg-white rounded-lg shadow-lg p-8 border border-gray-100" role="main">
-    <h1 class="text-2xl font-bold text-center text-primary mb-6">ALSHAM 360° — Login</h1>
-
-    <form id="login-form" class="space-y-4 hidden" autocomplete="on">
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
-        <input id="email" type="email"
-               class="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-               placeholder="seu@email.com"
-               value="teste@al01.com"
-               autocomplete="email"
-               required />
-      </div>
-
-      <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-        <div class="relative">
-          <input id="password" type="password" 
-                 class="mt-1 w-full border border-gray-300 rounded-lg p-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                 placeholder="••••••••"
-                 autocomplete="current-password"
-                 required
-                 minlength="6"
-                 value="123456" />
-          <button type="button" id="toggle-password"
-                  aria-label="Mostrar senha"
-                  class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-blue-600 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <button id="login-btn" type="submit"
-              class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
-        <span id="login-btn-text">Login Automático</span>
-        <span id="login-spinner" class="hidden animate-spin ml-2">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </span>
-      </button>
-    </form>
-
-    <div id="error-message" class="hidden mt-4 text-sm text-red-600 text-center" role="alert">
-      <span id="error-text"></span>
-    </div>
-    <div id="success-message" class="hidden mt-4 text-sm text-green-600 text-center" role="status">
-      <span id="success-text"></span>
-    </div>
-
-    <div class="mt-6 space-y-2">
-      <button onclick="LoginSystem.oauthLogin('google')"
-              class="w-full border border-gray-300 rounded-lg py-2 hover:bg-gray-50 flex justify-center items-center gap-2 transition-colors">
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Entrar com Google
-      </button>
-      
-      <button onclick="LoginSystem.oauthLogin('microsoft')"
-              class="w-full border border-gray-300 rounded-lg py-2 hover:bg-gray-50 flex justify-center items-center gap-2 transition-colors">
-        <svg class="w-5 h-5" viewBox="0 0 23 23">
-          <path fill="#f3f3f3" d="M0 0h23v23H0z"/>
-          <path fill="#f35325" d="M1 1h10v10H1z"/>
-          <path fill="#81bc06" d="M12 1h10v10H12z"/>
-          <path fill="#05a6f0" d="M1 12h10v10H1z"/>
-          <path fill="#ffba08" d="M12 12h10v10H12z"/>
-        </svg>
-        Entrar com Microsoft
-      </button>
-    </div>
-
-    <div class="mt-4 text-center">
-      <button type="button"
-              onclick="LoginSystem.forgotPassword(document.getElementById('email').value)"
-              class="text-sm text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
-        Esqueci minha senha
-      </button>
-    </div>
-
-    <div class="mt-4 text-center">
-      <p class="text-sm text-gray-600">
-        Não tem uma conta?
-        <a href="/register.html" class="text-blue-600 font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">Criar conta</a>
-      </p>
-    </div>
-  </main>
-
-  <footer class="mt-8 text-center text-gray-500 text-sm">
-    <p>© 2025 ALSHAM 360° PRIMA — Todos os direitos reservados</p>
-  </footer>
-
-  <!-- 🧩 Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
-    console.log('✅ Supabase integrado no login');
-  </script>
-
-  <script type="module">
-    import { getCurrentSession } from '/src/lib/supabase.js';
-
-    async function routeUser() {
-      const loginForm = document.getElementById('login-form');
-      const errorWrapper = document.getElementById('error-message');
-      const errorText = document.getElementById('error-text');
-
-      try {
-        const session = await getCurrentSession();
-
-        if (session?.user) {
-          window.location.href = '/dashboard.html';
-          return;
-        }
-
-        loginForm?.classList.remove('hidden');
-      } catch (err) {
-        console.error('Erro na sessão:', err);
-        if (errorWrapper && errorText) {
-          errorText.textContent = 'Sessão inválida. Faça login.';
-          errorWrapper.classList.remove('hidden');
-        }
-        loginForm?.classList.remove('hidden');
-      }
+  <script type="module" src="/src/lib/supabase.js"></script>
+  <script type="module" src="/src/js/auth.js"></script>
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f1c46, #4c1d95);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #1f2937;
+      padding: 1.5rem;
     }
 
-    document.addEventListener('DOMContentLoaded', routeUser);
-  </script>
+    .login-card {
+      width: min(24rem, 100%);
+      background: #fff;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(15, 28, 70, 0.35);
+      padding: 2.5rem 2rem;
+    }
 
-  <!-- ⚙️ Script de Login -->
-  <script type="module" src="/src/js/login.js"></script>
+    .login-card h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      text-align: center;
+      color: #1d4ed8;
+      margin-bottom: 1.5rem;
+    }
 
-  <!-- 🔐 Toggle Password Visibility -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const toggle = document.getElementById("toggle-password");
-      const pwd = document.getElementById("password");
-      
-      if (toggle && pwd) {
-        toggle.addEventListener("click", () => {
-          const isPassword = pwd.type === "password";
-          pwd.type = isPassword ? "text" : "password";
-          
-          // Atualizar ícone
-          const svg = toggle.querySelector('svg');
-          if (svg) {
-            svg.innerHTML = isPassword 
-              ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />'
-              : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
-          }
-          
-          // Atualizar ARIA label
-          toggle.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
-        });
-      }
-    });
-  </script>
+    .login-card form {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .login-card label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #4b5563;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .login-card input {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .login-card input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+
+    .login-card button {
+      margin-top: 0.5rem;
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .login-card button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .login-card button:active {
+      transform: translateY(0);
+    }
+
+    .feedback {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      text-align: center;
+      display: none;
+    }
+
+    .feedback.visible {
+      display: block;
+    }
+
+    .feedback.success {
+      color: #047857;
+    }
+
+    .feedback.error {
+      color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card" role="main">
+    <h1>ALSHAM 360°</h1>
+    <form id="login-form" data-auto-submit="true">
+      <div>
+        <label for="email">E-mail corporativo</label>
+        <input id="email" name="email" type="email" value="teste@al01.com" autocomplete="email" required />
+      </div>
+      <div>
+        <label for="password">Senha</label>
+        <input id="password" name="password" type="password" value="123456" autocomplete="current-password" minlength="6" required />
+      </div>
+      <button type="submit">Login Automático</button>
+    </form>
+    <p id="success-message" class="feedback success" role="status"></p>
+    <p id="error-message" class="feedback error" role="alert"></p>
+  </main>
 </body>
 </html>

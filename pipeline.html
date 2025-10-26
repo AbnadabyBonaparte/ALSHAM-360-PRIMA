@@ -1,515 +1,175 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- ✅ Theme Init Inline (Evita FOUC) -->
-  <script>
-    (function() {
-      const theme = localStorage.getItem('alsham-theme') || 'light';
-      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-      if (contrast === 'high') {
-        document.documentElement.classList.add('high-contrast');
-      }
-    })();
-  </script>
-  
-  <title>Pipeline de Vendas — ALSHAM 360° PRIMA v9.0</title>
-  <meta name="description" content="Pipeline de vendas Kanban com drag & drop, filtros avançados, busca e export CSV/PDF - ALSHAM 360° PRIMA CRM Enterprise com IA">
-
-  <!-- ✅ CSP COMPLETO -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://app.posthog.com https://us-assets.i.posthog.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:;">
-  
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0176D3">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ALSHAM Pipeline">
-  
-  <!-- Icons -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipeline de Vendas — ALSHAM 360°</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  
-  <!-- 🎨 Dark Mode Critical CSS -->
-  <style id="dark-theme-critical">
-    :root {
-      --alsham-text-primary: #111827;
-      --alsham-text-secondary: #6b7280;
-      --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #f3f4f6;
-      --alsham-bg-surface: #ffffff;
-      --alsham-bg-hover: #f3f4f6;
-      --alsham-border-default: #e5e7eb;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15);
-      --alsham-primary: #0176D3;
-      --alsham-primary-light: rgba(1,118,211,0.1);
-      --alsham-radius-lg: 1rem;
-      --alsham-radius-full: 9999px;
-    }
-    
-    html.dark {
-      --alsham-text-primary: #f9fafb;
-      --alsham-text-secondary: #d1d5db;
-      --alsham-text-tertiary: #9ca3af;
-      --alsham-bg-canvas: #0f172a;
-      --alsham-bg-surface: #1e293b;
-      --alsham-bg-hover: #334155;
-      --alsham-border-default: #334155;
-      --alsham-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
-      --alsham-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
-      --alsham-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
-      color-scheme: dark;
-    }
-    
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--alsham-bg-canvas);
-      color: var(--alsham-text-primary);
-      transition: background-color 0.3s ease, color 0.3s ease;
-      min-height: 100vh;
-      display: flex;
-    }
-  </style>
-  
-  <!-- 🌙 Theme Toggle Script -->
-  <script>
-    (function() {
-      'use strict';
-      
-      function toggleTheme() {
-        const html = document.documentElement;
-        const isDark = html.classList.toggle('dark');
-        localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
-      }
-      
-      document.addEventListener('DOMContentLoaded', function() {
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-          themeToggle.addEventListener('click', toggleTheme);
-        }
-      });
-    })();
-  </script>
-  
-  <!-- 🎨 Pipeline Styles -->
   <style>
-    /* Sidebar */
-    aside {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 16rem;
-      height: 100vh;
-      background: var(--alsham-bg-surface);
-      box-shadow: var(--alsham-shadow-lg);
-      border-right: 1px solid var(--alsham-border-default);
-      display: flex;
-      flex-direction: column;
-      z-index: 40;
+    :root {
+      --stage-bg: #f3f4f6;
+      --stage-border: #e5e7eb;
+      --card-bg: #fff;
+      --card-shadow: 0 14px 24px -16px rgba(15, 23, 42, 0.45);
     }
-    
-    aside > div:first-child {
-      height: 4rem;
-      display: flex;
-      align-items: center;
-      padding: 0 1.5rem;
-      border-bottom: 1px solid var(--alsham-border-default);
-    }
-    
-    aside h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #0176D3;
-    }
-    
-    nav {
-      margin-top: 1.25rem;
-      padding: 0 0.75rem;
-      flex-grow: 1;
-    }
-    
-    nav a {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem;
-      margin-bottom: 0.25rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      border-radius: 0.5rem;
-      color: var(--alsham-text-secondary);
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    
-    nav a:hover {
-      background: var(--alsham-bg-hover);
-      color: #0176D3;
-    }
-    
-    nav a.active {
-      background: var(--alsham-primary-light);
-      color: #0176D3;
-      font-weight: 600;
-    }
-    
-    /* Main */
-    main {
-      margin-left: 16rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+
+    body {
+      margin: 0;
       min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #111827, #1e3a8a);
+      color: #111827;
     }
-    
+
     header {
-      background: var(--alsham-bg-surface);
-      box-shadow: var(--alsham-shadow-sm);
-      border-bottom: 1px solid var(--alsham-border-default);
-      position: sticky;
-      top: 0;
-      z-index: 30;
+      padding: 2.5rem 3rem 1rem;
+      color: #fff;
     }
-    
-    header > div {
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    
+
     header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      font-size: 2.25rem;
     }
-    
-    #theme-toggle {
-      width: 2.5rem;
-      height: 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: 1px solid var(--alsham-border-default);
-      border-radius: 0.375rem;
-      cursor: pointer;
-      transition: all 0.2s;
+
+    header p {
+      margin: 0;
+      max-width: 48ch;
+      opacity: 0.85;
     }
-    
-    #theme-toggle:hover {
-      background: var(--alsham-primary-light);
-      border-color: #0176D3;
-      transform: scale(1.05);
-    }
-    
-    #theme-toggle svg {
-      width: 1.25rem;
-      height: 1.25rem;
-      color: var(--alsham-text-secondary);
-    }
-    
-    html:not(.dark) .moon-icon { display: none; }
-    html.dark .sun-icon { display: none; }
-    
-    /* Pipeline Container */
+
     .pipeline-container {
-      padding: 2rem;
-      overflow-x: auto;
-      flex: 1;
-    }
-    
-    #loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 400px;
-      font-size: 1.125rem;
-      color: var(--alsham-text-secondary);
-    }
-    
-    #pipeline-board {
       display: flex;
       gap: 1.5rem;
-      min-width: max-content;
-      align-items: flex-start;
+      padding: 0 3rem 3rem;
+      overflow-x: auto;
     }
-    
-    #pipeline-board.hidden {
-      display: none;
-    }
-    
-    /* Pipeline Columns */
+
     .pipeline-column {
-      background: var(--alsham-bg-canvas);
-      border-radius: 0.75rem;
-      width: 320px;
+      background: var(--stage-bg);
+      border: 1px solid var(--stage-border);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      min-width: 16rem;
       display: flex;
       flex-direction: column;
-      flex-shrink: 0;
+      gap: 0.85rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
-    
-    .pipeline-column-header {
-      padding: 1.25rem;
-      border-bottom: 3px solid;
-      border-radius: 0.75rem 0.75rem 0 0;
-      background: var(--alsham-bg-surface);
-      box-shadow: var(--alsham-shadow-sm);
-    }
-    
-    .pipeline-column-header h3 {
-      font-size: 0.875rem;
-      font-weight: 700;
+
+    .pipeline-column h2 {
+      font-size: 1rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.75rem;
-      color: var(--alsham-text-primary);
+      color: #1e3a8a;
+      letter-spacing: 0.08em;
+      margin: 0 0 0.25rem 0;
     }
-    
-    .pipeline-column-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.875rem;
-      color: var(--alsham-text-secondary);
-    }
-    
-    .deal-count {
-      background: var(--alsham-bg-hover);
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--alsham-radius-full);
-      font-weight: 600;
-      font-size: 0.75rem;
-    }
-    
-    .pipeline-column-body {
-      padding: 1rem;
-      flex: 1;
-      min-height: 200px;
-      border-radius: 0 0 0.75rem 0.75rem;
-      transition: background-color 0.2s ease;
-    }
-    
-    .pipeline-column-body.drag-over {
-      background: var(--alsham-primary-light);
-    }
-    
-    /* Opportunity Cards */
+
     .opportunity-card {
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-left: 4px solid #0176D3;
-      border-radius: 0.5rem;
+      background: var(--card-bg);
+      border-radius: 1rem;
       padding: 1rem;
-      margin-bottom: 0.75rem;
-      cursor: grab;
-      transition: all 0.2s;
-      box-shadow: var(--alsham-shadow-sm);
+      box-shadow: var(--card-shadow);
+      display: grid;
+      gap: 0.5rem;
     }
-    
-    .opportunity-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--alsham-shadow-md);
+
+    .opportunity-card strong {
+      font-size: 1rem;
+      color: #1f2937;
     }
-    
-    .opportunity-card:active {
-      cursor: grabbing;
+
+    .opportunity-card span {
+      font-size: 0.875rem;
+      color: #4b5563;
     }
-    
-    .opportunity-card.dragging {
-      opacity: 0.5;
+
+    .pipeline-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0 3rem 2.5rem;
+      color: #fff;
     }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      aside {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-      }
-      
-      aside.mobile-open {
-        transform: translateX(0);
-      }
-      
-      main {
-        margin-left: 0;
-      }
-      
-      header > div {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      
-      #pipeline-actions {
-        width: 100%;
-        flex-direction: column;
-      }
-      
-      #search-input {
-        width: 100% !important;
-      }
-      
-      .pipeline-column {
-        width: 280px;
-      }
+
+    .pipeline-footer strong {
+      font-size: 1.75rem;
     }
   </style>
 </head>
 <body>
-  <!-- 🎯 Sidebar -->
-  <aside id="sidebar">
-    <div>
-      <h1>ALSHAM 360°</h1>
-    </div>
-    <nav>
-      <a href="/dashboard.html">📊 Dashboard</a>
-      <a href="/leads-real.html">👥 Leads</a>
-      <a href="/pipeline.html" class="active" aria-current="page">🎯 Pipeline</a>
-      <a href="/automacoes.html">🤖 Automações</a>
-      <a href="/relatorios.html">📈 Relatórios</a>
-      <a href="/gamificacao.html">🎮 Gamificação</a>
-      <a href="/configuracoes.html">⚙️ Configurações</a>
-    </nav>
-  </aside>
-  
-  <!-- 📄 Main Content -->
-  <main>
-    <header>
-      <div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <button id="mobile-menu-toggle" style="display: none; background: none; border: none; cursor: pointer; padding: 0.5rem;" aria-label="Abrir menu">
-            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--alsham-text-secondary);">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
-          <h1>Pipeline de Vendas</h1>
-        </div>
-        <button id="theme-toggle" aria-label="Alternar tema claro/escuro">
-          <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-          </svg>
-        </button>
+  <header>
+    <h1>Pipeline Comercial</h1>
+    <p>Monitoramento das oportunidades em tempo real com distribuição por estágio, valor e prioridade de follow-up.</p>
+  </header>
+
+  <section class="pipeline-container" aria-label="Pipeline de vendas">
+    <article class="pipeline-column" data-stage="leads">
+      <h2>Leads</h2>
+      <div class="opportunity-card">
+        <strong>Lead #1027</strong>
+        <span>R$ 10.000 · Inbound · aguardando qualificação</span>
       </div>
-    </header>
-    
-    <div class="pipeline-container">
-      <div id="loading">⏳ Carregando pipeline...</div>
-      <div id="pipeline-board" class="hidden"></div>
-    </div>
-  </main>
-  
-  <!-- ✅ Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
-    console.log('✅ Supabase integrado no Pipeline:', Object.keys(window.AlshamSupabase).length, 'funções');
-  </script>
-  
-  <!-- ✅ Notifications (global function) -->
-  <script>
-    window.showNotification = function(message, type = 'info', duration = 3000) {
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        z-index: 10000;
-        padding: 1rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        font-size: 0.875rem;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
-        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#0176D3'};
-        color: white;
-        animation: slideIn 0.3s ease-out;
-      `;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease-in';
-        setTimeout(() => toast.remove(), 300);
-      }, duration);
-    };
-    
-    // Animações
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideIn {
-        from {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-      @keyframes slideOut {
-        from {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-      }
-      
-      @media (max-width: 768px) {
-        #mobile-menu-toggle {
-          display: block !important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-    
-    // Mobile menu toggle
-    document.addEventListener('DOMContentLoaded', function() {
-      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-      const sidebar = document.getElementById('sidebar');
-      
-      if (mobileMenuToggle && sidebar) {
-        mobileMenuToggle.addEventListener('click', function() {
-          sidebar.classList.toggle('mobile-open');
-        });
-        
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(e) {
-          if (window.innerWidth <= 768 && 
-              !sidebar.contains(e.target) && 
-              e.target !== mobileMenuToggle &&
-              !mobileMenuToggle.contains(e.target)) {
-            sidebar.classList.remove('mobile-open');
-          }
-        });
-      }
-    });
-  </script>
-  
-  <!-- ✅ Pipeline Script (v9.0 - 100% COMPLETO) -->
-  <script type="module" src="/src/js/pipeline.js"></script>
+      <div class="opportunity-card">
+        <strong>Lead #1028</strong>
+        <span>R$ 7.500 · Evento · agendamento de discovery</span>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="qualificacao">
+      <h2>Qualificação</h2>
+      <div class="opportunity-card">
+        <strong>Conta Atlas</strong>
+        <span>R$ 35.000 · Fit alto · aguardando proposta técnica</span>
+      </div>
+      <div class="opportunity-card">
+        <strong>Startup Boreal</strong>
+        <span>R$ 19.000 · Fit médio · demo marcada para hoje</span>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="proposta">
+      <h2>Proposta</h2>
+      <div class="opportunity-card">
+        <strong>Grupo Helios</strong>
+        <span>R$ 58.000 · Proposta enviada · aguardando jurídico</span>
+      </div>
+      <div class="opportunity-card">
+        <strong>Vision Tech</strong>
+        <span>R$ 42.000 · Cláusulas revisadas · retorno até amanhã</span>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="negociacao">
+      <h2>Negociação</h2>
+      <div class="opportunity-card">
+        <strong>Infinity Labs</strong>
+        <span>R$ 64.000 · Desconto estratégico · follow-up diário</span>
+      </div>
+      <div class="opportunity-card">
+        <strong>Orbital Ventures</strong>
+        <span>R$ 51.000 · Comitê de compras · retorno em 48h</span>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="fechamento">
+      <h2>Fechamento</h2>
+      <div class="opportunity-card">
+        <strong>Neon Global</strong>
+        <span>R$ 68.000 · Contrato enviado · assinatura pendente</span>
+      </div>
+      <div class="opportunity-card">
+        <strong>Quantum Systems</strong>
+        <span>R$ 75.000 · Implantação agendada · go-live em 10 dias</span>
+      </div>
+    </article>
+  </section>
+
+  <footer class="pipeline-footer">
+    <span>Oportunidades monitoradas: <strong>42</strong></span>
+    <span>Total ponderado: <strong>R$ 150.000</strong></span>
+  </footer>
 </body>
 </html>
