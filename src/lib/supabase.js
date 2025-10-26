@@ -8,7 +8,20 @@
 // 🧩 ARQUIVO ÚNICO: Consolidação de 10 partes sem remoções
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import { createClient } from '@supabase/supabase-js';
+const supabaseModule =
+  typeof window !== 'undefined' && window?.supabase?.createClient
+    ? window.supabase
+    : await import('@supabase/supabase-js');
+
+const { createClient } = supabaseModule;
+
+if (typeof createClient !== 'function') {
+  throw new Error('Supabase client factory not available.');
+}
+
+if (typeof window !== 'undefined' && !window.supabase) {
+  window.supabase = supabaseModule;
+}
 
 // ═══════════════════════════════════════════════════════
 // PARTE 1: CORE - Configuração Base + Autenticação
