@@ -1247,6 +1247,13 @@ export async function deleteContact(id) {
     return response(false, null, err);
   }
 }
+
+export function subscribeContacts(onChange) {
+  return supabase
+    .channel('realtime_contacts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
+    .subscribe();
+}
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🏢 ACCOUNTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1347,6 +1354,13 @@ export async function deleteAccount(id) {
     _log('error', 'deleteAccount exception:', err);
     return response(false, null, err);
   }
+}
+
+export function subscribeAccounts(onChange) {
+  return supabase
+    .channel('realtime_accounts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, onChange)
+    .subscribe();
 }
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 💼 OPPORTUNITIES & PIPELINE
@@ -8572,185 +8586,9 @@ export async function createAiPredictions(predictionData) {
 // TABELA: ACCOUNTS - Contas Comerciais (RLS: 4 policies, 2 triggers)
 // ============================================================================
 
-/**
- * Cria uma conta comercial
- * @param {Object} accountData - Dados da conta (nome, tipo, etc.)
- * @returns {Promise<Object>}
- */
-export async function createAccount(accountData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('accounts')
-      .insert([{ ...accountData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🏢 Conta criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createAccount:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca contas com filtros
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, tipo, limit)
- * @returns {Promise<Object>}
- */
-export async function getAccounts(orgId, filters = { limit: 50 }) {
-  return await withCache(`accounts_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('accounts')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.type) query = query.eq('type', filters.type);
-    if (filters.industry) query = query.eq('industry', filters.industry);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza conta
- * @param {string} id - ID da conta
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateAccount(id, updateData) {
-  const { data, error } = await supabase
-    .from('accounts')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Conta atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta conta
- * @param {string} id - ID da conta
- * @returns {Promise<Object>}
- */
-export async function deleteAccount(id) {
-  const { error } = await supabase.from('accounts').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Conta deletada:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em accounts
- * @param {Function} onChange - Callback para mudanças
- * @returns {RealtimeChannel}
- */
-export function subscribeAccounts(onChange) {
-  return supabase
-    .channel('realtime_accounts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, onChange)
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: CONTACTS - Contatos (RLS: 5 policies, 2 triggers)
 // ============================================================================
-
-/**
- * Cria contato
- * @param {Object} contactData - Dados do contato (nome, email, telefone, account_id, etc.)
- * @returns {Promise<Object>}
- */
-export async function createContact(contactData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('contacts')
-      .insert([{ ...contactData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('👤 Contato criado:', data.id, data.name);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createContact:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca contatos
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (account_id, status, limit)
- * @returns {Promise<Object>}
- */
-export async function getContacts(orgId, filters = { limit: 50 }) {
-  return await withCache(`contacts_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('contacts')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.account_id) query = query.eq('account_id', filters.account_id);
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.email) query = query.ilike('email', `%${filters.email}%`);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza contato
- * @param {string} id - ID do contato
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateContact(id, updateData) {
-  const { data, error } = await supabase
-    .from('contacts')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Contato atualizado:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta contato
- * @param {string} id - ID do contato
- * @returns {Promise<Object>}
- */
-export async function deleteContact(id) {
-  const { error } = await supabase.from('contacts').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Contato deletado:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em contacts
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeContacts(onChange) {
-  return supabase
-    .channel('realtime_contacts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
-    .subscribe();
-}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 2/10 - SUPPORT TICKETS & TASKS (CRUD Completo)
@@ -8760,302 +8598,14 @@ export function subscribeContacts(onChange) {
 // TABELA: SUPPORT_TICKETS - Sistema de Tickets (RLS: 4 policies, 2 triggers)
 // ============================================================================
 
-/**
- * Cria ticket de suporte
- * @param {Object} ticketData - Dados do ticket (titulo, descricao, prioridade, etc.)
- * @returns {Promise<Object>}
- */
-export async function createSupportTicket(ticketData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('support_tickets')
-      .insert([{ ...ticketData, org_id, status: ticketData.status || 'open' }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🎫 Ticket criado:', data.id, 'Prioridade:', data.priority);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createSupportTicket:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca tickets de suporte
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, prioridade, assigned_to, limit)
- * @returns {Promise<Object>}
- */
-export async function getSupportTickets(orgId, filters = { limit: 50 }) {
-  return await withCache(`support_tickets_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('support_tickets')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.priority) query = query.eq('priority', filters.priority);
-    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
-    if (filters.category) query = query.eq('category', filters.category);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60); // Cache 60s (tickets mudam rápido)
-}
-
-/**
- * Atualiza ticket de suporte
- * @param {string} id - ID do ticket
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateSupportTicket(id, updateData) {
-  const { data, error } = await supabase
-    .from('support_tickets')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Ticket atualizado:', id, 'Status:', data.status);
-  return response(true, data);
-}
-
-/**
- * Deleta ticket de suporte
- * @param {string} id - ID do ticket
- * @returns {Promise<Object>}
- */
-export async function deleteSupportTicket(id) {
-  const { error } = await supabase.from('support_tickets').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Ticket deletado:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em support_tickets
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeSupportTickets(onChange) {
-  return supabase
-    .channel('realtime_support_tickets')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, (payload) => {
-      logDebug('🎫 Ticket evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: TASKS - Gestão de Tarefas (RLS: 4 policies, 3 triggers)
 // ============================================================================
-
-/**
- * Cria tarefa
- * @param {Object} taskData - Dados da tarefa (titulo, descricao, prazo, etc.)
- * @returns {Promise<Object>}
- */
-export async function createTask(taskData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('tasks')
-      .insert([{ ...taskData, org_id, status: taskData.status || 'pending' }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('✅ Tarefa criada:', data.id, 'Status:', data.status);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createTask:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca tarefas
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, assigned_to, priority, due_date, limit)
- * @returns {Promise<Object>}
- */
-export async function getTasks(orgId, filters = { limit: 50 }) {
-  return await withCache(`tasks_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('tasks')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
-    if (filters.priority) query = query.eq('priority', filters.priority);
-    if (filters.due_date_from) query = query.gte('due_date', filters.due_date_from);
-    if (filters.due_date_to) query = query.lte('due_date', filters.due_date_to);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60);
-}
-
-/**
- * Atualiza tarefa
- * @param {string} id - ID da tarefa
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateTask(id, updateData) {
-  const { data, error } = await supabase
-    .from('tasks')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Tarefa atualizada:', id, 'Status:', data.status);
-  return response(true, data);
-}
-
-/**
- * Deleta tarefa
- * @param {string} id - ID da tarefa
- * @returns {Promise<Object>}
- */
-export async function deleteTask(id) {
-  const { error } = await supabase.from('tasks').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Tarefa deletada:', id);
-  return response(true, { id });
-}
-
-/**
- * Marca tarefa como concluída
- * @param {string} id - ID da tarefa
- * @returns {Promise<Object>}
- */
-export async function completeTask(id) {
-  return await updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
-}
-
-/**
- * Subscreve a mudanças em tasks
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeTasks(onChange) {
-  return supabase
-    .channel('realtime_tasks')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
-      logDebug('✅ Task evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
 
 // ============================================================================
 // TABELA: COMMENTS - Comentários (0 policies - needs RLS!, 1 trigger)
 // ============================================================================
 
-/**
- * Cria comentário
- * @param {Object} commentData - Dados do comentário (entity_type, entity_id, content)
- * @returns {Promise<Object>}
- */
-export async function createComment(commentData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('comments')
-      .insert([{ ...commentData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('💬 Comentário criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createComment:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca comentários de uma entidade
- * @param {string} entityType - Tipo da entidade (lead, ticket, task, etc.)
- * @param {string} entityId - ID da entidade
- * @returns {Promise<Object>}
- */
-export async function getComments(entityType, entityId) {
-  return await withCache(`comments_${entityType}_${entityId}`, async () => {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('entity_type', entityType)
-      .eq('entity_id', entityId)
-      .order('created_at', { ascending: true });
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 30);
-}
-
-/**
- * Atualiza comentário
- * @param {string} id - ID do comentário
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateComment(id, updateData) {
-  const { data, error } = await supabase
-    .from('comments')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Comentário atualizado:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta comentário
- * @param {string} id - ID do comentário
- * @returns {Promise<Object>}
- */
-export async function deleteComment(id) {
-  const { error } = await supabase.from('comments').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Comentário deletado:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em comments
- * @param {string} entityType - Tipo da entidade
- * @param {string} entityId - ID da entidade
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeComments(entityType, entityId, onChange) {
-  return supabase
-    .channel(`realtime_comments_${entityType}_${entityId}`)
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'comments',
-      filter: `entity_type=eq.${entityType},entity_id=eq.${entityId}`
-    }, (payload) => {
-      logDebug('💬 Comentário evento:', payload.eventType);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-    
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 3/10 - BILLING & CAMPAIGNS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9232,21 +8782,6 @@ export async function deleteCampaign(id) {
   if (error) return response(false, null, error);
   logDebug('🗑️ Campanha deletada:', id);
   return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em campaigns
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeCampaigns(onChange) {
-  return supabase
-    .channel('realtime_campaigns')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, (payload) => {
-      logDebug('📣 Campanha evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
 }
 
 // ============================================================================
@@ -9868,21 +9403,6 @@ export async function getAnalyticsEvents(orgId, filters = { limit: 100 }) {
     if (error) return response(false, null, error);
     return response(true, data);
   }, 60);
-}
-
-/**
- * Subscreve a mudanças em analytics_events
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeAnalyticsEvents(onChange) {
-  return supabase
-    .channel('realtime_analytics_events')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'analytics_events' }, (payload) => {
-      logDebug('📊 Analytics evento:', payload.eventType, payload.new?.event_name);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
 }
 
 // ============================================================================
