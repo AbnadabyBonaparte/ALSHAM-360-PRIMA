@@ -100,6 +100,9 @@ async function handleLoginSubmit(event) {
   const email = emailInput?.value?.trim();
   const password = passwordInput?.value ?? '';
 
+  console.log('🔐 [LOGIN] Iniciando processo de login...');
+  console.log('📧 [LOGIN] Email:', email);
+
   if (!email || !password) {
     setMessage(errorMessage, 'Erro no login: informe e-mail e senha.');
     return;
@@ -111,6 +114,12 @@ async function handleLoginSubmit(event) {
     console.log('🔐 Tentando login com:', email);
     
     const { data, error } = await supabaseAuth.signInWithPassword({ email, password });
+    console.log('📦 [LOGIN] Resposta do Supabase:', { 
+      hasData: !!data, 
+      hasError: !!error,
+      hasUser: !!data?.user,
+      hasSession: !!data?.session 
+    });
 
     const authError = error || null;
     const user = data?.user || null;
@@ -125,6 +134,8 @@ async function handleLoginSubmit(event) {
 
     console.log('✅ Login bem-sucedido:', user.email);
     setMessage(successMessage, 'Login realizado com sucesso! Redirecionando...');
+    console.log('✅ [LOGIN] Login bem-sucedido:', user.email);
+    console.log('🎫 [LOGIN] Sessão criada:', !!data?.session);
     await createAuditLog?.('LOGIN_SUCCESS', { email, user_id: user.id });
 
     // 🔧 FIX: Aumentar tempo de espera para garantir que a sessão foi salva
