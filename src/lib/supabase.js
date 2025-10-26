@@ -1247,6 +1247,13 @@ export async function deleteContact(id) {
     return response(false, null, err);
   }
 }
+
+export function subscribeContacts(onChange) {
+  return supabase
+    .channel('realtime_contacts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
+    .subscribe();
+}
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🏢 ACCOUNTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1347,6 +1354,13 @@ export async function deleteAccount(id) {
     _log('error', 'deleteAccount exception:', err);
     return response(false, null, err);
   }
+}
+
+export function subscribeAccounts(onChange) {
+  return supabase
+    .channel('realtime_accounts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, onChange)
+    .subscribe();
 }
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 💼 OPPORTUNITIES & PIPELINE
@@ -8572,185 +8586,9 @@ export async function createAiPredictions(predictionData) {
 // TABELA: ACCOUNTS - Contas Comerciais (RLS: 4 policies, 2 triggers)
 // ============================================================================
 
-/**
- * Cria uma conta comercial
- * @param {Object} accountData - Dados da conta (nome, tipo, etc.)
- * @returns {Promise<Object>}
- */
-export async function createAccount(accountData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('accounts')
-      .insert([{ ...accountData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🏢 Conta criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createAccount:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca contas com filtros
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, tipo, limit)
- * @returns {Promise<Object>}
- */
-export async function getAccounts(orgId, filters = { limit: 50 }) {
-  return await withCache(`accounts_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('accounts')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.type) query = query.eq('type', filters.type);
-    if (filters.industry) query = query.eq('industry', filters.industry);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza conta
- * @param {string} id - ID da conta
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateAccount(id, updateData) {
-  const { data, error } = await supabase
-    .from('accounts')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Conta atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta conta
- * @param {string} id - ID da conta
- * @returns {Promise<Object>}
- */
-export async function deleteAccount(id) {
-  const { error } = await supabase.from('accounts').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Conta deletada:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em accounts
- * @param {Function} onChange - Callback para mudanças
- * @returns {RealtimeChannel}
- */
-export function subscribeAccounts(onChange) {
-  return supabase
-    .channel('realtime_accounts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, onChange)
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: CONTACTS - Contatos (RLS: 5 policies, 2 triggers)
 // ============================================================================
-
-/**
- * Cria contato
- * @param {Object} contactData - Dados do contato (nome, email, telefone, account_id, etc.)
- * @returns {Promise<Object>}
- */
-export async function createContact(contactData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('contacts')
-      .insert([{ ...contactData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('👤 Contato criado:', data.id, data.name);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createContact:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca contatos
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (account_id, status, limit)
- * @returns {Promise<Object>}
- */
-export async function getContacts(orgId, filters = { limit: 50 }) {
-  return await withCache(`contacts_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('contacts')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.account_id) query = query.eq('account_id', filters.account_id);
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.email) query = query.ilike('email', `%${filters.email}%`);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza contato
- * @param {string} id - ID do contato
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateContact(id, updateData) {
-  const { data, error } = await supabase
-    .from('contacts')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Contato atualizado:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta contato
- * @param {string} id - ID do contato
- * @returns {Promise<Object>}
- */
-export async function deleteContact(id) {
-  const { error } = await supabase.from('contacts').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Contato deletado:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em contacts
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeContacts(onChange) {
-  return supabase
-    .channel('realtime_contacts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
-    .subscribe();
-}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 2/10 - SUPPORT TICKETS & TASKS (CRUD Completo)
@@ -8760,302 +8598,14 @@ export function subscribeContacts(onChange) {
 // TABELA: SUPPORT_TICKETS - Sistema de Tickets (RLS: 4 policies, 2 triggers)
 // ============================================================================
 
-/**
- * Cria ticket de suporte
- * @param {Object} ticketData - Dados do ticket (titulo, descricao, prioridade, etc.)
- * @returns {Promise<Object>}
- */
-export async function createSupportTicket(ticketData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('support_tickets')
-      .insert([{ ...ticketData, org_id, status: ticketData.status || 'open' }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🎫 Ticket criado:', data.id, 'Prioridade:', data.priority);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createSupportTicket:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca tickets de suporte
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, prioridade, assigned_to, limit)
- * @returns {Promise<Object>}
- */
-export async function getSupportTickets(orgId, filters = { limit: 50 }) {
-  return await withCache(`support_tickets_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('support_tickets')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.priority) query = query.eq('priority', filters.priority);
-    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
-    if (filters.category) query = query.eq('category', filters.category);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60); // Cache 60s (tickets mudam rápido)
-}
-
-/**
- * Atualiza ticket de suporte
- * @param {string} id - ID do ticket
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateSupportTicket(id, updateData) {
-  const { data, error } = await supabase
-    .from('support_tickets')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Ticket atualizado:', id, 'Status:', data.status);
-  return response(true, data);
-}
-
-/**
- * Deleta ticket de suporte
- * @param {string} id - ID do ticket
- * @returns {Promise<Object>}
- */
-export async function deleteSupportTicket(id) {
-  const { error } = await supabase.from('support_tickets').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Ticket deletado:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em support_tickets
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeSupportTickets(onChange) {
-  return supabase
-    .channel('realtime_support_tickets')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, (payload) => {
-      logDebug('🎫 Ticket evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: TASKS - Gestão de Tarefas (RLS: 4 policies, 3 triggers)
 // ============================================================================
-
-/**
- * Cria tarefa
- * @param {Object} taskData - Dados da tarefa (titulo, descricao, prazo, etc.)
- * @returns {Promise<Object>}
- */
-export async function createTask(taskData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('tasks')
-      .insert([{ ...taskData, org_id, status: taskData.status || 'pending' }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('✅ Tarefa criada:', data.id, 'Status:', data.status);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createTask:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca tarefas
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, assigned_to, priority, due_date, limit)
- * @returns {Promise<Object>}
- */
-export async function getTasks(orgId, filters = { limit: 50 }) {
-  return await withCache(`tasks_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('tasks')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
-    if (filters.priority) query = query.eq('priority', filters.priority);
-    if (filters.due_date_from) query = query.gte('due_date', filters.due_date_from);
-    if (filters.due_date_to) query = query.lte('due_date', filters.due_date_to);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60);
-}
-
-/**
- * Atualiza tarefa
- * @param {string} id - ID da tarefa
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateTask(id, updateData) {
-  const { data, error } = await supabase
-    .from('tasks')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Tarefa atualizada:', id, 'Status:', data.status);
-  return response(true, data);
-}
-
-/**
- * Deleta tarefa
- * @param {string} id - ID da tarefa
- * @returns {Promise<Object>}
- */
-export async function deleteTask(id) {
-  const { error } = await supabase.from('tasks').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Tarefa deletada:', id);
-  return response(true, { id });
-}
-
-/**
- * Marca tarefa como concluída
- * @param {string} id - ID da tarefa
- * @returns {Promise<Object>}
- */
-export async function completeTask(id) {
-  return await updateTask(id, { status: 'completed', completed_at: new Date().toISOString() });
-}
-
-/**
- * Subscreve a mudanças em tasks
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeTasks(onChange) {
-  return supabase
-    .channel('realtime_tasks')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
-      logDebug('✅ Task evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
 
 // ============================================================================
 // TABELA: COMMENTS - Comentários (0 policies - needs RLS!, 1 trigger)
 // ============================================================================
 
-/**
- * Cria comentário
- * @param {Object} commentData - Dados do comentário (entity_type, entity_id, content)
- * @returns {Promise<Object>}
- */
-export async function createComment(commentData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('comments')
-      .insert([{ ...commentData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('💬 Comentário criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createComment:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca comentários de uma entidade
- * @param {string} entityType - Tipo da entidade (lead, ticket, task, etc.)
- * @param {string} entityId - ID da entidade
- * @returns {Promise<Object>}
- */
-export async function getComments(entityType, entityId) {
-  return await withCache(`comments_${entityType}_${entityId}`, async () => {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('entity_type', entityType)
-      .eq('entity_id', entityId)
-      .order('created_at', { ascending: true });
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 30);
-}
-
-/**
- * Atualiza comentário
- * @param {string} id - ID do comentário
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateComment(id, updateData) {
-  const { data, error } = await supabase
-    .from('comments')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Comentário atualizado:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta comentário
- * @param {string} id - ID do comentário
- * @returns {Promise<Object>}
- */
-export async function deleteComment(id) {
-  const { error } = await supabase.from('comments').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Comentário deletado:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em comments
- * @param {string} entityType - Tipo da entidade
- * @param {string} entityId - ID da entidade
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeComments(entityType, entityId, onChange) {
-  return supabase
-    .channel(`realtime_comments_${entityType}_${entityId}`)
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'comments',
-      filter: `entity_type=eq.${entityType},entity_id=eq.${entityId}`
-    }, (payload) => {
-      logDebug('💬 Comentário evento:', payload.eventType);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-    
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 3/10 - BILLING & CAMPAIGNS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9158,122 +8708,9 @@ export function subscribeBilling(onChange) {
 // TABELA: CAMPAIGNS - Campanhas (RLS: 0 policies, 2 triggers)
 // ============================================================================
 
-/**
- * Cria campanha
- * @param {Object} campaignData - Dados da campanha (name, type, channel, status, etc.)
- * @returns {Promise<Object>}
- */
-export async function createCampaign(campaignData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('campaigns')
-      .insert([{ ...campaignData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📣 Campanha criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createCampaign:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca campanhas
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, type, channel, limit)
- * @returns {Promise<Object>}
- */
-export async function getCampaigns(orgId, filters = { limit: 50 }) {
-  return await withCache(`campaigns_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('campaigns')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.type) query = query.eq('type', filters.type);
-    if (filters.channel) query = query.eq('channel', filters.channel);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza campanha
- * @param {string} id - ID da campanha
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateCampaign(id, updateData) {
-  const { data, error } = await supabase
-    .from('campaigns')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Campanha atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta campanha
- * @param {string} id - ID da campanha
- * @returns {Promise<Object>}
- */
-export async function deleteCampaign(id) {
-  const { error } = await supabase.from('campaigns').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Campanha deletada:', id);
-  return response(true, { id });
-}
-
-/**
- * Subscreve a mudanças em campaigns
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeCampaigns(onChange) {
-  return supabase
-    .channel('realtime_campaigns')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, (payload) => {
-      logDebug('📣 Campanha evento:', payload.eventType, payload.new?.id);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: INVOICES - Faturas (RLS: 0 policies, 2 triggers)
 // ============================================================================
-
-/**
- * Cria fatura
- * @param {Object} invoiceData - Dados da fatura (amount, due_date, status, etc.)
- * @returns {Promise<Object>}
- */
-export async function createInvoice(invoiceData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('invoices')
-      .insert([{ ...invoiceData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🧾 Fatura criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createInvoice:', err);
-    return response(false, null, err);
-  }
-}
 
 /**
  * Busca faturas
@@ -9352,81 +8789,6 @@ export function subscribeInvoices(onChange) {
 // ============================================================================
 
 /**
- * Cria template de email
- * @param {Object} templateData - Dados do template (name, subject, body, category, etc.)
- * @returns {Promise<Object>}
- */
-export async function createEmailTemplate(templateData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('email_templates')
-      .insert([{ ...templateData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📧 Template de email criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createEmailTemplate:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca templates de email
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (category, active, limit)
- * @returns {Promise<Object>}
- */
-export async function getEmailTemplates(orgId, filters = { limit: 50 }) {
-  return await withCache(`email_templates_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('email_templates')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.category) query = query.eq('category', filters.category);
-    if (filters.active !== undefined) query = query.eq('active', filters.active);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza template de email
- * @param {string} id - ID do template
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateEmailTemplate(id, updateData) {
-  const { data, error } = await supabase
-    .from('email_templates')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Template atualizado:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta template de email
- * @param {string} id - ID do template
- * @returns {Promise<Object>}
- */
-export async function deleteEmailTemplate(id) {
-  const { error } = await supabase.from('email_templates').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Template deletado:', id);
-  return response(true, { id });
-}
-
-/**
  * Subscreve a mudanças em email_templates
  * @param {Function} onChange - Callback
  * @returns {RealtimeChannel}
@@ -9446,80 +8808,6 @@ export function subscribeEmailTemplates(onChange) {
 // ============================================================================
 
 /**
- * Cria landing page
- * @param {Object} pageData - Dados da landing page (name, url, content, etc.)
- * @returns {Promise<Object>}
- */
-export async function createLandingPage(pageData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('landing_pages')
-      .insert([{ ...pageData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🌐 Landing page criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createLandingPage:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca landing pages
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, limit)
- * @returns {Promise<Object>}
- */
-export async function getLandingPages(orgId, filters = { limit: 50 }) {
-  return await withCache(`landing_pages_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('landing_pages')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza landing page
- * @param {string} id - ID da landing page
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateLandingPage(id, updateData) {
-  const { data, error } = await supabase
-    .from('landing_pages')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Landing page atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta landing page
- * @param {string} id - ID da landing page
- * @returns {Promise<Object>}
- */
-export async function deleteLandingPage(id) {
-  const { error } = await supabase.from('landing_pages').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Landing page deletada:', id);
-  return response(true, { id });
-}
-
-/**
  * Subscreve a mudanças em landing_pages
  * @param {Function} onChange - Callback
  * @returns {RealtimeChannel}
@@ -9537,68 +8825,6 @@ export function subscribeLandingPages(onChange) {
 // ============================================================================
 // TABELA: SEO - SEO Management (RLS: 1 policy, 1 trigger)
 // ============================================================================
-
-/**
- * Cria registro SEO
- * @param {Object} seoData - Dados SEO (page, title, description, keywords, etc.)
- * @returns {Promise<Object>}
- */
-export async function createSEO(seoData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('seo')
-      .insert([{ ...seoData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🔍 SEO criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createSEO:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca registros SEO
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (page, limit)
- * @returns {Promise<Object>}
- */
-export async function getSEO(orgId, filters = { limit: 50 }) {
-  return await withCache(`seo_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('seo')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.page) query = query.eq('page', filters.page);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 180);
-}
-
-/**
- * Atualiza SEO
- * @param {string} id - ID do SEO
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateSEO(id, updateData) {
-  const { data, error } = await supabase
-    .from('seo')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ SEO atualizado:', id);
-  return response(true, data);
-}
 
 /**
  * Deleta SEO
@@ -9845,46 +9071,6 @@ export async function createAnalyticsEvent(eventData) {
   }
 }
 
-/**
- * Busca eventos de analytics
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (event_name, event_type, date_from, date_to, limit)
- * @returns {Promise<Object>}
- */
-export async function getAnalyticsEvents(orgId, filters = { limit: 100 }) {
-  return await withCache(`analytics_events_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('analytics_events')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.event_name) query = query.eq('event_name', filters.event_name);
-    if (filters.event_type) query = query.eq('event_type', filters.event_type);
-    if (filters.date_from) query = query.gte('created_at', filters.date_from);
-    if (filters.date_to) query = query.lte('created_at', filters.date_to);
-    
-    const { data, error } = await query.limit(filters.limit || 100);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60);
-}
-
-/**
- * Subscreve a mudanças em analytics_events
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeAnalyticsEvents(onChange) {
-  return supabase
-    .channel('realtime_analytics_events')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'analytics_events' }, (payload) => {
-      logDebug('📊 Analytics evento:', payload.eventType, payload.new?.event_name);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: CONVERSION_FUNNELS - Funis de Conversão (RLS: 4 policies, 3 triggers)
 // ============================================================================
@@ -9982,147 +9168,9 @@ export function subscribeConversionFunnels(onChange) {
 // TABELA: REPORT_DEFINITIONS - Definições de Relatórios (RLS: 0 policies, 3 triggers)
 // ============================================================================
 
-/**
- * Cria definição de relatório
- * @param {Object} reportData - Dados do relatório (name, type, config, etc.)
- * @returns {Promise<Object>}
- */
-export async function createReportDefinition(reportData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('report_definitions')
-      .insert([{ ...reportData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📋 Definição de relatório criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createReportDefinition:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca definições de relatórios
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (type, active, limit)
- * @returns {Promise<Object>}
- */
-export async function getReportDefinitions(orgId, filters = { limit: 50 }) {
-  return await withCache(`report_definitions_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('report_definitions')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.type) query = query.eq('type', filters.type);
-    if (filters.active !== undefined) query = query.eq('active', filters.active);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 180);
-}
-
-/**
- * Atualiza definição de relatório
- * @param {string} id - ID da definição
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateReportDefinition(id, updateData) {
-  const { data, error } = await supabase
-    .from('report_definitions')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Definição de relatório atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta definição de relatório
- * @param {string} id - ID da definição
- * @returns {Promise<Object>}
- */
-export async function deleteReportDefinition(id) {
-  const { error } = await supabase.from('report_definitions').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Definição de relatório deletada:', id);
-  return response(true, { id });
-}
-
 // ============================================================================
 // TABELA: SCHEDULED_REPORTS - Relatórios Agendados (RLS: 4 policies, 3 triggers)
 // ============================================================================
-
-/**
- * Cria relatório agendado
- * @param {Object} scheduleData - Dados do agendamento (report_id, frequency, recipients, etc.)
- * @returns {Promise<Object>}
- */
-export async function createScheduledReport(scheduleData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('scheduled_reports')
-      .insert([{ ...scheduleData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📅 Relatório agendado criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createScheduledReport:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca relatórios agendados
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (frequency, active, limit)
- * @returns {Promise<Object>}
- */
-export async function getScheduledReports(orgId, filters = { limit: 50 }) {
-  return await withCache(`scheduled_reports_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('scheduled_reports')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.frequency) query = query.eq('frequency', filters.frequency);
-    if (filters.active !== undefined) query = query.eq('active', filters.active);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza relatório agendado
- * @param {string} id - ID do agendamento
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateScheduledReport(id, updateData) {
-  const { data, error } = await supabase
-    .from('scheduled_reports')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Relatório agendado atualizado:', id);
-  return response(true, data);
-}
 
 /**
  * Deleta relatório agendado
@@ -10154,51 +9202,6 @@ export function subscribeScheduledReports(onChange) {
 // ============================================================================
 // TABELA: SENTIMENT_ANALYSIS - Análise de Sentimento (RLS: 0 policies, 1 trigger)
 // ============================================================================
-
-/**
- * Cria análise de sentimento
- * @param {Object} sentimentData - Dados da análise (text, sentiment, score, etc.)
- * @returns {Promise<Object>}
- */
-export async function createSentimentAnalysis(sentimentData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('sentiment_analysis')
-      .insert([{ ...sentimentData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('😊 Análise de sentimento criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createSentimentAnalysis:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca análises de sentimento
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (sentiment, entity_type, limit)
- * @returns {Promise<Object>}
- */
-export async function getSentimentAnalysis(orgId, filters = { limit: 100 }) {
-  return await withCache(`sentiment_analysis_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('sentiment_analysis')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.sentiment) query = query.eq('sentiment', filters.sentiment);
-    if (filters.entity_type) query = query.eq('entity_type', filters.entity_type);
-    
-    const { data, error } = await query.limit(filters.limit || 100);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60);
-}
 
 /**
  * Subscreve a mudanças em sentiment_analysis
@@ -10353,24 +9356,6 @@ export async function getViewSystemHealth(orgId) {
 // ============================================================================
 // VIEW: DASHBOARD_KPIS - KPIs do Dashboard
 // ============================================================================
-
-/**
- * Busca KPIs principais do dashboard
- * @param {string} orgId - ID da organização
- * @returns {Promise<Object>}
- */
-export async function getDashboardKPIs(orgId) {
-  return await withCache(`dashboard_kpis_${orgId}`, async () => {
-    const { data, error } = await supabase
-      .from('dashboard_kpis')
-      .select('*')
-      .eq('org_id', orgId)
-      .single();
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
 
 // ============================================================================
 // VIEW: V_GAMIFICATION_SUMMARY - Resumo de Gamificação
@@ -10976,23 +9961,6 @@ export async function getAIPredictions(orgId, filters = { limit: 100 }) {
  * @param {Object} memoryData - Dados da memória (key, value, context, importance, etc.)
  * @returns {Promise<Object>}
  */
-export async function createAIMemory(memoryData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('ai_memory')
-      .insert([{ ...memoryData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🧠 Memória AI criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createAIMemory:', err);
-    return response(false, null, err);
-  }
-}
-
 /**
  * Busca memórias da IA
  * @param {string} orgId - ID da organização
@@ -11851,29 +10819,6 @@ export async function assignUserBadge(userBadgeData) {
 }
 
 /**
- * Busca badges de um usuário
- * @param {string} userId - ID do usuário
- * @param {string} orgId - ID da organização
- * @returns {Promise<Object>}
- */
-export async function getUserBadges(userId, orgId) {
-  return await withCache(`user_badges_${userId}_${orgId}`, async () => {
-    const { data, error } = await supabase
-      .from('user_badges')
-      .select(`
-        *,
-        badge:gamification_badges(*)
-      `)
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .order('earned_at', { ascending: false });
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
  * Subscreve a mudanças em user_badges
  * @param {string} userId - ID do usuário (opcional)
  * @param {Function} onChange - Callback
@@ -12063,28 +11008,6 @@ export async function getGamificationRankHistory(userId, orgId, filters = { limi
 // TABELA: GAMIFICATION_BACKUPS - Backups de Gamificação (RLS: 0 policies, 1 trigger)
 // ============================================================================
 
-/**
- * Busca backups de gamificação
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (backup_type, limit)
- * @returns {Promise<Object>}
- */
-export async function getGamificationBackups(orgId, filters = { limit: 20 }) {
-  return await withCache(`gamification_backups_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('gamification_backups')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.backup_type) query = query.eq('backup_type', filters.backup_type);
-    
-    const { data, error } = await query.limit(filters.limit || 20);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 300);
-}
-
 // ============================================================================
 // FUNÇÕES AUXILIARES DE GAMIFICAÇÃO
 // ============================================================================
@@ -12144,31 +11067,6 @@ export async function getUserTotalPoints(userId, orgId) {
 }
 
 /**
- * Busca histórico de pontos de um usuário
- * @param {string} userId - ID do usuário
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (date_from, date_to, limit)
- * @returns {Promise<Object>}
- */
-export async function getUserPointsHistory(userId, orgId, filters = { limit: 100 }) {
-  return await withCache(`user_points_history_${userId}_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('gamification_points')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .order('awarded_at', { ascending: false });
-    
-    if (filters.date_from) query = query.gte('awarded_at', filters.date_from);
-    if (filters.date_to) query = query.lte('awarded_at', filters.date_to);
-    
-    const { data, error } = await query.limit(filters.limit || 100);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
  * Verifica e atribui badges automaticamente baseado em critérios
  * @param {string} userId - ID do usuário
  * @returns {Promise<Object>}
@@ -12220,62 +11118,6 @@ export async function checkAndAwardBadges(userId) {
     return response(true, { user_id: userId, newly_earned: newlyEarnedBadges });
   } catch (err) {
     logError('Erro checkAndAwardBadges:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Resgate de recompensa por um usuário
- * @param {string} userId - ID do usuário
- * @param {string} rewardId - ID da recompensa
- * @returns {Promise<Object>}
- */
-export async function redeemReward(userId, rewardId) {
-  try {
-    const org_id = await getCurrentOrgId();
-    
-    // Busca a recompensa
-    const { data: reward, error: rewardError } = await supabase
-      .from('gamification_rewards')
-      .select('*')
-      .eq('id', rewardId)
-      .eq('org_id', org_id)
-      .single();
-    
-    if (rewardError) return response(false, null, rewardError);
-    if (!reward.available) return response(false, null, new Error('Recompensa não disponível'));
-    
-    // Verifica pontuação do usuário
-    const pointsResult = await getUserTotalPoints(userId, org_id);
-    if (!pointsResult.success) return pointsResult;
-    
-    const totalPoints = pointsResult.data.total_points;
-    const rewardCost = reward.cost || 0;
-    
-    if (totalPoints < rewardCost) {
-      return response(false, null, new Error('Pontos insuficientes'));
-    }
-    
-    // Deduz os pontos
-    const deductResult = await addGamificationPoints(
-      userId,
-      -rewardCost,
-      `Resgate de recompensa: ${reward.name}`,
-      { reward_id: rewardId, reward_name: reward.name }
-    );
-    
-    if (!deductResult.success) return deductResult;
-    
-    logDebug('🎁 Recompensa resgatada:', userId, reward.name, rewardCost, 'pontos');
-    return response(true, {
-      user_id: userId,
-      reward_id: rewardId,
-      reward_name: reward.name,
-      points_spent: rewardCost,
-      remaining_points: totalPoints - rewardCost
-    });
-  } catch (err) {
-    logError('Erro redeemReward:', err);
     return response(false, null, err);
   }
 }
