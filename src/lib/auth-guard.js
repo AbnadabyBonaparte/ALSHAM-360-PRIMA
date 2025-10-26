@@ -278,6 +278,15 @@ if (typeof window !== 'undefined') {
     redirectInProgress = false;
     console.log('✅ [AUTH-GUARD] Flag de redirecionamento resetada');
   });
+
+  // 🔧 FIX: Expor utilitários de debug para o auth guard
+  window.AuthGuardDebug = {
+    resetRedirectFlag: () => {
+      redirectInProgress = false;
+      console.log('🔄 [AUTH-GUARD] Flag de redirecionamento resetada manualmente');
+    },
+    isRedirectInProgress: () => redirectInProgress
+  };
 }
 
 console.log('📦 [AUTH-GUARD] Módulo auth-guard.js carregado');
