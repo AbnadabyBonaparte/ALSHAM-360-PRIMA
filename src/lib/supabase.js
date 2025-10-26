@@ -15,6 +15,27 @@ const supabaseModule =
 
 const { createClient } = supabaseModule;
 
+if (typeof window !== 'undefined') {
+  window.ALSHAM = window.ALSHAM || {};
+  window.ALSHAM.METADATA = window.ALSHAM.METADATA || {};
+  if (typeof window.ALSHAM.registerModule !== 'function') {
+    window.ALSHAM.registerModule = (id, module = {}) => {
+      if (!id) return;
+      const registry = window.ALSHAM.METADATA;
+      registry[id] = registry[id] || {};
+      registry[id].audit = module.audit || {};
+      registry[id].tables = module.tables || registry[id].tables || {};
+      if (module.metadata) {
+        registry[id].metadata = {
+          ...(registry[id].metadata || {}),
+          ...module.metadata
+        };
+      }
+      console.log(`Módulo ${id} registrado com sucesso.`);
+    };
+  }
+}
+
 if (typeof createClient !== 'function') {
   throw new Error('Supabase client factory not available.');
 }
@@ -88,6 +109,24 @@ function ensureSupabaseClient() {
 }
 
 ensureSupabaseClient();
+
+export function getSupabaseClient() {
+  return ensureSupabaseClient();
+}
+
+export async function getCurrentSession() {
+  try {
+    const client = ensureSupabaseClient();
+    const { data, error } = await client.auth.getSession();
+    if (error) throw error;
+    return data?.session ?? null;
+  } catch (err) {
+    logError('getCurrentSession failed:', err);
+    throw err;
+  }
+}
+
+export const supabase = getSupabaseClient();
 
 // ---------------------------------------------------------------------------
 // CONSTANTES
@@ -12713,6 +12752,8 @@ const ALSHAM_FULL = new Proxy(
 
 Object.assign(ALSHAM_FULL, {
   supabase,
+  getSupabaseClient,
+  getCurrentSession,
   response,
   logDebug,
   logError,
@@ -12804,6 +12845,9 @@ export const ALSHAM_METADATA = {
     ],
   },
 };
+
+ALSHAM_METADATA.tables = ALSHAM_METADATA.tables || {};
+ALSHAM_METADATA.modulesRegistry = ALSHAM_METADATA.modulesRegistry || {};
 
 // ============================================================================
 // 🎯 LOG FINAL DE INICIALIZAÇÃO SUPREMA
@@ -12965,16 +13009,61 @@ logDebug(`📜 Páginas indexadas no núcleo Supabase (ALSHAM_PAGES): ${ALSHAM_P
 
     
 if (typeof window !== 'undefined') {
- window.ALSHAM = {
-  ...ALSHAM_FULL,
-  PAGES: ALSHAM_PAGES, // ✅ referência direta das 97 páginas
-  METADATA: ALSHAM_METADATA,
-  version: ALSHAM_METADATA.version,
-  initialized: true,
-  initTimestamp: new Date().toISOString()
-};
+  const existingAlsham = window.ALSHAM || {};
 
-  
+  window.ALSHAM = {
+    ...existingAlsham,
+    ...ALSHAM_FULL,
+    PAGES: ALSHAM_PAGES, // ✅ referência direta das 97 páginas
+    METADATA: {
+      ...window.ALSHAM.METADATA,
+      core: {
+        ...(window.ALSHAM.METADATA?.core || {}),
+        version: ALSHAM_METADATA.version
+      }
+    },
+    version: ALSHAM_METADATA.version,
+    initialized: true,
+    initTimestamp: new Date().toISOString()
+  };
+
+  window.ALSHAM.registerModule = (id, module = {}) => {
+    if (!id) {
+      throw new Error('Module id is required to register metadata.');
+    }
+
+    const registry = window.ALSHAM.METADATA;
+    const current = {
+      ...(registry[id] || {}),
+      ...(ALSHAM_METADATA.modulesRegistry[id] || {})
+    };
+
+    const normalized = {
+      ...current,
+      ...module,
+      audit: {
+        ...(current.audit || {}),
+        ...(module.audit || {})
+      }
+    };
+
+    registry[id] = normalized;
+    ALSHAM_METADATA.modulesRegistry[id] = normalized;
+
+    if (module.tables) {
+      ALSHAM_METADATA.tables[id] = module.tables;
+    }
+
+    if (module.audit && typeof module.audit === 'object') {
+      ALSHAM_METADATA.tables.audit = {
+        ...(ALSHAM_METADATA.tables.audit || {}),
+        ...module.audit
+      };
+    }
+
+    logDebug(`Módulo ${id} registrado com sucesso.`);
+  };
+
   logDebug('✅ ALSHAM 360° anexado ao window.ALSHAM');
 }
 
