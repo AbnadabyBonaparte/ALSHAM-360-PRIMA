@@ -6,15 +6,17 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
   });
 
   it('realiza login com credenciais válidas e redireciona para o dashboard', () => {
-    const signInStub = cy.stub().as('genericSignIn').resolves({
-      data: { user: { id: 'user-123', email: 'user@example.com' } },
+    const signInStub = cy.stub().as('signInWithPassword').resolves({
+      data: { user: { id: 'user-123', email: 'user@example.com' }, session: {} },
       error: null
     });
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
-    const sessionStub = cy.stub().resolves({ user: null });
+    const sessionStub = cy.stub().resolves({ data: { session: null }, error: null });
 
     cy.mockSupabase({
-      genericSignIn: signInStub,
+      supabase: { auth: { signInWithPassword: signInStub, getSession: sessionStub } },
+      auth: { signInWithPassword: signInStub, getSession: sessionStub },
+      signInWithPassword: signInStub,
       createAuditLog: auditStub,
       getCurrentSession: sessionStub
     });
@@ -27,7 +29,10 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     cy.get('#login-form').submit();
 
     cy.get('#success-message').should('contain', 'Login realizado com sucesso');
-    cy.get('@genericSignIn').should('have.been.calledWith', 'user@example.com', 'SenhaSegura1!');
+    cy.get('@signInWithPassword').should(
+      'have.been.calledWithMatch',
+      Cypress.sinon.match({ email: 'user@example.com', password: 'SenhaSegura1!' })
+    );
     cy.get('@auditLog').should('have.been.calledWithMatch', 'LOGIN_SUCCESS', Cypress.sinon.match({ user_id: 'user-123' }));
 
     cy.tick(1000);
@@ -36,13 +41,16 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
   it('exibe erro ao falhar no login', () => {
     const loginError = new Error('Credenciais inválidas');
-    const signInStub = cy.stub().as('genericSignIn').resolves({ data: null, error: loginError });
+    const signInStub = cy.stub().as('signInWithPassword').resolves({ data: { user: null }, error: loginError });
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
+    const sessionStub = cy.stub().resolves({ data: { session: null }, error: null });
 
     cy.mockSupabase({
-      genericSignIn: signInStub,
+      supabase: { auth: { signInWithPassword: signInStub, getSession: sessionStub } },
+      auth: { signInWithPassword: signInStub, getSession: sessionStub },
+      signInWithPassword: signInStub,
       createAuditLog: auditStub,
-      getCurrentSession: cy.stub().resolves({ user: null })
+      getCurrentSession: sessionStub
     });
 
     cy.visit('/login.html');
