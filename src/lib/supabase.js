@@ -50,6 +50,32 @@ const logDebug = console.log;
 const logError = console.error;
 const logWarn = console.warn;
 
+const resolveEnvValue = (key, fallback = '') => {
+  if (typeof process !== 'undefined' && process?.env?.[key]) {
+    return process.env[key];
+  }
+  if (typeof import.meta !== 'undefined' && import.meta.env?.[key]) {
+    return import.meta.env[key];
+  }
+  return fallback;
+};
+
+const SUPABASE_URL =
+  resolveEnvValue('VITE_SUPABASE_URL', resolveEnvValue('SUPABASE_URL', 'https://example.supabase.co'));
+const SUPABASE_ANON_KEY =
+  resolveEnvValue('VITE_SUPABASE_ANON_KEY', resolveEnvValue('SUPABASE_ANON_KEY', 'public-anon-key'));
+
+function ensureSupabaseClient() {
+  if (!supabase) {
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+  }
+  return supabase;
+}
+
+ensureSupabaseClient();
+
 // ---------------------------------------------------------------------------
 // CONSTANTES
 const ALSHAM_DEVICE_ID_KEY = 'alsham-device-id';
@@ -255,6 +281,69 @@ export async function createOrganization(orgData = {}) {
     return response(false, null, err);
   }
 }
+
+export async function getUserOrganizations() {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const user = data?.user;
+    if (!user) return [];
+
+    const { data: memberships, error } = await supabase
+      .from('user_organizations')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return memberships?.map((membership) => membership.organization_id).filter(Boolean) ?? [];
+  } catch (err) {
+    logError('getUserOrganizations exception:', err);
+    return [];
+  }
+}
+
+export async function setCurrentOrgId(orgId) {
+  try {
+    if (!orgId) {
+      removeItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
+      return null;
+    }
+
+    await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
+      org_id: orgId,
+      switched_at: new Date().toISOString()
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('orgSwitched', { detail: orgId }));
+    }
+
+    return orgId;
+  } catch (err) {
+    logError('setCurrentOrgId exception:', err);
+    return null;
+  }
+}
+
+export async function getCurrentOrgId() {
+  try {
+    const cached = await getActiveOrganization();
+    if (cached) return cached;
+
+    const orgs = await getUserOrganizations();
+    const firstOrg = orgs[0] ?? null;
+
+    if (firstOrg) {
+      await setCurrentOrgId(firstOrg);
+    }
+
+    return firstOrg;
+  } catch (err) {
+    logWarn('getCurrentOrgId fallback:', err);
+    return null;
+  }
+}
+
 export async function switchOrganization(org_id) {
   try {
     if (!org_id) return response(false, null, new Error('org_id é obrigatório'));
@@ -317,49 +406,76 @@ export async function orgPolicyCheck(table) {
 
 // ---------------------------------------------------------------------------
 // CRUD GENÉRICO
+function normalizeFilters(filters) {
+  if (Array.isArray(filters)) {
+    return filters;
+  }
+  if (filters && typeof filters === 'object') {
+    return Object.entries(filters).map(([column, value]) => ({ column, value, operator: 'eq' }));
+  }
+  return [];
+}
+
 function _applyFilters(qb, filters = []) {
-  if (!Array.isArray(filters)) return qb;
-  for (const f of filters) {
+  const normalized = normalizeFilters(filters);
+  for (const f of normalized) {
     const { column, operator = 'eq', value } = f;
-    if (!column) continue;
-    if (qb[operator]) qb = qb[operator](column, value);
+    if (!column || typeof qb[operator] !== 'function') continue;
+    qb = qb[operator](column, value);
   }
   return qb;
 }
+
 export async function genericSelect(table, filters = [], options = {}) {
   try {
-    if (!table) return response(false, null, new Error('table é obrigatório'));
-    let qb = supabase.from(table).select(options.columns || '*', { count: 'exact' });
+    if (!table) throw new Error('table é obrigatório');
+    const client = ensureSupabaseClient();
+    let qb = client.from(table).select(options.columns || '*');
     qb = _applyFilters(qb, filters);
     if (options.order) qb = qb.order(options.order.column, { ascending: !!options.order.ascending });
-    if (options.limit && typeof options.offset === 'number')
+    if (options.limit && typeof options.offset === 'number') {
       qb = qb.range(options.offset, options.offset + options.limit - 1);
-    else if (options.limit) qb = qb.limit(options.limit);
-    const { data, error, count } = await qb;
-    if (error) return response(false, null, error);
-    return response(true, { data, count });
+    } else if (options.limit) {
+      qb = qb.limit(options.limit);
+    }
+    const { data, error } = await qb;
+    if (error) {
+      return { data: null, error: { message: error.message, context: `select:${table}` } };
+    }
+    return { data: data ?? [] };
   } catch (err) {
     logError('genericSelect exception:', err);
-    return response(false, null, err);
+    return { data: null, error: err };
   }
 }
-export async function genericInsert(table, data, options = {}) {
+
+export async function genericInsert(table, payload, orgId) {
   try {
-    if (!table || !data) return response(false, null, new Error('table e data são obrigatórios'));
-    const { data: res, error } = await supabase
-      .from(table)
-      .insert(Array.isArray(data) ? data : [data], { returning: options.returning || 'representation' });
-    if (error) return response(false, null, error);
-    return response(true, { inserted: Array.isArray(res) ? res.length : 1, data: res });
+    if (!table || !payload) throw new Error('table e data são obrigatórios');
+    const client = ensureSupabaseClient();
+    const records = Array.isArray(payload) ? payload : [payload];
+    const enriched = records.map(record => {
+      if (orgId && record && typeof record === 'object' && !record.org_id) {
+        return { ...record, org_id: orgId };
+      }
+      return record;
+    });
+
+    const { data, error } = await client.from(table).insert(Array.isArray(payload) ? enriched : enriched[0]).select();
+    if (error) {
+      return { success: false, error: { message: error.message, context: `insert:${table}` } };
+    }
+    return { success: true, data };
   } catch (err) {
     logError('genericInsert exception:', err);
-    return response(false, null, err);
+    return { success: false, error: err };
   }
 }
 export async function genericUpdate(table, filters = [], data) {
   try {
     if (!table || !data) return response(false, null, new Error('table e data são obrigatórios'));
-    let qb = supabase.from(table).update(data).select();
+    const client = ensureSupabaseClient();
+    let qb = client.from(table).update(data).select();
     qb = _applyFilters(qb, filters);
     const { data: res, error } = await qb;
     if (error) return response(false, null, error);
@@ -372,11 +488,12 @@ export async function genericUpdate(table, filters = [], data) {
 export async function genericDelete(table, filters = []) {
   try {
     if (!table) return response(false, null, new Error('table é obrigatório'));
-    let qb = supabase.from(table).delete().select();
+    const client = ensureSupabaseClient();
+    let qb = client.from(table).delete().select();
     qb = _applyFilters(qb, filters);
     const { data: res, error } = await qb;
     if (error) return response(false, null, error);
-    const user = (await supabase.auth.getUser()).data?.user;
+    const user = (await client.auth?.getUser?.())?.data?.user;
     logDebug('[AUDIT]', { action: 'genericDelete', table, filters, user_id: user?.id });
     return response(true, res);
   } catch (err) {
@@ -384,15 +501,63 @@ export async function genericDelete(table, filters = []) {
     return response(false, null, err);
   }
 }
+
+export async function createAuditLog(action, details = {}, userId, orgId) {
+  try {
+    const client = ensureSupabaseClient();
+    let effectiveUserId = userId;
+    let effectiveOrgId = orgId;
+
+    if (!effectiveUserId || !effectiveOrgId) {
+      const { data: sessionData } = (await client.auth?.getSession?.()) ?? { data: null };
+      const sessionUser = sessionData?.session?.user;
+      effectiveUserId = effectiveUserId || sessionUser?.id || sessionUser?.user?.id || null;
+
+      if (!effectiveOrgId && sessionUser?.id) {
+        const { data: profileData } = await client
+          .from('user_profiles')
+          .select('org_id')
+          .eq('user_id', sessionUser.id)
+          .limit(1)
+          .maybeSingle();
+
+        if (profileData?.org_id) {
+          effectiveOrgId = profileData.org_id;
+        }
+      }
+    }
+
+    const payload = {
+      action,
+      details,
+      user_id: effectiveUserId,
+      org_id: effectiveOrgId,
+      created_at: new Date().toISOString()
+    };
+
+    const { data, error } = await client.from('audit_log').insert(payload).select();
+
+    if (error) {
+      return { success: false, error: { message: error.message, context: 'auditLog' } };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    logError('createAuditLog exception:', err);
+    return { success: false, error: err };
+  }
+}
+
 export async function batchInsert(table, dataArray = [], options = {}) {
   try {
     if (!table || !Array.isArray(dataArray) || !dataArray.length)
       return response(false, null, new Error('table e dataArray são obrigatórios'));
+    const client = ensureSupabaseClient();
     const chunkSize = options.chunkSize || 300;
     const results = [];
     for (let i = 0; i < dataArray.length; i += chunkSize) {
       const chunk = dataArray.slice(i, i + chunkSize);
-      const { data, error } = await supabase.from(table).insert(chunk);
+      const { data, error } = await client.from(table).insert(chunk);
       if (error) return response(false, null, error);
       results.push(...(data || []));
     }
@@ -2057,6 +2222,32 @@ function setCachedData(key, data) {
   } catch (error) {
     logError('Erro ao armazenar cache:', error);
   }
+}
+
+function clearCache(key) {
+  if (typeof localStorage === 'undefined' || !key) return;
+  try {
+    localStorage.removeItem(key);
+    logDebug('🧹 Cache removido:', key);
+  } catch (error) {
+    logError('Erro ao remover cache:', error);
+  }
+}
+
+function clearCacheByPattern(pattern) {
+  if (typeof localStorage === 'undefined' || !pattern) return;
+
+  const matcher = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+  const keysToRemove = [];
+
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key && matcher.test(key)) {
+      keysToRemove.push(key);
+    }
+  }
+
+  keysToRemove.forEach((key) => clearCache(key));
 }
 
 /**
@@ -8225,6 +8416,38 @@ export async function deleteRecord(tableName, id) {
     }
 }
 
+export function subscribeRecord(tableName, filter = {}, callback) {
+    try {
+        if (!supabase?.channel) {
+            logWarn('subscribeRecord: recurso de realtime indisponível.');
+            return null;
+        }
+
+        const channel = supabase.channel(`public:${tableName}`);
+        const filterParts = Object.entries(filter)
+            .filter(([, value]) => value !== undefined && value !== null)
+            .map(([key, value]) => `${key}=eq.${value}`);
+
+        const handler = typeof callback === 'function' ? callback : () => {};
+
+        return channel
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: tableName,
+                filter: filterParts.join('&') || undefined
+            }, handler)
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    logDebug(`📡 Inscrito em ${tableName} com filtro ${filterParts.join('&') || 'nenhum'}`);
+                }
+            });
+    } catch (err) {
+        logError(`Erro em subscribeRecord [${tableName}]:`, err);
+        return null;
+    }
+}
+
 
 // ============================================================================
 // EXPORTS FINAIS E METADADOS
@@ -12429,15 +12652,58 @@ export const IntegrationsModule = {
 // 🚀 EXPORT COMPLETO - TODAS AS FUNÇÕES ORGANIZADAS (USO INTERNO + DEFAULT)
 // ============================================================================
 
-const ALSHAM_FULL = {
-  // ============ CORE & AUTH ============
+const dynamicExportStore = new Map();
+
+const resolveBinding = (name) => {
+  try {
+    return Function(`return typeof ${name} !== 'undefined' ? ${name} : undefined;`)();
+  } catch {
+    return undefined;
+  }
+};
+
+const ALSHAM_FULL = new Proxy(
+  {},
+  {
+    get(_target, prop) {
+      if (typeof prop !== 'string') return undefined;
+      if (dynamicExportStore.has(prop)) {
+        return dynamicExportStore.get(prop);
+      }
+      return resolveBinding(prop);
+    },
+    set(_target, prop, value) {
+      if (typeof prop === 'string') {
+        dynamicExportStore.set(prop, value);
+      }
+      return true;
+    },
+    has(_target, prop) {
+      if (typeof prop !== 'string') return false;
+      return dynamicExportStore.has(prop) || typeof resolveBinding(prop) !== 'undefined';
+    },
+    ownKeys() {
+      return Array.from(dynamicExportStore.keys());
+    },
+    getOwnPropertyDescriptor(_target, prop) {
+      if (typeof prop !== 'string') return undefined;
+      if (!dynamicExportStore.has(prop)) return undefined;
+      return {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: dynamicExportStore.get(prop)
+      };
+    }
+  }
+);
+
+Object.assign(ALSHAM_FULL, {
   supabase,
   response,
   logDebug,
   logError,
   logWarn,
-
-  // ============ CRYPTO & SECURITY ============
   encryptString,
   decryptString,
   setItemEncrypted,
@@ -12445,136 +12711,21 @@ const ALSHAM_FULL = {
   removeItemEncrypted,
   ensureDeviceId,
   ensureDeviceKey,
-
-  // ============ ORGANIZATIONS ============
   createOrganization,
   getUserOrganizations,
   switchOrganization,
   getCurrentOrgId,
   setCurrentOrgId,
-
-  // ============ CACHE ============
   withCache,
   clearCache,
   clearCacheByPattern,
-
-  // ============ CRUD GENÉRICO ============
   createRecord,
   getRecords,
   updateRecord,
   deleteRecord,
   subscribeRecord,
-  batchInsert,
-
-  // ============ LEADS & CRM ============
-  createLead,
-  getLeads,
-  updateLead,
-  deleteLead,
-  subscribeLeads,
-  createLeadInteraction,
-  getLeadInteractions,
-  subscribeLeadInteractions,
-  createLeadLabel,
-  getLeadLabels,
-  updateLeadLabel,
-  deleteLeadLabel,
-  subscribeLeadLabels,
-  createLeadLabelLink,
-  getLeadLabelLinks,
-  deleteLeadLabelLink,
-  createLeadScoring,
-  getLeadScoring,
-  updateLeadScoring,
-  createLeadSource,
-  getLeadSources,
-  updateLeadSource,
-  deleteLeadSource,
-  subscribeLeadSources,
-
-  // ============ CONTACTS & ACCOUNTS ============
-  createContact,
-  getContacts,
-  updateContact,
-  deleteContact,
-  subscribeContacts,
-  createAccount,
-  getAccounts,
-  updateAccount,
-  deleteAccount,
-  subscribeAccounts,
-
-  // ============ OPPORTUNITIES & QUOTES ============
-  createOpportunity,
-  getOpportunities,
-  updateOpportunity,
-  deleteOpportunity,
-  subscribeOpportunities,
-  createQuote,
-  getQuotes,
-  updateQuote,
-  deleteQuote,
-  subscribeQuotes,
-
-  // ============ USERS & PROFILES ============
-  createUserProfile,
-  getUserProfiles,
-  updateUserProfile,
-  deleteUserProfile,
-  subscribeUserProfiles,
-  getCurrentUserProfile,
-
-  // ============ TEAMS ============
-  createTeam,
-  getTeams,
-  updateTeam,
-  deleteTeam,
-  subscribeTeams,
-  createUserOrganization,
-  getUserOrganizationLinks,
-  deleteUserOrganization,
-
-  // ============ SETTINGS ============
-  createOrgSettings,
-  getOrgSettings,
-  updateOrgSettings,
-  subscribeOrgSettings,
-
-  // ============ AUTOMATIONS ============
-  createAutomationRule,
-  getAutomationRules,
-  updateAutomationRule,
-  deleteAutomationRule,
-  subscribeAutomationRules,
-  createAutomationExecution,
-  getAutomationExecutions,
-  updateAutomationExecution,
-  subscribeAutomationExecutions,
-  createLogsAutomacao,
-  getLogsAutomacao,
-  subscribeLogsAutomacao,
-
-  // ============ NOTIFICATIONS ============
-  createNotification,
-  getNotifications,
-  updateNotification,
-  deleteNotification,
-  subscribeNotifications,
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-
-  // ============ SUPPORT ============
-  ...SupportModule,
-
-  // ============ COMMUNICATION ============
-  ...CommunicationModule,
-
-  // ============ MARKETING ============
-  ...MarketingModule,
-
-  // ============ INTEGRATIONS ============
-  ...IntegrationsModule,
-};
+  batchInsert
+});
 
 // ============================================================================
 // 🧭 METADATA SUPREMA - ALSHAM 360° PRIMA v7.4-HARMONIZED+
