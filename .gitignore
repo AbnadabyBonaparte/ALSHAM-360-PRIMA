@@ -37,6 +37,8 @@ vite.config.js.timestamp-*
 # ENVIRONMENT
 # ==================
 .env
+# Permitir versão sanitizada do arquivo de exemplo
+!.env
 .env.local
 .env.*.local
 .env.development

@@ -132,11 +132,20 @@ const LoginSystem = {
   }
 };
 
+if (typeof window !== "undefined") {
+  window.LoginSystem = LoginSystem;
+}
+
+const loginForm = document.getElementById("login-form");
+if (loginForm && !loginForm.dataset.listenerAttached) {
+  loginForm.addEventListener("submit", event => LoginSystem.login(event));
+  loginForm.dataset.listenerAttached = "true";
+}
+
 // Aguarda Supabase e verifica sessão existente
 waitForSupabase(async () => {
-  window.LoginSystem = LoginSystem;
   console.log("✅ LoginSystem READY v5.5.0");
-  
+
   // ✅ VERIFICA SE JÁ ESTÁ LOGADO
   await checkExistingSession();
 });
