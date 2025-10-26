@@ -4,24 +4,24 @@
  * @description Testes unitários completos para funções do Dashboard
  */
 
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
 // Mock do window.AlshamSupabase
 global.window = {
   AlshamSupabase: {
-    getCurrentUser: jest.fn(),
-    getCurrentOrgId: jest.fn(),
-    getDashboardKPIs: jest.fn(),
-    getROI: jest.fn(),
-    getLeads: jest.fn(),
-    genericSelect: jest.fn(),
-    genericInsert: jest.fn(),
+    getCurrentUser: vi.fn(),
+    getCurrentOrgId: vi.fn(),
+    getDashboardKPIs: vi.fn(),
+    getROI: vi.fn(),
+    getLeads: vi.fn(),
+    genericSelect: vi.fn(),
+    genericInsert: vi.fn(),
     supabase: {
-      from: jest.fn(() => ({
-        select: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            gte: jest.fn(() => ({
-              lte: jest.fn(() => ({ data: [], error: null }))
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            gte: vi.fn(() => ({
+              lte: vi.fn(() => ({ data: [], error: null }))
             }))
           }))
         }))
@@ -29,8 +29,8 @@ global.window = {
     }
   },
   localStorage: {
-    getItem: jest.fn(),
-    setItem: jest.fn()
+    getItem: vi.fn(),
+    setItem: vi.fn()
   }
 };
 
