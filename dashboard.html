@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <script type="module" src="/src/lib/supabase.js"></script>
   <style>
     body {
       margin: 0;
@@ -123,9 +124,45 @@
       color: #6b7280;
       font-size: 0.875rem;
     }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #loading-overlay .loading-card {
+      background: #fff;
+      padding: 2rem 3rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 25px 50px -12px rgba(15, 28, 70, 0.45);
+      text-align: center;
+      max-width: 320px;
+    }
+
+    #loading-overlay .loading-card h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.5rem;
+      color: #1d4ed8;
+    }
+
+    #loading-overlay .loading-card p {
+      margin: 0;
+      color: #4b5563;
+    }
   </style>
 </head>
 <body>
+  <div id="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <h2>Carregando sessão...</h2>
+      <p>Validando acesso seguro ao dashboard.</p>
+    </div>
+  </div>
   <header>
     <div>
       <h1>Dashboard Executivo</h1>
@@ -218,5 +255,50 @@
   <footer>
     © 2025 ALSHAM 360° PRIMA — Dados atualizados automaticamente pela suíte de inteligência.
   </footer>
+  <script type="module">
+    import { robustAuthGuard } from '/src/lib/auth-guard.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loading = document.getElementById('loading-overlay');
+      if (loading) {
+        loading.style.display = 'flex';
+      }
+
+      try {
+        const result = await robustAuthGuard();
+        if (!result.success) {
+          return;
+        }
+
+        window.ALSHAM_USER = result.user;
+        window.ALSHAM_SESSION = result.session;
+
+        if (result.fromBackup) {
+          console.warn('⚠️ Usando sessão do backup');
+        }
+
+        console.log('✅ Dashboard carregado');
+
+        if (loading) {
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 500);
+        }
+      } catch (err) {
+        console.error('❌ Erro crítico:', err);
+        if (loading) {
+          loading.innerHTML = `
+            <div class="loading-card" role="alert">
+              <h2 style="color: #dc2626; margin-bottom: 0.75rem;">Erro</h2>
+              <p>${err.message}</p>
+              <button type="button" style="margin-top: 1.5rem; padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer;" onclick="location.reload()">
+                Tentar novamente
+              </button>
+            </div>
+          `;
+        }
+      }
+    });
+  </script>
 </body>
 </html>
