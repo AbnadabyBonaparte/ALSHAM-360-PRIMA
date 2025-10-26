@@ -57,6 +57,9 @@ function hideMessages(...elements) {
   });
 }
 
+// 🔧 FIX: Remover verificação duplicada de sessão
+// Comentado para evitar loop de redirecionamento
+/*
 async function checkExistingSession() {
   try {
     const services = getAuthServices();
@@ -81,6 +84,7 @@ async function checkExistingSession() {
 
   return false;
 }
+*/
 
 async function handleLoginSubmit(event) {
   event.preventDefault();
@@ -103,6 +107,9 @@ async function handleLoginSubmit(event) {
 
   try {
     const { supabaseAuth, createAuditLog } = await waitForAuthServices();
+    
+    console.log('🔐 Tentando login com:', email);
+    
     const { data, error } = await supabaseAuth.signInWithPassword({ email, password });
 
     const authError = error || null;
@@ -110,24 +117,34 @@ async function handleLoginSubmit(event) {
 
     if (authError || !user) {
       const reason = authError?.message || 'Credenciais inválidas';
+      console.error('❌ Erro de autenticação:', reason);
       setMessage(errorMessage, `Erro no login: ${reason}`);
       await createAuditLog?.('LOGIN_FAILURE', { email, reason });
       return;
     }
 
-    setMessage(successMessage, 'Login realizado com sucesso');
+    console.log('✅ Login bem-sucedido:', user.email);
+    setMessage(successMessage, 'Login realizado com sucesso! Redirecionando...');
     await createAuditLog?.('LOGIN_SUCCESS', { email, user_id: user.id });
 
+    // 🔧 FIX: Aumentar tempo de espera para garantir que a sessão foi salva
     setTimeout(() => {
+      console.log('🔄 Redirecionando para dashboard...');
       window.location.href = '/dashboard.html';
-    }, 1000);
+    }, 1500);
   } catch (error) {
     console.error('❌ Erro ao realizar login:', error);
     setMessage(errorMessage, `Erro no login: ${error.message || 'Erro inesperado'}`);
   }
 }
 
+// 🔧 FIX: Remover auto-submit automático
+// O auto-submit pode causar problemas de sincronização
 function autoSubmitIfRequested(form) {
+  // Desabilitado para evitar problemas de loop
+  return;
+  
+  /*
   if (!form || form.dataset.autoSubmit !== 'true') {
     return;
   }
@@ -135,9 +152,12 @@ function autoSubmitIfRequested(form) {
   requestAnimationFrame(() => {
     form.requestSubmit();
   });
+  */
 }
 
 async function bootstrapLogin() {
+  console.log('🚀 Iniciando sistema de login...');
+  
   const form = document.getElementById('login-form');
   const successMessage = document.getElementById('success-message');
   const errorMessage = document.getElementById('error-message');
@@ -145,26 +165,43 @@ async function bootstrapLogin() {
   hideMessages(successMessage, errorMessage);
 
   if (!form) {
+    console.error('❌ Formulário de login não encontrado!');
     return;
   }
 
   form.addEventListener('submit', handleLoginSubmit, { once: false });
 
+  // 🔧 FIX: Simplificar verificação de sessão
+  // Apenas uma verificação, sem redirecionamento automático
   try {
-    const guardResult = await robustAuthGuard({ skipRedirect: true, maxRetries: 1, retryDelay: 300, timeout: 5000 });
-    if (guardResult?.user) {
-      setMessage(successMessage, 'Sessão ativa detectada. Redirecionando...');
-      setTimeout(() => {
-        window.location.href = '/dashboard.html';
-      }, 1200);
-      return;
+    console.log('🔍 Verificando sessão existente...');
+    const services = getAuthServices();
+    const supabaseAuth = resolveSupabaseAuth(services);
+    
+    if (supabaseAuth?.getSession) {
+      const { data } = await supabaseAuth.getSession();
+      
+      if (data?.session?.user) {
+        console.log('✅ Sessão ativa encontrada:', data.session.user.email);
+        setMessage(successMessage, 'Sessão ativa detectada. Redirecionando...');
+        
+        setTimeout(() => {
+          console.log('🔄 Redirecionando para dashboard...');
+          window.location.href = '/dashboard.html';
+        }, 1000);
+        return;
+      }
     }
+    
+    console.log('ℹ️ Nenhuma sessão ativa encontrada');
   } catch (error) {
-    console.warn('⚠️ Guard não pôde validar sessão antes do login:', error);
+    console.warn('⚠️ Erro ao verificar sessão:', error);
   }
 
-  await checkExistingSession();
-  autoSubmitIfRequested(form);
+  // 🔧 FIX: Desabilitar auto-submit
+  // autoSubmitIfRequested(form);
+  
+  console.log('✅ Sistema de login pronto');
 }
 
 if (document.readyState === 'loading') {
