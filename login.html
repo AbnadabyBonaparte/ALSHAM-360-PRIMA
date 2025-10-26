@@ -7,8 +7,10 @@
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <script type="module" src="/src/lib/supabase.js"></script>
-  <script type="module" src="/src/js/auth.js"></script>
+  <script type="module">
+    import { ensureSupabaseGlobal } from '/src/lib/attach-supabase.js';
+    ensureSupabaseGlobal();
+  </script>
   <style>
     body {
       min-height: 100vh;
@@ -125,50 +127,6 @@
     <p id="success-message" class="feedback success" role="status">Login realizado com sucesso</p>
     <p id="error-message" class="feedback error" role="alert"></p>
   </main>
-  <script type="module">
-    import { robustAuthGuard } from '/src/lib/auth-guard.js';
-
-    async function handleLoginGuard() {
-      const form = document.getElementById('login-form');
-      const successMessage = document.getElementById('success-message');
-
-      console.log('🔐 Login: verificando sessão...');
-
-      try {
-        const result = await robustAuthGuard({ skipRedirect: true, maxRetries: 1, retryDelay: 500, timeout: 5000 });
-
-        if (result?.user) {
-          if (form) {
-            form.dataset.autoSubmit = 'false';
-            form.innerHTML = `
-              <div aria-live="polite" style="text-align: center; padding: 1.5rem 0;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; color: #1d4ed8;">Você já está logado!</h2>
-                <p style="margin: 0; color: #374151;">Redirecionando...</p>
-              </div>
-            `;
-          }
-
-          if (successMessage) {
-            successMessage.textContent = 'Sessão ativa detectada. Redirecionando...';
-            successMessage.classList.add('visible');
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-          window.location.href = '/dashboard.html';
-          return;
-        }
-
-        console.log('🔓 Mostrando formulário de login');
-      } catch (err) {
-        console.error('❌ Erro ao verificar sessão antes do login:', err);
-      }
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', handleLoginGuard, { once: true });
-    } else {
-      handleLoginGuard();
-    }
-  </script>
+  <script type="module" src="/src/js/login.js"></script>
 </body>
 </html>

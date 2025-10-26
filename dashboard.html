@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <script type="module" src="/src/lib/supabase.js"></script>
+  <script type="module">
+    import { ensureSupabaseGlobal } from '/src/lib/attach-supabase.js';
+    ensureSupabaseGlobal();
+  </script>
   <style>
     body {
       margin: 0;
