@@ -1,151 +1,159 @@
-/**
- * ALSHAM 360° PRIMA - Enterprise Login v5.5.0
- * ✅ CORRIGIDO: Verifica sessão antes de mostrar login
- */
+import { robustAuthGuard } from '../lib/auth-guard.js';
+import { ensureSupabaseGlobal } from '../lib/attach-supabase.js';
 
-// Aguarda window.AlshamSupabase estar disponível
-function waitForSupabase(callback, maxAttempts = 100, attempt = 0) {
-  if (window.AlshamSupabase && window.AlshamSupabase.genericSignIn) {
-    console.log("✅ Supabase carregado após", attempt, "tentativas");
-    callback();
-  } else if (attempt >= maxAttempts) {
-    console.error("❌ Supabase não carregou após 10 segundos");
-    document.getElementById("error-message")?.classList.remove("hidden");
-    document.getElementById("error-text").textContent = 
-      "Erro ao carregar sistema. Recarregue a página.";
-  } else {
-    setTimeout(() => waitForSupabase(callback, maxAttempts, attempt + 1), 100);
-  }
+const WAIT_INTERVAL = 120;
+const MAX_ATTEMPTS = 80;
+
+function getAuthServices() {
+  if (typeof window === 'undefined') return {};
+  ensureSupabaseGlobal();
+  return window.AlshamSupabase || {};
 }
 
-// ✅ VERIFICA SE JÁ ESTÁ LOGADO
+async function waitForAuthServices(attempt = 0) {
+  const services = getAuthServices();
+  if (services.genericSignIn && services.createAuditLog) {
+    return services;
+  }
+
+  if (attempt >= MAX_ATTEMPTS) {
+    throw new Error('Serviços de autenticação indisponíveis');
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, WAIT_INTERVAL));
+  return waitForAuthServices(attempt + 1);
+}
+
+function setMessage(element, message) {
+  if (!element) return;
+  element.textContent = message;
+  element.classList.add('visible');
+}
+
+function hideMessages(...elements) {
+  elements.forEach((element) => {
+    if (element) {
+      element.classList.remove('visible');
+      if (element.id === 'error-message') {
+        element.textContent = '';
+      }
+    }
+  });
+}
+
 async function checkExistingSession() {
   try {
-    const { getCurrentSession } = window.AlshamSupabase || {};
-    if (!getCurrentSession) return false;
+    const services = getAuthServices();
+    if (typeof services.getCurrentSession !== 'function') {
+      return false;
+    }
 
-    const session = await getCurrentSession();
-    
+    const result = await services.getCurrentSession();
+    const session = result?.session || result?.data?.session || null;
+
     if (session?.user) {
-      console.log("✅ Sessão ativa detectada, redirecionando...");
-      window.location.href = "/dashboard.html";
+      window.location.href = '/dashboard.html';
       return true;
     }
-    
-    return false;
   } catch (error) {
-    console.error("❌ Erro ao verificar sessão:", error);
-    return false;
+    console.warn('⚠️ Não foi possível validar sessão existente:', error);
+  }
+
+  return false;
+}
+
+async function handleLoginSubmit(event) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const emailInput = form.querySelector('#email');
+  const passwordInput = form.querySelector('#password');
+  const successMessage = document.getElementById('success-message');
+  const errorMessage = document.getElementById('error-message');
+
+  hideMessages(successMessage, errorMessage);
+
+  const email = emailInput?.value?.trim();
+  const password = passwordInput?.value ?? '';
+
+  if (!email || !password) {
+    setMessage(errorMessage, 'Erro no login: informe e-mail e senha.');
+    return;
+  }
+
+  try {
+    const { genericSignIn, createAuditLog } = await waitForAuthServices();
+    const response = await genericSignIn(email, password);
+
+    const authError = response?.error || (response?.success === false ? new Error('Falha no login') : null);
+    const user = response?.data?.user || response?.user || null;
+
+    if (authError || !user) {
+      const reason = authError?.message || 'Credenciais inválidas';
+      setMessage(errorMessage, `Erro no login: ${reason}`);
+      await createAuditLog?.('LOGIN_FAILURE', { email, reason });
+      return;
+    }
+
+    setMessage(successMessage, 'Login realizado com sucesso');
+    await createAuditLog?.('LOGIN_SUCCESS', { email, user_id: user.id });
+
+    setTimeout(() => {
+      window.location.href = '/dashboard.html';
+    }, 1000);
+  } catch (error) {
+    console.error('❌ Erro ao realizar login:', error);
+    setMessage(errorMessage, `Erro no login: ${error.message || 'Erro inesperado'}`);
   }
 }
 
-const LoginSystem = {
-  async login(event) {
-    event.preventDefault();
-    console.log("🚀 Tentando login...");
-    
-    const { genericSignIn, createAuditLog } = window.AlshamSupabase || {};
+function autoSubmitIfRequested(form) {
+  if (!form || form.dataset.autoSubmit !== 'true') {
+    return;
+  }
 
-    if (!genericSignIn) {
-      console.error("❌ genericSignIn não disponível");
-      document.getElementById("error-text").textContent = 
-        "Sistema ainda carregando. Aguarde...";
-      document.getElementById("error-message").classList.remove("hidden");
-      return;
-    }
+  requestAnimationFrame(() => {
+    form.requestSubmit();
+  });
+}
 
-    const email = document.getElementById("email")?.value.trim();
-    const password = document.getElementById("password")?.value.trim();
-    const btn = document.getElementById("login-btn");
-    const btnText = document.getElementById("login-btn-text");
-    const spinner = document.getElementById("login-spinner");
-    const errorBox = document.getElementById("error-message");
-    const errorText = document.getElementById("error-text");
-    const successBox = document.getElementById("success-message");
-    const successText = document.getElementById("success-text");
+async function bootstrapLogin() {
+  const form = document.getElementById('login-form');
+  const successMessage = document.getElementById('success-message');
+  const errorMessage = document.getElementById('error-message');
 
-    errorBox.classList.add("hidden");
-    successBox.classList.add("hidden");
+  hideMessages(successMessage, errorMessage);
 
-    if (!email || !password) {
-      errorText.textContent = "Preencha todos os campos.";
-      errorBox.classList.remove("hidden");
-      return;
-    }
+  if (!form) {
+    return;
+  }
 
-    btn.disabled = true;
-    btnText.textContent = "Entrando...";
-    spinner.classList.remove("hidden");
+  form.addEventListener('submit', handleLoginSubmit, { once: false });
 
-    try {
-      const result = await genericSignIn(email, password);
-      
-      if (!result.success) {
-        console.warn("⚠️ Falha no login:", result.error);
-        errorText.textContent =
-          result.error?.message || "Credenciais inválidas.";
-        errorBox.classList.remove("hidden");
-        await createAuditLog?.("LOGIN_FAILURE", { email, reason: result.error?.message });
-        return;
-      }
-
-      console.log("✅ Login bem-sucedido");
-      successText.textContent = "Login realizado com sucesso!";
-      successBox.classList.remove("hidden");
-      
-      await createAuditLog?.("LOGIN_SUCCESS", { email, user_id: result.data.user?.id });
-
+  try {
+    const guardResult = await robustAuthGuard({ skipRedirect: true, maxRetries: 1, retryDelay: 300, timeout: 5000 });
+    if (guardResult?.user) {
+      setMessage(successMessage, 'Sessão ativa detectada. Redirecionando...');
       setTimeout(() => {
-        window.location.href = "/dashboard.html";
+        window.location.href = '/dashboard.html';
       }, 1200);
-    } catch (err) {
-      console.error("❌ Erro no login:", err);
-      errorText.textContent = err.message || "Erro inesperado.";
-      errorBox.classList.remove("hidden");
-    } finally {
-      btn.disabled = false;
-      btnText.textContent = "Entrar";
-      spinner.classList.add("hidden");
-    }
-  },
-
-  async forgotPassword(email) {
-    const { resetPassword, showNotification } = window.AlshamSupabase || {};
-    if (!email) {
-      alert("Digite seu e-mail.");
       return;
     }
-    const res = await resetPassword?.(email);
-    if (res?.success) {
-      alert("E-mail de redefinição enviado.");
-    } else {
-      alert("Erro ao enviar.");
-    }
-  },
-
-  oauthLogin(provider) {
-    alert(`Login com ${provider} em desenvolvimento.`);
-  },
-
-  biometricLogin() {
-    alert("Login biométrico em desenvolvimento.");
+  } catch (error) {
+    console.warn('⚠️ Guard não pôde validar sessão antes do login:', error);
   }
-};
 
-if (typeof window !== "undefined") {
-  window.LoginSystem = LoginSystem;
-}
-
-const loginForm = document.getElementById("login-form");
-if (loginForm && !loginForm.dataset.listenerAttached) {
-  loginForm.addEventListener("submit", event => LoginSystem.login(event));
-  loginForm.dataset.listenerAttached = "true";
-}
-
-// Aguarda Supabase e verifica sessão existente
-waitForSupabase(async () => {
-  console.log("✅ LoginSystem READY v5.5.0");
-
-  // ✅ VERIFICA SE JÁ ESTÁ LOGADO
   await checkExistingSession();
-});
+  autoSubmitIfRequested(form);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapLogin, { once: true });
+} else {
+  bootstrapLogin();
+}
+
+window.LoginSystem = {
+  login: (email, password) => waitForAuthServices().then(({ genericSignIn }) => genericSignIn(email, password)),
+  guard: robustAuthGuard
+};

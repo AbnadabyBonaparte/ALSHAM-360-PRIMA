@@ -88,10 +88,9 @@
   </footer>
   
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
+    import { ensureSupabaseGlobal } from '/src/lib/attach-supabase.js';
+    ensureSupabaseGlobal();
     console.log('✅ Supabase integrado no Logout');
   </script>
   <script type="module" src="/src/js/logout.js"></script>

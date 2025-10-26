@@ -1615,9 +1615,22 @@ waitForSupabase(() => {
 
   // Categoria 10: Mobile e Responsividade
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: 'key' });
-    });
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => {
+        if (window.Cypress || !reg?.pushManager) {
+          return null;
+        }
+        return reg.pushManager
+          .subscribe({ userVisibleOnly: true, applicationServerKey: 'key' })
+          .catch((err) => {
+            console.warn('Push subscription indisponível no ambiente atual:', err);
+            return null;
+          });
+      })
+      .catch((err) => {
+        console.warn('Registro de service worker ignorado:', err);
+      });
   }
 
   function handleOfflineEdits() {
