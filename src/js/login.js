@@ -199,7 +199,7 @@ async function bootstrapLogin() {
         setTimeout(() => {
           console.log('🔄 Redirecionando para dashboard...');
           window.location.href = '/dashboard.html';
-        }, 1000);
+        }, 2000);
         return;
       }
     }
