@@ -4,7 +4,6 @@
   "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
-
   "headers": [
     {
       "source": "/(.*)",
@@ -114,7 +113,6 @@
       ]
     }
   ],
-
   "rewrites": [
     { "source": "/sw.js", "destination": "/sw.js" },
     { "source": "/service-worker.js", "destination": "/service-worker.js" },
@@ -137,4 +135,3 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
-```
