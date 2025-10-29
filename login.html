@@ -122,7 +122,6 @@
   <main class="login-card" role="main">
     <h1>ALSHAM 360°</h1>
     
-    <!-- 🔧 FIX: Remover data-auto-submit="true" -->
     <form id="login-form">
       <div>
         <label for="email">E-mail corporativo</label>
@@ -149,7 +148,6 @@
         />
       </div>
       
-      <!-- 🔧 FIX: Texto do botão mais claro -->
       <button type="submit">Entrar</button>
     </form>
     
@@ -160,6 +158,9 @@
       <a href="/reset-password.html">Esqueceu sua senha?</a>
     </div>
   </main>
+  
+  <!-- PostHog Analytics -->
+  <script type="module" src="/src/lib/analytics.js"></script>
   
   <script type="module" src="/src/js/login.js"></script>
 </body>
