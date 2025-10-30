@@ -98,8 +98,20 @@ const SUPABASE_URL =
   resolveEnvValue('VITE_SUPABASE_URL', resolveEnvValue('SUPABASE_URL', 'https://example.supabase.co'));
 const SUPABASE_ANON_KEY =
   resolveEnvValue('VITE_SUPABASE_ANON_KEY', resolveEnvValue('SUPABASE_ANON_KEY', 'public-anon-key'));
+const SUPABASE_CONFIG = Object.freeze({
+  url: SUPABASE_URL,
+  anonKey: SUPABASE_ANON_KEY
+});
 
 function ensureSupabaseClient() {
+  if (typeof window !== 'undefined') {
+    if (!window.__VITE_SUPABASE_URL__) {
+      window.__VITE_SUPABASE_URL__ = SUPABASE_URL;
+    }
+    if (!window.__VITE_SUPABASE_ANON_KEY__) {
+      window.__VITE_SUPABASE_ANON_KEY__ = SUPABASE_ANON_KEY;
+    }
+  }
   if (!supabase) {
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
@@ -109,6 +121,20 @@ function ensureSupabaseClient() {
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
       }
     });
+
+    if (globalContainer) {
+      globalContainer[GLOBAL_CLIENT_KEY] = supabase;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.AlshamSupabase = window.AlshamSupabase || {};
+      if (!window.AlshamSupabase.supabase) {
+        window.AlshamSupabase.supabase = supabase;
+      }
+      if (!window.AlshamSupabase.auth) {
+        window.AlshamSupabase.auth = supabase.auth;
+      }
+    }
   }
   return supabase;
 }
@@ -118,6 +144,8 @@ ensureSupabaseClient();
 export function getSupabaseClient() {
   return ensureSupabaseClient();
 }
+
+export { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIG };
 
 export async function getCurrentSession() {
   try {

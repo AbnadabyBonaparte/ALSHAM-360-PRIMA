@@ -1,11 +1,14 @@
 /// <reference types="cypress" />
 
+import { getTestCredentials } from '../support/testData.js';
+
 describe('Fluxos de autenticação e proteção de sessão', () => {
   afterEach(() => {
     cy.mockSupabase(null);
   });
 
   it('realiza login com credenciais válidas e redireciona para o dashboard', () => {
+    const { email, password } = getTestCredentials();
     const signInStub = cy.stub().as('signInWithPassword').resolves({
       data: { user: { id: 'user-123', email: 'user@example.com' }, session: {} },
       error: null
@@ -24,22 +27,26 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     cy.clock();
     cy.visit('/login.html');
 
-    cy.get('#email').type('user@example.com');
-    cy.get('#password').type('SenhaSegura1!');
-    cy.get('#login-form').submit();
+    cy.log('Preenchendo formulário de login com credenciais de teste');
+    cy.get('[data-cy=login-email]').type(email);
+    cy.get('[data-cy=login-password]').type(password, { log: false });
+    cy.get('[data-cy=login-form]').submit();
 
-    cy.get('#success-message').should('contain', 'Login realizado com sucesso');
+    cy.get('[data-cy=login-success]').should('contain', 'Login realizado com sucesso');
     cy.get('@signInWithPassword').should(
       'have.been.calledWithMatch',
-      Cypress.sinon.match({ email: 'user@example.com', password: 'SenhaSegura1!' })
+      Cypress.sinon.match({ email, password })
     );
     cy.get('@auditLog').should('have.been.calledWithMatch', 'LOGIN_SUCCESS', Cypress.sinon.match({ user_id: 'user-123' }));
 
     cy.tick(1000);
     cy.location('pathname').should('eq', '/dashboard.html');
+    cy.get('[data-cy=dashboard-root]', { timeout: 10000 }).should('exist');
+    cy.screenshot('auth-login-success', { capture: 'viewport' });
   });
 
   it('exibe erro ao falhar no login', () => {
+    const { email, password } = getTestCredentials();
     const loginError = new Error('Credenciais inválidas');
     const signInStub = cy.stub().as('signInWithPassword').resolves({ data: { user: null }, error: loginError });
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
@@ -54,11 +61,11 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     });
 
     cy.visit('/login.html');
-    cy.get('#email').type('user@example.com');
-    cy.get('#password').type('SenhaSegura1!');
-    cy.get('#login-form').submit();
+    cy.get('[data-cy=login-email]').type(email);
+    cy.get('[data-cy=login-password]').type(password, { log: false });
+    cy.get('[data-cy=login-form]').submit();
 
-    cy.get('#error-message').should('contain', 'Erro no login');
+    cy.get('[data-cy=login-error]').should('contain', 'Erro no login');
     cy.get('@auditLog').should('have.been.calledWithMatch', 'LOGIN_FAILURE', Cypress.sinon.match({ reason: 'Credenciais inválidas' }));
     cy.location('pathname').should('eq', '/login.html');
   });
@@ -81,11 +88,11 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     cy.clock();
     cy.visit('/register.html');
 
-    cy.get('#first-name').type('Maria');
-    cy.get('#last-name').type('Silva');
-    cy.get('#email').type('nova@empresa.com');
-    cy.get('#password').type('SenhaSegura1!');
-    cy.get('#confirm-password').type('SenhaSegura1!');
+    cy.get('[data-cy=register-first-name]').type('Maria');
+    cy.get('[data-cy=register-last-name]').type('Silva');
+    cy.get('[data-cy=register-email]').type('nova@empresa.com');
+    cy.get('[data-cy=register-password]').type('SenhaSegura1!');
+    cy.get('[data-cy=register-confirm-password]').type('SenhaSegura1!');
 
     cy.window().then(win => {
       win.RegistrationSystem.submit();
@@ -109,11 +116,11 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
     cy.visit('/register.html');
 
-    cy.get('#first-name').type('João');
-    cy.get('#last-name').type('Souza');
-    cy.get('#email').type('duplicado@empresa.com');
-    cy.get('#password').type('SenhaSegura1!');
-    cy.get('#confirm-password').type('SenhaSegura1!');
+    cy.get('[data-cy=register-first-name]').type('João');
+    cy.get('[data-cy=register-last-name]').type('Souza');
+    cy.get('[data-cy=register-email]').type('duplicado@empresa.com');
+    cy.get('[data-cy=register-password]').type('SenhaSegura1!');
+    cy.get('[data-cy=register-confirm-password]').type('SenhaSegura1!');
 
     cy.window().then(win => {
       win.RegistrationSystem.submit();
@@ -133,10 +140,10 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     });
 
     cy.visit('/reset-password.html');
-    cy.get('#email').type('user@example.com');
-    cy.get('#reset-form').submit();
+    cy.get('[data-cy=reset-email]').type('user@example.com');
+    cy.get('[data-cy=reset-form]').submit();
 
-    cy.get('#reset-message').should('contain', 'Um link de redefinição');
+    cy.get('[data-cy=reset-success]').should('contain', 'Um link de redefinição');
     cy.get('@reset').should('have.been.calledWith', 'user@example.com');
     cy.get('@auditLog').should('have.been.calledWithMatch', 'PASSWORD_RESET_REQUEST', Cypress.sinon.match({ email: 'user@example.com' }));
   });
@@ -152,16 +159,15 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     });
 
     cy.visit('/reset-password.html');
-    cy.get('#email').type('user@example.com');
-    cy.get('#reset-form').submit();
+    cy.get('[data-cy=reset-email]').type('user@example.com');
+    cy.get('[data-cy=reset-form]').submit();
 
-    cy.get('#reset-error').should('contain', 'Falha Supabase');
+    cy.get('[data-cy=reset-error]').should('contain', 'Falha Supabase');
     cy.get('@auditLog').should('have.been.calledWithMatch', 'PASSWORD_RESET_FAILURE', Cypress.sinon.match({ reason: 'Falha Supabase' }));
   });
 
   it('protege rota privada redirecionando usuários não autenticados', () => {
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
-    const replaceStub = cy.stub().as('locationReplace');
 
     cy.mockSupabase({
       getCurrentSession: cy.stub().resolves({ user: null }),
@@ -185,7 +191,6 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
   it('mantém acesso quando a sessão é válida', () => {
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
-    const replaceStub = cy.stub().as('locationReplace');
 
     cy.mockSupabase({
       getCurrentSession: cy.stub().resolves({ user: { id: 'user-1', email: 'user@example.com' } }),
@@ -200,9 +205,12 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
       }
     });
 
-    cy.contains('Sessão válida', { timeout: 5000 }).should('exist');
+    cy.get('[data-cy=session-user-info]', { timeout: 5000 })
+      .should('be.visible')
+      .and('contain', 'user@example.com');
     cy.get('@locationReplace').should('not.have.been.called');
     cy.get('@auditLog').should('have.been.calledWithMatch', 'AUTHORIZED_ACCESS', Cypress.sinon.match({ route: '/session-guard.html' }));
+    cy.screenshot('session-guard-valid-session', { capture: 'viewport' });
   });
 
   it('executa logout completo e limpa sessão', () => {
@@ -226,7 +234,7 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
       win.localStorage.setItem('supabase.auth.token', 'token');
     });
 
-    cy.get('#logout-button').click();
+    cy.get('[data-cy=logout-button]').click();
 
     cy.get('@signOut').should('have.been.called');
     cy.get('@auditLog').should('have.been.calledWithMatch', 'USER_LOGGED_OUT', Cypress.sinon.match({ user_id: 'user-321' }));

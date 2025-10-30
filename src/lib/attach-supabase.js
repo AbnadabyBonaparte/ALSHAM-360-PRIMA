@@ -1,15 +1,39 @@
+import * as SupabaseLib from './supabase.js';
+
 /**
  * 🔧 ATTACH SUPABASE - Versão CDN (CORRIGIDO)
- * 
+ *
  * Usa Supabase CDN do HTML ao invés de importar módulo local
  * Resolve problema de bundle em produção
  */
+
+function ensureBrowserSupabaseNamespace() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const namespace = window.SupabaseLib || window.AlshamSupabase || {};
+  Object.entries(SupabaseLib).forEach(([key, value]) => {
+    if (typeof namespace[key] === 'undefined') {
+      namespace[key] = value;
+    }
+  });
+
+  window.SupabaseLib = namespace;
+  window.AlshamSupabase = namespace;
+
+  return namespace;
+}
+
+// 🔐 Garante que a namespace global seja inicializada assim que o módulo for carregado
+ensureBrowserSupabaseNamespace();
 
 console.log('🔧 [ATTACH-SUPABASE] Iniciando...');
 
 // Pegar variáveis de ambiente
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://example.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'public-anon-key';
+const GLOBAL_CLIENT_KEY = '__alshamSupabaseClient';
 
 console.log('📦 [ATTACH-SUPABASE] URL:', SUPABASE_URL);
 console.log('🔑 [ATTACH-SUPABASE] Anon Key:', SUPABASE_ANON_KEY?.substring(0, 20) + '...');
@@ -38,9 +62,14 @@ function createSupabaseClient() {
   if (!window.supabase?.createClient) {
     throw new Error('Supabase CDN não disponível');
   }
-  
+
+  if (window[GLOBAL_CLIENT_KEY]) {
+    console.log('♻️ [ATTACH-SUPABASE] Reutilizando cliente Supabase global.');
+    return window[GLOBAL_CLIENT_KEY];
+  }
+
   console.log('🔧 [ATTACH-SUPABASE] Criando cliente Supabase...');
-  
+
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,        // 🔧 FIX: Salvar sessão no localStorage
@@ -49,7 +78,9 @@ function createSupabaseClient() {
       storage: window.localStorage // 🔧 FIX: Usar localStorage explicitamente
     }
   });
-  
+
+  window[GLOBAL_CLIENT_KEY] = client;
+
   console.log('✅ [ATTACH-SUPABASE] Cliente criado com sucesso!');
   return client;
 }
@@ -68,49 +99,28 @@ export async function ensureSupabaseGlobal() {
     console.log('✅ [ATTACH-SUPABASE] AlshamSupabase já existe');
     return window.AlshamSupabase;
   }
-  
-  try {
-    // Aguardar CDN carregar
-    await waitForSupabaseCDN();
-    
-    // Criar cliente
-    const supabaseClient = createSupabaseClient();
-    
-    // Criar objeto AlshamSupabase
-    window.AlshamSupabase = {
-      supabase: supabaseClient,
-      auth: supabaseClient.auth,
-      
-      // Função auxiliar para pegar sessão
-      async getCurrentSession() {
-        try {
-          const { data, error } = await supabaseClient.auth.getSession();
-          if (error) throw error;
-          
-          console.log('📦 [ATTACH-SUPABASE] Sessão atual:', data?.session ? 'Existe' : 'Não existe');
-          return data?.session ?? null;
-        } catch (err) {
-          console.error('❌ [ATTACH-SUPABASE] Erro ao buscar sessão:', err);
-          throw err;
-        }
-      },
-      
-      // Flag de anexação
-      __alshamAttached: true
+
+  if (SupabaseLib?.SUPABASE_URL) {
+    existing.SUPABASE_URL = SupabaseLib.SUPABASE_URL;
+  }
+
+  if (SupabaseLib?.SUPABASE_ANON_KEY) {
+    existing.SUPABASE_ANON_KEY = SupabaseLib.SUPABASE_ANON_KEY;
+  }
+
+  if (SupabaseLib?.SUPABASE_CONFIG) {
+    existing.config = {
+      ...(existing.config || {}),
+      ...SupabaseLib.SUPABASE_CONFIG
     };
-    
-    console.log('🎉 [ATTACH-SUPABASE] window.AlshamSupabase criado com sucesso!');
-    console.log('✅ [ATTACH-SUPABASE] Configurações:');
-    console.log('   - persistSession: true');
-    console.log('   - autoRefreshToken: true');
-    console.log('   - detectSessionInUrl: true');
-    console.log('   - storage: localStorage');
-    
-    return window.AlshamSupabase;
-    
-  } catch (error) {
-    console.error('❌ [ATTACH-SUPABASE] Erro fatal:', error);
-    throw error;
+  }
+
+  if (!existing.auth && SupabaseLib?.supabase?.auth) {
+    existing.auth = SupabaseLib.supabase.auth;
+  }
+
+  if (typeof existing.getCurrentSession !== 'function' && typeof SupabaseLib.getCurrentSession === 'function') {
+    existing.getCurrentSession = SupabaseLib.getCurrentSession;
   }
 }
 

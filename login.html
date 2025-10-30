@@ -8,10 +8,7 @@
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <script type="module">
-    import { ensureSupabaseGlobal } from '/src/lib/attach-supabase.js';
-    ensureSupabaseGlobal();
-  </script>
+  <script type="module" src="/init-supabase.js"></script>
   <style>
     body {
       min-height: 100vh;
@@ -120,41 +117,43 @@
   </style>
 </head>
 <body>
-  <main class="login-card" role="main">
+  <main class="login-card" role="main" data-cy="login-page">
     <h1>ALSHAM 360°</h1>
-    
-    <form id="login-form">
+
+    <form id="login-form" data-cy="login-form">
       <div>
         <label for="email">E-mail corporativo</label>
-        <input 
-          id="email" 
-          name="email" 
-          type="email" 
+        <input
+          id="email"
+          name="email"
+          type="email"
           placeholder="seu@email.com"
-          autocomplete="email" 
-          required 
+          autocomplete="email"
+          required
+          data-cy="login-email"
         />
       </div>
-      
+
       <div>
         <label for="password">Senha</label>
         <input 
           id="password" 
           name="password" 
-          type="password" 
+          type="password"
           placeholder="••••••••"
-          autocomplete="current-password" 
-          minlength="6" 
-          required 
+          autocomplete="current-password"
+          minlength="6"
+          required
+          data-cy="login-password"
         />
       </div>
-      
-      <button type="submit">Entrar</button>
+
+      <button type="submit" data-cy="login-submit">Entrar</button>
     </form>
-    
-    <p id="success-message" class="feedback success" role="status"></p>
-    <p id="error-message" class="feedback error" role="alert"></p>
-    
+
+    <p id="success-message" class="feedback success" role="status" data-cy="login-success"></p>
+    <p id="error-message" class="feedback error" role="alert" data-cy="login-error"></p>
+
     <div class="login-footer">
       <a href="/reset-password.html">Esqueceu sua senha?</a>
     </div>
