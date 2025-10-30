@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://*.posthog.com https://cdn.posthog.com https://app.posthog.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://*.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; frame-src 'self' https://app.posthog.com; worker-src 'self' blob:; child-src 'self' blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - ALSHAM 360°</title>
   <link rel="stylesheet" href="/css/tokens.css" />
@@ -119,7 +120,6 @@
   <main class="login-card" role="main">
     <h1>ALSHAM 360°</h1>
     
-    <!-- 🔧 FIX: Remover data-auto-submit="true" -->
     <form id="login-form">
       <div>
         <label for="email">E-mail corporativo</label>
@@ -146,7 +146,6 @@
         />
       </div>
       
-      <!-- 🔧 FIX: Texto do botão mais claro -->
       <button type="submit">Entrar</button>
     </form>
     
@@ -157,6 +156,9 @@
       <a href="/reset-password.html">Esqueceu sua senha?</a>
     </div>
   </main>
+  
+  <!-- PostHog Analytics -->
+  <script src="/analytics.js"></script>
   
   <script type="module" src="/src/js/login.js"></script>
 </body>

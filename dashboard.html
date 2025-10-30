@@ -214,7 +214,7 @@
     #loading-overlay {
       position: fixed;
       inset: 0;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       background: rgba(15, 23, 42, 0.72);
@@ -353,45 +353,6 @@
     © 2025 ALSHAM 360° PRIMA — Dados processados automaticamente pela suíte de inteligência.
   </footer>
 
-  <script type="module">
-    import { robustAuthGuard } from '/src/lib/auth-guard.js';
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      const overlay = document.getElementById('loading-overlay');
-      if (overlay) {
-        overlay.style.display = 'flex';
-      }
-
-      try {
-        const result = await robustAuthGuard();
-        if (!result?.success) {
-          return;
-        }
-
-        if (overlay) {
-          setTimeout(() => {
-            overlay.style.display = 'none';
-          }, 400);
-        }
-      } catch (error) {
-        console.error('❌ Erro ao validar sessão do dashboard:', error);
-        if (overlay) {
-          overlay.innerHTML = `
-            <div class="loading-card" role="alert">
-              <h2 style="color: #dc2626; margin-bottom: 0.75rem;">Erro ao carregar</h2>
-              <p>${error.message || 'Falha inesperada ao validar sua sessão.'}</p>
-              <button
-                type="button"
-                style="margin-top: 1.5rem; padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer;"
-                onclick="location.reload()"
-              >
-                Tentar novamente
-              </button>
-            </div>
-          `;
-        }
-      }
-    });
-  </script>
+  <script type="module" src="/src/js/dashboard.js"></script>
 </body>
 </html>
