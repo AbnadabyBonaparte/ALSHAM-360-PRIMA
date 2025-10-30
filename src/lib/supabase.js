@@ -98,8 +98,18 @@ const SUPABASE_URL =
   resolveEnvValue('VITE_SUPABASE_URL', resolveEnvValue('SUPABASE_URL', 'https://example.supabase.co'));
 const SUPABASE_ANON_KEY =
   resolveEnvValue('VITE_SUPABASE_ANON_KEY', resolveEnvValue('SUPABASE_ANON_KEY', 'public-anon-key'));
+const GLOBAL_CLIENT_KEY = '__alshamSupabaseClient';
 
 function ensureSupabaseClient() {
+  const globalContainer = typeof window !== 'undefined' ? window : globalThis;
+  const isVitest = typeof process !== 'undefined' && process.env?.VITEST;
+  const existing = globalContainer?.[GLOBAL_CLIENT_KEY];
+
+  if (existing && !isVitest) {
+    supabase = existing;
+    return supabase;
+  }
+
   if (!supabase) {
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
@@ -109,6 +119,20 @@ function ensureSupabaseClient() {
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
       }
     });
+
+    if (globalContainer) {
+      globalContainer[GLOBAL_CLIENT_KEY] = supabase;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.AlshamSupabase = window.AlshamSupabase || {};
+      if (!window.AlshamSupabase.supabase) {
+        window.AlshamSupabase.supabase = supabase;
+      }
+      if (!window.AlshamSupabase.auth) {
+        window.AlshamSupabase.auth = supabase.auth;
+      }
+    }
   }
   return supabase;
 }
