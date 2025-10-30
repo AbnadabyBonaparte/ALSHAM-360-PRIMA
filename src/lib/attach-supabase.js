@@ -99,52 +99,28 @@ export async function ensureSupabaseGlobal() {
     console.log('✅ [ATTACH-SUPABASE] AlshamSupabase já existe');
     return window.AlshamSupabase;
   }
-  
-  try {
-    // Aguardar CDN carregar
-    await waitForSupabaseCDN();
-    
-    // Criar cliente
-    const supabaseClient = createSupabaseClient();
-    
-    const supabaseNamespace = ensureBrowserSupabaseNamespace() || {};
 
-    supabaseNamespace.supabase = supabaseClient;
-    supabaseNamespace.auth = supabaseClient.auth;
+  if (SupabaseLib?.SUPABASE_URL) {
+    existing.SUPABASE_URL = SupabaseLib.SUPABASE_URL;
+  }
 
-    if (typeof supabaseNamespace.getSupabaseClient !== 'function') {
-      supabaseNamespace.getSupabaseClient = () => supabaseClient;
-    }
+  if (SupabaseLib?.SUPABASE_ANON_KEY) {
+    existing.SUPABASE_ANON_KEY = SupabaseLib.SUPABASE_ANON_KEY;
+  }
 
-    if (typeof supabaseNamespace.getCurrentSession !== 'function') {
-      supabaseNamespace.getCurrentSession = async function getCurrentSession() {
-        try {
-          const { data, error } = await supabaseClient.auth.getSession();
-          if (error) throw error;
+  if (SupabaseLib?.SUPABASE_CONFIG) {
+    existing.config = {
+      ...(existing.config || {}),
+      ...SupabaseLib.SUPABASE_CONFIG
+    };
+  }
 
-          console.log('📦 [ATTACH-SUPABASE] Sessão atual:', data?.session ? 'Existe' : 'Não existe');
-          return data?.session ?? null;
-        } catch (err) {
-          console.error('❌ [ATTACH-SUPABASE] Erro ao buscar sessão:', err);
-          throw err;
-        }
-      };
-    }
+  if (!existing.auth && SupabaseLib?.supabase?.auth) {
+    existing.auth = SupabaseLib.supabase.auth;
+  }
 
-    supabaseNamespace.__alshamAttached = true;
-
-    console.log('🎉 [ATTACH-SUPABASE] window.AlshamSupabase criado com sucesso!');
-    console.log('✅ [ATTACH-SUPABASE] Configurações:');
-    console.log('   - persistSession: true');
-    console.log('   - autoRefreshToken: true');
-    console.log('   - detectSessionInUrl: true');
-    console.log('   - storage: localStorage');
-    
-    return window.AlshamSupabase;
-    
-  } catch (error) {
-    console.error('❌ [ATTACH-SUPABASE] Erro fatal:', error);
-    throw error;
+  if (typeof existing.getCurrentSession !== 'function' && typeof SupabaseLib.getCurrentSession === 'function') {
+    existing.getCurrentSession = SupabaseLib.getCurrentSession;
   }
 }
 
