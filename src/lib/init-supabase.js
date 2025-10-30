@@ -1,23 +1,19 @@
 // init-supabase.js
-console.log("🔹 [Supabase Init] Iniciando...");
+console.log('🔹 [Supabase Init] Iniciando...');
 
 async function bootstrapSupabase() {
   try {
-    const attachPath = '/assets/attach-supabase.js';
+    const module = await import('./attach-supabase.js');
+    const initializer = module.ensureSupabaseGlobal || module.default;
 
-    let module = await import(attachPath).catch(async () => {
-      const res = await fetch('/manifest.json').then(r => r.json());
-      const assetFile = Object.keys(res).find(f => f.includes('attach-supabase'));
-      if (assetFile) return import(`/assets/${assetFile}`);
-      throw new Error('attach-supabase não encontrado no manifest');
-    });
-
-    if (module && module.default) {
-      module.default();
-      console.log("✅ Supabase carregado com sucesso!");
+    if (typeof initializer === 'function') {
+      await initializer();
+      console.log('✅ Supabase carregado com sucesso!');
+    } else {
+      console.warn('⚠️ [Supabase Init] Módulo attach-supabase não exporta uma função inicializadora.');
     }
   } catch (err) {
-    console.error("❌ [Supabase Init] Falha:", err);
+    console.error('❌ [Supabase Init] Falha:', err);
   }
 }
 
