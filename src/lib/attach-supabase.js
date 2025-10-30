@@ -1,9 +1,32 @@
+import * as SupabaseLib from './supabase.js';
+
 /**
  * 🔧 ATTACH SUPABASE - Versão CDN (CORRIGIDO)
- * 
+ *
  * Usa Supabase CDN do HTML ao invés de importar módulo local
  * Resolve problema de bundle em produção
  */
+
+function ensureBrowserSupabaseNamespace() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const namespace = window.SupabaseLib || window.AlshamSupabase || {};
+  Object.entries(SupabaseLib).forEach(([key, value]) => {
+    if (typeof namespace[key] === 'undefined') {
+      namespace[key] = value;
+    }
+  });
+
+  window.SupabaseLib = namespace;
+  window.AlshamSupabase = namespace;
+
+  return namespace;
+}
+
+// 🔐 Garante que a namespace global seja inicializada assim que o módulo for carregado
+ensureBrowserSupabaseNamespace();
 
 console.log('🔧 [ATTACH-SUPABASE] Iniciando...');
 
@@ -84,17 +107,17 @@ export async function ensureSupabaseGlobal() {
     // Criar cliente
     const supabaseClient = createSupabaseClient();
     
-    // Criar objeto AlshamSupabase
-    window.AlshamSupabase = window.AlshamSupabase || {};
-    if (!window.AlshamSupabase.supabase) {
-      window.AlshamSupabase.supabase = supabaseClient;
-    }
-    if (!window.AlshamSupabase.auth) {
-      window.AlshamSupabase.auth = supabaseClient.auth;
+    const supabaseNamespace = ensureBrowserSupabaseNamespace() || {};
+
+    supabaseNamespace.supabase = supabaseClient;
+    supabaseNamespace.auth = supabaseClient.auth;
+
+    if (typeof supabaseNamespace.getSupabaseClient !== 'function') {
+      supabaseNamespace.getSupabaseClient = () => supabaseClient;
     }
 
-    if (typeof window.AlshamSupabase.getCurrentSession !== 'function') {
-      window.AlshamSupabase.getCurrentSession = async function getCurrentSession() {
+    if (typeof supabaseNamespace.getCurrentSession !== 'function') {
+      supabaseNamespace.getCurrentSession = async function getCurrentSession() {
         try {
           const { data, error } = await supabaseClient.auth.getSession();
           if (error) throw error;
@@ -108,8 +131,8 @@ export async function ensureSupabaseGlobal() {
       };
     }
 
-    window.AlshamSupabase.__alshamAttached = true;
-    
+    supabaseNamespace.__alshamAttached = true;
+
     console.log('🎉 [ATTACH-SUPABASE] window.AlshamSupabase criado com sucesso!');
     console.log('✅ [ATTACH-SUPABASE] Configurações:');
     console.log('   - persistSession: true');
