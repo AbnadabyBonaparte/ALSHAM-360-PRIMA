@@ -1,0 +1,55 @@
+{
+  "flow_name": "ALSHAM 360° Guardian Monitor",
+  "trigger": {
+    "type": "webhook",
+    "endpoint": "/supabase_guardian",
+    "methods": ["POST"]
+  },
+  "nodes": [
+    {
+      "name": "Evaluate Supabase/CSP Status",
+      "type": "IF",
+      "expression": "={{$json[\"status\"]}} === 'error'"
+    },
+    {
+      "name": "Send Telegram Alert",
+      "type": "telegram",
+      "when": "error",
+      "config": {
+        "chatId": "<SEU_CHAT_ID>",
+        "text": "🚨 *ALSHAM 360° ALERTA*\nFalha detectada em Supabase/CSP:\n{{$json[\"error\"]}}",
+        "parse_mode": "Markdown"
+      }
+    },
+    {
+      "name": "Log in Notion",
+      "type": "notion",
+      "when": "error",
+      "config": {
+        "databaseId": "<SEU_NOTION_DB_ID>",
+        "fields": {
+          "Título": "Falha em Supabase/CSP",
+          "Status": "Erro",
+          "Mensagem": "={{$json[\"error\"]}}",
+          "Projeto": "ALSHAM 360° PRIMA",
+          "Timestamp": "={{$now}}"
+        }
+      }
+    },
+    {
+      "name": "Success Log",
+      "type": "notion",
+      "when": "ok",
+      "config": {
+        "databaseId": "<SEU_NOTION_DB_ID>",
+        "fields": {
+          "Título": "Supabase OK",
+          "Status": "Sucesso",
+          "Mensagem": "Supabase inicializado corretamente.",
+          "Projeto": "ALSHAM 360° PRIMA",
+          "Timestamp": "={{$now}}"
+        }
+      }
+    }
+  ]
+}
