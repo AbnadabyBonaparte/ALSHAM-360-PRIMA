@@ -11,12 +11,12 @@ describe('🧭 Pipeline de Vendas - ALSHAM 360° PRIMA', () => {
   beforeEach(() => {
     cy.log('🎯 Iniciando teste do módulo Pipeline de Vendas...');
     cy.visit('/pipeline.html');
-    cy.wait(2000); // aguarda o carregamento inicial e o fetch do Supabase
+    cy.get('[data-cy=pipeline-column]', { timeout: 10000 }).should('have.length.at.least', 5);
   });
 
   it('✅ Deve carregar o título e as colunas principais', () => {
-    cy.get('h1').should('contain.text', 'Pipeline de Vendas');
-    cy.get('.pipeline-column')
+    cy.get('[data-cy=pipeline-title]').should('contain.text', 'Pipeline de Vendas');
+    cy.get('[data-cy=pipeline-column]')
       .should('have.length.at.least', 5)
       .each(($col) => {
         cy.wrap($col).find('.pipeline-column-header h3')
@@ -25,7 +25,7 @@ describe('🧭 Pipeline de Vendas - ALSHAM 360° PRIMA', () => {
   });
 
   it('📊 Deve exibir cards em pelo menos uma coluna', () => {
-    cy.get('.opportunity-card').its('length').then(count => {
+    cy.get('[data-cy=pipeline-card]').its('length').then(count => {
       cy.log(`📋 Total de cards renderizados: ${count}`);
       expect(count).to.be.greaterThan(0);
     });
@@ -33,12 +33,12 @@ describe('🧭 Pipeline de Vendas - ALSHAM 360° PRIMA', () => {
 
   it('🔄 Deve permitir mover um card entre colunas', () => {
     // Captura a primeira coluna com card e uma diferente como alvo
-    cy.get('.pipeline-column-body').then(($cols) => {
+    cy.get('[data-cy=pipeline-column] .pipeline-column-body').then(($cols) => {
       const fromCol = $cols[0];
       const toCol = $cols[1];
 
       cy.wrap(fromCol)
-        .find('.opportunity-card')
+        .find('[data-cy=pipeline-card]')
         .first()
         .as('cardToMove');
 
@@ -54,8 +54,8 @@ describe('🧭 Pipeline de Vendas - ALSHAM 360° PRIMA', () => {
       cy.get('@cardToMove').trigger('dragend');
 
       cy.wait(1500); // aguarda re-renderização
-      cy.get('.pipeline-column-body').eq(1)
-        .find('.opportunity-card')
+      cy.get('[data-cy=pipeline-column] .pipeline-column-body').eq(1)
+        .find('[data-cy=pipeline-card]')
         .should('exist');
 
       cy.log('✅ Card movido com sucesso visualmente!');
@@ -63,38 +63,39 @@ describe('🧭 Pipeline de Vendas - ALSHAM 360° PRIMA', () => {
   });
 
   it('🔔 Deve exibir notificação de sucesso após movimentação', () => {
-    cy.get('.opportunity-card').first().as('cardToMove');
+    cy.get('[data-cy=pipeline-card]').first().as('cardToMove');
     const dataTransfer = new DataTransfer();
     cy.get('@cardToMove').trigger('dragstart', { dataTransfer });
-    cy.get('.pipeline-column-body').eq(2).trigger('dragover', { dataTransfer });
-    cy.get('.pipeline-column-body').eq(2).trigger('drop', { dataTransfer });
+    cy.get('[data-cy=pipeline-column] .pipeline-column-body').eq(2).trigger('dragover', { dataTransfer });
+    cy.get('[data-cy=pipeline-column] .pipeline-column-body').eq(2).trigger('drop', { dataTransfer });
     cy.get('@cardToMove').trigger('dragend');
 
     cy.wait(1000);
-    cy.get('.notification.success')
+    cy.get('[data-cy=pipeline-notification]')
       .should('be.visible')
       .and('contain.text', 'Oportunidade movida com sucesso');
   });
 
   it('💰 Deve atualizar o total global após movimentação', () => {
-    cy.get('#pipeline-total')
+    cy.get('[data-cy=pipeline-total]')
       .should('exist')
       .invoke('text')
       .then((totalAntes) => {
         cy.log(`Valor antes do movimento: ${totalAntes}`);
         const dataTransfer = new DataTransfer();
-        cy.get('.opportunity-card').first().trigger('dragstart', { dataTransfer });
-        cy.get('.pipeline-column-body').eq(3).trigger('dragover', { dataTransfer });
-        cy.get('.pipeline-column-body').eq(3).trigger('drop', { dataTransfer });
-        cy.get('.opportunity-card').first().trigger('dragend');
+        cy.get('[data-cy=pipeline-card]').first().trigger('dragstart', { dataTransfer });
+        cy.get('[data-cy=pipeline-column] .pipeline-column-body').eq(3).trigger('dragover', { dataTransfer });
+        cy.get('[data-cy=pipeline-column] .pipeline-column-body').eq(3).trigger('drop', { dataTransfer });
+        cy.get('[data-cy=pipeline-card]').first().trigger('dragend');
         cy.wait(1000);
-        cy.get('#pipeline-total')
+        cy.get('[data-cy=pipeline-total]')
           .invoke('text')
           .then((totalDepois) => {
             cy.log(`Valor após movimento: ${totalDepois}`);
             expect(totalDepois).to.not.equal(totalAntes);
           });
       });
+    cy.screenshot('pipeline-total-update', { capture: 'viewport' });
   });
 
   after(() => {
