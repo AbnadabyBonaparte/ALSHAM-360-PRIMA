@@ -132,6 +132,7 @@
     { "source": "/auth-dashboard", "destination": "/auth-dashboard.html" },
     { "source": "/timeline-test", "destination": "/timeline-test.html" },
     { "source": "/manifest", "destination": "/manifest.json" },
+    { "source": "/manifest.webmanifest", "destination": "/manifest.json" }
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
