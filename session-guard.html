@@ -91,9 +91,8 @@
   </footer>
   
   <!-- Scripts -->
+  <script type="module" src="/init-supabase.js"></script>
   <script type="module">
-    import { ensureSupabaseGlobal } from '/src/lib/attach-supabase.js';
-    ensureSupabaseGlobal();
     console.log('✅ Supabase integrado no Session Guard');
 
     async function showUser() {

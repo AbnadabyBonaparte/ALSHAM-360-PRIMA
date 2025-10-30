@@ -161,7 +161,6 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
   it('protege rota privada redirecionando usuários não autenticados', () => {
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
-    const replaceStub = cy.stub().as('locationReplace');
 
     cy.mockSupabase({
       getCurrentSession: cy.stub().resolves({ user: null }),
@@ -172,7 +171,7 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     cy.clock();
     cy.visit('/session-guard.html', {
       onBeforeLoad(win) {
-        win.location.replace = replaceStub;
+        cy.stub(win.location, 'replace').as('locationReplace');
       }
     });
 
@@ -184,7 +183,6 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
   it('mantém acesso quando a sessão é válida', () => {
     const auditStub = cy.stub().as('auditLog').resolves({ success: true });
-    const replaceStub = cy.stub().as('locationReplace');
 
     cy.mockSupabase({
       getCurrentSession: cy.stub().resolves({ user: { id: 'user-1', email: 'user@example.com' } }),
@@ -194,7 +192,7 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
     cy.visit('/session-guard.html', {
       onBeforeLoad(win) {
-        win.location.replace = replaceStub;
+        cy.stub(win.location, 'replace').as('locationReplace');
       }
     });
 

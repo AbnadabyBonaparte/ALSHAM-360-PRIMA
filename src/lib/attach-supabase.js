@@ -20,6 +20,21 @@ export function ensureSupabaseGlobal() {
     existing.supabase = SupabaseLib.supabase;
   }
 
+  if (SupabaseLib?.SUPABASE_URL) {
+    existing.SUPABASE_URL = SupabaseLib.SUPABASE_URL;
+  }
+
+  if (SupabaseLib?.SUPABASE_ANON_KEY) {
+    existing.SUPABASE_ANON_KEY = SupabaseLib.SUPABASE_ANON_KEY;
+  }
+
+  if (SupabaseLib?.SUPABASE_CONFIG) {
+    existing.config = {
+      ...(existing.config || {}),
+      ...SupabaseLib.SUPABASE_CONFIG
+    };
+  }
+
   if (!existing.auth && SupabaseLib?.supabase?.auth) {
     existing.auth = SupabaseLib.supabase.auth;
   }
