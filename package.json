@@ -1,6 +1,6 @@
 {
   "name": "alsham-360-prima",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "description": "ALSHAM 360° PRIMA — CRM Enterprise com IA, Gamificação e Automações Integradas (Build Estável v6.0.4 - Enterprise Architecture)",
   "main": "server.js",
   "type": "module",
@@ -13,7 +13,8 @@
     "watch:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.min.css --watch",
     "preview": "vite preview --host 0.0.0.0",
     "server:dev": "nodemon server.js",
-    "deploy": "npm run build && npm start",
+    "deploy": "vercel --prod",
+    "deploy:local": "node scripts/deploy-local.js",
     "clean": "rm -rf dist node_modules/.vite css/tailwind.min.css",
     "clean:all": "rm -rf dist node_modules package-lock.json css/tailwind.min.css",
     "fresh-install": "npm run clean:all && npm install && npm run build:css",
@@ -66,7 +67,8 @@
     "nodemon": "3.1.7",
     "rollup-plugin-visualizer": "5.12.0",
     "start-server-and-test": "2.0.3",
-    "vitest": "2.1.4"
+    "vitest": "2.1.4",
+    "vercel": "^36.0.0"
   },
   "repository": {
     "type": "git",

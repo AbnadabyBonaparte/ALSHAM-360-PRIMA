@@ -11,7 +11,7 @@ import * as SupabaseLib from './supabase.js';
 console.log('🚀 [ATTACH-SUPABASE] Inicializando...');
 
 // Detecta ambiente (dev/prod)
-const isDev = window?.location?.hostname === 'localhost' || window?.location?.includes('127.0.0.1');
+const isDev = window?.location?.hostname === 'localhost' || window?.location?.href?.includes('127.0.0.1');
 
 // Fallback seguro (caso init-supabase.js ainda não tenha rodado)
 const SUPABASE_URL =

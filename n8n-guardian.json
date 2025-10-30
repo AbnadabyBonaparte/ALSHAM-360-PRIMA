@@ -1,0 +1,40 @@
+{
+  "flow_name": "ALSHAM 360° Guardian Monitor",
+  "trigger": {
+    "type": "webhook",
+    "endpoint": "/supabase_guardian",
+    "methods": ["POST"]
+  },
+  "nodes": [
+    {
+      "name": "Classificar Evento",
+      "type": "IF",
+      "expression": "={{$json['status']}} === 'error'"
+    },
+    {
+      "name": "Telegram Alerta",
+      "type": "telegram",
+      "when": "error",
+      "config": {
+        "chatId": "<SEU_CHAT_ID>",
+        "text": "🚨 *ALSHAM ALERTA*\nFalha detectada no deploy:\n{{$json['error']}}",
+        "parse_mode": "Markdown"
+      }
+    },
+    {
+      "name": "Log Notion Sucesso",
+      "type": "notion",
+      "when": "success",
+      "config": {
+        "databaseId": "<SEU_NOTION_DB_ID>",
+        "fields": {
+          "Título": "Deploy Local OK",
+          "Status": "Sucesso",
+          "Mensagem": "Deploy local concluído e notificado.",
+          "Projeto": "ALSHAM 360° PRIMA",
+          "Timestamp": "={{$now}}"
+        }
+      }
+    }
+  ]
+}
