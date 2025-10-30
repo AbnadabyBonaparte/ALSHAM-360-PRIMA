@@ -1,11 +1,33 @@
 import { robustAuthGuard } from '../lib/auth-guard.js';
+import * as SupabaseLib from '../lib/supabase.js';
 import { ensureSupabaseGlobal } from '../lib/attach-supabase.js';
+
+function ensureSupabaseLibGlobal() {
+  if (typeof window === 'undefined') {
+    return SupabaseLib;
+  }
+
+  const namespace = window.SupabaseLib || window.AlshamSupabase || {};
+  Object.entries(SupabaseLib).forEach(([key, value]) => {
+    if (typeof namespace[key] === 'undefined') {
+      namespace[key] = value;
+    }
+  });
+
+  window.SupabaseLib = namespace;
+  window.AlshamSupabase = namespace;
+
+  return namespace;
+}
+
+ensureSupabaseLibGlobal();
 
 const WAIT_INTERVAL = 120;
 const MAX_ATTEMPTS = 80;
 
 function getAuthServices() {
   if (typeof window === 'undefined') return {};
+  ensureSupabaseLibGlobal();
   ensureSupabaseGlobal();
   return window.AlshamSupabase || {};
 }

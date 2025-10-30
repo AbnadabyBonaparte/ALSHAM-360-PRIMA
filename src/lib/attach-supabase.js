@@ -1,3 +1,5 @@
+import * as SupabaseLib from './supabase.js';
+
 /**
  * 🔧 ATTACH SUPABASE - VERSÃO FINAL COMPATÍVEL (CDN + Fallback Local)
  *
