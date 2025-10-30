@@ -5,13 +5,15 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://*.posthog.com https://cdn.posthog.com https://app.posthog.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://*.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; frame-src 'self' https://app.posthog.com; worker-src 'self' blob:; child-src 'self' blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - ALSHAM 360°</title>
+
+  <!-- 🎨 Estilos principais -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <script type="module">
-    import { ensureSupabaseGlobal } from '/src/lib/attach-supabase.js';
-    ensureSupabaseGlobal();
-  </script>
+
+  <!-- 🔌 Supabase Initialization -->
+  <script src="/init-supabase.js"></script>
+
   <style>
     body {
       min-height: 100vh;
@@ -23,6 +25,7 @@
       color: #1f2937;
       padding: 1.5rem;
     }
+
     .login-card {
       width: min(24rem, 100%);
       background: #fff;
@@ -30,6 +33,7 @@
       box-shadow: 0 25px 50px -12px rgba(15, 28, 70, 0.35);
       padding: 2.5rem 2rem;
     }
+
     .login-card h1 {
       font-size: 1.875rem;
       font-weight: 700;
@@ -37,10 +41,12 @@
       color: #1d4ed8;
       margin-bottom: 1.5rem;
     }
+
     .login-card form {
       display: grid;
       gap: 0.75rem;
     }
+
     .login-card label {
       font-size: 0.875rem;
       font-weight: 600;
@@ -48,6 +54,7 @@
       display: block;
       margin-bottom: 0.25rem;
     }
+
     .login-card input {
       width: 100%;
       border: 1px solid #d1d5db;
@@ -56,11 +63,13 @@
       font-size: 1rem;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+
     .login-card input:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
+
     .login-card button {
       margin-top: 0.5rem;
       width: 100%;
@@ -74,46 +83,56 @@
       cursor: pointer;
       transition: background 0.2s ease, transform 0.2s ease;
     }
+
     .login-card button:hover {
       background: #1d4ed8;
       transform: translateY(-1px);
     }
+
     .login-card button:active {
       transform: translateY(0);
     }
+
     .login-card button:disabled {
       background: #9ca3af;
       cursor: not-allowed;
       transform: none;
     }
+
     .feedback {
       margin-top: 1rem;
       font-size: 0.875rem;
       text-align: center;
       display: none;
     }
+
     .feedback.visible {
       display: block;
     }
+
     .feedback.success {
       color: #047857;
       font-weight: 600;
     }
+
     .feedback.error {
       color: #b91c1c;
       font-weight: 600;
     }
+
     .login-footer {
       margin-top: 1.5rem;
       text-align: center;
       font-size: 0.875rem;
       color: #6b7280;
     }
+
     .login-footer a {
       color: #2563eb;
       text-decoration: none;
       font-weight: 600;
     }
+
     .login-footer a:hover {
       text-decoration: underline;
     }
@@ -122,7 +141,7 @@
 <body>
   <main class="login-card" role="main">
     <h1>ALSHAM 360°</h1>
-    
+
     <form id="login-form">
       <div>
         <label for="email">E-mail corporativo</label>
@@ -135,7 +154,7 @@
           required 
         />
       </div>
-      
+
       <div>
         <label for="password">Senha</label>
         <input 
@@ -148,21 +167,22 @@
           required 
         />
       </div>
-      
+
       <button type="submit">Entrar</button>
     </form>
-    
+
     <p id="success-message" class="feedback success" role="status"></p>
     <p id="error-message" class="feedback error" role="alert"></p>
-    
+
     <div class="login-footer">
       <a href="/reset-password.html">Esqueceu sua senha?</a>
     </div>
   </main>
-  
-  <!-- PostHog Analytics -->
+
+  <!-- 📈 PostHog Analytics -->
   <script src="/analytics.js"></script>
-  
+
+  <!-- ⚙️ Lógica de autenticação -->
   <script type="module" src="/src/js/login.js"></script>
 </body>
 </html>
