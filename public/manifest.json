@@ -2,14 +2,13 @@
   "name": "ALSHAM 360° PRIMA - CRM Enterprise com IA",
   "short_name": "ALSHAM360",
   "lang": "pt-BR",
-  "description": "CRM Inteligente com IA, Gamificação e Automações. Dashboard enterprise para gestão completa de leads, pipeline de vendas e analytics avançados.",
+  "description": "CRM Inteligente com IA, Gamificação e Automações.",
   "start_url": "/dashboard.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#F9FAFB",
   "theme_color": "#0176D3",
-  "prefer_related_applications": false,
   "categories": ["business", "productivity", "crm", "sales", "automation", "analytics"],
   "icons": [
     {
@@ -27,14 +26,12 @@
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "apple-touch-icon"
+      "type": "image/png"
     },
     {
       "src": "/favicon.ico",
@@ -43,29 +40,9 @@
     }
   ],
   "shortcuts": [
-    {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "Acessar Dashboard Principal com KPIs e Analytics",
-      "url": "/dashboard.html"
-    },
-    {
-      "name": "Leads",
-      "short_name": "Leads",
-      "description": "Gerenciar Leads e CRM",
-      "url": "/leads-real.html"
-    },
-    {
-      "name": "Pipeline",
-      "short_name": "Pipeline",
-      "description": "Visualizar Pipeline de Vendas",
-      "url": "/pipeline.html"
-    },
-    {
-      "name": "Relatórios",
-      "short_name": "Relatórios",
-      "description": "Analytics e Relatórios Avançados",
-      "url": "/relatorios.html"
-    }
+    { "name": "Dashboard", "url": "/dashboard.html" },
+    { "name": "Leads", "url": "/leads-real.html" },
+    { "name": "Pipeline", "url": "/pipeline.html" },
+    { "name": "Relatórios", "url": "/relatorios.html" }
   ]
 }
