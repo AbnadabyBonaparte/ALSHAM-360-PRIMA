@@ -43,6 +43,8 @@
     { "source": "/sw.js", "destination": "/sw.js" },
     { "source": "/service-worker.js", "destination": "/service-worker.js" },
     { "source": "/workbox-(.*).js", "destination": "/workbox-$1.js" },
+    { "source": "/manifest", "destination": "/manifest.json" },
+    { "source": "/manifest.webmanifest", "destination": "/manifest.json" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/leads", "destination": "/leads-real.html" },
     { "source": "/pipeline", "destination": "/pipeline.html" },
@@ -57,7 +59,6 @@
     { "source": "/create-org", "destination": "/create-org.html" },
     { "source": "/auth-dashboard", "destination": "/auth-dashboard.html" },
     { "source": "/timeline-test", "destination": "/timeline-test.html" },
-    { "source": "/manifest", "destination": "/manifest.json" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
