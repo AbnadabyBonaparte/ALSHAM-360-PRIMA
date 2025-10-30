@@ -121,6 +121,20 @@ function ensureSupabaseClient() {
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
       }
     });
+
+    if (globalContainer) {
+      globalContainer[GLOBAL_CLIENT_KEY] = supabase;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.AlshamSupabase = window.AlshamSupabase || {};
+      if (!window.AlshamSupabase.supabase) {
+        window.AlshamSupabase.supabase = supabase;
+      }
+      if (!window.AlshamSupabase.auth) {
+        window.AlshamSupabase.auth = supabase.auth;
+      }
+    }
   }
   return supabase;
 }
