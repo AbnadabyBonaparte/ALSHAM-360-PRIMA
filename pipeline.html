@@ -157,93 +157,93 @@
     }
   </style>
 </head>
-<body>
-  <div id="notification-container" class="notification-container" aria-live="polite"></div>
+<body data-cy="pipeline-page">
+  <div id="notification-container" class="notification-container" aria-live="polite" data-cy="pipeline-notification-container"></div>
   <header>
-    <h1>Pipeline de Vendas</h1>
+    <h1 data-cy="pipeline-title">Pipeline de Vendas</h1>
     <p>Monitoramento das oportunidades em tempo real com distribuição por estágio, valor e prioridade de follow-up.</p>
   </header>
 
-  <section class="pipeline-container" aria-label="Pipeline de vendas">
-    <article class="pipeline-column" data-stage="lead" data-weight="0.2">
+  <section class="pipeline-container" aria-label="Pipeline de vendas" data-cy="pipeline-columns">
+    <article class="pipeline-column" data-stage="lead" data-weight="0.2" data-cy="pipeline-column">
       <div class="pipeline-column-header">
         <h3>Leads</h3>
         <span>Entrada do funil</span>
       </div>
       <div class="pipeline-column-body" data-stage="lead">
-        <div class="opportunity-card" data-opportunity-id="lead-1027" data-value="10000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="lead-1027" data-value="10000" draggable="true" data-cy="pipeline-card">
           <strong>Lead #1027</strong>
           <span>R$ 10.000 · Inbound · aguardando qualificação</span>
         </div>
-        <div class="opportunity-card" data-opportunity-id="lead-1028" data-value="7500" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="lead-1028" data-value="7500" draggable="true" data-cy="pipeline-card">
           <strong>Lead #1028</strong>
           <span>R$ 7.500 · Evento · agendamento de discovery</span>
         </div>
       </div>
     </article>
 
-    <article class="pipeline-column" data-stage="qualification" data-weight="0.35">
+    <article class="pipeline-column" data-stage="qualification" data-weight="0.35" data-cy="pipeline-column">
       <div class="pipeline-column-header">
         <h3>Qualificação</h3>
         <span>Fit comercial</span>
       </div>
       <div class="pipeline-column-body" data-stage="qualification">
-        <div class="opportunity-card" data-opportunity-id="qual-2001" data-value="35000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="qual-2001" data-value="35000" draggable="true" data-cy="pipeline-card">
           <strong>Conta Atlas</strong>
           <span>R$ 35.000 · Fit alto · aguardando proposta técnica</span>
         </div>
-        <div class="opportunity-card" data-opportunity-id="qual-2002" data-value="19000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="qual-2002" data-value="19000" draggable="true" data-cy="pipeline-card">
           <strong>Startup Boreal</strong>
           <span>R$ 19.000 · Fit médio · demo marcada para hoje</span>
         </div>
       </div>
     </article>
 
-    <article class="pipeline-column" data-stage="proposal" data-weight="0.55">
+    <article class="pipeline-column" data-stage="proposal" data-weight="0.55" data-cy="pipeline-column">
       <div class="pipeline-column-header">
         <h3>Proposta</h3>
         <span>Documentos enviados</span>
       </div>
       <div class="pipeline-column-body" data-stage="proposal">
-        <div class="opportunity-card" data-opportunity-id="prop-3001" data-value="58000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="prop-3001" data-value="58000" draggable="true" data-cy="pipeline-card">
           <strong>Grupo Helios</strong>
           <span>R$ 58.000 · Proposta enviada · aguardando jurídico</span>
         </div>
-        <div class="opportunity-card" data-opportunity-id="prop-3002" data-value="42000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="prop-3002" data-value="42000" draggable="true" data-cy="pipeline-card">
           <strong>Vision Tech</strong>
           <span>R$ 42.000 · Cláusulas revisadas · retorno até amanhã</span>
         </div>
       </div>
     </article>
 
-    <article class="pipeline-column" data-stage="negotiation" data-weight="0.75">
+    <article class="pipeline-column" data-stage="negotiation" data-weight="0.75" data-cy="pipeline-column">
       <div class="pipeline-column-header">
         <h3>Negociação</h3>
         <span>Follow-up ativo</span>
       </div>
       <div class="pipeline-column-body" data-stage="negotiation">
-        <div class="opportunity-card" data-opportunity-id="neg-4001" data-value="64000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="neg-4001" data-value="64000" draggable="true" data-cy="pipeline-card">
           <strong>Infinity Labs</strong>
           <span>R$ 64.000 · Desconto estratégico · follow-up diário</span>
         </div>
-        <div class="opportunity-card" data-opportunity-id="neg-4002" data-value="51000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="neg-4002" data-value="51000" draggable="true" data-cy="pipeline-card">
           <strong>Orbital Ventures</strong>
           <span>R$ 51.000 · Comitê de compras · retorno em 48h</span>
         </div>
       </div>
     </article>
 
-    <article class="pipeline-column" data-stage="closing" data-weight="1">
+    <article class="pipeline-column" data-stage="closing" data-weight="1" data-cy="pipeline-column">
       <div class="pipeline-column-header">
         <h3>Fechamento</h3>
         <span>Fase final</span>
       </div>
       <div class="pipeline-column-body" data-stage="closing">
-        <div class="opportunity-card" data-opportunity-id="close-5001" data-value="68000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="close-5001" data-value="68000" draggable="true" data-cy="pipeline-card">
           <strong>Neon Global</strong>
           <span>R$ 68.000 · Contrato enviado · assinatura pendente</span>
         </div>
-        <div class="opportunity-card" data-opportunity-id="close-5002" data-value="75000" draggable="true">
+        <div class="opportunity-card" data-opportunity-id="close-5002" data-value="75000" draggable="true" data-cy="pipeline-card">
           <strong>Quantum Systems</strong>
           <span>R$ 75.000 · Implantação agendada · go-live em 10 dias</span>
         </div>
@@ -251,7 +251,7 @@
     </article>
   </section>
 
-  <div id="pipeline-total" class="pipeline-footer">Total ponderado: R$ 150.000</div>
+  <div id="pipeline-total" class="pipeline-footer" data-cy="pipeline-total">Total ponderado: R$ 150.000</div>
 
   <script type="module">
     const STAGE_WEIGHTS = {
@@ -298,9 +298,11 @@
       if (!notification) {
         notification = document.createElement('div');
         notification.className = 'notification success';
+        notification.dataset.cy = 'pipeline-notification';
         container.appendChild(notification);
       }
 
+      notification.dataset.cy = 'pipeline-notification';
       notification.textContent = message;
       notification.classList.add('visible');
 
