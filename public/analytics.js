@@ -10,7 +10,6 @@
 // Initialize PostHog
 posthog.init('phc_eOd3UJXy8cwTdodbF4zMazJFepembQnBmKpVGrZwR4J', {
     api_host: 'https://us.i.posthog.com',
-    defaults: '2025-05-24',
     person_profiles: 'identified_only',
     autocapture: true,
     capture_pageview: true,
@@ -25,33 +24,20 @@ posthog.init('phc_eOd3UJXy8cwTdodbF4zMazJFepembQnBmKpVGrZwR4J', {
 
 // Helper functions para uso global
 window.AlshamAnalytics = {
-    /**
-     * Rastrear evento customizado
-     * @param {string} eventName - Nome do evento
-     * @param {object} properties - Propriedades adicionais
-     */
-    track: function(eventName, properties = {}) {
+    track: function(eventName, properties) {
+        properties = properties || {};
         if (window.posthog) {
             posthog.capture(eventName, properties);
         }
     },
 
-    /**
-     * Identificar usuário logado
-     * @param {string} userId - ID do usuário
-     * @param {object} traits - Informações do usuário
-     */
-    identify: function(userId, traits = {}) {
+    identify: function(userId, traits) {
+        traits = traits || {};
         if (window.posthog) {
             posthog.identify(userId, traits);
         }
     },
 
-    /**
-     * Verificar feature flag
-     * @param {string} flagName - Nome da feature flag
-     * @returns {boolean}
-     */
     isFeatureEnabled: function(flagName) {
         if (window.posthog) {
             return posthog.isFeatureEnabled(flagName);
@@ -59,25 +45,18 @@ window.AlshamAnalytics = {
         return false;
     },
 
-    /**
-     * Rastrear erro
-     * @param {Error} error - Objeto de erro
-     * @param {object} context - Contexto adicional
-     */
-    trackError: function(error, context = {}) {
+    trackError: function(error, context) {
+        context = context || {};
         if (window.posthog) {
             posthog.capture('error_occurred', {
                 error_message: error.message,
                 error_stack: error.stack,
                 page: window.location.pathname,
-                ...context
+                context: context
             });
         }
     },
 
-    /**
-     * Reset (logout)
-     */
     reset: function() {
         if (window.posthog) {
             posthog.reset();
@@ -86,27 +65,3 @@ window.AlshamAnalytics = {
 };
 
 console.log('✅ PostHog Analytics carregado - ALSHAM 360° PRIMA');
-```
-
-6. Commit message: `feat: add PostHog analytics integration`
-7. Clique **"Commit new file"**
-
----
-
-### **PASSO 2: Adicionar em TODOS os HTMLs principais**
-
-#### **Arquivos para editar:**
-```
-✅ index.html
-✅ dashboard.html
-✅ leads-real.html
-✅ pipeline.html
-✅ automacoes.html
-✅ gamificacao.html
-✅ relatorios.html
-✅ configuracoes.html
-✅ login.html
-✅ register.html
-✅ reset-password.html
-✅ create-org.html
-✅ auth-dashboard.html

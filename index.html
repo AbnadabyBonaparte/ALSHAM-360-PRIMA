@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ✅ Theme Init Inline -->
   <script>
     (function() {
       const theme = localStorage.getItem('alsham-theme') || 'light';
@@ -16,17 +15,16 @@
 
   <title>ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema CRM Enterprise com IA" />
-
-  <!-- ❌ CSP REMOVIDO TEMPORARIAMENTE PARA DEBUG -->
-  <!-- A CSP estava bloqueando Google Fonts, APIs e outros recursos -->
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; connect-src 'self' https://*.supabase.co https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://accounts.google.com https://*.supabase.co;"
+  />
 
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   
-  <!-- ✅ SUPABASE CDN - DEVE VIR ANTES DE QUALQUER SCRIPT -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- ✅ Estilos básicos inline -->
   <style>
     * {
       margin: 0;
@@ -155,7 +153,6 @@
   </main>
 
   <script>
-    // Sistema de debug avançado
     const debugLog = [];
     const debugEl = document.getElementById('debug-info');
     
@@ -184,13 +181,11 @@
       if (statusEl) statusEl.textContent = message;
     }
 
-    // Patch LockManager
     if (!('locks' in navigator)) {
       navigator.locks = { request: async (_, cb) => cb() };
       addLog('LockManager patch aplicado', 'warning');
     }
 
-    // Função de erro
     function showError(title, message, details = '') {
       addLog(`${title}: ${message}`, 'error');
       
@@ -211,30 +206,25 @@
       `;
     }
 
-    // Função principal
     async function routeUser() {
       try {
         addLog('🚀 Iniciando roteamento...', 'info');
 
-        // Verificar conexão
         if (!navigator.onLine) {
           throw new Error('Sem conexão com a internet');
         }
         addLog('🌐 Conexão ativa', 'success');
 
-        // Verificar se Supabase CDN foi carregado
         if (!window.supabase?.createClient) {
           throw new Error('Supabase CDN não foi carregado. Verifique a conexão.');
         }
         addLog('✅ Supabase CDN detectado', 'success');
 
-        // Timeout global
         const TIMEOUT = 8000;
         const timeout = new Promise((_, reject) => 
           setTimeout(() => reject(new Error(`Timeout após ${TIMEOUT/1000}s`)), TIMEOUT)
         );
 
-        // Carregar módulo local
         addLog('📂 Carregando módulo Supabase...', 'info');
         let SupabaseLib;
         
@@ -249,13 +239,11 @@
           throw new Error(`Módulo não encontrado: ${importError.message}`);
         }
 
-        // Validar funções
         if (typeof SupabaseLib.getCurrentSession !== 'function') {
           throw new Error('getCurrentSession não encontrado no módulo');
         }
         addLog('✅ Funções validadas', 'success');
 
-        // Verificar sessão
         addLog('🔍 Verificando sessão...', 'info');
         const session = await Promise.race([
           SupabaseLib.getCurrentSession(),
@@ -267,7 +255,6 @@
           addLog(`👤 Usuário: ${session.user.email || session.user.id}`, 'info');
           addLog('🔄 Redirecionando para dashboard...', 'info');
           
-          // Aguardar 800ms para o usuário ver as mensagens
           await new Promise(resolve => setTimeout(resolve, 800));
           window.location.replace('/dashboard.html');
         } else {
@@ -291,14 +278,12 @@
       }
     }
 
-    // Executar
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', routeUser);
     } else {
       routeUser();
     }
 
-    // Fallback: Se após 15s não redirecionou, mostrar erro
     setTimeout(() => {
       if (document.getElementById('main-loader')) {
         showError(
@@ -310,7 +295,6 @@
       }
     }, 15000);
 
-    // Capturar erros globais
     window.addEventListener('error', (e) => {
       addLog(`Erro global: ${e.message}`, 'error');
     });
@@ -318,17 +302,6 @@
     window.addEventListener('unhandledrejection', (e) => {
       addLog(`Promise rejeitada: ${e.reason}`, 'error');
     });
-  </script>
-
-  <!-- Service Worker (opcional) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('✅ SW registrado:', reg.scope))
-          .catch(err => console.warn('⚠️ SW falhou:', err));
-      });
-    }
   </script>
 </body>
 </html>

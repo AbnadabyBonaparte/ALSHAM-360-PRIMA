@@ -1,2893 +1,358 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- ✅ Theme Init Inline (Evita FOUC) - CRITICAL -->
-  <script>
-    (function() {
-      const theme = localStorage.getItem('alsham-theme') || 'light';
-      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      if (theme === 'dark') document.documentElement.classList.add('dark');
-      if (contrast === 'high') document.documentElement.classList.add('high-contrast');
-    })();
-  </script>
-  
-  <!-- ========================================== -->
-  <!-- SEO ESSENCIAL -->
-  <!-- ========================================== -->
-  <title>Dashboard Executivo v11.1 — ALSHAM 360° PRIMA</title>
-  <meta name="description" content="Dashboard executivo ALSHAM 360° PRIMA v11.1 - CRM Enterprise com IA, exports completos, animações premium, acessibilidade WCAG AAA e relatórios agendados. Gerencie leads, pipeline e automações em um único lugar." />
-  <meta name="keywords" content="CRM, dashboard, leads, pipeline, automação, IA, enterprise, analytics, ROI, gamificação">
-  <meta name="author" content="ALSHAM Global">
-  <meta name="robots" content="index, follow">
-  <meta name="language" content="pt-BR">
-  <link rel="canonical" href="https://app.alshamglobal.com.br/dashboard">
-
-  <!-- ========================================== -->
-  <!-- DUBLIN CORE METADATA -->
-  <!-- ========================================== -->
-  <meta name="DC.title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
-  <meta name="DC.creator" content="ALSHAM Global">
-  <meta name="DC.subject" content="CRM, Vendas, Automação">
-  <meta name="DC.description" content="Dashboard executivo ALSHAM 360° PRIMA v11.1">
-  <meta name="DC.publisher" content="ALSHAM Global">
-  <meta name="DC.contributor" content="AbnadabyBonaparte">
-  <meta name="DC.date" content="2025-10-14">
-  <meta name="DC.type" content="Text.Homepage">
-  <meta name="DC.format" content="text/html">
-  <meta name="DC.identifier" content="https://app.alshamglobal.com.br/dashboard">
-  <meta name="DC.language" content="pt-BR">
-  <meta name="DC.coverage" content="Brasil">
-  <meta name="DC.rights" content="© 2025 ALSHAM Global">
-
-  <!-- ========================================== -->
-  <!-- SECURITY & COMPATIBILITY -->
-  <!-- ========================================== -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  
-<!-- ========================================== -->
-<!-- ⚠️ CONTENT SECURITY POLICY -->
-<!-- ========================================== -->
-<!-- 
-  NOTA: CSP configurado exclusivamente no vercel.json
-  Meta tags CSP foram removidas para evitar conflitos com headers HTTP
--->
-
-<!-- Report-To API -->
-<meta http-equiv="Report-To" content='{"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"https://alshamglobal.report-uri.com/a/d/g"}],"include_subdomains":true}'>
-
-<!-- Permissions Policy (Empresarial) -->
-<meta http-equiv="Permissions-Policy" content="
-  accelerometer=(),
-  ambient-light-sensor=(),
-  autoplay=(self),
-  battery=(),
-  camera=(),
-  cross-origin-isolated=(),
-  display-capture=(),
-  document-domain=(),
-  encrypted-media=(self),
-  execution-while-not-rendered=(),
-  execution-while-out-of-viewport=(),
-  fullscreen=(self),
-  geolocation=(),
-  gyroscope=(),
-  keyboard-map=(),
-  magnetometer=(),
-  microphone=(),
-  midi=(),
-  navigation-override=(),
-  payment=(self),
-  picture-in-picture=(self),
-  publickey-credentials-get=(),
-  screen-wake-lock=(),
-  sync-xhr=(),
-  usb=(),
-  web-share=(self),
-  xr-spatial-tracking=()
-">
-
-  <!-- Report-To API -->
-  <meta http-equiv="Report-To" content='{"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"https://alshamglobal.report-uri.com/a/d/g"}],"include_subdomains":true}'>
-
-  <!-- Permissions Policy (Empresarial) -->
-  <meta http-equiv="Permissions-Policy" content="
-    accelerometer=(),
-    ambient-light-sensor=(),
-    autoplay=(self),
-    battery=(),
-    camera=(),
-    cross-origin-isolated=(),
-    display-capture=(),
-    document-domain=(),
-    encrypted-media=(self),
-    execution-while-not-rendered=(),
-    execution-while-out-of-viewport=(),
-    fullscreen=(self),
-    geolocation=(),
-    gyroscope=(),
-    keyboard-map=(),
-    magnetometer=(),
-    microphone=(),
-    midi=(),
-    navigation-override=(),
-    payment=(self),
-    picture-in-picture=(self),
-    publickey-credentials-get=(),
-    screen-wake-lock=(),
-    sync-xhr=(),
-    usb=(),
-    web-share=(self),
-    xr-spatial-tracking=()
-  ">
-
-  <!-- ========================================== -->
-  <!-- FORMAT & GEOGRAPHIC -->
-  <!-- ========================================== -->
-  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
-  <meta name="geo.region" content="BR">
-  <meta name="geo.placename" content="São Paulo">
-  <meta name="geo.position" content="-23.550520;-46.633308">
-  <meta name="ICBM" content="-23.550520, -46.633308">
-
-  <!-- ========================================== -->
-  <!-- BUSINESS CONTACT -->
-  <!-- ========================================== -->
-  <meta name="contact" content="contato@alshamglobal.com.br">
-  <meta name="copyright" content="© 2025 ALSHAM Global. Todos os direitos reservados.">
-  <meta name="reply-to" content="suporte@alshamglobal.com.br">
-
-  <!-- ========================================== -->
-  <!-- SEO AVANÇADO -->
-  <!-- ========================================== -->
-  <meta name="rating" content="general">
-  <meta name="revisit-after" content="7 days">
-  <meta name="distribution" content="global">
-  <meta name="expires" content="never">
-  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-  <meta name="bingbot" content="index, follow, max-image-preview:large">
-
-  <!-- ========================================== -->
-  <!-- OPEN GRAPH -->
-  <!-- ========================================== -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://app.alshamglobal.com.br/dashboard">
-  <meta property="og:title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
-  <meta property="og:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações com inteligência artificial">
-  <meta property="og:image" content="https://app.alshamglobal.com.br/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:site_name" content="ALSHAM 360° PRIMA">
-  <meta property="og:locale" content="pt_BR">
-  <meta property="og:locale:alternate" content="en_US">
-  <meta property="og:locale:alternate" content="es_ES">
-
-  <!-- ========================================== -->
-  <!-- TWITTER CARD -->
-  <!-- ========================================== -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://app.alshamglobal.com.br/dashboard">
-  <meta name="twitter:title" content="Dashboard Executivo v11.1 — ALSHAM 360° PRIMA">
-  <meta name="twitter:description" content="CRM Enterprise com IA - Gerencie leads, pipeline e automações">
-  <meta name="twitter:image" content="https://app.alshamglobal.com.br/twitter-image.png">
-  <meta name="twitter:image:alt" content="Dashboard Executivo ALSHAM 360° PRIMA">
-  <meta name="twitter:site" content="@alshamglobal">
-  <meta name="twitter:creator" content="@alshamglobal">
-
-  <!-- ========================================== -->
-  <!-- LINKEDIN & PINTEREST -->
-  <!-- ========================================== -->
-  <meta property="linkedin:owner" content="ALSHAM Global">
-  <meta name="pinterest" content="nopin" description="Esta página não pode ser pinada no Pinterest">
-
-  <!-- ========================================== -->
-  <!-- PWA & MOBILE -->
-  <!-- ========================================== -->
-  <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
-  <meta name="theme-color" content="#0176D3" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
-  <meta name="color-scheme" content="light dark">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ALSHAM 360°">
-  
-  <!-- Microsoft Tiles -->
-  <meta name="msapplication-TileColor" content="#0176D3">
-  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-  <meta name="msapplication-config" content="/browserconfig.xml">
-  <meta name="msapplication-tooltip" content="ALSHAM 360° PRIMA - CRM Enterprise">
-  <meta name="msapplication-starturl" content="/">
-  <meta name="msapplication-navbutton-color" content="#0176D3">
-  <meta name="msapplication-task" content="name=Dashboard;action-uri=/dashboard;icon-uri=/favicon.ico">
-  <meta name="msapplication-task" content="name=Leads;action-uri=/leads-real;icon-uri=/favicon.ico">
-  <meta name="msapplication-task" content="name=Pipeline;action-uri=/pipeline;icon-uri=/favicon.ico">
-
-  <!-- ========================================== -->
-  <!-- ICONS (OTIMIZADO E COMPLETO) -->
-  <!-- ========================================== -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230176D3'/%3E%3Cpath d='M35 65L45 45L55 65M40 57h10M65 45v20M75 45v10c0 5 5 5 5 0v-10' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="shortcut icon" href="/favicon.ico">
-  
-  <!-- Favicons principais -->
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-  
-  <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
-  <!-- Apple Splash Screens para diferentes resoluções -->
-  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
-  
-  <!-- Android Icons -->
-  <link rel="icon" sizes="192x192" href="/android-icon-192x192.png">
-  <link rel="icon" sizes="512x512" href="/android-icon-512x512.png">
-
-  <!-- ========================================== -->
-  <!-- ALTERNATE LANGUAGES -->
-  <!-- ========================================== -->
-  <link rel="alternate" hreflang="pt-BR" href="https://app.alshamglobal.com.br/dashboard">
-  <link rel="alternate" hreflang="en-US" href="https://app.alshamglobal.com/en/dashboard">
-  <link rel="alternate" hreflang="es-ES" href="https://app.alshamglobal.com/es/dashboard">
-  <link rel="alternate" hreflang="x-default" href="https://app.alshamglobal.com.br/dashboard">
-
-  <!-- ========================================== -->
-  <!-- RSS/ATOM & SEARCH -->
-  <!-- ========================================== -->
-  <link rel="alternate" type="application/rss+xml" title="ALSHAM Blog RSS" href="/rss.xml">
-  <link rel="alternate" type="application/atom+xml" title="ALSHAM Blog Atom" href="/atom.xml">
-  <link rel="search" type="application/opensearchdescription+xml" title="Buscar ALSHAM" href="/opensearch.xml">
-  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
-
-  <!-- ========================================== -->
-  <!-- DNS PREFETCH & PRECONNECT (OTIMIZADO) -->
-  <!-- ========================================== -->
-  <link rel="preconnect" href="https://rgvnbtuqtxvfxhrdnkjg.supabase.co" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="dns-prefetch" href="//apis.google.com">
-  <link rel="dns-prefetch" href="//accounts.google.com">
-
-  <!-- ========================================== -->
-  <!-- PRELOAD CRITICAL RESOURCES -->
-  <!-- ========================================== -->
-  <link rel="preload" href="/css/tokens.css" as="style">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- ✅ MODULEPRELOAD para ES6 modules -->
-  <link rel="modulepreload" href="/src/lib/supabase.js">
-  <link rel="modulepreload" href="/src/lib/chart-loader.js">
-  <link rel="modulepreload" href="/src/js/dashboard.js">
-
-  <!-- ========================================== -->
-  <!-- PREFETCH NEXT PAGES (Empresarial) -->
-  <!-- ========================================== -->
-  <link rel="prefetch" href="/leads-real.html" as="document">
-  <link rel="prefetch" href="/pipeline.html" as="document">
-  <link rel="prefetch" href="/automacoes.html" as="document">
-  <link rel="prefetch" href="/relatorios.html" as="document">
-
-  <!-- ========================================== -->
-  <!-- CSS (ORDEM OTIMIZADA) -->
-  <!-- ========================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Executivo — ALSHAM 360°</title>
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/dashboard-animations.css" />
-  <link rel="stylesheet" href="/css/dashboard-improvements.css" />
-  <link rel="stylesheet" href="/css/tailwind.min.css" />
-
-  <!-- Google Fonts (Otimizado) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- ========================================== -->
-<!-- ⚡ EXTERNAL SCRIPTS (DEFER - Ordem Correta) -->
-<!-- ========================================== -->
-
-<!-- jQuery (OBRIGATÓRIO - carregar PRIMEIRO) -->
-<script defer 
-  src="https://code.jquery.com/jquery-3.7.1.min.js"
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- Chart.js -->
-<script defer 
-  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" 
-  crossorigin="anonymous" 
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- jsPDF -->
-<script defer 
-  src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" 
-  crossorigin="anonymous" 
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- SheetJS (Excel) -->
-<script defer 
-  src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" 
-  crossorigin="anonymous" 
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- Canvas Confetti -->
-<script defer 
-  src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" 
-  crossorigin="anonymous" 
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- Peity (depende de jQuery) -->
-<script defer 
-  src="https://cdn.jsdelivr.net/npm/peity@3.3.0/jquery.peity.min.js"
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- Moment.js (para DateRangePicker) -->
-<script defer 
-  src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer">
-</script>
-
-<!-- Date Range Picker (depende de jQuery e Moment) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
-<script defer 
-  src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.min.js"
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer">
-</script>
-
-  <!-- ========================================== -->
-  <!-- 📦 BIBLIOTECAS ADICIONAIS (FEATURES AVANÇADAS) -->
-  <!-- ========================================== -->
-
-  <!-- Gridstack.js - Drag & Drop Widgets -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.4.0/dist/gridstack.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.4.0/dist/gridstack-extra.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/gridstack@8.4.0/dist/gridstack-all.js"></script>
-
-  <!-- Leaflet.js - Mapas Geográficos -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
-
-  <!-- Peity.js - Sparklines -->
-  <script defer src="https://cdn.jsdelivr.net/npm/peity@3.3.0/jquery.peity.min.js"></script>
-
-  <!-- PptxGenJS - Export PowerPoint -->
-  <script defer src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-
-  <!-- ApexCharts - Gráficos Avançados (alternativa ao Chart.js para alguns casos) -->
-  <script defer src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
-
-  <!-- Moment.js + Timezone -->
-  <script defer src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.43/builds/moment-timezone-with-data.min.js"></script>
-
-  <!-- Date Range Picker -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.min.js"></script>
-
-  <!-- Heatmap.js -->
-  <script defer src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
-
-  <!-- ========================================== -->
-  <!-- ✅ CRITICAL CSS INLINE (< 14KB) -->
-  <!-- ========================================== -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <script type="module" src="/init-supabase.js"></script>
   <style>
-    /* ========================================== */
-    /* CRITICAL RENDERING PATH */
-    /* ========================================== */
-    
-    /* CSS Variables Base */
     :root {
-      --alsham-primary: #0176D3;
-      --alsham-secondary: #16325C;
-      --alsham-success: #22C55E;
-      --alsham-warning: #F59E0B;
-      --alsham-error: #EF4444;
-      --alsham-info: #3B82F6;
-      
-      --alsham-bg-canvas: #F9FAFB;
-      --alsham-bg-surface: #FFFFFF;
-      --alsham-bg-hover: #F3F4F6;
-      
-      --alsham-text-primary: #111827;
-      --alsham-text-secondary: #6B7280;
-      --alsham-text-tertiary: #9CA3AF;
-      
-      --alsham-border-default: #E5E7EB;
-      --alsham-border-focus: #3B82F6;
-      
-      --alsham-radius-sm: 4px;
-      --alsham-radius-md: 8px;
-      --alsham-radius-lg: 12px;
-      --alsham-radius-xl: 16px;
-      
-      --alsham-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --alsham-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-      --alsham-shadow-lg: 0 10px 15px rgba(0,0,0,0.15);
-      
-      --alsham-motion-productive: 200ms;
-      --alsham-ease-productive: cubic-bezier(0.2, 0, 0.38, 0.9);
-    }
-
-    /* Dark Mode Variables */
-    html.dark {
-      --alsham-bg-canvas: #0f172a;
-      --alsham-bg-surface: #1e293b;
-      --alsham-bg-hover: #334155;
-      --alsham-text-primary: #f9fafb;
-      --alsham-text-secondary: #cbd5e1;
-      --alsham-text-tertiary: #94a3b8;
-      --alsham-border-default: #334155;
-      color-scheme: dark;
-    }
-
-    /* High Contrast Override */
-    html.high-contrast {
-      --alsham-bg-canvas: #000000;
-      --alsham-bg-surface: #1a1a1a;
-      --alsham-border-default: #ffffff;
-      --alsham-text-primary: #ffffff;
-      --alsham-text-secondary: #cccccc;
-      --alsham-primary: #00ffff;
-    }
-    
-    html.high-contrast .text-blue-600 { 
-      color: #00ffff !important; 
-    }
-    
-    html.high-contrast button,
-    html.high-contrast input,
-    html.high-contrast select,
-    html.high-contrast textarea { 
-      border: 2px solid #ffffff !important; 
-    }
-    
-    /* Base Reset */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
+      color-scheme: light only;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background-color: var(--alsham-bg-canvas);
-      color: var(--alsham-text-primary);
-      line-height: 1.6;
-    }
-    
-    /* Skip Link (A11y) - Empresarial */
-    .skip-link {
-      position: absolute;
-      top: -100px;
-      left: 10px;
-      background: var(--alsham-primary);
-      color: white;
-      padding: 12px 16px;
-      text-decoration: none;
-      border-radius: var(--alsham-radius-md);
-      font-weight: 600;
-      z-index: 10000;
-      transition: top 0.3s ease;
-    }
-    
-    .skip-link:focus { 
-      top: 10px;
-      outline: 3px solid #FFFFFF;
-      outline-offset: 2px;
-    }
-    
-    /* Loading Spinner - Empresarial */
-    .loading-spinner {
-      width: 4rem; 
-      height: 4rem;
-      border: 4px solid rgba(1, 118, 211, 0.2);
-      border-top-color: var(--alsham-primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto;
-    }
-    
-    @keyframes spin { 
-      to { transform: rotate(360deg); } 
-    }
-    
-    /* Skeleton Loader - Empresarial */
-    .skeleton {
-      background: linear-gradient(
-        90deg,
-        var(--alsham-bg-hover) 0%,
-        var(--alsham-bg-surface) 50%,
-        var(--alsham-bg-hover) 100%
-      );
-      background-size: 200% 100%;
-      animation: skeleton-loading 1.5s ease-in-out infinite;
-      border-radius: var(--alsham-radius-md);
-    }
-    
-    @keyframes skeleton-loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    
-    /* Toast Notifications - Empresarial */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-lg);
-      padding: 16px 20px;
-      box-shadow: var(--alsham-shadow-lg);
-      z-index: 10000;
-      min-width: 320px;
-      max-width: 420px;
-      transform: translateX(500px);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .toast.show { 
-      transform: translateX(0); 
-      opacity: 1; 
-    }
-    
-    .toast.success { 
-      border-left: 4px solid var(--alsham-success);
-    }
-    
-    .toast.error { 
-      border-left: 4px solid var(--alsham-error);
-    }
-    
-    .toast.info { 
-      border-left: 4px solid var(--alsham-info);
-    }
-    
-    .toast.warning { 
-      border-left: 4px solid var(--alsham-warning);
-    }
-    
-    /* Counter Animation - Empresarial */
-    .counter { 
-      display: inline-block;
-      font-feature-settings: 'tnum';
-      font-variant-numeric: tabular-nums;
-      transition: all 0.5s ease;
-    }
-    
-    /* Scroll Reveal - Empresarial */
-    .reveal { 
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    
-    .reveal.active { 
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    /* Modal Styles - Empresarial */
-    .modal { 
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-      animation: fadeIn 0.3s ease;
-    }
-    
-    .modal.active { 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-content { 
-      background: var(--alsham-bg-surface);
-      padding: 2.5rem;
-      border-radius: var(--alsham-radius-xl);
-      max-width: 540px;
-      width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      border: 1px solid var(--alsham-border-default);
-    }
-    
-    @keyframes fadeIn { 
-      from { opacity: 0; } 
-      to { opacity: 1; } 
-    }
-    
-    @keyframes slideUp { 
-      from { 
-        transform: translateY(40px) scale(0.95);
-        opacity: 0;
-      } 
-      to { 
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      } 
-    }
-    
-    /* Offline Indicator - Empresarial */
-    .offline-badge {
-      position: fixed;
-      top: 80px;
-      right: 24px;
-      background: linear-gradient(135deg, var(--alsham-error), #DC2626);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 700;
-      z-index: 9999;
-      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
-      animation: slideInRight 0.4s ease;
-    }
-    
-    @keyframes slideInRight {
-      from { 
-        transform: translateX(200px);
-        opacity: 0;
-      }
-      to { 
-        transform: translateX(0);
-        opacity: 1;
-      }
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
     }
 
-    /* Focus Visible - Empresarial */
-    *:focus-visible { 
-      outline: 3px solid var(--alsham-border-focus);
-      outline-offset: 3px;
-      border-radius: var(--alsham-radius-sm);
+    .dashboard-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
     }
-    
-    .hidden { 
-      display: none !important;
+
+    .dashboard-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
     }
-    
-    /* Chart Interactions */
-    .chart-drilldown { 
-      cursor: pointer;
-      transition: opacity 0.2s ease;
+
+    .dashboard-header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 700;
     }
-    
-    .chart-drilldown:hover { 
+
+    .dashboard-header p {
+      margin: 0.25rem 0 0 0;
+      font-size: 1rem;
+      color: #475569;
+    }
+
+    .snapshot-card {
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: #f8fafc;
+      border-radius: 1.25rem;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 24px 48px -20px rgba(29, 78, 216, 0.45);
+    }
+
+    .snapshot-card h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       opacity: 0.85;
     }
-    
-    /* Screen Reader Only - Empresarial */
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
-    }
-    
-    .sr-only-focusable:focus {
-      position: static;
-      width: auto;
-      height: auto;
-      padding: inherit;
-      margin: inherit;
-      overflow: visible;
-      clip: auto;
-      white-space: normal;
-    }
 
-    /* ========================================== */
-    /* RESPONSIVE & ACCESSIBILITY */
-    /* ========================================== */
-
-    /* Mobile Responsive - Empresarial */
-    @media (max-width: 768px) {
-      .side-nav.mobile-hidden { 
-        display: none !important;
-      }
-      
-      .side-nav.mobile-visible { 
-        display: block !important;
-        position: fixed;
-        top: 64px;
-        left: 0;
-        width: 100%;
-        height: calc(100vh - 64px);
-        z-index: 9998;
-        box-shadow: var(--alsham-shadow-lg);
-      }
-      
-      .main-content-wrapper { 
-        margin-left: 0 !important;
-        padding: 16px !important;
-      }
-      
-      .grid { 
-        grid-template-columns: 1fr !important;
-        gap: 16px !important;
-      }
-      
-      .md\:flex { 
-        display: none !important;
-      }
-
-      .toast {
-        bottom: 16px;
-        right: 16px;
-        left: 16px;
-        min-width: auto;
-      }
-    }
-
-    /* Tablet Responsive */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .main-content-wrapper {
-        padding: 24px !important;
-      }
-
-      .grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-      }
-    }
-
-    /* Reduced Motion (A11y) - Empresarial */
-    @media (prefers-reduced-motion: reduce) {
-      *, 
-      *::before, 
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-
-      .skeleton {
-        animation: none;
-        background: var(--alsham-bg-hover);
-      }
-    }
-
-    /* High Contrast Media Query - Empresarial */
-    @media (prefers-contrast: high) {
-      :root {
-        --alsham-bg-canvas: #000000 !important;
-        --alsham-bg-surface: #1a1a1a !important;
-        --alsham-border-default: #ffffff !important;
-        --alsham-text-primary: #ffffff !important;
-        --alsham-text-secondary: #e5e5e5 !important;
-      }
-
-      button,
-      input,
-      select,
-      textarea {
-        border-width: 2px !important;
-      }
-    }
-
-    /* Dark Mode (prefers-color-scheme) - Empresarial */
-    @media (prefers-color-scheme: dark) {
-      :root:not(.light) {
-        --alsham-bg-canvas: #0f172a;
-        --alsham-bg-surface: #1e293b;
-        --alsham-bg-hover: #334155;
-        --alsham-text-primary: #f9fafb;
-        --alsham-text-secondary: #cbd5e1;
-        --alsham-text-tertiary: #94a3b8;
-        --alsham-border-default: #334155;
-        color-scheme: dark;
-      }
-    }
-
-    /* Print Styles - Empresarial */
-    @media print {
-      .no-print, 
-      nav, 
-      aside, 
-      button:not(.print-btn), 
-      .modal,
-      .toast,
-      .offline-badge,
-      .skip-link,
-      #back-to-top,
-      #theme-toggle,
-      #contrast-toggle,
-      #fullscreen-toggle,
-      #menu-toggle { 
-        display: none !important;
-      }
-      
-      body { 
-        background: white !important;
-        color: black !important;
-      }
-      
-      .main-content-wrapper { 
-        margin-left: 0 !important;
-        padding: 0 !important;
-      }
-      
-      .chart-drilldown { 
-        page-break-inside: avoid;
-        page-break-after: always;
-      }
-      
-      @page { 
-        margin: 2cm;
-        size: A4 portrait;
-      }
-      
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      
-      a[href^="http"]:after {
-        content: " (" attr(href) ")";
-        font-size: 0.8em;
-        color: #666;
-      }
-
-      h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid;
-        page-break-inside: avoid;
-      }
-      
-      table, figure, img {
-        page-break-inside: avoid;
-      }
-      
-      img {
-        max-width: 100% !important;
-        page-break-inside: avoid;
-      }
-    }
-
-    /* Noscript Warning - Empresarial */
-    .noscript-warning {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(135deg, #fef3c7, #fcd34d);
-      border-bottom: 3px solid #f59e0b;
-      padding: 16px;
-      text-align: center;
-      font-weight: 600;
-      color: #92400e;
-      z-index: 10000;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    /* ========================================== */
-    /* FEATURES AVANÇADAS - DASHBOARD */
-    /* ========================================== */
-
-    /* Gridstack - Drag & Drop */
-    .grid-stack {
-      background: transparent;
-    }
-
-    .grid-stack-item {
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-lg);
-      box-shadow: var(--alsham-shadow-sm);
-      transition: box-shadow 0.3s ease;
-    }
-
-    .grid-stack-item:hover {
-      box-shadow: var(--alsham-shadow-md);
-    }
-
-    .grid-stack-item-content {
-      padding: 1.5rem;
-      overflow: auto;
-    }
-
-    .grid-stack-item .widget-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--alsham-border-default);
-    }
-
-    .grid-stack-item .widget-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--alsham-text-primary);
-    }
-
-    .grid-stack-item .widget-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .grid-stack-item .widget-action-btn {
-      padding: 0.25rem;
-      border: none;
-      background: transparent;
-      color: var(--alsham-text-secondary);
-      cursor: pointer;
-      border-radius: var(--alsham-radius-sm);
-      transition: all 0.2s ease;
-    }
-
-    .grid-stack-item .widget-action-btn:hover {
-      background: var(--alsham-bg-hover);
-      color: var(--alsham-text-primary);
-    }
-
-    /* Dashboard Switcher */
-    .dashboard-switcher {
-      position: relative;
-      display: inline-block;
-    }
-
-    .dashboard-switcher-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-md);
-      color: var(--alsham-text-primary);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .dashboard-switcher-btn:hover {
-      background: var(--alsham-bg-hover);
-      border-color: var(--alsham-primary);
-    }
-
-    .dashboard-switcher-dropdown {
-      position: absolute;
-      top: calc(100% + 0.5rem);
-      left: 0;
-      min-width: 250px;
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-lg);
-      box-shadow: var(--alsham-shadow-lg);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s ease;
-    }
-
-    .dashboard-switcher-dropdown.active {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .dashboard-switcher-dropdown .dashboard-item {
-      padding: 0.75rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: var(--alsham-text-primary);
-      cursor: pointer;
-      transition: background 0.2s ease;
-      border-bottom: 1px solid var(--alsham-border-default);
-    }
-
-    .dashboard-switcher-dropdown .dashboard-item:last-child {
-      border-bottom: none;
-    }
-
-    .dashboard-switcher-dropdown .dashboard-item:hover {
-      background: var(--alsham-bg-hover);
-    }
-
-    .dashboard-switcher-dropdown .dashboard-item.active {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--alsham-primary);
-      font-weight: 600;
-    }
-
-    .dashboard-switcher-dropdown .dashboard-item .dashboard-icon {
-      width: 1.5rem;
-      height: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Notification Bell */
-    .notification-bell {
-      position: relative;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -0.25rem;
-      right: -0.25rem;
-      min-width: 1.25rem;
-      height: 1.25rem;
-      padding: 0 0.35rem;
-      background: var(--alsham-error);
-      color: white;
-      font-size: 0.7rem;
+    .snapshot-card strong {
+      display: block;
+      font-size: 2.25rem;
       font-weight: 700;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: pulse 2s infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+    .snapshot-card span {
+      display: block;
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+      color: rgba(248, 250, 252, 0.75);
     }
 
-    .notifications-dropdown {
-      position: absolute;
-      top: calc(100% + 0.5rem);
-      right: 0;
-      width: 380px;
-      max-height: 500px;
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-lg);
-      box-shadow: var(--alsham-shadow-lg);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s ease;
-      overflow: hidden;
+    .metrics-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 3rem;
+    }
+
+    .metric-card {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 20px 35px -22px rgba(15, 23, 42, 0.4);
       display: flex;
       flex-direction: column;
+      gap: 0.75rem;
     }
 
-    .notifications-dropdown.active {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
+    .metric-card span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
     }
 
-    .notifications-header {
-      padding: 1rem;
-      border-bottom: 1px solid var(--alsham-border-default);
+    .metric-card strong {
+      font-size: 2rem;
+      color: #1d4ed8;
+      line-height: 1.2;
+    }
+
+    .metric-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    .insights-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      margin-bottom: 3rem;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 24px 50px -25px rgba(15, 23, 42, 0.35);
+    }
+
+    .panel h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      color: #0f172a;
+    }
+
+    .panel ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    .panel ul li + li {
+      margin-top: 0.65rem;
+    }
+
+    .trend-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .trend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.95rem;
+      color: #0f172a;
+    }
+
+    .trend-item strong {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    .activity-section {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 24px 50px -25px rgba(15, 23, 42, 0.35);
+    }
+
+    .activity-section h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+    }
+
+    .activity-timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .activity-timeline li {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0.85rem 1.1rem;
+      border-radius: 1rem;
+      background: #f8fafc;
+      color: #0f172a;
     }
 
-    .notifications-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--alsham-text-primary);
+    .activity-timeline span {
+      font-size: 0.85rem;
+      color: #475569;
     }
 
-    .notifications-list {
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .notification-item {
-      padding: 1rem;
-      border-bottom: 1px solid var(--alsham-border-default);
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .notification-item:hover {
-      background: var(--alsham-bg-hover);
-    }
-
-    .notification-item.unread {
-      background: rgba(59, 130, 246, 0.05);
-      border-left: 3px solid var(--alsham-primary);
-    }
-
-    .notification-item .notification-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--alsham-text-primary);
-      margin-bottom: 0.25rem;
-    }
-
-    .notification-item .notification-message {
-      font-size: 0.8rem;
-      color: var(--alsham-text-secondary);
-      margin-bottom: 0.5rem;
-    }
-
-    .notification-item .notification-time {
-      font-size: 0.75rem;
-      color: var(--alsham-text-tertiary);
-    }
-
-    /* Sparklines */
-    .sparkline-container {
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    /* Currency & Timezone Selector */
-    .global-settings {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .setting-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-md);
-      font-size: 0.875rem;
-    }
-
-    .setting-selector select {
-      border: none;
-      background: transparent;
-      color: var(--alsham-text-primary);
-      font-weight: 500;
-      cursor: pointer;
-      outline: none;
-    }
-
-    /* Widget Gallery Modal */
-    .widget-gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-      padding: 1rem;
-    }
-
-    .widget-gallery-item {
-      padding: 1.5rem;
-      background: var(--alsham-bg-surface);
-      border: 2px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-lg);
+    footer {
       text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      padding: 2.5rem 1rem 3rem;
+      color: #64748b;
+      font-size: 0.9rem;
     }
 
-    .widget-gallery-item:hover {
-      border-color: var(--alsham-primary);
-      background: rgba(59, 130, 246, 0.05);
-      transform: translateY(-2px);
-      box-shadow: var(--alsham-shadow-md);
-    }
-
-    .widget-gallery-item .widget-icon {
-      width: 3rem;
-      height: 3rem;
-      margin: 0 auto 0.75rem;
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--alsham-primary);
-      color: white;
-      border-radius: var(--alsham-radius-md);
+      background: rgba(15, 23, 42, 0.72);
+      z-index: 1000;
+    }
+
+    #loading-overlay .loading-card {
+      background: #ffffff;
+      padding: 2rem 3rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 25px 55px -15px rgba(15, 23, 42, 0.45);
+      text-align: center;
+      max-width: 320px;
+    }
+
+    #loading-overlay h2 {
+      margin: 0 0 0.75rem 0;
+      color: #1d4ed8;
       font-size: 1.5rem;
     }
 
-    .widget-gallery-item .widget-name {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--alsham-text-primary);
-      margin-bottom: 0.25rem;
+    #loading-overlay p {
+      margin: 0;
+      color: #475569;
+      font-size: 0.95rem;
     }
-
-    .widget-gallery-item .widget-description {
-      font-size: 0.75rem;
-      color: var(--alsham-text-secondary);
-    }
-
-    /* Saved Filters */
-    .saved-filters-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-    }
-
-    .saved-filter-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      background: var(--alsham-bg-surface);
-      border: 1px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-md);
-      font-size: 0.875rem;
-      color: var(--alsham-text-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .saved-filter-tag:hover {
-      border-color: var(--alsham-primary);
-      background: rgba(59, 130, 246, 0.05);
-    }
-
-    .saved-filter-tag.active {
-      background: var(--alsham-primary);
-      color: white;
-      border-color: var(--alsham-primary);
-    }
-
-    .saved-filter-tag .remove-filter {
-      margin-left: 0.25rem;
-      padding: 0;
-      background: transparent;
-      border: none;
-      color: currentColor;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.2s ease;
-    }
-
-    .saved-filter-tag .remove-filter:hover {
-      opacity: 1;
-    }
-
-    /* Cohort Analysis Table */
-    .cohort-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    .cohort-table th,
-    .cohort-table td {
-      padding: 0.75rem;
-      text-align: center;
-      border: 1px solid var(--alsham-border-default);
-    }
-
-    .cohort-table th {
-      background: var(--alsham-bg-hover);
-      font-weight: 600;
-      color: var(--alsham-text-primary);
-    }
-
-    .cohort-table td {
-      color: var(--alsham-text-secondary);
-    }
-
-    .cohort-table .cohort-cell {
-      position: relative;
-    }
-
-    .cohort-table .cohort-cell::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      opacity: 0.3;
-      pointer-events: none;
-    }
-
-    .cohort-table .cohort-high::before { background: #22C55E; }
-    .cohort-table .cohort-medium::before { background: #F59E0B; }
-    .cohort-table .cohort-low::before { background: #EF4444; }
-
-    /* Heatmap Container */
-    .heatmap-container {
-      position: relative;
-      width: 100%;
-      height: 400px;
-      border-radius: var(--alsham-radius-lg);
-      overflow: hidden;
-    }
-
-    /* Drill-down Modal Enhanced */
-    .drill-down-modal {
-      max-width: 900px;
-      width: 95%;
-    }
-
-    .drill-down-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-      color: var(--alsham-text-secondary);
-    }
-
-    .drill-down-breadcrumb a {
-      color: var(--alsham-primary);
-      text-decoration: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .drill-down-breadcrumb a:hover {
-      opacity: 0.8;
-    }
-
-    .drill-down-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    .drill-down-table thead {
-      background: var(--alsham-bg-hover);
-    }
-
-    .drill-down-table th {
-      padding: 0.75rem;
-      text-align: left;
-      font-weight: 600;
-      color: var(--alsham-text-primary);
-      border-bottom: 2px solid var(--alsham-border-default);
-    }
-
-    .drill-down-table td {
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--alsham-border-default);
-      color: var(--alsham-text-secondary);
-    }
-
-    .drill-down-table tbody tr:hover {
-      background: var(--alsham-bg-hover);
-    }
-
-    /* Layout Templates Selector */
-    .layout-templates {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .layout-template-card {
-      padding: 1rem;
-      background: var(--alsham-bg-surface);
-      border: 2px solid var(--alsham-border-default);
-      border-radius: var(--alsham-radius-lg);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-    }
-
-    .layout-template-card:hover {
-      border-color: var(--alsham-primary);
-      transform: translateY(-2px);
-      box-shadow: var(--alsham-shadow-md);
-    }
-
-    .layout-template-card.active {
-      border-color: var(--alsham-primary);
-      background: rgba(59, 130, 246, 0.05);
-    }
-
-    .layout-template-preview {
-      width: 100%;
-      height: 100px;
-      background: var(--alsham-bg-hover);
-      border-radius: var(--alsham-radius-md);
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-    }
-
-    .layout-template-name {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--alsham-text-primary);
-    }
-
   </style>
-
-  <!-- ========================================== -->
-  <!-- JSON-LD STRUCTURED DATA (Empresarial) -->
-  <!-- ========================================== -->
-  
-  <!-- SoftwareApplication Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "ALSHAM 360° PRIMA",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web, iOS, Android, Windows, macOS",
-    "browserRequirements": "Requires JavaScript. Requires HTML5. Requires CSS3.",
-    "softwareVersion": "11.1.0",
-    "releaseNotes": "https://app.alshamglobal.com.br/changelog",
-    "datePublished": "2025-01-01",
-    "dateModified": "2025-10-14",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "BRL",
-      "availability": "https://schema.org/InStock",
-      "validFrom": "2025-01-01"
-    },
-    "description": "CRM Enterprise com IA para gestão de leads, pipeline e automações. Plataforma completa de vendas com relatórios avançados, gamificação e integrações.",
-    "screenshot": [
-      "https://app.alshamglobal.com.br/screenshots/dashboard.png",
-      "https://app.alshamglobal.com.br/screenshots/leads.png",
-      "https://app.alshamglobal.com.br/screenshots/pipeline.png"
-    ],
-    "publisher": {
-      "@type": "Organization",
-      "name": "ALSHAM Global",
-      "url": "https://alshamglobal.com.br",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://alshamglobal.com.br/logo.png",
-        "width": 250,
-        "height": 60
-      }
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "127",
-      "bestRating": "5",
-      "worstRating": "1"
-    },
-    "featureList": [
-      "Gestão Inteligente de Leads com IA",
-      "Pipeline Visual Interativo",
-      "Automações de Marketing e Vendas",
-      "Relatórios e Analytics Avançados",
-      "Gamificação e Metas",
-      "Integrações via API REST",
-      "Dark Mode e Acessibilidade WCAG AAA",
-      "PWA com Offline Support",
-      "Export PDF, Excel e CSV",
-      "Webhooks e Notificações em Tempo Real"
-    ],
-    "applicationSubCategory": "CRM, Sales, Marketing Automation",
-    "downloadUrl": "https://app.alshamglobal.com.br",
-    "installUrl": "https://app.alshamglobal.com.br/install",
-    "permissions": "Notificações, Armazenamento Local, Sincronização em Background"
-  }
-  </script>
-
-  <!-- Breadcrumb Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://app.alshamglobal.com.br/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Dashboard",
-        "item": "https://app.alshamglobal.com.br/dashboard"
-      }
-    ]
-  }
-  </script>
-
-  <!-- Organization Schema (Completo) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "ALSHAM Global",
-    "alternateName": "ALSHAM 360° PRIMA",
-    "url": "https://alshamglobal.com.br",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://alshamglobal.com.br/logo.png",
-      "width": 250,
-      "height": 60
-    },
-    "description": "Empresa líder em soluções de CRM Enterprise com Inteligência Artificial para gestão de vendas e marketing",
-    "foundingDate": "2020",
-    "founders": [
-      {
-        "@type": "Person",
-        "name": "AbnadabyBonaparte"
-      }
-    ],
-    "contactPoint": [
-      {
-        "@type": "ContactPoint",
-        "telephone": "+55-11-3333-4444",
-        "contactType": "customer service",
-        "areaServed": "BR",
-        "availableLanguage": ["Portuguese", "English", "Spanish"],
-        "contactOption": "TollFree"
-      },
-      {
-        "@type": "ContactPoint",
-        "telephone": "+55-11-3333-4445",
-        "contactType": "technical support",
-        "areaServed": "BR",
-        "availableLanguage": ["Portuguese", "English"
-      }
-      },
-      {
-        "@type": "ContactPoint",
-        "telephone": "+55-11-3333-4446",
-        "contactType": "sales",
-        "areaServed": ["BR", "US", "ES"],
-        "availableLanguage": ["Portuguese", "English", "Spanish"]
-      }
-    ],
-    "sameAs": [
-      "https://twitter.com/alshamglobal",
-      "https://linkedin.com/company/alshamglobal",
-      "https://instagram.com/alshamglobal",
-      "https://youtube.com/@alshamglobal",
-      "https://facebook.com/alshamglobal"
-    ],
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Av. Paulista, 1000 - Conjunto 101",
-      "addressLocality": "São Paulo",
-      "addressRegion": "SP",
-      "postalCode": "01310-100",
-      "addressCountry": "BR"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": "-23.550520",
-      "longitude": "-46.633308"
-    },
-    "areaServed": {
-      "@type": "GeoCircle",
-      "geoMidpoint": {
-        "@type": "GeoCoordinates",
-        "latitude": "-23.550520",
-        "longitude": "-46.633308"
-      },
-      "geoRadius": "50000"
-    },
-    "email": "contato@alshamglobal.com.br",
-    "taxID": "12.345.678/0001-99",
-    "vatID": "BR12345678000199",
-    "numberOfEmployees": {
-      "@type": "QuantitativeValue",
-      "value": 50
-    }
-  }
-  </script>
-
-  <!-- WebApplication Schema (Completo e Detalhado) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "ALSHAM 360° PRIMA",
-    "url": "https://app.alshamglobal.com.br",
-    "applicationCategory": "BusinessApplication",
-    "applicationSubCategory": "CRM, SaaS, Business Intelligence",
-    "operatingSystem": "Web (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+), iOS 14+, Android 10+",
-    "browserRequirements": "Requires JavaScript ES2020+. Requires HTML5. Requires CSS3 Grid/Flexbox. Requires WebSocket.",
-    "softwareVersion": "11.1.0",
-    "datePublished": "2025-01-01T00:00:00Z",
-    "dateModified": "2025-10-14T00:00:00Z",
-    "description": "CRM Enterprise com Inteligência Artificial para gestão completa de leads, pipeline de vendas, automações de marketing e relatórios avançados. Plataforma robusta com acessibilidade WCAG AAA, PWA, dark mode e integrações.",
-    "screenshot": [
-      "https://app.alshamglobal.com.br/screenshots/dashboard-overview.png",
-      "https://app.alshamglobal.com.br/screenshots/leads-management.png",
-      "https://app.alshamglobal.com.br/screenshots/pipeline-visual.png",
-      "https://app.alshamglobal.com.br/screenshots/automation-builder.png",
-      "https://app.alshamglobal.com.br/screenshots/advanced-reports.png"
-    ],
-    "video": {
-      "@type": "VideoObject",
-      "name": "ALSHAM 360° PRIMA - Demo Completo",
-      "description": "Demonstração completa da plataforma ALSHAM 360° PRIMA",
-      "thumbnailUrl": "https://app.alshamglobal.com.br/video-thumb.jpg",
-      "uploadDate": "2025-01-15T00:00:00Z",
-      "contentUrl": "https://app.alshamglobal.com.br/demo-video.mp4"
-    },
-    "offers": {
-      "@type": "AggregateOffer",
-      "offerCount": "3",
-      "lowPrice": "0",
-      "highPrice": "999",
-      "priceCurrency": "BRL",
-      "availability": "https://schema.org/InStock",
-      "validFrom": "2025-01-01T00:00:00Z"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "127",
-      "reviewCount": "89",
-      "bestRating": "5",
-      "worstRating": "1"
-    },
-    "author": {
-      "@type": "Organization",
-      "name": "ALSHAM Global",
-      "url": "https://alshamglobal.com.br"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "ALSHAM Global",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://alshamglobal.com.br/logo.png",
-        "width": 250,
-        "height": 60
-      }
-    },
-    "featureList": [
-      "Gestão Inteligente de Leads com IA e Machine Learning",
-      "Pipeline Visual Drag & Drop com Kanban",
-      "Automações Avançadas de Marketing e Vendas",
-      "Relatórios Executivos e Analytics em Tempo Real",
-      "Gamificação com Metas e Rankings",
-      "Integrações via API REST e Webhooks",
-      "Dark Mode e Temas Personalizáveis",
-      "Acessibilidade WCAG 2.1 AAA",
-      "PWA com Suporte Offline",
-      "Export Multi-formato (PDF, Excel, CSV, JSON)",
-      "Notificações Push em Tempo Real",
-      "Auditoria e Logs Completos",
-      "Segurança Enterprise (2FA, SSO, RBAC)",
-      "Backup Automático e Versionamento",
-      "Suporte Multi-idioma (PT, EN, ES)"
-    ],
-    "softwareRequirements": "Navegador moderno com JavaScript ES2020+, WebSocket, IndexedDB",
-    "permissions": "Notificações Push, Armazenamento Local, Sincronização em Background, Geolocalização (Opcional)",
-    "installUrl": "https://app.alshamglobal.com.br/install",
-    "downloadUrl": "https://app.alshamglobal.com.br/download",
-    "releaseNotes": "https://app.alshamglobal.com.br/changelog/v11.1.0",
-    "softwareHelp": {
-      "@type": "CreativeWork",
-      "url": "https://help.alshamglobal.com.br"
-    },
-    "discussionUrl": "https://community.alshamglobal.com.br",
-    "license": "https://app.alshamglobal.com.br/terms",
-    "isAccessibleForFree": true,
-    "countriesSupported": ["BR", "US", "ES", "PT", "MX", "AR", "CL", "CO"],
-    "inLanguage": ["pt-BR", "en-US", "es-ES"]
-  }
-  </script>
-
-  <!-- FAQ Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "O que é ALSHAM 360° PRIMA?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "ALSHAM 360° PRIMA é uma plataforma CRM Enterprise com Inteligência Artificial para gestão completa de leads, pipeline de vendas, automações de marketing e relatórios avançados."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Quais navegadores são suportados?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "ALSHAM 360° PRIMA é compatível com Chrome 90+, Firefox 88+, Safari 14+ e Edge 90+. Também funciona perfeitamente em dispositivos iOS 14+ e Android 10+."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "A plataforma funciona offline?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Sim! ALSHAM 360° PRIMA é um Progressive Web App (PWA) com suporte completo offline, permitindo que você trabalhe mesmo sem conexão com a internet."
-        }
-      }
-    ]
-  }
-  </script>
-
 </head>
-<body class="font-inter min-h-screen">
-
-  <!-- Noscript Warning -->
-  <noscript>
-    <div class="noscript-warning" style="display: block !important;">
-      ⚠️ JavaScript está desabilitado. Este sistema requer JavaScript para funcionar corretamente.
-      <a href="https://www.enable-javascript.com/pt/" target="_blank" style="color: #0176D3; text-decoration: underline; margin-left: 10px;">
-        Como habilitar JavaScript?
-      </a>
-    </div>
-  </noscript>
-
-  <!-- Skip to Content (A11y) -->
-  <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
-
-  <!-- Offline Indicator -->
-  <div id="offline-indicator" class="offline-badge hidden" aria-live="assertive">
-    Offline - Alguns recursos limitados
-  </div>
-
-  <!-- Toast Container -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2" aria-live="polite"></div>
-
-  <!-- Loading Overlay -->
-  <div id="loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);" role="status" aria-live="polite" aria-label="Carregando dashboard">
-    <div class="text-center">
-      <div class="loading-spinner mb-4"></div>
-      <!-- Logo SVG Inline -->
-      <svg width="180" height="60" viewBox="0 0 180 60" xmlns="http://www.w3.org/2000/svg" aria-label="Logo ALSHAM 360° PRIMA">
-        <defs>
-          <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <text x="10" y="35" font-family="Poppins, sans-serif" font-size="28" font-weight="700" fill="url(#logo-gradient)">ALSHAM</text>
-        <text x="10" y="52" font-family="Inter, sans-serif" font-size="12" fill="#6b7280">360° PRIMA</text>
-        <circle cx="155" cy="30" r="20" fill="none" stroke="url(#logo-gradient)" stroke-width="2"/>
-        <path d="M150 30 L160 30 M155 25 L155 35" stroke="url(#logo-gradient)" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <p class="font-medium mt-4" style="color: var(--alsham-text-secondary);">
-        Carregando dashboard executivo v11.1...
-      </p>
+<body>
+  <div id="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <h2>Carregando sessão...</h2>
+      <p>Validando credenciais de acesso ao painel executivo.</p>
     </div>
   </div>
 
-  <!-- NAVBAR -->
-  <nav class="sticky top-0 z-40 shadow-sm border-b no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" role="navigation" aria-label="Navegação principal">
-    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
-      <div class="flex items-center gap-4">
-        <button id="menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Abrir menu" aria-expanded="false">
-          <svg class="w-6 h-6" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-        <svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" aria-label="ALSHAM 360°">
-          <defs>
-            <linearGradient id="nav-logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#0176D3;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <text x="5" y="25" font-family="Poppins, sans-serif" font-size="20" font-weight="700" fill="url(#nav-logo-gradient)">ALSHAM 360°</text>
-        </svg>
+  <main class="dashboard-container" id="dashboard-root" data-cy="dashboard-root">
+    <header class="dashboard-header">
+      <div>
+        <h1>Dashboard Executivo</h1>
+        <p>KPIs consolidados da operação ALSHAM 360° PRIMA</p>
       </div>
-
-      <div class="hidden md:flex items-center space-x-6" role="menubar">
-        <a href="/dashboard.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1" role="menuitem" aria-current="page">Dashboard</a>
-        <a href="/leads-real.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Leads</a>
-        <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Pipeline</a>
-        <a href="/automacoes.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Automações</a>
-        <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Gamificação</a>
-        <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 transition" role="menuitem">Relatórios</a>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button id="contrast-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar modo de alto contraste" title="Alto Contraste">
-          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
-        </button>
-        
-        <button id="theme-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Alternar tema claro/escuro" title="Tema">
-          <svg class="sun-icon w-5 h-5 dark:hidden" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <svg class="moon-icon w-5 h-5 hidden dark:block" style="color: var(--alsham-text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-          </svg>
-        </button>
-        
-        <button id="fullscreen-toggle" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition hidden md:block" style="border-color: var(--alsham-border-default);" aria-label="Tela cheia" title="Tela Cheia">
-          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-          </svg>
-        </button>
-        
-        <a href="/configuracoes.html" class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800 transition" style="border-color: var(--alsham-border-default);" aria-label="Configurações" title="Configurações">
-          <svg class="w-5 h-5" style="color: var(--alsham-text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- SIDENAV -->
-  <aside id="sidenav" class="side-nav mobile-hidden md:block fixed left-0 top-16 w-56 h-[calc(100vh-64px)] border-r p-4 overflow-y-auto no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" role="navigation" aria-label="Navegação lateral">
-    <nav class="flex flex-col space-y-2">
-      <a href="/dashboard.html" class="font-semibold text-blue-600 p-2 rounded transition flex items-center gap-2" style="background: rgba(59,130,246,0.1);" aria-current="page">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        Dashboard
-      </a>
-      <a href="/leads-real.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        Leads
-      </a>
-      <a href="/pipeline.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-        </svg>
-        Pipeline
-      </a>
-      <a href="/automacoes.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
-        Automações
-      </a>
-      <a href="/gamificacao.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
-        </svg>
-        Gamificação
-      </a>
-      <a href="/relatorios.html" style="color: var(--alsham-text-secondary);" class="hover:text-blue-600 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        Relatórios
-      </a>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main id="main-content" class="main-content-wrapper max-w-7xl mx-auto px-4 py-8 md:ml-56" role="main">
-    <header class="mb-8">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-        <div>
-          <h1 class="text-3xl font-bold mb-2" style="color: var(--alsham-text-primary);">Dashboard Executivo v11.1</h1>
-          <p style="color: var(--alsham-text-secondary);">CRM Enterprise com IA - Exports completos, animações premium e acessibilidade WCAG AAA</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <label class="flex items-center gap-2 text-sm cursor-pointer" style="color: var(--alsham-text-secondary);">
-            <input type="checkbox" id="auto-refresh" class="w-4 h-4 cursor-pointer" aria-label="Auto-atualização a cada minuto">
-            <span>🔄 Auto-refresh</span>
-          </label>
-          <button onclick="window.DashboardApp.openScheduledReports()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm" aria-label="Agendar relatórios automáticos">📅 Agendar Relatórios</button>
-        </div>
+      <div class="snapshot-card" aria-label="Resumo do dia">
+        <h2>Snapshot Diário</h2>
+        <strong>R$ 482K</strong>
+        <span>MRR projetado com base em 415 contas ativas</span>
       </div>
     </header>
 
-    <div id="dashboard-filters" aria-label="Filtros do dashboard"></div>
-    <div id="dashboard-kpis" aria-label="Indicadores principais" class="reveal"></div>
-    <div id="dashboard-goals" aria-label="Metas e objetivos" class="reveal"></div>
-    <div id="dashboard-roi" aria-label="ROI mensal" class="reveal"></div>
-
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" aria-label="Gráficos analíticos">
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownStatus(event)" role="button" tabindex="0" aria-label="Gráfico de distribuição por status - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Distribuição por Status</h3>
-        <div class="h-[350px]"><canvas id="status-chart" aria-label="Gráfico de pizza com distribuição de status"></canvas></div>
-      </div>
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownDaily(event)" role="button" tabindex="0" aria-label="Gráfico de novos leads - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Novos Leads (Últimos 7 dias)</h3>
-        <div class="h-[350px]"><canvas id="daily-chart" aria-label="Gráfico de linha com novos leads diários"></canvas></div>
-      </div>
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownFunnel(event)" role="button" tabindex="0" aria-label="Gráfico de funil de conversão - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Funil de Conversão</h3>
-        <div class="h-[350px]"><canvas id="funnel-chart" aria-label="Gráfico de barras com funil de conversão"></canvas></div>
-      </div>
-      <div class="rounded-lg shadow-md p-6 border reveal chart-drilldown" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);" onclick="window.DashboardApp.drilldownOrigem(event)" role="button" tabindex="0" aria-label="Gráfico de leads por origem - clique para detalhes">
-        <h3 class="text-lg font-semibold mb-4" style="color: var(--alsham-text-primary);">Leads por Origem</h3>
-        <div class="h-[350px]"><canvas id="origem-chart" aria-label="Gráfico de pizza com distribuição por origem"></canvas></div>
-      </div>
+    <section class="metrics-grid" aria-label="Indicadores principais">
+      <article class="metric-card">
+        <span>Leads Hoje</span>
+        <strong>42</strong>
+        <p>Novos cadastros nas últimas 24 horas</p>
+      </article>
+      <article class="metric-card">
+        <span>Conversão semanal</span>
+        <strong>18,5%</strong>
+        <p>Taxa média de avanço no funil comercial</p>
+      </article>
+      <article class="metric-card">
+        <span>Previsão de fechamento</span>
+        <strong>R$ 1,8M</strong>
+        <p>Pipeline ponderado para os próximos 30 dias</p>
+      </article>
+      <article class="metric-card">
+        <span>Tempo médio de resposta</span>
+        <strong>1h 14m</strong>
+        <p>Atendimento omnichannel real-time</p>
+      </article>
+      <article class="metric-card">
+        <span>Tickets abertos</span>
+        <strong>28</strong>
+        <p>Chamados aguardando tratativa</p>
+      </article>
+      <article class="metric-card">
+        <span>Satisfação NPS</span>
+        <strong>76</strong>
+        <p>Índice calculado a partir de 415 respostas</p>
+      </article>
+      <article class="metric-card">
+        <span>Campanhas ativas</span>
+        <strong>12</strong>
+        <p>Fluxos rodando em canais digitais</p>
+      </article>
+      <article class="metric-card">
+        <span>Retenção líquida</span>
+        <strong>118%</strong>
+        <p>Expansão via upsell e cross-sell nas contas</p>
+      </article>
     </section>
 
-    <div id="leads-table" class="reveal" aria-label="Tabela de leads recentes"></div>
+    <section class="insights-grid" aria-label="Análises consolidadas">
+      <article class="panel" aria-labelledby="funnel-progress-title">
+        <h2 id="funnel-progress-title">Progresso do Funil</h2>
+        <ul>
+          <li>140 oportunidades em prospecção ativa</li>
+          <li>68 propostas aguardando assinatura</li>
+          <li>21 negociações críticas com follow-up diário</li>
+          <li>Receita conquistada no mês: <strong>R$ 920K</strong></li>
+        </ul>
+      </article>
+
+      <article class="panel" aria-labelledby="retention-panel-title">
+        <h2 id="retention-panel-title">Retenção & Experiência</h2>
+        <ul>
+          <li>Churn voluntário reduziu 12% vs. mês anterior</li>
+          <li>83% dos tickets resolvidos no primeiro contato</li>
+          <li>Comunidade ativa com 1.250 interações semanais</li>
+          <li>CSAT médio de <strong>4,6/5</strong> em 3.100 avaliações</li>
+        </ul>
+      </article>
+
+      <article class="panel" aria-labelledby="trend-panel-title">
+        <h2 id="trend-panel-title">Tendências Prioritárias</h2>
+        <ul class="trend-list">
+          <li class="trend-item"><span>IA aplicada ao onboarding</span><strong>+32% adoção</strong></li>
+          <li class="trend-item"><span>Playbook de vendas consultivas</span><strong>+19% taxa de ganho</strong></li>
+          <li class="trend-item"><span>Campanhas de automação por e-mail</span><strong>+24% engajamento</strong></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="activity-section" aria-label="Atividades recentes">
+      <h2>Linha do tempo executiva</h2>
+      <ul class="activity-timeline">
+        <li><span>09:20</span> Fechamento da conta Enterprise &mdash; Setor Energia</li>
+        <li><span>11:05</span> Aprovação de orçamento em Gamificação &amp; Onboarding</li>
+        <li><span>13:40</span> Renegociação concluída com upsell de plataforma IA</li>
+        <li><span>16:15</span> Comitê executivo confirmou OKRs do próximo trimestre</li>
+      </ul>
+    </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="border-t mt-16 py-8 no-print" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
-    <div class="max-w-7xl mx-auto px-4 md:ml-56">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
-        <div>
-          <h3 class="font-bold mb-3" style="color: var(--alsham-text-primary);">ALSHAM 360° PRIMA</h3>
-          <p class="text-sm" style="color: var(--alsham-text-secondary);">CRM Enterprise com IA</p>
-          <p class="text-xs mt-2" style="color: var(--alsham-text-secondary);">v11.0.0 • Build 2025.10.13</p>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-3" style="color: var(--alsham-text-primary);">Links Úteis</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="/docs" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Documentação</a></li>
-            <li><a href="/help" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Central de Ajuda</a></li>
-            <li><a href="/api" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">API Docs</a></li>
-            <li><a href="/status" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Status do Sistema</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-3" style="color: var(--alsham-text-primary);">Legal</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="/privacy" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Política de Privacidade</a></li>
-            <li><a href="/terms" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Termos de Uso</a></li>
-            <li><a href="/lgpd" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">LGPD/GDPR</a></li>
-            <li><a href="/cookies" class="hover:text-blue-600" style="color: var(--alsham-text-secondary);">Política de Cookies</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="border-t pt-6 flex flex-col md:flex-row justify-between items-center text-sm" style="border-color: var(--alsham-border-default); color: var(--alsham-text-secondary);">
-        <p>© 2025 ALSHAM Global. Todos os direitos reservados.</p>
-        <p class="flex items-center gap-2 mt-2 md:mt-0">
-          <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">Ctrl+K</kbd> Atalhos
-        </p>
-      </div>
-    </div>
+  <footer>
+    © 2025 ALSHAM 360° PRIMA — Dados processados automaticamente pela suíte de inteligência.
   </footer>
 
-  <!-- ========================================== -->
-  <!-- COMPONENTES INTERATIVOS ADICIONAIS -->
-  <!-- ========================================== -->
-
-  <!-- Back to Top Button -->
-  <button 
-    id="back-to-top" 
-    class="hidden fixed bottom-20 right-4 z-[1070] w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all no-print"
-    aria-label="Voltar ao topo"
-    title="Voltar ao topo">
-    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-    </svg>
-  </button>
-
-  <!-- Keyboard Shortcuts Modal -->
-  <div id="shortcuts-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title">
-    <div class="modal-content" role="document">
-      <div class="flex justify-between items-center mb-6">
-        <h2 id="shortcuts-modal-title" class="text-2xl font-bold" style="color: var(--alsham-text-primary);">⌨️ Atalhos de Teclado</h2>
-        <button onclick="document.getElementById('shortcuts-modal').classList.remove('active')" class="text-gray-500 hover:text-gray-700" aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Navegação -->
-        <div>
-          <h3 class="font-semibold mb-3" style="color: var(--alsham-text-secondary);">Navegação</h3>
-          <ul class="space-y-2 text-sm">
-            <li class="flex justify-between items-center">
-              <span style="color: var(--alsham-text-secondary);">Busca global</span>
-              <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">Ctrl + K</kbd>
-            </li>
-            <li class="flex justify-between items-center">
-              <span style="color: var(--alsham-text-secondary);">Dashboard</span>
-              <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">G + D</kbd>
-            </li>
-            <li class="flex justify-between items-center">
-              <span style="color: var(--alsham-text-secondary);">Leads</span>
-              <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">G + L</kbd>
-            </li>
-          </ul>
-        </div>
-        <!-- Ações -->
-        <div>
-          <h3 class="font-semibold mb-3" style="color: var(--alsham-text-secondary);">Ações</h3>
-          <ul class="space-y-2 text-sm">
-            <li class="flex justify-between items-center">
-              <span style="color: var(--alsham-text-secondary);">Tela cheia</span>
-              <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">F11</kbd>
-            </li>
-            <li class="flex justify-between items-center">
-              <span style="color: var(--alsham-text-secondary);">Fechar modais</span>
-              <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">ESC</kbd>
-            </li>
-            <li class="flex justify-between items-center">
-              <span style="color: var(--alsham-text-secondary);">Atalhos</span>
-              <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">?</kbd>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Confirmation Dialog (Reutilizável) -->
-  <div id="confirm-dialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
-    <div class="modal-content" role="document">
-      <div class="flex items-start gap-4">
-        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-          <svg class="w-6 h-6 rounded text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-          </svg>
-        </div>
-        <div class="flex-1">
-          <h3 id="confirm-title" class="text-lg font-semibold mb-2" style="color: var(--alsham-text-primary);">Confirmar ação</h3>
-          <p id="confirm-message" class="text-sm" style="color: var(--alsham-text-secondary);">Tem certeza que deseja continuar?</p>
-        </div>
-      </div>
-      <div class="flex justify-end gap-3 mt-6">
-        <button onclick="document.getElementById('confirm-dialog').classList.remove('active')" class="px-4 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-          Cancelar
-        </button>
-        <button id="confirm-button" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-          Confirmar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODALS -->
-  <div id="status-filter-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="status-modal-title">
-    <div class="modal-content" role="document">
-      <div class="flex justify-between items-center mb-4">
-        <h2 id="status-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Filtrar por Status</h2>
-        <button onclick="window.DashboardApp.closeStatusFilter()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div id="status-checkboxes" class="space-y-2"></div>
-      <div class="mt-4 flex gap-2">
-        <button onclick="window.DashboardApp.applyStatusFilter()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
-        <button onclick="window.DashboardApp.closeStatusFilter()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="origem-filter-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="origem-modal-title">
-    <div class="modal-content" role="document">
-      <div class="flex justify-between items-center mb-4">
-        <h2 id="origem-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Filtrar por Origem</h2>
-        <button onclick="window.DashboardApp.closeOrigemFilter()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div id="origem-checkboxes" class="space-y-2"></div>
-      <div class="mt-4 flex gap-2">
-        <button onclick="window.DashboardApp.applyOrigemFilter()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
-        <button onclick="window.DashboardApp.closeOrigemFilter()" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="scheduled-reports-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="scheduled-modal-title">
-    <div class="modal-content" role="document">
-      <div class="flex justify-between items-center mb-4">
-        <h2 id="scheduled-modal-title" class="text-xl font-bold" style="color: var(--alsham-text-primary);">Agendar Relatórios Automáticos</h2>
-        <button onclick="window.DashboardApp.closeScheduledReports()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" aria-label="Fechar modal">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <form id="schedule-form" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Frequência</label>
-          <select id="schedule-frequency" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
-            <option value="daily">Diário</option>
-            <option value="weekly">Semanal</option>
-            <option value="monthly">Mensal</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Email de destino</label>
-          <input type="email" id="schedule-email" placeholder="seu@email.com" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1" style="color: var(--alsham-text-secondary);">Formato</label>
-          <select id="schedule-format" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:text-white" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default); color: var(--alsham-text-primary);">
-            <option value="pdf">PDF</option>
-            <option value="excel">Excel</option>
-            <option value="both">Ambos</option>
-          </select>
-        </div>
-        <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Agendar Relatório</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- COMPONENTES AVANÇADOS - DASHBOARD -->
-  <!-- ========================================== -->
-
-  <!-- Dashboard Switcher & Global Settings -->
-  <div id="dashboard-toolbar" class="hidden fixed top-20 left-0 right-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-    <div class="max-w-7xl mx-auto flex justify-between items-center md:ml-56">
-      <!-- Dashboard Switcher -->
-      <div class="dashboard-switcher">
-        <button class="dashboard-switcher-btn" onclick="window.DashboardAdvanced.toggleDashboardDropdown()">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-          </svg>
-          <span id="current-dashboard-name">Dashboard Principal</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </button>
-        
-        <div class="dashboard-switcher-dropdown" id="dashboard-dropdown">
-          <div class="dashboard-item active" onclick="window.DashboardAdvanced.switchDashboard('main')">
-            <span class="dashboard-icon">📊</span>
-            <span>Dashboard Principal</span>
-          </div>
-          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('sales')">
-            <span class="dashboard-icon">💰</span>
-            <span>Dashboard de Vendas</span>
-          </div>
-          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('marketing')">
-            <span class="dashboard-icon">📢</span>
-            <span>Dashboard de Marketing</span>
-          </div>
-          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('executive')">
-            <span class="dashboard-icon">👔</span>
-            <span>Dashboard Executivo</span>
-          </div>
-          <div class="dashboard-item" onclick="window.DashboardAdvanced.switchDashboard('forecast')">
-            <span class="dashboard-icon">📈</span>
-            <span>Forecast & Analytics</span>
-          </div>
-          <div class="dashboard-item" style="border-top: 2px solid var(--alsham-border-default);" onclick="window.DashboardAdvanced.openDashboardManager()">
-            <span class="dashboard-icon">⚙️</span>
-            <span>Gerenciar Dashboards</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Global Settings -->
-      <div class="global-settings">
-        <!-- Currency Selector -->
-        <div class="setting-selector">
-          <span>💱</span>
-          <select id="currency-selector" onchange="window.DashboardAdvanced.changeCurrency(this.value)">
-            <option value="BRL">BRL (R$)</option>
-            <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="GBP">GBP (£)</option>
-          </select>
-        </div>
-        
-        <!-- Timezone Selector -->
-        <div class="setting-selector">
-          <span>🌍</span>
-          <select id="timezone-selector" onchange="window.DashboardAdvanced.changeTimezone(this.value)">
-            <option value="America/Sao_Paulo">São Paulo (BRT)</option>
-            <option value="America/New_York">New York (EST)</option>
-            <option value="Europe/London">London (GMT)</option>
-            <option value="Asia/Tokyo">Tokyo (JST)</option>
-          </select>
-        </div>
-        
-        <!-- Notification Bell -->
-        <div class="notification-bell">
-          <button class="p-2 rounded-md border hover:bg-gray-100 dark:hover:bg-gray-800" onclick="window.DashboardAdvanced.toggleNotifications()">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            <span class="notification-badge" id="notification-badge">5</span>
-          </button>
-          
-          <div class="notifications-dropdown" id="notifications-dropdown">
-            <div class="notifications-header">
-              <h3>Notificações</h3>
-              <button class="text-sm text-blue-600 hover:underline" onclick="window.DashboardAdvanced.markAllAsRead()">
-                Marcar todas como lidas
-              </button>
-            </div>
-            <div class="notifications-list" id="notifications-list">
-              <!-- Notificações carregadas dinamicamente -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Gridstack Container (substitui o grid atual) -->
-  <div id="gridstack-container" class="hidden">
-    <div class="grid-stack" id="main-grid">
-      <!-- Widgets adicionados dinamicamente -->
-    </div>
-  </div>
-
-  <!-- Widget Gallery Modal -->
-  <div id="widget-gallery-modal" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Galeria de Widgets</h2>
-        <button onclick="window.DashboardAdvanced.closeWidgetGallery()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div class="widget-gallery-grid" id="widget-gallery-grid">
-        <!-- Widgets disponíveis -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Dashboard Manager Modal -->
-  <div id="dashboard-manager-modal" class="modal">
-    <div class="modal-content" style="max-width: 600px;">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Gerenciar Dashboards</h2>
-        <button onclick="window.DashboardAdvanced.closeDashboardManager()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <button onclick="window.DashboardAdvanced.createNewDashboard()" class="w-full mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-        ➕ Criar Novo Dashboard
-      </button>
-      
-      <div id="dashboards-list" class="space-y-2">
-        <!-- Lista de dashboards -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Saved Filters -->
-  <div id="saved-filters-container" class="hidden">
-    <div class="flex justify-between items-center mb-2">
-      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Filtros Salvos</h4>
-      <button onclick="window.DashboardAdvanced.saveCurrentFilters()" class="text-sm text-blue-600 hover:underline">
-        💾 Salvar filtros atuais
-      </button>
-    </div>
-    <div class="saved-filters-list" id="saved-filters-list">
-      <!-- Filtros salvos -->
-    </div>
-  </div>
-
-  <!-- Drill-down Modal Enhanced -->
-  <div id="drill-down-modal" class="modal">
-    <div class="modal-content drill-down-modal">
-      <div class="drill-down-breadcrumb" id="drill-down-breadcrumb">
-        <!-- Breadcrumb -->
-      </div>
-      
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold" id="drill-down-title">Detalhes</h2>
-        <button onclick="window.DashboardAdvanced.closeDrillDown()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div id="drill-down-content">
-        <!-- Conteúdo carregado dinamicamente -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Layout Templates Modal -->
-  <div id="layout-templates-modal" class="modal">
-    <div class="modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Templates de Layout</h2>
-        <button onclick="window.DashboardAdvanced.closeLayoutTemplates()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="layout-templates">
-        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('sales')">
-          <div class="layout-template-preview">
-            💰
-          </div>
-          <div class="layout-template-name">Vendas</div>
-        </div>
-        
-        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('marketing')">
-          <div class="layout-template-preview">
-            📢
-          </div>
-          <div class="layout-template-name">Marketing</div>
-        </div>
-        
-        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('executive')">
-          <div class="layout-template-preview">
-            👔
-          </div>
-          <div class="layout-template-name">Executivo</div>
-        </div>
-        
-        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('analytics')">
-          <div class="layout-template-preview">
-            📊
-          </div>
-          <div class="layout-template-name">Analytics</div>
-        </div>
-        
-        <div class="layout-template-card" onclick="window.DashboardAdvanced.applyLayoutTemplate('custom')">
-          <div class="layout-template-preview">
-            ⚙️
-          </div>
-          <div class="layout-template-name">Personalizado</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cohort Analysis Modal -->
-  <div id="cohort-modal" class="modal">
-    <div class="modal-content" style="max-width: 900px;">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Análise de Cohort</h2>
-        <button onclick="window.DashboardAdvanced.closeCohortModal()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div id="cohort-table-container">
-        <!-- Tabela de cohort -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Map Modal -->
-  <div id="map-modal" class="modal">
-    <div class="modal-content" style="max-width: 1000px;">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Mapa de Leads</h2>
-        <button onclick="window.DashboardAdvanced.closeMapModal()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div id="map-container" style="height: 500px; border-radius: 8px;"></div>
-    </div>
-  </div>
-
-  <!-- Heatmap Modal -->
-  <div id="heatmap-modal" class="modal">
-    <div class="modal-content" style="max-width: 900px;">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Heatmap de Atividades</h2>
-        <button onclick="window.DashboardAdvanced.closeHeatmapModal()" class="text-gray-500 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="heatmap-container" id="heatmap-container"></div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
-  
-  <!-- Supabase Init Inline -->
-  <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
-    console.log('✅ Supabase integrado:', Object.keys(window.AlshamSupabase).length, 'funções');
-  </script>
-
-  <!-- ✅ Theme Toggle Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Theme Toggle
-      const themeToggle = document.getElementById('theme-toggle');
-      if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
-          const html = document.documentElement;
-          const isDark = html.classList.toggle('dark');
-          localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
-          
-          // Atualizar gráficos se existirem
-          if (window.DashboardApp?.updateCharts) {
-            window.DashboardApp.updateCharts();
-          }
-        });
-      }
-
-      // High Contrast Toggle
-      const contrastToggle = document.getElementById('contrast-toggle');
-      if (contrastToggle) {
-        contrastToggle.addEventListener('click', function() {
-          const html = document.documentElement;
-          const isHighContrast = html.classList.toggle('high-contrast');
-          localStorage.setItem('alsham-contrast', isHighContrast ? 'high' : 'normal');
-        });
-      }
-
-      // Menu Mobile Toggle
-      const menuToggle = document.getElementById('menu-toggle');
-      const sideNav = document.getElementById('sidenav');
-      if (menuToggle && sideNav) {
-        menuToggle.addEventListener('click', function() {
-          sideNav.classList.toggle('mobile-hidden');
-          sideNav.classList.toggle('mobile-visible');
-          const isExpanded = sideNav.classList.contains('mobile-visible');
-          menuToggle.setAttribute('aria-expanded', isExpanded);
-        });
-      }
-
-      // Fullscreen Toggle
-      const fullscreenToggle = document.getElementById('fullscreen-toggle');
-      if (fullscreenToggle) {
-        fullscreenToggle.addEventListener('click', function() {
-          if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-          } else {
-            document.exitFullscreen();
-          }
-        });
-      }
-
-      // Offline/Online Detection
-      const offlineIndicator = document.getElementById('offline-indicator');
-      window.addEventListener('offline', () => {
-        if (offlineIndicator) offlineIndicator.classList.remove('hidden');
-      });
-      window.addEventListener('online', () => {
-        if (offlineIndicator) offlineIndicator.classList.add('hidden');
-      });
-
-      // Scroll Reveal
-      const revealElements = document.querySelectorAll('.reveal');
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add('active');
-        });
-      }, { threshold: 0.1 });
-      revealElements.forEach(el => revealObserver.observe(el));
-
-      // Keyboard Shortcuts
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
-        }
-        if (e.ctrlKey && e.key === 'k') {
-          e.preventDefault();
-          showToast('Atalhos disponíveis: ESC (fechar), F11 (tela cheia)', 'info');
-        }
-      });
-
-      // Toast Notification System
-      window.showToast = function(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
-              ${type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
-              ${type === 'info' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' : ''}
-            </svg>
-            <p class="text-sm flex-1" style="color: var(--alsham-text-primary);">${message}</p>
-          </div>
-        `;
-        container.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-      };
-
-      // Trap Focus in Modals
-      const modals = document.querySelectorAll('.modal');
-      modals.forEach(modal => {
-        const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-        modal.addEventListener('keydown', function(e) {
-          if (e.key === 'Tab' && modal.classList.contains('active')) {
-            const focusable = Array.from(modal.querySelectorAll(focusableElements));
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-              last.focus();
-              e.preventDefault();
-            } else if (!e.shiftKey && document.activeElement === last) {
-              first.focus();
-              e.preventDefault();
-            }
-          }
-        });
-      });
-
-      // PWA Install Prompt
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        showToast('Instale o ALSHAM 360° como app!', 'info');
-      });
-    });
-  </script>
-
   <script type="module" src="/src/js/dashboard.js"></script>
-
-  <!-- ========================================== -->
-  <!-- PERFORMANCE MONITORING & ENHANCEMENTS -->
-  <!-- ========================================== -->
-
-  <script>
-  // Service Worker Registration Registration
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
-        console.log('✅ ServiceWorker registrado:', registration.scope);
-        
-        // Verificar atualizações
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              if (confirm('Nova versão disponível! Recarregar?')) {
-                window.location.reload();
-              }
-            }
-          });
-        });
-      }).catch(function(err) {
-        console.error('❌ Erro ao registrar ServiceWorker:', err);
-      });
-    });
-  }
-
-  // Web Vitals Monitoring
-  (function() {
-    if (window.PerformanceObserver) {
-      // Largest Contentful Paint (LCP)
-      new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        console.log('📊 LCP:', lastEntry.renderTime || lastEntry.loadTime);
-        if (window.gtag) {
-          gtag('event', 'web_vitals', {
-            event_category: 'Web Vitals',
-            event_label: 'LCP',
-            value: Math.round(lastEntry.renderTime || lastEntry.loadTime),
-            non_interaction: true
-          });
-        }
-      }).observe({ type: 'largest-contentful-paint', buffered: true });
-      
-      // First Input Delay (FID)
-      new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry) => {
-          console.log('📊 FID:', entry.processingStart - entry.startTime);
-          if (window.gtag) {
-            gtag('event', 'web_vitals', {
-              event_category: 'Web Vitals',
-              event_label: 'FID',
-              value: Math.round(entry.processingStart - entry.startTime),
-              non_interaction: true
-            });
-          }
-        });
-      }).observe({ type: 'first-input', buffered: true });
-      
-      // Cumulative Layout Shift (CLS)
-      let clsValue = 0;
-      new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
-          }
-        }
-        console.log('📊 CLS:', clsValue);
-      }).observe({ type: 'layout-shift', buffered: true });
-    }
-  })();
-
-  // Resource Timing Monitoring
-  window.addEventListener('load', function() {
-    if (window.performance && window.performance.timing) {
-      const perfData = window.performance.timing;
-      const pageLoadTime = Math.max(0, perfData.loadEventEnd - perfData.navigationStart);
-      const connectTime = perfData.responseEnd - perfData.requestStart;
-      const renderTime = perfData.domComplete - perfData.domLoading;
-      
-      if (pageLoadTime < 0 || pageLoadTime > 60000) {
-        console.warn('⚠️ Page load time inválido, pulando métrica');
-      } else {
-        console.log('⚡ Page Load:', pageLoadTime + 'ms');
-      }
-      console.log('⚡ Performance Metrics:');
-      console.log('  Connect:', connectTime + 'ms');
-      console.log('  Render:', renderTime + 'ms');
-      
-      // Enviar para Analytics
-      if (window.gtag) {
-        gtag('event', 'timing_complete', {
-          name: 'load',
-          value: pageLoadTime,
-          event_category: 'Performance'
-        });
-      }
-      
-      // Alertar se performance ruim
-      if (pageLoadTime > 3000) {
-        console.warn('⚠️ Página demorou mais de 3s para carregar');
-      }
-    }
-    
-    // Resource Timing API
-    if (window.performance && window.performance.getEntriesByType) {
-      const resources = performance.getEntriesByType('resource');
-      const slowResources = resources.filter(r => r.duration > 1000);
-      if (slowResources.length > 0) {
-        console.warn('🐌 Recursos lentos (>1s):', slowResources.map(r => ({
-          name: r.name,
-          duration: Math.round(r.duration) + 'ms'
-        })));
-      }
-    }
-  });
-
-  // Memory Leak Detection
-  if (window.performance && performance.memory) {
-    setInterval(() => {
-      const usedMemory = performance.memory.usedJSHeapSize;
-      const totalMemory = performance.memory.totalJSHeapSize;
-      const percentage = (usedMemory / totalMemory) * 100;
-      
-      if (percentage > 97) {
-        console.warn('⚠️ Uso de memória alto:', percentage.toFixed(2) + '%');
-        if (window.Sentry) {
-          Sentry.captureMessage('High memory usage: ' + percentage.toFixed(2) + '%', 'warning');
-        }
-      }
-    }, 30000); // Check every 30s
-  }
-
-  // Network Information API
-  if ('connection' in navigator) {
-    const connection = navigator.connection;
-    const effectiveType = connection.effectiveType;
-    
-    console.log('🌐 Tipo de conexão:', effectiveType);
-    
-    if (effectiveType === 'slow-2g' || effectiveType === '2g') {
-      console.warn('🐢 Conexão lenta detectada');
-      // Desabilitar animações pesadas
-      document.documentElement.classList.add('reduced-motion');
-      // Informar usuário
-      if (window.showToast) {
-        showToast('Conexão lenta detectada. Modo otimizado ativado.', 'info');
-      }
-    }
-    
-    // Monitorar mudanças de conexão
-    connection.addEventListener('change', () => {
-      console.log('🌐 Mudança de conexão:', connection.effectiveType);
-    });
-  }
-
-  // Page Visibility API
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-      console.log('🔇 Página oculta - pausando atividades');
-      // Pausar timers, animações, etc
-      if (window.DashboardApp && window.DashboardApp.autoRefreshInterval) {
-        clearInterval(window.DashboardApp.autoRefreshInterval);
-      }
-    } else {
-      console.log('🔊 Página visível - retomando atividades');
-      // Retomar atividades
-      if (document.getElementById('auto-refresh').checked && window.DashboardApp) {
-        window.DashboardApp.startAutoRefresh();
-      }
-    }
-  });
-
-  // Back to Top Button
-  const backToTopBtn = document.getElementById('back-to-top');
-  if (backToTopBtn) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 500) {
-        backToTopBtn.classList.remove('hidden');
-      } else {
-        backToTopBtn.classList.add('hidden');
-      }
-    });
-    
-    backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  // Keyboard Shortcuts ADICIONAL
-  document.addEventListener('keydown', (e) => {
-    // ? - Mostrar atalhos
-    if (e.key === '?') {
-      e.preventDefault();
-      document.getElementById('shortcuts-modal').classList.add('active');
-    }
-    
-    // G+D - Dashboard
-    if (window._lastKey === 'g' && e.key === 'd') {
-      window.location.href = '/dashboard.html';
-    }
-    
-    // G+L - Leads
-    if (window._lastKey === 'g' && e.key === 'l') {
-      window.location.href = '/leads-real.html';
-    }
-    
-    window._lastKey = e.key;
-    setTimeout(() => { window._lastKey = null; }, 1000);
-  });
-
-  // Error Handler Global (adicional)
-  window.addEventListener('unhandledrejection', function(event) {
-    console.error('❌ Promise rejeitada:', event.reason);
-    if (window.Sentry) {
-      Sentry.captureException(event.reason);
-    }
-  });
-
-  // Lazy Load Images (se houver)
-  if ('IntersectionObserver' in window) {
-    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          if (img.dataset.src) {
-            img.src = img.dataset.src;
-            img.removeAttribute('data-src');
-          }
-          imageObserver.unobserve(img);
-        }
-      });
-    });
-    lazyImages.forEach(img => imageObserver.observe(img));
-  }
-  </script>
-
-  <!-- ========================================== -->
-  <!-- 🚀 DASHBOARD ADVANCED FEATURES -->
-  <!-- ========================================== -->
-  <script type="module" src="/src/js/dashboard-advanced.js"></script>
-
-  <script>
-  // Inicializar features avançadas após dashboard base carregar
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Aguardar dashboard base inicializar
-    await new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        if (window.DashboardApp && window.DashboardState) {
-          clearInterval(checkInterval);
-          resolve();
-        }
-      }, 100);
-    });
-    
-    // Aguardar 1 segundo adicional para garantir que tudo carregou
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Inicializar features avançadas
-    if (window.DashboardAdvanced) {
-      await window.DashboardAdvanced.init();
-    }
-  });
-
-  // Adicionar botões de features avançadas no header
-  window.addEventListener('DOMContentLoaded', () => {
-    const header = document.querySelector('main header .flex');
-    if (header) {
-      const advancedButtons = `
-        <button onclick="window.DashboardAdvanced?.openWidgetGallery()" 
-                class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
-                title="Adicionar Widget">
-          ➕ Widget
-        </button>
-        
-        <button onclick="window.DashboardAdvanced?.openLayoutTemplates()" 
-                class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
-                title="Templates de Layout">
-          🎨 Templates
-        </button>
-        
-        <button onclick="window.DashboardAdvanced?.openCohortModal()" 
-                class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm"
-                title="Análise de Cohort">
-          📊 Cohort
-        </button>
-        
-        <button onclick="window.DashboardAdvanced?.openMapModal()" 
-                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                title="Mapa de Leads">
-          🗺️ Mapa
-        </button>
-        
-        <button onclick="window.DashboardAdvanced?.openHeatmapModal()" 
-                class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm"
-                title="Heatmap">
-          🔥 Heatmap
-        </button>
-        
-        <button onclick="window.DashboardAdvanced?.exportPowerPoint()" 
-                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                title="Export PowerPoint">
-          📊 PPT
-        </button>
-      `;
-      
-      header.insertAdjacentHTML('beforeend', advancedButtons);
-    }
-  });
-  </script>
-
 </body>
 </html>

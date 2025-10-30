@@ -71,15 +71,15 @@
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
   
   <!-- Main Content -->
-  <main class="flex-1 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 max-w-lg w-full text-center border" style="border-color: var(--alsham-border-default);">
+  <main class="flex-1 flex items-center justify-center p-4" data-cy="session-guard-page">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 max-w-lg w-full text-center border" style="border-color: var(--alsham-border-default);" data-cy="session-guard-card">
       <h1 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">🛡️ Diagnóstico Session Guard</h1>
       <p class="mb-6" style="color: var(--alsham-text-secondary);">
         Esta página é protegida pelo <b>Session Guard</b>.<br/>
         Se você estiver autenticado, verá seus dados abaixo; caso contrário, será redirecionado ao login.
       </p>
-      <div id="user-info" class="hidden text-left bg-gray-50 dark:bg-gray-700 border rounded-lg p-4" style="border-color: var(--alsham-border-default);"></div>
-      <button id="force-check" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+      <div id="user-info" class="hidden text-left bg-gray-50 dark:bg-gray-700 border rounded-lg p-4" style="border-color: var(--alsham-border-default);" data-cy="session-user-info"></div>
+      <button id="force-check" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors" data-cy="session-force-check">
         🔄 Forçar Revalidação
       </button>
     </div>
@@ -91,12 +91,10 @@
   </footer>
   
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="/init-supabase.js"></script>
   <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
     console.log('✅ Supabase integrado no Session Guard');
-    
+
     async function showUser() {
       try {
         const { getCurrentSession } = window.AlshamSupabase;

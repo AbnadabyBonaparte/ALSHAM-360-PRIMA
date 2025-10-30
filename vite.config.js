@@ -1,7 +1,7 @@
 /**
- * ⚡ ALSHAM 360° PRIMA — Vite Config v11.1.5 FINAL
- * Data: 2025-10-15 01:55 UTC
- * Fix: closeBundle async com 2s de timeout
+ * ⚡ ALSHAM 360° PRIMA — Vite Config v11.2.0 FINAL
+ * Data: 2025-10-28 22:00 UTC
+ * Fix: Desabilitar CSP do Vite para usar vercel.json
  * Autor: @AbnadabyBonaparte
  */
 
@@ -58,37 +58,37 @@ export default defineConfig({
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
-            options: { cacheName: 'supabase-api-v11.1.5', expiration: { maxEntries: 50, maxAgeSeconds: 300 }, networkTimeoutSeconds: 10, cacheableResponse: { statuses: [0, 200] } }
+            options: { cacheName: 'supabase-api-v11.2.0', expiration: { maxEntries: 50, maxAgeSeconds: 300 }, networkTimeoutSeconds: 10, cacheableResponse: { statuses: [0, 200] } }
           },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
-            options: { cacheName: 'google-fonts-styles-v11.1.5', expiration: { maxEntries: 10, maxAgeSeconds: 31536000 }, cacheableResponse: { statuses: [0, 200] } }
+            options: { cacheName: 'google-fonts-styles-v11.2.0', expiration: { maxEntries: 10, maxAgeSeconds: 31536000 }, cacheableResponse: { statuses: [0, 200] } }
           },
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
-            options: { cacheName: 'google-fonts-files-v11.1.5', expiration: { maxEntries: 20, maxAgeSeconds: 31536000 }, cacheableResponse: { statuses: [0, 200] } }
+            options: { cacheName: 'google-fonts-files-v11.2.0', expiration: { maxEntries: 20, maxAgeSeconds: 31536000 }, cacheableResponse: { statuses: [0, 200] } }
           },
           {
             urlPattern: /^https:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net)\/.*/i,
             handler: 'CacheFirst',
-            options: { cacheName: 'cdn-libs-v11.1.5', expiration: { maxEntries: 50, maxAgeSeconds: 2592000 }, cacheableResponse: { statuses: [0, 200] } }
+            options: { cacheName: 'cdn-libs-v11.2.0', expiration: { maxEntries: 50, maxAgeSeconds: 2592000 }, cacheableResponse: { statuses: [0, 200] } }
           },
           {
             urlPattern: ({ url }) => url.origin === self.location.origin && /\.(?:css|js)$/.test(url.pathname),
             handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'local-assets-v11.1.5', expiration: { maxEntries: 100, maxAgeSeconds: 604800 } }
+            options: { cacheName: 'local-assets-v11.2.0', expiration: { maxEntries: 100, maxAgeSeconds: 604800 } }
           },
           {
             urlPattern: ({ url }) => url.origin === self.location.origin && /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/.test(url.pathname),
             handler: 'CacheFirst',
-            options: { cacheName: 'local-images-v11.1.5', expiration: { maxEntries: 100, maxAgeSeconds: 2592000 } }
+            options: { cacheName: 'local-images-v11.2.0', expiration: { maxEntries: 100, maxAgeSeconds: 2592000 } }
           },
           {
             urlPattern: ({ url }) => url.origin === self.location.origin && /\.html$/.test(url.pathname),
             handler: 'NetworkFirst',
-            options: { cacheName: 'html-pages-v11.1.5', networkTimeoutSeconds: 5, expiration: { maxEntries: 50, maxAgeSeconds: 86400 } }
+            options: { cacheName: 'html-pages-v11.2.0', networkTimeoutSeconds: 5, expiration: { maxEntries: 50, maxAgeSeconds: 86400 } }
           }
         ],
         cleanupOutdatedCaches: true,
@@ -100,7 +100,6 @@ export default defineConfig({
     compression({ algorithm: 'brotliCompress', ext: '.br', threshold: 1024, compressionOptions: { level: 11 } }),
     compression({ algorithm: 'gzip', ext: '.gz', threshold: 1024, compressionOptions: { level: 9 } }),
 
-    // ✅ CORRIGIDO: closeBundle async com 2s de timeout
     {
       name: 'copy-sw-root',
       closeBundle: {
@@ -192,8 +191,24 @@ export default defineConfig({
     }
   },
 
-  server: { host: '0.0.0.0', port: 5173, open: true, cors: true, strictPort: false, hmr: { overlay: true } },
-  preview: { host: '0.0.0.0', port: 4173, open: true, cors: true },
+  server: { 
+    host: '0.0.0.0', 
+    port: 5173, 
+    open: true, 
+    cors: true, 
+    strictPort: false, 
+    hmr: { overlay: true },
+    headers: {}
+  },
+  
+  preview: { 
+    host: '0.0.0.0', 
+    port: 4173, 
+    open: true, 
+    cors: true,
+    headers: {}
+  },
+  
   optimizeDeps: { include: ['@supabase/supabase-js'], exclude: ['@vite/client', '@vite/env', 'chart.js', 'jspdf', 'xlsx'], esbuildOptions: { target: 'esnext' } },
   css: { devSourcemap: true, modules: { localsConvention: 'camelCase' } },
   json: { stringify: true }

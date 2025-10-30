@@ -617,7 +617,7 @@ waitForSupabase(() => {
     
     container.innerHTML = `
       <div class="flex flex-wrap gap-3 mb-4">
-        <input id="filter-search" type="text" placeholder="Busca global (nome, email, empresa...)" class="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <input id="filter-search" type="text" placeholder="Busca global (nome, email, empresa...)" class="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" data-cy="leads-filter-search">
         <input id="filter-search-advanced" type="text" placeholder="Busca avançada (múltiplos campos)" class="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         <input id="filter-date-criacao" type="date" placeholder="Data de Criação" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500">
         <input id="filter-date-atualizacao" type="date" placeholder="Data de Atualização" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500">
@@ -1615,9 +1615,22 @@ waitForSupabase(() => {
 
   // Categoria 10: Mobile e Responsividade
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: 'key' });
-    });
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => {
+        if (window.Cypress || !reg?.pushManager) {
+          return null;
+        }
+        return reg.pushManager
+          .subscribe({ userVisibleOnly: true, applicationServerKey: 'key' })
+          .catch((err) => {
+            console.warn('Push subscription indisponível no ambiente atual:', err);
+            return null;
+          });
+      })
+      .catch((err) => {
+        console.warn('Registro de service worker ignorado:', err);
+      });
   }
 
   function handleOfflineEdits() {

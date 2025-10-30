@@ -74,10 +74,11 @@
   <main class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md text-center max-w-md w-full border" style="border-color: var(--alsham-border-default);">
     <h1 class="text-2xl font-bold mb-4" style="color: var(--alsham-text-primary);">Encerrar Sessão</h1>
     <p class="mb-6" style="color: var(--alsham-text-secondary);">Deseja realmente sair da sua conta?</p>
-    <button 
-      id="logout-button" 
+    <button
+      id="logout-button"
       aria-label="Encerrar sessão com segurança"
-      class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+      class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+      data-cy="logout-button">
       🚪 Sair com segurança
     </button>
   </main>
@@ -88,10 +89,8 @@
   </footer>
   
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="/init-supabase.js"></script>
   <script type="module">
-    import * as SupabaseLib from '/src/lib/supabase.js';
-    window.AlshamSupabase = SupabaseLib;
     console.log('✅ Supabase integrado no Logout');
   </script>
   <script type="module" src="/src/js/logout.js"></script>

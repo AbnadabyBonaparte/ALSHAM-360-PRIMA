@@ -8,7 +8,41 @@
 // 🧩 ARQUIVO ÚNICO: Consolidação de 10 partes sem remoções
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import { createClient } from '@supabase/supabase-js';
+const supabaseModule =
+  typeof window !== 'undefined' && window?.supabase?.createClient
+    ? window.supabase
+    : await import('@supabase/supabase-js');
+
+const { createClient } = supabaseModule;
+
+if (typeof window !== 'undefined') {
+  window.ALSHAM = window.ALSHAM || {};
+  window.ALSHAM.METADATA = window.ALSHAM.METADATA || {};
+  if (typeof window.ALSHAM.registerModule !== 'function') {
+    window.ALSHAM.registerModule = (id, module = {}) => {
+      if (!id) return;
+      const registry = window.ALSHAM.METADATA;
+      registry[id] = registry[id] || {};
+      registry[id].audit = module.audit || {};
+      registry[id].tables = module.tables || registry[id].tables || {};
+      if (module.metadata) {
+        registry[id].metadata = {
+          ...(registry[id].metadata || {}),
+          ...module.metadata
+        };
+      }
+      console.log(`Módulo ${id} registrado com sucesso.`);
+    };
+  }
+}
+
+if (typeof createClient !== 'function') {
+  throw new Error('Supabase client factory not available.');
+}
+
+if (typeof window !== 'undefined' && !window.supabase) {
+  window.supabase = supabaseModule;
+}
 
 // ═══════════════════════════════════════════════════════
 // PARTE 1: CORE - Configuração Base + Autenticação
@@ -49,6 +83,84 @@ const response = (success, data, error) => ({ success, data, error });
 const logDebug = console.log;
 const logError = console.error;
 const logWarn = console.warn;
+
+const resolveEnvValue = (key, fallback = '') => {
+  if (typeof process !== 'undefined' && process?.env?.[key]) {
+    return process.env[key];
+  }
+  if (typeof import.meta !== 'undefined' && import.meta.env?.[key]) {
+    return import.meta.env[key];
+  }
+  return fallback;
+};
+
+const SUPABASE_URL =
+  resolveEnvValue('VITE_SUPABASE_URL', resolveEnvValue('SUPABASE_URL', 'https://example.supabase.co'));
+const SUPABASE_ANON_KEY =
+  resolveEnvValue('VITE_SUPABASE_ANON_KEY', resolveEnvValue('SUPABASE_ANON_KEY', 'public-anon-key'));
+const SUPABASE_CONFIG = Object.freeze({
+  url: SUPABASE_URL,
+  anonKey: SUPABASE_ANON_KEY
+});
+
+function ensureSupabaseClient() {
+  if (typeof window !== 'undefined') {
+    if (!window.__VITE_SUPABASE_URL__) {
+      window.__VITE_SUPABASE_URL__ = SUPABASE_URL;
+    }
+    if (!window.__VITE_SUPABASE_ANON_KEY__) {
+      window.__VITE_SUPABASE_ANON_KEY__ = SUPABASE_ANON_KEY;
+    }
+  }
+  if (!supabase) {
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined
+      }
+    });
+
+    if (globalContainer) {
+      globalContainer[GLOBAL_CLIENT_KEY] = supabase;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.AlshamSupabase = window.AlshamSupabase || {};
+      if (!window.AlshamSupabase.supabase) {
+        window.AlshamSupabase.supabase = supabase;
+      }
+      if (!window.AlshamSupabase.auth) {
+        window.AlshamSupabase.auth = supabase.auth;
+      }
+    }
+  }
+  return supabase;
+}
+
+ensureSupabaseClient();
+
+export function getSupabaseClient() {
+  return ensureSupabaseClient();
+}
+
+export { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIG };
+
+export async function getCurrentSession() {
+  try {
+    const client = ensureSupabaseClient();
+    const { data, error } = await client.auth.getSession();
+    if (error) throw error;
+    return data?.session ?? null;
+  } catch (err) {
+    logError('getCurrentSession failed:', err);
+    throw err;
+  }
+}
+
+const supabaseClient = supabase;
+export { supabaseClient as supabase };
 
 // ---------------------------------------------------------------------------
 // CONSTANTES
@@ -255,6 +367,69 @@ export async function createOrganization(orgData = {}) {
     return response(false, null, err);
   }
 }
+
+export async function getUserOrganizations() {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const user = data?.user;
+    if (!user) return [];
+
+    const { data: memberships, error } = await supabase
+      .from('user_organizations')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return memberships?.map((membership) => membership.organization_id).filter(Boolean) ?? [];
+  } catch (err) {
+    logError('getUserOrganizations exception:', err);
+    return [];
+  }
+}
+
+export async function setCurrentOrgId(orgId) {
+  try {
+    if (!orgId) {
+      removeItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
+      return null;
+    }
+
+    await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
+      org_id: orgId,
+      switched_at: new Date().toISOString()
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('orgSwitched', { detail: orgId }));
+    }
+
+    return orgId;
+  } catch (err) {
+    logError('setCurrentOrgId exception:', err);
+    return null;
+  }
+}
+
+export async function getCurrentOrgId() {
+  try {
+    const cached = await getActiveOrganization();
+    if (cached) return cached;
+
+    const orgs = await getUserOrganizations();
+    const firstOrg = orgs[0] ?? null;
+
+    if (firstOrg) {
+      await setCurrentOrgId(firstOrg);
+    }
+
+    return firstOrg;
+  } catch (err) {
+    logWarn('getCurrentOrgId fallback:', err);
+    return null;
+  }
+}
+
 export async function switchOrganization(org_id) {
   try {
     if (!org_id) return response(false, null, new Error('org_id é obrigatório'));
@@ -317,49 +492,76 @@ export async function orgPolicyCheck(table) {
 
 // ---------------------------------------------------------------------------
 // CRUD GENÉRICO
+function normalizeFilters(filters) {
+  if (Array.isArray(filters)) {
+    return filters;
+  }
+  if (filters && typeof filters === 'object') {
+    return Object.entries(filters).map(([column, value]) => ({ column, value, operator: 'eq' }));
+  }
+  return [];
+}
+
 function _applyFilters(qb, filters = []) {
-  if (!Array.isArray(filters)) return qb;
-  for (const f of filters) {
+  const normalized = normalizeFilters(filters);
+  for (const f of normalized) {
     const { column, operator = 'eq', value } = f;
-    if (!column) continue;
-    if (qb[operator]) qb = qb[operator](column, value);
+    if (!column || typeof qb[operator] !== 'function') continue;
+    qb = qb[operator](column, value);
   }
   return qb;
 }
+
 export async function genericSelect(table, filters = [], options = {}) {
   try {
-    if (!table) return response(false, null, new Error('table é obrigatório'));
-    let qb = supabase.from(table).select(options.columns || '*', { count: 'exact' });
+    if (!table) throw new Error('table é obrigatório');
+    const client = ensureSupabaseClient();
+    let qb = client.from(table).select(options.columns || '*');
     qb = _applyFilters(qb, filters);
     if (options.order) qb = qb.order(options.order.column, { ascending: !!options.order.ascending });
-    if (options.limit && typeof options.offset === 'number')
+    if (options.limit && typeof options.offset === 'number') {
       qb = qb.range(options.offset, options.offset + options.limit - 1);
-    else if (options.limit) qb = qb.limit(options.limit);
-    const { data, error, count } = await qb;
-    if (error) return response(false, null, error);
-    return response(true, { data, count });
+    } else if (options.limit) {
+      qb = qb.limit(options.limit);
+    }
+    const { data, error } = await qb;
+    if (error) {
+      return { data: null, error: { message: error.message, context: `select:${table}` } };
+    }
+    return { data: data ?? [] };
   } catch (err) {
     logError('genericSelect exception:', err);
-    return response(false, null, err);
+    return { data: null, error: err };
   }
 }
-export async function genericInsert(table, data, options = {}) {
+
+export async function genericInsert(table, payload, orgId) {
   try {
-    if (!table || !data) return response(false, null, new Error('table e data são obrigatórios'));
-    const { data: res, error } = await supabase
-      .from(table)
-      .insert(Array.isArray(data) ? data : [data], { returning: options.returning || 'representation' });
-    if (error) return response(false, null, error);
-    return response(true, { inserted: Array.isArray(res) ? res.length : 1, data: res });
+    if (!table || !payload) throw new Error('table e data são obrigatórios');
+    const client = ensureSupabaseClient();
+    const records = Array.isArray(payload) ? payload : [payload];
+    const enriched = records.map(record => {
+      if (orgId && record && typeof record === 'object' && !record.org_id) {
+        return { ...record, org_id: orgId };
+      }
+      return record;
+    });
+
+    const { data, error } = await client.from(table).insert(Array.isArray(payload) ? enriched : enriched[0]).select();
+    if (error) {
+      return { success: false, error: { message: error.message, context: `insert:${table}` } };
+    }
+    return { success: true, data };
   } catch (err) {
     logError('genericInsert exception:', err);
-    return response(false, null, err);
+    return { success: false, error: err };
   }
 }
 export async function genericUpdate(table, filters = [], data) {
   try {
     if (!table || !data) return response(false, null, new Error('table e data são obrigatórios'));
-    let qb = supabase.from(table).update(data).select();
+    const client = ensureSupabaseClient();
+    let qb = client.from(table).update(data).select();
     qb = _applyFilters(qb, filters);
     const { data: res, error } = await qb;
     if (error) return response(false, null, error);
@@ -372,11 +574,12 @@ export async function genericUpdate(table, filters = [], data) {
 export async function genericDelete(table, filters = []) {
   try {
     if (!table) return response(false, null, new Error('table é obrigatório'));
-    let qb = supabase.from(table).delete().select();
+    const client = ensureSupabaseClient();
+    let qb = client.from(table).delete().select();
     qb = _applyFilters(qb, filters);
     const { data: res, error } = await qb;
     if (error) return response(false, null, error);
-    const user = (await supabase.auth.getUser()).data?.user;
+    const user = (await client.auth?.getUser?.())?.data?.user;
     logDebug('[AUDIT]', { action: 'genericDelete', table, filters, user_id: user?.id });
     return response(true, res);
   } catch (err) {
@@ -384,15 +587,63 @@ export async function genericDelete(table, filters = []) {
     return response(false, null, err);
   }
 }
+
+export async function createAuditLog(action, details = {}, userId, orgId) {
+  try {
+    const client = ensureSupabaseClient();
+    let effectiveUserId = userId;
+    let effectiveOrgId = orgId;
+
+    if (!effectiveUserId || !effectiveOrgId) {
+      const { data: sessionData } = (await client.auth?.getSession?.()) ?? { data: null };
+      const sessionUser = sessionData?.session?.user;
+      effectiveUserId = effectiveUserId || sessionUser?.id || sessionUser?.user?.id || null;
+
+      if (!effectiveOrgId && sessionUser?.id) {
+        const { data: profileData } = await client
+          .from('user_profiles')
+          .select('org_id')
+          .eq('user_id', sessionUser.id)
+          .limit(1)
+          .maybeSingle();
+
+        if (profileData?.org_id) {
+          effectiveOrgId = profileData.org_id;
+        }
+      }
+    }
+
+    const payload = {
+      action,
+      details,
+      user_id: effectiveUserId,
+      org_id: effectiveOrgId,
+      created_at: new Date().toISOString()
+    };
+
+    const { data, error } = await client.from('audit_log').insert(payload).select();
+
+    if (error) {
+      return { success: false, error: { message: error.message, context: 'auditLog' } };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    logError('createAuditLog exception:', err);
+    return { success: false, error: err };
+  }
+}
+
 export async function batchInsert(table, dataArray = [], options = {}) {
   try {
     if (!table || !Array.isArray(dataArray) || !dataArray.length)
       return response(false, null, new Error('table e dataArray são obrigatórios'));
+    const client = ensureSupabaseClient();
     const chunkSize = options.chunkSize || 300;
     const results = [];
     for (let i = 0; i < dataArray.length; i += chunkSize) {
       const chunk = dataArray.slice(i, i + chunkSize);
-      const { data, error } = await supabase.from(table).insert(chunk);
+      const { data, error } = await client.from(table).insert(chunk);
       if (error) return response(false, null, error);
       results.push(...(data || []));
     }
@@ -2058,6 +2309,32 @@ function setCachedData(key, data) {
   } catch (error) {
     logError('Erro ao armazenar cache:', error);
   }
+}
+
+function clearCache(key) {
+  if (typeof localStorage === 'undefined' || !key) return;
+  try {
+    localStorage.removeItem(key);
+    logDebug('🧹 Cache removido:', key);
+  } catch (error) {
+    logError('Erro ao remover cache:', error);
+  }
+}
+
+function clearCacheByPattern(pattern) {
+  if (typeof localStorage === 'undefined' || !pattern) return;
+
+  const matcher = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+  const keysToRemove = [];
+
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key && matcher.test(key)) {
+      keysToRemove.push(key);
+    }
+  }
+
+  keysToRemove.forEach((key) => clearCache(key));
 }
 
 /**
@@ -8291,6 +8568,38 @@ export async function deleteRecord(tableName, id) {
     }
 }
 
+export function subscribeRecord(tableName, filter = {}, callback) {
+    try {
+        if (!supabase?.channel) {
+            logWarn('subscribeRecord: recurso de realtime indisponível.');
+            return null;
+        }
+
+        const channel = supabase.channel(`public:${tableName}`);
+        const filterParts = Object.entries(filter)
+            .filter(([, value]) => value !== undefined && value !== null)
+            .map(([key, value]) => `${key}=eq.${value}`);
+
+        const handler = typeof callback === 'function' ? callback : () => {};
+
+        return channel
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: tableName,
+                filter: filterParts.join('&') || undefined
+            }, handler)
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    logDebug(`📡 Inscrito em ${tableName} com filtro ${filterParts.join('&') || 'nenhum'}`);
+                }
+            });
+    } catch (err) {
+        logError(`Erro em subscribeRecord [${tableName}]:`, err);
+        return null;
+    }
+}
+
 
 // ============================================================================
 // EXPORTS FINAIS E METADADOS
@@ -8940,81 +9249,6 @@ export function subscribeInvoices(onChange) {
 // ============================================================================
 
 /**
- * Cria template de email
- * @param {Object} templateData - Dados do template (name, subject, body, category, etc.)
- * @returns {Promise<Object>}
- */
-export async function createEmailTemplate(templateData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('email_templates')
-      .insert([{ ...templateData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📧 Template de email criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createEmailTemplate:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca templates de email
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (category, active, limit)
- * @returns {Promise<Object>}
- */
-export async function getEmailTemplates(orgId, filters = { limit: 50 }) {
-  return await withCache(`email_templates_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('email_templates')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.category) query = query.eq('category', filters.category);
-    if (filters.active !== undefined) query = query.eq('active', filters.active);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza template de email
- * @param {string} id - ID do template
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateEmailTemplate(id, updateData) {
-  const { data, error } = await supabase
-    .from('email_templates')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Template atualizado:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta template de email
- * @param {string} id - ID do template
- * @returns {Promise<Object>}
- */
-export async function deleteEmailTemplate(id) {
-  const { error } = await supabase.from('email_templates').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Template deletado:', id);
-  return response(true, { id });
-}
-
-/**
  * Subscreve a mudanças em email_templates
  * @param {Function} onChange - Callback
  * @returns {RealtimeChannel}
@@ -9034,80 +9268,6 @@ export function subscribeEmailTemplates(onChange) {
 // ============================================================================
 
 /**
- * Cria landing page
- * @param {Object} pageData - Dados da landing page (name, url, content, etc.)
- * @returns {Promise<Object>}
- */
-export async function createLandingPage(pageData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('landing_pages')
-      .insert([{ ...pageData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🌐 Landing page criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createLandingPage:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca landing pages
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (status, limit)
- * @returns {Promise<Object>}
- */
-export async function getLandingPages(orgId, filters = { limit: 50 }) {
-  return await withCache(`landing_pages_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('landing_pages')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.status) query = query.eq('status', filters.status);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza landing page
- * @param {string} id - ID da landing page
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateLandingPage(id, updateData) {
-  const { data, error } = await supabase
-    .from('landing_pages')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Landing page atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta landing page
- * @param {string} id - ID da landing page
- * @returns {Promise<Object>}
- */
-export async function deleteLandingPage(id) {
-  const { error } = await supabase.from('landing_pages').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Landing page deletada:', id);
-  return response(true, { id });
-}
-
-/**
  * Subscreve a mudanças em landing_pages
  * @param {Function} onChange - Callback
  * @returns {RealtimeChannel}
@@ -9125,68 +9285,6 @@ export function subscribeLandingPages(onChange) {
 // ============================================================================
 // TABELA: SEO - SEO Management (RLS: 1 policy, 1 trigger)
 // ============================================================================
-
-/**
- * Cria registro SEO
- * @param {Object} seoData - Dados SEO (page, title, description, keywords, etc.)
- * @returns {Promise<Object>}
- */
-export async function createSEO(seoData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('seo')
-      .insert([{ ...seoData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🔍 SEO criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createSEO:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca registros SEO
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (page, limit)
- * @returns {Promise<Object>}
- */
-export async function getSEO(orgId, filters = { limit: 50 }) {
-  return await withCache(`seo_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('seo')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.page) query = query.eq('page', filters.page);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 180);
-}
-
-/**
- * Atualiza SEO
- * @param {string} id - ID do SEO
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateSEO(id, updateData) {
-  const { data, error } = await supabase
-    .from('seo')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ SEO atualizado:', id);
-  return response(true, data);
-}
 
 /**
  * Deleta SEO
@@ -9433,46 +9531,6 @@ export async function createAnalyticsEvent(eventData) {
   }
 }
 
-/**
- * Busca eventos de analytics
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (event_name, event_type, date_from, date_to, limit)
- * @returns {Promise<Object>}
- */
-export async function getAnalyticsEvents(orgId, filters = { limit: 100 }) {
-  return await withCache(`analytics_events_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('analytics_events')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.event_name) query = query.eq('event_name', filters.event_name);
-    if (filters.event_type) query = query.eq('event_type', filters.event_type);
-    if (filters.date_from) query = query.gte('created_at', filters.date_from);
-    if (filters.date_to) query = query.lte('created_at', filters.date_to);
-    
-    const { data, error } = await query.limit(filters.limit || 100);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60);
-}
-
-/**
- * Subscreve a mudanças em analytics_events
- * @param {Function} onChange - Callback
- * @returns {RealtimeChannel}
- */
-export function subscribeAnalyticsEvents(onChange) {
-  return supabase
-    .channel('realtime_analytics_events')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'analytics_events' }, (payload) => {
-      logDebug('📊 Analytics evento:', payload.eventType, payload.new?.event_name);
-      if (onChange) onChange(payload);
-    })
-    .subscribe();
-}
-
 // ============================================================================
 // TABELA: CONVERSION_FUNNELS - Funis de Conversão (RLS: 4 policies, 3 triggers)
 // ============================================================================
@@ -9570,147 +9628,9 @@ export function subscribeConversionFunnels(onChange) {
 // TABELA: REPORT_DEFINITIONS - Definições de Relatórios (RLS: 0 policies, 3 triggers)
 // ============================================================================
 
-/**
- * Cria definição de relatório
- * @param {Object} reportData - Dados do relatório (name, type, config, etc.)
- * @returns {Promise<Object>}
- */
-export async function createReportDefinition(reportData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('report_definitions')
-      .insert([{ ...reportData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📋 Definição de relatório criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createReportDefinition:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca definições de relatórios
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (type, active, limit)
- * @returns {Promise<Object>}
- */
-export async function getReportDefinitions(orgId, filters = { limit: 50 }) {
-  return await withCache(`report_definitions_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('report_definitions')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.type) query = query.eq('type', filters.type);
-    if (filters.active !== undefined) query = query.eq('active', filters.active);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 180);
-}
-
-/**
- * Atualiza definição de relatório
- * @param {string} id - ID da definição
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateReportDefinition(id, updateData) {
-  const { data, error } = await supabase
-    .from('report_definitions')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Definição de relatório atualizada:', id);
-  return response(true, data);
-}
-
-/**
- * Deleta definição de relatório
- * @param {string} id - ID da definição
- * @returns {Promise<Object>}
- */
-export async function deleteReportDefinition(id) {
-  const { error } = await supabase.from('report_definitions').delete().eq('id', id);
-  if (error) return response(false, null, error);
-  logDebug('🗑️ Definição de relatório deletada:', id);
-  return response(true, { id });
-}
-
 // ============================================================================
 // TABELA: SCHEDULED_REPORTS - Relatórios Agendados (RLS: 4 policies, 3 triggers)
 // ============================================================================
-
-/**
- * Cria relatório agendado
- * @param {Object} scheduleData - Dados do agendamento (report_id, frequency, recipients, etc.)
- * @returns {Promise<Object>}
- */
-export async function createScheduledReport(scheduleData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('scheduled_reports')
-      .insert([{ ...scheduleData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('📅 Relatório agendado criado:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createScheduledReport:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca relatórios agendados
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (frequency, active, limit)
- * @returns {Promise<Object>}
- */
-export async function getScheduledReports(orgId, filters = { limit: 50 }) {
-  return await withCache(`scheduled_reports_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('scheduled_reports')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.frequency) query = query.eq('frequency', filters.frequency);
-    if (filters.active !== undefined) query = query.eq('active', filters.active);
-    
-    const { data, error } = await query.limit(filters.limit || 50);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
- * Atualiza relatório agendado
- * @param {string} id - ID do agendamento
- * @param {Object} updateData - Dados para atualizar
- * @returns {Promise<Object>}
- */
-export async function updateScheduledReport(id, updateData) {
-  const { data, error } = await supabase
-    .from('scheduled_reports')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) return response(false, null, error);
-  logDebug('✏️ Relatório agendado atualizado:', id);
-  return response(true, data);
-}
 
 /**
  * Deleta relatório agendado
@@ -9742,51 +9662,6 @@ export function subscribeScheduledReports(onChange) {
 // ============================================================================
 // TABELA: SENTIMENT_ANALYSIS - Análise de Sentimento (RLS: 0 policies, 1 trigger)
 // ============================================================================
-
-/**
- * Cria análise de sentimento
- * @param {Object} sentimentData - Dados da análise (text, sentiment, score, etc.)
- * @returns {Promise<Object>}
- */
-export async function createSentimentAnalysis(sentimentData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('sentiment_analysis')
-      .insert([{ ...sentimentData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('😊 Análise de sentimento criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createSentimentAnalysis:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Busca análises de sentimento
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (sentiment, entity_type, limit)
- * @returns {Promise<Object>}
- */
-export async function getSentimentAnalysis(orgId, filters = { limit: 100 }) {
-  return await withCache(`sentiment_analysis_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('sentiment_analysis')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.sentiment) query = query.eq('sentiment', filters.sentiment);
-    if (filters.entity_type) query = query.eq('entity_type', filters.entity_type);
-    
-    const { data, error } = await query.limit(filters.limit || 100);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 60);
-}
 
 /**
  * Subscreve a mudanças em sentiment_analysis
@@ -9941,24 +9816,6 @@ export async function getViewSystemHealth(orgId) {
 // ============================================================================
 // VIEW: DASHBOARD_KPIS - KPIs do Dashboard
 // ============================================================================
-
-/**
- * Busca KPIs principais do dashboard
- * @param {string} orgId - ID da organização
- * @returns {Promise<Object>}
- */
-export async function getDashboardKPIs(orgId) {
-  return await withCache(`dashboard_kpis_${orgId}`, async () => {
-    const { data, error } = await supabase
-      .from('dashboard_kpis')
-      .select('*')
-      .eq('org_id', orgId)
-      .single();
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
 
 // ============================================================================
 // VIEW: V_GAMIFICATION_SUMMARY - Resumo de Gamificação
@@ -10564,23 +10421,6 @@ export async function getAIPredictions(orgId, filters = { limit: 100 }) {
  * @param {Object} memoryData - Dados da memória (key, value, context, importance, etc.)
  * @returns {Promise<Object>}
  */
-export async function createAIMemory(memoryData) {
-  try {
-    const org_id = await getCurrentOrgId();
-    const { data, error } = await supabase
-      .from('ai_memory')
-      .insert([{ ...memoryData, org_id }])
-      .select()
-      .single();
-    if (error) return response(false, null, error);
-    logDebug('🧠 Memória AI criada:', data.id);
-    return response(true, data);
-  } catch (err) {
-    logError('Erro createAIMemory:', err);
-    return response(false, null, err);
-  }
-}
-
 /**
  * Busca memórias da IA
  * @param {string} orgId - ID da organização
@@ -11439,29 +11279,6 @@ export async function assignUserBadge(userBadgeData) {
 }
 
 /**
- * Busca badges de um usuário
- * @param {string} userId - ID do usuário
- * @param {string} orgId - ID da organização
- * @returns {Promise<Object>}
- */
-export async function getUserBadges(userId, orgId) {
-  return await withCache(`user_badges_${userId}_${orgId}`, async () => {
-    const { data, error } = await supabase
-      .from('user_badges')
-      .select(`
-        *,
-        badge:gamification_badges(*)
-      `)
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .order('earned_at', { ascending: false });
-    
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
  * Subscreve a mudanças em user_badges
  * @param {string} userId - ID do usuário (opcional)
  * @param {Function} onChange - Callback
@@ -11651,28 +11468,6 @@ export async function getGamificationRankHistory(userId, orgId, filters = { limi
 // TABELA: GAMIFICATION_BACKUPS - Backups de Gamificação (RLS: 0 policies, 1 trigger)
 // ============================================================================
 
-/**
- * Busca backups de gamificação
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (backup_type, limit)
- * @returns {Promise<Object>}
- */
-export async function getGamificationBackups(orgId, filters = { limit: 20 }) {
-  return await withCache(`gamification_backups_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('gamification_backups')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false });
-    
-    if (filters.backup_type) query = query.eq('backup_type', filters.backup_type);
-    
-    const { data, error } = await query.limit(filters.limit || 20);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 300);
-}
-
 // ============================================================================
 // FUNÇÕES AUXILIARES DE GAMIFICAÇÃO
 // ============================================================================
@@ -11732,31 +11527,6 @@ export async function getUserTotalPoints(userId, orgId) {
 }
 
 /**
- * Busca histórico de pontos de um usuário
- * @param {string} userId - ID do usuário
- * @param {string} orgId - ID da organização
- * @param {Object} filters - Filtros (date_from, date_to, limit)
- * @returns {Promise<Object>}
- */
-export async function getUserPointsHistory(userId, orgId, filters = { limit: 100 }) {
-  return await withCache(`user_points_history_${userId}_${orgId}_${JSON.stringify(filters)}`, async () => {
-    let query = supabase
-      .from('gamification_points')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('org_id', orgId)
-      .order('awarded_at', { ascending: false });
-    
-    if (filters.date_from) query = query.gte('awarded_at', filters.date_from);
-    if (filters.date_to) query = query.lte('awarded_at', filters.date_to);
-    
-    const { data, error } = await query.limit(filters.limit || 100);
-    if (error) return response(false, null, error);
-    return response(true, data);
-  }, 120);
-}
-
-/**
  * Verifica e atribui badges automaticamente baseado em critérios
  * @param {string} userId - ID do usuário
  * @returns {Promise<Object>}
@@ -11808,62 +11578,6 @@ export async function checkAndAwardBadges(userId) {
     return response(true, { user_id: userId, newly_earned: newlyEarnedBadges });
   } catch (err) {
     logError('Erro checkAndAwardBadges:', err);
-    return response(false, null, err);
-  }
-}
-
-/**
- * Resgate de recompensa por um usuário
- * @param {string} userId - ID do usuário
- * @param {string} rewardId - ID da recompensa
- * @returns {Promise<Object>}
- */
-export async function redeemReward(userId, rewardId) {
-  try {
-    const org_id = await getCurrentOrgId();
-    
-    // Busca a recompensa
-    const { data: reward, error: rewardError } = await supabase
-      .from('gamification_rewards')
-      .select('*')
-      .eq('id', rewardId)
-      .eq('org_id', org_id)
-      .single();
-    
-    if (rewardError) return response(false, null, rewardError);
-    if (!reward.available) return response(false, null, new Error('Recompensa não disponível'));
-    
-    // Verifica pontuação do usuário
-    const pointsResult = await getUserTotalPoints(userId, org_id);
-    if (!pointsResult.success) return pointsResult;
-    
-    const totalPoints = pointsResult.data.total_points;
-    const rewardCost = reward.cost || 0;
-    
-    if (totalPoints < rewardCost) {
-      return response(false, null, new Error('Pontos insuficientes'));
-    }
-    
-    // Deduz os pontos
-    const deductResult = await addGamificationPoints(
-      userId,
-      -rewardCost,
-      `Resgate de recompensa: ${reward.name}`,
-      { reward_id: rewardId, reward_name: reward.name }
-    );
-    
-    if (!deductResult.success) return deductResult;
-    
-    logDebug('🎁 Recompensa resgatada:', userId, reward.name, rewardCost, 'pontos');
-    return response(true, {
-      user_id: userId,
-      reward_id: rewardId,
-      reward_name: reward.name,
-      points_spent: rewardCost,
-      remaining_points: totalPoints - rewardCost
-    });
-  } catch (err) {
-    logError('Erro redeemReward:', err);
     return response(false, null, err);
   }
 }
@@ -13175,15 +12889,60 @@ export const IntegrationsModule = {
 // 🚀 EXPORT COMPLETO - TODAS AS FUNÇÕES ORGANIZADAS (USO INTERNO + DEFAULT)
 // ============================================================================
 
-const ALSHAM_FULL = {
-  // ============ CORE & AUTH ============
+const dynamicExportStore = new Map();
+
+const resolveBinding = (name) => {
+  try {
+    return Function(`return typeof ${name} !== 'undefined' ? ${name} : undefined;`)();
+  } catch {
+    return undefined;
+  }
+};
+
+const ALSHAM_FULL = new Proxy(
+  {},
+  {
+    get(_target, prop) {
+      if (typeof prop !== 'string') return undefined;
+      if (dynamicExportStore.has(prop)) {
+        return dynamicExportStore.get(prop);
+      }
+      return resolveBinding(prop);
+    },
+    set(_target, prop, value) {
+      if (typeof prop === 'string') {
+        dynamicExportStore.set(prop, value);
+      }
+      return true;
+    },
+    has(_target, prop) {
+      if (typeof prop !== 'string') return false;
+      return dynamicExportStore.has(prop) || typeof resolveBinding(prop) !== 'undefined';
+    },
+    ownKeys() {
+      return Array.from(dynamicExportStore.keys());
+    },
+    getOwnPropertyDescriptor(_target, prop) {
+      if (typeof prop !== 'string') return undefined;
+      if (!dynamicExportStore.has(prop)) return undefined;
+      return {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: dynamicExportStore.get(prop)
+      };
+    }
+  }
+);
+
+Object.assign(ALSHAM_FULL, {
   supabase,
+  getSupabaseClient,
+  getCurrentSession,
   response,
   logDebug,
   logError,
   logWarn,
-
-  // ============ CRYPTO & SECURITY ============
   encryptString,
   decryptString,
   setItemEncrypted,
@@ -13191,136 +12950,21 @@ const ALSHAM_FULL = {
   removeItemEncrypted,
   ensureDeviceId,
   ensureDeviceKey,
-
-  // ============ ORGANIZATIONS ============
   createOrganization,
   getUserOrganizations,
   switchOrganization,
   getCurrentOrgId,
   setCurrentOrgId,
-
-  // ============ CACHE ============
   withCache,
   clearCache,
   clearCacheByPattern,
-
-  // ============ CRUD GENÉRICO ============
   createRecord,
   getRecords,
   updateRecord,
   deleteRecord,
   subscribeRecord,
-  batchInsert,
-
-  // ============ LEADS & CRM ============
-  createLead,
-  getLeads,
-  updateLead,
-  deleteLead,
-  subscribeLeads,
-  createLeadInteraction,
-  getLeadInteractions,
-  subscribeLeadInteractions,
-  createLeadLabel,
-  getLeadLabels,
-  updateLeadLabel,
-  deleteLeadLabel,
-  subscribeLeadLabels,
-  createLeadLabelLink,
-  getLeadLabelLinks,
-  deleteLeadLabelLink,
-  createLeadScoring,
-  getLeadScoring,
-  updateLeadScoring,
-  createLeadSource,
-  getLeadSources,
-  updateLeadSource,
-  deleteLeadSource,
-  subscribeLeadSources,
-
-  // ============ CONTACTS & ACCOUNTS ============
-  createContact,
-  getContacts,
-  updateContact,
-  deleteContact,
-  subscribeContacts,
-  createAccount,
-  getAccounts,
-  updateAccount,
-  deleteAccount,
-  subscribeAccounts,
-
-  // ============ OPPORTUNITIES & QUOTES ============
-  createOpportunity,
-  getOpportunities,
-  updateOpportunity,
-  deleteOpportunity,
-  subscribeOpportunities,
-  createQuote,
-  getQuotes,
-  updateQuote,
-  deleteQuote,
-  subscribeQuotes,
-
-  // ============ USERS & PROFILES ============
-  createUserProfile,
-  getUserProfiles,
-  updateUserProfile,
-  deleteUserProfile,
-  subscribeUserProfiles,
-  getCurrentUserProfile,
-
-  // ============ TEAMS ============
-  createTeam,
-  getTeams,
-  updateTeam,
-  deleteTeam,
-  subscribeTeams,
-  createUserOrganization,
-  getUserOrganizationLinks,
-  deleteUserOrganization,
-
-  // ============ SETTINGS ============
-  createOrgSettings,
-  getOrgSettings,
-  updateOrgSettings,
-  subscribeOrgSettings,
-
-  // ============ AUTOMATIONS ============
-  createAutomationRule,
-  getAutomationRules,
-  updateAutomationRule,
-  deleteAutomationRule,
-  subscribeAutomationRules,
-  createAutomationExecution,
-  getAutomationExecutions,
-  updateAutomationExecution,
-  subscribeAutomationExecutions,
-  createLogsAutomacao,
-  getLogsAutomacao,
-  subscribeLogsAutomacao,
-
-  // ============ NOTIFICATIONS ============
-  createNotification,
-  getNotifications,
-  updateNotification,
-  deleteNotification,
-  subscribeNotifications,
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-
-  // ============ SUPPORT ============
-  ...SupportModule,
-
-  // ============ COMMUNICATION ============
-  ...CommunicationModule,
-
-  // ============ MARKETING ============
-  ...MarketingModule,
-
-  // ============ INTEGRATIONS ============
-  ...IntegrationsModule,
-};
+  batchInsert
+});
 
 // ============================================================================
 // 🧭 METADATA SUPREMA - ALSHAM 360° PRIMA v7.4-HARMONIZED+
@@ -13386,6 +13030,9 @@ export const ALSHAM_METADATA = {
     ],
   },
 };
+
+ALSHAM_METADATA.tables = ALSHAM_METADATA.tables || {};
+ALSHAM_METADATA.modulesRegistry = ALSHAM_METADATA.modulesRegistry || {};
 
 // ============================================================================
 // 🎯 LOG FINAL DE INICIALIZAÇÃO SUPREMA
@@ -13547,16 +13194,61 @@ logDebug(`📜 Páginas indexadas no núcleo Supabase (ALSHAM_PAGES): ${ALSHAM_P
 
     
 if (typeof window !== 'undefined') {
- window.ALSHAM = {
-  ...ALSHAM_FULL,
-  PAGES: ALSHAM_PAGES, // ✅ referência direta das 97 páginas
-  METADATA: ALSHAM_METADATA,
-  version: ALSHAM_METADATA.version,
-  initialized: true,
-  initTimestamp: new Date().toISOString()
-};
+  const existingAlsham = window.ALSHAM || {};
 
-  
+  window.ALSHAM = {
+    ...existingAlsham,
+    ...ALSHAM_FULL,
+    PAGES: ALSHAM_PAGES, // ✅ referência direta das 97 páginas
+    METADATA: {
+      ...window.ALSHAM.METADATA,
+      core: {
+        ...(window.ALSHAM.METADATA?.core || {}),
+        version: ALSHAM_METADATA.version
+      }
+    },
+    version: ALSHAM_METADATA.version,
+    initialized: true,
+    initTimestamp: new Date().toISOString()
+  };
+
+  window.ALSHAM.registerModule = (id, module = {}) => {
+    if (!id) {
+      throw new Error('Module id is required to register metadata.');
+    }
+
+    const registry = window.ALSHAM.METADATA;
+    const current = {
+      ...(registry[id] || {}),
+      ...(ALSHAM_METADATA.modulesRegistry[id] || {})
+    };
+
+    const normalized = {
+      ...current,
+      ...module,
+      audit: {
+        ...(current.audit || {}),
+        ...(module.audit || {})
+      }
+    };
+
+    registry[id] = normalized;
+    ALSHAM_METADATA.modulesRegistry[id] = normalized;
+
+    if (module.tables) {
+      ALSHAM_METADATA.tables[id] = module.tables;
+    }
+
+    if (module.audit && typeof module.audit === 'object') {
+      ALSHAM_METADATA.tables.audit = {
+        ...(ALSHAM_METADATA.tables.audit || {}),
+        ...module.audit
+      };
+    }
+
+    logDebug(`Módulo ${id} registrado com sucesso.`);
+  };
+
   logDebug('✅ ALSHAM 360° anexado ao window.ALSHAM');
 }
 
