@@ -178,7 +178,8 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     cy.clock();
     cy.visit('/session-guard.html', {
       onBeforeLoad(win) {
-        cy.stub(win.location, 'replace').as('locationReplace');
+        delete win.location;
+        win.location = { replace: replaceStub };
       }
     });
 
@@ -199,7 +200,8 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
     cy.visit('/session-guard.html', {
       onBeforeLoad(win) {
-        cy.stub(win.location, 'replace').as('locationReplace');
+        delete win.location;
+        win.location = { replace: replaceStub };
       }
     });
 
