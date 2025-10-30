@@ -90,7 +90,7 @@ describe('🧭 Pipeline de Vendas - ALSHAM 360° PRIMA', () => {
         cy.wait(1000);
         cy.get('#pipeline-total')
           .invoke('text')
-          .should((totalDepois) => {
+          .then((totalDepois) => {
             cy.log(`Valor após movimento: ${totalDepois}`);
             expect(totalDepois).to.not.equal(totalAntes);
           });

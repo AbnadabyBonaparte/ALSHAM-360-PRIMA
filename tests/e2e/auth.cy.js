@@ -172,7 +172,13 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
     cy.clock();
     cy.visit('/session-guard.html', {
       onBeforeLoad(win) {
-        win.location.replace = replaceStub;
+        const safeLocation = Object.create(win.location);
+        safeLocation.replace = replaceStub;
+
+        Object.defineProperty(win, 'location', {
+          configurable: true,
+          value: safeLocation,
+        });
       }
     });
 
@@ -194,7 +200,13 @@ describe('Fluxos de autenticação e proteção de sessão', () => {
 
     cy.visit('/session-guard.html', {
       onBeforeLoad(win) {
-        win.location.replace = replaceStub;
+        const safeLocation = Object.create(win.location);
+        safeLocation.replace = replaceStub;
+
+        Object.defineProperty(win, 'location', {
+          configurable: true,
+          value: safeLocation,
+        });
       }
     });
 

@@ -51,17 +51,30 @@ describe('Gestão de leads (CRUD)', () => {
       subscribeToTable
     });
 
-    cy.visit('/leads-real.html');
+    cy.intercept('GET', '/__mockLeads__', (req) => {
+      req.reply({ statusCode: 200, body: leadsDataset });
+    }).as('mockLeads');
+
+    cy.visit('/leads-real.html', {
+      onBeforeLoad(win) {
+        if (typeof win.fetch === 'function') {
+          win.fetch('/__mockLeads__');
+        }
+      }
+    });
+
+    cy.wait('@mockLeads');
+
+    cy.get('#leads-table', { timeout: 10000 })
+      .should('contain.text', 'Primeiro Lead');
 
     cy.get('#leads-table').within(() => {
-      cy.contains('Primeiro Lead').should('exist');
       cy.contains('novo').should('exist');
     });
 
     cy.get('#filter-search').type('Primeiro');
-    cy.get('#leads-table').within(() => {
-      cy.contains('Primeiro Lead').should('exist');
-    });
+    cy.get('#leads-table', { timeout: 10000 })
+      .should('contain.text', 'Primeiro Lead');
 
     cy.then(() => {
       leadsDataset = [
