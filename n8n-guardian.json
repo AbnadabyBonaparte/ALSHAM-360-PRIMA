@@ -7,45 +7,30 @@
   },
   "nodes": [
     {
-      "name": "Evaluate Supabase/CSP Status",
+      "name": "Classificar Evento",
       "type": "IF",
-      "expression": "={{$json[\"status\"]}} === 'error'"
+      "expression": "={{$json['status']}} === 'error'"
     },
     {
-      "name": "Send Telegram Alert",
+      "name": "Telegram Alerta",
       "type": "telegram",
       "when": "error",
       "config": {
         "chatId": "<SEU_CHAT_ID>",
-        "text": "🚨 *ALSHAM 360° ALERTA*\nFalha detectada em Supabase/CSP:\n{{$json[\"error\"]}}",
+        "text": "🚨 *ALSHAM ALERTA*\nFalha detectada no deploy:\n{{$json['error']}}",
         "parse_mode": "Markdown"
       }
     },
     {
-      "name": "Log in Notion",
+      "name": "Log Notion Sucesso",
       "type": "notion",
-      "when": "error",
+      "when": "success",
       "config": {
         "databaseId": "<SEU_NOTION_DB_ID>",
         "fields": {
-          "Título": "Falha em Supabase/CSP",
-          "Status": "Erro",
-          "Mensagem": "={{$json[\"error\"]}}",
-          "Projeto": "ALSHAM 360° PRIMA",
-          "Timestamp": "={{$now}}"
-        }
-      }
-    },
-    {
-      "name": "Success Log",
-      "type": "notion",
-      "when": "ok",
-      "config": {
-        "databaseId": "<SEU_NOTION_DB_ID>",
-        "fields": {
-          "Título": "Supabase OK",
+          "Título": "Deploy Local OK",
           "Status": "Sucesso",
-          "Mensagem": "Supabase inicializado corretamente.",
+          "Mensagem": "Deploy local concluído e notificado.",
           "Projeto": "ALSHAM 360° PRIMA",
           "Timestamp": "={{$now}}"
         }
