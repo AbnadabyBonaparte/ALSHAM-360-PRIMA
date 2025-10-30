@@ -1,13 +1,10 @@
 // next.config.js
 /**
- * 🌐 ALSHAM 360° PRIMA
- * Configuração de Segurança e Observabilidade
- * Compatível com: Vercel Live, PostHog, Supabase
+ * 🌐 ALSHAM 360° PRIMA - Cloud Supreme Edition
+ * Configuração de Segurança, Observabilidade e Governança
+ * Ambiente: 100% GitHub → Vercel → Supabase → n8n
  * 
- * Diretrizes:
- * - Mantém segurança CSP rígida (sem wildcard *)
- * - Permite domínios específicos para scripts externos confiáveis
- * - Alinhado ao Protocolo de Proteção Supremo ALSHAM
+ * Zero dependência local. Tudo deploya automaticamente via push.
  */
 
 const securityHeaders = [
@@ -26,12 +23,15 @@ const securityHeaders = [
         https://us-assets.i.posthog.com
         https://vercel.live;
       connect-src 'self'
+        https://*.vercel.app
+        https://vercel.live
+        wss://*.vercel.live
         https://app.posthog.com
         https://us-assets.i.posthog.com
-        https://*.vercel.app
-        wss://*.vercel.live
         https://*.supabase.co
-        wss://*.supabase.co;
+        wss://*.supabase.co
+        https://*.n8n.cloud
+        https://*.n8n.io;
       img-src 'self' data: blob: https:;
       style-src 'self' 'unsafe-inline' https:;
       frame-src 'self' https://vercel.live;
@@ -71,8 +71,8 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
 
-  // 🔒 Headers globais aplicados a todas as rotas
   async headers() {
     return [
       {
@@ -82,11 +82,10 @@ const nextConfig = {
     ];
   },
 
-  // 🧠 Otimizações de build (opcional, mas recomendadas)
+  // 🔄 Build otimizado e limpo para pipelines GitHub → Vercel
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  poweredByHeader: false,
 };
 
 module.exports = nextConfig;
