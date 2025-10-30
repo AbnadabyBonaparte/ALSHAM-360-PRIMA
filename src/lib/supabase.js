@@ -122,7 +122,7 @@ function ensureSupabaseClient() {
       }
     });
 
-    if (globalContainer) {
+    if (typeof globalContainer !== 'undefined') {
       globalContainer[GLOBAL_CLIENT_KEY] = supabase;
     }
 
