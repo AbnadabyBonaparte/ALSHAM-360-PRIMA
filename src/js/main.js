@@ -147,8 +147,14 @@ if (window.AlshamMainInitialized) {
 
     // ===== SUPABASE CHECK =====
     async function checkSupabaseAvailability() {
-      if (typeof genericSelect === 'function' && typeof getCurrentSession === 'function') {
+      // Verifica se pelo menos getCurrentSession está disponível
+      if (typeof getCurrentSession === 'function') {
         console.info('✅ [MAIN] Supabase disponível');
+        
+        // Verifica funções opcionais
+        if (typeof genericSelect !== 'function') {
+          console.warn('⚠️ [MAIN] genericSelect não disponível, algumas funções serão limitadas');
+        }
       } else {
         console.warn('⚠️ [MAIN] Supabase não disponível → modo demo');
         AppState.isDemoMode = true;
