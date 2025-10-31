@@ -65,16 +65,15 @@ async function setupSupabaseAndAnalytics() {
       try {
         const { data, error } = await supabaseClient
           .from('user_organizations')
-          .select('organization_id')
+          .select('org_id')
           .eq('user_id', session.user.id)
-          .order('created_at', { ascending: false })
           .limit(1)
           .single();
         
         if (error) throw error;
-        return data?.organization_id || null;
+        return data?.org_id || null;
       } catch (error) {
-        console.error('❌ Erro ao obter organization_id:', error);
+        console.error('❌ Erro ao obter org_id:', error);
         return null;
       }
     }
