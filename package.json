@@ -1,7 +1,7 @@
 {
   "name": "alsham-360-prima",
-  "version": "2.1.0",
-  "description": "ALSHAM 360° PRIMA — CRM Enterprise com IA, Gamificação e Automações Integradas (Build Estável v6.0.4 - Enterprise Architecture)",
+  "version": "2.2.0",
+  "description": "ALSHAM 360° PRIMA — CRM Enterprise com IA, Gamificação e Automações Integradas (Build Estável v6.0.4 - Enterprise Architecture + React Hybrid v2.2.0-SUPREMO)",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -31,7 +31,7 @@
     "npm": ">=10.0.0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.45.4",
+    "@supabase/supabase-js": "2.46.1",
     "@tailwindcss/aspect-ratio": "0.4.2",
     "@tailwindcss/forms": "0.5.9",
     "@tailwindcss/typography": "0.5.15",
@@ -39,18 +39,26 @@
     "autoprefixer": "10.4.20",
     "canvas-confetti": "1.9.3",
     "chart.js": "4.4.6",
+    "clsx": "^2.1.0",
     "compression": "1.7.4",
     "cors": "2.8.5",
     "dotenv": "16.4.5",
     "express": "4.21.2",
     "express-rate-limit": "7.4.1",
+    "framer-motion": "^11.0.8",
     "helmet": "8.0.0",
     "jspdf": "2.5.2",
+    "lucide-react": "^0.533.0",
     "morgan": "1.10.0",
     "papaparse": "5.4.1",
     "postcss": "8.4.47",
     "posthog-js": "^1.282.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1",
+    "react-chartjs-2": "^5.3.1",
     "redis": "4.7.0",
+    "zustand": "^4.4.7",
     "tailwindcss": "3.4.14",
     "vite": "5.4.20",
     "vite-plugin-compression": "0.5.1",
@@ -59,6 +67,9 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.5.2",
     "@vitest/coverage-v8": "2.1.4",
     "cssnano": "7.0.6",
     "cypress": "15.5.0",
@@ -67,6 +78,7 @@
     "nodemon": "3.1.7",
     "rollup-plugin-visualizer": "5.12.0",
     "start-server-and-test": "2.0.3",
+    "typescript": "^5.8.3",
     "vitest": "2.1.4",
     "vercel": "^36.0.0"
   },
@@ -85,10 +97,14 @@
     "automation",
     "ai",
     "gamification",
-    "alsham"
+    "alsham",
+    "react",
+    "supabase",
+    "vite",
+    "typescript"
   ],
   "author": {
-    "name": "AbnadabyBonaparte",
+    "name": "Abnadaby Bonaparte",
     "email": "founder@alshamglobal.com.br",
     "url": "https://alshamglobal.com.br"
   },
