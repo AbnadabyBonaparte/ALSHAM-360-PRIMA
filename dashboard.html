@@ -541,7 +541,7 @@
         
         await new Promise((resolve, reject) => {
           let attempts = 0;
-          const maxAttempts = 50; // 5 segundos
+          const maxAttempts = 150; // 15 segundos
           
           const check = () => {
             attempts++;
@@ -569,8 +569,8 @@
         updateLoadingState('Validando acesso...', 'Verificando suas credenciais...');
         console.log('🔐 [DASHBOARD] Iniciando validação de sessão...');
         
-        const { getSession } = window.AlshamSupabase;
-        const session = await getSession();
+        const { getCurrentSession } = window.AlshamSupabase;
+        const session = await getCurrentSession();
 
         if (!session?.user) {
           console.warn('⚠️ [DASHBOARD] Sessão inválida - redirecionando para login');
