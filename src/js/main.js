@@ -1,7 +1,7 @@
 /**
- * 🚀 ALSHAM 360° PRIMA - Main Application Script v3.1.1
+ * 🚀 ALSHAM 360° PRIMA - Main Application Script v3.1.2
  * ✅ Estável | Auto-inicialização | Melhorias de Resiliência, Sync e Logs
- * 🔧 FIX: Agora se auto-inicializa corretamente
+ * 🔧 FIX: Corrigida verificação do Supabase
  */
 
 if (window.AlshamMainInitialized) {
@@ -11,7 +11,7 @@ if (window.AlshamMainInitialized) {
 
   // 🔁 Aguardando Supabase (até 20s)
   function waitForSupabase(callback, maxAttempts = 200, attempt = 0) {
-    if (window.AlshamSupabase?.getCurrentSession) {
+    if (window.AlshamSupabase?.supabase) {
       console.log('✅ [MAIN] Supabase carregado para Main');
       callback();
     } else if (attempt >= maxAttempts) {
@@ -33,7 +33,7 @@ if (window.AlshamMainInitialized) {
 
     // ===== CONFIG GLOBAL =====
     const APP_CONFIG = {
-      version: '3.1.1',
+      version: '3.1.2',
       environment: 'production',
       features: {
         realTimeUpdates: true,
@@ -134,7 +134,7 @@ if (window.AlshamMainInitialized) {
       }
 
       try {
-        console.info('🚀 [MAIN] ALSHAM 360° PRIMA - Main Script v3.1.1 iniciando...');
+        console.info('🚀 [MAIN] ALSHAM 360° PRIMA - Main Script v3.1.2 iniciando...');
         await checkSupabaseAvailability();
         await initializeApplication();
         console.info('✅ [MAIN] Main inicializado com sucesso');
@@ -272,7 +272,7 @@ if (window.AlshamMainInitialized) {
       ErrorHandler,
     };
 
-    console.info('📦 [MAIN] ALSHAM 360° PRIMA Main Script v3.1.1 exportado para window.AlshamMain');
+    console.info('📦 [MAIN] ALSHAM 360° PRIMA Main Script v3.1.2 exportado para window.AlshamMain');
     
     // 🔧 FIX: AUTO-INICIALIZAÇÃO
     // Verifica se deve auto-inicializar (não inicializa na página index.html)
