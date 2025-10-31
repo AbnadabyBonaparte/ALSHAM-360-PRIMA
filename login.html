@@ -2,13 +2,22 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://*.posthog.com https://cdn.posthog.com https://app.posthog.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://*.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; frame-src 'self' https://app.posthog.com; worker-src 'self' blob:; child-src 'self' blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - ALSHAM 360°</title>
+
+  <!-- ÍCONES PWA -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <!-- SUPABASE INIT (MÓDULO) -->
   <script type="module" src="/src/lib/init-supabase.js"></script>
+
+  <!-- ESTILOS INLINE -->
   <style>
     body {
       min-height: 100vh;
@@ -19,6 +28,7 @@
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #1f2937;
       padding: 1.5rem;
+      margin: 0;
     }
     .login-card {
       width: min(24rem, 100%);
@@ -119,7 +129,6 @@
 <body>
   <main class="login-card" role="main" data-cy="login-page">
     <h1>ALSHAM 360°</h1>
-
     <form id="login-form" data-cy="login-form">
       <div>
         <label for="email">E-mail corporativo</label>
@@ -133,12 +142,11 @@
           data-cy="login-email"
         />
       </div>
-
       <div>
         <label for="password">Senha</label>
-        <input 
-          id="password" 
-          name="password" 
+        <input
+          id="password"
+          name="password"
           type="password"
           placeholder="••••••••"
           autocomplete="current-password"
@@ -147,21 +155,19 @@
           data-cy="login-password"
         />
       </div>
-
       <button type="submit" data-cy="login-submit">Entrar</button>
     </form>
-
     <p id="success-message" class="feedback success" role="status" data-cy="login-success"></p>
     <p id="error-message" class="feedback error" role="alert" data-cy="login-error"></p>
-
     <div class="login-footer">
       <a href="/reset-password.html">Esqueceu sua senha?</a>
     </div>
   </main>
-  
-  <!-- PostHog Analytics -->
+
+  <!-- ANALYTICS (opcional) -->
   <script type="module" src="/src/lib/analytics.js"></script>
-  
+
+  <!-- LÓGICA DO LOGIN -->
   <script type="module" src="/src/js/login.js"></script>
 </body>
 </html>
