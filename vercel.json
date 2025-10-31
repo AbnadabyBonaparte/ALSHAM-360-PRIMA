@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://us-assets.i.posthog.com https://*.posthog.com https://esm.sh https://cdn.jsdelivr.net https://gc.kis.v2.scr.kaspersky-labs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: data: https://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://gc.kis.v2.scr.kaspersky-labs.com wss://*.supabase.co wss://gc.kis.v2.scr.kaspersky-labs.com; worker-src 'self' blob: https://us-assets.i.posthog.com https://*.posthog.com; img-src 'self' data: blob: https:; frame-src 'self';"
+          "value": "default-src 'self' https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://us-assets.i.posthog.com https://*.posthog.com https://gc.kis.v2.scr.kaspersky-labs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com; worker-src 'self' blob: https://us-assets.i.posthog.com https://*.posthog.com; img-src 'self' data: blob: https:; frame-src 'none'; base-uri 'self';"
         },
         {
           "key": "X-Frame-Options",
@@ -18,9 +18,29 @@
         {
           "key": "Permissions-Policy",
           "value": "geolocation=(), microphone=(), camera=()"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Cross-Origin-Embedder-Policy",
+          "value": "require-corp"
         }
       ]
     }
   ],
-  "rewrites": []
+
+  "rewrites": [
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/app/(.*)", "destination": "/app.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+
+  "cleanUrls": true,
+  "trailingSlash": false
 }
