@@ -1,26 +1,20 @@
-// src/lib/attach-supabase.js
-import { createClient } from '@supabase/supabase-js';
+// src/lib/init-supabase.js
+console.log('Iniciando Supabase Init...');
 
-export default async function ensureSupabaseGlobal() {
-  if (window.AlshamSupabase?.supabase) {
-    console.info('Supabase já inicializado globalmente.');
-    return;
+async function bootstrapSupabase() {
+  try {
+    const module = await import('./attach-supabase.js');
+    const initializer = module.ensureSupabaseGlobal || module.default;
+
+    if (typeof initializer === 'function') {
+      await initializer();
+      console.log('Supabase carregado com sucesso!');
+    } else {
+      console.warn('Módulo attach-supabase não exporta uma função inicializadora.');
+    }
+  } catch (err) {
+    console.error('Falha:', err);
   }
-
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    throw new Error('VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY ausentes no Vercel.');
-  }
-
-  const supabase = createClient(url, key);
-
-  window.supabase = supabase;
-  window.AlshamSupabase = {
-    supabase,
-    auth: supabase.auth
-  };
-
-  console.info('Supabase inicializado via attach-supabase.js');
 }
+
+document.addEventListener('DOMContentLoaded', bootstrapSupabase);
