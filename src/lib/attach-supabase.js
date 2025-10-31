@@ -2,24 +2,24 @@
 // ALSHAM 360° PRIMA – SUPABASE ATTACH MODULE (V6.4-GRAAL-COMPLIANT+)
 
 /**
- * 🔧 ATTACH-SUPABASE – VERSÃO FINAL 100% FUNCIONAL
+ * ATTACH-SUPABASE – VERSÃO FINAL 100% FUNCIONAL
  * 
- * ✅ Lê VITE_ do Vercel (build-time)
- * ✅ Fallback seguro com CDN
- * ✅ Reutiliza cliente global
- * ✅ Zero dependência de window.ENV
- * ✅ Suporta SSR (não quebra)
+ * Lê VITE_ do Vercel (build-time)
+ * Reutiliza cliente global
+ * Zero dependência de window.ENV
+ * Suporta SSR (não quebra)
+ * Sem .includes() em window.location
  */
 
-console.log('Iniciando attach-supabase.js...');
+console.info('Iniciando attach-supabase.js...');
 
-// === 1. PEGA VARIÁVEIS DO VERCEL (VITE_) ===
+// === 1. VARIÁVEIS DO VERCEL (VITE_) ===
 const SUPABASE_URL = import.meta.env?.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env?.VITE_SUPABASE_ANON_KEY;
 
 // === 2. VALIDAÇÃO RÍGIDA ===
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error('ERRO CRÍTICO: VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY ausentes no Vercel.');
+  console.error('ERRO: VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY ausentes no Vercel.');
   throw new Error('Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Vercel Dashboard.');
 }
 
@@ -27,14 +27,14 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 export async function ensureSupabaseGlobal() {
   if (typeof window === 'undefined') return null;
 
-  // Reutiliza se já existe
+  // Reutiliza cliente existente
   if (window.AlshamSupabase?.supabase) {
     console.info('Supabase já inicializado. Reutilizando cliente global.');
     return window.AlshamSupabase;
   }
 
   try {
-    // Import dinâmico do Supabase (CDN ou bundle)
+    // Import dinâmico do Supabase
     const { createClient } = await import('@supabase/supabase-js');
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
