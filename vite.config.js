@@ -1,23 +1,15 @@
 import { defineConfig } from 'vite';
-import path from 'path';
 
 export default defineConfig({
   build: {
-    target: 'esnext',
-    outDir: 'dist',
     rollupOptions: {
       input: {
         main: './index.html',
         login: './login.html',
-        dashboard: './dashboard.html'
-      },
-      external: ['posthog-js']
+        dashboard: './dashboard.html',
+        'init-supabase': './src/lib/init-supabase.js',
+        'attach-supabase': './src/lib/attach-supabase.js'
+      }
     }
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(process.cwd(), 'src')
-    }
-  },
-  server: { port: 3000 }
+  }
 });
