@@ -64,9 +64,11 @@ async function setupSupabaseAndAnalytics() {
       
       try {
         const { data, error } = await supabaseClient
-          .from('users')
+          .from('user_organizations')
           .select('organization_id')
-          .eq('id', session.user.id)
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .single();
         
         if (error) throw error;
