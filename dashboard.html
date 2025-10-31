@@ -3,11 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Executivo — ALSHAM 360°</title>
+  <title>Dashboard Executivo — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Dashboard Executivo ALSHAM 360° PRIMA - KPIs e Analytics em tempo real" />
+
+  <!-- PWA & ÍCONES -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="/css/tokens.css" />
   <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+  <!-- SUPABASE INIT (MÓDULO) -->
   <script type="module" src="/src/lib/init-supabase.js"></script>
+
+  <!-- ESTILOS -->
   <style>
     :root {
       color-scheme: light only;
@@ -241,17 +252,23 @@
       color: #475569;
       font-size: 0.95rem;
     }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
+  <!-- LOADING OVERLAY -->
   <div id="loading-overlay" role="status" aria-live="polite">
     <div class="loading-card">
-      <h2>Carregando sessão...</h2>
-      <p>Validando credenciais de acesso ao painel executivo.</p>
+      <h2>Carregando Dashboard...</h2>
+      <p>Validando sessão e carregando dados em tempo real.</p>
     </div>
   </div>
 
-  <main class="dashboard-container" id="dashboard-root" data-cy="dashboard-root">
+  <!-- DASHBOARD CONTENT -->
+  <main class="dashboard-container hidden" id="dashboard-root">
     <header class="dashboard-header">
       <div>
         <h1>Dashboard Executivo</h1>
@@ -259,7 +276,7 @@
       </div>
       <div class="snapshot-card" aria-label="Resumo do dia">
         <h2>Snapshot Diário</h2>
-        <strong>R$ 482K</strong>
+        <strong id="snapshot-value">R$ 482K</strong>
         <span>MRR projetado com base em 415 contas ativas</span>
       </div>
     </header>
@@ -267,42 +284,42 @@
     <section class="metrics-grid" aria-label="Indicadores principais">
       <article class="metric-card">
         <span>Leads Hoje</span>
-        <strong>42</strong>
+        <strong id="leads-today">42</strong>
         <p>Novos cadastros nas últimas 24 horas</p>
       </article>
       <article class="metric-card">
         <span>Conversão semanal</span>
-        <strong>18,5%</strong>
+        <strong id="conversion-rate">18,5%</strong>
         <p>Taxa média de avanço no funil comercial</p>
       </article>
       <article class="metric-card">
         <span>Previsão de fechamento</span>
-        <strong>R$ 1,8M</strong>
+        <strong id="forecast-value">R$ 1,8M</strong>
         <p>Pipeline ponderado para os próximos 30 dias</p>
       </article>
       <article class="metric-card">
         <span>Tempo médio de resposta</span>
-        <strong>1h 14m</strong>
+        <strong id="response-time">1h 14m</strong>
         <p>Atendimento omnichannel real-time</p>
       </article>
       <article class="metric-card">
         <span>Tickets abertos</span>
-        <strong>28</strong>
+        <strong id="open-tickets">28</strong>
         <p>Chamados aguardando tratativa</p>
       </article>
       <article class="metric-card">
         <span>Satisfação NPS</span>
-        <strong>76</strong>
+        <strong id="nps-score">76</strong>
         <p>Índice calculado a partir de 415 respostas</p>
       </article>
       <article class="metric-card">
         <span>Campanhas ativas</span>
-        <strong>12</strong>
+        <strong id="active-campaigns">12</strong>
         <p>Fluxos rodando em canais digitais</p>
       </article>
       <article class="metric-card">
         <span>Retenção líquida</span>
-        <strong>118%</strong>
+        <strong id="retention-rate">118%</strong>
         <p>Expansão via upsell e cross-sell nas contas</p>
       </article>
     </section>
@@ -311,40 +328,40 @@
       <article class="panel" aria-labelledby="funnel-progress-title">
         <h2 id="funnel-progress-title">Progresso do Funil</h2>
         <ul>
-          <li>140 oportunidades em prospecção ativa</li>
-          <li>68 propostas aguardando assinatura</li>
-          <li>21 negociações críticas com follow-up diário</li>
-          <li>Receita conquistada no mês: <strong>R$ 920K</strong></li>
+          <li id="funnel-1">140 oportunidades em prospecção ativa</li>
+          <li id="funnel-2">68 propostas aguardando assinatura</li>
+          <li id="funnel-3">21 negociações críticas com follow-up diário</li>
+          <li id="funnel-4">Receita conquistada no mês: <strong>R$ 920K</strong></li>
         </ul>
       </article>
 
       <article class="panel" aria-labelledby="retention-panel-title">
         <h2 id="retention-panel-title">Retenção & Experiência</h2>
         <ul>
-          <li>Churn voluntário reduziu 12% vs. mês anterior</li>
-          <li>83% dos tickets resolvidos no primeiro contato</li>
-          <li>Comunidade ativa com 1.250 interações semanais</li>
-          <li>CSAT médio de <strong>4,6/5</strong> em 3.100 avaliações</li>
+          <li id="retention-1">Churn voluntário reduziu 12% vs. mês anterior</li>
+          <li id="retention-2">83% dos tickets resolvidos no primeiro contato</li>
+          <li id="retention-3">Comunidade ativa com 1.250 interações semanais</li>
+          <li id="retention-4">CSAT médio de <strong>4,6/5</strong> em 3.100 avaliações</li>
         </ul>
       </article>
 
       <article class="panel" aria-labelledby="trend-panel-title">
         <h2 id="trend-panel-title">Tendências Prioritárias</h2>
         <ul class="trend-list">
-          <li class="trend-item"><span>IA aplicada ao onboarding</span><strong>+32% adoção</strong></li>
-          <li class="trend-item"><span>Playbook de vendas consultivas</span><strong>+19% taxa de ganho</strong></li>
-          <li class="trend-item"><span>Campanhas de automação por e-mail</span><strong>+24% engajamento</strong></li>
+          <li class="trend-item" id="trend-1"><span>IA aplicada ao onboarding</span><strong>+32% adoção</strong></li>
+          <li class="trend-item" id="trend-2"><span>Playbook de vendas consultivas</span><strong>+19% taxa de ganho</strong></li>
+          <li class="trend-item" id="trend-3"><span>Campanhas de automação por e-mail</span><strong>+24% engajamento</strong></li>
         </ul>
       </article>
     </section>
 
     <section class="activity-section" aria-label="Atividades recentes">
       <h2>Linha do tempo executiva</h2>
-      <ul class="activity-timeline">
-        <li><span>09:20</span> Fechamento da conta Enterprise &mdash; Setor Energia</li>
-        <li><span>11:05</span> Aprovação de orçamento em Gamificação &amp; Onboarding</li>
-        <li><span>13:40</span> Renegociação concluída com upsell de plataforma IA</li>
-        <li><span>16:15</span> Comitê executivo confirmou OKRs do próximo trimestre</li>
+      <ul class="activity-timeline" id="activity-timeline">
+        <li id="activity-1"><span>09:20</span> Fechamento da conta Enterprise — Setor Energia</li>
+        <li id="activity-2"><span>11:05</span> Aprovação de orçamento em Gamificação & Onboarding</li>
+        <li id="activity-3"><span>13:40</span> Renegociação concluída com upsell de plataforma IA</li>
+        <li id="activity-4"><span>16:15</span> Comitê executivo confirmou OKRs do próximo trimestre</li>
       </ul>
     </section>
   </main>
@@ -353,6 +370,7 @@
     © 2025 ALSHAM 360° PRIMA — Dados processados automaticamente pela suíte de inteligência.
   </footer>
 
+  <!-- DASHBOARD JAVASCRIPT -->
   <script type="module" src="/src/js/dashboard.js"></script>
 </body>
 </html>
