@@ -234,14 +234,17 @@
           check();
         });
 
-        const { getCurrentSession } = window.AlshamSupabase;
-        
-        if (typeof getCurrentSession !== 'function') {
-          throw new Error('getCurrentSession não é uma função válida');
+        // Verifica se o cliente Supabase está disponível
+        if (!window.AlshamSupabase?.supabase?.auth) {
+          throw new Error('Cliente Supabase não está disponível');
         }
 
         addLog('Verificando sessão...', 'info');
-        const session = await getCurrentSession();
+        const { data: { session }, error } = await window.AlshamSupabase.supabase.auth.getSession();
+        
+        if (error) {
+          throw new Error(`Erro ao obter sessão: ${error.message}`);
+        }
 
         if (session?.user) {
           addLog(`Usuário autenticado: ${session.user.email || session.user.id}`, 'success');
