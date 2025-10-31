@@ -158,7 +158,7 @@
 
     function addLog(message, type = 'info') {
       const timestamp = new Date().toLocaleTimeString('pt-BR');
-      const emoji = { info: 'Info', success: 'Check', error: 'Cross', warning: 'Warning' }[type] || 'Info';
+      const emoji = { info: 'ℹ️', success: '✅', error: '❌', warning: '⚠️' }[type] || 'ℹ️';
       const logMsg = `[${timestamp}] ${emoji} ${message}`;
       debugLog.push(logMsg);
       console.log(logMsg);
@@ -183,87 +183,117 @@
 
     function showError(title, message, details = '') {
       addLog(`${title}: ${message}`, 'error');
-      document.getElementById('main-loader').innerHTML = `
-        <div class="spinner" style="display: none;"></div>
-        <h1>ALSHAM 360°</h1>
-        <div class="error-box">
-          <h2>Error ${title}</h2>
-          <p>${message}</p>
-          ${details ? `<pre>${details}</pre>` : ''}
-          <div style="margin-top: 20px;">
-            <button class="btn" onclick="location.reload()">Retry</button>
-            <a href="/login.html" class="btn">Login</a>
-            <a href="/dashboard.html" class="btn">Dashboard</a>
+      const mainLoader = document.getElementById('main-loader');
+      if (mainLoader) {
+        mainLoader.innerHTML = `
+          <div class="spinner" style="display: none;"></div>
+          <h1>ALSHAM 360°</h1>
+          <div class="error-box">
+            <h2>❌ ${title}</h2>
+            <p>${message}</p>
+            ${details ? `<pre>${details}</pre>` : ''}
+            <div style="margin-top: 20px;">
+              <button class="btn" onclick="location.reload()">🔄 Tentar Novamente</button>
+              <a href="/login.html" class="btn">🔐 Ir para Login</a>
+              <a href="/dashboard.html" class="btn">📊 Ir para Dashboard</a>
+            </div>
           </div>
-        </div>
-        <div id="debug-info" style="margin-top: 20px; color: white;">${debugLog.map(log => `<div>${log}</div>`).join('')}</div>
-      `;
+          <div id="debug-info" style="margin-top: 20px; color: white;">${debugLog.map(log => `<div>${log}</div>`).join('')}</div>
+        `;
+      }
     }
 
     async function routeUser() {
       try {
         addLog('Iniciando roteamento...', 'info');
-        if (!navigator.onLine) throw new Error('Sem conexão com a internet');
+        
+        if (!navigator.onLine) {
+          throw new Error('Sem conexão com a internet');
+        }
         addLog('Conexão ativa', 'success');
 
-        // Aguarda Supabase global
+        // Aguarda Supabase global com timeout
+        addLog('Aguardando Supabase...', 'info');
         await new Promise((resolve, reject) => {
+          let attempts = 0;
+          const maxAttempts = 100; // 10 segundos
+          
           const check = () => {
+            attempts++;
+            
             if (window.AlshamSupabase?.supabase) {
               addLog('Supabase cliente global detectado', 'success');
               resolve();
-            } else if (document.getElementById('main-loader')) {
-              setTimeout(check, 100);
-            } else {
+            } else if (attempts >= maxAttempts) {
               reject(new Error('Timeout ao aguardar Supabase'));
+            } else {
+              setTimeout(check, 100);
             }
           };
+          
           check();
         });
 
         const { getSession } = window.AlshamSupabase;
+        
+        if (typeof getSession !== 'function') {
+          throw new Error('getSession não é uma função válida');
+        }
+
+        addLog('Verificando sessão...', 'info');
         const session = await getSession();
 
         if (session?.user) {
-          addLog(`Usuário logado: ${session.user.email || session.user.id}`, 'success');
+          addLog(`Usuário autenticado: ${session.user.email || session.user.id}`, 'success');
           addLog('Redirecionando para dashboard...', 'info');
-          setTimeout(() => window.location.replace('/dashboard.html'), 800);
+          
+          setTimeout(() => {
+            window.location.replace('/dashboard.html');
+          }, 500);
         } else {
           addLog('Nenhuma sessão ativa', 'info');
           addLog('Redirecionando para login...', 'info');
-          setTimeout(() => window.location.replace('/login.html'), 800);
+          
+          setTimeout(() => {
+            window.location.replace('/login.html');
+          }, 500);
         }
       } catch (error) {
-        console.error('Erro crítico:', error);
+        console.error('❌ Erro crítico:', error);
         showError(
           'Erro ao Carregar Sistema',
           'Não foi possível inicializar o ALSHAM 360°.',
-          `Detalhes: ${error.message}\n\nLogs:\n${debugLog.join('\n')}`
+          `Detalhes técnicos:\n${error.message}\n${error.stack || ''}\n\nLogs:\n${debugLog.join('\n')}`
         );
       }
     }
 
-    // Timeout global
+    // Timeout global de segurança
     setTimeout(() => {
-      if (document.getElementById('main-loader')) {
+      if (document.getElementById('main-loader')?.style.display !== 'none') {
         showError(
           'Timeout Atingido',
           'O sistema demorou mais de 15 segundos para carregar.',
-          'Possíveis causas:\n- Conexão lenta\n- Supabase não inicializado\n- CSP bloqueando'
+          'Possíveis causas:\n- Conexão lenta com a internet\n- Supabase não inicializou corretamente\n- Content Security Policy bloqueando recursos\n- Erro de JavaScript não tratado'
         );
       }
     }, 15000);
 
-    // Inicia após DOM
+    // Inicia após DOM carregar
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', routeUser);
     } else {
       routeUser();
     }
 
-    // Erros globais
-    window.addEventListener('error', e => addLog(`Erro JS: ${e.message}`, 'error'));
-    window.addEventListener('unhandledrejection', e => addLog(`Promise rejeitada: ${e.reason}`, 'error'));
+    // Captura erros globais
+    window.addEventListener('error', e => {
+      addLog(`Erro JS: ${e.message} em ${e.filename}:${e.lineno}`, 'error');
+    });
+    
+    window.addEventListener('unhandledrejection', e => {
+      addLog(`Promise rejeitada: ${e.reason}`, 'error');
+    });
   </script>
 </body>
 </html>
