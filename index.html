@@ -234,14 +234,14 @@
           check();
         });
 
-        const { getSession } = window.AlshamSupabase;
+        const { getCurrentSession } = window.AlshamSupabase;
         
-        if (typeof getSession !== 'function') {
-          throw new Error('getSession não é uma função válida');
+        if (typeof getCurrentSession !== 'function') {
+          throw new Error('getCurrentSession não é uma função válida');
         }
 
         addLog('Verificando sessão...', 'info');
-        const session = await getSession();
+        const session = await getCurrentSession();
 
         if (session?.user) {
           addLog(`Usuário autenticado: ${session.user.email || session.user.id}`, 'success');
