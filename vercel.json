@@ -1,17 +1,11 @@
 {
-  "version": 2,
-  "public": true,
-  "cleanUrls": true,
-  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://cdn.jsdelivr.net https://us-assets.i.posthog.com https://vercel.live wss://*.supabase.co; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://vercel.live wss://*.supabase.co; img-src 'self' data: https:; frame-src 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://*.posthog.com https://esm.sh https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://us.i.posthog.com wss://*.supabase.co; img-src 'self' data: https: blob:; frame-src 'self';"
         }
       ]
     }
