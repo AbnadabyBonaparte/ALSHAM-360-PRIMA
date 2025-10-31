@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "alsham-360-prima",
   "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
@@ -10,16 +9,14 @@
       "headers": [
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://cdn.jsdelivr.net https://us-assets.i.posthog.com https://*.posthog.com https://vercel.live wss://*.supabase.co wss://*.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://esm.sh https://*.supabase.co https://*.posthog.com https://vercel.live wss://*.supabase.co wss://*.posthog.com; frame-src 'self'; manifest-src 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://cdn.jsdelivr.net https://us-assets.i.posthog.com https://vercel.live wss://*.supabase.co; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://vercel.live wss://*.supabase.co; img-src 'self' data: https:; frame-src 'self';"
         }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/manifest.webmanifest", "destination": "/manifest.json" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
