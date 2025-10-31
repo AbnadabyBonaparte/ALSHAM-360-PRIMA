@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - ALSHAM 360°</title>
 
-  <!-- ÍCONES PWA -->
+  <!-- PWA & ÍCONES -->
+  <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/manifest.json" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/tokens.css" />
@@ -164,10 +164,61 @@
     </div>
   </main>
 
-  <!-- ANALYTICS (opcional) -->
-  <script type="module" src="/src/lib/analytics.js"></script>
+  <!-- LÓGICA DO LOGIN (SEM TOP-LEVEL AWAIT) -->
+  <script type="module">
+    // Aguarda o Supabase estar pronto
+    const waitForSupabase = () => {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (window.AlshamSupabase?.supabase) {
+            resolve(window.AlshamSupabase);
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+    };
 
-  <!-- LÓGICA DO LOGIN -->
-  <script type="module" src="/src/js/login.js"></script>
+    // Função de login
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const submitBtn = document.querySelector('[data-cy="login-submit"]');
+      const errorEl = document.getElementById('error-message');
+      const successEl = document.getElementById('success-message');
+
+      errorEl.classList.remove('visible');
+      successEl.classList.remove('visible');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Entrando...';
+
+      try {
+        const { supabase } = await waitForSupabase();
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        successEl.textContent = 'Login bem-sucedido! Redirecionando...';
+        successEl.classList.add('visible');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 1000);
+      } catch (err) {
+        errorEl.textContent = err.message || 'Erro ao fazer login.';
+        errorEl.classList.add('visible');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrar';
+      }
+    }
+
+    // Ativa o formulário
+    document.getElementById('login-form').addEventListener('submit', handleLogin);
+  </script>
 </body>
 </html>
