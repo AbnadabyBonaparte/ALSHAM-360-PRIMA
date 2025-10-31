@@ -9,7 +9,7 @@
     (function() {
       const theme = localStorage.getItem('alsham-theme') || 'light';
       const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      
+
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
       }
@@ -18,7 +18,9 @@
       }
     })();
   </script>
-  
+
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+
   <!-- SEO -->
   <title>Automações v11.0 — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Automações ALSHAM 360° PRIMA v11.0 - Gerencie regras, execuções e logs com IA e n8n. Exports completos, animações premium e acessibilidade WCAG AAA." />

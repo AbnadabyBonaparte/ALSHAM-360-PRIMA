@@ -9,7 +9,7 @@
     (function() {
       const theme = localStorage.getItem('alsham-theme') || 'light';
       const contrast = localStorage.getItem('alsham-contrast') || 'normal';
-      
+
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
       }
@@ -18,7 +18,9 @@
       }
     })();
   </script>
-  
+
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+
   <title>Relatórios — ALSHAM 360° PRIMA</title>
   <meta name="description" content="Sistema de Relatórios e Analytics Avançado - ALSHAM 360° PRIMA CRM Enterprise com IA. Visualize métricas, KPIs, evolução de leads e receita em tempo real." />
 
