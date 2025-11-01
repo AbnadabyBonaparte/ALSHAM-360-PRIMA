@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { getSupabaseClient, type SupabaseClient } from "../lib/supabase";
 import MetricCard from "../components/MetricCard";
 import ChartSupremo from "../components/ChartSupremo";
 
@@ -16,14 +16,23 @@ export default function Financeiro() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadFinance() {
+    let active = true;
+    let client: SupabaseClient | null = null;
+    let subscription: ReturnType<SupabaseClient["channel"]> | null = null;
+
+    async function loadFinance(currentClient: SupabaseClient) {
       setLoading(true);
       try {
-        // Buscar dados agregados
-        const { data, error } = await supabase
+        const baseQuery = currentClient
           .from("registros_financeiros")
-          .select("tipo, valor, data_registro")
-          .order("data_registro", { ascending: true });
+          .select("tipo, valor, data_registro");
+
+        const queryResult =
+          typeof (baseQuery as any).order === "function"
+            ? await (baseQuery as any).order("data_registro", { ascending: true })
+            : await baseQuery;
+
+        const { data, error } = queryResult as { data: any[]; error: unknown };
 
         if (error) throw error;
 
@@ -31,7 +40,7 @@ export default function Financeiro() {
         let despesas = 0;
         const lucroMap: Record<string, number> = {};
 
-        data?.forEach((r: any) => {
+        data?.forEach((r) => {
           const date = new Date(r.data_registro);
           const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
@@ -51,30 +60,48 @@ export default function Financeiro() {
         const lucroMensalArray = sortedMonths.map((m) => lucroMap[m]);
         const mrr = receita / (sortedMonths.length || 1);
 
-        setMetrics({ receita, despesas, lucro, mrr });
-        setLabels(sortedMonths);
-        setLucroMensal(lucroMensalArray);
+        if (active) {
+          setMetrics({ receita, despesas, lucro, mrr });
+          setLabels(sortedMonths);
+          setLucroMensal(lucroMensalArray);
+        }
       } catch (err) {
         console.error("Erro ao carregar dados financeiros:", err);
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
-    loadFinance();
+    async function initialize() {
+      try {
+        client = await getSupabaseClient();
+        await loadFinance(client);
 
-    // Atualização em tempo real
-    const sub = supabase
-      .channel("public:financeiro")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "registros_financeiros" },
-        () => loadFinance()
-      )
-      .subscribe();
+        subscription = client
+          .channel("public:financeiro")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "registros_financeiros" },
+            () => client && loadFinance(client)
+          )
+          .subscribe();
+      } catch (error) {
+        console.error("Erro ao inicializar dados financeiros:", error);
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    initialize();
 
     return () => {
-      supabase.removeChannel(sub);
+      active = false;
+      if (subscription && client) {
+        client.removeChannel(subscription);
+      }
     };
   }, []);
 

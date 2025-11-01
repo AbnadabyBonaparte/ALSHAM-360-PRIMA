@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { getSupabaseClient } from "../lib/supabase";
 import GamificationCard from "../components/GamificationCard";
 import ChartSupremo from "../components/ChartSupremo";
 
@@ -14,37 +14,53 @@ export default function Gamificacao() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+
     async function loadGamification() {
       setLoading(true);
       try {
-        // Busca dados do usuário logado
-        const { data: user } = await supabase.auth.getUser();
+        const client = await getSupabaseClient();
+        const { data: user } = await client.auth.getUser();
         const email = user?.user?.email;
 
-        // Busca pontos e histórico na tabela gamificação
-        const { data } = await supabase
+        if (!email) {
+          throw new Error("Usuário não autenticado");
+        }
+
+        const baseQuery = client
           .from("gamificacao_usuarios")
           .select("pontos, metas_batidas, semana, nivel")
-          .eq("email", email)
-          .order("semana", { ascending: true });
+          .eq("email", email);
 
-        const labels = data?.map((r) => `Sem ${r.semana}`);
-        const tendencia = data?.map((r) => r.pontos) || [];
+        const { data } = (await (typeof (baseQuery as any).order === "function"
+          ? (baseQuery as any).order("semana", { ascending: true })
+          : baseQuery)) as { data?: any[] };
+
+        const labels = data?.map((r) => `Sem ${r.semana}`) ?? [];
+        const tendencia = data?.map((r) => r.pontos) ?? [];
 
         const pontosAtuais = tendencia[tendencia.length - 1] || 0;
         const metas = data?.reduce((acc, r) => acc + (r.metas_batidas || 0), 0) || 0;
         const nivel = calcularNivel(pontosAtuais);
 
-        setStats({ pontos: pontosAtuais, nivel, tendencia, metas });
-        setLabels(labels || []);
+        if (active) {
+          setStats({ pontos: pontosAtuais, nivel, tendencia, metas });
+          setLabels(labels);
+        }
       } catch (err) {
         console.error("Erro ao carregar gamificação:", err);
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     loadGamification();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   function calcularNivel(pontos: number) {
