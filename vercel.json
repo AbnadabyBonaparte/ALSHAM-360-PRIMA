@@ -7,14 +7,15 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self' https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live; img-src 'self' data: blob: https:; worker-src 'self' blob:; frame-src 'none'; base-uri 'self';"
+          "value": "default-src 'self' https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live https://cdn.coverr.co https://www.youtube.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live; img-src 'self' data: blob: https:; worker-src 'self' blob:; frame-src 'self' https://www.youtube.com https://*.youtube.com; media-src 'self' https://cdn.coverr.co; base-uri 'self';"
         }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/app/:path*", "destination": "/app.html" },
+    { "source": "/", "destination": "/index.html" }
   ],
   "cleanUrls": true,
   "trailingSlash": false
