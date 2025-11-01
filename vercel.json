@@ -7,7 +7,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self' https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://us-assets.i.posthog.com https://*.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com; worker-src 'self' blob:; img-src 'self' data: blob: https:; frame-src 'none'; base-uri 'self';"
+          "value": "default-src 'self' https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://*.supabase.co https://esm.sh https://cdn.jsdelivr.net https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://*.posthog.com https://us-assets.i.posthog.com https://vercel.live; img-src 'self' data: blob: https:; worker-src 'self' blob:; frame-src 'none'; base-uri 'self';"
         },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
@@ -19,9 +19,10 @@
     }
   ],
   "rewrites": [
-    { "source": "/app", "destination": "/index.html" },
-    { "source": "/app/(.*)", "destination": "/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/", "destination": "/src/index.html" },
+    { "source": "/app", "destination": "/src/index.html" },
+    { "source": "/app/(.*)", "destination": "/src/index.html" },
+    { "source": "/(.*)", "destination": "/src/index.html" }
   ],
   "cleanUrls": true,
   "trailingSlash": false
