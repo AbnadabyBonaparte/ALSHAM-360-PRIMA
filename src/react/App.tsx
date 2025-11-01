@@ -58,6 +58,7 @@ export default function App() {
           <Route path="home" element={<Home />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="financeiro" element={<Financeiro />} />
+          <Route path="gamificacao" element={<Gamificacao />} />
         </Route>
         <Route path="*" element={<Navigate to="/app/home" replace />} />
       </Routes>
