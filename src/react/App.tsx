@@ -69,31 +69,37 @@ import {
   getDeals,
   getGamificationScores,
   createAuditLog,
-  testConnection
+  testConnection,
 } from "./lib/supabase"; // ajuste se o caminho for diferente
 
 const supabase = getSupabaseClient();
 
-import { useEffect } from "react";
-
-useEffect(() => {
-  async function initSupabase() {
-    console.group("🧩 ALSHAM 360° PRIMA – Verificação Supabase");
-    try {
-      await testConnection();
-      const session = await getCurrentSession();
-      console.info("👤 Sessão atual:", session ? "Ativa" : "Nenhuma");
-      const leads = await getLeads({ status: "novo" });
-      console.info(`📊 Leads retornados: ${leads?.length ?? 0}`);
-      console.info("✅ Supabase conectado e funcional!");
-    } catch (err) {
-      console.error("❌ Erro de integração Supabase:", err);
-    } finally {
-      console.groupEnd();
+// ⚙️ Inicializa o Supabase ao carregar o App
+function useSupabaseInit() {
+  useEffect(() => {
+    async function initSupabase() {
+      console.group("🧩 ALSHAM 360° PRIMA – Verificação Supabase");
+      try {
+        await testConnection();
+        const session = await getCurrentSession();
+        console.info("👤 Sessão atual:", session ? "Ativa" : "Nenhuma");
+        const leads = await getLeads({ status: "novo" });
+        console.info(`📊 Leads retornados: ${leads?.length ?? 0}`);
+        console.info("✅ Supabase conectado e funcional!");
+      } catch (err) {
+        console.error("❌ Erro de integração Supabase:", err);
+      } finally {
+        console.groupEnd();
+      }
     }
-  }
-  initSupabase();
-}, []);
+    initSupabase();
+  }, []);
+}
+
+useSupabaseInit();
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🔚 FIM DA INTEGRAÇÃO SUPABASE (Fase 1)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const hexToRgba = (hex: string, alpha: number) => {
   const value = hex.replace("#", "");
@@ -103,6 +109,7 @@ const hexToRgba = (hex: string, alpha: number) => {
   const b = bigint & 255;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
+
 
 const sidebarGroups = [
   {
