@@ -57,13 +57,43 @@ ChartJS.register(
   Filler
 );
 
-const chartNeutrals = {
-  sage: "#7a8f80",
-  mist: "#8794a4",
-  clay: "#c5a47c",
-  brass: "#b89a6c",
-  soot: "#41464a",
-};
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ⚜️ ALSHAM 360° PRIMA – INTEGRAÇÃO SUPABASE (Fase 1)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import {
+  getSupabaseClient,
+  getCurrentSession,
+  getCurrentOrgId,
+  getLeads,
+  getCampaigns,
+  getDeals,
+  getGamificationScores,
+  createAuditLog,
+  testConnection
+} from "./lib/supabase"; // ajuste se o caminho for diferente
+
+const supabase = getSupabaseClient();
+
+import { useEffect } from "react";
+
+useEffect(() => {
+  async function initSupabase() {
+    console.group("🧩 ALSHAM 360° PRIMA – Verificação Supabase");
+    try {
+      await testConnection();
+      const session = await getCurrentSession();
+      console.info("👤 Sessão atual:", session ? "Ativa" : "Nenhuma");
+      const leads = await getLeads({ status: "novo" });
+      console.info(`📊 Leads retornados: ${leads?.length ?? 0}`);
+      console.info("✅ Supabase conectado e funcional!");
+    } catch (err) {
+      console.error("❌ Erro de integração Supabase:", err);
+    } finally {
+      console.groupEnd();
+    }
+  }
+  initSupabase();
+}, []);
 
 const hexToRgba = (hex: string, alpha: number) => {
   const value = hex.replace("#", "");
