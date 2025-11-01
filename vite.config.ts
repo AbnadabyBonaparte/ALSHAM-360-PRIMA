@@ -1,23 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { youwareVitePlugin } from "@youware/vite-plugin-react";
 
-// ✅ Versão harmônica: respeita index.html na raiz, compila src normalmente
 export default defineConfig({
-  plugins: [youwareVitePlugin(), react()],
-  root: ".", // usa a raiz como referência principal
+  plugins: [react()],
+  root: ".",
   resolve: {
     alias: { "@": "/src" }
   },
   build: {
     outDir: "dist",
-    emptyOutDir: true, // limpa antes de buildar (corrige o warning anterior)
+    emptyOutDir: true,
     target: "es2022",
     sourcemap: true,
     minify: "esbuild",
     rollupOptions: {
       input: {
-        main: "./index.html" // ✅ aponta pro HTML correto na raiz
+        main: "./index.html",        // Landing page (mantém)
+        app: "./app.html",            // React Dashboard (NOVO!)
+        login: "./login.html",        // Login antigo (mantém)
+        dashboard: "./dashboard.html" // Dashboard antigo (mantém)
       }
     }
   },
