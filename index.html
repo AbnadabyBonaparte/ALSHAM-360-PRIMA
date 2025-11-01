@@ -1,8 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
+    <!-- ⚜️ ALSHAM 360° PRIMA — CORE ENTRY HTML v10.0.7-STABILIZED -->
+    <!-- 📅 Atualizado: 2025-11-01 | 🧠 Autoridade: Citizen Supremo X.1 -->
+    <!-- 🚀 Missão: Corrigir caminho do main.tsx e otimizar inicialização React + Supabase -->
+
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -10,10 +17,24 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="apple-mobile-web-app-title" content="ALSHAM 360° PRIMA" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Youware App</title>
+
+    <!-- 🧩 Manifest & Favicon -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+
+    <!-- 🔐 Segurança & Performance -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
+
+    <title>ALSHAM 360° PRIMA</title>
   </head>
+
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ⚙️ Corrigido: caminho relativo para main.tsx -->
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
