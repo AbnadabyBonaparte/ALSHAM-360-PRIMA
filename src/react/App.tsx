@@ -51,18 +51,18 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/app" element={<LayoutSupremo />}>
-          <Route index element={<Navigate to="/app/home" replace />} />
-          <Route path="home" element={<Home />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="financeiro" element={<Financeiro />} />
-          <Route path="gamificacao" element={<Gamificacao />} />
-          <Route path="automacoes" element={<Automacoes />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/app/home" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+  <BrowserRouter>
+    <Routes>
+      <Route path="/app" element={<LayoutSupremo />}>
+        <Route index element={<Navigate to="/app/home" replace />} />
+        <Route path="home" element={<Home />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="financeiro" element={<Financeiro />} />
+        <Route path="gamificacao" element={<Gamificacao />} />
+        <Route path="automacoes" element={<Automacoes />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/app/home" replace />} />
+    </Routes>
+  </BrowserRouter>
+);
