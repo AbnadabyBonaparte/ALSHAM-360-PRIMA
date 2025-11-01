@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { supabase, getCurrentSession } from "./lib/supabase";
+import { getSupabaseClient, getCurrentSession } from "./lib/supabase";
 
 // Layout
 import LayoutSupremo from "./components/LayoutSupremo";
@@ -19,18 +19,36 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadSession() {
-      const s = await getCurrentSession();
-      setSession(s);
-      setLoading(false);
+    let isMounted = true;
+    let unsubscribe: (() => void) | null = null;
+
+    async function initializeSession() {
+      try {
+        const currentSession = await getCurrentSession();
+        if (isMounted) {
+          setSession(currentSession);
+          setLoading(false);
+        }
+
+        const client = await getSupabaseClient();
+        const { data: listener } = client.auth.onAuthStateChange((_event, sess) => {
+          setSession(sess);
+        });
+        unsubscribe = () => listener.subscription.unsubscribe();
+      } catch (error) {
+        console.error("Erro ao inicializar Supabase:", error);
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     }
-    loadSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, sess) =>
-      setSession(sess)
-    );
+    initializeSession();
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe?.();
+    };
   }, []);
 
   if (loading) {
@@ -50,7 +68,8 @@ export default function App() {
         </p>
         <button
           onClick={async () => {
-            await supabase.auth.signInWithOAuth({ provider: "google" });
+            const client = await getSupabaseClient();
+            await client.auth.signInWithOAuth({ provider: "google" });
           }}
           className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-semibold transition-all"
         >

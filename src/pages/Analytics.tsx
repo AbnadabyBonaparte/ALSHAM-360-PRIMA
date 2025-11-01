@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { getSupabaseClient } from "../lib/supabase";
 import ChartSupremo from "../components/ChartSupremo";
 
 export default function Analytics() {
@@ -9,34 +9,50 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+
     async function loadAnalytics() {
       setLoading(true);
       try {
-        // Exemplo: busca dados agregados semanais
-        const { data: leads } = await supabase
-          .from("leads_crm")
-          .select("created_at")
-          .order("created_at", { ascending: true });
+        const client = await getSupabaseClient();
 
-        const { data: vendas } = await supabase
-          .from("sales_pipeline")
-          .select("created_at")
-          .order("created_at", { ascending: true });
+        const leadsQuery = client.from("leads_crm").select("created_at");
+        const vendasQuery = client.from("sales_pipeline").select("created_at");
 
-        const groupedLeads = groupByWeek(leads || []);
-        const groupedVendas = groupByWeek(vendas || []);
+        const [leadsResult, vendasResult] = await Promise.all([
+          typeof (leadsQuery as any).order === "function"
+            ? (leadsQuery as any).order("created_at", { ascending: true })
+            : leadsQuery,
+          typeof (vendasQuery as any).order === "function"
+            ? (vendasQuery as any).order("created_at", { ascending: true })
+            : vendasQuery,
+        ]);
 
-        setLabels(Object.keys(groupedLeads));
-        setLeadsData(Object.values(groupedLeads));
-        setVendasData(Object.values(groupedVendas));
+        const leadsDataResult = leadsResult as { data?: any[] };
+        const vendasDataResult = vendasResult as { data?: any[] };
+
+        const groupedLeads = groupByWeek(leadsDataResult.data || []);
+        const groupedVendas = groupByWeek(vendasDataResult.data || []);
+
+        if (active) {
+          setLabels(Object.keys(groupedLeads));
+          setLeadsData(Object.values(groupedLeads));
+          setVendasData(Object.values(groupedVendas));
+        }
       } catch (err) {
         console.error("Erro ao carregar dados de analytics:", err);
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     loadAnalytics();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   function groupByWeek(rows: any[]) {
