@@ -1,7 +1,10 @@
-// src/react/App.tsx
 import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { supabase, getCurrentSession } from "./lib/supabase";
-import DashboardSupremo from "./components/DashboardSupremo";
+import LayoutSupremo from "./components/LayoutSupremo";
+import Home from "./pages/Home";
+import Analytics from "./pages/Analytics";
+import Financeiro from "./pages/Financeiro";
 
 export default function App() {
   const [session, setSession] = useState<any>(null);
@@ -9,54 +12,37 @@ export default function App() {
 
   useEffect(() => {
     async function loadSession() {
-      try {
-        const s = await getCurrentSession();
-        setSession(s);
-      } catch (err) {
-        console.error("Erro ao carregar sessão:", err);
-      } finally {
-        setLoading(false);
-      }
+      const s = await getCurrentSession();
+      setSession(s);
+      setLoading(false);
     }
-
     loadSession();
 
-    // Listener de mudanças de autenticação (login/logout)
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, sess) => {
-      setSession(sess);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, sess) =>
+      setSession(sess)
+    );
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  // ⏳ Tela de carregamento
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-gray-400 text-lg">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-gray-400">
         Carregando sessão...
       </div>
     );
   }
 
-  // 🚪 Login via Google (quando não há sessão)
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-950 text-white px-4 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-950 text-white">
         <h1 className="text-3xl font-bold mb-4">🚀 ALSHAM 360° PRIMA</h1>
-        <p className="text-gray-400 mb-6 max-w-md">
-          Nenhuma sessão ativa. Faça login com sua conta Google para acessar o painel supremo.
-        </p>
+        <p className="text-gray-400 mb-6">Nenhuma sessão ativa.</p>
         <button
           onClick={async () => {
-            try {
-              await supabase.auth.signInWithOAuth({ provider: "google" });
-            } catch (err) {
-              console.error("Erro ao iniciar login:", err);
-            }
+            await supabase.auth.signInWithOAuth({ provider: "google" });
           }}
-          className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-semibold transition-all"
+          className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-semibold"
         >
           Entrar com Google
         </button>
@@ -64,6 +50,17 @@ export default function App() {
     );
   }
 
-  // 🔥 Painel Supremo (usuário autenticado)
-  return <DashboardSupremo />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/app" element={<LayoutSupremo />}>
+          <Route index element={<Navigate to="/app/home" replace />} />
+          <Route path="home" element={<Home />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="financeiro" element={<Financeiro />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/app/home" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
