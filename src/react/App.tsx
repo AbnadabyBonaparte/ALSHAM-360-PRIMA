@@ -311,20 +311,98 @@ const useDashboardStore = create<DashboardState>((set) => ({
   currency: "BRL",
   timeframe: "30d",
   theme: "glass-dark",
-  fetchData: () => {
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ⚡ FASE 2 – FETCH DATA REAL DO SUPABASE (ALSHAM 360° PRIMA)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fetchData: async () => {
+  try {
     set({ loading: true });
-    setTimeout(() => {
-      set({
-        loading: false,
-        kpis: mockKpis,
-        analytics: mockAnalytics,
-        aiInsights: mockAiInsights,
-        automations: mockAutomations,
-        engagement: mockEngagement,
-        campaigns: mockCampaigns,
-      });
-    }, 800);
-  },
+
+    // 🔹 1. Coleta simultânea dos principais dados
+    const [leads, deals, campaigns, leaderboard] = await Promise.all([
+      getLeads(),
+      getDeals(),
+      getCampaigns(),
+      getGamificationScores(5)
+    ]);
+
+    // 🔹 2. Montagem dinâmica dos KPIs reais
+    const kpis: KPI[] = [
+      {
+        id: "leads",
+        title: "Leads Ativos",
+        value: leads.length.toString(),
+        trend: 0,
+        trendLabel: "Base Supabase",
+        series: [0, 0, 0, leads.length],
+        target: "—",
+        description: "Total de leads ativos em leads_crm",
+        icon: <Target className="h-5 w-5 text-[var(--accent-emerald)]" />,
+      },
+      {
+        id: "deals",
+        title: "Negócios em Andamento",
+        value: deals.length.toString(),
+        trend: 0,
+        trendLabel: "Base Supabase",
+        series: [0, 0, 0, deals.length],
+        target: "—",
+        description: "Registros atuais em sales_pipeline",
+        icon: <Rocket className="h-5 w-5 text-[var(--accent-sky)]" />,
+      },
+      {
+        id: "campaigns",
+        title: "Campanhas Ativas",
+        value: campaigns.length.toString(),
+        trend: 0,
+        trendLabel: "Base Supabase",
+        series: [0, 0, 0, campaigns.length],
+        target: "—",
+        description: "Campanhas registradas em marketing_campaigns",
+        icon: <LineChart className="h-5 w-5 text-[var(--accent-fuchsia)]" />,
+      },
+    ];
+
+    // 🔹 3. Leaderboard (Gamificação)
+    const engagement = {
+      feed: [],
+      leaderboard: leaderboard.map((p, i) => ({
+        user: p.user_name ?? `User ${i + 1}`,
+        avatar: p.avatar_url ?? "https://api.dicebear.com/7.x/identicon/svg",
+        score: p.score ?? 0,
+        delta: 0,
+        rank: i + 1,
+      })),
+      tasks: [],
+      community: [],
+      sla: [],
+    };
+
+    // 🔹 4. Atualiza o estado global com os dados reais
+    set({
+      loading: false,
+      kpis,
+      analytics: {
+        pipeline: [],
+        conversion: [],
+        heatmap: [],
+        cohort: [],
+        geo: [],
+        marketSplit: [],
+      },
+      aiInsights: [],
+      automations: [],
+      engagement,
+      campaigns,
+    });
+
+    console.info("✅ Dashboard populado com dados reais do Supabase.");
+  } catch (err) {
+    console.error("❌ Erro ao buscar dados Supabase:", err);
+    set({ loading: false });
+  }
+},
+
   setCurrency: (currency) => set({ currency }),
   setTimeframe: (timeframe) => set({ timeframe }),
   setTheme: (theme) => set({ theme }),
