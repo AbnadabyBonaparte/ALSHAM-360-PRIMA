@@ -1,0 +1,2379 @@
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { create } from "zustand";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Activity,
+  ArrowUpRight,
+  Bell,
+  Brain,
+  ChevronDown,
+  Command,
+  Compass,
+  Flame,
+  Globe2,
+  HeartPulse,
+  Layers,
+  LineChart,
+  MonitorPlay,
+  Menu,
+  MessageCircle,
+  Palette,
+  PieChart as PieChartIcon,
+  Rocket,
+  Search,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Users,
+  X,
+} from "lucide-react";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
+import campaignOrion from "./assets/campaign-orion.png";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+const chartNeutrals = {
+  sage: "#7a8f80",
+  mist: "#8794a4",
+  clay: "#c5a47c",
+  brass: "#b89a6c",
+  soot: "#41464a",
+};
+
+const hexToRgba = (hex: string, alpha: number) => {
+  const value = hex.replace("#", "");
+  const bigint = parseInt(value, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const sidebarGroups = [
+  {
+    id: "sales",
+    label: "Vendas",
+    icon: <Target className="h-4 w-4" />,
+    links: [
+      "Contatos",
+      "Contas",
+      "Oportunidades",
+      "Negócios",
+      "Previsões",
+      "Propostas",
+      "Contratos",
+      "Faturamento",
+      "Produtos",
+      "Tabelas de preço",
+    ],
+  },
+  {
+    id: "marketing",
+    label: "Marketing",
+    icon: <Rocket className="h-4 w-4" />,
+    links: [
+      "Campanhas",
+      "E-mail",
+      "Landing pages",
+      "Formulários",
+      "Social",
+      "SEO",
+      "Ads",
+      "Biblioteca",
+    ],
+  },
+  {
+    id: "support",
+    label: "Suporte",
+    icon: <ShieldCheck className="h-4 w-4" />,
+    links: [
+      "Tickets",
+      "Base de conhecimento",
+      "Chat",
+      "SLAs",
+      "Casos",
+      "Portal",
+      "Feedback",
+    ],
+  },
+  {
+    id: "communication",
+    label: "Comunicação",
+    icon: <MessageCircle className="h-4 w-4" />,
+    links: [
+      "Inbox",
+      "E-mails",
+      "Chamadas",
+      "Reuniões",
+      "SMS",
+      "WhatsApp",
+    ],
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    icon: <LineChart className="h-4 w-4" />,
+    links: [
+      "Dashboard executivo",
+      "Cohorts",
+      "Pipeline",
+      "ROI",
+      "Mapas",
+      "Previsões",
+    ],
+  },
+  {
+    id: "automation",
+    label: "Automação",
+    icon: <Layers className="h-4 w-4" />,
+    links: [
+      "Workflows",
+      "Sequências",
+      "Playbooks",
+      "Triggers",
+      "Logs",
+      "Conectores",
+    ],
+  },
+  {
+    id: "team",
+    label: "Equipe",
+    icon: <Users className="h-4 w-4" />,
+    links: [
+      "Membros",
+      "Permissões",
+      "Metas",
+      "Comissões",
+      "Territórios",
+      "Leaderboards",
+    ],
+  },
+  {
+    id: "integrations",
+    label: "Integrações",
+    icon: <Compass className="h-4 w-4" />,
+    links: [
+      "Hub",
+      "Marketplace",
+      "API console",
+      "Webhooks",
+      "Import/Export",
+    ],
+  },
+  {
+    id: "ai",
+    label: "IA & Inovação",
+    icon: <Brain className="h-4 w-4" />,
+    links: [
+      "Copilot",
+      "Insights",
+      "Comandos de voz",
+      "Forecast",
+      "Plano de ação",
+      "Laboratório",
+    ],
+  },
+  {
+    id: "platform",
+    label: "Plataforma",
+    icon: <Settings className="h-4 w-4" />,
+    links: [
+      "Configurações",
+      "Branding",
+      "Segurança",
+      "Audit log",
+      "Onboarding",
+      "Comunidade",
+    ],
+  },
+];
+
+const themeOptions: ThemeOption[] = [
+  { key: "glass-dark", label: "Glass Dark", description: "Night ops" },
+  { key: "platinum-glass", label: "Platinum Glass", description: "Boardroom" },
+  { key: "midnight-aurora", label: "Midnight Aurora", description: "Innovation" },
+  { key: "desert-quartz", label: "Desert Quartz", description: "Hospitality" },
+  { key: "neon-energy", label: "Neon Energy", description: "Vibrant" },
+  { key: "cyber-vivid", label: "Cyber Vivid", description: "Electric" },
+];
+
+const themeSwatches: Record<ThemeKey, string> = {
+  "glass-dark": "linear-gradient(140deg, #7a8f80 0%, #8794a4 52%, #c5a47c 100%)",
+  "platinum-glass": "linear-gradient(140deg, #f7f7f4 0%, #d9dde2 55%, #c0b3a2 100%)",
+  "midnight-aurora": "linear-gradient(140deg, #45505f 0%, #7a8c9f 60%, #b8976d 100%)",
+  "desert-quartz": "linear-gradient(140deg, #f5efe6 0%, #d9c3a9 58%, #b88958 100%)",
+  "neon-energy": "linear-gradient(140deg, #34d399 0%, #38bdf8 50%, #a855f7 100%)",
+  "cyber-vivid": "linear-gradient(140deg, #fb923c 0%, #f472b6 50%, #8b5cf6 100%)",
+};
+
+const currencyOptions = [
+  { label: "BRL", value: "BRL" as DashboardState["currency"] },
+  { label: "USD", value: "USD" as DashboardState["currency"] },
+  { label: "EUR", value: "EUR" as DashboardState["currency"] },
+];
+
+const timeframeOptions = [
+  { label: "7D", value: "7d" as DashboardState["timeframe"] },
+  { label: "30D", value: "30d" as DashboardState["timeframe"] },
+  { label: "90D", value: "90d" as DashboardState["timeframe"] },
+];
+
+const badgePalette: Record<Campaign["badgeTone"], string> = {
+  emerald: "text-[var(--accent-emerald)] border-[var(--accent-emerald)]/35 bg-[var(--accent-emerald)]/14",
+  sky: "text-[var(--accent-sky)] border-[var(--accent-sky)]/32 bg-[var(--accent-sky)]/14",
+  fuchsia: "text-[var(--accent-fuchsia)] border-[var(--accent-fuchsia)]/32 bg-[var(--accent-fuchsia)]/14",
+  amber: "text-[var(--accent-amber)] border-[var(--accent-amber)]/30 bg-[var(--accent-amber)]/14",
+};
+
+const useDashboardStore = create<DashboardState>((set) => ({
+  loading: true,
+  kpis: [],
+  analytics: {
+    pipeline: [],
+    conversion: [],
+    heatmap: [],
+    cohort: [],
+    geo: [],
+    marketSplit: [],
+  },
+  aiInsights: [],
+  automations: [],
+  engagement: {
+    feed: [],
+    leaderboard: [],
+    tasks: [],
+    community: [],
+    sla: [],
+  },
+  campaigns: [],
+  currency: "BRL",
+  timeframe: "30d",
+  theme: "glass-dark",
+  fetchData: () => {
+    set({ loading: true });
+    setTimeout(() => {
+      set({
+        loading: false,
+        kpis: mockKpis,
+        analytics: mockAnalytics,
+        aiInsights: mockAiInsights,
+        automations: mockAutomations,
+        engagement: mockEngagement,
+        campaigns: mockCampaigns,
+      });
+    }, 800);
+  },
+  setCurrency: (currency) => set({ currency }),
+  setTimeframe: (timeframe) => set({ timeframe }),
+  setTheme: (theme) => set({ theme }),
+}));
+
+type DashboardState = {
+  loading: boolean;
+  kpis: KPI[];
+  analytics: AnalyticsData;
+  aiInsights: AIInsight[];
+  automations: Automation[];
+  engagement: EngagementData;
+  currency: "USD" | "EUR" | "BRL";
+  timeframe: "7d" | "30d" | "90d";
+  theme: ThemeKey;
+  campaigns: Campaign[];
+  fetchData: () => void;
+  setCurrency: (currency: "USD" | "EUR" | "BRL") => void;
+  setTimeframe: (timeframe: "7d" | "30d" | "90d") => void;
+  setTheme: (theme: ThemeKey) => void;
+};
+
+type ThemeKey =
+  | "glass-dark"
+  | "platinum-glass"
+  | "midnight-aurora"
+  | "desert-quartz"
+  | "neon-energy"
+  | "cyber-vivid";
+
+type ThemeOption = {
+  key: ThemeKey;
+  label: string;
+  description: string;
+};
+
+type KPI = {
+  id: string;
+  title: string;
+  value: string;
+  trend: number;
+  trendLabel: string;
+  series: number[];
+  target: string;
+  highlight?: boolean;
+  description: string;
+  icon: JSX.Element;
+};
+
+type AnalyticsData = {
+  pipeline: PipelineStage[];
+  conversion: ConversionStage[];
+  heatmap: HeatmapCell[];
+  cohort: CohortRow[];
+  geo: GeoPoint[];
+  marketSplit: MarketSlice[];
+};
+
+type MarketSlice = {
+  label: string;
+  value: number;
+  accent: string;
+};
+
+type Campaign = {
+  id: string;
+  name: string;
+  headline: string;
+  subheadline: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+  badge: string;
+  badgeTone: "emerald" | "sky" | "fuchsia" | "amber";
+  mediaType: "image" | "video" | "iframe";
+  mediaSrc: string;
+  metrics: Array<{ label: string; value: string }>;
+};
+
+type PipelineStage = {
+  stage: string;
+  value: number;
+  delta: number;
+};
+
+type ConversionStage = {
+  stage: string;
+  value: number;
+  benchmark: number;
+};
+
+type HeatmapCell = {
+  squad: string;
+  day: string;
+  score: number;
+};
+
+type CohortRow = {
+  cohort: string;
+  retention: number[];
+};
+
+type GeoPoint = {
+  region: string;
+  value: number;
+  latitude: number;
+  longitude: number;
+  trend: number;
+};
+
+type AIInsight = {
+  id: string;
+  title: string;
+  impact: string;
+  confidence: "Alta" | "Média" | "Baixa";
+  action: string;
+  score: number;
+};
+
+type Automation = {
+  id: string;
+  name: string;
+  status: "Executando" | "Agendado" | "Concluído";
+  efficiency: number;
+  savedHours: number;
+  lastRun: string;
+};
+
+type EngagementData = {
+  feed: ActivityEvent[];
+  leaderboard: LeaderboardEntry[];
+  tasks: Task[];
+  community: CommunityHighlight[];
+  sla: SLARecord[];
+};
+
+type ActivityEvent = {
+  id: string;
+  type: "Deal" | "Lead" | "Automation" | "Gamification" | "AI";
+  title: string;
+  description: string;
+  timestamp: string;
+  icon: JSX.Element;
+};
+
+type LeaderboardEntry = {
+  user: string;
+  avatar: string;
+  score: number;
+  delta: number;
+  rank: number;
+};
+
+type Task = {
+  id: string;
+  title: string;
+  owner: string;
+  dueIn: string;
+  progress: number;
+};
+
+type CommunityHighlight = {
+  id: string;
+  title: string;
+  author: string;
+  likes: number;
+  comments: number;
+  trend: number;
+};
+
+type SLARecord = {
+  metric: string;
+  value: string;
+  target: string;
+  status: "OK" | "Alerta" | "Crítico";
+};
+
+const mockKpis: KPI[] = [
+  {
+    id: "revenue",
+    title: "Receita reconhecida",
+    value: "R$ 3,1M",
+    trend: 12,
+    trendLabel: "+12% vs último mês",
+    series: [2.4, 2.6, 2.8, 3.1],
+    target: "Meta: R$ 3,5M",
+    highlight: true,
+    description: "Soma dos deals marcados como ganhos no período",
+    icon: <PieChartIcon className="h-5 w-5 text-[var(--accent-emerald)]" />,
+  },
+  {
+    id: "nps",
+    title: "NPS Global",
+    value: "76",
+    trend: 6,
+    trendLabel: "+6 pts vs último trimestre",
+    series: [68, 71, 74, 76],
+    target: "Meta: 80",
+    description: "Pontuação líquida de promotores em todos os canais",
+    icon: <HeartPulse className="h-5 w-5" />,
+  },
+  {
+    id: "automation",
+    title: "Horas economizadas",
+    value: "428h",
+    trend: 18,
+    trendLabel: "+18% vs média trimestral",
+    series: [280, 320, 364, 428],
+    target: "Meta: 450h",
+    description: "Tempo poupado com automações aprovadas",
+    icon: <Flame className="h-5 w-5" />,
+  },
+  {
+    id: "forecast",
+    title: "Precisão do forecast",
+    value: "92%",
+    trend: 4,
+    trendLabel: "+4pp vs benchmark",
+    series: [76, 81, 88, 92],
+    target: "Meta: 94%",
+    description: "Desvio médio entre previsão e realizado",
+    icon: <Sparkles className="h-5 w-5" />,
+  },
+];
+
+const mockAnalytics: AnalyticsData = {
+  pipeline: [
+    { stage: "Prospects", value: 423, delta: 8 },
+    { stage: "Qualificados", value: 276, delta: 12 },
+    { stage: "Propostas", value: 148, delta: 6 },
+    { stage: "Negociação", value: 94, delta: 9 },
+    { stage: "Ganhos", value: 62, delta: 11 },
+  ],
+  conversion: [
+    { stage: "MQL → SQL", value: 42, benchmark: 38 },
+    { stage: "SQL → Oportunidade", value: 37, benchmark: 31 },
+    { stage: "Oportunidade → Fechado", value: 24, benchmark: 21 },
+  ],
+  heatmap: [
+    { squad: "Orion", day: "Seg", score: 96 },
+    { squad: "Orion", day: "Ter", score: 88 },
+    { squad: "Orion", day: "Qua", score: 92 },
+    { squad: "Lyra", day: "Seg", score: 84 },
+    { squad: "Lyra", day: "Ter", score: 91 },
+    { squad: "Lyra", day: "Qua", score: 88 },
+    { squad: "Vega", day: "Seg", score: 78 },
+    { squad: "Vega", day: "Ter", score: 83 },
+    { squad: "Vega", day: "Qua", score: 86 },
+  ],
+  cohort: [
+    { cohort: "Jul/24", retention: [100, 91, 83, 76, 71] },
+    { cohort: "Ago/24", retention: [100, 89, 82, 74, 70] },
+    { cohort: "Set/24", retention: [100, 92, 85, 79, 74] },
+  ],
+  geo: [
+    { region: "São Paulo", value: 42, latitude: -23.55, longitude: -46.63, trend: 14 },
+    { region: "Rio de Janeiro", value: 24, latitude: -22.9, longitude: -43.17, trend: 9 },
+    { region: "Curitiba", value: 18, latitude: -25.43, longitude: -49.27, trend: 6 },
+    { region: "Porto Alegre", value: 15, latitude: -30.03, longitude: -51.23, trend: 7 },
+  ],
+  marketSplit: [
+    { label: "SaaS Enterprise", value: 38, accent: "#7a8f80" },
+    { label: "Mid-market", value: 27, accent: "#8794a4" },
+    { label: "SMB Digital", value: 21, accent: "#c5a47c" },
+    { label: "Channel Partners", value: 14, accent: "#b89a6c" },
+  ],
+};
+
+const mockAiInsights: AIInsight[] = [
+  {
+    id: "ai-1",
+    title: "Segmento SaaS Enterprise queimou 78% do objetivo anual",
+    impact: "Potencial de +R$ 720K no trimestre",
+    confidence: "Alta",
+    action: "Implantar nova sequência de abordagem consultiva para leads >R$ 50K",
+    score: 94,
+  },
+  {
+    id: "ai-2",
+    title: "Processos com risco de churn nas últimas 72h",
+    impact: "18 contas com sentimento negativo consistente",
+    confidence: "Média",
+    action: "Acionar playbook 'Resgate Premium' com call executiva",
+    score: 88,
+  },
+  {
+    id: "ai-3",
+    title: "Marketing Ops com ROI abaixo do benchmark",
+    impact: "Campanhas de webinar -17% de conversão",
+    confidence: "Alta",
+    action: "Redirecionar verba para Paid Search e personalizar landing",
+    score: 81,
+  },
+];
+
+const mockAutomations: Automation[] = [
+  {
+    id: "auto-1",
+    name: "Requalificação automática de leads com IA",
+    status: "Executando",
+    efficiency: 96,
+    savedHours: 112,
+    lastRun: "há 8 min",
+  },
+  {
+    id: "auto-2",
+    name: "Distribuição inteligente de deals high-touch",
+    status: "Concluído",
+    efficiency: 88,
+    savedHours: 64,
+    lastRun: "há 52 min",
+  },
+  {
+    id: "auto-3",
+    name: "Nurturing avançado pós-evento",
+    status: "Agendado",
+    efficiency: 79,
+    savedHours: 43,
+    lastRun: "prev. 20h",
+  },
+];
+
+const mockEngagement: EngagementData = {
+  feed: [
+    {
+      id: "event-1",
+      type: "Deal",
+      title: "Fechado ganhou • R$ 280K",
+      description: "Conta: Nubra AgroTech • Squad Orion",
+      timestamp: "há 12 min",
+      icon: <ArrowUpRight className="h-4 w-4 text-[var(--accent-emerald)]" />,
+    },
+    {
+      id: "event-2",
+      type: "AI",
+      title: "Copilot gerou 24 propostas",
+      description: "Eficiência +34% vs média",
+      timestamp: "há 27 min",
+      icon: <Sparkles className="h-4 w-4 text-[var(--accent-fuchsia)]" />,
+    },
+    {
+      id: "event-3",
+      type: "Gamification",
+      title: "Badge Diamante desbloqueado",
+      description: "Maria P. atingiu 98% de metas consecutivas",
+      timestamp: "há 41 min",
+      icon: <Flame className="h-4 w-4 text-[var(--accent-amber)]" />,
+    },
+  ],
+  leaderboard: [
+    { user: "Maria Pereira", avatar: "MP", score: 982, delta: 34, rank: 1 },
+    { user: "João Carvalho", avatar: "JC", score: 941, delta: 22, rank: 2 },
+    { user: "Ana Souza", avatar: "AS", score: 918, delta: 18, rank: 3 },
+  ],
+  tasks: [
+    {
+      id: "task-1",
+      title: "Revisar proposta Fortune + Copilot",
+      owner: "Você",
+      dueIn: "4h",
+      progress: 72,
+    },
+    {
+      id: "task-2",
+      title: "Kick-off Aliança Phobos",
+      owner: "Squad Vega",
+      dueIn: "AMANHÃ",
+      progress: 28,
+    },
+    {
+      id: "task-3",
+      title: "Auditar SLA Premium",
+      owner: "Time Suporte",
+      dueIn: "2 dias",
+      progress: 54,
+    },
+  ],
+  community: [
+    {
+      id: "post-1",
+      title: "Playbook de abordagem híbrida com IA",
+      author: "Lorena Campos",
+      likes: 284,
+      comments: 47,
+      trend: 26,
+    },
+    {
+      id: "post-2",
+      title: "Integração Supabase × Data Warehouse",
+      author: "Rafael A.",
+      likes: 198,
+      comments: 22,
+      trend: 14,
+    },
+  ],
+  sla: [
+    {
+      metric: "First Response Time",
+      value: "07m",
+      target: "Meta: 10m",
+      status: "OK",
+    },
+    {
+      metric: "Resolução Prioridade A",
+      value: "2h18",
+      target: "Meta: 2h",
+      status: "Alerta",
+    },
+    {
+      metric: "Backlog crítico",
+      value: "12 casos",
+      target: "Meta: ≤ 8",
+      status: "Crítico",
+    },
+  ],
+};
+
+const mockCampaigns: Campaign[] = [
+  {
+    id: "campaign-orion",
+    name: "Orion Prime Experience",
+    headline: "Suite de IA com onboarding em 48h",
+    subheadline: "Nova geração de playbooks orientados por copilots",
+    description:
+      "Implante jornadas de aquisição com recomendação cognitiva e sprints assistidos por IA. Tudo calibrado para squads enterprise e velocity teams.",
+    ctaLabel: "Ver blueprint",
+    ctaHref: "https://alshamprima.com/blueprint/orion",
+    badge: "Lançamento Q4",
+    badgeTone: "emerald",
+    mediaType: "image",
+    mediaSrc: campaignOrion,
+    metrics: [
+      { label: "Ativação", value: "+63%" },
+      { label: "Payback", value: "3.2m" },
+      { label: "Upsell", value: "+28%" },
+    ],
+  },
+  {
+    id: "campaign-video",
+    name: "Motion Studio GTM",
+    headline: "Campanhas com vídeo inteligente",
+    subheadline: "Stories e webinars com insights em tempo real",
+    description:
+      "Automatize conteúdos dinâmicos com roteiros otimizados por IA, geração de cortes automáticos e analytics preditivo direto no painel executivo.",
+    ctaLabel: "Assistir demo",
+    ctaHref: "https://alshamprima.com/demo/motion",
+    badge: "Preview exclusivo",
+    badgeTone: "sky",
+    mediaType: "video",
+    mediaSrc: "https://cdn.coverr.co/videos/coverr-business-team-meeting-9950/1080p.mp4",
+    metrics: [
+      { label: "Conversão", value: "+21%" },
+      { label: "Tempo médio", value: "7m14s" },
+      { label: "CSAT", value: "96" },
+    ],
+  },
+  {
+    id: "campaign-labs",
+    name: "CX Labs Copilot",
+    headline: "Assistente cognitivo para squads de suporte",
+    subheadline: "Contexto unificado, scripts dinâmicos e SLA premium",
+    description:
+      "Habilite agentes com copilotos especializados, monitoramento de sentimento e priorização automática das interações mais valiosas.",
+    ctaLabel: "Ver laboratório",
+    ctaHref: "https://alshamprima.com/labs/cx",
+    badge: "Beta fechado",
+    badgeTone: "fuchsia",
+    mediaType: "iframe",
+    mediaSrc: "https://www.youtube.com/embed/iYe07ZcHqh4?rel=0&modestbranding=1",
+    metrics: [
+      { label: "SLA 1ª resposta", value: "-42%" },
+      { label: "Adoção IA", value: "94%" },
+      { label: "FCR", value: "+18pp" },
+    ],
+  },
+];
+
+function App() {
+  const {
+    loading,
+    kpis,
+    analytics,
+    aiInsights,
+    automations,
+    engagement,
+    campaigns,
+    currency,
+    timeframe,
+    theme,
+    fetchData,
+    setCurrency,
+    setTimeframe,
+    setTheme,
+  } = useDashboardStore();
+  const [campaignIndex, setCampaignIndex] = useState(0);
+  const [isMobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const closeMobileNav = () => setMobileNavOpen(false);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    if (!campaigns.length) return;
+    setCampaignIndex((prev) => (prev >= campaigns.length ? 0 : prev));
+  }, [campaigns.length]);
+
+  useEffect(() => {
+    if (campaigns.length <= 1) return;
+    const timer = setInterval(() => {
+      setCampaignIndex((prev) => (prev + 1) % campaigns.length);
+    }, 9000);
+    return () => clearInterval(timer);
+  }, [campaigns.length]);
+
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    if (isMobileNavOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMobileNavOpen]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const handleChange = (event: MediaQueryList | MediaQueryListEvent) => {
+      if (event.matches) {
+        setMobileNavOpen(false);
+      }
+    };
+
+    handleChange(mediaQuery);
+
+    const listener = (event: MediaQueryListEvent) => handleChange(event);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", listener);
+      return () => mediaQuery.removeEventListener("change", listener);
+    }
+
+    mediaQuery.addListener(listener);
+    return () => mediaQuery.removeListener(listener);
+  }, []);
+
+  const pipelineBarData = useMemo(() => {
+    const labels = analytics.pipeline.map((stage) => stage.stage);
+    const values = analytics.pipeline.map((stage) => stage.value ?? 0);
+    const palette = [chartNeutrals.sage, chartNeutrals.mist, chartNeutrals.clay, chartNeutrals.brass];
+
+    return {
+      labels: labels.length ? labels : ["Sem dados"],
+      datasets: [
+        {
+          label: "Volume",
+          data: values.length ? values : [0],
+          backgroundColor: values.map((_, idx) => hexToRgba(palette[idx % palette.length], 0.75)),
+          borderRadius: 18,
+          hoverBackgroundColor: values.map((_, idx) => hexToRgba(palette[idx % palette.length], 0.95)),
+        },
+      ],
+    };
+  }, [analytics.pipeline]);
+
+  const pipelineBarOptions = useMemo(() => {
+    const axisColor = hexToRgba(chartNeutrals.soot, 0.45);
+    const gridColor = hexToRgba(chartNeutrals.soot, 0.15);
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: "y",
+      layout: { padding: { top: 8, bottom: 8 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: hexToRgba(chartNeutrals.soot, 0.92),
+          borderColor: hexToRgba(chartNeutrals.soot, 0.25),
+          borderWidth: 1,
+          titleColor: "#f8f8f6",
+          bodyColor: "#f8f8f6",
+          padding: 12,
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: gridColor },
+          ticks: {
+            color: axisColor,
+            precision: 0,
+          },
+        },
+        y: {
+          grid: { display: false },
+          ticks: {
+            color: axisColor,
+            font: { size: 12 },
+          },
+        },
+      },
+    };
+  }, [analytics.pipeline.length]);
+
+  const conversionLineData = useMemo(() => {
+    const labels = analytics.conversion.map((stage) => stage.stage);
+    const values = analytics.conversion.map((stage) => stage.value ?? 0);
+
+    return {
+      labels: labels.length ? labels : ["Sem dados"],
+      datasets: [
+        {
+          label: "Taxa de Conversão",
+          data: values.length ? values : [0],
+          borderColor: chartNeutrals.sage,
+          backgroundColor: hexToRgba(chartNeutrals.sage, 0.18),
+          fill: true,
+          tension: 0.38,
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: chartNeutrals.clay,
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 1.5,
+        },
+      ],
+    };
+  }, [analytics.conversion]);
+
+  const conversionLineOptions = useMemo(() => {
+    const axisColor = hexToRgba(chartNeutrals.soot, 0.45);
+    const gridColor = hexToRgba(chartNeutrals.soot, 0.12);
+    const maxValue = analytics.conversion.length
+      ? Math.max(...analytics.conversion.map((stage) => stage.value ?? 0))
+      : 100;
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: hexToRgba(chartNeutrals.soot, 0.92),
+          borderColor: hexToRgba(chartNeutrals.soot, 0.25),
+          borderWidth: 1,
+          titleColor: "#f8f8f6",
+          bodyColor: "#f8f8f6",
+          padding: 12,
+          callbacks: {
+            label: (context: any) => `${context.parsed.y ?? 0}% de conversão`,
+          },
+        },
+      },
+      interaction: {
+        mode: "index" as const,
+        intersect: false,
+      },
+      scales: {
+        x: {
+          grid: { color: gridColor },
+          ticks: { color: axisColor },
+        },
+        y: {
+          grid: { color: gridColor },
+          ticks: {
+            color: axisColor,
+            callback: (value: number) => `${value}%`,
+          },
+          suggestedMin: 0,
+          suggestedMax: Math.min(Math.ceil(maxValue / 10) * 10 + 10, 100),
+        },
+      },
+    };
+  }, [analytics.conversion]);
+
+  const marketSplitData = useMemo(() => {
+    const labels = analytics.marketSplit.map((slice) => slice.label);
+    const values = analytics.marketSplit.map((slice) => slice.value ?? 0);
+    const colors = analytics.marketSplit.map((slice) => hexToRgba(slice.accent, 0.85));
+
+    return {
+      labels: labels.length ? labels : ["Sem dados"],
+      datasets: [
+        {
+          label: "Participação",
+          data: values.length ? values : [1],
+          backgroundColor: colors.length ? colors : [hexToRgba(chartNeutrals.sage, 0.6)],
+          borderColor: hexToRgba(chartNeutrals.soot, 0.08),
+          borderWidth: 2,
+          hoverOffset: 6,
+          spacing: 3,
+        },
+      ],
+    };
+  }, [analytics.marketSplit]);
+
+  const marketSplitOptions = useMemo(() => {
+    const legendColor = hexToRgba(chartNeutrals.soot, 0.55);
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "62%",
+      plugins: {
+        legend: {
+          position: "right" as const,
+          labels: {
+            color: legendColor,
+            usePointStyle: true,
+            padding: 16,
+            boxWidth: 8,
+          },
+        },
+        tooltip: {
+          backgroundColor: hexToRgba(chartNeutrals.soot, 0.92),
+          borderColor: hexToRgba(chartNeutrals.soot, 0.25),
+          borderWidth: 1,
+          titleColor: "#f8f8f6",
+          bodyColor: "#f8f8f6",
+          padding: 12,
+          callbacks: {
+            label: (context: any) => `${context.label}: ${context.parsed}%`,
+          },
+        },
+      },
+    };
+  }, [analytics.marketSplit]);
+
+  const heatmapMeta = useMemo(() => {
+    if (!analytics.heatmap.length) {
+      return {
+        days: [] as string[],
+        squads: [] as string[],
+        matrix: [] as number[][],
+        maxScore: 0,
+      };
+    }
+
+    const days = Array.from(new Set(analytics.heatmap.map((cell) => cell.day)));
+    const squads = Array.from(new Set(analytics.heatmap.map((cell) => cell.squad)));
+    const matrix = squads.map((squad) =>
+      days.map((day) => {
+        const match = analytics.heatmap.find((cell) => cell.squad === squad && cell.day === day);
+        return match?.score ?? 0;
+      })
+    );
+    const maxScore = matrix.flat().reduce((max, score) => Math.max(max, score), 0);
+
+    return { days, squads, matrix, maxScore };
+  }, [analytics.heatmap]);
+
+  const heatmapSafeMax = heatmapMeta.maxScore > 0 ? heatmapMeta.maxScore : 100;
+
+  if (loading) {
+    return <LoadingSkeletonLayout theme={theme} />;
+  }
+
+  return (
+    <div
+      data-theme={theme}
+      className="min-h-screen text-[var(--text-primary)] transition-colors"
+      style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
+    >
+      <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
+        <button
+          className="fixed right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-xl shadow-[color-mix(in_srgb,var(--accent-emerald)_25%,transparent)] backdrop-blur md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
+          onClick={() => setMobileNavOpen((prev) => !prev)}
+          aria-expanded={isMobileNavOpen}
+          aria-controls="mobile-command-center"
+          aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
+        >
+          {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+
+        <AnimatePresence>
+          {isMobileNavOpen && (
+            <motion.div
+              className="fixed inset-0 z-40 bg-[color-mix(in_srgb,var(--background)_75%,transparent)] backdrop-blur-xl md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMobileNav}
+            >
+              <motion.div
+                id="mobile-command-center"
+                className="absolute left-0 top-0 flex h-full w-[min(88vw,360px)] flex-col border-r border-[var(--border-strong)] bg-[var(--surface)]/92 shadow-2xl"
+                style={{
+                  paddingTop: "calc(env(safe-area-inset-top) + 1.25rem)",
+                  paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)",
+                }}
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", stiffness: 260, damping: 32 }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="flex items-center justify-between px-6 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
+                      A∞
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
+                      <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeMobileNav}
+                    className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                    aria-label="Fechar menu"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="h-[1px] w-full bg-[var(--border)]/60" />
+
+                <div className="flex-1 overflow-y-auto px-6">
+                  <div className="space-y-4 pt-4">
+                    {sidebarGroups.map((group) => (
+                      <div key={`mobile-${group.id}`} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-4">
+                        <div className="flex items-center gap-3">
+                          <span className="grid h-9 w-9 place-content-center rounded-xl bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
+                            {group.icon}
+                          </span>
+                          <p className="text-sm font-semibold text-[var(--text-primary)]">{group.label}</p>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
+                          {group.links.map((link) => (
+                            <span key={link} className="rounded-full border border-[var(--border)]/70 px-3 py-1">
+                              {link}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
+                    <p className="text-[11px] uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Moeda</p>
+                        <div className="mt-2 flex gap-2">
+                          {currencyOptions.map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setCurrency(option.value)}
+                              aria-label={`Selecionar moeda ${option.label}`}
+                              aria-pressed={currency === option.value}
+                              className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                                currency === option.value
+                                  ? "border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
+                                  : "border-[var(--border)] bg-[var(--surface-strong)]/60 text-[var(--text-secondary)]"
+                              }`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Timeframe</p>
+                        <div className="mt-2 flex gap-2">
+                          {timeframeOptions.map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setTimeframe(option.value)}
+                              aria-label={`Selecionar período ${option.label}`}
+                              aria-pressed={timeframe === option.value}
+                              className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                                timeframe === option.value
+                                  ? "border-[var(--accent-sky)]/40 bg-[var(--accent-sky)]/15 text-[var(--accent-sky)]"
+                                  : "border-[var(--border)] bg-[var(--surface-strong)]/60 text-[var(--text-secondary)]"
+                              }`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Tema</p>
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                          {themeOptions.map((option) => (
+                            <button
+                              key={option.key}
+                              type="button"
+                              onClick={() => setTheme(option.key)}
+                              aria-label={`Mudar para tema ${option.label}`}
+                              aria-current={theme === option.key ? "true" : "false"}
+                              className={`min-h-[48px] rounded-xl border px-3 py-2 text-left text-xs uppercase tracking-[0.2em] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                                theme === option.key
+                                  ? "border-[var(--accent-fuchsia)]/40 bg-[var(--accent-fuchsia)]/10 text-[var(--accent-fuchsia)]"
+                                  : "border-[var(--border)] bg-[var(--surface-strong)]/55 text-[var(--text-secondary)]"
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                <span
+                                  className="h-4 w-4 rounded-full"
+                                  style={{ background: themeSwatches[option.key], boxShadow: "0 0 10px rgba(135, 148, 164, 0.28)" }}
+                                />
+                                {option.label}
+                              </span>
+                              <span className="mt-1 block text-[10px] capitalize text-[var(--text-secondary)]/80">{option.description}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <aside className="hidden min-h-screen lg:flex lg:w-80 xl:w-[22rem] flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
+          <div className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur">
+            <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
+              A∞
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">ALSHAM</p>
+              <p className="text-lg font-medium">360° PRIMA</p>
+            </div>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto px-4 pb-6">
+            <div className="space-y-5">
+              {sidebarGroups.map((group) => (
+                <div key={group.id} className="space-y-3">
+                  <button
+                    className="flex w-full items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] transition hover:border-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                    aria-label={`Abrir categoria ${group.label}`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="grid h-8 w-8 place-content-center rounded-full bg-[var(--surface)] text-[var(--accent-emerald)]">
+                        {group.icon}
+                      </span>
+                      {group.label}
+                    </span>
+                    <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
+                  </button>
+                  <ul className="ml-4 space-y-2 border-l border-[var(--border)] pl-4 text-sm text-[var(--text-secondary)]">
+                    {group.links.map((link) => (
+                      <li key={link} className="flex items-center gap-2">
+                        <span className="h-[1px] w-2 bg-[var(--accent-emerald)]/60" />
+                        {link}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </nav>
+
+          <div className="border-t border-[var(--border)] px-6 py-6">
+            <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+              <div className="grid h-10 w-10 place-content-center rounded-full bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Copilot 360°</p>
+                <p className="text-xs text-[var(--text-secondary)]">Integração profunda com IA generativa e preditiva.</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div className="flex flex-col">
+          <header
+            className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
+            style={{ paddingTop: "env(safe-area-inset-top)" }}
+          >
+            <div className="flex flex-wrap items-center gap-4 px-6 py-4 sm:py-5">
+              <button
+                type="button"
+                className="grid h-10 w-10 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                onClick={() => setMobileNavOpen((prev) => !prev)}
+                aria-expanded={isMobileNavOpen}
+                aria-controls="mobile-command-center"
+                aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
+              >
+                {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-secondary)]" />
+                <input
+                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] py-3 pl-12 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-[var(--accent-emerald)] focus:outline-none focus:ring-0"
+                  placeholder="Pesquisar qualquer interação, deal, automação ou insight"
+                />
+                <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-2 py-1 text-[11px] uppercase tracking-[0.2em] text-[var(--text-secondary)]">
+                  <Command className="h-3.5 w-3.5" /> K
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                  <Globe2 className="h-4 w-4 text-[var(--accent-emerald)]" />
+                  <button
+                    onClick={() => setCurrency("BRL")}
+                    aria-label="Selecionar moeda Real Brasileiro"
+                    aria-pressed={currency === "BRL"}
+                    className={`${
+                      currency === "BRL"
+                        ? "text-[var(--accent-emerald)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    BRL
+                  </button>
+                  <button
+                    onClick={() => setCurrency("USD")}
+                    aria-label="Selecionar moeda Dólar Americano"
+                    aria-pressed={currency === "USD"}
+                    className={`${
+                      currency === "USD"
+                        ? "text-[var(--accent-sky)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    USD
+                  </button>
+                  <button
+                    onClick={() => setCurrency("EUR")}
+                    aria-label="Selecionar moeda Euro"
+                    aria-pressed={currency === "EUR"}
+                    className={`${
+                      currency === "EUR"
+                        ? "text-[var(--accent-fuchsia)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    EUR
+                  </button>
+                  <span className="mx-1 h-4 w-[1px] bg-[var(--surface-strong)]" />
+                  <button
+                    onClick={() => setTimeframe("7d")}
+                    aria-label="Selecionar período de 7 dias"
+                    aria-pressed={timeframe === "7d"}
+                    className={`${
+                      timeframe === "7d"
+                        ? "text-[var(--accent-emerald)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    7D
+                  </button>
+                  <button
+                    onClick={() => setTimeframe("30d")}
+                    aria-label="Selecionar período de 30 dias"
+                    aria-pressed={timeframe === "30d"}
+                    className={`${
+                      timeframe === "30d"
+                        ? "text-[var(--accent-sky)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    30D
+                  </button>
+                  <button
+                    onClick={() => setTimeframe("90d")}
+                    aria-label="Selecionar período de 90 dias"
+                    aria-pressed={timeframe === "90d"}
+                    className={`${
+                      timeframe === "90d"
+                        ? "text-[var(--accent-fuchsia)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    90D
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--text-secondary)]">
+                  <Palette className="h-4 w-4 text-[var(--accent-sky)]" />
+                  <div className="flex items-center gap-2">
+                    {themeOptions.map((option) => (
+                      <button
+                        key={option.key}
+                        onClick={() => setTheme(option.key)}
+                        aria-label={`Mudar para tema ${option.label}`}
+                        aria-current={theme === option.key ? "true" : "false"}
+                        className={`flex items-center gap-2 rounded-xl border px-2 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                          theme === option.key
+                            ? "border-[var(--accent-emerald)] bg-[var(--surface-strong)] text-[var(--text-primary)]"
+                            : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-sky)]"
+                        }`}
+                        title={`${option.label} • ${option.description}`}
+                      >
+                        <span
+                          className="h-4 w-4 rounded-full"
+                          style={{ background: themeSwatches[option.key], boxShadow: "0 0 10px rgba(135, 148, 164, 0.28)" }}
+                        />
+                        <span className="text-[10px] font-medium uppercase tracking-[0.2em]">
+                          {option.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  className="grid h-11 w-11 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-secondary)] transition hover:text-[var(--accent-emerald)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                  aria-label="Abrir notificações"
+                >
+                  <Bell className="h-5 w-5" />
+                </button>
+
+                <div className="flex items-center gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-2">
+                  <div className="grid h-9 w-9 place-content-center rounded-full bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-sm font-semibold text-slate-950">
+                    VP
+                  </div>
+                  <div className="hidden text-sm leading-tight lg:block">
+                    <p className="font-medium">Victor Prado</p>
+                    <p className="text-xs text-[var(--accent-emerald)]">Chief Growth Architect</p>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main
+            className="flex-1 overflow-y-auto bg-[var(--background)]"
+            style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
+          >
+            <section className="px-4 pb-14 pt-10 sm:px-6 md:pb-16 md:pt-12 lg:px-10"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 3.5rem)" }}
+            >
+              <div className="flex flex-col gap-6">
+                {campaigns.length > 0 && (
+                  <CampaignSpotlight
+                    campaigns={campaigns}
+                    activeIndex={campaignIndex}
+                    onSelect={setCampaignIndex}
+                  />
+                )}
+
+                <motion.section
+                  className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/90 p-6 shadow-lifted sm:p-8 lg:p-10"
+                  initial={{ opacity: 0, y: 36 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  viewport={{ once: true, amount: 0.4 }}
+                >
+                  <div className="pointer-events-none absolute inset-0 opacity-90" style={{ background: "var(--gradient-wash)" }} />
+                  <div className="absolute -left-32 top-0 hidden h-full w-32 bg-gradient-to-r from-black/10 to-transparent blur-3xl lg:block" />
+                  <div className="absolute -right-24 bottom-0 hidden h-56 w-48 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl lg:block" />
+
+                  <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)] lg:gap-12">
+                    <div className="flex flex-col gap-8">
+                      <div className="space-y-4">
+                        <span className="inline-flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/60 px-4 py-2 text-[11px] uppercase tracking-[0.5em] text-[var(--accent-sky)]">
+                          <span className="h-1.5 w-6 rounded-full bg-[var(--accent-emerald)]/70" /> You are in control
+                        </span>
+                        <h1 className="text-4xl font-light leading-tight text-[var(--text-primary)] sm:text-[46px]">
+                          Dashboard Executivo 360° — Obsessão em Resultados Visíveis.
+                        </h1>
+                        <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)] sm:text-lg">
+                          Uma visão holística que combina CRM, Inteligência Artificial, Automação, Comunidade e Gamificação em tempo real. Cada interação mapeada em valor, cada decisão orientada por dados, cada resultado amplificado por IA.
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3 text-sm">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-emerald)]/40 bg-wash-sage px-5 py-2.5 text-[var(--accent-emerald)]">
+                          <Sparkles className="h-4 w-4" /> Copilot 360° integrado
+                        </span>
+                        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-sky)]/40 bg-wash-mist px-5 py-2.5 text-[var(--accent-sky)]">
+                          <HeartPulse className="h-4 w-4" /> ROI em tempo real
+                        </span>
+                        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-fuchsia)]/40 bg-wash-clay px-5 py-2.5 text-[var(--accent-fuchsia)]">
+                          <Flame className="h-4 w-4" /> Automação proativa
+                        </span>
+                      </div>
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="group relative overflow-hidden rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-emerald)]/45 hover:shadow-lifted">
+                          <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl transition duration-500 group-hover:scale-110" />
+                          <p className="text-sm text-[var(--accent-emerald)]">Valor agregado</p>
+                          <p className="mt-3 text-4xl font-semibold text-[var(--text-primary)]">R$ 18,7M</p>
+                          <p className="mt-4 text-xs text-[var(--text-secondary)]">+328% vs baseline pré-ALSHAM</p>
+                        </div>
+
+                        <div className="group relative overflow-hidden rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-sky)]/45 hover:shadow-lifted">
+                          <div className="absolute -left-20 top-1/2 h-44 w-44 -translate-y-1/2 rounded-full bg-[var(--accent-sky)]/14 blur-3xl transition duration-500 group-hover:translate-x-4" />
+                          <p className="text-sm text-[var(--accent-sky)]">IA & Automação</p>
+                          <p className="mt-3 text-4xl font-semibold text-[var(--text-primary)]">6.320h</p>
+                          <p className="mt-4 text-xs text-[var(--text-secondary)]">Horas poupadas no período</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-5 rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/75 p-6">
+                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                        <span>ROI acumulado nos últimos 12 meses</span>
+                        <span>Moeda: {currency}</span>
+                      </div>
+
+                      <div className="flex flex-col gap-4 rounded-3xl border border-[var(--border)] bg-[var(--surface)]/80 p-5">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Momento aha</p>
+                            <p className="mt-2 text-lg font-medium text-[var(--text-primary)]">Onboarding concierge completado</p>
+                          </div>
+                          <span className="rounded-full border border-[var(--accent-emerald)]/40 px-3 py-1 text-[11px] font-medium text-[var(--accent-emerald)]">92%</span>
+                        </div>
+                        <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                          <span className="font-medium text-[var(--accent-emerald)]">Momento Aha em 3m42s</span> • NPS mensal 76 • Taxa de adoção de IA 94%.
+                        </p>
+                      </div>
+
+                      <div className="grid gap-4 rounded-3xl border border-[var(--border)] bg-[var(--surface)]/80 p-5">
+                        <div className="flex items-center justify-between text-sm text-[var(--text-secondary)]">
+                          <span>Blueprint executivo</span>
+                          <span className="inline-flex items-center gap-1 text-[var(--accent-emerald)]">
+                            <ArrowUpRight className="h-4 w-4" /> Ver playbook
+                          </span>
+                        </div>
+                        <div className="grid gap-3 text-sm text-[var(--text-secondary)]">
+                          <div className="flex justify-between">
+                            <span>Valor incremental</span>
+                            <span className="text-[var(--text-primary)]">+R$ 720K</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Precisão de forecast</span>
+                            <span className="text-[var(--text-primary)]">92%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Eficiência IA</span>
+                            <span className="text-[var(--text-primary)]">+34pp</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.section>
+
+                <section>
+                  <div className="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">Radar de Performance</p>
+                      <h2 className="text-2xl font-semibold text-[var(--text-primary)]">KPIs estratégicos para decisões exponenciais</h2>
+                    </div>
+                    <p className="text-sm text-[var(--text-secondary)]">Atualizado • timeframe: {timeframe}</p>
+                  </div>
+
+                  <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                    {kpis.map((kpi, index) => (
+                      <motion.div
+                        key={kpi.id}
+                        role="article"
+                        aria-label={`KPI: ${kpi.title} — Valor ${kpi.value}`}
+                        className="relative overflow-hidden rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface)]/85 p-6 sm:p-7"
+                        style={
+                          kpi.highlight
+                            ? {
+                                backgroundImage:
+                                  "linear-gradient(140deg, rgba(122,143,128,0.22) 0%, rgba(197,164,124,0.18) 48%, rgba(135,148,164,0.16) 100%)",
+                              }
+                            : undefined
+                        }
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        whileHover={{ y: -10, rotateX: 0.5 }}
+                        transition={{ duration: 0.6, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                        viewport={{ once: true, amount: 0.35 }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="grid h-12 w-12 place-content-center rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
+                            {kpi.icon}
+                          </span>
+                          <span className={`text-xs font-medium ${kpi.trend >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"}`}>
+                            {kpi.trend >= 0 ? "+" : ""}
+                            {kpi.trend}%
+                          </span>
+                        </div>
+                        <h3 className="mt-5 text-lg font-medium tracking-tight text-[var(--text-primary)]">{kpi.title}</h3>
+                        <p className="mt-3 text-4xl font-semibold tracking-tight text-[var(--text-primary)]">{kpi.value}</p>
+                        <p className="mt-3 text-xs text-[var(--accent-emerald)]/80">{kpi.trendLabel}</p>
+                        <div className="mt-5 flex items-start justify-between text-xs text-[var(--text-secondary)]">
+                          <span className="max-w-[45%] leading-relaxed">{kpi.target}</span>
+                          <span className="max-w-[50%] text-right leading-relaxed">{kpi.description}</span>
+                        </div>
+                        <div className="mt-6 h-16 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)]/55 p-3">
+                          <Sparkline series={kpi.series} highlight={kpi.highlight} />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="grid gap-8 xl:grid-cols-[1.45fr_0.85fr]">
+                  <motion.div
+                    className="space-y-8 overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:p-8"
+                    initial={{ opacity: 0, y: 48 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    viewport={{ once: true, amount: 0.35 }}
+                  >
+                    <header className="space-y-3">
+                      <p className="text-[11px] uppercase tracking-[0.45em] text-[var(--accent-sky)]">Analytics & Performance</p>
+                      <h3 className="text-xl font-semibold text-[var(--text-primary)]">Indicadores executivos em tempo real</h3>
+                      <p className="text-sm text-[var(--text-secondary)]">
+                        Visualize os pontos críticos do pipeline, evolução das conversões e composição de receita em um painel único.
+                      </p>
+                    </header>
+
+                    <div className="grid gap-5 lg:grid-cols-2">
+                      <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-[var(--text-primary)]">Pipeline por estágio</h4>
+                          <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">volume</span>
+                        </div>
+                        <div className="mt-5 h-56 sm:h-60 md:h-72" role="img" aria-label="Gráfico de Pipeline por Estágio">
+                          <Bar data={pipelineBarData} options={pipelineBarOptions} />
+                        </div>
+                      </div>
+
+                      <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-[var(--text-primary)]">Funil de conversão</h4>
+                          <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">taxa %</span>
+                        </div>
+                        <div className="mt-5 h-56 sm:h-60 md:h-72" role="img" aria-label="Gráfico de Funil de Conversão">
+                          <Line data={conversionLineData} options={conversionLineOptions} />
+                        </div>
+                      </div>
+
+                      <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 lg:col-span-2">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <h4 className="text-sm font-semibold text-[var(--text-primary)]">Divisão de receita por mercado</h4>
+                          <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">{timeframe}</span>
+                        </div>
+                        <div className="mt-5 flex flex-col gap-6 lg:flex-row">
+                          <div className="mx-auto h-52 w-52 sm:h-56 sm:w-56" role="img" aria-label="Gráfico de Participação por Mercado">
+                            <Doughnut data={marketSplitData} options={marketSplitOptions} />
+                          </div>
+                          <div className="flex-1 space-y-3 text-sm text-[var(--text-secondary)]">
+                            {analytics.marketSplit.length ? (
+                              analytics.marketSplit.map((slice) => (
+                                <div
+                                  key={slice.label}
+                                  className="flex items-center justify-between rounded-2xl border border-[var(--border)]/70 bg-[var(--surface)]/75 px-4 py-3"
+                                >
+                                  <span className="flex items-center gap-2 text-[var(--text-primary)]">
+                                    <span
+                                      className="h-2.5 w-2.5 rounded-full"
+                                      style={{ backgroundColor: hexToRgba(slice.accent, 0.85) }}
+                                    />
+                                    {slice.label}
+                                  </span>
+                                  <span className="font-medium">{slice.value}%</span>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-sm text-[var(--text-secondary)]">Sem dados de segmentação disponíveis.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h4 className="text-sm font-semibold text-[var(--text-primary)]">Heatmap de energia por squad</h4>
+                        <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">score 0-100</span>
+                      </div>
+                      {heatmapMeta.days.length === 0 || heatmapMeta.squads.length === 0 ? (
+                        <p className="mt-6 text-sm text-[var(--text-secondary)]">Sem registros de atividade para o período selecionado.</p>
+                      ) : (
+                        <div
+                          className="mt-6 grid gap-3 text-sm"
+                          style={{ gridTemplateColumns: `repeat(${heatmapMeta.days.length + 1}, minmax(0, 1fr))` }}
+                        >
+                          <div />
+                          {heatmapMeta.days.map((day) => (
+                            <div
+                              key={day}
+                              className="text-center text-xs uppercase tracking-[0.28em] text-[var(--text-secondary)]"
+                            >
+                              {day}
+                            </div>
+                          ))}
+                          {heatmapMeta.squads.map((squad, squadIndex) => (
+                            <Fragment key={squad}>
+                              <div className="text-xs font-medium uppercase tracking-[0.28em] text-[var(--text-secondary)]">
+                                {squad}
+                              </div>
+                              {heatmapMeta.matrix[squadIndex].map((score, dayIndex) => {
+                                const alpha = score > 0 ? Math.min(0.18 + (score / heatmapSafeMax) * 0.55, 0.78) : 0.12;
+                                const highlight = score > heatmapSafeMax * 0.6;
+                                const dayLabel = heatmapMeta.days[dayIndex];
+                                return (
+                                  <div
+                                    key={`${squad}-${dayLabel}`}
+                                    className="grid h-14 place-content-center rounded-2xl border border-[var(--border)]/70 md:h-16"
+                                    style={{
+                                      backgroundColor: hexToRgba(chartNeutrals.sage, alpha),
+                                      color: highlight ? "var(--text-primary)" : "var(--text-secondary)",
+                                    }}
+                                    title={`${squad} em ${dayLabel}: ${score} pontos`}
+                                  >
+                                    <span className="text-sm font-semibold">{score}</span>
+                                  </div>
+                                );
+                              })}
+                            </Fragment>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="grid gap-8 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:p-8"
+                    initial={{ opacity: 0, x: 48 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    viewport={{ once: true, amount: 0.35 }}
+                  >
+                    <header className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="space-y-2">
+                        <p className="text-[11px] uppercase tracking-[0.45em] text-[var(--accent-sky)]">IA Next-Best-Action</p>
+                        <h3 className="text-xl font-semibold text-[var(--text-primary)]">Planos de ação sugeridos pela inteligência preditiva</h3>
+                      </div>
+                      <button
+                        className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 px-4 py-2 text-xs text-[var(--text-secondary)] transition hover:border-[var(--accent-fuchsia)]/45 hover:text-[var(--accent-fuchsia)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                        aria-label="Ver modelo completo de IA"
+                      >
+                        <Brain className="h-3.5 w-3.5" /> Ver modelo completo
+                      </button>
+                    </header>
+
+                    <div className="space-y-4">
+                      {aiInsights.map((insight) => (
+                        <div
+                          key={insight.id}
+                          className="group relative overflow-hidden rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-emerald)]/45"
+                        >
+                          <div className="absolute inset-y-0 left-0 w-1 rounded-full bg-[var(--accent-emerald)]/65" />
+                          <div className="absolute inset-0 opacity-[0.32]" style={{ background: "var(--gradient-wash)" }} />
+                          <div className="relative flex flex-wrap items-start justify-between gap-4">
+                            <div className="max-w-2xl space-y-2">
+                              <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-emerald)]">Confiança {insight.confidence}</p>
+                              <h4 className="text-lg font-medium text-[var(--text-primary)]">{insight.title}</h4>
+                              <p className="text-sm text-[var(--text-secondary)]">{insight.impact}</p>
+                            </div>
+                            <span className="rounded-full border border-[var(--border)]/75 bg-[var(--surface)]/75 px-4 py-1.5 text-[11px] font-medium tracking-[0.28em] text-[var(--accent-sky)]">
+                              Score IA • {insight.score}
+                            </span>
+                          </div>
+                          <p className="relative mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
+                            Próxima ação sugerida: <span className="text-[var(--accent-fuchsia)]">{insight.action}</span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
+                        <span>Automação estratégica ativa</span>
+                        <button
+                          className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/80 px-4 py-2 text-xs text-[var(--accent-sky)] transition hover:border-[var(--accent-emerald)]/45 hover:text-[var(--accent-emerald)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                          aria-label="Abrir catálogo de automações"
+                        >
+                          <Flame className="h-3.5 w-3.5" /> Catálogo de automações
+                        </button>
+                      </div>
+                      <div className="mt-5 space-y-4 text-sm text-[var(--text-secondary)]">
+                        {automations.map((automation) => (
+                          <div key={automation.id} className="grid gap-4 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-5 py-4">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <div>
+                                <p className="font-medium text-[var(--text-primary)]">{automation.name}</p>
+                                <p className="text-xs text-[var(--text-secondary)]">Última execução: {automation.lastRun}</p>
+                              </div>
+                              <span
+                                className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                                  automation.status === "Executando"
+                                    ? "border-[var(--accent-emerald)]/40 text-[var(--accent-emerald)]"
+                                    : automation.status === "Agendado"
+                                    ? "border-[var(--accent-sky)]/40 text-[var(--accent-sky)]"
+                                    : "border-[var(--accent-fuchsia)]/40 text-[var(--accent-fuchsia)]"
+                                }`}
+                              >
+                                {automation.status}
+                              </span>
+                            </div>
+                            <div className="grid gap-3 text-xs">
+                              <div className="flex justify-between">
+                                <span>Eficiência</span>
+                                <span className="text-[var(--text-primary)]">{automation.efficiency}%</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-[var(--surface-strong)]/60">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${automation.efficiency}%`,
+                                    background: "linear-gradient(90deg, rgba(122,143,128,0.6), rgba(197,164,124,0.58))",
+                                  }}
+                                />
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Horas economizadas</span>
+                                <span className="text-[var(--text-primary)]">{automation.savedHours}h</span>
+                              </div>
+                              <div className="h-2 rounded-full bg-[var(--surface-strong)]/60">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${Math.min((automation.savedHours / 150) * 100, 100)}%`,
+                                    background: "linear-gradient(90deg, rgba(135,148,164,0.58), rgba(197,164,124,0.55))",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                </section>
+
+                <section className="grid gap-8 2xl:grid-cols-[1.15fr_0.85fr]">
+                  <motion.div
+                    className="grid gap-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:gap-6 sm:p-8"
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                    viewport={{ once: true, amount: 0.4 }}
+                  >
+                    <header className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="space-y-2">
+                        <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Engajamento vivo</p>
+                        <h3 className="text-xl font-semibold text-[var(--text-primary)]">Ritmo operacional, comunidade e experiência</h3>
+                      </div>
+                      <button
+                        className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 px-4 py-2 text-xs text-[var(--text-secondary)] transition hover:border-[var(--accent-emerald)]/45 hover:text-[var(--accent-emerald)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                        aria-label="Abrir pulse realtime"
+                      >
+                        <Activity className="h-3.5 w-3.5" /> Pulse realtime
+                      </button>
+                    </header>
+
+                    <div className="grid gap-5 sm:gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+                      <div className="space-y-4">
+                        {engagement.feed.map((event) => (
+                          <div
+                            key={event.id}
+                            className="flex items-start gap-3 rounded-[24px] border border-[var(--border)]/80 bg-[var(--surface)]/75 p-4 transition duration-300 hover:border-[var(--accent-emerald)]/40"
+                          >
+                            <span className="grid h-10 w-10 place-content-center rounded-xl bg-wash-sage text-[var(--accent-emerald)]">
+                              {event.icon}
+                            </span>
+                            <div>
+                              <p className="text-sm font-medium text-[var(--text-primary)]">{event.title}</p>
+                              <p className="text-xs text-[var(--text-secondary)]">{event.description}</p>
+                              <p className="mt-3 text-[10px] uppercase tracking-[0.32em] text-[var(--text-secondary)]">{event.timestamp}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="grid gap-5">
+                        <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                          <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Leaderboard</p>
+                          <div className="mt-5 space-y-3">
+                            {engagement.leaderboard.map((entry) => (
+                              <div key={entry.rank} className="flex items-center gap-3 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3 transition hover:border-[var(--accent-emerald)]/40">
+                                <span className="text-lg text-[var(--accent-emerald)]">#{entry.rank}</span>
+                                <div className="grid h-9 w-9 place-content-center rounded-full border border-[var(--border)]/60 bg-[var(--surface-strong)]/70 text-sm font-semibold text-[var(--accent-sky)]">
+                                  {entry.avatar}
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm text-[var(--text-primary)]">{entry.user}</p>
+                                  <p className="text-xs text-[var(--text-secondary)]">Score {entry.score}</p>
+                                </div>
+                                <span className={`text-xs font-medium ${entry.delta >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"}`}>
+                                  {entry.delta >= 0 ? "+" : ""}
+                                  {entry.delta}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                          <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-fuchsia)]">Missões & tarefas</p>
+                          <div className="mt-5 space-y-3">
+                            {engagement.tasks.map((task) => (
+                              <div key={task.id} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 p-4">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-sm font-medium text-[var(--text-primary)]">{task.title}</p>
+                                  <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/80 px-3 py-1 text-xs text-[var(--text-secondary)]">
+                                    {task.dueIn}
+                                  </span>
+                                </div>
+                                <p className="mt-2 text-xs text-[var(--text-secondary)]">Owner: {task.owner}</p>
+                                <div className="mt-3 h-2 w-full rounded-full bg-[var(--surface-strong)]/55">
+                                  <div
+                                    className="h-full rounded-full"
+                                    style={{
+                                      width: `${task.progress}%`,
+                                      background: "linear-gradient(90deg, rgba(122,143,128,0.6), rgba(197,164,124,0.58))",
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="grid gap-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:gap-6 sm:p-8"
+                    initial={{ opacity: 0, x: 40 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                    viewport={{ once: true, amount: 0.4 }}
+                  >
+                    <div className="space-y-2">
+                      <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Comunidade & SLA</p>
+                      <h3 className="text-xl font-semibold text-[var(--text-primary)]">Inteligência coletiva + excelência operacional</h3>
+                    </div>
+                    <div className="space-y-4">
+                      {engagement.community.map((post) => (
+                        <div
+                          key={post.id}
+                          className="relative overflow-hidden rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6"
+                        >
+                          <div className="absolute inset-0 opacity-[0.28]" style={{ background: "var(--gradient-wash)" }} />
+                          <div className="relative space-y-3">
+                            <p className="text-sm font-medium text-[var(--text-primary)]">{post.title}</p>
+                            <p className="text-xs text-[var(--text-secondary)]">por {post.author}</p>
+                            <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)]">
+                              <span>{post.likes} likes</span>
+                              <span>{post.comments} comentários</span>
+                              <span className="text-[var(--accent-emerald)]/85">+{post.trend}% adoção</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
+                      <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Status SLA Premium</p>
+                      <div className="mt-5 grid gap-3">
+                        {engagement.sla.map((record) => (
+                          <div key={record.metric} className="flex items-center justify-between rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3">
+                            <div>
+                              <p className="text-sm text-[var(--text-primary)]">{record.metric}</p>
+                              <p className="text-xs text-[var(--text-secondary)]">{record.target}</p>
+                            </div>
+                            <span
+                              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                                record.status === "OK"
+                                  ? "border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/12 text-[var(--accent-emerald)]"
+                                  : record.status === "Alerta"
+                                  ? "border-[var(--accent-amber)]/45 bg-[var(--accent-amber)]/14 text-[var(--accent-amber)]"
+                                  : "border-[var(--accent-alert)]/45 bg-[var(--accent-alert)]/14 text-[var(--accent-alert)]"
+                              }`}
+                            >
+                              {record.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                </section>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CampaignSpotlight({
+  campaigns,
+  activeIndex,
+  onSelect,
+}: {
+  campaigns: Campaign[];
+  activeIndex: number;
+  onSelect: (index: number) => void;
+}) {
+  const activeCampaign = campaigns[activeIndex];
+  const isSingle = campaigns.length <= 1;
+
+  if (!activeCampaign) {
+    return null;
+  }
+
+  const renderMedia = (campaign: Campaign) => {
+    switch (campaign.mediaType) {
+      case "video":
+        return (
+          <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-black/40">
+            <video
+              key={campaign.id}
+              src={campaign.mediaSrc}
+              className="h-full w-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+            >
+              <track kind="captions" label="Sem legendas" />
+            </video>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/45 via-transparent to-black/10" />
+          </div>
+        );
+      case "iframe":
+        return (
+          <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-black/50">
+            <iframe
+              key={campaign.id}
+              src={campaign.mediaSrc}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="aspect-video h-full w-full"
+            />
+          </div>
+        );
+      default:
+        return (
+          <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)]">
+            <img
+              src={campaign.mediaSrc}
+              alt={campaign.name}
+              className="h-full w-full object-cover"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-black/5" />
+          </div>
+        );
+    }
+  };
+
+  return (
+    <motion.section
+      className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:p-8"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true, amount: 0.45 }}
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-[0.28]" style={{ background: "var(--gradient-wash)" }} />
+      <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.32em] ${badgePalette[activeCampaign.badgeTone]}`}>
+              {activeCampaign.badge}
+            </span>
+            <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/80 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+              {activeCampaign.name}
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-3xl font-semibold text-[var(--text-primary)] sm:text-4xl">
+              {activeCampaign.headline}
+            </h2>
+            <p className="text-base text-[var(--text-secondary)] sm:text-lg">{activeCampaign.subheadline}</p>
+            <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
+              {activeCampaign.description}
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {activeCampaign.metrics.map((metric) => (
+              <div
+                key={metric.label}
+                className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3"
+              >
+                <p className="text-[11px] uppercase tracking-[0.32em] text-[var(--text-secondary)]">
+                  {metric.label}
+                </p>
+                <p className="mt-2 text-xl font-semibold text-[var(--text-primary)]">
+                  {metric.value}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href={activeCampaign.ctaHref}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-emerald)]/45 bg-[var(--surface-strong)]/70 px-5 py-2 text-sm font-medium text-[var(--accent-emerald)] transition hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
+            >
+              {activeCampaign.mediaType === "video" ? <MonitorPlay className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
+              {activeCampaign.ctaLabel}
+            </a>
+            <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+              {campaigns.map((campaign, index) => (
+                <button
+                  key={campaign.id}
+                  onClick={() => onSelect(index)}
+                  className={`h-1.5 w-10 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                    index === activeIndex ? "bg-[var(--accent-emerald)]" : "bg-[var(--border)] hover:bg-[var(--accent-emerald)]/40"
+                  }`}
+                  aria-label={`Selecionar campanha ${campaign.name}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="min-h-[260px] space-y-4">
+          {renderMedia(activeCampaign)}
+          <div className="flex items-center justify-between rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3 text-sm text-[var(--text-secondary)]">
+            <span>
+              {activeIndex + 1}/{campaigns.length} • {activeCampaign.name}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                className={`grid h-9 w-9 place-content-center rounded-full border border-[var(--border)]/80 bg-[var(--surface-strong)]/70 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                  isSingle ? "cursor-not-allowed opacity-40" : "hover:border-[var(--accent-emerald)]/45"
+                }`}
+                onClick={() => !isSingle && onSelect((activeIndex - 1 + campaigns.length) % campaigns.length)}
+                aria-label="Campanha anterior"
+                disabled={isSingle}
+              >
+                ‹
+              </button>
+              <button
+                className={`grid h-9 w-9 place-content-center rounded-full border border-[var(--border)]/80 bg-[var(--surface-strong)]/70 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                  isSingle ? "cursor-not-allowed opacity-40" : "hover:border-[var(--accent-emerald)]/45"
+                }`}
+                onClick={() => !isSingle && onSelect((activeIndex + 1) % campaigns.length)}
+                aria-label="Próxima campanha"
+                disabled={isSingle}
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+function Sparkline({ series, highlight }: { series: number[]; highlight?: boolean }) {
+  const max = Math.max(...series);
+  const normalized = series.map((value) => value / max);
+
+  return (
+    <div className="flex h-full items-end gap-1.5">
+      {normalized.map((value, index) => (
+        <div
+          key={index}
+          className="flex-1 rounded-lg"
+          style={{
+            height: `${Math.max(value * 100, 12)}%`,
+            opacity: highlight ? 1 : 0.7,
+            background: "linear-gradient(180deg, rgba(122,143,128,0.72) 0%, rgba(197,164,124,0.45) 100%)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function LoadingSkeletonLayout({ theme }: { theme: ThemeKey }) {
+  return (
+    <div
+      data-theme={theme}
+      className="min-h-screen text-[var(--text-primary)]"
+      style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
+    >
+      <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
+        <aside className="hidden min-h-screen flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl lg:flex lg:w-80 xl:w-[22rem]">
+          <div className="sticky top-0 space-y-6 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur">
+            <div className="flex items-center gap-3">
+              <div className="skeleton-shimmer h-10 w-10 rounded-2xl" />
+              <div className="space-y-2">
+                <div className="skeleton-shimmer h-3 w-24 rounded-full" />
+                <div className="skeleton-shimmer h-4 w-36 rounded-full" />
+              </div>
+            </div>
+            <div className="skeleton-shimmer h-10 w-full rounded-2xl" />
+          </div>
+          <div className="flex-1 space-y-4 px-4 pb-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="space-y-3">
+                <div className="skeleton-shimmer h-12 w-full rounded-xl" />
+                <div className="space-y-2 border-l border-[var(--border)] pl-4">
+                  {Array.from({ length: 4 }).map((_, linkIndex) => (
+                    <div key={linkIndex} className="skeleton-shimmer h-3 w-[70%] rounded-full" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-[var(--border)] px-6 py-6">
+            <div className="skeleton-shimmer h-16 w-full rounded-2xl" />
+          </div>
+        </aside>
+
+        <div className="flex flex-col">
+          <header
+            className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
+            style={{ paddingTop: "env(safe-area-inset-top)" }}
+          >
+            <div className="flex flex-wrap items-center gap-4 px-6 py-4 sm:py-5">
+              <div className="skeleton-shimmer h-10 w-10 rounded-2xl lg:hidden" />
+              <div className="skeleton-shimmer h-12 flex-1 rounded-2xl" />
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="skeleton-shimmer h-11 w-48 rounded-2xl" />
+                <div className="skeleton-shimmer h-11 w-48 rounded-2xl" />
+                <div className="skeleton-shimmer h-11 w-11 rounded-2xl" />
+                <div className="skeleton-shimmer h-11 w-36 rounded-2xl" />
+              </div>
+            </div>
+          </header>
+
+          <main
+            className="flex-1 overflow-y-auto bg-[var(--background)]"
+            style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
+          >
+            <section
+              className="px-4 pb-14 pt-10 sm:px-6 md:pb-16 md:pt-12 lg:px-10"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 3.5rem)" }}
+            >
+              <div className="flex flex-col gap-6">
+                <motion.section
+                  className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/90 p-6 shadow-lifted sm:p-8 lg:p-10"
+                  initial={{ opacity: 0.6 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+                >
+                  <div className="absolute inset-0 opacity-70" style={{ background: "var(--gradient-wash)" }} />
+                  <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)] lg:gap-12">
+                    <div className="flex flex-col gap-6">
+                      <div className="space-y-4">
+                        <div className="skeleton-shimmer h-8 w-40 rounded-full" />
+                        <div className="skeleton-shimmer h-14 w-[90%] rounded-3xl" />
+                        <div className="skeleton-shimmer h-4 w-[70%] rounded-full" />
+                        <div className="skeleton-shimmer h-4 w-[60%] rounded-full" />
+                        <div className="skeleton-shimmer h-4 w-[80%] rounded-full" />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                          <div key={index} className="skeleton-shimmer h-9 w-40 rounded-full" />
+                        ))}
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {Array.from({ length: 2 }).map((_, index) => (
+                          <div key={index} className="skeleton-shimmer h-28 rounded-3xl" />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-4 rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/75 p-6">
+                      <div className="skeleton-shimmer h-3 w-40 rounded-full" />
+                      <div className="skeleton-shimmer h-28 rounded-3xl" />
+                      <div className="grid gap-3">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                          <div key={index} className="skeleton-shimmer h-4 w-full rounded-full" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.section>
+
+                <section>
+                  <div className="flex flex-wrap items-end justify-between gap-3">
+                    <div className="space-y-2">
+                      <div className="skeleton-shimmer h-3 w-52 rounded-full" />
+                      <div className="skeleton-shimmer h-5 w-72 rounded-full" />
+                    </div>
+                    <div className="skeleton-shimmer h-3 w-32 rounded-full" />
+                  </div>
+                  <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                    {Array.from({ length: 4 }).map((_, index) => (
+                      <div key={index} className="skeleton-shimmer h-72 rounded-[28px]" />
+                    ))}
+                  </div>
+                </section>
+
+                <section className="grid gap-8 xl:grid-cols-[1.45fr_0.85fr]">
+                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:p-8">
+                    <div className="space-y-2">
+                      <div className="skeleton-shimmer h-3 w-40 rounded-full" />
+                      <div className="skeleton-shimmer h-5 w-64 rounded-full" />
+                      <div className="skeleton-shimmer h-4 w-72 rounded-full" />
+                    </div>
+                    <div className="grid gap-5 lg:grid-cols-2">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-72 rounded-[28px]" />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-48 rounded-full" />
+                    <div className="skeleton-shimmer h-64 rounded-[28px]" />
+                    <div className="space-y-2">
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-3 w-full rounded-full" />
+                      ))}
+                    </div>
+                  </div>
+                </section>
+
+                <section className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-44 rounded-full" />
+                    <div className="grid gap-3">
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-16 rounded-2xl" />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-56 rounded-full" />
+                    <div className="skeleton-shimmer h-56 rounded-2xl" />
+                  </div>
+                </section>
+
+                <section className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)_minmax(0,0.7fr)]">
+                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-48 rounded-full" />
+                    <div className="space-y-3 border-l border-[var(--border)] pl-4">
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-14 rounded-2xl" />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-40 rounded-full" />
+                    <div className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-20 rounded-2xl" />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-32 rounded-full" />
+                    <div className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-16 rounded-2xl" />
+                      ))}
+                    </div>
+                  </div>
+                </section>
+
+                <section className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-52 rounded-full" />
+                    <div className="skeleton-shimmer h-64 rounded-2xl" />
+                  </div>
+                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
+                    <div className="skeleton-shimmer h-4 w-48 rounded-full" />
+                    <div className="grid gap-3">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <div key={index} className="skeleton-shimmer h-14 rounded-2xl" />
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
