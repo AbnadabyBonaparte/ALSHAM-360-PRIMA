@@ -1498,11 +1498,13 @@ export async function deleteContact(id) {
     return response(false, null, err);
   }
 }
-
 export function subscribeContacts(onChange) {
   return supabase
     .channel('realtime_contacts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, (payload) => {
+      logDebug('👥 Contato evento:', payload.eventType, payload.new?.id);
+      if (onChange) onChange(payload);
+    })
     .subscribe();
 }
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1606,7 +1608,6 @@ export async function deleteAccount(id) {
     return response(false, null, err);
   }
 }
-
 export function subscribeAccounts(onChange) {
   return supabase
     .channel('realtime_accounts')
@@ -4199,6 +4200,71 @@ export function subscribeTickets(onChange) {
       table: 'support_tickets'
     }, (payload) => {
       logDebug('📡 Ticket evento:', payload.eventType);
+      if (onChange) onChange(payload);
+    })
+    .subscribe();
+}
+
+export async function createSupportTicket(ticketData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .insert([{ ...ticketData, org_id, status: ticketData.status || 'open' }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('🎫 Ticket criado:', data.id, 'Prioridade:', data.priority);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createSupportTicket:', err);
+    return response(false, null, err);
+  }
+}
+
+export async function getSupportTickets(orgId, filters = { limit: 50 }) {
+  return await withCache(`support_tickets_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('support_tickets')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.priority) query = query.eq('priority', filters.priority);
+    if (filters.assigned_to) query = query.eq('assigned_to', filters.assigned_to);
+    if (filters.category) query = query.eq('category', filters.category);
+
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 60);
+}
+
+export async function updateSupportTicket(id, updateData) {
+  const { data, error } = await supabase
+    .from('support_tickets')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Ticket atualizado:', id, 'Status:', data.status);
+  return response(true, data);
+}
+
+export async function deleteSupportTicket(id) {
+  const { error } = await supabase.from('support_tickets').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Ticket deletado:', id);
+  return response(true, { id });
+}
+
+export function subscribeSupportTickets(onChange) {
+  return supabase
+    .channel('realtime_support_tickets')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, (payload) => {
+      logDebug('🎫 Ticket evento:', payload.eventType, payload.new?.id);
       if (onChange) onChange(payload);
     })
     .subscribe();
@@ -8888,34 +8954,6 @@ export async function createAiPredictions(predictionData) {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🆕 PARTE 1/10 - ACCOUNTS & CONTACTS (CRUD Completo)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// ============================================================================
-// TABELA: ACCOUNTS - Contas Comerciais (RLS: 4 policies, 2 triggers)
-// ============================================================================
-
-// ============================================================================
-// TABELA: CONTACTS - Contatos (RLS: 5 policies, 2 triggers)
-// ============================================================================
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🆕 PARTE 2/10 - SUPPORT TICKETS & TASKS (CRUD Completo)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// ============================================================================
-// TABELA: SUPPORT_TICKETS - Sistema de Tickets (RLS: 4 policies, 2 triggers)
-// ============================================================================
-
-// ============================================================================
-// TABELA: TASKS - Gestão de Tarefas (RLS: 4 policies, 3 triggers)
-// ============================================================================
-
-// ============================================================================
-// TABELA: COMMENTS - Comentários (0 policies - needs RLS!, 1 trigger)
-// ============================================================================
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🆕 PARTE 3/10 - BILLING & CAMPAIGNS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -9017,9 +9055,122 @@ export function subscribeBilling(onChange) {
 // TABELA: CAMPAIGNS - Campanhas (RLS: 0 policies, 2 triggers)
 // ============================================================================
 
+/**
+ * Cria campanha
+ * @param {Object} campaignData - Dados da campanha (name, type, channel, status, etc.)
+ * @returns {Promise<Object>}
+ */
+export async function createCampaign(campaignData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('campaigns')
+      .insert([{ ...campaignData, org_id }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('📣 Campanha criada:', data.id);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createCampaign:', err);
+    return response(false, null, err);
+  }
+}
+
+/**
+ * Busca campanhas
+ * @param {string} orgId - ID da organização
+ * @param {Object} filters - Filtros (status, type, channel, limit)
+ * @returns {Promise<Object>}
+ */
+export async function getCampaigns(orgId, filters = { limit: 50 }) {
+  return await withCache(`campaigns_${orgId}_${JSON.stringify(filters)}`, async () => {
+    let query = supabase
+      .from('campaigns')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false });
+    
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.type) query = query.eq('type', filters.type);
+    if (filters.channel) query = query.eq('channel', filters.channel);
+    
+    const { data, error } = await query.limit(filters.limit || 50);
+    if (error) return response(false, null, error);
+    return response(true, data);
+  }, 120);
+}
+
+/**
+ * Atualiza campanha
+ * @param {string} id - ID da campanha
+ * @param {Object} updateData - Dados para atualizar
+ * @returns {Promise<Object>}
+ */
+export async function updateCampaign(id, updateData) {
+  const { data, error } = await supabase
+    .from('campaigns')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return response(false, null, error);
+  logDebug('✏️ Campanha atualizada:', id);
+  return response(true, data);
+}
+
+/**
+ * Deleta campanha
+ * @param {string} id - ID da campanha
+ * @returns {Promise<Object>}
+ */
+export async function deleteCampaign(id) {
+  const { error } = await supabase.from('campaigns').delete().eq('id', id);
+  if (error) return response(false, null, error);
+  logDebug('🗑️ Campanha deletada:', id);
+  return response(true, { id });
+}
+
+/**
+ * Subscreve a mudanças em campaigns
+ * @param {Function} onChange - Callback
+ * @returns {RealtimeChannel}
+ */
+export function subscribeCampaigns(onChange) {
+  return supabase
+    .channel('realtime_campaigns')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, (payload) => {
+      logDebug('📣 Campanha evento:', payload.eventType, payload.new?.id);
+      if (onChange) onChange(payload);
+    })
+    .subscribe();
+}
+
 // ============================================================================
 // TABELA: INVOICES - Faturas (RLS: 0 policies, 2 triggers)
 // ============================================================================
+
+/**
+ * Cria fatura
+ * @param {Object} invoiceData - Dados da fatura (amount, due_date, status, etc.)
+ * @returns {Promise<Object>}
+ */
+export async function createInvoice(invoiceData) {
+  try {
+    const org_id = await getCurrentOrgId();
+    const { data, error } = await supabase
+      .from('invoices')
+      .insert([{ ...invoiceData, org_id }])
+      .select()
+      .single();
+    if (error) return response(false, null, error);
+    logDebug('🧾 Fatura criada:', data.id);
+    return response(true, data);
+  } catch (err) {
+    logError('Erro createInvoice:', err);
+    return response(false, null, err);
+  }
+}
 
 /**
  * Busca faturas
