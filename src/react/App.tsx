@@ -91,7 +91,7 @@ import {
   getDeals,
   createDeal,
   updateDeal,
-} from "../../lib/supabase";
+} from "./lib/supabase";
 
 // Inicializar cliente Supabase
 const supabase = getSupabaseClient();
