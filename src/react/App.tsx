@@ -109,6 +109,26 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎨 CHART.JS - Paleta de cores neutras
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const chartNeutrals = {
+  sage: "#7a8f80",
+  mist: "#8794a4",
+  clay: "#c5a47c",
+  brass: "#b89a6c",
+  soot: "#41464a",
+};
+
+const hexToRgba = (hex: string, alpha: number) => {
+  const value = hex.replace("#", "");
+  const bigint = parseInt(value, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
 
 const sidebarGroups = [
   {
