@@ -90,31 +90,11 @@ import {
   subscribeLeads,
 } from "../../lib/supabase";
 
-// ⚙️ Inicializa o Supabase ao carregar o App
-function useSupabaseInit() {
-  useEffect(() => {
-    async function initSupabase() {
-      console.group("🧩 ALSHAM 360° PRIMA – Verificação Supabase");
-      try {
-        await testConnection();
-        const session = await getCurrentSession();
-        console.info("👤 Sessão atual:", session ? "Ativa" : "Nenhuma");
-        const leads = await getLeads({ status: "novo" });
-        console.info(`📊 Leads retornados: ${leads?.length ?? 0}`);
-        console.info("✅ Supabase conectado e funcional!");
-      } catch (err) {
-        console.error("❌ Erro de integração Supabase:", err);
-      } finally {
-        console.groupEnd();
-      }
-    }
-    initSupabase();
-  }, []);
-}
+// Inicializar cliente Supabase
+const supabase = getSupabaseClient();
 
-useSupabaseInit();
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🔚 FIM DA INTEGRAÇÃO SUPABASE (Fase 1)
+// 🔚 FIM DA INTEGRAÇÃO SUPABASE (Fase 1) - Imports
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const hexToRgba = (hex: string, alpha: number) => {
