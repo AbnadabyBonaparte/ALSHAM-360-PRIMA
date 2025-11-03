@@ -904,7 +904,125 @@ function App() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => {
+    console.log('🔴 Iniciando subscriptions Real-time...');
+    
+    // Subscribe para mudanças em leads
+    const leadsChannel = supabase
+      .channel('leads_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leads_crm'
+        },
+        (payload) => {
+          console.log('📊 Lead atualizado:', payload);
+          fetchData(); // Re-carregar dados
+        }
+      )
+      .subscribe();
 
+    // Subscribe para mudanças em campanhas
+    const campaignsChannel = supabase
+      .channel('campaigns_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'campaigns'
+        },
+        (payload) => {
+          console.log('🚀 Campanha atualizada:', payload);
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    // Subscribe para mudanças em gamificação
+    const gamificationChannel = supabase
+      .channel('gamification_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'gamification_points'
+        },
+        (payload) => {
+          console.log('🏆 Pontuação atualizada:', payload);
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    // Cleanup ao desmontar
+    return () => {
+      console.log('🔴 Desconectando subscriptions...');
+      leadsChannel.unsubscribe();
+      campaignsChannel.unsubscribe();
+      gamificationChannel.unsubscribe();
+    };
+  }, [fetchData]);
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🔚 FIM DA INTEGRAÇÃO REAL-TIME
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    if (!campaigns.length) return;
+    setCampaignIndex((prev) => (prev >= campaigns.length ? 0 : prev));
+  }, [campaigns.length]);
+
+  useEffect(() => {
+    if (campaigns.length <= 1) return;
+    const timer = setInterval(() => {
+      setCampaignIndex((prev) => (prev + 1) % campaigns.length);
+    }, 9000);
+    return () => clearInterval(timer);
+  }, [campaigns.length]);
+
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    if (isMobileNavOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMobileNavOpen]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const handleChange = (event: MediaQueryList | MediaQueryListEvent) => {
+      if (event.matches) {
+        setMobileNavOpen(false);
+      }
+    };
+
+    handleChange(mediaQuery);
+
+    const listener = (event: MediaQueryListEvent) => handleChange(event);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", listener);
+      return () => mediaQuery.removeEventListener("change", listener);
+    }
+
+    mediaQuery.addListener(listener);
+    return () => mediaQuery.removeListener(listener);
+  }, []);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
