@@ -283,44 +283,70 @@ export async function updateDeal(id: string, updates: any) {
 // 🏆 GAMIFICATION
 // ===============================================================
 
-/** Retorna pontuações de gamificação */
+/** Retorna pontuações de gamificação agregadas por usuário */
 export async function getGamificationScores(limit = 5) {
-  const { data, error } = await supabase
-    .from("gamification_points")
-    .select(`
-      user_id,
-      score,
-      level,
-      user:user_id (
-        email,
-        user_profiles (
-          full_name,
-          avatar_url
-        )
-      )
-    `)
-    .order("score", { ascending: false })
-    .limit(limit);
+  try {
+    const orgId = await getCurrentOrgId();
+    
+    // Buscar pontos agregados por usuário
+    const { data, error } = await supabase
+      .from("gamification_points")
+      .select("user_id, points_awarded")
+      .eq("org_id", orgId || "");
 
-  if (error) {
-    console.error("Erro ao buscar gamificação:", error);
+    if (error) {
+      console.error("Erro ao buscar gamificação:", error);
+      return [];
+    }
+
+    // Agregar pontos por usuário
+    const userScores = (data || []).reduce((acc: any, item: any) => {
+      const userId = item.user_id;
+      if (!acc[userId]) {
+        acc[userId] = { user_id: userId, total_points: 0 };
+      }
+      acc[userId].total_points += item.points_awarded || 0;
+      return acc;
+    }, {});
+
+    // Converter para array e ordenar
+    const sortedScores = Object.values(userScores)
+      .sort((a: any, b: any) => b.total_points - a.total_points)
+      .slice(0, limit);
+
+    // Buscar informações dos usuários
+    const userIds = sortedScores.map((s: any) => s.user_id);
+    
+    if (userIds.length === 0) {
+      return [];
+    }
+    
+    const { data: profiles } = await supabase
+      .from("user_profiles")
+      .select("user_id, full_name, avatar_url")
+      .in("user_id", userIds);
+
+    // Combinar dados
+    return sortedScores.map((score: any, index: number) => {
+      const profile = profiles?.find((p: any) => p.user_id === score.user_id);
+      
+      return {
+        user_id: score.user_id,
+        score: score.total_points,
+        level: Math.floor(score.total_points / 100) + 1, // 1 level a cada 100 pontos
+        user_name: profile?.full_name || `Usuário ${index + 1}`,
+        avatar_url: profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${score.user_id}`,
+      };
+    });
+  } catch (err) {
+    console.error("Erro ao buscar gamificação:", err);
     return [];
   }
-
-  // Formatar dados para o formato esperado
-  return (data ?? []).map((item: any) => ({
-    user_id: item.user_id,
-    score: item.score ?? 0,
-    level: item.level ?? 1,
-    user_name: item.user?.user_profiles?.[0]?.full_name || item.user?.email || "Usuário",
-    avatar_url: item.user?.user_profiles?.[0]?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.user_id}`,
-  }));
 }
 
 // ===============================================================
 // 🔧 GENERIC CRUD
 // ===============================================================
-
 /** Select genérico */
 export async function genericSelect(table: string, filters: any[] = [], options: any = {}) {
   let query = supabase.from(table).select(options.select || "*");
