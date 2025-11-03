@@ -289,11 +289,17 @@ export async function getGamificationScores(limit = 5) {
     const orgId = await getCurrentOrgId();
     
     // Buscar pontos agregados por usuário
-    const { data, error } = await supabase
+   // Se não houver org_id, buscar todos os pontos
+    let query = supabase
       .from("gamification_points")
-      .select("user_id, points_awarded")
-      .eq("org_id", orgId || "");
+      .select("user_id, points_awarded");
 
+    if (orgId) {
+      query = query.eq("org_id", orgId);
+    }
+
+    const { data, error } = await query;
+    
     if (error) {
       console.error("Erro ao buscar gamificação:", error);
       return [];
