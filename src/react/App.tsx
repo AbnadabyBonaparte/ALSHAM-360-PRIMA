@@ -88,6 +88,9 @@ import {
   subscribeContacts,
   subscribeCampaigns,
   subscribeLeads,
+  getDeals,
+  createDeal,
+  updateDeal,
 } from "../../lib/supabase";
 
 // Inicializar cliente Supabase
