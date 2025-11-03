@@ -60,19 +60,35 @@ ChartJS.register(
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ⚜️ ALSHAM 360° PRIMA – INTEGRAÇÃO SUPABASE (Fase 1)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🜂 IMPORTAÇÃO: Funções do supabase.js master (17.389 linhas)
+// 📅 DATA: 01 de Novembro de 2025
+// 🎯 OBJETIVO: Conectar dashboard 10/10 com backend completo
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 import {
   getSupabaseClient,
   getCurrentSession,
   getCurrentOrgId,
   getLeads,
+  createLead,
+  updateLead,
+  deleteLead,
+  getContacts,
+  createContact,
+  getAccounts,
+  createAccount,
   getCampaigns,
-  getDeals,
+  createCampaign,
+  updateCampaign,
   getGamificationScores,
   createAuditLog,
-  testConnection,
-} from "./lib/supabase"; // ajuste se o caminho for diferente
-
-const supabase = getSupabaseClient();
+  genericSelect,
+  genericInsert,
+  genericUpdate,
+  subscribeContacts,
+  subscribeCampaigns,
+  subscribeLeads,
+} from "../../lib/supabase";
 
 // ⚙️ Inicializa o Supabase ao carregar o App
 function useSupabaseInit() {
