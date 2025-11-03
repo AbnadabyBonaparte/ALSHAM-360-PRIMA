@@ -100,17 +100,8 @@ const supabase = getSupabaseClient();
 // 🔚 FIM DA INTEGRAÇÃO SUPABASE (Fase 1) - Imports
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const hexToRgba = (hex: string, alpha: number) => {
-  const value = hex.replace("#", "");
-  const bigint = parseInt(value, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎨 CHART.JS - Paleta de cores neutras
+// 🎨 CHART.JS - Paleta de cores neutras e helpers
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const chartNeutrals = {
