@@ -15,10 +15,9 @@ export default defineConfig({
     minify: "esbuild",
     rollupOptions: {
       input: {
-        main: "./index.html",        // Landing page (mantém)
-        app: "./app.html",            // React Dashboard (NOVO!)
-        login: "./login.html",        // Login antigo (mantém)
-        dashboard: "./dashboard.html" // Dashboard antigo (mantém)
+        main: "./index.html",
+        login: "./login.html",
+        dashboard: "./dashboard.html"
       }
     }
   },
