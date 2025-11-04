@@ -3,24 +3,21 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  root: ".",
+  root: "./src/react",
+  publicDir: "../../public",
   resolve: {
-    alias: { "@": "/src" }
+    alias: { 
+      "@": "/src",
+      "@/lib": "/src/lib",
+      "@/components": "/src/components"
+    }
   },
   build: {
-    outDir: "dist",
+    outDir: "../../dist",
     emptyOutDir: true,
     target: "es2022",
     sourcemap: true,
-    minify: "esbuild",
-    rollupOptions: {
-      input: {
-        main: "./index.html",        // Landing page (mantém)
-        app: "./app.html",            // React Dashboard (NOVO!)
-        login: "./login.html",        // Login antigo (mantém)
-        dashboard: "./dashboard.html" // Dashboard antigo (mantém)
-      }
-    }
+    minify: "esbuild"
   },
   esbuild: {
     supported: { "top-level-await": true }
