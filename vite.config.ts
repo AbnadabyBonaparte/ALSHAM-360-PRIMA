@@ -23,14 +23,14 @@ export default defineConfig({
     supported: { "top-level-await": true }
   },
   server: {
-    host: "127.0.0.1",
+    host: "0.0.0.0",
     port: 5173,
-    strictPort: true,
+    strictPort: false,
     cors: true
   },
   preview: {
     port: 4173,
-    strictPort: true
+    strictPort: false
   },
   optimizeDeps: {
     include: [
