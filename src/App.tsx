@@ -87,6 +87,8 @@ import {
   subscribeContacts,
   subscribeCampaigns,
   subscribeLeads,
+  getOpportunities,
+  getTopLeadsByScore,
 } from "./lib/supabase";
 
 // Inicializar cliente Supabase
@@ -325,11 +327,11 @@ fetchData: async () => {
     set({ loading: true });
 
     // 🔹 1. Coleta simultânea dos principais dados
-    const [leads, campaigns] = await Promise.all([
+    const [leads, opportunities, campaigns, leaderboard] = await Promise.all([
       getLeads(),
-      // getDeals() // FUNÇÃO NÃO EXISTE,
+      getOpportunities(),
       getCampaigns(),
-      // getGamificationScores(5) // FUNÇÃO NÃO EXISTE
+      getTopLeadsByScore(5)
     ]);
 
     // 🔹 2. Montagem dinâmica dos KPIs reais
@@ -348,10 +350,10 @@ fetchData: async () => {
       {
         id: "deals",
         title: "Negócios em Andamento",
-        value: deals.length.toString(),
+        value: opportunities.length.toString(),
         trend: 0,
         trendLabel: "Base Supabase",
-        series: [0, 0, 0, deals.length],
+        series: [0, 0, 0, opportunities.length],
         target: "—",
         description: "Registros atuais em sales_pipeline",
         icon: <Rocket className="h-5 w-5 text-[var(--accent-sky)]" />,
