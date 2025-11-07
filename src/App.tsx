@@ -339,8 +339,6 @@ fetchData: async () => {
     const opportunities = results[1]?.data?.data || [];
     const campaigns = results[2]?.data || [];
     const leaderboard = results[3]?.data || [];
-    console.log('🐛 campaigns:', campaigns);
-    console.log('🐛 leaderboard:', leaderboard);
     // 🔹 2. Montagem dinâmica dos KPIs reais
     const kpis: KPI[] = [
       {
