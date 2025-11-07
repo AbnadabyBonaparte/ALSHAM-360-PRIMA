@@ -1,113 +1,35 @@
-const SUPABASE_JS_URL = "https://esm.sh/@supabase/supabase-js@2.45.2?bundle" as const;
+/**
+ * Supabase Client Master - Bridge para supabase-full.js
+ * Este arquivo importa TODAS as 570 funções do arquivo mestre
+ */
 
-type SupabaseModule = {
-  createClient: (
-    url: string,
-    key: string,
-    options?: {
-      auth?: {
-        persistSession?: boolean;
-        autoRefreshToken?: boolean;
-        detectSessionInUrl?: boolean;
-        storage?: Storage | undefined;
-      };
-    }
-  ) => SupabaseClient;
-};
+// @ts-ignore - supabase-full.js tem 17k linhas sem types
+import * as supabaseFull from './supabase-full.js';
 
-type SupabaseClient = {
-  auth: {
-    getSession: () => Promise<{ data: { session: unknown } | null; error: unknown }>;
-    getUser: () => Promise<{ data: { user: unknown } | null; error: unknown }>;
-    onAuthStateChange: (
-      callback: (event: string, session: unknown | null) => void
-    ) => { data: { subscription: { unsubscribe: () => void } } };
-    signInWithOAuth: (options: { provider: string }) => Promise<unknown>;
-    signOut: () => Promise<unknown>;
-  };
-  from: (table: string) => {
-    select: (
-      columns: string,
-      options?: { count?: "exact" | "planned" | "estimated"; head?: boolean }
-    ) => Promise<{ data: unknown; error: unknown; count?: number | null }>;
-    insert?: (values: unknown) => Promise<unknown>;
-    order?: (column: string, options?: { ascending?: boolean }) => Promise<unknown>;
-  };
-  channel: (
-    identifier: string
-  ) => {
-    on: (
-      event: string,
-      filter: Record<string, unknown>,
-      callback: () => void
-    ) => ReturnType<SupabaseClient["channel"]>;
-    subscribe: () => ReturnType<SupabaseClient["channel"]>;
-  };
-  removeChannel: (channel: ReturnType<SupabaseClient["channel"]>) => void;
-};
+// Re-exportar TUDO
+export * from './supabase-full.js';
 
-type SupabaseLoader = () => Promise<SupabaseModule>;
+// Exportar principais com nomes específicos
+// @ts-ignore
+export const supabase = supabaseFull.getSupabaseClient();
+// @ts-ignore
+export const getSupabaseClient = supabaseFull.getSupabaseClient;
+// @ts-ignore
+export const getCurrentSession = supabaseFull.getCurrentSession;
+// @ts-ignore
+export const getCurrentOrgId = supabaseFull.getCurrentOrgId;
+// @ts-ignore
+export const getLeads = supabaseFull.getLeads;
+// @ts-ignore
+export const createLead = supabaseFull.createLead;
+// @ts-ignore
+export const updateLead = supabaseFull.updateLead;
+// @ts-ignore
+export const deleteLead = supabaseFull.deleteLead;
 
-const resolveEnvValue = (key: string, fallback = "") => {
-  if (typeof process !== "undefined" && process.env?.[key]) {
-    return process.env[key] ?? fallback;
-  }
-  if (typeof import.meta !== "undefined" && (import.meta as any).env?.[key]) {
-    return (import.meta as any).env[key] ?? fallback;
-  }
-  return fallback;
-};
-
-const supabaseUrl = resolveEnvValue("VITE_SUPABASE_URL", "");
-const supabaseAnonKey = resolveEnvValue("VITE_SUPABASE_ANON_KEY", "");
-
-const importSupabase: SupabaseLoader = async () => {
-  const existing = (globalThis as any).supabase;
-  if (existing?.createClient) {
-    return existing;
-  }
-
-  const module = await import(/* @vite-ignore */ SUPABASE_JS_URL);
-  if (!(globalThis as any).supabase && module?.createClient) {
-    (globalThis as any).supabase = module;
-  }
-  return module as SupabaseModule;
-};
-
-let clientPromise: Promise<SupabaseClient> | null = null;
-
-const createSupabaseClient = async () => {
-  const module = await importSupabase();
-  const { createClient } = module ?? {};
-
-  if (typeof createClient !== "function") {
-    throw new Error("Supabase client factory not available.");
-  }
-
-  const client = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: typeof window !== "undefined" ? window.localStorage : undefined,
-    },
-  });
-
-  return client;
-};
-
-export async function getSupabaseClient(): Promise<SupabaseClient> {
-  if (!clientPromise) {
-    clientPromise = createSupabaseClient();
-  }
-  return clientPromise;
+// Garantir que o cliente está inicializado
+if (!supabase) {
+  console.error('❌ Supabase client não inicializado!');
 }
 
-export async function getCurrentSession() {
-  const client = await getSupabaseClient();
-  const { data, error } = await client.auth.getSession();
-  if (error) throw error;
-  return data?.session ?? null;
-}
-
-export type { SupabaseClient };
+console.log('✅ Supabase Master carregado:', Object.keys(supabaseFull).length, 'exports');
