@@ -327,7 +327,6 @@ fetchData: async () => {
     set({ loading: true });
 
     // 🔹 1. Coleta simultânea dos principais dados
-    // 🔹 1. Coleta simultânea dos principais dados
     const results = await Promise.all([
       getLeads(),
       getOpportunities(),
