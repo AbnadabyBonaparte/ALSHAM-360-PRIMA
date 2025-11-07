@@ -327,7 +327,7 @@ fetchData: async () => {
     // 🔹 1. Coleta simultânea dos principais dados
     const [leads, deals, campaigns, leaderboard] = await Promise.all([
       getLeads(),
-      getDeals(),
+      // getDeals() // FUNÇÃO NÃO EXISTE,
       getCampaigns(),
       getGamificationScores(5)
     ]);
