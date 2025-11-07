@@ -325,7 +325,7 @@ fetchData: async () => {
     set({ loading: true });
 
     // 🔹 1. Coleta simultânea dos principais dados
-    const [leads, deals, campaigns, leaderboard] = await Promise.all([
+    const [leads, campaigns] = await Promise.all([
       getLeads(),
       // getDeals() // FUNÇÃO NÃO EXISTE,
       getCampaigns(),
