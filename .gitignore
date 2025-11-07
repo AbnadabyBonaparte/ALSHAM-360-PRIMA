@@ -153,3 +153,30 @@ docs/.vitepress/cache/
 .nuxt/
 .cache/
 .parcel-cache/
+
+# ══════════════════════════════════════════════════════════════
+# ADICIONADO NA FASE 5: LIMPEZA
+# ══════════════════════════════════════════════════════════════
+
+# Legacy e arquivos temporários
+legacy/
+*.tmp
+.DS_Store
+
+# Builds locais
+.vercel/
+
+# IDEs
+.vscode/
+.idea/
+
+# Arquivos de sistema
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Arquivos temporários do projeto
+docs/archive/
