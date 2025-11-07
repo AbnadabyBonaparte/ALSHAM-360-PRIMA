@@ -329,7 +329,7 @@ fetchData: async () => {
       getLeads(),
       // getDeals() // FUNÇÃO NÃO EXISTE,
       getCampaigns(),
-      getGamificationScores(5)
+      // getGamificationScores(5) // FUNÇÃO NÃO EXISTE
     ]);
 
     // 🔹 2. Montagem dinâmica dos KPIs reais
