@@ -328,12 +328,19 @@ fetchData: async () => {
 
     // 🔹 1. Coleta simultânea dos principais dados
     const [leads, opportunities, campaigns, leaderboard] = await Promise.all([
+    // 🔹 1. Coleta simultânea dos principais dados
+    const results = await Promise.all([
       getLeads(),
       getOpportunities(),
       getCampaigns(),
       getTopLeadsByScore(5)
     ]);
-
+    
+    // 🔹 Extrair dados (funções retornam {success, data, error})
+    const leads = results[0]?.data || [];
+    const opportunities = results[1]?.data || [];
+    const campaigns = results[2]?.data || [];
+    const leaderboard = results[3]?.data || [];
     // 🔹 2. Montagem dinâmica dos KPIs reais
     const kpis: KPI[] = [
       {
