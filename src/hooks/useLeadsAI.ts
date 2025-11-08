@@ -1,4 +1,4 @@
-typescriptimport { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Lead } from '../types';
 
@@ -14,12 +14,10 @@ export function useLeadsAI(): UseLeadsAIResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Refs para evitar múltiplas execuções
   const isLoadingRef = useRef(false);
   const isMountedRef = useRef(true);
 
   const loadLeads = async () => {
-    // Previne execução simultânea
     if (isLoadingRef.current) {
       console.log('⏭️ loadLeads já está executando, pulando...');
       return;
@@ -39,7 +37,6 @@ export function useLeadsAI(): UseLeadsAIResult {
 
       if (supabaseError) throw supabaseError;
 
-      // Só atualiza se o componente ainda estiver montado
       if (isMountedRef.current) {
         setLeads(data || []);
         console.log(`✅ ${data?.length || 0} leads carregados`);
@@ -62,13 +59,10 @@ export function useLeadsAI(): UseLeadsAIResult {
   };
 
   useEffect(() => {
-    // Marca componente como montado
     isMountedRef.current = true;
 
-    // Carrega dados iniciais
     loadLeads();
 
-    // Configura subscription para realtime
     const channel = supabase
       .channel('leads-changes')
       .on(
@@ -80,7 +74,6 @@ export function useLeadsAI(): UseLeadsAIResult {
         },
         (payload) => {
           console.log('🔔 Mudança detectada em leads:', payload);
-          // Recarrega apenas quando há mudança real
           if (isMountedRef.current && !isLoadingRef.current) {
             loadLeads();
           }
@@ -88,18 +81,16 @@ export function useLeadsAI(): UseLeadsAIResult {
       )
       .subscribe();
 
-    // Cleanup ao desmontar
     return () => {
       console.log('🧹 Limpando useLeadsAI...');
       isMountedRef.current = false;
       isLoadingRef.current = false;
       
-      // Remove subscription
       if (channel && typeof channel.unsubscribe === 'function') {
         channel.unsubscribe();
       }
     };
-  }, []); // Array vazio = executa apenas uma vez
+  }, []);
 
   return {
     leads,
