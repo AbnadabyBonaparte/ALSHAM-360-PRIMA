@@ -34,14 +34,17 @@ export function useLeadsAI() {
     loadLeads();
   }, [loadLeads]);
 
-  // Real-time subscription
+  // Real-time subscription - CORRIGIDO
   useEffect(() => {
     const unsubscribe = leadsService.subscribe(() => {
       loadLeads();
     });
-
+    
     return () => {
-      if (unsubscribe) unsubscribe();
+      // Verificar se unsubscribe é uma função antes de chamar
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
     };
   }, [loadLeads]);
 
