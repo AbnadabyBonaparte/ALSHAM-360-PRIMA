@@ -2041,13 +2041,20 @@ function App() {
         </AnimatePresence>
 
         <aside className="hidden min-h-screen lg:flex lg:w-80 xl:w-[22rem] flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
-          <div className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur">
-            <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
+          <div 
+            onClick={() => setActivePage('dashboard')}
+            className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur cursor-pointer hover:bg-[var(--surface)]/95 transition-colors group"
+            role="button"
+            tabIndex={0}
+            onKeyPress={(e) => e.key === 'Enter' && setActivePage('dashboard')}
+            aria-label="Voltar ao Dashboard"
+          >
+            <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold group-hover:scale-105 transition-transform">
               A∞
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">ALSHAM</p>
-              <p className="text-lg font-medium">360° PRIMA</p>
+              <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)] group-hover:text-[var(--accent-sky)] transition-colors">ALSHAM</p>
+              <p className="text-lg font-medium group-hover:text-[var(--accent-emerald)] transition-colors">360° PRIMA</p>
             </div>
           </div>
 
