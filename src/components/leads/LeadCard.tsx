@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Mail, Phone, Building, Calendar, Star, TrendingUp,
   MoreVertical, Edit, Trash2, Eye, MessageSquare,
-  User, MapPin
+  User, MapPin, MessageCircle
 } from 'lucide-react';
 import { useState } from 'react';
 import LeadScoreGauge from './LeadScoreGauge';
@@ -63,6 +63,23 @@ export default function LeadCard({
   const daysSinceContact = lead.last_contact 
     ? Math.floor((Date.now() - new Date(lead.last_contact).getTime()) / (1000 * 60 * 60 * 24))
     : null;
+
+  // 🟢 WHATSAPP - Formatação brasileira
+  const formatPhone = (phone?: string) => {
+    if (!phone) return '';
+    const numbers = phone.replace(/\D/g, '');
+    return numbers.startsWith('55') ? numbers : `55${numbers}`;
+  };
+
+  const openWhatsApp = () => {
+    const formattedPhone = formatPhone(lead.phone);
+    if (formattedPhone) {
+      const message = encodeURIComponent(
+        `Olá ${lead.first_name}! Entrei em contato através do ALSHAM 360° PRIMA.`
+      );
+      window.open(`https://wa.me/${formattedPhone}?text=${message}`, '_blank');
+    }
+  };
 
   return (
     <motion.div
@@ -210,19 +227,33 @@ export default function LeadCard({
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        <div className="grid grid-cols-3 gap-2 mt-4">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg text-sm font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all"
+            className="px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg text-sm font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all"
           >
             <Phone className="w-4 h-4 inline mr-1" />
             Ligar
           </motion.button>
+          
+          {lead.phone && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={openWhatsApp}
+              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-green-500/20"
+              title="Abrir WhatsApp"
+            >
+              <MessageCircle className="w-4 h-4 inline mr-1" />
+              WhatsApp
+            </motion.button>
+          )}
+          
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-sm font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
+            className="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-sm font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
           >
             <Mail className="w-4 h-4 inline mr-1" />
             Email
