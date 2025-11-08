@@ -31,7 +31,7 @@ export function useLeadsAI(): UseLeadsAIResult {
       setError(null);
 
       const { data, error: supabaseError } = await supabase
-        .from('leads')
+        .from('leads_crm')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -70,7 +70,7 @@ export function useLeadsAI(): UseLeadsAIResult {
         {
           event: '*',
           schema: 'public',
-          table: 'leads'
+          table: 'leads_crm'
         },
         (payload) => {
           console.log('🔔 Mudança detectada em leads:', payload);
