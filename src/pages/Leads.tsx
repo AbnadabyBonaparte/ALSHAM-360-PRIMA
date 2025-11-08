@@ -18,10 +18,57 @@ import LeadScoreGauge from '../components/leads/LeadScoreGauge';
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
 export default function Leads() {
-  const { enrichedLeads, loading, analytics, applyFilters, filterByAI } = useLeadsAI();
+  // ✅ CORREÇÃO: Usar os valores corretos do hook
+  const { leads, loading, error } = useLeadsAI();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<any>(null);
   const [showAIPanel, setShowAIPanel] = useState(true);
+  const [filters, setFilters] = useState<any>({});
+
+  // ✅ CORREÇÃO: Calcular analytics a partir dos leads
+  const analytics = useMemo(() => {
+    if (!leads || leads.length === 0) {
+      return {
+        total: 0,
+        qualified: 0,
+        hot: 0,
+        atRisk: 0,
+        healthScore: 0,
+        conversionRate: 0
+      };
+    }
+
+    const qualified = leads.filter((l: any) => l.status === 'qualified').length;
+    const hot = leads.filter((l: any) => (l.score_ia || 0) >= 70).length;
+    const atRisk = leads.filter((l: any) => (l.score_ia || 0) < 40).length;
+    const avgScore = leads.reduce((sum: number, l: any) => sum + (l.score_ia || 50), 0) / leads.length;
+
+    return {
+      total: leads.length,
+      qualified,
+      hot,
+      atRisk,
+      healthScore: Math.round(avgScore),
+      conversionRate: leads.length > 0 ? (qualified / leads.length) * 100 : 0
+    };
+  }, [leads]);
+
+  // ✅ CORREÇÃO: Aplicar filtros localmente
+  const filteredLeads = useMemo(() => {
+    if (!leads || leads.length === 0) return [];
+    
+    let result = [...leads];
+
+    // Aplicar filtros se existirem
+    if (filters.status) {
+      result = result.filter((l: any) => l.status === filters.status);
+    }
+    if (filters.minScore) {
+      result = result.filter((l: any) => (l.score_ia || 0) >= filters.minScore);
+    }
+
+    return result;
+  }, [leads, filters]);
 
   // Prepare data for charts
   const chartData = useMemo(() => {
@@ -42,7 +89,7 @@ export default function Leads() {
     };
   }, []);
 
-  // Prepare pipeline stages
+  // ✅ CORREÇÃO: Verificar se filteredLeads existe antes do forEach
   const pipelineStages = useMemo(() => {
     const stages = [
       { id: 'new', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] as any[] },
@@ -52,13 +99,18 @@ export default function Leads() {
       { id: 'negotiation', name: 'Negociação', color: 'from-cyan-500 to-blue-500', leads: [] as any[] },
     ];
 
-    enrichedLeads.forEach(lead => {
+    // ✅ CORREÇÃO: Guard clause
+    if (!filteredLeads || !Array.isArray(filteredLeads)) {
+      return stages;
+    }
+
+    filteredLeads.forEach((lead: any) => {
       const stage = stages.find(s => s.id === lead.status);
       if (stage) stage.leads.push(lead);
     });
 
     return stages;
-  }, [enrichedLeads]);
+  }, [filteredLeads]);
 
   // Prepare network data
   const networkData = useMemo(() => {
@@ -124,6 +176,18 @@ export default function Leads() {
       },
     ];
   }, [selectedLead]);
+
+  // ✅ CORREÇÃO: Mostrar erro se houver
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
+        <div className="bg-red-500/10 border border-red-500 rounded-xl p-6 max-w-md">
+          <h2 className="text-2xl font-bold text-red-400 mb-2">Erro ao carregar leads</h2>
+          <p className="text-gray-300">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8">
@@ -295,8 +359,8 @@ export default function Leads() {
       {/* Smart Filters */}
       <div className="mb-8">
         <SmartFilters 
-          onFilterChange={applyFilters}
-          totalResults={enrichedLeads.length}
+          onFilterChange={setFilters}
+          totalResults={filteredLeads.length}
         />
       </div>
 
@@ -339,7 +403,7 @@ export default function Leads() {
                   exit={{ opacity: 0 }}
                   className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
                 >
-                  {enrichedLeads.map((lead, index) => (
+                  {filteredLeads.map((lead: any, index: number) => (
                     <LeadCard
                       key={lead.id}
                       lead={lead}
