@@ -14,9 +14,6 @@ interface LeadCardProps {
 export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 LIGAR (TELEFONEMA)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleCall = (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -35,9 +32,6 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
     window.location.href = `tel:+55${cleanPhone}`;
   };
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 WHATSAPP COM NÚMERO BRASILEIRO
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -64,9 +58,6 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
     window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
   };
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 EMAIL COM MAILTO
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleEmail = (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -107,10 +98,15 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
     >
       {/* Glow effect */}
       {isHovered && (
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none" 
+             style={{ 
+               background: `linear-gradient(135deg, var(--color-primary-from), var(--color-primary-to))`,
+               opacity: 0.05
+             }} 
+        />
       )}
 
-      {/* Header com Nome e Email */}
+      {/* Header com Nome, Email e Gráfico de Pizza */}
       <div className="flex items-start justify-between mb-4 relative z-10">
         <div className="flex-1">
           <h3 className="text-lg font-bold text-white mb-1">
@@ -119,9 +115,7 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
           <p className="text-sm text-gray-400">{lead.email || 'Sem email'}</p>
         </div>
 
-        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        {/* 🍕 GRÁFICO DE PIZZA DE VOLTA! */}
-        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        {/* 🍕 GRÁFICO DE PIZZA! */}
         <div className="flex-shrink-0">
           <LeadScoreGauge score={score} size={60} />
         </div>
@@ -153,62 +147,73 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
 
       {/* Status */}
       <div className="mb-4 relative z-10">
-        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-semibold">
+        <span 
+          className="px-3 py-1 rounded-full text-xs font-semibold text-white"
+          style={{ 
+            background: `linear-gradient(135deg, var(--color-primary-from), var(--color-primary-to))`,
+            opacity: 0.9
+          }}
+        >
           {lead.status || 'novo'}
         </span>
       </div>
 
-      {/* Botões de Ação */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* 🎨 BOTÕES COM CORES DINÂMICAS DO TEMA */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div className="grid grid-cols-3 gap-2 relative z-10">
-        {/* Botão Ligar */}
+        {/* Botão Ligar - Usa cores INFO do tema */}
         <motion.button
           whileHover={{ scale: hasValidPhone ? 1.05 : 1 }}
           whileTap={{ scale: hasValidPhone ? 0.95 : 1 }}
           onClick={handleCall}
           disabled={!hasValidPhone}
-          className={`
-            px-3 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-sm
-            ${hasValidPhone
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'
-              : 'bg-neutral-800 text-gray-600 cursor-not-allowed'
-            }
-          `}
+          className="px-3 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-sm text-white"
+          style={hasValidPhone ? {
+            background: `linear-gradient(135deg, var(--color-info-from), var(--color-info-to))`
+          } : {
+            background: '#27272a',
+            color: '#71717a',
+            cursor: 'not-allowed'
+          }}
         >
           <Phone className="w-3.5 h-3.5" />
           Ligar
         </motion.button>
 
-        {/* Botão WhatsApp */}
+        {/* Botão WhatsApp - Usa cores SUCCESS do tema */}
         <motion.button
           whileHover={{ scale: hasValidPhone ? 1.05 : 1 }}
           whileTap={{ scale: hasValidPhone ? 0.95 : 1 }}
           onClick={handleWhatsApp}
           disabled={!hasValidPhone}
-          className={`
-            px-3 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-sm
-            ${hasValidPhone
-              ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
-              : 'bg-neutral-800 text-gray-600 cursor-not-allowed'
-            }
-          `}
+          className="px-3 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-sm text-white"
+          style={hasValidPhone ? {
+            background: `linear-gradient(135deg, var(--color-success-from), var(--color-success-to))`
+          } : {
+            background: '#27272a',
+            color: '#71717a',
+            cursor: 'not-allowed'
+          }}
         >
           <MessageCircle className="w-3.5 h-3.5" />
           Zap
         </motion.button>
 
-        {/* Botão Email */}
+        {/* Botão Email - Usa cores ACCENT do tema */}
         <motion.button
           whileHover={{ scale: lead.email ? 1.05 : 1 }}
           whileTap={{ scale: lead.email ? 0.95 : 1 }}
           onClick={handleEmail}
           disabled={!lead.email}
-          className={`
-            px-3 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-sm
-            ${lead.email
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
-              : 'bg-neutral-800 text-gray-600 cursor-not-allowed'
-            }
-          `}
+          className="px-3 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-sm text-white"
+          style={lead.email ? {
+            background: `linear-gradient(135deg, var(--color-accent-from), var(--color-accent-to))`
+          } : {
+            background: '#27272a',
+            color: '#71717a',
+            cursor: 'not-allowed'
+          }}
         >
           <Mail className="w-3.5 h-3.5" />
           Email
@@ -220,7 +225,10 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
         <div className="mt-4 pt-4 border-t border-neutral-800 relative z-10">
           <div className="flex items-center justify-between text-xs">
             <span className="text-gray-400">Conversão prevista:</span>
-            <span className="text-emerald-400 font-bold">
+            <span 
+              className="font-bold"
+              style={{ color: 'var(--color-primary-from)' }}
+            >
               {lead.ai_conversion_probability}%
             </span>
           </div>
