@@ -1,8 +1,9 @@
 // src/components/leads/LeadCard.tsx
 import { motion } from 'framer-motion';
-import { Phone, Mail, Building, Calendar, TrendingUp, MessageCircle } from 'lucide-react';
+import { Phone, Mail, Building, Calendar, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { formatPhoneForWhatsApp, formatPhoneDisplay, isValidBrazilianPhone } from '../../utils/phoneFormatter';
+import LeadScoreGauge from './LeadScoreGauge';
 
 interface LeadCardProps {
   lead: any;
@@ -14,7 +15,7 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 1: LIGAR (TELEFONEMA)
+  // 🔧 LIGAR (TELEFONEMA)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleCall = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -30,13 +31,12 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
       return;
     }
 
-    // Abrir discador do telefone
     const cleanPhone = phone.replace(/\D/g, '');
     window.location.href = `tel:+55${cleanPhone}`;
   };
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 2: WHATSAPP COM NÚMERO BRASILEIRO
+  // 🔧 WHATSAPP COM NÚMERO BRASILEIRO
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -52,10 +52,8 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
       return;
     }
 
-    // Formatar para WhatsApp (com +55)
     const whatsappPhone = formatPhoneForWhatsApp(phone);
     
-    // Mensagem personalizada
     const message = encodeURIComponent(
       `Olá ${lead.nome || 'cliente'}! 👋\n\n` +
       `Vi que você demonstrou interesse em nossos serviços e gostaria de conversar com você.\n\n` +
@@ -63,12 +61,11 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
       `Atenciosamente,\nEquipe ALSHAM 360° PRIMA`
     );
 
-    // Abrir WhatsApp
     window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
   };
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 3: EMAIL COM MAILTO
+  // 🔧 EMAIL COM MAILTO
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleEmail = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -93,16 +90,6 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
   };
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // HELPERS
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'from-emerald-500 to-teal-500';
-    if (score >= 60) return 'from-blue-500 to-cyan-500';
-    if (score >= 40) return 'from-yellow-500 to-orange-500';
-    return 'from-red-500 to-pink-500';
-  };
-
   const score = lead.score_ia || 0;
   const phone = lead.telefone || lead.phone;
   const hasValidPhone = phone && isValidBrazilianPhone(phone);
@@ -123,7 +110,7 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 pointer-events-none" />
       )}
 
-      {/* Header */}
+      {/* Header com Nome e Email */}
       <div className="flex items-start justify-between mb-4 relative z-10">
         <div className="flex-1">
           <h3 className="text-lg font-bold text-white mb-1">
@@ -132,9 +119,11 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
           <p className="text-sm text-gray-400">{lead.email || 'Sem email'}</p>
         </div>
 
-        {/* Score Badge */}
-        <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getScoreColor(score)} text-white text-sm font-bold`}>
-          {score}
+        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        {/* 🍕 GRÁFICO DE PIZZA DE VOLTA! */}
+        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <div className="flex-shrink-0">
+          <LeadScoreGauge score={score} size={60} />
         </div>
       </div>
 
@@ -169,9 +158,7 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
         </span>
       </div>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {/* 🔧 FIX: BOTÕES TODOS FUNCIONANDO */}
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* Botões de Ação */}
       <div className="grid grid-cols-3 gap-2 relative z-10">
         {/* Botão Ligar */}
         <motion.button
@@ -231,9 +218,8 @@ export default function LeadCard({ lead, delay = 0, onView }: LeadCardProps) {
       {/* IA Insights Preview */}
       {lead.ai_conversion_probability && (
         <div className="mt-4 pt-4 border-t border-neutral-800 relative z-10">
-          <div className="flex items-center gap-2 text-xs">
-            <TrendingUp className="w-3 h-3 text-emerald-400" />
-            <span className="text-gray-400">Conversão:</span>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-400">Conversão prevista:</span>
             <span className="text-emerald-400 font-bold">
               {lead.ai_conversion_probability}%
             </span>
