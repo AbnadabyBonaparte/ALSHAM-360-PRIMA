@@ -1,5 +1,5 @@
 // src/pages/Leads.tsx
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutGrid, List, Kanban, Network, Plus, Download, 
@@ -18,14 +18,112 @@ import LeadScoreGauge from '../components/leads/LeadScoreGauge';
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
 export default function Leads() {
-  // ✅ CORREÇÃO: Usar os valores corretos do hook
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🔧 FIX 1: CARREGAR LEADS DO BANCO
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const { leads, loading, error } = useLeadsAI();
+  
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<any>(null);
-  const [showAIPanel, setShowAIPanel] = useState(true);
+  const [showAIPanel, setShowAIPanel] = useState(false); // 🔧 FIX: Começa fechado
   const [filters, setFilters] = useState<any>({});
 
-  // ✅ CORREÇÃO: Calcular analytics a partir dos leads
+  // 🔧 FIX: Log para debug
+  useEffect(() => {
+    console.log('🔄 Leads carregados:', leads?.length || 0);
+    console.log('📊 Leads:', leads);
+  }, [leads]);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🔧 FIX 2: FILTROS FUNCIONANDO
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const filteredLeads = useMemo(() => {
+    if (!leads || leads.length === 0) return [];
+    
+    let result = [...leads];
+
+    // Busca por texto
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      result = result.filter((l: any) => 
+        l.nome?.toLowerCase().includes(searchLower) ||
+        l.email?.toLowerCase().includes(searchLower) ||
+        l.empresa?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filtro de status
+    if (filters.status && filters.status !== 'all') {
+      result = result.filter((l: any) => l.status === filters.status);
+    }
+
+    // Filtro de score
+    if (filters.score && filters.score !== 'all') {
+      switch (filters.score) {
+        case 'hot':
+          result = result.filter((l: any) => (l.score_ia || 0) >= 80);
+          break;
+        case 'warm':
+          result = result.filter((l: any) => (l.score_ia || 0) >= 60 && (l.score_ia || 0) < 80);
+          break;
+        case 'cold':
+          result = result.filter((l: any) => (l.score_ia || 0) >= 40 && (l.score_ia || 0) < 60);
+          break;
+        case 'ice':
+          result = result.filter((l: any) => (l.score_ia || 0) < 40);
+          break;
+      }
+    }
+
+    // Filtro de origem
+    if (filters.source && filters.source !== 'all') {
+      result = result.filter((l: any) => l.origem === filters.source);
+    }
+
+    // Filtro de risco
+    if (filters.risk && filters.risk !== 'all') {
+      const riskScore = (l: any) => l.ai_risk_score || 0;
+      switch (filters.risk) {
+        case 'high':
+          result = result.filter((l: any) => riskScore(l) >= 60);
+          break;
+        case 'medium':
+          result = result.filter((l: any) => riskScore(l) >= 30 && riskScore(l) < 60);
+          break;
+        case 'low':
+          result = result.filter((l: any) => riskScore(l) < 30);
+          break;
+      }
+    }
+
+    // Filtro de conversão
+    if (filters.conversion && filters.conversion !== 'all') {
+      const convProb = (l: any) => l.ai_conversion_probability || 0;
+      switch (filters.conversion) {
+        case 'vhigh':
+          result = result.filter((l: any) => convProb(l) >= 80);
+          break;
+        case 'high':
+          result = result.filter((l: any) => convProb(l) >= 60 && convProb(l) < 80);
+          break;
+        case 'medium':
+          result = result.filter((l: any) => convProb(l) >= 40 && convProb(l) < 60);
+          break;
+        case 'low':
+          result = result.filter((l: any) => convProb(l) < 40);
+          break;
+      }
+    }
+
+    console.log('🔍 Filtros aplicados:', filters);
+    console.log('📊 Resultados filtrados:', result.length);
+
+    return result;
+  }, [leads, filters]);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 📊 ANALYTICS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const analytics = useMemo(() => {
     if (!leads || leads.length === 0) {
       return {
@@ -38,7 +136,9 @@ export default function Leads() {
       };
     }
 
-    const qualified = leads.filter((l: any) => l.status === 'qualified').length;
+    const qualified = leads.filter((l: any) => 
+      l.status === 'qualified' || l.status === 'qualificado'
+    ).length;
     const hot = leads.filter((l: any) => (l.score_ia || 0) >= 70).length;
     const atRisk = leads.filter((l: any) => (l.score_ia || 0) < 40).length;
     const avgScore = leads.reduce((sum: number, l: any) => sum + (l.score_ia || 50), 0) / leads.length;
@@ -53,22 +153,35 @@ export default function Leads() {
     };
   }, [leads]);
 
-  // ✅ CORREÇÃO: Aplicar filtros localmente
-  const filteredLeads = useMemo(() => {
-    if (!leads || leads.length === 0) return [];
-    
-    let result = [...leads];
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🔧 FIX 3: KANBAN COM STAGES CORRETOS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const pipelineStages = useMemo(() => {
+    const stages = [
+      { id: 'novo', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] as any[] },
+      { id: 'contacted', name: 'Contatado', color: 'from-purple-500 to-pink-500', leads: [] as any[] },
+      { id: 'qualified', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] as any[] },
+      { id: 'qualificado', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] as any[] },
+      { id: 'proposal', name: 'Proposta', color: 'from-orange-500 to-yellow-500', leads: [] as any[] },
+      { id: 'negotiation', name: 'Negociação', color: 'from-cyan-500 to-blue-500', leads: [] as any[] },
+      { id: 'won', name: 'Ganho', color: 'from-green-500 to-emerald-500', leads: [] as any[] },
+      { id: 'convertido', name: 'Convertido', color: 'from-green-500 to-emerald-500', leads: [] as any[] },
+    ];
 
-    // Aplicar filtros se existirem
-    if (filters.status) {
-      result = result.filter((l: any) => l.status === filters.status);
-    }
-    if (filters.minScore) {
-      result = result.filter((l: any) => (l.score_ia || 0) >= filters.minScore);
+    if (!filteredLeads || !Array.isArray(filteredLeads)) {
+      return stages;
     }
 
-    return result;
-  }, [leads, filters]);
+    filteredLeads.forEach((lead: any) => {
+      const stage = stages.find(s => s.id === (lead.status || 'novo').toLowerCase());
+      if (stage) stage.leads.push(lead);
+    });
+
+    // Remover stages vazios duplicados
+    return stages.filter((s, i, arr) => 
+      s.leads.length > 0 || !arr.slice(i + 1).some(other => other.name === s.name)
+    );
+  }, [filteredLeads]);
 
   // Prepare data for charts
   const chartData = useMemo(() => {
@@ -78,7 +191,6 @@ export default function Leads() {
       return d.toLocaleDateString('pt-BR', { month: 'short' });
     });
 
-    // Mock historical data (em produção, buscar do Supabase)
     const historical = [45, 52, 48, 61, 58, 67];
     const predictions = [72, 78, 85];
 
@@ -89,45 +201,26 @@ export default function Leads() {
     };
   }, []);
 
-  // ✅ CORREÇÃO: Verificar se filteredLeads existe antes do forEach
-  const pipelineStages = useMemo(() => {
-    const stages = [
-      { id: 'new', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] as any[] },
-      { id: 'contacted', name: 'Contatado', color: 'from-purple-500 to-pink-500', leads: [] as any[] },
-      { id: 'qualified', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] as any[] },
-      { id: 'proposal', name: 'Proposta', color: 'from-orange-500 to-yellow-500', leads: [] as any[] },
-      { id: 'negotiation', name: 'Negociação', color: 'from-cyan-500 to-blue-500', leads: [] as any[] },
-    ];
-
-    // ✅ CORREÇÃO: Guard clause
-    if (!filteredLeads || !Array.isArray(filteredLeads)) {
-      return stages;
-    }
-
-    filteredLeads.forEach((lead: any) => {
-      const stage = stages.find(s => s.id === lead.status);
-      if (stage) stage.leads.push(lead);
-    });
-
-    return stages;
-  }, [filteredLeads]);
-
   // Prepare network data
   const networkData = useMemo(() => {
     if (!selectedLead) return { nodes: [], edges: [] };
 
     const nodes = [
-      { id: selectedLead.id, label: `${selectedLead.first_name} ${selectedLead.last_name}`, type: 'lead' as const, value: selectedLead.score_ia || 50 },
+      { 
+        id: selectedLead.id, 
+        label: selectedLead.nome || `${selectedLead.first_name || ''} ${selectedLead.last_name || ''}`.trim(), 
+        type: 'lead' as const, 
+        value: selectedLead.score_ia || 50 
+      },
     ];
 
     const edges: any[] = [];
 
-    // Add similar leads
     if (selectedLead.ai_similar_leads) {
       selectedLead.ai_similar_leads.forEach((similar: any) => {
         nodes.push({
           id: similar.lead.id,
-          label: `${similar.lead.first_name} ${similar.lead.last_name}`,
+          label: similar.lead.nome || `${similar.lead.first_name} ${similar.lead.last_name}`,
           type: 'lead' as const,
           value: similar.similarity
         });
@@ -177,7 +270,15 @@ export default function Leads() {
     ];
   }, [selectedLead]);
 
-  // ✅ CORREÇÃO: Mostrar erro se houver
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🔧 FIX 4: CRIAR NOVO LEAD
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const handleCreateLead = () => {
+    // TODO: Implementar modal de criação
+    alert('Funcionalidade de criar lead será implementada em breve!');
+  };
+
+  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
@@ -222,7 +323,8 @@ export default function Leads() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+            onClick={handleCreateLead}
+            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
             Novo Lead
@@ -230,9 +332,9 @@ export default function Leads() {
         </div>
       </div>
 
-      {/* KPIs Dashboard */}
-      {analytics && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+      {/* Analytics Cards */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -319,7 +421,7 @@ export default function Leads() {
         </div>
       )}
 
-      {/* View Mode Selector & Filters */}
+      {/* View Mode Selector & AI Panel Toggle */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2 p-1 bg-neutral-900 border border-neutral-800 rounded-xl">
           {[
@@ -347,13 +449,22 @@ export default function Leads() {
           ))}
         </div>
 
-        <button
+        {/* 🔧 FIX 5: BOTÃO MOSTRAR IA PANEL */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setShowAIPanel(!showAIPanel)}
-          className="px-4 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 text-purple-400 rounded-xl hover:bg-purple-500/20 transition-all flex items-center gap-2"
+          className={`
+            px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2
+            ${showAIPanel
+              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+              : 'bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20'
+            }
+          `}
         >
           <Sparkles className="w-4 h-4" />
           {showAIPanel ? 'Ocultar' : 'Mostrar'} IA Panel
-        </button>
+        </motion.button>
       </div>
 
       {/* Smart Filters */}
@@ -366,32 +477,41 @@ export default function Leads() {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - AI Insights (Optional) */}
-        {showAIPanel && selectedLead && (
+        {/* 🔧 FIX 6: IA PANEL SEM PRECISAR DE LEAD SELECIONADO */}
+        {showAIPanel && (
           <div className="lg:col-span-1 space-y-6">
             <AIInsightsPanel
-              insights={selectedLead.ai_insights || []}
-              conversionProb={selectedLead.ai_conversion_probability || 0}
-              healthScore={selectedLead.ai_health_score || 0}
-              riskScore={selectedLead.ai_risk_score || 0}
-              nextAction={selectedLead.ai_next_best_action}
+              insights={selectedLead?.ai_insights || []}
+              conversionProb={selectedLead?.ai_conversion_probability || 0}
+              healthScore={selectedLead?.ai_health_score || 0}
+              riskScore={selectedLead?.ai_risk_score || 0}
+              nextAction={selectedLead?.ai_next_best_action}
             />
 
-            <ActivityTimeline activities={activities} maxItems={5} />
-
-            <RelationshipNetwork
-              nodes={networkData.nodes}
-              edges={networkData.edges}
-              centerNodeId={selectedLead.id}
-            />
+            {selectedLead && (
+              <>
+                <ActivityTimeline activities={activities} maxItems={5} />
+                <RelationshipNetwork
+                  nodes={networkData.nodes}
+                  edges={networkData.edges}
+                  centerNodeId={selectedLead.id}
+                />
+              </>
+            )}
           </div>
         )}
 
         {/* Right Column - Leads Display */}
-        <div className={showAIPanel && selectedLead ? 'lg:col-span-2' : 'lg:col-span-3'}>
+        <div className={showAIPanel ? 'lg:col-span-2' : 'lg:col-span-3'}>
           {loading ? (
-            <div className="flex items-center justify-center h-96">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-emerald-500"></div>
+            <div className="flex flex-col items-center justify-center h-96">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
+              <p className="text-gray-400">Carregando leads...</p>
+            </div>
+          ) : filteredLeads.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-96 bg-neutral-900 border border-neutral-800 rounded-2xl">
+              <p className="text-2xl text-gray-400 mb-2">Nenhum lead encontrado</p>
+              <p className="text-sm text-gray-500">Tente ajustar os filtros ou criar um novo lead</p>
             </div>
           ) : (
             <AnimatePresence mode="wait">
@@ -421,7 +541,13 @@ export default function Leads() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <LeadsPipeline stages={pipelineStages} />
+                  <LeadsPipeline 
+                    stages={pipelineStages}
+                    onLeadMove={(leadId, newStageId) => {
+                      console.log(`Lead ${leadId} movido para ${newStageId}`);
+                      // TODO: Atualizar no banco
+                    }}
+                  />
                 </motion.div>
               )}
 
@@ -437,6 +563,49 @@ export default function Leads() {
                     edges={networkData.edges}
                     centerNodeId={selectedLead.id}
                   />
+                </motion.div>
+              )}
+
+              {viewMode === 'list' && (
+                <motion.div
+                  key="list"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden"
+                >
+                  <table className="w-full">
+                    <thead className="bg-neutral-950 border-b border-neutral-800">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Nome</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Email</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Empresa</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Status</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-gray-400">Score</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-800">
+                      {filteredLeads.map((lead: any) => (
+                        <tr 
+                          key={lead.id}
+                          onClick={() => setSelectedLead(lead)}
+                          className="hover:bg-neutral-950 cursor-pointer transition-colors"
+                        >
+                          <td className="px-6 py-4 text-white font-medium">{lead.nome || '-'}</td>
+                          <td className="px-6 py-4 text-gray-400">{lead.email || '-'}</td>
+                          <td className="px-6 py-4 text-gray-400">{lead.empresa || '-'}</td>
+                          <td className="px-6 py-4">
+                            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-semibold">
+                              {lead.status || 'novo'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="text-emerald-400 font-bold">{lead.score_ia || 0}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </motion.div>
               )}
             </AnimatePresence>
