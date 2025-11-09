@@ -1,0 +1,293 @@
+/* src/styles/themes.css */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 🎨 ALSHAM 360° PRIMA - SISTEMA DE TEMAS DINÂMICOS */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ============================================ */
+/* 🌑 GLASS DARK (Tema Padrão) */
+/* ============================================ */
+[data-theme="glass-dark"] {
+  /* Cores primárias */
+  --color-primary-from: #10b981;
+  --color-primary-to: #14b8a6;
+  --color-primary-hover-from: #059669;
+  --color-primary-hover-to: #0d9488;
+  
+  /* Cores secundárias */
+  --color-secondary-from: #3b82f6;
+  --color-secondary-to: #06b6d4;
+  --color-secondary-hover-from: #2563eb;
+  --color-secondary-hover-to: #0891b2;
+  
+  /* Cores de acento */
+  --color-accent-from: #a855f7;
+  --color-accent-to: #ec4899;
+  --color-accent-hover-from: #9333ea;
+  --color-accent-hover-to: #db2777;
+  
+  /* Status - Success */
+  --color-success-from: #22c55e;
+  --color-success-to: #10b981;
+  --color-success-hover-from: #16a34a;
+  --color-success-hover-to: #059669;
+  
+  /* Status - Warning */
+  --color-warning-from: #f59e0b;
+  --color-warning-to: #f97316;
+  --color-warning-hover-from: #d97706;
+  --color-warning-hover-to: #ea580c;
+  
+  /* Status - Error */
+  --color-error-from: #ef4444;
+  --color-error-to: #ec4899;
+  --color-error-hover-from: #dc2626;
+  --color-error-hover-to: #db2777;
+  
+  /* Status - Info */
+  --color-info-from: #3b82f6;
+  --color-info-to: #6366f1;
+  --color-info-hover-from: #2563eb;
+  --color-info-hover-to: #4f46e5;
+}
+
+/* ============================================ */
+/* 🪙 PLATINUM GLASS */
+/* ============================================ */
+[data-theme="platinum-glass"] {
+  --color-primary-from: #94a3b8;
+  --color-primary-to: #cbd5e1;
+  --color-primary-hover-from: #64748b;
+  --color-primary-hover-to: #94a3b8;
+  
+  --color-secondary-from: #9ca3af;
+  --color-secondary-to: #d1d5db;
+  --color-secondary-hover-from: #6b7280;
+  --color-secondary-hover-to: #9ca3af;
+  
+  --color-accent-from: #71717a;
+  --color-accent-to: #a1a1aa;
+  --color-accent-hover-from: #52525b;
+  --color-accent-hover-to: #71717a;
+  
+  --color-success-from: #22c55e;
+  --color-success-to: #10b981;
+  --color-success-hover-from: #16a34a;
+  --color-success-hover-to: #059669;
+  
+  --color-warning-from: #f59e0b;
+  --color-warning-to: #f97316;
+  --color-warning-hover-from: #d97706;
+  --color-warning-hover-to: #ea580c;
+  
+  --color-error-from: #ef4444;
+  --color-error-to: #f43f5e;
+  --color-error-hover-from: #dc2626;
+  --color-error-hover-to: #e11d48;
+  
+  --color-info-from: #0ea5e9;
+  --color-info-to: #3b82f6;
+  --color-info-hover-from: #0284c7;
+  --color-info-hover-to: #2563eb;
+}
+
+/* ============================================ */
+/* 🌌 MIDNIGHT AURORA */
+/* ============================================ */
+[data-theme="midnight-aurora"] {
+  --color-primary-from: #8b5cf6;
+  --color-primary-to: #a855f7;
+  --color-primary-hover-from: #7c3aed;
+  --color-primary-hover-to: #9333ea;
+  
+  --color-secondary-from: #6366f1;
+  --color-secondary-to: #3b82f6;
+  --color-secondary-hover-from: #4f46e5;
+  --color-secondary-hover-to: #2563eb;
+  
+  --color-accent-from: #d946ef;
+  --color-accent-to: #ec4899;
+  --color-accent-hover-from: #c026d3;
+  --color-accent-hover-to: #db2777;
+  
+  --color-success-from: #22c55e;
+  --color-success-to: #10b981;
+  --color-success-hover-from: #16a34a;
+  --color-success-hover-to: #059669;
+  
+  --color-warning-from: #f59e0b;
+  --color-warning-to: #f97316;
+  --color-warning-hover-from: #d97706;
+  --color-warning-hover-to: #ea580c;
+  
+  --color-error-from: #ef4444;
+  --color-error-to: #f43f5e;
+  --color-error-hover-from: #dc2626;
+  --color-error-hover-to: #e11d48;
+  
+  --color-info-from: #3b82f6;
+  --color-info-to: #6366f1;
+  --color-info-hover-from: #2563eb;
+  --color-info-hover-to: #4f46e5;
+}
+
+/* ============================================ */
+/* 🏜️ DESERT QUARTZ */
+/* ============================================ */
+[data-theme="desert-quartz"] {
+  --color-primary-from: #f59e0b;
+  --color-primary-to: #f97316;
+  --color-primary-hover-from: #d97706;
+  --color-primary-hover-to: #ea580c;
+  
+  --color-secondary-from: #eab308;
+  --color-secondary-to: #f59e0b;
+  --color-secondary-hover-from: #ca8a04;
+  --color-secondary-hover-to: #d97706;
+  
+  --color-accent-from: #f97316;
+  --color-accent-to: #ef4444;
+  --color-accent-hover-from: #ea580c;
+  --color-accent-hover-to: #dc2626;
+  
+  --color-success-from: #22c55e;
+  --color-success-to: #10b981;
+  --color-success-hover-from: #16a34a;
+  --color-success-hover-to: #059669;
+  
+  --color-warning-from: #eab308;
+  --color-warning-to: #f59e0b;
+  --color-warning-hover-from: #ca8a04;
+  --color-warning-hover-to: #d97706;
+  
+  --color-error-from: #ef4444;
+  --color-error-to: #f43f5e;
+  --color-error-hover-from: #dc2626;
+  --color-error-hover-to: #e11d48;
+  
+  --color-info-from: #3b82f6;
+  --color-info-to: #06b6d4;
+  --color-info-hover-from: #2563eb;
+  --color-info-hover-to: #0891b2;
+}
+
+/* ============================================ */
+/* ⚡ NEON ENERGY */
+/* ============================================ */
+[data-theme="neon-energy"] {
+  --color-primary-from: #06b6d4;
+  --color-primary-to: #3b82f6;
+  --color-primary-hover-from: #0891b2;
+  --color-primary-hover-to: #2563eb;
+  
+  --color-secondary-from: #3b82f6;
+  --color-secondary-to: #6366f1;
+  --color-secondary-hover-from: #2563eb;
+  --color-secondary-hover-to: #4f46e5;
+  
+  --color-accent-from: #ec4899;
+  --color-accent-to: #f43f5e;
+  --color-accent-hover-from: #db2777;
+  --color-accent-hover-to: #e11d48;
+  
+  --color-success-from: #22c55e;
+  --color-success-to: #10b981;
+  --color-success-hover-from: #16a34a;
+  --color-success-hover-to: #059669;
+  
+  --color-warning-from: #f59e0b;
+  --color-warning-to: #f97316;
+  --color-warning-hover-from: #d97706;
+  --color-warning-hover-to: #ea580c;
+  
+  --color-error-from: #ef4444;
+  --color-error-to: #ec4899;
+  --color-error-hover-from: #dc2626;
+  --color-error-hover-to: #db2777;
+  
+  --color-info-from: #06b6d4;
+  --color-info-to: #3b82f6;
+  --color-info-hover-from: #0891b2;
+  --color-info-hover-to: #2563eb;
+}
+
+/* ============================================ */
+/* 🔮 CYBER VIVID */
+/* ============================================ */
+[data-theme="cyber-vivid"] {
+  --color-primary-from: #d946ef;
+  --color-primary-to: #a855f7;
+  --color-primary-hover-from: #c026d3;
+  --color-primary-hover-to: #9333ea;
+  
+  --color-secondary-from: #a855f7;
+  --color-secondary-to: #8b5cf6;
+  --color-secondary-hover-from: #9333ea;
+  --color-secondary-hover-to: #7c3aed;
+  
+  --color-accent-from: #ec4899;
+  --color-accent-to: #f43f5e;
+  --color-accent-hover-from: #db2777;
+  --color-accent-hover-to: #e11d48;
+  
+  --color-success-from: #22c55e;
+  --color-success-to: #10b981;
+  --color-success-hover-from: #16a34a;
+  --color-success-hover-to: #059669;
+  
+  --color-warning-from: #f59e0b;
+  --color-warning-to: #f97316;
+  --color-warning-hover-from: #d97706;
+  --color-warning-hover-to: #ea580c;
+  
+  --color-error-from: #ef4444;
+  --color-error-to: #f43f5e;
+  --color-error-hover-from: #dc2626;
+  --color-error-hover-to: #e11d48;
+  
+  --color-info-from: #3b82f6;
+  --color-info-to: #6366f1;
+  --color-info-hover-from: #2563eb;
+  --color-info-hover-to: #4f46e5;
+}
+
+/* ============================================ */
+/* 🎨 HELPER CLASSES */
+/* ============================================ */
+
+/* Gradientes */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary-from), var(--color-primary-to));
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-hover-from), var(--color-primary-hover-to));
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--color-secondary-from), var(--color-secondary-to));
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, var(--color-secondary-hover-from), var(--color-secondary-hover-to));
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--color-success-from), var(--color-success-to));
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--color-success-hover-from), var(--color-success-hover-to));
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--color-warning-from), var(--color-warning-to));
+}
+
+.btn-error {
+  background: linear-gradient(135deg, var(--color-error-from), var(--color-error-to));
+}
+
+.btn-info {
+  background: linear-gradient(135deg, var(--color-info-from), var(--color-info-to));
+}
