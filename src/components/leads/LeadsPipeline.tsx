@@ -54,6 +54,40 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
     onLeadMove?.(draggableId, destination.droppableId);
   };
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🔧 FIX: ADICIONAR NOVO LEAD NO STAGE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const handleAddLead = (stageId: string) => {
+    console.log('➕ Adicionar lead ao stage:', stageId);
+    
+    // TODO: Abrir modal de criação de lead com status pré-selecionado
+    const leadName = prompt(`Criar novo lead no stage "${stages.find(s => s.id === stageId)?.name}".\n\nNome do lead:`);
+    
+    if (!leadName) return;
+    
+    const newLead = {
+      id: `temp-${Date.now()}`,
+      nome: leadName,
+      email: '',
+      empresa: '',
+      status: stageId,
+      score_ia: 50,
+      created_at: new Date().toISOString()
+    };
+
+    const newStages = stages.map(stage => {
+      if (stage.id === stageId) {
+        return { ...stage, leads: [...stage.leads, newLead] };
+      }
+      return stage;
+    });
+
+    setStages(newStages);
+    
+    // TODO: Salvar no banco de dados
+    alert(`✅ Lead "${leadName}" criado! (Salvar no banco em breve)`);
+  };
+
   const getTotalValue = (leads: any[]) => {
     return leads.reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
   };
@@ -86,9 +120,17 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                         <DollarSign className="w-3 h-3" />
                         ${getTotalValue(stage.leads).toLocaleString()}
                       </div>
-                      <button className="p-1 hover:bg-white/10 rounded transition-colors">
+                      
+                      {/* 🔧 FIX: BOTÃO + COM ONCLICK */}
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleAddLead(stage.id)}
+                        className="p-1 hover:bg-white/10 rounded transition-colors"
+                        title={`Adicionar lead em ${stage.name}`}
+                      >
                         <Plus className="w-4 h-4" />
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
 
@@ -131,7 +173,16 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                     
                     {stage.leads.length === 0 && (
                       <div className="text-center py-12 text-gray-500">
-                        <p className="text-sm">Nenhum lead nesta etapa</p>
+                        <p className="text-sm mb-3">Nenhum lead nesta etapa</p>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleAddLead(stage.id)}
+                          className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-sm hover:bg-emerald-500/20 transition-colors inline-flex items-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Adicionar primeiro lead
+                        </motion.button>
                       </div>
                     )}
                   </div>
