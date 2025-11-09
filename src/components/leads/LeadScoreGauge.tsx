@@ -1,133 +1,116 @@
 // src/components/leads/LeadScoreGauge.tsx
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 
 interface LeadScoreGaugeProps {
   score: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: number;
   showLabel?: boolean;
-  animated?: boolean;
 }
 
-export default function LeadScoreGauge({ 
-  score = 0, 
-  size = 'md',
-  showLabel = true,
-  animated = true 
-}: LeadScoreGaugeProps) {
-  const [displayScore, setDisplayScore] = useState(0);
-
-  useEffect(() => {
-    if (animated) {
-      let start = 0;
-      const increment = score / 50;
-      const timer = setInterval(() => {
-        start += increment;
-        if (start >= score) {
-          setDisplayScore(score);
-          clearInterval(timer);
-        } else {
-          setDisplayScore(Math.floor(start));
-        }
-      }, 20);
-      return () => clearInterval(timer);
-    } else {
-      setDisplayScore(score);
-    }
-  }, [score, animated]);
-
-  const sizes = {
-    sm: { width: 80, height: 80, strokeWidth: 6, fontSize: 'text-lg' },
-    md: { width: 120, height: 120, strokeWidth: 8, fontSize: 'text-2xl' },
-    lg: { width: 160, height: 160, strokeWidth: 10, fontSize: 'text-4xl' }
+export default function LeadScoreGauge({ score, size = 80, showLabel = true }: LeadScoreGaugeProps) {
+  // Garantir que score está entre 0 e 100
+  const normalizedScore = Math.min(Math.max(score || 0, 0), 100);
+  
+  // Calcular cor baseada no score
+  const getColor = (value: number) => {
+    if (value >= 80) return { from: '#10b981', to: '#14b8a6' }; // Verde (emerald-teal)
+    if (value >= 60) return { from: '#3b82f6', to: '#06b6d4' }; // Azul (blue-cyan)
+    if (value >= 40) return { from: '#f59e0b', to: '#f97316' }; // Laranja (amber-orange)
+    return { from: '#ef4444', to: '#ec4899' }; // Vermelho (red-pink)
   };
 
-  const { width, height, strokeWidth, fontSize } = sizes[size];
-  const radius = (width - strokeWidth) / 2;
+  const colors = getColor(normalizedScore);
+  
+  // Calcular ângulo para o arco (0-360 graus)
+  const angle = (normalizedScore / 100) * 360;
+  
+  // Criar gradiente único
+  const gradientId = `scoreGradient-${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Tamanhos
+  const strokeWidth = size * 0.15;
+  const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (displayScore / 100) * circumference;
-
-  const getColor = () => {
-    if (score >= 80) return '#10b981'; // Emerald
-    if (score >= 60) return '#3b82f6'; // Blue
-    if (score >= 40) return '#f59e0b'; // Orange
-    return '#ef4444'; // Red
-  };
-
-  const getGradient = () => {
-    if (score >= 80) return 'from-emerald-500 to-teal-500';
-    if (score >= 60) return 'from-blue-500 to-indigo-500';
-    if (score >= 40) return 'from-orange-500 to-yellow-500';
-    return 'from-red-500 to-pink-500';
-  };
-
-  const getLabel = () => {
-    if (score >= 80) return '🔥 Quente';
-    if (score >= 60) return '👍 Bom';
-    if (score >= 40) return '😐 Morno';
-    return '🧊 Frio';
-  };
+  const strokeDashoffset = circumference - (normalizedScore / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative" style={{ width, height }}>
-        <svg width={width} height={height} className="transform -rotate-90">
-          {/* Background circle */}
-          <circle
-            cx={width / 2}
-            cy={height / 2}
-            r={radius}
-            stroke="rgba(255,255,255,0.1)"
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-          {/* Progress circle */}
-          <motion.circle
-            cx={width / 2}
-            cy={height / 2}
-            r={radius}
-            stroke={getColor()}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: offset }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            style={{
-              filter: `drop-shadow(0 0 ${strokeWidth}px ${getColor()}40)`
-            }}
-          />
-        </svg>
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Definir gradiente */}
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={colors.from} />
+            <stop offset="100%" stopColor={colors.to} />
+          </linearGradient>
+        </defs>
         
-        {/* Score in center */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <motion.span 
-            className={`${fontSize} font-bold bg-gradient-to-br ${getGradient()} bg-clip-text text-transparent`}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, type: "spring" }}
-          >
-            {displayScore}
-          </motion.span>
-          <span className="text-xs text-gray-400">score</span>
-        </div>
-      </div>
-
-      {showLabel && (
+        {/* Círculo de fundo (cinza) */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.1)"
+          strokeWidth={strokeWidth}
+        />
+        
+        {/* Círculo animado (score) */}
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={`url(#${gradientId})`}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference}
+          animate={{ strokeDashoffset }}
+          initial={{ strokeDashoffset: circumference }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        />
+      </svg>
+      
+      {/* Score no centro */}
+      <div className="absolute inset-0 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className={`
-            px-3 py-1 rounded-full text-xs font-semibold
-            bg-gradient-to-r ${getGradient()} bg-opacity-20
-          `}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
+          className="text-center"
         >
-          {getLabel()}
+          <div 
+            className="font-bold leading-none"
+            style={{ 
+              fontSize: size * 0.3,
+              background: `linear-gradient(135deg, ${colors.from}, ${colors.to})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            {Math.round(normalizedScore)}
+          </div>
+          {showLabel && size > 60 && (
+            <div 
+              className="text-gray-400 font-medium mt-0.5"
+              style={{ fontSize: size * 0.12 }}
+            >
+              Score
+            </div>
+          )}
         </motion.div>
-      )}
+      </div>
+      
+      {/* Glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full blur-xl opacity-0"
+        style={{
+          background: `linear-gradient(135deg, ${colors.from}, ${colors.to})`,
+        }}
+        animate={{ opacity: [0, 0.3, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
     </div>
   );
 }
