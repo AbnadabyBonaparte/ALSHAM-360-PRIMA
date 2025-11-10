@@ -1,10 +1,6 @@
 // src/components/leads/LeadCard.tsx
 import { motion } from 'framer-motion';
-import { 
-  Mail, Phone, Building, Calendar, Star, TrendingUp,
-  MoreVertical, Edit, Trash2, Eye, MessageSquare,
-  User, MapPin
-} from 'lucide-react';
+import { Mail, Phone, Building, Calendar, Star, TrendingUp, MoreVertical, Edit, Trash2, Eye, MessageSquare, User, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import LeadScoreGauge from './LeadScoreGauge';
 
@@ -34,13 +30,7 @@ interface LeadCardProps {
   delay?: number;
 }
 
-export default function LeadCard({ 
-  lead, 
-  onEdit, 
-  onDelete, 
-  onView,
-  delay = 0 
-}: LeadCardProps) {
+export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: LeadCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -48,31 +38,29 @@ export default function LeadCard({
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const getStatusColor = (status: string) => {
     const colors = {
-      new: 'from-blue-500 to-indigo-500',
-      contacted: 'from-purple-500 to-pink-500',
-      qualified: 'from-emerald-500 to-teal-500',
-      proposal: 'from-orange-500 to-yellow-500',
-      negotiation: 'from-cyan-500 to-blue-500',
-      won: 'from-green-500 to-emerald-500',
-      lost: 'from-red-500 to-pink-500'
+      new: 'from-[var(--accent-blue)] to-[var(--accent-indigo)]',
+      contacted: 'from-[var(--accent-purple)] to-[var(--accent-pink)]',
+      qualified: 'from-[var(--accent-emerald)] to-[var(--accent-teal)]',
+      proposal: 'from-[var(--accent-orange)] to-[var(--accent-yellow)]',
+      negotiation: 'from-[var(--accent-cyan)] to-[var(--accent-blue)]',
+      won: 'from-[var(--accent-green)] to-[var(--accent-emerald)]',
+      lost: 'from-[var(--accent-red)] to-[var(--accent-pink)]'
     };
-    return colors[status as keyof typeof colors] || 'from-gray-500 to-gray-600';
+    return colors[status as keyof typeof colors] || 'from-[var(--neutral-gray)] to-[var(--neutral-gray-dark)]';
   };
 
   const getInitials = () => {
     return `${lead.first_name?.[0] || ''}${lead.last_name?.[0] || ''}`.toUpperCase();
   };
 
-  const daysSinceContact = lead.last_contact 
-    ? Math.floor((Date.now() - new Date(lead.last_contact).getTime()) / (1000 * 60 * 60 * 24))
-    : null;
+  const daysSinceContact = lead.last_contact ? Math.floor((Date.now() - new Date(lead.last_contact).getTime()) / (1000 * 60 * 60 * 24)) : null;
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 📞 FUNÇÕES DOS BOTÕES - AGORA FUNCIONAM!
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleCall = () => {
     if (!lead.phone) {
-      alert('❌ Lead sem telefone cadastrado');
+      alert('Lead sem telefone cadastrado');
       return;
     }
     const cleanPhone = lead.phone.replace(/\D/g, '');
@@ -81,7 +69,7 @@ export default function LeadCard({
 
   const handleWhatsApp = () => {
     if (!lead.phone) {
-      alert('❌ Lead sem telefone cadastrado');
+      alert('Lead sem telefone cadastrado');
       return;
     }
     const cleanPhone = lead.phone.replace(/\D/g, '');
@@ -93,7 +81,7 @@ export default function LeadCard({
 
   const handleEmail = () => {
     if (!lead.email) {
-      alert('❌ Lead sem email cadastrado');
+      alert('Lead sem email cadastrado');
       return;
     }
     const subject = encodeURIComponent('Contato - ALSHAM 360° PRIMA');
@@ -105,216 +93,140 @@ export default function LeadCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      whileHover={{ y: -4 }}
-      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl overflow-hidden hover:border-neutral-700 transition-all shadow-xl hover:shadow-2xl"
+      className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6 relative overflow-hidden" // AJUSTE: Vars para bg/border
     >
       {/* Header with Avatar */}
-      <div className="relative h-32 bg-gradient-to-br from-neutral-800 to-neutral-900 p-6">
-        <div className="absolute top-4 right-4">
-          <button 
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-2 bg-neutral-900/50 hover:bg-neutral-900 rounded-lg backdrop-blur-sm transition-colors"
-          >
-            <MoreVertical className="w-4 h-4 text-gray-400" />
-          </button>
-          
-          {showMenu && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute right-0 mt-2 w-48 bg-neutral-900 border border-neutral-800 rounded-xl shadow-xl overflow-hidden z-10"
-            >
-              <button 
-                onClick={() => onView?.(lead)}
-                className="w-full px-4 py-3 text-left hover:bg-neutral-800 transition-colors flex items-center gap-3 text-gray-300"
-              >
-                <Eye className="w-4 h-4" />
-                Ver Detalhes
-              </button>
-              <button 
-                onClick={() => onEdit?.(lead)}
-                className="w-full px-4 py-3 text-left hover:bg-neutral-800 transition-colors flex items-center gap-3 text-gray-300"
-              >
-                <Edit className="w-4 h-4" />
-                Editar
-              </button>
-              <button 
-                onClick={() => onDelete?.(lead)}
-                className="w-full px-4 py-3 text-left hover:bg-red-500/10 transition-colors flex items-center gap-3 text-red-400"
-              >
-                <Trash2 className="w-4 h-4" />
-                Excluir
-              </button>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Avatar */}
-        <div className="absolute -bottom-10 left-6">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-2xl font-bold text-white shadow-xl border-4 border-neutral-950">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-white font-bold text-sm"> // AJUSTE: Vars
             {getInitials()}
           </div>
-        </div>
-
-        {/* Status Badge */}
-        <div className="absolute top-4 left-4">
-          <span className={`
-            px-3 py-1 rounded-full text-xs font-semibold text-white
-            bg-gradient-to-r ${getStatusColor(lead.status)}
-          `}>
+          {/* Status Badge */}
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getStatusColor(lead.status)} text-white`}> // AJUSTE: Vars no getStatusColor
             {lead.status}
           </span>
         </div>
+        <motion.button
+          onClick={() => setShowMenu(!showMenu)}
+          whileHover={{ scale: 1.05 }}
+          className="text-[var(--text-gray)] hover:text-[var(--text-white)]" // AJUSTE: Vars
+        >
+          <MoreVertical className="w-5 h-5" />
+        </motion.button>
+        {showMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="absolute top-8 right-4 bg-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-lg shadow-lg py-2 z-10" // AJUSTE: Vars
+          >
+            {onEdit && (
+              <button onClick={() => onEdit(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full"> // AJUSTE: Vars
+                <Edit className="w-4 h-4" /> Editar
+              </button>
+            )}
+            {onDelete && (
+              <button onClick={() => onDelete(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full"> // AJUSTE: Vars
+                <Trash2 className="w-4 h-4" /> Excluir
+              </button>
+            )}
+            {onView && (
+              <button onClick={() => onView(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full"> // AJUSTE: Vars
+                <Eye className="w-4 h-4" /> Ver Detalhes
+              </button>
+            )}
+          </motion.div>
+        )}
       </div>
-
       {/* Content */}
-      <div className="p-6 pt-14">
+      <div className="space-y-3">
         {/* Name and Position */}
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-white mb-1">
-            {lead.first_name} {lead.last_name}
-          </h3>
-          {lead.position && (
-            <p className="text-sm text-gray-400 flex items-center gap-1">
-              <User className="w-3 h-3" />
-              {lead.position}
-            </p>
-          )}
-          {lead.company && (
-            <p className="text-sm text-emerald-400 flex items-center gap-1 mt-1">
-              <Building className="w-3 h-3" />
-              {lead.company}
-            </p>
-          )}
-        </div>
-
-        {/* Contact Info */}
-        <div className="space-y-2 mb-4 pb-4 border-b border-neutral-800">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
-            <Mail className="w-4 h-4" />
-            <span className="truncate">{lead.email}</span>
-          </div>
-          {lead.phone && (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Phone className="w-4 h-4" />
-              <span>{lead.phone}</span>
-            </div>
-          )}
-        </div>
-
-        {/* AI Metrics */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex-1">
-            <LeadScoreGauge 
-              score={lead.score_ia || 0} 
-              size="sm"
-              showLabel={false}
-            />
-          </div>
-          
-          <div className="flex-1 text-center">
-            <div className="text-xs text-gray-400 mb-1">Conversão</div>
-            <div className="text-2xl font-bold text-emerald-400">
-              {lead.ai_conversion_probability || 0}%
-            </div>
-          </div>
-        </div>
-
-        {/* Next Action */}
-        {lead.ai_next_best_action && (
-          <div className="mb-4 p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">{lead.ai_next_best_action.icon}</span>
-              <span className="text-xs font-semibold text-purple-400">Próxima Ação</span>
-            </div>
-            <p className="text-xs text-gray-300">{lead.ai_next_best_action.script}</p>
+        <h3 className="font-semibold text-[var(--text-white)] text-lg"> // AJUSTE: Var
+          {lead.first_name} {lead.last_name}
+        </h3>
+        {lead.position && (
+          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+            <User className="w-4 h-4" />
+            {lead.position}
           </div>
         )}
-
-        {/* Footer Info */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
-            {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+        {lead.company && (
+          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+            <Building className="w-4 h-4" />
+            {lead.company}
           </div>
-          {daysSinceContact !== null && (
-            <div className={`flex items-center gap-1 ${daysSinceContact > 14 ? 'text-orange-400' : ''}`}>
-              <MessageSquare className="w-3 h-3" />
-              {daysSinceContact}d sem contato
+        )}
+        
+        {/* Contact Info */}
+        <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+          <Mail className="w-4 h-4" />
+          {lead.email}
+        </div>
+        {lead.phone && (
+          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+            <Phone className="w-4 h-4" />
+            {lead.phone}
+          </div>
+        )}
+        
+        {/* AI Metrics */}
+        <div className="flex items-center justify-between">
+          <LeadScoreGauge score={lead.score_ia || 50} size={60} />
+          <div className="text-right">
+            <div className="text-xs text-[var(--text-gray)]">Conversão</div> // AJUSTE: Var
+            <div className="font-bold text-[var(--accent-emerald)]">{lead.ai_conversion_probability || 0}%</div> // AJUSTE: Var
+          </div>
+        </div>
+        
+        {/* Next Action */}
+        {lead.ai_next_best_action && (
+          <div className="bg-[var(--neutral-950)] p-3 rounded-lg"> // AJUSTE: Var
+            <div className="flex items-center gap-2 text-sm font-medium text-[var(--accent-blue)] mb-1"> // AJUSTE: Var
+              {lead.ai_next_best_action.icon} Próxima Ação
             </div>
+            <p className="text-xs text-[var(--text-gray)]">{lead.ai_next_best_action.script}</p> // AJUSTE: Var
+          </div>
+        )}
+        
+        {/* Footer Info */}
+        <div className="flex justify-between text-xs text-[var(--text-gray)] mt-4"> // AJUSTE: Var
+          <span>{new Date(lead.created_at).toLocaleDateString('pt-BR')}</span>
+          {daysSinceContact !== null && (
+            <span className="text-[var(--accent-orange)]">{daysSinceContact}d sem contato</span> // AJUSTE: Var
           )}
         </div>
-
-        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        {/* 🎨 BOTÕES COM ÍCONES + CSS VARIABLES DO TEMA */}
-        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        <div className="grid grid-cols-3 gap-2 mt-4">
-          {/* Botão Ligar - Azul */}
-          <motion.button
-            whileHover={{ scale: lead.phone ? 1.05 : 1 }}
-            whileTap={{ scale: lead.phone ? 0.95 : 1 }}
-            onClick={handleCall}
-            disabled={!lead.phone}
-            className={`
-              px-3 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5
-              ${lead.phone 
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600' 
-                : 'bg-neutral-800/50 text-gray-600 cursor-not-allowed'
-              }
-            `}
-            style={lead.phone ? {
-              background: 'linear-gradient(135deg, var(--accent-sky), #6366f1)'
-            } : undefined}
-          >
-            <Phone className="w-4 h-4" />
-            Ligar
-          </motion.button>
-
-          {/* Botão WhatsApp - Verde */}
-          <motion.button
-            whileHover={{ scale: lead.phone ? 1.05 : 1 }}
-            whileTap={{ scale: lead.phone ? 0.95 : 1 }}
-            onClick={handleWhatsApp}
-            disabled={!lead.phone}
-            className={`
-              px-3 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5
-              ${lead.phone 
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600' 
-                : 'bg-neutral-800/50 text-gray-600 cursor-not-allowed'
-              }
-            `}
-            style={lead.phone ? {
-              background: 'linear-gradient(135deg, var(--accent-emerald), #14b8a6)'
-            } : undefined}
-          >
-            <MessageSquare className="w-4 h-4" />
-            Zap
-          </motion.button>
-
-          {/* Botão Email - Rosa/Roxo */}
-          <motion.button
-            whileHover={{ scale: lead.email ? 1.05 : 1 }}
-            whileTap={{ scale: lead.email ? 0.95 : 1 }}
-            onClick={handleEmail}
-            disabled={!lead.email}
-            className={`
-              px-3 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5
-              ${lead.email 
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600' 
-                : 'bg-neutral-800/50 text-gray-600 cursor-not-allowed'
-              }
-            `}
-            style={lead.email ? {
-              background: 'linear-gradient(135deg, var(--accent-fuchsia), #ec4899)'
-            } : undefined}
-          >
-            <Mail className="w-4 h-4" />
-            Email
-          </motion.button>
-        </div>
+      </div>
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* 🎨 BOTÕES COM ÍCONES + CSS VARIABLES DO TEMA */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <div className="flex gap-2 mt-4">
+        {/* Botão Ligar - Azul */}
+        <button 
+          onClick={handleCall}
+          className="flex-1 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-lg text-sm hover:bg-[var(--accent-blue-20)] transition-colors flex items-center justify-center gap-1" // AJUSTE: Vars + cor azul
+        >
+          <Phone className="w-4 h-4" />
+          Ligar
+        </button>
+        {/* Botão WhatsApp - Verde */}
+        <button 
+          onClick={handleWhatsApp}
+          className="flex-1 py-2 bg-[var(--accent-green-10)] border border-[var(--accent-green-20)] text-[var(--accent-green)] rounded-lg text-sm hover:bg-[var(--accent-green-20)] transition-colors flex items-center justify-center gap-1" // AJUSTE: Vars + cor verde
+        >
+          <MessageSquare className="w-4 h-4" />
+          Zap
+        </button>
+        {/* Botão Email - Rosa/Roxo */}
+        <button 
+          onClick={handleEmail}
+          className="flex-1 py-2 bg-[var(--accent-pink-10)] border border-[var(--accent-pink-20)] text-[var(--accent-pink)] rounded-lg text-sm hover:bg-[var(--accent-pink-20)] transition-colors flex items-center justify-center gap-1" // AJUSTE: Vars + cor rosa/roxo
+        >
+          <Mail className="w-4 h-4" />
+          Email
+        </button>
       </div>
     </motion.div>
   );
