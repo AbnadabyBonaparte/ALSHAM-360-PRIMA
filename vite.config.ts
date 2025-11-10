@@ -32,8 +32,7 @@ export default defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'supabase': ['@supabase/supabase-js'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
-          'charts': ['recharts']
+          'ui-vendor': ['framer-motion', 'lucide-react']
         },
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.')
