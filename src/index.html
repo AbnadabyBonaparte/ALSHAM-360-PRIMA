@@ -19,14 +19,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="ALSHAM360" />
     
-    <!-- Icons -->
+    <!-- Icons CORRIGIDOS -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/pwa-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/pwa-512x512.png" />
     
     <!-- Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,6 +34,7 @@
     
     <!-- DNS Prefetch -->
     <link rel="dns-prefetch" href="https://us-assets.i.posthog.com" />
+    <link rel="dns-prefetch" href="https://app.posthog.com" />
     <link rel="dns-prefetch" href="https://vercel.live" />
     
     <!-- Title -->
@@ -41,6 +42,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./main.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
