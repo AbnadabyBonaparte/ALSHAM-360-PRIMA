@@ -1095,12 +1095,12 @@ function App() {
     fetchData();
   }, [fetchData]);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
     console.log('🔴 Iniciando subscriptions Real-time...');
-    
+
     // Subscribe para mudanças em leads
     const leadsChannel = supabase
       .channel('leads_changes')
@@ -1116,7 +1116,13 @@ function App() {
           fetchData(); // Re-carregar dados
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Subscription para leads ativa');
+        } else if (status === 'CLOSED') {
+          console.log('❌ Subscription para leads fechada');
+        }
+      });
 
     // Subscribe para mudanças em campanhas
     const campaignsChannel = supabase
@@ -1126,14 +1132,20 @@ function App() {
         {
           event: '*',
           schema: 'public',
-          table: 'campaigns'
+          table: 'marketing_campaigns' // Corrigido para tabela real (baseado em supabase-full.js)
         },
         (payload) => {
           console.log('🚀 Campanha atualizada:', payload);
           fetchData();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Subscription para campanhas ativa');
+        } else if (status === 'CLOSED') {
+          console.log('❌ Subscription para campanhas fechada');
+        }
+      });
 
     // Subscribe para mudanças em gamificação
     const gamificationChannel = supabase
@@ -1150,7 +1162,13 @@ function App() {
           fetchData();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Subscription para gamificação ativa');
+        } else if (status === 'CLOSED') {
+          console.log('❌ Subscription para gamificação fechada');
+        }
+      });
 
     // Cleanup ao desmontar
     return () => {
@@ -1163,7 +1181,6 @@ function App() {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🔚 FIM DA INTEGRAÇÃO REAL-TIME
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
