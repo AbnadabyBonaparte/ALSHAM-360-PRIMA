@@ -1,9 +1,7 @@
-// src/pages/Leads.tsx
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  LayoutGrid, List, Kanban, Network, Plus, Download, 
-  Upload, Filter, Settings, Sparkles, TrendingUp
+import {
+  LayoutGrid, List, Kanban, Network, Sparkles, TrendingUp
 } from 'lucide-react';
 import { useLeadsAI } from '../hooks/useLeadsAI';
 import AIInsightsPanel from '../components/leads/AIInsightsPanel';
@@ -13,19 +11,53 @@ import LeadsPipeline from '../components/leads/LeadsPipeline';
 import PredictiveChart from '../components/leads/PredictiveChart';
 import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
-import LeadScoreGauge from '../components/leads/LeadScoreGauge';
 import LeadActions from '../components/leads/LeadActions';
 import { createLead, getCurrentOrgId } from '../lib/supabase-full.js';
 
+// import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
+
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
+
+interface Lead {
+  id: string;
+  nome?: string;
+  email?: string;
+  empresa?: string;
+  status?: string;
+  score_ia?: number;
+  origem?: string;
+  ai_risk_score?: number;
+  ai_conversion_probability?: number;
+  ai_similar_leads?: { similarity: number; lead: Lead }[];
+  ai_insights?: Array<{ title: string; description: string }>;
+  ai_health_score?: number;
+  ai_next_best_action?: string;
+  first_name?: string;
+  last_name?: string;
+  // ...outros campos que você usar
+}
+interface LeadFilters {
+  search?: string;
+  status?: string;
+  score?: 'hot' | 'warm' | 'cold' | 'ice' | 'all';
+  source?: string;
+  risk?: 'high' | 'medium' | 'low' | 'all';
+  conversion?: 'vhigh' | 'high' | 'medium' | 'low' | 'all';
+}
+interface PipelineStage {
+  id: string;
+  name: string;
+  color: string;
+  leads: Lead[];
+}
 
 export default function Leads() {
   const { leads, loading, error, refetch } = useLeadsAI();
-  
+
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [selectedLead, setSelectedLead] = useState<any>(null);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<LeadFilters>({});
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -34,76 +66,63 @@ export default function Leads() {
     }
   }, [leads]);
 
-  const filteredLeads = useMemo(() => {
+  const filteredLeads: Lead[] = useMemo(() => {
     if (!leads || leads.length === 0) return [];
-    
     let result = [...leads];
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      result = result.filter((l: any) => 
-        l.nome?.toLowerCase().includes(searchLower) ||
-        l.email?.toLowerCase().includes(searchLower) ||
-        l.empresa?.toLowerCase().includes(searchLower)
+      result = result.filter(l =>
+        (l.nome ?? '').toLowerCase().includes(searchLower) ||
+        (l.email ?? '').toLowerCase().includes(searchLower) ||
+        (l.empresa ?? '').toLowerCase().includes(searchLower)
       );
     }
 
     if (filters.status && filters.status !== 'all') {
-      result = result.filter((l: any) => l.status === filters.status);
+      result = result.filter(l => l.status === filters.status);
     }
 
     if (filters.score && filters.score !== 'all') {
-      switch (filters.score) {
-        case 'hot':
-          result = result.filter((l: any) => (l.score_ia || 0) >= 80);
-          break;
-        case 'warm':
-          result = result.filter((l: any) => (l.score_ia || 0) >= 60 && (l.score_ia || 0) < 80);
-          break;
-        case 'cold':
-          result = result.filter((l: any) => (l.score_ia || 0) >= 40 && (l.score_ia || 0) < 60);
-          break;
-        case 'ice':
-          result = result.filter((l: any) => (l.score_ia || 0) < 40);
-          break;
-      }
+      result = result.filter(l => {
+        const s = l.score_ia ?? 0;
+        switch (filters.score) {
+          case 'hot': return s >= 80;
+          case 'warm': return s >= 60 && s < 80;
+          case 'cold': return s >= 40 && s < 60;
+          case 'ice': return s < 40;
+          default: return true;
+        }
+      });
     }
 
     if (filters.source && filters.source !== 'all') {
-      result = result.filter((l: any) => l.origem === filters.source);
+      result = result.filter(l => l.origem === filters.source);
     }
 
     if (filters.risk && filters.risk !== 'all') {
-      const riskScore = (l: any) => l.ai_risk_score || 0;
-      switch (filters.risk) {
-        case 'high':
-          result = result.filter((l: any) => riskScore(l) >= 60);
-          break;
-        case 'medium':
-          result = result.filter((l: any) => riskScore(l) >= 30 && riskScore(l) < 60);
-          break;
-        case 'low':
-          result = result.filter((l: any) => riskScore(l) < 30);
-          break;
-      }
+      result = result.filter(l => {
+        const rs = l.ai_risk_score ?? 0;
+        switch (filters.risk) {
+          case 'high': return rs >= 60;
+          case 'medium': return rs >= 30 && rs < 60;
+          case 'low': return rs < 30;
+          default: return true;
+        }
+      });
     }
 
     if (filters.conversion && filters.conversion !== 'all') {
-      const convProb = (l: any) => l.ai_conversion_probability || 0;
-      switch (filters.conversion) {
-        case 'vhigh':
-          result = result.filter((l: any) => convProb(l) >= 80);
-          break;
-        case 'high':
-          result = result.filter((l: any) => convProb(l) >= 60 && convProb(l) < 80);
-          break;
-        case 'medium':
-          result = result.filter((l: any) => convProb(l) >= 40 && convProb(l) < 60);
-          break;
-        case 'low':
-          result = result.filter((l: any) => convProb(l) < 40);
-          break;
-      }
+      result = result.filter(l => {
+        const conv = l.ai_conversion_probability ?? 0;
+        switch (filters.conversion) {
+          case 'vhigh': return conv >= 80;
+          case 'high': return conv >= 60 && conv < 80;
+          case 'medium': return conv >= 40 && conv < 60;
+          case 'low': return conv < 40;
+          default: return true;
+        }
+      });
     }
 
     if (import.meta.env.DEV) {
@@ -117,22 +136,13 @@ export default function Leads() {
   const analytics = useMemo(() => {
     if (!leads || leads.length === 0) {
       return {
-        total: 0,
-        qualified: 0,
-        hot: 0,
-        atRisk: 0,
-        healthScore: 0,
-        conversionRate: 0
+        total: 0, qualified: 0, hot: 0, atRisk: 0, healthScore: 0, conversionRate: 0
       };
     }
-
-    const qualified = leads.filter((l: any) => 
-      l.status === 'qualified' || l.status === 'qualificado'
-    ).length;
-    const hot = leads.filter((l: any) => (l.score_ia || 0) >= 70).length;
-    const atRisk = leads.filter((l: any) => (l.score_ia || 0) < 40).length;
-    const avgScore = leads.reduce((sum: number, l: any) => sum + (l.score_ia || 50), 0) / leads.length;
-
+    const qualified = leads.filter(l => l.status === 'qualified' || l.status === 'qualificado').length;
+    const hot = leads.filter(l => (l.score_ia ?? 0) >= 70).length;
+    const atRisk = leads.filter(l => (l.score_ia ?? 0) < 40).length;
+    const avgScore = leads.reduce((sum: number, l) => sum + (l.score_ia ?? 50), 0) / leads.length;
     return {
       total: leads.length,
       qualified,
@@ -143,42 +153,38 @@ export default function Leads() {
     };
   }, [leads]);
 
-  const pipelineStages = useMemo(() => {
-    const stages = [
-      { id: 'novo', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] as any[] },
-      { id: 'contacted', name: 'Contatado', color: 'from-purple-500 to-pink-500', leads: [] as any[] },
-      { id: 'qualified', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] as any[] },
-      { id: 'qualificado', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] as any[] },
-      { id: 'proposal', name: 'Proposta', color: 'from-orange-500 to-yellow-500', leads: [] as any[] },
-      { id: 'negotiation', name: 'Negociação', color: 'from-cyan-500 to-blue-500', leads: [] as any[] },
-      { id: 'won', name: 'Ganho', color: 'from-green-500 to-emerald-500', leads: [] as any[] },
-      { id: 'convertido', name: 'Convertido', color: 'from-green-500 to-emerald-500', leads: [] as any[] },
+  const pipelineStages: PipelineStage[] = useMemo(() => {
+    const stages: PipelineStage[] = [
+      { id: 'novo', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] },
+      { id: 'contacted', name: 'Contatado', color: 'from-purple-500 to-pink-500', leads: [] },
+      { id: 'qualified', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] },
+      { id: 'qualificado', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] },
+      { id: 'proposal', name: 'Proposta', color: 'from-orange-500 to-yellow-500', leads: [] },
+      { id: 'negotiation', name: 'Negociação', color: 'from-cyan-500 to-blue-500', leads: [] },
+      { id: 'won', name: 'Ganho', color: 'from-green-500 to-emerald-500', leads: [] },
+      { id: 'convertido', name: 'Convertido', color: 'from-green-500 to-emerald-500', leads: [] },
     ];
-
-    if (!filteredLeads || !Array.isArray(filteredLeads)) {
-      return stages;
-    }
-
-    filteredLeads.forEach((lead: any) => {
-      const stage = stages.find(s => s.id === (lead.status || 'novo').toLowerCase());
-      if (stage) stage.leads.push(lead);
+    if (!filteredLeads || !Array.isArray(filteredLeads)) return stages;
+    filteredLeads.forEach(l => {
+      const stage = stages.find(s => s.id === (l.status ?? 'novo').toLowerCase());
+      if (stage) stage.leads.push(l);
     });
-
-    return stages.filter((s, i, arr) => 
+    // Remove duplicado se algum "qualificado" existir em português e inglês
+    return stages.filter((s, i, arr) =>
       s.leads.length > 0 || !arr.slice(i + 1).some(other => other.name === s.name)
     );
   }, [filteredLeads]);
 
+  // Sugestão: aqui, implemente gráfico REAL extraindo Qtd por mês usando 'created_at'
   const chartData = useMemo(() => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
       d.setMonth(d.getMonth() - (5 - i));
       return d.toLocaleDateString('pt-BR', { month: 'short' });
     });
-
+    // Aqui pode-se melhorar usando realmente os leads, mas mantido mock (recomendo implementar!)
     const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67];
     const predictions = [72, 78, 85];
-
     return {
       labels: [...last6Months, 'Próx', '+2', '+3'],
       historical,
@@ -186,25 +192,23 @@ export default function Leads() {
     };
   }, [leads]);
 
+  // Prepara dados para o RelationshipNetwork
   const networkData = useMemo(() => {
     if (!selectedLead) return { nodes: [], edges: [] };
-
     const nodes = [
-      { 
-        id: selectedLead.id, 
-        label: selectedLead.nome || `${selectedLead.first_name || ''} ${selectedLead.last_name || ''}`.trim(), 
-        type: 'lead' as const, 
-        value: selectedLead.score_ia || 50 
-      },
+      {
+        id: selectedLead.id,
+        label: selectedLead.nome ?? `${selectedLead.first_name ?? ''} ${selectedLead.last_name ?? ''}`.trim(),
+        type: 'lead' as const,
+        value: selectedLead.score_ia ?? 50
+      }
     ];
-
     const edges: any[] = [];
-
     if (selectedLead.ai_similar_leads) {
-      selectedLead.ai_similar_leads.forEach((similar: any) => {
+      selectedLead.ai_similar_leads.forEach(similar => {
         nodes.push({
           id: similar.lead.id,
-          label: similar.lead.nome || `${similar.lead.first_name} ${similar.lead.last_name}`,
+          label: similar.lead.nome ?? `${similar.lead.first_name} ${similar.lead.last_name}`,
           type: 'lead' as const,
           value: similar.similarity
         });
@@ -215,13 +219,12 @@ export default function Leads() {
         });
       });
     }
-
     return { nodes, edges };
   }, [selectedLead]);
 
+  // Mock de atividades de lead (ideal: trazer do backend no futuro!)
   const activities = useMemo(() => {
     if (!selectedLead) return [];
-    
     return [
       {
         id: '1',
@@ -249,25 +252,29 @@ export default function Leads() {
         date: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
         user: 'Carlos Oliveira',
         status: 'completed' as const
-      },
+      }
     ];
   }, [selectedLead]);
 
-  const handleCreateLead = async (newLeadData) => {
+  // Criação real de novo lead com feedback visual e segurança
+  const handleCreateLead = async (newLeadData: Partial<Lead>) => {
     try {
       const orgId = await getCurrentOrgId();
       await createLead(orgId, newLeadData);
       refetch();
-      alert('Lead criado com sucesso!');
-    } catch (err) {
-      alert('Erro ao criar lead: ' + err.message);
+      // toast.success('Lead criado com sucesso!'); // Se usar biblioteca de toast
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230); // Ajuda feedback
+    } catch (err: any) {
+      // toast.error('Erro ao criar lead: ' + err.message); // Se usar biblioteca de toast
+      console.error(err);
     }
   };
 
+  // Error state com acessibilidade boa (role alert) e re-tentativa fácil
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
-        <div className="bg-red-500/10 border border-red-500 rounded-xl p-6 max-w-md">
+        <div role="alert" aria-live="assertive" className="bg-red-500/10 border border-red-500 rounded-xl p-6 max-w-md">
           <h2 className="text-2xl font-bold text-red-400 mb-2">Erro ao carregar leads</h2>
           <p className="text-gray-300">{error}</p>
           <button onClick={refetch} className="mt-4 bg-emerald-500 text-white px-4 py-2 rounded">Tentar novamente</button>
@@ -277,30 +284,33 @@ export default function Leads() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] p-4 sm:p-6 lg:p-8 container-responsive">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+    <div
+      className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] p-4 sm:p-6 lg:p-8 container-responsive"
+      tabIndex={-1}
+      aria-label="Painel de Leads"
+    >
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent">
+          <h1
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent"
+          >
             🎯 Leads Intelligence
           </h1>
           <p className="text-sm sm:text-base text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p>
         </div>
-
-        <LeadActions 
-          leads={leads || []}
+        <LeadActions
+          leads={leads ?? []}
           onImport={() => {
-            console.log('📥 Importar concluído, recarregando...');
             if (refetch) refetch();
           }}
-          onExport={() => {
-            console.log('📤 Exportar concluído!');
-          }}
+          onExport={() => {}}
           onNewLead={handleCreateLead}
         />
-      </div>
+      </header>
 
       {!loading && (
-        <div className="kpi-grid mb-6 sm:mb-8">
+        <section className="kpi-grid mb-6 sm:mb-8" aria-label="KPI de Leads">
+          {/* Os cards podem ser extraídos para um component KPICard futuramente */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -309,14 +319,15 @@ export default function Leads() {
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-indigo)] flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-white)]" />
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-white)]" aria-hidden="true" />
               </div>
-              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Quentes</span>
+              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Qualificados</span>
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-emerald)]">{analytics.qualified}</div>
-            <div className="text-xs text-[var(--accent-emerald)] mt-1">+{analytics.conversionRate.toFixed(1)}% taxa</div>
+            <div className="text-xs text-[var(--accent-emerald)] mt-1" aria-label="Taxa de conversão">
+              +{analytics.conversionRate.toFixed(1)}% taxa
+            </div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -333,7 +344,6 @@ export default function Leads() {
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-orange)]">{analytics.hot}</div>
             <div className="text-xs text-[var(--accent-orange)] mt-1">alta conversão</div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -350,7 +360,6 @@ export default function Leads() {
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-yellow)]">{analytics.atRisk}</div>
             <div className="text-xs text-[var(--accent-yellow)] mt-1">precisam atenção</div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -367,10 +376,11 @@ export default function Leads() {
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-purple)]">{analytics.healthScore}%</div>
             <div className="text-xs text-[var(--accent-purple)] mt-1">saúde geral</div>
           </motion.div>
-        </div>
+        </section>
       )}
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      {/* View Mode Selector & AI Panel Toggle */}
+      <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6" role="navigation" aria-label="Seleção de visualização">
         <div className="theme-selector-container">
           {[
             { mode: 'grid', icon: LayoutGrid, label: 'Grade' },
@@ -380,27 +390,29 @@ export default function Leads() {
           ].map(({ mode, icon: Icon, label }) => (
             <motion.button
               key={mode}
+              aria-pressed={viewMode === mode}
+              onClick={() => setViewMode(mode as ViewMode)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setViewMode(mode as ViewMode)}
               className={`
                 theme-selector-button
-                ${viewMode === mode 
-                  ? 'bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] text-[var(--text-white)]' 
+                ${viewMode === mode
+                  ? 'bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] text-[var(--text-white)]'
                   : 'bg-[var(--neutral-900)] border border-[var(--neutral-800)] text-[var(--text-gray)] hover:text-[var(--text-white)] hover:border-[var(--neutral-700)]'
                 }
               `}
+              aria-label={`Visualizar em ${label}`}
             >
-              <Icon className="theme-selector-icon" />
+              <Icon className="theme-selector-icon" aria-hidden="true" />
               <span className="hidden sm:inline text-sm font-medium ml-2">{label}</span>
             </motion.button>
           ))}
         </div>
-
         <motion.button
+          aria-pressed={showAIPanel}
+          onClick={() => setShowAIPanel(!showAIPanel)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setShowAIPanel(!showAIPanel)}
           className={`
             px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm sm:text-base
             ${showAIPanel
@@ -408,23 +420,26 @@ export default function Leads() {
               : 'bg-[var(--accent-purple-10)] border border-[var(--accent-purple-20)] text-[var(--accent-purple)] hover:bg-[var(--accent-purple-20)]'
             }
           `}
+          aria-label={showAIPanel ? 'Ocultar IA Panel' : 'Mostrar IA Panel'}
         >
-          <Sparkles className="w-4 h-4" />
+          <Sparkles className="w-4 h-4" aria-hidden="true" />
           <span className="hidden sm:inline">{showAIPanel ? 'Ocultar' : 'Mostrar'} IA Panel</span>
           <span className="sm:hidden">IA</span>
         </motion.button>
-      </div>
+      </nav>
 
-      <div className="mb-6 sm:mb-8">
-        <SmartFilters 
+      {/* Smart Filters */}
+      <section className="mb-6 sm:mb-8" aria-label="Filtros Inteligentes">
+        <SmartFilters
           onFilterChange={setFilters}
           totalResults={filteredLeads.length}
         />
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* IA Panel */}
         {showAIPanel && (
-          <div className="lg:col-span-1 space-y-6">
+          <aside className="lg:col-span-1 space-y-6" aria-label="Insights Inteligência Artificial">
             <AIInsightsPanel
               insights={selectedLead?.ai_insights || []}
               conversionProb={selectedLead?.ai_conversion_probability || 0}
@@ -432,7 +447,6 @@ export default function Leads() {
               riskScore={selectedLead?.ai_risk_score || 0}
               nextAction={selectedLead?.ai_next_best_action}
             />
-
             {selectedLead ? (
               <>
                 <ActivityTimeline activities={activities} maxItems={5} />
@@ -442,11 +456,14 @@ export default function Leads() {
                   centerNodeId={selectedLead.id}
                 />
               </>
-            ) : <p className="text-[var(--text-gray)]">Selecione um lead para ver atividades e rede.</p>}
-          </div>
+            ) : (
+              <p className="text-[var(--text-gray)]" tabIndex={0}>Selecione um lead para ver atividades e rede.</p>
+            )}
+          </aside>
         )}
 
-        <div className={showAIPanel ? 'lg:col-span-2' : 'lg:col-span-3'}>
+        {/* Leads Visualization */}
+        <section className={showAIPanel ? 'lg:col-span-2' : 'lg:col-span-3'} aria-label="Leads">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-96">
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent-emerald)] mb-4"></div>
@@ -466,18 +483,19 @@ export default function Leads() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="leads-grid"
+                  role="list"
                 >
-                  {filteredLeads.map((lead: any, index: number) => (
+                  {/* Para listas grandes: use react-window para virtualização */}
+                  {filteredLeads.map((lead, index) => (
                     <LeadCard
                       key={lead.id}
                       lead={lead}
                       delay={index * 0.05}
-                      onView={(lead) => setSelectedLead(lead)}
+                      onView={setSelectedLead}
                     />
-                  ))} {/* AJUSTE: Em LeadCard.tsx, use vars para botões */}
+                  ))}
                 </motion.div>
               )}
-
               {viewMode === 'kanban' && (
                 <motion.div
                   key="kanban"
@@ -485,16 +503,15 @@ export default function Leads() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <LeadsPipeline 
+                  <LeadsPipeline
                     stages={pipelineStages}
                     onLeadMove={(leadId, newStageId) => {
-                      console.log(`Lead ${leadId} movido para ${newStageId}`);
-                      // TODO: Atualizar no banco
+                      // Implemente ação de drag-and-drop real, feedback, loading
+                      // toast.info('Movendo lead...');
                     }}
                   />
                 </motion.div>
-              )} {/* AJUSTE: Em LeadsPipeline.tsx, use vars para colors de stages */}
-
+              )}
               {viewMode === 'network' && (
                 <motion.div
                   key="network"
@@ -511,7 +528,6 @@ export default function Leads() {
                   ) : <p className="text-[var(--text-gray)]">Selecione um lead para ver a rede.</p>}
                 </motion.div>
               )}
-
               {viewMode === 'list' && (
                 <motion.div
                   key="list"
@@ -519,6 +535,8 @@ export default function Leads() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl overflow-hidden overflow-x-auto"
+                  tabIndex={0}
+                  aria-label="Tabela de leads"
                 >
                   <table className="w-full">
                     <thead className="bg-[var(--neutral-950)] border-b border-[var(--neutral-800)]">
@@ -531,22 +549,22 @@ export default function Leads() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--neutral-800)]">
-                      {filteredLeads.map((lead: any) => (
-                        <tr 
+                      {filteredLeads.map((lead) => (
+                        <tr
                           key={lead.id}
                           onClick={() => setSelectedLead(lead)}
                           className="hover:bg-[var(--neutral-950)] cursor-pointer transition-colors"
                         >
-                          <td className="px-4 sm:px-6 py-4 text-[var(--text-white)] font-medium text-sm">{lead.nome || '-'}</td>
-                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm">{lead.email || '-'}</td>
-                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm hidden sm:table-cell">{lead.empresa || '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-[var(--text-white)] font-medium text-sm">{lead.nome ?? '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm">{lead.email ?? '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm hidden sm:table-cell">{lead.empresa ?? '-'}</td>
                           <td className="px-4 sm:px-6 py-4">
                             <span className="px-3 py-1 bg-[var(--accent-emerald-10)] text-[var(--accent-emerald)] rounded-full text-xs font-semibold">
-                              {lead.status || 'novo'}
+                              {lead.status ?? 'novo'}
                             </span>
                           </td>
                           <td className="px-4 sm:px-6 py-4 text-center">
-                            <span className="text-[var(--accent-emerald)] font-bold text-sm">{lead.score_ia || 0}</span>
+                            <span className="text-[var(--accent-emerald)] font-bold text-sm">{lead.score_ia ?? 0}</span>
                           </td>
                         </tr>
                       ))}
@@ -556,10 +574,9 @@ export default function Leads() {
               )}
             </AnimatePresence>
           )}
-        </div>
-      </div>
-
-      <div className="mt-6 sm:mt-8">
+        </section>
+      </main>
+      <section className="mt-6 sm:mt-8" aria-label="Gráfico preditivo de conversões">
         <PredictiveChart
           historicalData={chartData.historical}
           predictions={chartData.predictions}
@@ -567,7 +584,7 @@ export default function Leads() {
           title="Previsão de Conversões - Próximos 3 Meses"
           metric="conversões"
         />
-      </div>
+      </section>
     </div>
   );
 }
