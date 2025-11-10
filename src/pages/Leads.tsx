@@ -15,23 +15,18 @@ import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadScoreGauge from '../components/leads/LeadScoreGauge';
 import LeadActions from '../components/leads/LeadActions';
-// AJUSTE: Importar createLead de supabase para FIX 4 real
-import { createLead, getCurrentOrgId } from '../lib/supabase-full.js'; // Já existe no repositório
+import { createLead, getCurrentOrgId } from '../lib/supabase-full.js';
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
 export default function Leads() {
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 1: CARREGAR LEADS DO BANCO
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const { leads, loading, error, refetch } = useLeadsAI();
   
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<any>(null);
-  const [showAIPanel, setShowAIPanel] = useState(false); // 🔧 FIX: Começa fechado
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [filters, setFilters] = useState<any>({});
 
-  // AJUSTE: Log para debug, condicionado para dev mode
   useEffect(() => {
     if (import.meta.env.DEV) {
       console.log('🔄 Leads carregados:', leads?.length || 0);
@@ -39,15 +34,11 @@ export default function Leads() {
     }
   }, [leads]);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 2: FILTROS FUNCIONANDO
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const filteredLeads = useMemo(() => {
     if (!leads || leads.length === 0) return [];
     
     let result = [...leads];
 
-    // Busca por texto
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       result = result.filter((l: any) => 
@@ -57,12 +48,10 @@ export default function Leads() {
       );
     }
 
-    // Filtro de status
     if (filters.status && filters.status !== 'all') {
       result = result.filter((l: any) => l.status === filters.status);
     }
 
-    // Filtro de score
     if (filters.score && filters.score !== 'all') {
       switch (filters.score) {
         case 'hot':
@@ -80,12 +69,10 @@ export default function Leads() {
       }
     }
 
-    // Filtro de origem
     if (filters.source && filters.source !== 'all') {
       result = result.filter((l: any) => l.origem === filters.source);
     }
 
-    // Filtro de risco
     if (filters.risk && filters.risk !== 'all') {
       const riskScore = (l: any) => l.ai_risk_score || 0;
       switch (filters.risk) {
@@ -101,7 +88,6 @@ export default function Leads() {
       }
     }
 
-    // Filtro de conversão
     if (filters.conversion && filters.conversion !== 'all') {
       const convProb = (l: any) => l.ai_conversion_probability || 0;
       switch (filters.conversion) {
@@ -128,9 +114,6 @@ export default function Leads() {
     return result;
   }, [leads, filters]);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 📊 ANALYTICS
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const analytics = useMemo(() => {
     if (!leads || leads.length === 0) {
       return {
@@ -160,9 +143,6 @@ export default function Leads() {
     };
   }, [leads]);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 3: KANBAN COM STAGES CORRETOS
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const pipelineStages = useMemo(() => {
     const stages = [
       { id: 'novo', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] as any[] },
@@ -184,13 +164,11 @@ export default function Leads() {
       if (stage) stage.leads.push(lead);
     });
 
-    // Remover stages vazios duplicados
     return stages.filter((s, i, arr) => 
       s.leads.length > 0 || !arr.slice(i + 1).some(other => other.name === s.name)
     );
   }, [filteredLeads]);
 
-  // Prepare data for charts
   const chartData = useMemo(() => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
@@ -198,11 +176,7 @@ export default function Leads() {
       return d.toLocaleDateString('pt-BR', { month: 'short' });
     });
 
-    // AJUSTE: Tornar mais real, usar leads para calcular historical se possível (exemplo simples)
-    const historical = leads ? leads.reduce((acc, l) => {
-      // Lógica real: calcular por mês baseado em created_at de leads, mas mock por agora
-      return [45, 52, 48, 61, 58, 67]; // Substitua por cálculo real via Supabase se quiser
-    }, []) : [45, 52, 48, 61, 58, 67];
+    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67];
     const predictions = [72, 78, 85];
 
     return {
@@ -210,9 +184,8 @@ export default function Leads() {
       historical,
       predictions: [...historical.slice(-1), ...predictions]
     };
-  }, [leads]); // AJUSTE: Depend de leads para atualizar
+  }, [leads]);
 
-  // Prepare network data
   const networkData = useMemo(() => {
     if (!selectedLead) return { nodes: [], edges: [] };
 
@@ -246,7 +219,6 @@ export default function Leads() {
     return { nodes, edges };
   }, [selectedLead]);
 
-  // Activities mock data
   const activities = useMemo(() => {
     if (!selectedLead) return [];
     
@@ -281,22 +253,17 @@ export default function Leads() {
     ];
   }, [selectedLead]);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔧 FIX 4: CRIAR NOVO LEAD (agora real com Supabase)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleCreateLead = async (newLeadData) => {
     try {
-      // AJUSTE: Pegar orgId real (use getCurrentOrgId de supabase-full.js ou session)
-      const orgId = await getCurrentOrgId(); // Assumindo função disponível via import
-      await createLead(orgId, newLeadData); // Usa função existente em supabase-full.js
-      refetch(); // Recarrega leads
-      alert('Lead criado com sucesso!'); // Temporário, depois modal completo
+      const orgId = await getCurrentOrgId();
+      await createLead(orgId, newLeadData);
+      refetch();
+      alert('Lead criado com sucesso!');
     } catch (err) {
       alert('Erro ao criar lead: ' + err.message);
     }
   };
 
-  // Error state com AJUSTE: Botão retry
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
@@ -310,14 +277,13 @@ export default function Leads() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] p-4 sm:p-6 lg:p-8 container-responsive"> {/* AJUSTE: Vars para tema */}
-      {/* Header */}
+    <div className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] p-4 sm:p-6 lg:p-8 container-responsive">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent"> {/* AJUSTE: Vars para gradient */}
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent">
             🎯 Leads Intelligence
           </h1>
-          <p className="text-sm sm:text-base text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p> {/* AJUSTE: Var para gray */}
+          <p className="text-sm sm:text-base text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p>
         </div>
 
         <LeadActions 
@@ -329,27 +295,26 @@ export default function Leads() {
           onExport={() => {
             console.log('📤 Exportar concluído!');
           }}
-          onNewLead={handleCreateLead} // AJUSTE: Função real
+          onNewLead={handleCreateLead}
         />
       </div>
 
-      {/* Analytics Cards */}
       {!loading && (
         <div className="kpi-grid mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border (comentário movido pra cá pra evitar erro de parse)
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-indigo)] flex items-center justify-center"> {/* AJUSTE: Vars */}
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-indigo)] flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-white)]" />
               </div>
-              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Quentes</span> {/* AJUSTE: Var */}
+              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Quentes</span>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-emerald)]">{analytics.qualified}</div> {/* AJUSTE: Var */}
-            <div className="text-xs text-[var(--accent-emerald)] mt-1">+{analytics.conversionRate.toFixed(1)}% taxa</div> {/* AJUSTE: Var */}
+            <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-emerald)]">{analytics.qualified}</div>
+            <div className="text-xs text-[var(--accent-emerald)] mt-1">+{analytics.conversionRate.toFixed(1)}% taxa</div>
           </motion.div>
 
           <motion.div
@@ -357,7 +322,7 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-orange)] to-[var(--accent-red)] flex items-center justify-center text-base sm:text-lg">
@@ -374,7 +339,7 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-yellow)] to-[var(--accent-orange)] flex items-center justify-center text-base sm:text-lg">
@@ -391,7 +356,7 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-base sm:text-lg">
@@ -405,7 +370,6 @@ export default function Leads() {
         </div>
       )}
 
-      {/* View Mode Selector & AI Panel Toggle */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="theme-selector-container">
           {[
@@ -425,7 +389,7 @@ export default function Leads() {
                   ? 'bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] text-[var(--text-white)]' 
                   : 'bg-[var(--neutral-900)] border border-[var(--neutral-800)] text-[var(--text-gray)] hover:text-[var(--text-white)] hover:border-[var(--neutral-700)]'
                 }
-              `} // AJUSTE: Vars para consistência com tema
+              `}
             >
               <Icon className="theme-selector-icon" />
               <span className="hidden sm:inline text-sm font-medium ml-2">{label}</span>
@@ -433,7 +397,6 @@ export default function Leads() {
           ))}
         </div>
 
-        {/* 🔧 FIX 5: BOTÃO MOSTRAR IA PANEL */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -444,7 +407,7 @@ export default function Leads() {
               ? 'bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] text-[var(--text-white)]'
               : 'bg-[var(--accent-purple-10)] border border-[var(--accent-purple-20)] text-[var(--accent-purple)] hover:bg-[var(--accent-purple-20)]'
             }
-          `} // AJUSTE: Vars, corrigindo "botão verde" (era purple, agora dinâmico)
+          `}
         >
           <Sparkles className="w-4 h-4" />
           <span className="hidden sm:inline">{showAIPanel ? 'Ocultar' : 'Mostrar'} IA Panel</span>
@@ -452,7 +415,6 @@ export default function Leads() {
         </motion.button>
       </div>
 
-      {/* Smart Filters */}
       <div className="mb-6 sm:mb-8">
         <SmartFilters 
           onFilterChange={setFilters}
@@ -460,9 +422,7 @@ export default function Leads() {
         />
       </div>
 
-      {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 🔧 FIX 6: IA PANEL SEM PRECISAR DE LEAD SELECIONADO */}
         {showAIPanel && (
           <div className="lg:col-span-1 space-y-6">
             <AIInsightsPanel
@@ -471,9 +431,9 @@ export default function Leads() {
               healthScore={selectedLead?.ai_health_score || 0}
               riskScore={selectedLead?.ai_risk_score || 0}
               nextAction={selectedLead?.ai_next_best_action}
-            /> {/* AJUSTE: Em AIInsightsPanel.tsx, use vars para cores */}
+            />
 
-            {selectedLead ? ( // AJUSTE: Fallback se !selectedLead
+            {selectedLead ? (
               <>
                 <ActivityTimeline activities={activities} maxItems={5} />
                 <RelationshipNetwork
@@ -486,15 +446,14 @@ export default function Leads() {
           </div>
         )}
 
-        {/* Right Column - Leads Display */}
         <div className={showAIPanel ? 'lg:col-span-2' : 'lg:col-span-3'}>
           {loading ? (
             <div className="flex flex-col items-center justify-center h-96">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent-emerald)] mb-4"></div> {/* AJUSTE: Var */}
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent-emerald)] mb-4"></div>
               <p className="text-[var(--text-gray)]">Carregando leads...</p>
             </div>
           ) : filteredLeads.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-96 bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl"> {/* AJUSTE: Vars */}
+            <div className="flex flex-col items-center justify-center h-96 bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl">
               <p className="text-xl sm:text-2xl text-[var(--text-gray)] mb-2">Nenhum lead encontrado</p>
               <p className="text-sm text-[var(--text-gray-500)]">Tente ajustar os filtros ou criar um novo lead</p>
             </div>
@@ -514,8 +473,8 @@ export default function Leads() {
                       lead={lead}
                       delay={index * 0.05}
                       onView={(lead) => setSelectedLead(lead)}
-                    /> {/* AJUSTE: Em LeadCard.tsx, use vars para botões */}
-                  ))}
+                    />
+                  ))} {/* AJUSTE: Em LeadCard.tsx, use vars para botões */}
                 </motion.div>
               )}
 
@@ -532,9 +491,9 @@ export default function Leads() {
                       console.log(`Lead ${leadId} movido para ${newStageId}`);
                       // TODO: Atualizar no banco
                     }}
-                  /> {/* AJUSTE: Em LeadsPipeline.tsx, use vars para colors de stages */}
+                  />
                 </motion.div>
-              )}
+              )} {/* AJUSTE: Em LeadsPipeline.tsx, use vars para colors de stages */}
 
               {viewMode === 'network' && (
                 <motion.div
@@ -543,7 +502,7 @@ export default function Leads() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {selectedLead ? ( // AJUSTE: Fallback
+                  {selectedLead ? (
                     <RelationshipNetwork
                       nodes={networkData.nodes}
                       edges={networkData.edges}
@@ -559,10 +518,10 @@ export default function Leads() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl overflow-hidden overflow-x-auto" // AJUSTE: Vars
+                  className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl overflow-hidden overflow-x-auto"
                 >
                   <table className="w-full">
-                    <thead className="bg-[var(--neutral-950)] border-b border-[var(--neutral-800)]"> {/* AJUSTE: Vars */}
+                    <thead className="bg-[var(--neutral-950)] border-b border-[var(--neutral-800)]">
                       <tr>
                         <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Nome</th>
                         <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Email</th>
@@ -571,12 +530,12 @@ export default function Leads() {
                         <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Score</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[var(--neutral-800)]"> {/* AJUSTE: Var */}
+                    <tbody className="divide-y divide-[var(--neutral-800)]">
                       {filteredLeads.map((lead: any) => (
                         <tr 
                           key={lead.id}
                           onClick={() => setSelectedLead(lead)}
-                          className="hover:bg-[var(--neutral-950)] cursor-pointer transition-colors" // AJUSTE: Var
+                          className="hover:bg-[var(--neutral-950)] cursor-pointer transition-colors"
                         >
                           <td className="px-4 sm:px-6 py-4 text-[var(--text-white)] font-medium text-sm">{lead.nome || '-'}</td>
                           <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm">{lead.email || '-'}</td>
@@ -584,7 +543,7 @@ export default function Leads() {
                           <td className="px-4 sm:px-6 py-4">
                             <span className="px-3 py-1 bg-[var(--accent-emerald-10)] text-[var(--accent-emerald)] rounded-full text-xs font-semibold">
                               {lead.status || 'novo'}
-                            </span> {/* AJUSTE: Vars para status */}
+                            </span>
                           </td>
                           <td className="px-4 sm:px-6 py-4 text-center">
                             <span className="text-[var(--accent-emerald)] font-bold text-sm">{lead.score_ia || 0}</span>
@@ -600,7 +559,6 @@ export default function Leads() {
         </div>
       </div>
 
-      {/* Predictive Chart */}
       <div className="mt-6 sm:mt-8">
         <PredictiveChart
           historicalData={chartData.historical}
@@ -608,7 +566,7 @@ export default function Leads() {
           labels={chartData.labels}
           title="Previsão de Conversões - Próximos 3 Meses"
           metric="conversões"
-        /> {/* AJUSTE: Em PredictiveChart.tsx, use vars para cores de linhas */}
+        />
       </div>
     </div>
   );
