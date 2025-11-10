@@ -16,7 +16,7 @@ import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadScoreGauge from '../components/leads/LeadScoreGauge';
 import LeadActions from '../components/leads/LeadActions';
 // AJUSTE: Importar createLead de supabase para FIX 4 real
-import { createLead } from '../lib/supabase-full.js'; // Já existe no repositório
+import { createLead, getCurrentOrgId } from '../lib/supabase-full.js'; // Já existe no repositório
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
@@ -340,7 +340,7 @@ export default function Leads() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" {/* AJUSTE: Vars para bg/border */}
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border (comentário movido pra cá pra evitar erro de parse)
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-indigo)] flex items-center justify-center"> {/* AJUSTE: Vars */}
@@ -357,7 +357,7 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-orange)] to-[var(--accent-red)] flex items-center justify-center text-base sm:text-lg">
@@ -374,7 +374,7 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-yellow)] to-[var(--accent-orange)] flex items-center justify-center text-base sm:text-lg">
@@ -391,7 +391,7 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
+            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6" // AJUSTE: Vars para bg/border
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-base sm:text-lg">
@@ -514,7 +514,7 @@ export default function Leads() {
                       lead={lead}
                       delay={index * 0.05}
                       onView={(lead) => setSelectedLead(lead)}
-                    /> {/* AJUSTE: Em LeadCard.tsx, use vars para botões ligar/WhatsApp: text-[var(--accent-gray)] hover:text-[var(--accent-hover)] */}
+                    /> {/* AJUSTE: Em LeadCard.tsx, use vars para botões */}
                   ))}
                 </motion.div>
               )}
