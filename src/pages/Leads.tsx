@@ -1,3 +1,4 @@
+// src/pages/Leads.tsx
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -13,7 +14,6 @@ import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadActions from '../components/leads/LeadActions';
 import { createLead, getCurrentOrgId } from '../lib/supabase-full.js';
-
 // import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
@@ -36,6 +36,7 @@ interface Lead {
   last_name?: string;
   // ...outros campos que você usar
 }
+
 interface LeadFilters {
   search?: string;
   status?: string;
@@ -44,6 +45,7 @@ interface LeadFilters {
   risk?: 'high' | 'medium' | 'low' | 'all';
   conversion?: 'vhigh' | 'high' | 'medium' | 'low' | 'all';
 }
+
 interface PipelineStage {
   id: string;
   name: string;
@@ -53,7 +55,6 @@ interface PipelineStage {
 
 export default function Leads() {
   const { leads, loading, error, refetch } = useLeadsAI();
-
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
@@ -69,7 +70,6 @@ export default function Leads() {
   const filteredLeads: Lead[] = useMemo(() => {
     if (!leads || leads.length === 0) return [];
     let result = [...leads];
-
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       result = result.filter(l =>
@@ -78,11 +78,9 @@ export default function Leads() {
         (l.empresa ?? '').toLowerCase().includes(searchLower)
       );
     }
-
     if (filters.status && filters.status !== 'all') {
       result = result.filter(l => l.status === filters.status);
     }
-
     if (filters.score && filters.score !== 'all') {
       result = result.filter(l => {
         const s = l.score_ia ?? 0;
@@ -95,11 +93,9 @@ export default function Leads() {
         }
       });
     }
-
     if (filters.source && filters.source !== 'all') {
       result = result.filter(l => l.origem === filters.source);
     }
-
     if (filters.risk && filters.risk !== 'all') {
       result = result.filter(l => {
         const rs = l.ai_risk_score ?? 0;
@@ -111,7 +107,6 @@ export default function Leads() {
         }
       });
     }
-
     if (filters.conversion && filters.conversion !== 'all') {
       result = result.filter(l => {
         const conv = l.ai_conversion_probability ?? 0;
@@ -124,12 +119,10 @@ export default function Leads() {
         }
       });
     }
-
     if (import.meta.env.DEV) {
       console.log('🔍 Filtros aplicados:', filters);
       console.log('📊 Resultados filtrados:', result.length);
     }
-
     return result;
   }, [leads, filters]);
 
@@ -155,35 +148,32 @@ export default function Leads() {
 
   const pipelineStages: PipelineStage[] = useMemo(() => {
     const stages: PipelineStage[] = [
-      { id: 'novo', name: 'Novo', color: 'from-blue-500 to-indigo-500', leads: [] },
-      { id: 'contacted', name: 'Contatado', color: 'from-purple-500 to-pink-500', leads: [] },
-      { id: 'qualified', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] },
-      { id: 'qualificado', name: 'Qualificado', color: 'from-emerald-500 to-teal-500', leads: [] },
-      { id: 'proposal', name: 'Proposta', color: 'from-orange-500 to-yellow-500', leads: [] },
-      { id: 'negotiation', name: 'Negociação', color: 'from-cyan-500 to-blue-500', leads: [] },
-      { id: 'won', name: 'Ganho', color: 'from-green-500 to-emerald-500', leads: [] },
-      { id: 'convertido', name: 'Convertido', color: 'from-green-500 to-emerald-500', leads: [] },
+      { id: 'novo', name: 'Novo', color: 'from-[var(--accent-blue)] to-[var(--accent-indigo)]', leads: [] },
+      { id: 'contacted', name: 'Contatado', color: 'from-[var(--accent-purple)] to-[var(--accent-pink)]', leads: [] },
+      { id: 'qualified', name: 'Qualificado', color: 'from-[var(--accent-emerald)] to-[var(--accent-teal)]', leads: [] },
+      { id: 'qualificado', name: 'Qualificado', color: 'from-[var(--accent-emerald)] to-[var(--accent-teal)]', leads: [] },
+      { id: 'proposal', name: 'Proposta', color: 'from-[var(--accent-orange)] to-[var(--accent-yellow)]', leads: [] },
+      { id: 'negotiation', name: 'Negociação', color: 'from-[var(--accent-cyan)] to-[var(--accent-blue)]', leads: [] },
+      { id: 'won', name: 'Ganho', color: 'from-[var(--accent-green)] to-[var(--accent-emerald)]', leads: [] },
+      { id: 'convertido', name: 'Convertido', color: 'from-[var(--accent-green)] to-[var(--accent-emerald)]', leads: [] },
     ];
     if (!filteredLeads || !Array.isArray(filteredLeads)) return stages;
     filteredLeads.forEach(l => {
       const stage = stages.find(s => s.id === (l.status ?? 'novo').toLowerCase());
       if (stage) stage.leads.push(l);
     });
-    // Remove duplicado se algum "qualificado" existir em português e inglês
     return stages.filter((s, i, arr) =>
       s.leads.length > 0 || !arr.slice(i + 1).some(other => other.name === s.name)
     );
   }, [filteredLeads]);
 
-  // Sugestão: aqui, implemente gráfico REAL extraindo Qtd por mês usando 'created_at'
   const chartData = useMemo(() => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
       d.setMonth(d.getMonth() - (5 - i));
       return d.toLocaleDateString('pt-BR', { month: 'short' });
     });
-    // Aqui pode-se melhorar usando realmente os leads, mas mantido mock (recomendo implementar!)
-    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67];
+    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67]; // Sugestão: aqui, implemente gráfico REAL extraindo Qtd por mês usando 'created_at'
     const predictions = [72, 78, 85];
     return {
       labels: [...last6Months, 'Próx', '+2', '+3'],
@@ -192,7 +182,6 @@ export default function Leads() {
     };
   }, [leads]);
 
-  // Prepara dados para o RelationshipNetwork
   const networkData = useMemo(() => {
     if (!selectedLead) return { nodes: [], edges: [] };
     const nodes = [
@@ -222,7 +211,6 @@ export default function Leads() {
     return { nodes, edges };
   }, [selectedLead]);
 
-  // Mock de atividades de lead (ideal: trazer do backend no futuro!)
   const activities = useMemo(() => {
     if (!selectedLead) return [];
     return [
@@ -253,10 +241,9 @@ export default function Leads() {
         user: 'Carlos Oliveira',
         status: 'completed' as const
       }
-    ];
+    ]; // Mock de atividades de lead (ideal: trazer do backend no futuro!)
   }, [selectedLead]);
 
-  // Criação real de novo lead com feedback visual e segurança
   const handleCreateLead = async (newLeadData: Partial<Lead>) => {
     try {
       const orgId = await getCurrentOrgId();
@@ -270,7 +257,6 @@ export default function Leads() {
     }
   };
 
-  // Error state com acessibilidade boa (role alert) e re-tentativa fácil
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
@@ -310,7 +296,6 @@ export default function Leads() {
 
       {!loading && (
         <section className="kpi-grid mb-6 sm:mb-8" aria-label="KPI de Leads">
-          {/* Os cards podem ser extraídos para um component KPICard futuramente */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -328,6 +313,7 @@ export default function Leads() {
               +{analytics.conversionRate.toFixed(1)}% taxa
             </div>
           </motion.div>
+          {/* Os outros cards seguem o mesmo padrão – copiei da versão fornecida, com vars nossos */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -379,7 +365,6 @@ export default function Leads() {
         </section>
       )}
 
-      {/* View Mode Selector & AI Panel Toggle */}
       <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6" role="navigation" aria-label="Seleção de visualização">
         <div className="theme-selector-container">
           {[
@@ -428,7 +413,6 @@ export default function Leads() {
         </motion.button>
       </nav>
 
-      {/* Smart Filters */}
       <section className="mb-6 sm:mb-8" aria-label="Filtros Inteligentes">
         <SmartFilters
           onFilterChange={setFilters}
@@ -437,7 +421,6 @@ export default function Leads() {
       </section>
 
       <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* IA Panel */}
         {showAIPanel && (
           <aside className="lg:col-span-1 space-y-6" aria-label="Insights Inteligência Artificial">
             <AIInsightsPanel
@@ -461,8 +444,6 @@ export default function Leads() {
             )}
           </aside>
         )}
-
-        {/* Leads Visualization */}
         <section className={showAIPanel ? 'lg:col-span-2' : 'lg:col-span-3'} aria-label="Leads">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-96">
@@ -485,7 +466,6 @@ export default function Leads() {
                   className="leads-grid"
                   role="list"
                 >
-                  {/* Para listas grandes: use react-window para virtualização */}
                   {filteredLeads.map((lead, index) => (
                     <LeadCard
                       key={lead.id}
@@ -493,7 +473,7 @@ export default function Leads() {
                       delay={index * 0.05}
                       onView={setSelectedLead}
                     />
-                  ))}
+                  ))} {/* Para listas grandes: use react-window para virtualização */}
                 </motion.div>
               )}
               {viewMode === 'kanban' && (
@@ -506,7 +486,7 @@ export default function Leads() {
                   <LeadsPipeline
                     stages={pipelineStages}
                     onLeadMove={(leadId, newStageId) => {
-                      // Implemente ação de drag-and-drop real, feedback, loading
+                      console.log(`Lead ${leadId} movido para ${newStageId}`);
                       // toast.info('Movendo lead...');
                     }}
                   />
@@ -576,6 +556,7 @@ export default function Leads() {
           )}
         </section>
       </main>
+
       <section className="mt-6 sm:mt-8" aria-label="Gráfico preditivo de conversões">
         <PredictiveChart
           historicalData={chartData.historical}
