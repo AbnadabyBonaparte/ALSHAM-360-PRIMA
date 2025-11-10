@@ -14,6 +14,7 @@ import PredictiveChart from '../components/leads/PredictiveChart';
 import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadScoreGauge from '../components/leads/LeadScoreGauge';
+import LeadActions from '../components/leads/LeadActions';
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
@@ -21,7 +22,7 @@ export default function Leads() {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🔧 FIX 1: CARREGAR LEADS DO BANCO
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  const { leads, loading, error } = useLeadsAI();
+  const { leads, loading, error, refetch } = useLeadsAI();
   
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<any>(null);
@@ -291,63 +292,45 @@ export default function Leads() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8">
+    <div className="min-h-screen bg-[var(--bg-dark)] text-white p-4 sm:p-6 lg:p-8 container-responsive">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
             🎯 Leads Intelligence
           </h1>
-          <p className="text-gray-400">Gestão inteligente com IA e previsões em tempo real</p>
+          <p className="text-sm sm:text-base text-gray-400">Gestão inteligente com IA e previsões em tempo real</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-xl hover:border-emerald-500 transition-all flex items-center gap-2"
-          >
-            <Upload className="w-4 h-4" />
-            Importar
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-xl hover:border-emerald-500 transition-all flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Exportar
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleCreateLead}
-            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Novo Lead
-          </motion.button>
-        </div>
+        <LeadActions 
+          leads={leads || []}
+          onImport={() => {
+            console.log('📥 Importar concluído, recarregando...');
+            if (refetch) refetch();
+          }}
+          onExport={() => {
+            console.log('📤 Exportar concluído!');
+          }}
+          onNewLead={handleCreateLead}
+        />
       </div>
 
       {/* Analytics Cards */}
       {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="kpi-grid mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-sm text-gray-400">Total</span>
+              <span className="text-xs sm:text-sm text-gray-400">Total</span>
             </div>
-            <div className="text-3xl font-bold text-white">{analytics.total}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-white">{analytics.total}</div>
             <div className="text-xs text-gray-500 mt-1">leads no funil</div>
           </motion.div>
 
@@ -356,15 +339,15 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-sm text-gray-400">Qualificados</span>
+              <span className="text-xs sm:text-sm text-gray-400">Qualificados</span>
             </div>
-            <div className="text-3xl font-bold text-emerald-400">{analytics.qualified}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-400">{analytics.qualified}</div>
             <div className="text-xs text-emerald-500 mt-1">+{analytics.conversionRate.toFixed(1)}% taxa</div>
           </motion.div>
 
@@ -373,15 +356,15 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-base sm:text-lg">
                 🔥
               </div>
-              <span className="text-sm text-gray-400">Quentes</span>
+              <span className="text-xs sm:text-sm text-gray-400">Quentes</span>
             </div>
-            <div className="text-3xl font-bold text-orange-400">{analytics.hot}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-orange-400">{analytics.hot}</div>
             <div className="text-xs text-orange-500 mt-1">alta conversão</div>
           </motion.div>
 
@@ -390,15 +373,15 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-base sm:text-lg">
                 ⚠️
               </div>
-              <span className="text-sm text-gray-400">Em Risco</span>
+              <span className="text-xs sm:text-sm text-gray-400">Em Risco</span>
             </div>
-            <div className="text-3xl font-bold text-yellow-400">{analytics.atRisk}</div>
+            <div className="text-2xl sm:text-3xl font-bold text-yellow-400">{analytics.atRisk}</div>
             <div className="text-xs text-yellow-500 mt-1">precisam atenção</div>
           </motion.div>
 
@@ -407,23 +390,23 @@ export default function Leads() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+            className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-4 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-base sm:text-lg">
                 💚
               </div>
-              <span className="text-sm text-gray-400">Health Score</span>
+              <span className="text-xs sm:text-sm text-gray-400">Health Score</span>
             </div>
-            <div className="text-3xl font-bold text-purple-400">{analytics.healthScore}%</div>
+            <div className="text-2xl sm:text-3xl font-bold text-purple-400">{analytics.healthScore}%</div>
             <div className="text-xs text-purple-500 mt-1">saúde geral</div>
           </motion.div>
         </div>
       )}
 
       {/* View Mode Selector & AI Panel Toggle */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2 p-1 bg-neutral-900 border border-neutral-800 rounded-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="theme-selector-container">
           {[
             { mode: 'grid', icon: LayoutGrid, label: 'Grade' },
             { mode: 'list', icon: List, label: 'Lista' },
@@ -436,15 +419,15 @@ export default function Leads() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setViewMode(mode as ViewMode)}
               className={`
-                px-4 py-2 rounded-lg flex items-center gap-2 transition-all
+                theme-selector-button
                 ${viewMode === mode 
                   ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' 
-                  : 'text-gray-400 hover:text-white'
+                  : 'bg-neutral-900 border border-neutral-800 text-gray-400 hover:text-white hover:border-neutral-700'
                 }
               `}
             >
-              <Icon className="w-4 h-4" />
-              <span className="text-sm font-medium">{label}</span>
+              <Icon className="theme-selector-icon" />
+              <span className="hidden sm:inline text-sm font-medium ml-2">{label}</span>
             </motion.button>
           ))}
         </div>
@@ -455,7 +438,7 @@ export default function Leads() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowAIPanel(!showAIPanel)}
           className={`
-            px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2
+            px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm sm:text-base
             ${showAIPanel
               ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
               : 'bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20'
@@ -463,12 +446,13 @@ export default function Leads() {
           `}
         >
           <Sparkles className="w-4 h-4" />
-          {showAIPanel ? 'Ocultar' : 'Mostrar'} IA Panel
+          <span className="hidden sm:inline">{showAIPanel ? 'Ocultar' : 'Mostrar'} IA Panel</span>
+          <span className="sm:hidden">IA</span>
         </motion.button>
       </div>
 
       {/* Smart Filters */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <SmartFilters 
           onFilterChange={setFilters}
           totalResults={filteredLeads.length}
@@ -510,7 +494,7 @@ export default function Leads() {
             </div>
           ) : filteredLeads.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 bg-neutral-900 border border-neutral-800 rounded-2xl">
-              <p className="text-2xl text-gray-400 mb-2">Nenhum lead encontrado</p>
+              <p className="text-xl sm:text-2xl text-gray-400 mb-2">Nenhum lead encontrado</p>
               <p className="text-sm text-gray-500">Tente ajustar os filtros ou criar um novo lead</p>
             </div>
           ) : (
@@ -521,7 +505,7 @@ export default function Leads() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                  className="leads-grid"
                 >
                   {filteredLeads.map((lead: any, index: number) => (
                     <LeadCard
@@ -572,16 +556,16 @@ export default function Leads() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden"
+                  className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden overflow-x-auto"
                 >
                   <table className="w-full">
                     <thead className="bg-neutral-950 border-b border-neutral-800">
                       <tr>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Nome</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Email</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Empresa</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Status</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-gray-400">Score</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-gray-400">Nome</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-gray-400">Email</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-gray-400 hidden sm:table-cell">Empresa</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-gray-400">Status</th>
+                        <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-gray-400">Score</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-800">
@@ -591,16 +575,16 @@ export default function Leads() {
                           onClick={() => setSelectedLead(lead)}
                           className="hover:bg-neutral-950 cursor-pointer transition-colors"
                         >
-                          <td className="px-6 py-4 text-white font-medium">{lead.nome || '-'}</td>
-                          <td className="px-6 py-4 text-gray-400">{lead.email || '-'}</td>
-                          <td className="px-6 py-4 text-gray-400">{lead.empresa || '-'}</td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 sm:px-6 py-4 text-white font-medium text-sm">{lead.nome || '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-gray-400 text-sm">{lead.email || '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-gray-400 text-sm hidden sm:table-cell">{lead.empresa || '-'}</td>
+                          <td className="px-4 sm:px-6 py-4">
                             <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-semibold">
                               {lead.status || 'novo'}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="text-emerald-400 font-bold">{lead.score_ia || 0}</span>
+                          <td className="px-4 sm:px-6 py-4 text-center">
+                            <span className="text-emerald-400 font-bold text-sm">{lead.score_ia || 0}</span>
                           </td>
                         </tr>
                       ))}
@@ -614,7 +598,7 @@ export default function Leads() {
       </div>
 
       {/* Predictive Chart */}
-      <div className="mt-8">
+      <div className="mt-6 sm:mt-8">
         <PredictiveChart
           historicalData={chartData.historical}
           predictions={chartData.predictions}
