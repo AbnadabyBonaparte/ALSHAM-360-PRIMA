@@ -22,13 +22,11 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
 
   const handleDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
-
     if (!destination) return;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
     const sourceStage = stages.find(s => s.id === source.droppableId);
     const destStage = stages.find(s => s.id === destination.droppableId);
-
     if (!sourceStage || !destStage) return;
 
     // Remove from source
@@ -59,12 +57,10 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleAddLead = (stageId: string) => {
     console.log('➕ Adicionar lead ao stage:', stageId);
-    
     // TODO: Abrir modal de criação de lead com status pré-selecionado
     const leadName = prompt(`Criar novo lead no stage "${stages.find(s => s.id === stageId)?.name}".\n\nNome do lead:`);
-    
     if (!leadName) return;
-    
+
     const newLead = {
       id: `temp-${Date.now()}`,
       nome: leadName,
@@ -83,9 +79,8 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
     });
 
     setStages(newStages);
-    
     // TODO: Salvar no banco de dados
-    alert(`✅ Lead "${leadName}" criado! (Salvar no banco em breve)`);
+    alert(`Lead "${leadName}" criado! (Salvar no banco em breve)`);
   };
 
   const getTotalValue = (leads: any[]) => {
@@ -93,105 +88,76 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
   };
 
   return (
-    <div className="h-full">
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {stages.map((stage) => (
-            <Droppable key={stage.id} droppableId={stage.id}>
-              {(provided, snapshot) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`
-                    flex-shrink-0 w-80 bg-neutral-900 border rounded-2xl overflow-hidden
-                    ${snapshot.isDraggingOver ? 'border-emerald-500 bg-emerald-500/5' : 'border-neutral-800'}
-                  `}
-                >
-                  {/* Stage Header */}
-                  <div className={`p-4 border-b border-neutral-800 bg-gradient-to-r ${stage.color}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-bold text-white">{stage.name}</h3>
-                      <span className="px-2 py-1 bg-white/20 rounded-full text-xs font-semibold text-white">
-                        {stage.leads.length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-white/80">
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        ${getTotalValue(stage.leads).toLocaleString()}
-                      </div>
-                      
-                      {/* 🔧 FIX: BOTÃO + COM ONCLICK */}
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleAddLead(stage.id)}
-                        className="p-1 hover:bg-white/10 rounded transition-colors"
-                        title={`Adicionar lead em ${stage.name}`}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </motion.button>
-                    </div>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <div className="flex gap-6 overflow-x-auto pb-4">
+        {stages.map((stage) => (
+          <Droppable key={stage.id} droppableId={stage.id}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className={`flex-shrink-0 w-80 ${snapshot.isDraggingOver ? 'bg-[var(--neutral-gray-800-50)] rounded-lg' : ''}`} // AJUSTE: Vars
+              >
+                {/* Stage Header */}
+                <div className="bg-[var(--neutral-800)] rounded-t-lg p-4 border-b border-[var(--neutral-700)]"> // AJUSTE: Vars
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-[var(--text-white)]">{stage.name}</h3> // AJUSTE: Var
+                    <span className="text-xs text-[var(--text-gray-400)]">{stage.leads.length}</span> // AJUSTE: Var
                   </div>
+                  <div className="flex items-center gap-1 text-xs text-[var(--text-gray-400)]"> // AJUSTE: Var
+                    <DollarSign className="w-3 h-3" />
+                    <span>{getTotalValue(stage.leads).toLocaleString()}</span>
+                  </div>
+                </div>
 
-                  {/* Leads List */}
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="p-4 space-y-3 min-h-[500px] max-h-[calc(100vh-300px)] overflow-y-auto"
-                  >
-                    <AnimatePresence>
-                      {stage.leads.map((lead, index) => (
-                        <Draggable key={lead.id} draggableId={lead.id} index={index}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={{
-                                ...provided.draggableProps.style,
-                                opacity: snapshot.isDragging ? 0.8 : 1,
-                              }}
-                            >
-                              <motion.div
-                                layout
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.8 }}
-                                className={`
-                                  ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-emerald-500' : ''}
-                                `}
-                              >
-                                <LeadCard lead={lead} delay={index * 0.05} />
-                              </motion.div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                    </AnimatePresence>
-                    {provided.placeholder}
-                    
-                    {stage.leads.length === 0 && (
-                      <div className="text-center py-12 text-gray-500">
-                        <p className="text-sm mb-3">Nenhum lead nesta etapa</p>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleAddLead(stage.id)}
-                          className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-sm hover:bg-emerald-500/20 transition-colors inline-flex items-center gap-2"
+                {/* Add Lead Button */}
+                <button
+                  onClick={() => handleAddLead(stage.id)}
+                  className="p-1 hover:bg-[var(--text-white-10)] rounded transition-colors" // AJUSTE: Var
+                  title={`Adicionar lead em ${stage.name}`}
+                >
+                  <Plus className="w-4 h-4 text-[var(--text-gray-400)]" /> // AJUSTE: Var
+                </button>
+
+                {/* Leads List */}
+                <div className="space-y-2 p-2">
+                  {stage.leads.map((lead, index) => (
+                    <Draggable key={lead.id} draggableId={lead.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={`transition-all ${snapshot.isDragging ? 'rotate-12' : ''}`}
                         >
-                          <Plus className="w-4 h-4" />
-                          Adicionar primeiro lead
-                        </motion.button>
-                      </div>
-                    )}
+                          <LeadCard lead={lead} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+
+                {stage.leads.length === 0 && (
+                  <div className="text-center py-8 text-[var(--text-gray-500)]"> // AJUSTE: Var
+                    Nenhum lead nesta etapa
                   </div>
-                </motion.div>
-              )}
-            </Droppable>
-          ))}
-        </div>
-      </DragDropContext>
-    </div>
+                )}
+
+                {stage.leads.length === 0 && (
+                  <button
+                    onClick={() => handleAddLead(stage.id)}
+                    className="w-full mt-2 px-4 py-2 bg-[var(--accent-emerald-10)] border border-[var(--accent-emerald-20)] text-[var(--accent-emerald)] rounded-lg text-sm hover:bg-[var(--accent-emerald-20)] transition-colors inline-flex items-center gap-2" // AJUSTE: Vars
+                  >
+                    <Plus className="w-4 h-4" />
+                    Adicionar primeiro lead
+                  </button>
+                )}
+              </div>
+            )}
+          </Droppable>
+        ))}
+      </div>
+    </DragDropContext>
   );
 }
