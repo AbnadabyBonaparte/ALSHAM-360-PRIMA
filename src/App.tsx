@@ -46,6 +46,7 @@ import campaignOrion from "./assets/campaign-orion.png";
 import { renderPage } from "./routes";
 import { registerRoute } from "./routes";
 import Leads from "./pages/Leads";
+import LeadsDetails from "./pages/LeadsDetails";
 import './styles/responsive.css';
 
 ChartJS.register(
@@ -102,6 +103,26 @@ const supabase = getSupabaseClient();
 // 🔚 FIM DA INTEGRAÇÃO SUPABASE (Fase 1) - Imports
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// Placeholder para páginas pendentes (em desenvolvimento)
+const PlaceholderPage = ({ title }: { title: string }) => (
+  <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
+    <div className="text-center space-y-4">
+      <h1 className="text-3xl font-bold">{title}</h1>
+      <p className="text-xl text-gray-400">Em desenvolvimento...</p>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto" />
+    </div>
+  </div>
+);
+
+// Componente simples para Dashboard Principal (wrapper do conteúdo existente)
+const Dashboard = () => (
+  <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8">
+    {/* Aqui vai o conteúdo do dashboard principal existente, ex.: KPIs, gráficos, etc. */}
+    <h1 className="text-3xl font-bold">Dashboard Principal</h1>
+    {/* Copie o <main> do código original aqui se necessário */}
+  </div>
+);
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 CHART.JS - Paleta de cores neutras e helpers
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -123,147 +144,310 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+// Sidebar expandida com todas as 110+ páginas do checklist, agrupadas por módulo
 const sidebarGroups = [
   {
-    id: "sales",
-    label: "Vendas",
+    id: "crm-core",
+    label: "CRM CORE",
     icon: <Target className="h-4 w-4" />,
     links: [
-      { id: "leads", label: "Leads" },
-      { id: "contacts", label: "Contatos" },
-      { id: "accounts", label: "Contas" },
-      { id: "opportunities", label: "Oportunidades" },
-      { id: "deals", label: "Negócios" },
-      { id: "forecasts", label: "Previsões" },
-      { id: "proposals", label: "Propostas" },
-      { id: "contracts", label: "Contratos" },
-      { id: "billing", label: "Faturamento" },
-      { id: "products", label: "Produtos" },
-      { id: "pricing-tables", label: "Tabelas de preço" },
+      { id: "dashboard-principal", label: "Dashboard Principal" },
+      { id: "leads-lista", label: "Leads - Lista" },
+      { id: "leads-detalhes", label: "Leads - Detalhes" },
+      { id: "leads-importacao", label: "Leads - Importação" },
+      { id: "contatos-lista", label: "Contatos - Lista" },
+      { id: "contatos-detalhes", label: "Contatos - Detalhes" },
+      { id: "contas-empresas-lista", label: "Contas/Empresas - Lista" },
+      { id: "contas-detalhes", label: "Contas - Detalhes" },
+      { id: "oportunidades-lista", label: "Oportunidades - Lista" },
+      { id: "oportunidades-kanban", label: "Oportunidades - Kanban" },
+      { id: "pipeline-de-vendas", label: "Pipeline de Vendas" },
+      { id: "atividades-tarefas", label: "Atividades/Tarefas" },
+      { id: "calendario", label: "Calendário" },
+      { id: "cotacoes", label: "Cotações" },
+      { id: "propostas-comerciais", label: "Propostas Comerciais" },
     ],
   },
   {
     id: "marketing",
-    label: "Marketing",
+    label: "MARKETING",
     icon: <Rocket className="h-4 w-4" />,
     links: [
-      { id: "campaigns", label: "Campanhas" },
-      { id: "email-marketing", label: "E-mail" },
-      { id: "landing-pages", label: "Landing pages" },
-      { id: "forms", label: "Formulários" },
-      { id: "social", label: "Social" },
-      { id: "seo", label: "SEO" },
-      { id: "ads", label: "Ads" },
-      { id: "marketing-library", label: "Biblioteca" },
+      { id: "campanhas-lista", label: "Campanhas - Lista" },
+      { id: "campanhas-criar-editar", label: "Campanhas - Criar/Editar" },
+      { id: "email-marketing-dashboard", label: "Email Marketing - Dashboard" },
+      { id: "email-marketing-templates", label: "Email Marketing - Templates" },
+      { id: "email-marketing-envios", label: "Email Marketing - Envios" },
+      { id: "landing-pages-lista", label: "Landing Pages - Lista" },
+      { id: "landing-pages-builder", label: "Landing Pages - Builder" },
+      { id: "formularios-lista", label: "Formulários - Lista" },
+      { id: "formularios-builder", label: "Formulários - Builder" },
+      { id: "redes-sociais-dashboard", label: "Redes Sociais - Dashboard" },
+      { id: "redes-sociais-agendamento", label: "Redes Sociais - Agendamento" },
+      { id: "automacao-de-marketing", label: "Automação de Marketing" },
     ],
   },
   {
-    id: "support",
-    label: "Suporte",
+    id: "suporte-ao-cliente",
+    label: "SUPORTE AO CLIENTE",
     icon: <ShieldCheck className="h-4 w-4" />,
     links: [
-      { id: "tickets", label: "Tickets" },
-      { id: "knowledge-base", label: "Base de conhecimento" },
-      { id: "chat", label: "Chat" },
-      { id: "slas", label: "SLAs" },
-      { id: "cases", label: "Casos" },
-      { id: "portal", label: "Portal" },
-      { id: "support-feedback", label: "Feedback" },
+      { id: "tickets-lista", label: "Tickets - Lista" },
+      { id: "tickets-detalhes", label: "Tickets - Detalhes" },
+      { id: "chat-ao-vivo", label: "Chat Ao Vivo" },
+      { id: "base-de-conhecimento", label: "Base de Conhecimento" },
+      { id: "feedback-de-clientes", label: "Feedback de Clientes" },
+      { id: "portal-do-cliente", label: "Portal do Cliente" },
+      { id: "slas-e-metricas", label: "SLAs e Métricas" },
+      { id: "integracoes-de-suporte", label: "Integrações de Suporte" },
     ],
   },
   {
-    id: "communication",
-    label: "Comunicação",
-    icon: <MessageCircle className="h-4 w-4" />,
-    links: [
-      { id: "inbox", label: "Inbox" },
-      { id: "communication-emails", label: "E-mails" },
-      { id: "calls", label: "Chamadas" },
-      { id: "meetings", label: "Reuniões" },
-      { id: "sms", label: "SMS" },
-      { id: "whatsapp", label: "WhatsApp" },
-    ],
-  },
-  {
-    id: "analytics",
-    label: "Analytics",
+    id: "analytics-relatorios",
+    label: "ANALYTICS & RELATÓRIOS",
     icon: <LineChart className="h-4 w-4" />,
     links: [
-      { id: "executive-dashboard", label: "Dashboard executivo" },
-      { id: "cohorts", label: "Cohorts" },
-      { id: "analytics-pipeline", label: "Pipeline" },
-      { id: "roi", label: "ROI" },
-      { id: "maps", label: "Mapas" },
-      { id: "analytics-forecasts", label: "Previsões" },
+      { id: "analytics-dashboard", label: "Analytics - Dashboard" },
+      { id: "relatorios-personalizados", label: "Relatórios Personalizados" },
+      { id: "forecasting-de-vendas", label: "Forecasting de Vendas" },
+      { id: "analise-de-roi", label: "Análise de ROI" },
+      { id: "cohort-analysis", label: "Cohort Analysis" },
+      { id: "atribuicao-de-marketing", label: "Atribuição de Marketing" },
+      { id: "heatmaps-e-sessoes", label: "Heatmaps e Sessões" },
+      { id: "a-b-testing", label: "A/B Testing" },
+      { id: "executive-reports", label: "Executive Reports" },
+      { id: "data-export-import", label: "Data Export/Import" },
     ],
   },
   {
-    id: "automation",
-    label: "Automação",
-    icon: <Layers className="h-4 w-4" />,
-    links: [
-      { id: "workflows", label: "Workflows" },
-      { id: "sequences", label: "Sequências" },
-      { id: "playbooks", label: "Playbooks" },
-      { id: "triggers", label: "Triggers" },
-      { id: "logs", label: "Logs" },
-      { id: "connectors", label: "Conectores" },
-    ],
-  },
-  {
-    id: "team",
-    label: "Equipe",
-    icon: <Users className="h-4 w-4" />,
-    links: [
-      { id: "members", label: "Membros" },
-      { id: "permissions", label: "Permissões" },
-      { id: "goals", label: "Metas" },
-      { id: "commissions", label: "Comissões" },
-      { id: "territories", label: "Territórios" },
-      { id: "leaderboards", label: "Leaderboards" },
-    ],
-  },
-  {
-    id: "integrations",
-    label: "Integrações",
-    icon: <Compass className="h-4 w-4" />,
-    links: [
-      { id: "hub", label: "Hub" },
-      { id: "marketplace", label: "Marketplace" },
-      { id: "api-console", label: "API console" },
-      { id: "webhooks", label: "Webhooks" },
-      { id: "import-export", label: "Import/Export" },
-    ],
-  },
-  {
-    id: "ai",
-    label: "IA & Inovação",
+    id: "automacao-ia",
+    label: "AUTOMAÇÃO & IA",
     icon: <Brain className="h-4 w-4" />,
     links: [
-      { id: "copilot", label: "Copilot" },
-      { id: "insights", label: "Insights" },
-      { id: "voice-commands", label: "Comandos de voz" },
-      { id: "ai-forecast", label: "Forecast" },
-      { id: "action-plan", label: "Plano de ação" },
-      { id: "laboratory", label: "Laboratório" },
+      { id: "workflows-lista", label: "Workflows - Lista" },
+      { id: "workflows-builder", label: "Workflows - Builder" },
+      { id: "sequences-de-vendas", label: "Sequences de Vendas" },
+      { id: "ai-insights", label: "AI Insights" },
+      { id: "ai-assistant", label: "AI Assistant" },
+      { id: "playbooks-de-vendas", label: "Playbooks de Vendas" },
+      { id: "automacao-de-tarefas", label: "Automação de Tarefas" },
     ],
   },
   {
-    id: "platform",
-    label: "Plataforma",
+    id: "gamificacao",
+    label: "GAMIFICAÇÃO",
+    icon: <Flame className="h-4 w-4" />,
+    links: [
+      { id: "leaderboards", label: "Leaderboards" },
+      { id: "badges-e-conquistas", label: "Badges e Conquistas" },
+      { id: "metas-e-desafios", label: "Metas e Desafios" },
+      { id: "pontuacao-e-niveis", label: "Pontuação e Níveis" },
+      { id: "competitions", label: "Competitions" },
+      { id: "rewards-store", label: "Rewards Store" },
+      { id: "feedback-gamificado", label: "Feedback Gamificado" },
+      { id: "analytics-de-gamificacao", label: "Analytics de Gamificação" },
+    ],
+  },
+  {
+    id: "omnichannel",
+    label: "OMNICHANNEL",
+    icon: <Globe2 className="h-4 w-4" />,
+    links: [
+      { id: "inbox-unificada", label: "Inbox Unificada" },
+      { id: "email-inbox", label: "Email Inbox" },
+      { id: "chamadas-e-voip", label: "Chamadas e VoIP" },
+      { id: "reunioes-virtuais", label: "Reuniões Virtuais" },
+      { id: "sms-marketing", label: "SMS Marketing" },
+      { id: "whatsapp-business", label: "WhatsApp Business" },
+      { id: "chatbots-config", label: "Chatbots Config" },
+      { id: "voice-analytics", label: "Voice Analytics" },
+      { id: "social-listening", label: "Social Listening" },
+      { id: "push-notifications", label: "Push Notifications" },
+      { id: "api-de-comunicacao", label: "API de Comunicação" },
+      { id: "omnichannel-analytics", label: "Omnichannel Analytics" },
+    ],
+  },
+  {
+    id: "gestao-de-equipes",
+    label: "GESTÃO DE EQUIPES",
+    icon: <Users className="h-4 w-4" />,
+    links: [
+      { id: "equipes-lista", label: "Equipes - Lista" },
+      { id: "usuarios-lista", label: "Usuários - Lista" },
+      { id: "funcoes-e-permissoes", label: "Funções e Permissões" },
+      { id: "territorios-e-cotas", label: "Territórios e Cotas" },
+      { id: "comissoes", label: "Comissões" },
+      { id: "metas-de-equipe", label: "Metas de Equipe" },
+      { id: "treinamentos", label: "Treinamentos" },
+      { id: "performance-reviews", label: "Performance Reviews" },
+    ],
+  },
+  {
+    id: "integracoes",
+    label: "INTEGRAÇÕES",
+    icon: <Compass className="h-4 w-4" />,
+    links: [
+      { id: "marketplace-de-apps", label: "Marketplace de Apps" },
+      { id: "api-console", label: "API Console" },
+      { id: "webhooks", label: "Webhooks" },
+      { id: "integracao-google-workspace", label: "Integração Google Workspace" },
+      { id: "integracao-microsoft-365", label: "Integração Microsoft 365" },
+      { id: "integracao-com-erps", label: "Integração com ERPs" },
+      { id: "pagamentos-integrados", label: "Pagamentos Integrados" },
+      { id: "e-commerce-integrations", label: "E-commerce Integrations" },
+      { id: "bi-tools-integration", label: "BI Tools Integration" },
+      { id: "custom-integrations", label: "Custom Integrations" },
+    ],
+  },
+  {
+    id: "configuracoes-admin",
+    label: "CONFIGURAÇÕES & ADMIN",
     icon: <Settings className="h-4 w-4" />,
     links: [
-      { id: "settings", label: "Configurações" },
-      { id: "branding", label: "Branding" },
-      { id: "security", label: "Segurança" },
-      { id: "audit-log", label: "Audit log" },
-      { id: "onboarding", label: "Onboarding" },
-      { id: "community", label: "Comunidade" },
+      { id: "configuracoes-gerais", label: "Configurações Gerais" },
+      { id: "notificacoes", label: "Notificações" },
+      { id: "email-config", label: "Email Config" },
+      { id: "cobranca-e-planos", label: "Cobrança e Planos" },
+      { id: "branding-personalizado", label: "Branding Personalizado" },
+      { id: "campos-customizados", label: "Campos Customizados" },
+      { id: "privacidade-de-dados", label: "Privacidade de Dados" },
+      { id: "backups-e-restore", label: "Backups e Restore" },
+      { id: "logs-de-auditoria", label: "Logs de Auditoria" },
+      { id: "seguranca-avancada", label: "Segurança Avançada" },
+      { id: "onboarding-wizard", label: "Onboarding Wizard" },
+      { id: "migracao-de-dados", label: "Migração de Dados" },
+      { id: "api-keys-management", label: "API Keys Management" },
+      { id: "mobile-app-config", label: "Mobile App Config" },
+      { id: "system-status", label: "System Status" },
+    ],
+  },
+  {
+    id: "comunidade-suporte",
+    label: "COMUNIDADE & SUPORTE",
+    icon: <HeartPulse className="h-4 w-4" />,
+    links: [
+      { id: "centro-de-ajuda", label: "Centro de Ajuda" },
+      { id: "novidades", label: "Novidades" },
+      { id: "recursos-e-templates", label: "Recursos e Templates" },
+      { id: "comunidade", label: "Comunidade" },
+      { id: "historias-de-sucesso", label: "Histórias de Sucesso" },
     ],
   },
 ];
 
-const themeOptions: ThemeOption[] = [
+// Registre todas as rotas de uma vez (com placeholders para pendentes)
+registerRoute("dashboard-principal", Dashboard);
+registerRoute("leads-lista", Leads);
+registerRoute("leads-detalhes", LeadsDetails);
+registerRoute("leads-importacao", () => <PlaceholderPage title="Leads - Importação" />);
+registerRoute("contatos-lista", () => <PlaceholderPage title="Contatos - Lista" />);
+registerRoute("contatos-detalhes", () => <PlaceholderPage title="Contatos - Detalhes" />);
+registerRoute("contas-empresas-lista", () => <PlaceholderPage title="Contas/Empresas - Lista" />);
+registerRoute("contas-detalhes", () => <PlaceholderPage title="Contas - Detalhes" />);
+registerRoute("oportunidades-lista", () => <PlaceholderPage title="Oportunidades - Lista" />);
+registerRoute("oportunidades-kanban", () => <PlaceholderPage title="Oportunidades - Kanban" />);
+registerRoute("pipeline-de-vendas", () => <PlaceholderPage title="Pipeline de Vendas" />);
+registerRoute("atividades-tarefas", () => <PlaceholderPage title="Atividades/Tarefas" />);
+registerRoute("calendario", () => <PlaceholderPage title="Calendário" />);
+registerRoute("cotacoes", () => <PlaceholderPage title="Cotações" />);
+registerRoute("propostas-comerciais", () => <PlaceholderPage title="Propostas Comerciais" />);
+registerRoute("campanhas-lista", () => <PlaceholderPage title="Campanhas - Lista" />);
+registerRoute("campanhas-criar-editar", () => <PlaceholderPage title="Campanhas - Criar/Editar" />);
+registerRoute("email-marketing-dashboard", () => <PlaceholderPage title="Email Marketing - Dashboard" />);
+registerRoute("email-marketing-templates", () => <PlaceholderPage title="Email Marketing - Templates" />);
+registerRoute("email-marketing-envios", () => <PlaceholderPage title="Email Marketing - Envios" />);
+registerRoute("landing-pages-lista", () => <PlaceholderPage title="Landing Pages - Lista" />);
+registerRoute("landing-pages-builder", () => <PlaceholderPage title="Landing Pages - Builder" />);
+registerRoute("formularios-lista", () => <PlaceholderPage title="Formulários - Lista" />);
+registerRoute("formularios-builder", () => <PlaceholderPage title="Formulários - Builder" />);
+registerRoute("redes-sociais-dashboard", () => <PlaceholderPage title="Redes Sociais - Dashboard" />);
+registerRoute("redes-sociais-agendamento", () => <PlaceholderPage title="Redes Sociais - Agendamento" />);
+registerRoute("automacao-de-marketing", () => <PlaceholderPage title="Automação de Marketing" />);
+registerRoute("tickets-lista", () => <PlaceholderPage title="Tickets - Lista" />);
+registerRoute("tickets-detalhes", () => <PlaceholderPage title="Tickets - Detalhes" />);
+registerRoute("chat-ao-vivo", () => <PlaceholderPage title="Chat Ao Vivo" />);
+registerRoute("base-de-conhecimento", () => <PlaceholderPage title="Base de Conhecimento" />);
+registerRoute("feedback-de-clientes", () => <PlaceholderPage title="Feedback de Clientes" />);
+registerRoute("portal-do-cliente", () => <PlaceholderPage title="Portal do Cliente" />);
+registerRoute("slas-e-metricas", () => <PlaceholderPage title="SLAs e Métricas" />);
+registerRoute("integracoes-de-suporte", () => <PlaceholderPage title="Integrações de Suporte" />);
+registerRoute("analytics-dashboard", () => <PlaceholderPage title="Analytics - Dashboard" />);
+registerRoute("relatorios-personalizados", () => <PlaceholderPage title="Relatórios Personalizados" />);
+registerRoute("forecasting-de-vendas", () => <PlaceholderPage title="Forecasting de Vendas" />);
+registerRoute("analise-de-roi", () => <PlaceholderPage title="Análise de ROI" />);
+registerRoute("cohort-analysis", () => <PlaceholderPage title="Cohort Analysis" />);
+registerRoute("atribuicao-de-marketing", () => <PlaceholderPage title="Atribuição de Marketing" />);
+registerRoute("heatmaps-e-sessoes", () => <PlaceholderPage title="Heatmaps e Sessões" />);
+registerRoute("a-b-testing", () => <PlaceholderPage title="A/B Testing" />);
+registerRoute("executive-reports", () => <PlaceholderPage title="Executive Reports" />);
+registerRoute("data-export-import", () => <PlaceholderPage title="Data Export/Import" />);
+registerRoute("workflows-lista", () => <PlaceholderPage title="Workflows - Lista" />);
+registerRoute("workflows-builder", () => <PlaceholderPage title="Workflows - Builder" />);
+registerRoute("sequences-de-vendas", () => <PlaceholderPage title="Sequences de Vendas" />);
+registerRoute("ai-insights", () => <PlaceholderPage title="AI Insights" />);
+registerRoute("ai-assistant", () => <PlaceholderPage title="AI Assistant" />);
+registerRoute("playbooks-de-vendas", () => <PlaceholderPage title="Playbooks de Vendas" />);
+registerRoute("automacao-de-tarefas", () => <PlaceholderPage title="Automação de Tarefas" />);
+registerRoute("leaderboards", () => <PlaceholderPage title="Leaderboards" />);
+registerRoute("badges-e-conquistas", () => <PlaceholderPage title="Badges e Conquistas" />);
+registerRoute("metas-e-desafios", () => <PlaceholderPage title="Metas e Desafios" />);
+registerRoute("pontuacao-e-niveis", () => <PlaceholderPage title="Pontuação e Níveis" />);
+registerRoute("competitions", () => <PlaceholderPage title="Competitions" />);
+registerRoute("rewards-store", () => <PlaceholderPage title="Rewards Store" />);
+registerRoute("feedback-gamificado", () => <PlaceholderPage title="Feedback Gamificado" />);
+registerRoute("analytics-de-gamificacao", () => <PlaceholderPage title="Analytics de Gamificação" />);
+registerRoute("inbox-unificada", () => <PlaceholderPage title="Inbox Unificada" />);
+registerRoute("email-inbox", () => <PlaceholderPage title="Email Inbox" />);
+registerRoute("chamadas-e-voip", () => <PlaceholderPage title="Chamadas e VoIP" />);
+registerRoute("reunioes-virtuais", () => <PlaceholderPage title="Reuniões Virtuais" />);
+registerRoute("sms-marketing", () => <PlaceholderPage title="SMS Marketing" />);
+registerRoute("whatsapp-business", () => <PlaceholderPage title="WhatsApp Business" />);
+registerRoute("chatbots-config", () => <PlaceholderPage title="Chatbots Config" />);
+registerRoute("voice-analytics", () => <PlaceholderPage title="Voice Analytics" />);
+registerRoute("social-listening", () => <PlaceholderPage title="Social Listening" />);
+registerRoute("push-notifications", () => <PlaceholderPage title="Push Notifications" />);
+registerRoute("api-de-comunicacao", () => <PlaceholderPage title="API de Comunicação" />);
+registerRoute("omnichannel-analytics", () => <PlaceholderPage title="Omnichannel Analytics" />);
+registerRoute("equipes-lista", () => <PlaceholderPage title="Equipes - Lista" />);
+registerRoute("usuarios-lista", () => <PlaceholderPage title="Usuários - Lista" />);
+registerRoute("funcoes-e-permissoes", () => <PlaceholderPage title="Funções e Permissões" />);
+registerRoute("territorios-e-cotas", () => <PlaceholderPage title="Territórios e Cotas" />);
+registerRoute("comissoes", () => <PlaceholderPage title="Comissões" />);
+registerRoute("metas-de-equipe", () => <PlaceholderPage title="Metas de Equipe" />);
+registerRoute("treinamentos", () => <PlaceholderPage title="Treinamentos" />);
+registerRoute("performance-reviews", () => <PlaceholderPage title="Performance Reviews" />);
+registerRoute("marketplace-de-apps", () => <PlaceholderPage title="Marketplace de Apps" />);
+registerRoute("api-console", () => <PlaceholderPage title="API Console" />);
+registerRoute("webhooks", () => <PlaceholderPage title="Webhooks" />);
+registerRoute("integracao-google-workspace", () => <PlaceholderPage title="Integração Google Workspace" />);
+registerRoute("integracao-microsoft-365", () => <PlaceholderPage title="Integração Microsoft 365" />);
+registerRoute("integracao-com-erps", () => <PlaceholderPage title="Integração com ERPs" />);
+registerRoute("pagamentos-integrados", () => <PlaceholderPage title="Pagamentos Integrados" />);
+registerRoute("e-commerce-integrations", () => <PlaceholderPage title="E-commerce Integrations" />);
+registerRoute("bi-tools-integration", () => <PlaceholderPage title="BI Tools Integration" />);
+registerRoute("custom-integrations", () => <PlaceholderPage title="Custom Integrations" />);
+registerRoute("configuracoes-gerais", () => <PlaceholderPage title="Configurações Gerais" />);
+registerRoute("notificacoes", () => <PlaceholderPage title="Notificações" />);
+registerRoute("email-config", () => <PlaceholderPage title="Email Config" />);
+registerRoute("cobranca-e-planos", () => <PlaceholderPage title="Cobrança e Planos" />);
+registerRoute("branding-personalizado", () => <PlaceholderPage title="Branding Personalizado" />);
+registerRoute("campos-customizados", () => <PlaceholderPage title="Campos Customizados" />);
+registerRoute("privacidade-de-dados", () => <PlaceholderPage title="Privacidade de Dados" />);
+registerRoute("backups-e-restore", () => <PlaceholderPage title="Backups e Restore" />);
+registerRoute("logs-de-auditoria", () => <PlaceholderPage title="Logs de Auditoria" />);
+registerRoute("seguranca-avancada", () => <PlaceholderPage title="Segurança Avançada" />);
+registerRoute("onboarding-wizard", () => <PlaceholderPage title="Onboarding Wizard" />);
+registerRoute("migracao-de-dados", () => <PlaceholderPage title="Migração de Dados" />);
+registerRoute("api-keys-management", () => <PlaceholderPage title="API Keys Management" />);
+registerRoute("mobile-app-config", () => <PlaceholderPage title="Mobile App Config" />);
+registerRoute("system-status", () => <PlaceholderPage title="System Status" />);
+registerRoute("centro-de-ajuda", () => <PlaceholderPage title="Centro de Ajuda" />);
+registerRoute("novidades", () => <PlaceholderPage title="Novidades" />);
+registerRoute("recursos-e-templates", () => <PlaceholderPage title="Recursos e Templates" />);
+registerRoute("comunidade", () => <PlaceholderPage title="Comunidade" />);
+registerRoute("historias-de-sucesso", () => <PlaceholderPage title="Histórias de Sucesso" />);
+
+const themeOptions: { key: string; label: string; description: string }[] = [
   { key: "glass-dark", label: "Glass Dark", description: "Night ops" },
   { key: "platinum-glass", label: "Platinum Glass", description: "Boardroom" },
   { key: "midnight-aurora", label: "Midnight Aurora", description: "Innovation" },
@@ -272,7 +456,7 @@ const themeOptions: ThemeOption[] = [
   { key: "cyber-vivid", label: "Cyber Vivid", description: "Electric" },
 ];
 
-const themeSwatches: Record<ThemeKey, string> = {
+const themeSwatches: Record<string, string> = {
   "glass-dark": "linear-gradient(140deg, #7a8f80 0%, #8794a4 52%, #c5a47c 100%)",
   "platinum-glass": "linear-gradient(140deg, #f7f7f4 0%, #d9dde2 55%, #c0b3a2 100%)",
   "midnight-aurora": "linear-gradient(140deg, #45505f 0%, #7a8c9f 60%, #b8976d 100%)",
@@ -282,18 +466,18 @@ const themeSwatches: Record<ThemeKey, string> = {
 };
 
 const currencyOptions = [
-  { label: "BRL", value: "BRL" as DashboardState["currency"] },
-  { label: "USD", value: "USD" as DashboardState["currency"] },
-  { label: "EUR", value: "EUR" as DashboardState["currency"] },
+  { label: "BRL", value: "BRL" },
+  { label: "USD", value: "USD" },
+  { label: "EUR", value: "EUR" },
 ];
 
 const timeframeOptions = [
-  { label: "7D", value: "7d" as DashboardState["timeframe"] },
-  { label: "30D", value: "30d" as DashboardState["timeframe"] },
-  { label: "90D", value: "90d" as DashboardState["timeframe"] },
+  { label: "7D", value: "7d" },
+  { label: "30D", value: "30d" },
+  { label: "90D", value: "90d" },
 ];
 
-const badgePalette: Record<Campaign["badgeTone"], string> = {
+const badgePalette: Record<string, string> = {
   emerald: "text-[var(--accent-emerald)] border-[var(--accent-emerald)]/35 bg-[var(--accent-emerald)]/14",
   sky: "text-[var(--accent-sky)] border-[var(--accent-sky)]/32 bg-[var(--accent-sky)]/14",
   fuchsia: "text-[var(--accent-fuchsia)] border-[var(--accent-fuchsia)]/32 bg-[var(--accent-fuchsia)]/14",
@@ -324,103 +508,95 @@ const useDashboardStore = create<DashboardState>((set) => ({
   currency: "BRL",
   timeframe: "30d",
   theme: "glass-dark",
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚡ FASE 2 – FETCH DATA REAL DO SUPABASE (ALSHAM 360° PRIMA)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-fetchData: async () => {
-  try {
-    set({ loading: true });
+  fetchData: async () => {
+    try {
+      set({ loading: true });
 
-    // 🔹 1. Coleta simultânea dos principais dados
-    const results = await Promise.all([
-      getLeads(),
-      getOpportunities(),
-      getCampaigns(),
-      getTopLeadsByScore(5)
-    ]);
-    
-    // 🔹 Extrair dados (estrutura: {success, data: {data: [], count: N}})
-    const leads = results[0]?.data?.data || [];
-    const opportunities = results[1]?.data?.data || [];
-    const campaigns = results[2]?.data || [];
-    const leaderboard = results[3]?.data || [];
-    // 🔹 2. Montagem dinâmica dos KPIs reais
-    const kpis: KPI[] = [
-      {
-        id: "leads",
-        title: "Leads Ativos",
-        value: leads.length.toString(),
-        trend: 0,
-        trendLabel: "Base Supabase",
-        series: [0, 0, 0, leads.length],
-        target: "—",
-        description: "Total de leads ativos em leads_crm",
-        icon: <Target className="h-5 w-5 text-[var(--accent-emerald)]" />,
-      },
-      {
-        id: "deals",
-        title: "Negócios em Andamento",
-        value: opportunities.length.toString(),
-        trend: 0,
-        trendLabel: "Base Supabase",
-        series: [0, 0, 0, opportunities.length],
-        target: "—",
-        description: "Registros atuais em sales_pipeline",
-        icon: <Rocket className="h-5 w-5 text-[var(--accent-sky)]" />,
-      },
-      {
-        id: "campaigns",
-        title: "Campanhas Ativas",
-        value: campaigns.length.toString(),
-        trend: 0,
-        trendLabel: "Base Supabase",
-        series: [0, 0, 0, campaigns.length],
-        target: "—",
-        description: "Campanhas registradas em marketing_campaigns",
-        icon: <LineChart className="h-5 w-5 text-[var(--accent-fuchsia)]" />,
-      },
-    ];
+      const results = await Promise.all([
+        getLeads(),
+        getOpportunities(),
+        getCampaigns(),
+        getTopLeadsByScore(5)
+      ]);
+      
+      const leads = results[0]?.data?.data || [];
+      const opportunities = results[1]?.data?.data || [];
+      const campaigns = results[2]?.data || [];
+      const leaderboard = results[3]?.data || [];
 
-    // 🔹 3. Leaderboard (Gamificação)
-    const engagement = {
-      feed: [],
-      leaderboard: leaderboard.map((p, i) => ({
-        user: p.user_name ?? `User ${i + 1}`,
-        avatar: p.avatar_url ?? "https://api.dicebear.com/7.x/identicon/svg",
-        score: p.score ?? 0,
-        delta: 0,
-        rank: i + 1,
-      })),
-      tasks: [],
-      community: [],
-      sla: [],
-    };
+      const kpis: KPI[] = [
+        {
+          id: "leads",
+          title: "Leads Ativos",
+          value: leads.length.toString(),
+          trend: 0,
+          trendLabel: "Base Supabase",
+          series: [0, 0, 0, leads.length],
+          target: "—",
+          description: "Total de leads ativos em leads_crm",
+          icon: <Target className="h-5 w-5 text-[var(--accent-emerald)]" />,
+        },
+        {
+          id: "deals",
+          title: "Negócios em Andamento",
+          value: opportunities.length.toString(),
+          trend: 0,
+          trendLabel: "Base Supabase",
+          series: [0, 0, 0, opportunities.length],
+          target: "—",
+          description: "Registros atuais em sales_pipeline",
+          icon: <Rocket className="h-5 w-5 text-[var(--accent-sky)]" />,
+        },
+        {
+          id: "campanhas",
+          title: "Campanhas Ativas",
+          value: campaigns.length.toString(),
+          trend: 0,
+          trendLabel: "Base Supabase",
+          series: [0, 0, 0, campaigns.length],
+          target: "—",
+          description: "Campanhas registradas em marketing_campaigns",
+          icon: <LineChart className="h-5 w-5 text-[var(--accent-fuchsia)]" />,
+        },
+      ];
 
-    // 🔹 4. Atualiza o estado global com os dados reais
-    set({
-      loading: false,
-      kpis,
-      analytics: {
-        pipeline: [],
-        conversion: [],
-        heatmap: [],
-        cohort: [],
-        geo: [],
-        marketSplit: [],
-      },
-      aiInsights: [],
-      automations: [],
-      engagement,
-      campaigns,
-    });
+      const engagement = {
+        feed: [],
+        leaderboard: leaderboard.map((p: any, i: number) => ({
+          user: p.user_name ?? `User ${i + 1}`,
+          avatar: p.avatar_url ?? "https://api.dicebear.com/7.x/identicon/svg",
+          score: p.score ?? 0,
+          delta: 0,
+          rank: i + 1,
+        })),
+        tasks: [],
+        community: [],
+        sla: [],
+      };
 
-    console.info("✅ Dashboard populado com dados reais do Supabase.");
-  } catch (err) {
-    console.error("❌ Erro ao buscar dados Supabase:", err);
-    set({ loading: false });
-  }
-},
+      set({
+        loading: false,
+        kpis,
+        analytics: {
+          pipeline: [],
+          conversion: [],
+          heatmap: [],
+          cohort: [],
+          geo: [],
+          marketSplit: [],
+        },
+        aiInsights: [],
+        automations: [],
+        engagement,
+        campaigns,
+      });
 
+      console.info("✅ Dashboard populado com dados reais do Supabase.");
+    } catch (err) {
+      console.error("❌ Erro ao buscar dados Supabase:", err);
+      set({ loading: false });
+    }
+  },
   setCurrency: (currency) => set({ currency }),
   setTimeframe: (timeframe) => set({ timeframe }),
   setTheme: (theme) => set({ theme }),
@@ -450,12 +626,6 @@ type ThemeKey =
   | "desert-quartz"
   | "neon-energy"
   | "cyber-vivid";
-
-type ThemeOption = {
-  key: ThemeKey;
-  label: string;
-  description: string;
-};
 
 type KPI = {
   id: string;
@@ -917,14 +1087,15 @@ function App() {
   } = useDashboardStore();
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] = useState("dashboard-principal");
 
   const closeMobileNav = () => setMobileNavOpen(false);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
