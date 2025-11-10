@@ -1,8 +1,92 @@
-/* src/styles/themes.css */
-
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* 🎨 ALSHAM 360° PRIMA - SISTEMA DE TEMAS DINÂMICOS */
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ============================================ */
+/* 📐 VARIÁVEIS GLOBAIS DE FONTE */
+/* ============================================ */
+:root {
+  /* Tamanhos de fonte responsivos com clamp */
+  --font-xs: clamp(0.75rem, 2vw, 0.875rem);
+  --font-sm: clamp(0.875rem, 2.5vw, 1rem);
+  --font-base: clamp(0.875rem, 2vw, 1rem);
+  --font-md: clamp(1rem, 3vw, 1.125rem);
+  --font-lg: clamp(1.125rem, 3.5vw, 1.5rem);
+  --font-xl: clamp(1.25rem, 4vw, 1.875rem);
+  --font-2xl: clamp(1.5rem, 5vw, 2.25rem);
+  --font-3xl: clamp(1.875rem, 6vw, 3rem);
+  --font-4xl: clamp(2.25rem, 7vw, 3.75rem);
+  
+  /* Headings específicos */
+  --font-heading-h1: clamp(1.5rem, 5vw, 2.25rem);
+  --font-heading-h2: clamp(1.25rem, 4vw, 1.875rem);
+  --font-heading-h3: clamp(1.125rem, 3.5vw, 1.5rem);
+  --font-heading-h4: clamp(1rem, 3vw, 1.25rem);
+  --font-heading-h5: clamp(0.875rem, 2.5vw, 1.125rem);
+  --font-heading-h6: clamp(0.875rem, 2vw, 1rem);
+  
+  /* Line heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+  
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+}
+
+/* Aplicação global de fontes */
+body {
+  font-size: var(--font-base);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
+}
+
+h1 {
+  font-size: var(--font-heading-h1);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+h2 {
+  font-size: var(--font-heading-h2);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+h3 {
+  font-size: var(--font-heading-h3);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+}
+
+h4 {
+  font-size: var(--font-heading-h4);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-semibold);
+}
+
+h5 {
+  font-size: var(--font-heading-h5);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-medium);
+}
+
+h6 {
+  font-size: var(--font-heading-h6);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-medium);
+}
+
+p {
+  font-size: var(--font-base);
+  line-height: var(--line-height-relaxed);
+}
 
 /* ============================================ */
 /* 🌑 GLASS DARK (Tema Padrão) */
@@ -129,6 +213,9 @@
   --color-info-to: #6366f1;
   --color-info-hover-from: #2563eb;
   --color-info-hover-to: #4f46e5;
+  
+  /* Ajuste de fonte mais vibrante (opcional) */
+  --font-heading-h1: clamp(1.625rem, 5.5vw, 2.5rem);
 }
 
 /* ============================================ */
@@ -169,6 +256,9 @@
   --color-info-to: #06b6d4;
   --color-info-hover-from: #2563eb;
   --color-info-hover-to: #0891b2;
+  
+  /* Fonte com serifa suave (opcional - descomente se tiver fonte específica) */
+  /* --font-family-heading: 'Georgia', serif; */
 }
 
 /* ============================================ */
@@ -209,6 +299,9 @@
   --color-info-to: #3b82f6;
   --color-info-hover-from: #0891b2;
   --color-info-hover-to: #2563eb;
+  
+  /* Fonte mais técnica/futurista (opcional) */
+  --font-weight-bold: 800;
 }
 
 /* ============================================ */
@@ -249,6 +342,10 @@
   --color-info-to: #6366f1;
   --color-info-hover-from: #2563eb;
   --color-info-hover-to: #4f46e5;
+  
+  /* Fonte mais agressiva */
+  --font-weight-bold: 900;
+  --font-heading-h1: clamp(1.75rem, 6vw, 2.75rem);
 }
 
 /* ============================================ */
@@ -258,6 +355,7 @@
 /* Gradientes */
 .btn-primary {
   background: linear-gradient(135deg, var(--color-primary-from), var(--color-primary-to));
+  transition: background 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -266,6 +364,7 @@
 
 .btn-secondary {
   background: linear-gradient(135deg, var(--color-secondary-from), var(--color-secondary-to));
+  transition: background 0.3s ease;
 }
 
 .btn-secondary:hover {
@@ -274,6 +373,7 @@
 
 .btn-success {
   background: linear-gradient(135deg, var(--color-success-from), var(--color-success-to));
+  transition: background 0.3s ease;
 }
 
 .btn-success:hover {
@@ -282,12 +382,52 @@
 
 .btn-warning {
   background: linear-gradient(135deg, var(--color-warning-from), var(--color-warning-to));
+  transition: background 0.3s ease;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, var(--color-warning-hover-from), var(--color-warning-hover-to));
 }
 
 .btn-error {
   background: linear-gradient(135deg, var(--color-error-from), var(--color-error-to));
+  transition: background 0.3s ease;
+}
+
+.btn-error:hover {
+  background: linear-gradient(135deg, var(--color-error-hover-from), var(--color-error-hover-to));
 }
 
 .btn-info {
   background: linear-gradient(135deg, var(--color-info-from), var(--color-info-to));
+  transition: background 0.3s ease;
 }
+
+.btn-info:hover {
+  background: linear-gradient(135deg, var(--color-info-hover-from), var(--color-info-hover-to));
+}
+
+/* Classes de texto responsivo */
+.text-xs { font-size: var(--font-xs); }
+.text-sm { font-size: var(--font-sm); }
+.text-base { font-size: var(--font-base); }
+.text-md { font-size: var(--font-md); }
+.text-lg { font-size: var(--font-lg); }
+.text-xl { font-size: var(--font-xl); }
+.text-2xl { font-size: var(--font-2xl); }
+.text-3xl { font-size: var(--font-3xl); }
+.text-4xl { font-size: var(--font-4xl); }
+
+/* Font weights */
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-extrabold { font-weight: var(--font-weight-extrabold); }
+
+/* Line heights */
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+.leading-loose { line-height: var(--line-height-loose); }
