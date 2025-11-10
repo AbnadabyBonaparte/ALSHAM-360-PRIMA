@@ -1,4 +1,4 @@
-src/pages/Leads.tsx"// src/pages/Leads.tsx
+// src/pages/Leads.tsx
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -15,7 +15,9 @@ import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadActions from '../components/leads/LeadActions';
 import { createLead, getCurrentOrgId } from '../lib/supabase-full.js';
 // import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
+
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
+
 interface Lead {
   id: string;
   nome?: string;
@@ -34,6 +36,7 @@ interface Lead {
   last_name?: string;
   // ...outros campos que você usar
 }
+
 interface LeadFilters {
   search?: string;
   status?: string;
@@ -42,24 +45,28 @@ interface LeadFilters {
   risk?: 'high' | 'medium' | 'low' | 'all';
   conversion?: 'vhigh' | 'high' | 'medium' | 'low' | 'all';
 }
+
 interface PipelineStage {
   id: string;
   name: string;
   color: string;
   leads: Lead[];
 }
+
 export default function Leads() {
   const { leads, loading, error, refetch } = useLeadsAI();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [filters, setFilters] = useState<LeadFilters>({});
+
   useEffect(() => {
     if (import.meta.env.DEV) {
       console.log('🔄 Leads carregados:', leads?.length || 0);
       console.log('📊 Leads:', leads);
     }
   }, [leads]);
+
   const filteredLeads: Lead[] = useMemo(() => {
     if (!leads || leads.length === 0) return [];
     let result = [...leads];
@@ -118,6 +125,7 @@ export default function Leads() {
     }
     return result;
   }, [leads, filters]);
+
   const analytics = useMemo(() => {
     if (!leads || leads.length === 0) {
       return {
@@ -137,6 +145,7 @@ export default function Leads() {
       conversionRate: leads.length > 0 ? (qualified / leads.length) * 100 : 0
     };
   }, [leads]);
+
   const pipelineStages: PipelineStage[] = useMemo(() => {
     const stages: PipelineStage[] = [
       { id: 'novo', name: 'Novo', color: 'from-[var(--accent-blue)] to-[var(--accent-indigo)]', leads: [] },
@@ -157,6 +166,7 @@ export default function Leads() {
       s.leads.length > 0 || !arr.slice(i + 1).some(other => other.name === s.name)
     );
   }, [filteredLeads]);
+
   const chartData = useMemo(() => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
@@ -171,6 +181,7 @@ export default function Leads() {
       predictions: [...historical.slice(-1), ...predictions]
     };
   }, [leads]);
+
   const networkData = useMemo(() => {
     if (!selectedLead) return { nodes: [], edges: [] };
     const nodes = [
@@ -199,6 +210,7 @@ export default function Leads() {
     }
     return { nodes, edges };
   }, [selectedLead]);
+
   const activities = useMemo(() => {
     if (!selectedLead) return [];
     return [
@@ -231,6 +243,7 @@ export default function Leads() {
       }
     ]; // Mock de atividades de lead (ideal: trazer do backend no futuro!)
   }, [selectedLead]);
+
   const handleCreateLead = async (newLeadData: Partial<Lead>) => {
     try {
       const orgId = await getCurrentOrgId();
@@ -243,6 +256,7 @@ export default function Leads() {
       console.error(err);
     }
   };
+
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
@@ -254,6 +268,7 @@ export default function Leads() {
       </div>
     );
   }
+
   return (
     <div
       className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] p-4 sm:p-6 lg:p-8 container-responsive"
@@ -278,6 +293,7 @@ export default function Leads() {
           onNewLead={handleCreateLead}
         />
       </header>
+
       {!loading && (
         <section className="kpi-grid mb-6 sm:mb-8" aria-label="KPI de Leads">
           <motion.div
@@ -348,6 +364,7 @@ export default function Leads() {
           </motion.div>
         </section>
       )}
+
       <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6" role="navigation" aria-label="Seleção de visualização">
         <div className="theme-selector-container">
           {[
@@ -395,12 +412,14 @@ export default function Leads() {
           <span className="sm:hidden">IA</span>
         </motion.button>
       </nav>
+
       <section className="mb-6 sm:mb-8" aria-label="Filtros Inteligentes">
         <SmartFilters
           onFilterChange={setFilters}
           totalResults={filteredLeads.length}
         />
       </section>
+
       <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {showAIPanel && (
           <aside className="lg:col-span-1 space-y-6" aria-label="Insights Inteligência Artificial">
@@ -537,6 +556,7 @@ export default function Leads() {
           )}
         </section>
       </main>
+
       <section className="mt-6 sm:mt-8" aria-label="Gráfico preditivo de conversões">
         <PredictiveChart
           historicalData={chartData.historical}
