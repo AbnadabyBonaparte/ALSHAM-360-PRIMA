@@ -46,6 +46,7 @@ import campaignOrion from "./assets/campaign-orion.png";
 import { renderPage } from "./routes";
 import { registerRoute } from "./routes";
 import Leads from "./pages/Leads";
+import './styles/responsive.css';
 
 ChartJS.register(
   CategoryScale,
