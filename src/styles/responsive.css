@@ -1,0 +1,320 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📱 ALSHAM 360° PRIMA - CSS RESPONSIVO
+   📅 Data: 11/11/2025
+   🎯 Objetivo: Design mobile-first para todos os dispositivos
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📱 MOBILE FIRST (< 640px)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Ícones de tema - Tamanho normal no mobile */
+.theme-selector-button {
+  width: 2.5rem; /* 40px */
+  height: 2.5rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.theme-selector-button:hover {
+  transform: scale(1.05);
+}
+
+.theme-selector-icon {
+  width: 1.25rem; /* 20px */
+  height: 1.25rem;
+}
+
+/* Cards de Lead - Stack vertical no mobile */
+.leads-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Botões de ação - Tamanho confortável no mobile */
+.lead-action-button {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  min-height: 2.5rem;
+}
+
+.lead-action-button-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Header - Compacto no mobile */
+.dashboard-header {
+  padding: 1rem;
+  gap: 0.75rem;
+}
+
+/* Search bar - Largura total no mobile */
+.search-bar {
+  width: 100%;
+  min-width: auto;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📱 TABLET (640px - 1024px)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@media (min-width: 640px) {
+  /* Cards - 2 colunas */
+  .leads-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  /* Ícones de tema - Mantém tamanho razoável */
+  .theme-selector-button {
+    width: 3rem; /* 48px */
+    height: 3rem;
+  }
+
+  .theme-selector-icon {
+    width: 1.5rem; /* 24px */
+    height: 1.5rem;
+  }
+
+  /* Header - Mais espaçoso */
+  .dashboard-header {
+    padding: 1.25rem 1.5rem;
+    gap: 1rem;
+  }
+
+  /* Search bar - Tamanho médio */
+  .search-bar {
+    width: auto;
+    min-width: 300px;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   💻 DESKTOP (1024px+)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@media (min-width: 1024px) {
+  /* Cards - 3 colunas */
+  .leads-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Ícones de tema - Tamanho normal desktop */
+  .theme-selector-button {
+    width: 2.5rem; /* 40px - Menor que tablet */
+    height: 2.5rem;
+  }
+
+  .theme-selector-icon {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+  }
+
+  /* Header - Espaçoso */
+  .dashboard-header {
+    padding: 1.5rem 2rem;
+    gap: 1.25rem;
+  }
+
+  /* Search bar - Tamanho completo */
+  .search-bar {
+    min-width: 400px;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🖥️ DESKTOP GRANDE (1280px+)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@media (min-width: 1280px) {
+  /* Cards - 4 colunas */
+  .leads-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Sidebar - Visível */
+  .sidebar {
+    display: block;
+  }
+
+  .search-bar {
+    min-width: 500px;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📐 UTILITÁRIOS RESPONSIVOS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Esconder texto em telas pequenas */
+@media (max-width: 640px) {
+  .hide-on-mobile {
+    display: none;
+  }
+
+  /* Botões - Só ícones */
+  .button-text-mobile {
+    display: none;
+  }
+
+  /* Stack de botões verticalmente se necessário */
+  .action-buttons-mobile {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-buttons-mobile button {
+    width: 100%;
+  }
+}
+
+/* Ajustes de fonte responsivos */
+.text-responsive-xl {
+  font-size: 1.25rem; /* 20px */
+}
+
+@media (min-width: 640px) {
+  .text-responsive-xl {
+    font-size: 1.5rem; /* 24px */
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-xl {
+    font-size: 1.875rem; /* 30px */
+  }
+}
+
+/* Padding responsivo */
+.container-responsive {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🎨 SELETOR DE TEMAS RESPONSIVO
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.theme-selector-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Mobile - Ícones menores e mais agrupados */
+@media (max-width: 640px) {
+  .theme-selector-container {
+    gap: 0.375rem;
+    justify-content: center;
+  }
+
+  .theme-selector-button {
+    width: 2rem; /* 32px - BEM MENOR no mobile */
+    height: 2rem;
+    padding: 0.375rem;
+  }
+
+  .theme-selector-icon {
+    width: 1rem; /* 16px */
+    height: 1rem;
+  }
+}
+
+/* Tablet - Tamanho médio */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .theme-selector-container {
+    gap: 0.5rem;
+  }
+
+  .theme-selector-button {
+    width: 2.5rem; /* 40px */
+    height: 2.5rem;
+  }
+
+  .theme-selector-icon {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+  }
+}
+
+/* Desktop - Tamanho normal */
+@media (min-width: 1024px) {
+  .theme-selector-container {
+    gap: 0.625rem;
+  }
+
+  .theme-selector-button {
+    width: 2.5rem; /* 40px */
+    height: 2.5rem;
+  }
+
+  .theme-selector-icon {
+    width: 1.25rem; /* 20px */
+    height: 1.25rem;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📊 DASHBOARD CARDS RESPONSIVOS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.kpi-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔧 CORREÇÕES ESPECÍFICAS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Evitar overflow horizontal */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Botões touch-friendly no mobile */
+@media (max-width: 640px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
