@@ -1,8 +1,16 @@
 // src/components/leads/AIInsightsPanel.tsx
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Brain, TrendingUp, AlertTriangle, Target, Lightbulb,
-  Zap, ThumbsUp, Clock, Award, ArrowRight
+import {
+  Brain,
+  TrendingUp,
+  AlertTriangle,
+  Target,
+  Lightbulb,
+  Zap,
+  ThumbsUp,
+  Clock,
+  Award,
+  ArrowRight,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,54 +36,54 @@ export default function AIInsightsPanel({
   conversionProb = 0,
   healthScore = 0,
   riskScore = 0,
-  nextAction
+  nextAction,
 }: AIInsightsPanelProps) {
   const [expanded, setExpanded] = useState(true);
 
   const getInsightColor = (type: string) => {
     switch (type) {
-      case 'opportunity': return 'from-emerald-500 to-teal-500';
-      case 'warning': return 'from-orange-500 to-red-500';
-      case 'action': return 'from-blue-500 to-indigo-500';
-      default: return 'from-gray-500 to-gray-600';
+      case 'opportunity':
+        return 'from-[var(--accent-emerald)] to-[var(--accent-teal)]';
+      case 'warning':
+        return 'from-[var(--accent-orange)] to-[var(--accent-red)]';
+      case 'action':
+        return 'from-[var(--accent-blue)] to-[var(--accent-indigo)]';
+      default:
+        return 'from-[var(--neutral-gray)] to-[var(--neutral-gray-dark)]';
     }
   };
 
   const getInsightIcon = (type: string) => {
     switch (type) {
-      case 'opportunity': return <Target className="w-5 h-5" />;
-      case 'warning': return <AlertTriangle className="w-5 h-5" />;
-      case 'action': return <Zap className="w-5 h-5" />;
-      default: return <Lightbulb className="w-5 h-5" />;
+      case 'opportunity':
+        return <TrendingUp className="w-5 h-5" />;
+      case 'warning':
+        return <AlertTriangle className="w-5 h-5" />;
+      case 'action':
+        return <Target className="w-5 h-5" />;
+      default:
+        return <Lightbulb className="w-5 h-5" />;
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl overflow-hidden"
-    >
+    <div className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl overflow-hidden"> // AJUSTE: Vars para bg/border (painel muda com tema)
       {/* Header */}
-      <div 
-        className="p-6 border-b border-neutral-800 cursor-pointer hover:bg-neutral-900/50 transition-colors"
+      <div
+        className="bg-gradient-to-r from-[var(--neutral-800)] to-[var(--neutral-900)] p-4 cursor-pointer flex items-center justify-between" // AJUSTE: Vars
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white">Insights IA</h3>
-              <p className="text-sm text-gray-400">Análise inteligente em tempo real</p>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+          <Brain className="w-6 h-6 text-[var(--text-white)]" /> // AJUSTE: Var
+          <h2 className="text-xl font-semibold text-[var(--text-white)]">Insights IA</h2> // AJUSTE: Var
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-[var(--text-gray-300)]">Análise inteligente em tempo real</span> // AJUSTE: Var
           <motion.div
             animate={{ rotate: expanded ? 180 : 0 }}
-            className="text-gray-400"
+            transition={{ duration: 0.3 }}
           >
-            <ArrowRight className="w-5 h-5 rotate-90" />
+            <ArrowRight className="w-5 h-5 text-[var(--text-gray-400)]" /> // AJUSTE: Var
           </motion.div>
         </div>
       </div>
@@ -87,170 +95,118 @@ export default function AIInsightsPanel({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
+            className="overflow-hidden bg-[var(--neutral-50)] border-x border-b border-[var(--neutral-200)]" // AJUSTE: Vars
           >
             {/* Metrics Grid */}
-            <div className="grid grid-cols-3 gap-4 p-6 border-b border-neutral-800">
+            <div className="grid grid-cols-3 gap-4 p-4">
               {/* Conversion Probability */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs text-gray-400">Conversão</span>
+              <div className="bg-gradient-to-br from-[var(--accent-emerald-50)] to-[var(--accent-teal-50)] p-4 rounded-lg border border-[var(--accent-emerald-200)]"> // AJUSTE: Vars
+                <div className="flex items-center justify-between mb-2">
+                  <Zap className="w-5 h-5 text-[var(--accent-emerald-600)]" /> // AJUSTE: Var
+                  <span className="text-xs font-medium text-[var(--accent-emerald-700)]">Conversão</span> // AJUSTE: Var
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-emerald-400">
-                    {conversionProb}%
-                  </span>
-                  {conversionProb > 70 && (
-                    <span className="text-xs text-emerald-400">🔥 Quente</span>
-                  )}
-                </div>
-                <div className="mt-2 h-1 bg-neutral-800 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${conversionProb}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"
-                  />
-                </div>
-              </motion.div>
+                <div className="text-2xl font-bold text-[var(--accent-emerald-900)]">{conversionProb}%</div> // AJUSTE: Var
+                {conversionProb > 70 && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <ThumbsUp className="w-4 h-4 text-[var(--accent-emerald-600)]" /> // AJUSTE: Var
+                    <span className="text-xs text-[var(--accent-emerald-700)]">Quente</span> // AJUSTE: Var
+                  </div>
+                )}
+              </div>
 
               {/* Health Score */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <ThumbsUp className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs text-gray-400">Saúde</span>
+              <div className="bg-gradient-to-br from-[var(--accent-blue-50)] to-[var(--accent-indigo-50)] p-4 rounded-lg border border-[var(--accent-blue-200)]"> // AJUSTE: Vars
+                <div className="flex items-center justify-between mb-2">
+                  <Award className="w-5 h-5 text-[var(--accent-blue-600)]" /> // AJUSTE: Var
+                  <span className="text-xs font-medium text-[var(--accent-blue-700)]">Saúde</span> // AJUSTE: Var
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-blue-400">
-                    {healthScore}%
-                  </span>
-                  {healthScore > 80 && (
-                    <span className="text-xs text-blue-400">💚 Ótimo</span>
-                  )}
-                </div>
-                <div className="mt-2 h-1 bg-neutral-800 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${healthScore}%` }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-500"
-                  />
-                </div>
-              </motion.div>
+                <div className="text-2xl font-bold text-[var(--accent-blue-900)]">{healthScore}%</div> // AJUSTE: Var
+                {healthScore > 80 && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <Award className="w-4 h-4 text-[var(--accent-green-600)]" /> // AJUSTE: Var
+                    <span className="text-xs text-[var(--accent-green-700)]">Ótimo</span> // AJUSTE: Var
+                  </div>
+                )}
+              </div>
 
               {/* Risk Score */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-4 h-4 text-orange-400" />
-                  <span className="text-xs text-gray-400">Risco</span>
+              <div className="bg-gradient-to-br from-[var(--accent-orange-50)] to-[var(--accent-red-50)] p-4 rounded-lg border border-[var(--accent-orange-200)]"> // AJUSTE: Vars
+                <div className="flex items-center justify-between mb-2">
+                  <AlertTriangle className="w-5 h-5 text-[var(--accent-orange-600)]" /> // AJUSTE: Var
+                  <span className="text-xs font-medium text-[var(--accent-orange-700)]">Risco</span> // AJUSTE: Var
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-orange-400">
-                    {riskScore}%
-                  </span>
-                  {riskScore > 60 && (
-                    <span className="text-xs text-orange-400">⚠️ Alto</span>
-                  )}
-                </div>
-                <div className="mt-2 h-1 bg-neutral-800 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${riskScore}%` }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
-                    className="h-full bg-gradient-to-r from-orange-500 to-red-500"
-                  />
-                </div>
-              </motion.div>
+                <div className="text-2xl font-bold text-[var(--accent-orange-900)]">{riskScore}%</div> // AJUSTE: Var
+                {riskScore > 60 && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <AlertTriangle className="w-4 h-4 text-[var(--accent-red-600)]" /> // AJUSTE: Var
+                    <span className="text-xs text-[var(--accent-red-700)]">Alto</span> // AJUSTE: Var
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Next Best Action */}
             {nextAction && (
-              <div className="p-6 border-b border-neutral-800 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">{nextAction.icon}</span>
+              <div className="border-t border-[var(--neutral-200)] p-4 bg-[var(--text-white)]"> // AJUSTE: Vars
+                <div className="flex items-start gap-3">
+                  <div className="bg-[var(--accent-blue-100)] p-2 rounded-lg"> // AJUSTE: Var
+                    {nextAction.icon}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-white">Próxima Melhor Ação</h4>
-                      <span className={`
-                        px-2 py-0.5 rounded-full text-xs font-semibold
-                        ${nextAction.priority === 'urgent' ? 'bg-red-500/20 text-red-400' : ''}
-                        ${nextAction.priority === 'high' ? 'bg-orange-500/20 text-orange-400' : ''}
-                        ${nextAction.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : ''}
-                        ${nextAction.priority === 'low' ? 'bg-green-500/20 text-green-400' : ''}
-                      `}>
+                    <h3 className="font-semibold text-[var(--neutral-900)]">Próxima Melhor Ação</h3> // AJUSTE: Var
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm font-medium text-[var(--neutral-600)]">
                         {nextAction.priority?.toUpperCase()}
-                      </span>
+                      </span> // AJUSTE: Var
                     </div>
-                    <p className="text-sm text-gray-300 mb-2">{nextAction.reason}</p>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-sm font-semibold hover:from-purple-600 hover:to-pink-600 transition-all"
-                    >
-                      {nextAction.script}
-                    </motion.button>
+                    <p className="text-sm text-[var(--neutral-600)] mt-2">{nextAction.reason}</p> // AJUSTE: Var
+                    {nextAction.script && (
+                      <div className="mt-3 p-3 bg-[var(--neutral-50)] rounded-lg border border-[var(--neutral-200)]"> // AJUSTE: Vars
+                        <p className="text-sm text-[var(--neutral-700)] font-mono">{nextAction.script}</p> // AJUSTE: Var
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             )}
 
             {/* Insights List */}
-            <div className="p-6 space-y-3">
+            <div className="border-t border-[var(--neutral-200)] p-4 bg-[var(--text-white)]"> // AJUSTE: Vars
               {insights.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhum insight disponível no momento</p>
-                </div>
+                <p className="text-center text-[var(--neutral-500)] py-8">Nenhum insight disponível no momento</p> // AJUSTE: Var
               ) : (
-                insights.map((insight, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.01 }}
-                    className={`
-                      p-4 rounded-xl border backdrop-blur-sm
-                      bg-gradient-to-r ${getInsightColor(insight.type)}/10
-                      border-${insight.type === 'opportunity' ? 'emerald' : insight.type === 'warning' ? 'orange' : 'blue'}-500/20
-                    `}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`
-                        w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0
-                        bg-gradient-to-br ${getInsightColor(insight.type)}
-                      `}>
-                        {getInsightIcon(insight.type)}
+                <div className="space-y-4">
+                  {insights.map((insight, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`p-4 rounded-lg bg-gradient-to-r ${getInsightColor(
+                        insight.type
+                      )} bg-opacity-10 border border-opacity-20`} // AJUSTE: getInsightColor usa vars
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5">{getInsightIcon(insight.type)}</div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-[var(--neutral-900)]">{insight.title}</h4> // AJUSTE: Var
+                          <p className="text-sm text-[var(--neutral-700)] mt-1">{insight.message}</p> // AJUSTE: Var
+                          {insight.action && (
+                            <button className="mt-2 text-sm font-medium text-[var(--neutral-900)] hover:text-[var(--neutral-700)] flex items-center gap-1"> // AJUSTE: Vars
+                              {insight.action}
+                              <ArrowRight className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h5 className="font-semibold text-white mb-1">{insight.title}</h5>
-                        <p className="text-sm text-gray-300 mb-2">{insight.message}</p>
-                        {insight.action && (
-                          <button className="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1">
-                            {insight.action}
-                            <ArrowRight className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
+                    </motion.div>
+                  ))}
+                </div>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
