@@ -1,4 +1,3 @@
-// src/pages/Leads.tsx
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -278,11 +277,11 @@ export default function Leads() {
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent"
+            className="text-[clamp(1.5rem,5vw,2.25rem)] font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent"
           >
             🎯 Leads Intelligence
           </h1>
-          <p className="text-sm sm:text-base text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p>
+          <p className="text-[clamp(0.75rem,3vw,1rem)] text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p>
         </div>
         <LeadActions
           leads={leads ?? []}
@@ -306,14 +305,13 @@ export default function Leads() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-indigo)] flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-white)]" aria-hidden="true" />
               </div>
-              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Qualificados</span>
+              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Qualificados</span>
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-emerald)]">{analytics.qualified}</div>
             <div className="text-xs text-[var(--accent-emerald)] mt-1" aria-label="Taxa de conversão">
               +{analytics.conversionRate.toFixed(1)}% taxa
             </div>
           </motion.div>
-          {/* Os outros cards seguem o mesmo padrão – copiei da versão fornecida, com vars nossos */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -325,7 +323,7 @@ export default function Leads() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-orange)] to-[var(--accent-red)] flex items-center justify-center text-base sm:text-lg">
                 🔥
               </div>
-              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Quentes</span>
+              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Quentes</span>
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-orange)]">{analytics.hot}</div>
             <div className="text-xs text-[var(--accent-orange)] mt-1">alta conversão</div>
@@ -341,7 +339,7 @@ export default function Leads() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-yellow)] to-[var(--accent-orange)] flex items-center justify-center text-base sm:text-lg">
                 ⚠️
               </div>
-              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Em Risco</span>
+              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Em Risco</span>
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-yellow)]">{analytics.atRisk}</div>
             <div className="text-xs text-[var(--accent-yellow)] mt-1">precisam atenção</div>
@@ -357,7 +355,7 @@ export default function Leads() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-base sm:text-lg">
                 💚
               </div>
-              <span className="text-xs sm:text-sm text-[var(--text-gray)]">Health Score</span>
+              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Health Score</span>
             </div>
             <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-purple)]">{analytics.healthScore}%</div>
             <div className="text-xs text-[var(--accent-purple)] mt-1">saúde geral</div>
@@ -389,7 +387,7 @@ export default function Leads() {
               aria-label={`Visualizar em ${label}`}
             >
               <Icon className="theme-selector-icon" aria-hidden="true" />
-              <span className="hidden sm:inline text-sm font-medium ml-2">{label}</span>
+              <span className="hidden sm:inline text-[clamp(0.875rem,3vw,1.125rem)] font-medium ml-2">{label}</span>
             </motion.button>
           ))}
         </div>
@@ -399,7 +397,7 @@ export default function Leads() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={`
-            px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm sm:text-base
+            px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2 text-[clamp(0.875rem,3vw,1.125rem)]
             ${showAIPanel
               ? 'bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] text-[var(--text-white)]'
               : 'bg-[var(--accent-purple-10)] border border-[var(--accent-purple-20)] text-[var(--accent-purple)] hover:bg-[var(--accent-purple-20)]'
@@ -440,7 +438,7 @@ export default function Leads() {
                 />
               </>
             ) : (
-              <p className="text-[var(--text-gray)]" tabIndex={0}>Selecione um lead para ver atividades e rede.</p>
+              <p className="text-[var(--text-gray)] text-[clamp(0.875rem,3vw,1.125rem)]" tabIndex={0}>Selecione um lead para ver atividades e rede.</p>
             )}
           </aside>
         )}
@@ -448,12 +446,12 @@ export default function Leads() {
           {loading ? (
             <div className="flex flex-col items-center justify-center h-96">
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent-emerald)] mb-4"></div>
-              <p className="text-[var(--text-gray)]">Carregando leads...</p>
+              <p className="text-[var(--text-gray)] text-[clamp(0.875rem,3vw,1.125rem)]">Carregando leads...</p>
             </div>
           ) : filteredLeads.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl">
               <p className="text-xl sm:text-2xl text-[var(--text-gray)] mb-2">Nenhum lead encontrado</p>
-              <p className="text-sm text-[var(--text-gray-500)]">Tente ajustar os filtros ou criar um novo lead</p>
+              <p className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray-500)]">Tente ajustar os filtros ou criar um novo lead</p>
             </div>
           ) : (
             <AnimatePresence mode="wait">
@@ -505,7 +503,7 @@ export default function Leads() {
                       edges={networkData.edges}
                       centerNodeId={selectedLead.id}
                     />
-                  ) : <p className="text-[var(--text-gray)]">Selecione um lead para ver a rede.</p>}
+                  ) : <p className="text-[var(--text-gray)] text-[clamp(0.875rem,3vw,1.125rem)]">Selecione um lead para ver a rede.</p>}
                 </motion.div>
               )}
               {viewMode === 'list' && (
@@ -521,11 +519,11 @@ export default function Leads() {
                   <table className="w-full">
                     <thead className="bg-[var(--neutral-950)] border-b border-[var(--neutral-800)]">
                       <tr>
-                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Nome</th>
-                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Email</th>
-                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-[var(--text-gray)] hidden sm:table-cell">Empresa</th>
-                        <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Status</th>
-                        <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-[var(--text-gray)]">Score</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-[clamp(0.875rem,3vw,1.125rem)] font-semibold text-[var(--text-gray)]">Nome</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-[clamp(0.875rem,3vw,1.125rem)] font-semibold text-[var(--text-gray)]">Email</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-[clamp(0.875rem,3vw,1.125rem)] font-semibold text-[var(--text-gray)] hidden sm:table-cell">Empresa</th>
+                        <th className="px-4 sm:px-6 py-4 text-left text-[clamp(0.875rem,3vw,1.125rem)] font-semibold text-[var(--text-gray)]">Status</th>
+                        <th className="px-4 sm:px-6 py-4 text-center text-[clamp(0.875rem,3vw,1.125rem)] font-semibold text-[var(--text-gray)]">Score</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--neutral-800)]">
@@ -535,16 +533,16 @@ export default function Leads() {
                           onClick={() => setSelectedLead(lead)}
                           className="hover:bg-[var(--neutral-950)] cursor-pointer transition-colors"
                         >
-                          <td className="px-4 sm:px-6 py-4 text-[var(--text-white)] font-medium text-sm">{lead.nome ?? '-'}</td>
-                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm">{lead.email ?? '-'}</td>
-                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-sm hidden sm:table-cell">{lead.empresa ?? '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-[var(--text-white)] font-medium text-[clamp(0.875rem,3vw,1.125rem)]">{lead.nome ?? '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-[clamp(0.875rem,3vw,1.125rem)]">{lead.email ?? '-'}</td>
+                          <td className="px-4 sm:px-6 py-4 text-[var(--text-gray)] text-[clamp(0.875rem,3vw,1.125rem)] hidden sm:table-cell">{lead.empresa ?? '-'}</td>
                           <td className="px-4 sm:px-6 py-4">
                             <span className="px-3 py-1 bg-[var(--accent-emerald-10)] text-[var(--accent-emerald)] rounded-full text-xs font-semibold">
                               {lead.status ?? 'novo'}
                             </span>
                           </td>
                           <td className="px-4 sm:px-6 py-4 text-center">
-                            <span className="text-[var(--accent-emerald)] font-bold text-sm">{lead.score_ia ?? 0}</span>
+                            <span className="text-[var(--accent-emerald)] font-bold text-[clamp(0.875rem,3vw,1.125rem)]">{lead.score_ia ?? 0}</span>
                           </td>
                         </tr>
                       ))}
