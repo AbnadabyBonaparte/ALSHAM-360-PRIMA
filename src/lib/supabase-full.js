@@ -38,6 +38,7 @@ if (typeof createClient !== 'function') {
 if (typeof window !== 'undefined' && !window.supabase) {
   window.supabase = supabaseModule;
 }
+
 // ═══════════════════════════════════════════════════════
 // PARTE 1: CORE - Configuração Base + Autenticação
 // ═══════════════════════════════════════════════════════
@@ -52,80 +53,18 @@ if (typeof window !== 'undefined' && !window.supabase) {
 // org event dispatch, slug auto-gen, stricter pagination,
 // audit logs, validateSession returns user, batchInsert counts
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-/**
- * Instruções rápidas:
- * - Substitua o arquivo de extensão atual por este (ou mescle as mudanças).
- * - Recomenda-se criar a função SQL `alsham_is_rls_enabled(table_name text)` no DB
- * para que orgPolicyCheck retorne resultado definitivo.
- *
- * Notas de configuração (opcionais):
- * - VITE_ALSHAM_ENCRYPTION_KEY: string principal para derivação (recomendado).
- * - VITE_ALSHAM_PBKDF2_ITERATIONS: número de iterações PBKDF2 (default 150000).
- *
- * Formato do payload criptografado:
- * - payload = base64( header | iv (12 bytes) | ciphertext )
- * - header = `${ALSHAM_CRYPTO_VERSION}|` as UTF-8
- */
-// As funções supabase, response, logDebug, logError, logWarn serão definidas a partir do core
-// e usadas pelas outras partes.
+
 let supabase;
+const GLOBAL_CLIENT_KEY = '__ALSHAM_SUPABASE_CLIENT__';
+
 // Mock implementations for context where these are not yet defined.
-// The actual definitions will come from the core part logic.
 const response = (success, data, error) => ({ success, data, error });
 const logDebug = console.log;
 const logError = console.error;
 const logWarn = console.warn;
 
-// Função para obter o ID da organização ativa (padronizada)
-export async function getActiveOrganization(options = {}) {
-  const { forceRefresh = false } = options || {};
-  // FIX: Always resolve organization against cached encrypted storage before hitting Supabase
-  try {
-    const client = ensureSupabaseClient();
-    if (!forceRefresh) {
-      // FIX: Use encrypted cache for faster lookups and CSP-safe fallbacks
-      const cached = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
-      if (cached?.org_id) {
-        return cached.org_id;
-      }
-    }
-    const { data: { user } = {} } = await client.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-    const { data: activeOrg, error: activeErr } = await client
-      .from('user_organizations')
-      .select('org_id')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .maybeSingle();
-    if (activeErr) throw activeErr;
-    let orgId = activeOrg?.org_id ?? null;
-    if (!orgId) {
-      const { data: fallbackList, error: fallbackErr } = await client
-        .from('user_organizations')
-        .select('org_id')
-        .eq('user_id', user.id)
-        .order('is_active', { ascending: false })
-        .order('created_at', { ascending: true })
-        .limit(1);
-      if (fallbackErr) throw fallbackErr;
-      orgId = fallbackList?.[0]?.org_id ?? null;
-    }
-    if (orgId) {
-      // FIX: Persist resolved organization locally to avoid future null org scenarios
-      await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
-        org_id: orgId,
-        synced_at: new Date().toISOString()
-      });
-      return orgId;
-    }
-    logError('Org ID not found for active organization');
-    return null;
-  } catch (err) {
-    logWarn('getActiveOrganization falhou:', err);
-    return null;
-  }
-}
-
+// ---------------------------------------------------------------------------
+// ENV RESOLUTION
 const resolveEnvValue = (key, fallback = '') => {
   if (typeof process !== 'undefined' && process?.env?.[key]) {
     return process.env[key];
@@ -146,6 +85,8 @@ const SUPABASE_CONFIG = Object.freeze({
   anonKey: SUPABASE_ANON_KEY
 });
 
+// ---------------------------------------------------------------------------
+// SUPABASE CLIENT
 function ensureSupabaseClient() {
   if (typeof window !== 'undefined') {
     if (!window.__VITE_SUPABASE_URL__) {
@@ -164,8 +105,8 @@ function ensureSupabaseClient() {
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
       }
     });
-    if (typeof globalContainer !== 'undefined') {
-      globalContainer[GLOBAL_CLIENT_KEY] = supabase;
+    if (typeof globalThis !== 'undefined') {
+      globalThis[GLOBAL_CLIENT_KEY] = supabase;
     }
     if (typeof window !== 'undefined') {
       window.AlshamSupabase = window.AlshamSupabase || {};
@@ -188,6 +129,8 @@ export function getSupabaseClient() {
 
 export { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIG };
 
+// ---------------------------------------------------------------------------
+// SESSION
 export async function getCurrentSession() {
   try {
     const client = ensureSupabaseClient();
@@ -197,56 +140,6 @@ export async function getCurrentSession() {
   } catch (err) {
     logError('getCurrentSession failed:', err);
     throw err;
-  }
-}
-
-// FIX: Improved active organization resolution without is_active column
-export async function getActiveOrganization(options = {}) {
-  const { forceRefresh = false } = options || {};
-  
-  try {
-    const client = ensureSupabaseClient();
-    
-    // Check encrypted cache first (unless force refresh)
-    if (!forceRefresh) {
-      const cached = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
-      if (cached?.org_id) {
-        return cached.org_id;
-      }
-    }
-    
-    // Get authenticated user
-    const { data: { user } = {} } = await client.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-    
-    // FIX: Query without is_active column (does not exist in schema)
-    // Get first organization for user, ordered by creation date
-    const { data: orgList, error: orgErr } = await client
-      .from('user_organizations')
-      .select('org_id')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: true })
-      .limit(1);
-    
-    if (orgErr) throw orgErr;
-    
-    const orgId = orgList?.[0]?.org_id ?? null;
-    
-    if (orgId) {
-      // Persist to encrypted cache
-      await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
-        org_id: orgId,
-        synced_at: new Date().toISOString()
-      });
-      return orgId;
-    }
-    
-    logWarn('No organization found for user:', user.id);
-    return null;
-    
-  } catch (err) {
-    logError('getActiveOrganization failed:', err);
-    return null;
   }
 }
 
@@ -417,6 +310,63 @@ export async function ensureDeviceKey() {
 }
 
 // ---------------------------------------------------------------------------
+// ACTIVE ORGANIZATION (FIXED - REMOVED DUPLICATE AND is_active COLUMN)
+export async function getActiveOrganization(options = {}) {
+  const { forceRefresh = false } = options || {};
+  
+  try {
+    const client = ensureSupabaseClient();
+    
+    // Check encrypted cache first (unless force refresh)
+    if (!forceRefresh) {
+      const cached = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
+      if (cached?.org_id) {
+        return cached.org_id;
+      }
+    }
+    
+    // Get authenticated user
+    const { data: { user } = {} } = await client.auth.getUser();
+    if (!user) {
+      logWarn('getActiveOrganization: User not authenticated');
+      return null;
+    }
+    
+    // FIX: Query without is_active column (does not exist in schema)
+    // Get first organization for user, ordered by creation date
+    const { data: orgList, error: orgErr } = await client
+      .from('user_organizations')
+      .select('org_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true })
+      .limit(1);
+    
+    if (orgErr) {
+      logError('getActiveOrganization query failed:', orgErr);
+      return null;
+    }
+    
+    const orgId = orgList?.[0]?.org_id ?? null;
+    
+    if (orgId) {
+      // Persist to encrypted cache
+      await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
+        org_id: orgId,
+        synced_at: new Date().toISOString()
+      });
+      return orgId;
+    }
+    
+    logWarn('No organization found for user:', user.id);
+    return null;
+    
+  } catch (err) {
+    logError('getActiveOrganization failed:', err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // ORG MANAGEMENT
 function _slugify(name = '') {
   return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
@@ -464,7 +414,7 @@ export async function getUserOrganizations() {
       .from('user_organizations')
       .select('organization_id')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true});
     if (error) throw error;
     return memberships?.map((membership) => membership.organization_id).filter(Boolean) ?? [];
   } catch (err) {
@@ -517,13 +467,13 @@ export async function switchOrganization(org_id) {
     return response(false, null, err);
   }
 }
+
 // ---------------------------------------------------------------------------
 // ORG POLICY CHECK
 export async function orgPolicyCheck(table) {
   try {
     if (!table) return response(false, null, new Error('table é obrigatório'));
     const client = ensureSupabaseClient();
-    // FIX: Always query using the ensured client to honor new caching behaviour
     const { data: rpcData, error: rpcErr } = await client.rpc('alsham_is_rls_enabled', {
       table_name: table
     });
@@ -540,6 +490,7 @@ export async function orgPolicyCheck(table) {
     return response(false, null, err);
   }
 }
+
 // ---------------------------------------------------------------------------
 // CRUD GENÉRICO
 function normalizeFilters(filters) {
@@ -690,6 +641,7 @@ export async function batchInsert(table, dataArray = [], options = {}) {
     return response(false, null, err);
   }
 }
+
 // ---------------------------------------------------------------------------
 // SESSION INTEGRITY
 function _decodeJwt(token) {
