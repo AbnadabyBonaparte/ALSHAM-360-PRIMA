@@ -12,7 +12,7 @@ import PredictiveChart from '../components/leads/PredictiveChart';
 import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadActions from '../components/leads/LeadActions';
-import { createLead, getCurrentOrgId } from '../lib/supabase-full.js';
+import { createLead, getActiveOrganization } from '../lib/supabase-full.js';
 // import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
@@ -58,6 +58,7 @@ export default function Leads() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [filters, setFilters] = useState<LeadFilters>({});
+  const [organizationUnavailable, setOrganizationUnavailable] = useState(false);
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -65,6 +66,20 @@ export default function Leads() {
       console.log('📊 Leads:', leads);
     }
   }, [leads]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const orgId = await getActiveOrganization({ forceRefresh: false });
+      if (mounted) {
+        // FIX: expõe estado de autenticação/organização para feedback visual
+        setOrganizationUnavailable(!orgId);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const filteredLeads: Lead[] = useMemo(() => {
     if (!leads || leads.length === 0) return [];
@@ -245,9 +260,14 @@ export default function Leads() {
 
   const handleCreateLead = async (newLeadData: Partial<Lead>) => {
     try {
-      const orgId = await getCurrentOrgId();
+      const orgId = await getActiveOrganization();
+      if (!orgId) {
+        // FIX: Evita tentativa de criação sem escopo de organização válido
+        console.error('Organização ativa não encontrada. Abortando criação de lead.');
+        return;
+      }
       await createLead(orgId, newLeadData);
-      refetch();
+      await refetch?.();
       // toast.success('Lead criado com sucesso!'); // Se usar biblioteca de toast
       setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230); // Ajuda feedback
     } catch (err: any) {
@@ -274,6 +294,17 @@ export default function Leads() {
       tabIndex={-1}
       aria-label="Painel de Leads"
     >
+      {organizationUnavailable && (
+        <div
+          role="alert"
+          className="mb-6 rounded-xl border border-[var(--accent-alert)]/40 bg-[var(--accent-alert)]/10 p-4 text-[var(--accent-alert)]"
+        >
+          <p className="font-semibold">Não encontramos uma organização ativa.</p>
+          <p className="text-sm text-[color-mix(in srgb,var(--accent-alert) 70%,white)]">
+            Faça login novamente ou selecione uma organização válida para carregar os dados de leads.
+          </p>
+        </div>
+      )}
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1
