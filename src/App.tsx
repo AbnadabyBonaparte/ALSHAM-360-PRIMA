@@ -1095,11 +1095,13 @@ function App() {
     fetchData();
   }, [fetchData]);
 
- // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - FIXED
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - FIXED v2
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 useEffect(() => {
   console.log('🔴 Iniciando subscriptions Real-time...');
+
+  const channels: any[] = [];
 
   // Subscribe para mudanças em leads
   const leadsChannel = supabase
@@ -1113,10 +1115,12 @@ useEffect(() => {
       },
       (payload) => {
         console.log('📊 Lead atualizado:', payload);
-        fetchData(); // Re-carregar dados
+        fetchData();
       }
     )
     .subscribe();
+
+  channels.push(leadsChannel);
 
   // Subscribe para mudanças em campanhas
   const campaignsChannel = supabase
@@ -1135,6 +1139,8 @@ useEffect(() => {
     )
     .subscribe();
 
+  channels.push(campaignsChannel);
+
   // Subscribe para mudanças em gamificação
   const gamificationChannel = supabase
     .channel('gamification_changes')
@@ -1152,14 +1158,16 @@ useEffect(() => {
     )
     .subscribe();
 
+  channels.push(gamificationChannel);
+
   console.log('✅ Subscriptions Real-time iniciadas');
 
   // Cleanup ao desmontar
   return () => {
     console.log('🔴 Desconectando subscriptions...');
-    supabase.removeChannel(leadsChannel);
-    supabase.removeChannel(campaignsChannel);
-    supabase.removeChannel(gamificationChannel);
+    channels.forEach(channel => {
+      supabase.removeChannel(channel);
+    });
   };
 }, [fetchData]);
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
