@@ -30,3 +30,76 @@ export async function getLeadInteractions(leadId: string) {
 }
 
 // subscribeLeads já existe no full.js, então o re-export deve funcionar
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🔧 GENERIC SELECT - EXPORTAÇÃO OBRIGATÓRIA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const genericSelect = async (
+  table: string,
+  filters?: Record<string, any>,
+  options?: {
+    columns?: string;
+    limit?: number;
+    offset?: number;
+    orderBy?: { column: string; ascending?: boolean };
+  }
+) => {
+  try {
+    const orgId = await getCurrentOrgId();
+    if (!orgId) {
+      throw new Error('Organização não identificada');
+    }
+
+    let query = supabase
+      .from(table)
+      .select(options?.columns || '*', { count: 'exact' });
+
+    // Aplicar filtro de organização (SEMPRE)
+    query = query.eq('org_id', orgId);
+
+    // Aplicar filtros adicionais
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          query = query.eq(key, value);
+        }
+      });
+    }
+
+    // Aplicar ordenação
+    if (options?.orderBy) {
+      query = query.order(options.orderBy.column, { 
+        ascending: options.orderBy.ascending ?? true 
+      });
+    }
+
+    // Aplicar paginação
+    if (options?.limit) {
+      query = query.limit(options.limit);
+    }
+    if (options?.offset) {
+      const start = options.offset;
+      const end = start + (options.limit || 10) - 1;
+      query = query.range(start, end);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) throw error;
+
+    console.log(`✅ genericSelect: ${count} registros em ${table}`);
+
+    return { 
+      data, 
+      error: null, 
+      count 
+    };
+  } catch (error: any) {
+    console.error(`❌ Erro em genericSelect (${table}):`, error);
+    return { 
+      data: null, 
+      error, 
+      count: 0 
+    };
+  }
+};
