@@ -26,7 +26,8 @@ export default defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'supabase': ['@supabase/supabase-js'],
-          'ui-vendor': ['framer-motion', 'lucide-react']
+          'ui-vendor': ['framer-motion', 'lucide-react'],
+          'posthog': ['posthog-js'] // ✅ ADICIONADO - Isola PostHog warnings
         },
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.')
@@ -44,14 +45,23 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000,
-    assetsInlineLimit: 4096
+    assetsInlineLimit: 4096,
+    // ✅ ADICIONADO - Otimizações extras
+    target: 'esnext',
+    cssCodeSplit: true,
+    reportCompressedSize: false, // Acelera build
   },
   server: {
     port: 5173,
     strictPort: false,
     open: true,
     host: true,
-    cors: true
+    cors: true,
+    // ✅ ADICIONADO - Headers de segurança locais
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp'
+    }
   },
   preview: {
     port: 4173,
@@ -66,8 +76,14 @@ export default defineConfig({
       'react-router-dom',
       '@supabase/supabase-js',
       'framer-motion',
-      'lucide-react'
+      'lucide-react',
+      'zustand', // ✅ ADICIONADO
+      'chart.js', // ✅ ADICIONADO
+      'react-chartjs-2' // ✅ ADICIONADO
     ],
     exclude: ['@vite/client', '@vite/env']
-  }
+  },
+  // ✅ ADICIONADO - Evita warnings desnecessários
+  logLevel: 'warn',
+  clearScreen: false
 })
