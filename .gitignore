@@ -1,7 +1,6 @@
 # ========================================
 # ALSHAM 360° PRIMA - .gitignore
-# Enterprise-grade Git ignore configuration
-# @version 2.0.4
+# Version: 2.1.0 (Fixed)
 # ========================================
 
 # ==================
@@ -11,12 +10,6 @@ node_modules/
 .npm/
 .yarn/
 .pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 
 # ==================
 # BUILD OUTPUTS
@@ -28,17 +21,9 @@ build/
 vite.config.js.timestamp-*
 
 # ==================
-# TAILWIND COMPILED
-# (descomente para NÃO versionar)
-# ==================
-# css/tailwind.min.css
-
-# ==================
 # ENVIRONMENT
 # ==================
 .env
-# Versão sanitizada rastreada no repositório
-# (variáveis sensíveis devem ser mantidas fora do git)
 .env.local
 .env.*.local
 .env.development
@@ -110,18 +95,11 @@ temp/
 *.backup
 
 # ==================
-# DEPLOYMENT
+# DEPLOYMENT (apenas cache)
 # ==================
 .vercel/
 .netlify/
 .firebase/
-
-# ==================
-# SERVICE WORKER
-# ==================
-sw.js
-workbox-*.js
-*.sw.js
 
 # ==================
 # DATABASE
@@ -140,12 +118,6 @@ secrets/
 .secrets/
 
 # ==================
-# DOCUMENTATION
-# ==================
-.docusaurus/
-docs/.vitepress/cache/
-
-# ==================
 # MISC
 # ==================
 .turbo/
@@ -153,30 +125,3 @@ docs/.vitepress/cache/
 .nuxt/
 .cache/
 .parcel-cache/
-
-# ══════════════════════════════════════════════════════════════
-# ADICIONADO NA FASE 5: LIMPEZA
-# ══════════════════════════════════════════════════════════════
-
-# Legacy e arquivos temporários
-legacy/
-*.tmp
-.DS_Store
-
-# Builds locais
-.vercel/
-
-# IDEs
-.vscode/
-.idea/
-
-# Arquivos de sistema
-Thumbs.db
-*.swp
-
-# Logs
-*.log
-npm-debug.log*
-
-# Arquivos temporários do projeto
-docs/archive/
