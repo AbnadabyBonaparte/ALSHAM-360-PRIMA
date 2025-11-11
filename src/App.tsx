@@ -1096,80 +1096,92 @@ function App() {
   }, [fetchData]);
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - FIXED v2
+// ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - FIXED v3
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 useEffect(() => {
-  console.log('🔴 Iniciando subscriptions Real-time...');
-
+  let mounted = true;
   const channels: any[] = [];
 
-  // Subscribe para mudanças em leads
-  const leadsChannel = supabase
-    .channel('leads_changes')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'leads_crm'
-      },
-      (payload) => {
-        console.log('📊 Lead atualizado:', payload);
-        fetchData();
-      }
-    )
-    .subscribe();
+  const setupSubscriptions = async () => {
+    console.log('🔴 Iniciando subscriptions Real-time...');
 
-  channels.push(leadsChannel);
+    // Subscribe para mudanças em leads
+    const leadsChannel = supabase
+      .channel('leads_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leads_crm'
+        },
+        (payload) => {
+          if (mounted) {
+            console.log('📊 Lead atualizado:', payload);
+            fetchData();
+          }
+        }
+      )
+      .subscribe();
 
-  // Subscribe para mudanças em campanhas
-  const campaignsChannel = supabase
-    .channel('campaigns_changes')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'marketing_campaigns'
-      },
-      (payload) => {
-        console.log('🚀 Campanha atualizada:', payload);
-        fetchData();
-      }
-    )
-    .subscribe();
+    channels.push(leadsChannel);
 
-  channels.push(campaignsChannel);
+    // Subscribe para mudanças em campanhas
+    const campaignsChannel = supabase
+      .channel('campaigns_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'marketing_campaigns'
+        },
+        (payload) => {
+          if (mounted) {
+            console.log('🚀 Campanha atualizada:', payload);
+            fetchData();
+          }
+        }
+      )
+      .subscribe();
 
-  // Subscribe para mudanças em gamificação
-  const gamificationChannel = supabase
-    .channel('gamification_changes')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'gamification_points'
-      },
-      (payload) => {
-        console.log('🏆 Pontuação atualizada:', payload);
-        fetchData();
-      }
-    )
-    .subscribe();
+    channels.push(campaignsChannel);
 
-  channels.push(gamificationChannel);
+    // Subscribe para mudanças em gamificação
+    const gamificationChannel = supabase
+      .channel('gamification_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'gamification_points'
+        },
+        (payload) => {
+          if (mounted) {
+            console.log('🏆 Pontuação atualizada:', payload);
+            fetchData();
+          }
+        }
+      )
+      .subscribe();
 
-  console.log('✅ Subscriptions Real-time iniciadas');
+    channels.push(gamificationChannel);
+
+    console.log('✅ Subscriptions Real-time iniciadas');
+  };
+
+  setupSubscriptions();
 
   // Cleanup ao desmontar
   return () => {
+    mounted = false;
     console.log('🔴 Desconectando subscriptions...');
     channels.forEach(channel => {
       supabase.removeChannel(channel);
     });
   };
-}, [fetchData]);
+}, []); // ⚠️ IMPORTANTE: array vazio - executar só uma vez
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🔚 FIM DA INTEGRAÇÃO REAL-TIME
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
