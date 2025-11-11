@@ -346,14 +346,12 @@ export async function createOrganization(orgData = {}) {
     const user = (await supabase.auth.getUser()).data?.user;
     if (!user) return response(false, null, new Error('Usuário não autenticado'));
     if (!orgData.slug && orgData.name) orgData.slug = _slugify(orgData.name);
-
     const { data: orgInsert, error: orgErr } = await supabase
       .from('organizations')
       .insert([orgData])
       .select()
       .maybeSingle();
     if (orgErr) return response(false, null, orgErr);
-
     const rel = {
       user_id: user.id,
       organization_id: orgInsert.id,
@@ -369,7 +367,6 @@ export async function createOrganization(orgData = {}) {
       await supabase.from('organizations').delete().eq('id', orgInsert.id);
       return response(false, null, relErr);
     }
-
     logDebug('[AUDIT]', { action: 'createOrganization', org_id: orgInsert.id, user_id: user.id });
     await switchOrganization(orgInsert.id);
     return response(true, { organization: orgInsert, membership: relInsert });
@@ -378,19 +375,16 @@ export async function createOrganization(orgData = {}) {
     return response(false, null, err);
   }
 }
-
 export async function getUserOrganizations() {
   try {
     const { data } = await supabase.auth.getUser();
     const user = data?.user;
     if (!user) return [];
-
     const { data: memberships, error } = await supabase
       .from('user_organizations')
       .select('organization_id')
       .eq('user_id', user.id)
       .order('created_at', { ascending: true });
-
     if (error) throw error;
     return memberships?.map((membership) => membership.organization_id).filter(Boolean) ?? [];
   } catch (err) {
@@ -398,87 +392,25 @@ export async function getUserOrganizations() {
     return [];
   }
 }
-
 export async function setCurrentOrgId(orgId) {
   try {
     if (!orgId) {
       removeItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
       return null;
     }
-
     await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
       org_id: orgId,
       switched_at: new Date().toISOString()
     });
-
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('orgSwitched', { detail: orgId }));
     }
-
     return orgId;
   } catch (err) {
     logError('setCurrentOrgId exception:', err);
     return null;
   }
 }
-
-export async function getCurrentOrgId() {
-  try {
-    const cached = await getActiveOrganization();
-    if (cached) return cached;
-
-    const orgs = await getUserOrganizations();
-    const firstOrg = orgs[0] ?? null;
-
-    if (firstOrg) {
-      await setCurrentOrgId(firstOrg);
-    }
-
-    return firstOrg;
-  } catch (err) {
-    logWarn('getCurrentOrgId fallback:', err);
-    return null;
-  }
-}
-
-export async function switchOrganization(org_id) {
-  try {
-    if (!org_id) return response(false, null, new Error('org_id é obrigatório'));
-    const user = (await supabase.auth.getUser()).data?.user;
-    if (!user) return response(false, null, new Error('Usuário não autenticado'));
-
-    const { data: membership, error } = await supabase
-      .from('user_organizations')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('organization_id', org_id)
-      .maybeSingle();
-    if (error) return response(false, null, error);
-    if (!membership) return response(false, null, new Error('Usuário não pertence à organização'));
-
-    await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
-      org_id,
-      switched_at: new Date().toISOString()
-    });
-    logDebug('[AUDIT]', { action: 'switchOrganization', org_id, user_id: user.id });
-    if (typeof window !== 'undefined')
-      window.dispatchEvent(new CustomEvent('orgSwitched', { detail: org_id }));
-    return response(true, { org_id });
-  } catch (err) {
-    logError('switchOrganization exception:', err);
-    return response(false, null, err);
-  }
-}
-export async function getActiveOrganization() {
-  try {
-    const payload = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
-    return payload?.org_id ?? null;
-  } catch (err) {
-    logWarn('getActiveOrganization falhou:', err);
-    return null;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // ORG POLICY CHECK
 export async function orgPolicyCheck(table) {
@@ -500,35 +432,6 @@ export async function orgPolicyCheck(table) {
     return response(false, null, err);
   }
 }
-
-// ---------------------------------------------------------------------------
-// SWITCH ORGANIZATION (mantida, usa funções padronizadas do topo)
-export async function switchOrganization(org_id) {
-  try {
-    if (!org_id) return response(false, null, new Error('org_id é obrigatório'));
-    const user = (await supabase.auth.getUser()).data?.user;
-    if (!user) return response(false, null, new Error('Usuário não autenticado'));
-    const { data: membership, error } = await supabase
-      .from('user_organizations')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('organization_id', org_id)
-      .maybeSingle();
-    if (error) return response(false, null, error);
-    if (!membership) return response(false, null, new Error('Usuário não pertence à organização'));
-    await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
-      org_id,
-      switched_at: new Date().toISOString()
-    });
-    logDebug('[AUDIT]', { action: 'switchOrganization', org_id, user_id: user.id });
-    if (typeof window !== 'undefined')
-      window.dispatchEvent(new CustomEvent('orgSwitched', { detail: org_id }));
-    return response(true, { org_id });
-  } catch (err) {
-    logError('switchOrganization exception:', err);
-    return response(false, null, err);
-  }
-}
 // ---------------------------------------------------------------------------
 // CRUD GENÉRICO
 function normalizeFilters(filters) {
@@ -540,7 +443,6 @@ function normalizeFilters(filters) {
   }
   return [];
 }
-
 function _applyFilters(qb, filters = []) {
   const normalized = normalizeFilters(filters);
   for (const f of normalized) {
@@ -550,7 +452,6 @@ function _applyFilters(qb, filters = []) {
   }
   return qb;
 }
-
 export async function genericSelect(table, filters = [], options = {}) {
   try {
     if (!table) throw new Error('table é obrigatório');
@@ -573,7 +474,6 @@ export async function genericSelect(table, filters = [], options = {}) {
     return { data: null, error: err };
   }
 }
-
 export async function genericInsert(table, payload, orgId) {
   try {
     if (!table || !payload) throw new Error('table e data são obrigatórios');
@@ -585,7 +485,6 @@ export async function genericInsert(table, payload, orgId) {
       }
       return record;
     });
-
     const { data, error } = await client.from(table).insert(Array.isArray(payload) ? enriched : enriched[0]).select();
     if (error) {
       return { success: false, error: { message: error.message, context: `insert:${table}` } };
@@ -626,18 +525,15 @@ export async function genericDelete(table, filters = []) {
     return response(false, null, err);
   }
 }
-
 export async function createAuditLog(action, details = {}, userId, orgId) {
   try {
     const client = ensureSupabaseClient();
     let effectiveUserId = userId;
     let effectiveOrgId = orgId;
-
     if (!effectiveUserId || !effectiveOrgId) {
       const { data: sessionData } = (await client.auth?.getSession?.()) ?? { data: null };
       const sessionUser = sessionData?.session?.user;
       effectiveUserId = effectiveUserId || sessionUser?.id || sessionUser?.user?.id || null;
-
       if (!effectiveOrgId && sessionUser?.id) {
         const { data: profileData } = await client
           .from('user_profiles')
@@ -645,13 +541,11 @@ export async function createAuditLog(action, details = {}, userId, orgId) {
           .eq('user_id', sessionUser.id)
           .limit(1)
           .maybeSingle();
-
         if (profileData?.org_id) {
           effectiveOrgId = profileData.org_id;
         }
       }
     }
-
     const payload = {
       action,
       details,
@@ -659,20 +553,16 @@ export async function createAuditLog(action, details = {}, userId, orgId) {
       org_id: effectiveOrgId,
       created_at: new Date().toISOString()
     };
-
     const { data, error } = await client.from('audit_log').insert(payload).select();
-
     if (error) {
       return { success: false, error: { message: error.message, context: 'auditLog' } };
     }
-
     return { success: true, data };
   } catch (err) {
     logError('createAuditLog exception:', err);
     return { success: false, error: err };
   }
 }
-
 export async function batchInsert(table, dataArray = [], options = {}) {
   try {
     if (!table || !Array.isArray(dataArray) || !dataArray.length)
@@ -692,7 +582,6 @@ export async function batchInsert(table, dataArray = [], options = {}) {
     return response(false, null, err);
   }
 }
-
 // ---------------------------------------------------------------------------
 // SESSION INTEGRITY
 function _decodeJwt(token) {
