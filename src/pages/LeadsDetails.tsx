@@ -1,13 +1,14 @@
 // src/pages/LeadsDetails.tsx
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  getLead, 
-  updateLead, 
+import {
+  getLead,
+  updateLead,
   deleteLead,
-  subscribeLeads, 
+  subscribeLeads,
   getLeadInteractions,
-  createAuditLog 
+  createAuditLog,
+  getActiveOrganization
 } from "../lib/supabase";
 import { 
   Loader2, 
@@ -78,15 +79,32 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedLead, setEditedLead] = useState<Partial<Lead>>({});
   const [saving, setSaving] = useState(false);
+  const [organizationUnavailable, setOrganizationUnavailable] = useState(false);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 📡 FETCH INICIAL
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
+    let mounted = true;
     const fetchLead = async () => {
       try {
+        if (!leadId) {
+          throw new Error('Identificador de lead inválido');
+        }
         setLoading(true);
         setError(null);
+
+        const orgId = await getActiveOrganization();
+        if (!orgId) {
+          if (mounted) {
+            // FIX: Espelha indisponibilidade de organização para feedback do usuário
+            setOrganizationUnavailable(true);
+          }
+          throw new Error('Organização ativa não encontrada');
+        }
+        if (mounted) {
+          setOrganizationUnavailable(false);
+        }
 
         const [leadResult, interactionsResult] = await Promise.all([
           getLead(leadId),
@@ -96,40 +114,44 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
         if (leadResult.error) throw new Error(leadResult.error.message);
         if (interactionsResult.error) throw new Error(interactionsResult.error.message);
 
-        setLead(leadResult.data);
-        setInteractions(interactionsResult.data || []);
-        setEditedLead(leadResult.data);
+        if (mounted) {
+          setLead(leadResult.data);
+          setInteractions(interactionsResult.data || []);
+          setEditedLead(leadResult.data);
+        }
 
-        // Audit log
         await createAuditLog({
           action: 'lead_viewed',
           table_name: 'leads_crm',
           record_id: leadId,
           changes: { viewed_at: new Date().toISOString() }
         });
-
       } catch (err: any) {
         console.error('❌ Erro ao carregar lead:', err);
-        setError(err.message || 'Erro desconhecido');
+        if (mounted) {
+          setError(err.message || 'Erro desconhecido');
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchLead();
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // 🔴 REALTIME SUBSCRIPTION
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     const unsubscribe = subscribeLeads((payload) => {
       if (payload.new?.id === leadId) {
         console.log('📊 Lead atualizado via realtime:', payload.new);
-        setLead(payload.new as Lead);
-        setEditedLead(payload.new as Lead);
+        if (mounted) {
+          setLead(payload.new as Lead);
+          setEditedLead(payload.new as Lead);
+        }
       }
     });
 
     return () => {
+      mounted = false;
       unsubscribe?.();
     };
   }, [leadId]);
@@ -187,6 +209,15 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
     }
   }, [lead, leadId, editedLead]);
 
+  const handleBack = useCallback(() => {
+    if (onBack) {
+      onBack();
+      return;
+    }
+    // FIX: fallback para navegação quando onBack não é fornecido
+    window.history.back();
+  }, [onBack]);
+
   const handleDelete = useCallback(async () => {
     if (!confirm('Tem certeza que deseja excluir este lead?')) return;
 
@@ -195,7 +226,7 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
       if (deleteError) throw deleteError;
 
       alert('Lead excluído com sucesso!');
-      onBack?.();
+      handleBack();
     } catch (err: any) {
       console.error('❌ Erro ao deletar:', err);
       alert(`Erro ao deletar: ${err.message}`);
@@ -209,6 +240,16 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
     return (
       <div className="flex justify-center items-center h-screen bg-[var(--bg-dark)]">
         <Loader2 className="animate-spin h-12 w-12 text-[var(--accent-emerald)]" />
+      </div>
+    );
+  }
+
+  if (organizationUnavailable) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen bg-[var(--bg-dark)] text-white px-6 text-center">
+        <AlertCircle className="h-16 w-16 text-[var(--accent-alert)] mb-4" />
+        <p className="text-xl font-semibold">Nenhuma organização ativa encontrada</p>
+        <p className="mt-2 max-w-md text-sm text-white/70">Faça login novamente ou selecione uma organização válida para visualizar os detalhes do lead.</p>
       </div>
     );
   }

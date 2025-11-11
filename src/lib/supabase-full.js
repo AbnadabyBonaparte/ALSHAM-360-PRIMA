@@ -77,31 +77,53 @@ const logError = console.error;
 const logWarn = console.warn;
 
 // Função para obter o ID da organização ativa (padronizada)
-export async function getActiveOrganization() {
+export async function getActiveOrganization(options = {}) {
+  const { forceRefresh = false } = options || {};
+  // FIX: Always resolve organization against cached encrypted storage before hitting Supabase
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const client = ensureSupabaseClient();
+    if (!forceRefresh) {
+      // FIX: Use encrypted cache for faster lookups and CSP-safe fallbacks
+      const cached = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
+      if (cached?.org_id) {
+        return cached.org_id;
+      }
+    }
+    const { data: { user } = {} } = await client.auth.getUser();
     if (!user) throw new Error('User not authenticated');
-    const { data, error } = await supabase
+    const { data: activeOrg, error: activeErr } = await client
       .from('user_organizations')
       .select('org_id')
       .eq('user_id', user.id)
       .eq('is_active', true)
-      .single();
-    if (error) throw error;
-    if (!data.org_id) {
-      logError('Org ID not found for active organization');
-      throw new Error('No active organization found');
+      .maybeSingle();
+    if (activeErr) throw activeErr;
+    let orgId = activeOrg?.org_id ?? null;
+    if (!orgId) {
+      const { data: fallbackList, error: fallbackErr } = await client
+        .from('user_organizations')
+        .select('org_id')
+        .eq('user_id', user.id)
+        .order('is_active', { ascending: false })
+        .order('created_at', { ascending: true })
+        .limit(1);
+      if (fallbackErr) throw fallbackErr;
+      orgId = fallbackList?.[0]?.org_id ?? null;
     }
-    return data.org_id;
+    if (orgId) {
+      // FIX: Persist resolved organization locally to avoid future null org scenarios
+      await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
+        org_id: orgId,
+        synced_at: new Date().toISOString()
+      });
+      return orgId;
+    }
+    logError('Org ID not found for active organization');
+    return null;
   } catch (err) {
     logWarn('getActiveOrganization falhou:', err);
     return null;
   }
-}
-
-// Alias para compatibilidade retroativa com chamadas antigas de getCurrentOrgId
-export async function getCurrentOrgId() {
-  return await getActiveOrganization();
 }
 
 const resolveEnvValue = (key, fallback = '') => {
@@ -442,7 +464,9 @@ export async function switchOrganization(org_id) {
 export async function orgPolicyCheck(table) {
   try {
     if (!table) return response(false, null, new Error('table é obrigatório'));
-    const { data: rpcData, error: rpcErr } = await supabase.rpc('alsham_is_rls_enabled', {
+    const client = ensureSupabaseClient();
+    // FIX: Always query using the ensured client to honor new caching behaviour
+    const { data: rpcData, error: rpcErr } = await client.rpc('alsham_is_rls_enabled', {
       table_name: table
     });
     if (!rpcErr && rpcData) {
@@ -662,7 +686,7 @@ export async function validateSessionIntegrity(options = { signOutIfInvalid: tru
  *
  * DEPENDENCIES:
  * - Parte 1 (core) exports: supabase, response, logDebug, logError, logWarn,
- * getCurrentOrgId, genericSelect, genericInsert, genericUpdate, genericDelete
+ * getActiveOrganization, genericSelect, genericInsert, genericUpdate, genericDelete
  *
  * ENVIRONMENT VARIABLES REQUIRED:
  * - VITE_SUPABASE_URL
@@ -724,7 +748,7 @@ function _applyListOptions(qb, { filters = {}, limit, offset, order } = {}) {
 }
 async function _insertAudit(action, resource_type, resource_id, payload = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     await supabase.from('system_audit_log').insert([{
       level: 'info',
       action,
@@ -809,7 +833,7 @@ export async function createLead(leadData = {}) {
     }
 
     await _checkRLS('leads_crm');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     if (!org_id) return response(false, null, new Error('Org não encontrada'));
     const payload = {
       ...leadData,
@@ -851,7 +875,7 @@ export async function createLead(leadData = {}) {
 }
 export async function getLeads(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const filters = { ...(options.filters || {}) };
     if (org_id) filters.org_id = org_id;
     // Try genericSelect if available
@@ -882,7 +906,7 @@ export async function getLeads(options = {}) {
 export async function getLeadById(id) {
   try {
     if (!id) return response(false, null, new Error('id é obrigatório'));
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('leads_crm').select('*').eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -903,7 +927,7 @@ export async function updateLead(id, updateData = {}) {
       return response(false, null, new Error('updateData é obrigatório'));
     }
     await _checkRLS('leads_crm');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('leads_crm')
@@ -935,7 +959,7 @@ export async function archiveLead(id) {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
     await _checkRLS('leads_crm');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('leads_crm')
@@ -962,7 +986,7 @@ export async function deleteLead(id) {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
     await _checkRLS('leads_crm');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('leads_crm').delete().eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -987,7 +1011,7 @@ export async function createLeadInteraction(leadId, type = 'note', content = '',
   try {
     if (!leadId) return response(false, null, new Error('leadId é obrigatório'));
     if (!content) return response(false, null, new Error('content é obrigatório'));
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = {
       lead_id: leadId,
       org_id,
@@ -1022,7 +1046,7 @@ export async function createLeadInteraction(leadId, type = 'note', content = '',
 export async function getLeadInteractions(leadId, options = {}) {
   try {
     if (!leadId) return response(false, null, new Error('leadId é obrigatório'));
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     let qb = supabase
       .from('lead_interactions')
       .select('*', { count: 'exact' })
@@ -1049,7 +1073,7 @@ export async function createLeadLabel(labelData = {}) {
       return response(false, null, new Error('labelData.name é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = {
       ...labelData,
       org_id,
@@ -1074,7 +1098,7 @@ export async function createLeadLabel(labelData = {}) {
 }
 export async function getLeadLabels(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('lead_labels').select('*', { count: 'exact' });
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1095,7 +1119,7 @@ export async function addLabelToLead(leadId, labelId) {
       return response(false, null, new Error('leadId e labelId são obrigatórios'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const { data, error } = await supabase
       .from('lead_label_links')
       .insert([{ lead_id: leadId, label_id: labelId, org_id }])
@@ -1117,7 +1141,7 @@ export async function removeLabelFromLead(leadId, labelId) {
       return response(false, null, new Error('leadId e labelId são obrigatórios'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const { error } = await supabase
       .from('lead_label_links')
       .delete()
@@ -1181,7 +1205,7 @@ export async function updateLeadScore(leadId, options = { force: true }) {
 }
 export async function getTopLeadsByScore(limit = 10) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('lead_scoring')
@@ -1209,7 +1233,7 @@ export async function assignLeadToUser(leadId, userId) {
       return response(false, null, new Error('leadId e userId são obrigatórios'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('leads_crm')
@@ -1239,7 +1263,7 @@ export async function mergeLeads(primaryId, duplicateId, options = { strategy: '
     if (primaryId === duplicateId) {
       return response(false, null, new Error('IDs devem ser distintos'));
     }
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     // Try server RPC first
     try {
@@ -1339,7 +1363,7 @@ export async function createContact(contactData = {}) {
     }
 
     await _checkRLS('contacts');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     if (!org_id) return response(false, null, new Error('Org não encontrada'));
 
     const payload = {
@@ -1369,7 +1393,7 @@ export async function createContact(contactData = {}) {
 }
 export async function getContacts(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('contacts').select('*', { count: 'exact' });
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1387,7 +1411,7 @@ export async function getContacts(options = {}) {
 export async function getContactById(id) {
   try {
     if (!id) return response(false, null, new Error('id é obrigatório'));
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('contacts').select('*').eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1409,7 +1433,7 @@ export async function updateContact(id, updateData = {}) {
     }
 
     await _checkRLS('contacts');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('contacts')
@@ -1435,7 +1459,7 @@ export async function deleteContact(id) {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
     await _checkRLS('contacts');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('contacts').delete().eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1468,7 +1492,7 @@ export async function createAccount(accountData = {}) {
       return response(false, null, new Error('accountData é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = {
       ...accountData,
       org_id,
@@ -1496,7 +1520,7 @@ export async function createAccount(accountData = {}) {
 }
 export async function getAccounts(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('accounts').select('*', { count: 'exact' });
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1518,7 +1542,7 @@ export async function updateAccount(id, updateData = {}) {
       return response(false, null, new Error('updateData é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('accounts')
@@ -1543,7 +1567,7 @@ export async function deleteAccount(id) {
   try {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('accounts').delete().eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1576,7 +1600,7 @@ export async function createOpportunity(opportunityData = {}) {
       return response(false, null, new Error('opportunityData é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = {
       ...opportunityData,
       org_id,
@@ -1604,7 +1628,7 @@ export async function createOpportunity(opportunityData = {}) {
 }
 export async function getOpportunities(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('sales_opportunities').select('*', { count: 'exact' });
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1623,7 +1647,7 @@ export async function getOpportunitiesByStage(stage, options = {}) {
   try {
     if (!stage) return response(false, null, new Error('stage é obrigatório'));
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('sales_opportunities')
@@ -1649,7 +1673,7 @@ export async function updateOpportunity(id, updateData = {}) {
       return response(false, null, new Error('updateData é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('sales_opportunities')
@@ -1674,7 +1698,7 @@ export async function deleteOpportunity(id) {
   try {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('sales_opportunities').delete().eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1693,7 +1717,7 @@ export async function deleteOpportunity(id) {
 }
 export async function getPipelineStages(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('pipeline_stages').select('*', { count: 'exact' });
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1714,7 +1738,7 @@ export async function createPipelineStage(stageData = {}) {
       return response(false, null, new Error('stageData é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = {
       ...stageData,
       org_id,
@@ -1744,7 +1768,7 @@ export async function updatePipelineStage(id, updateData = {}) {
       return response(false, null, new Error('updateData é obrigatório'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('pipeline_stages')
@@ -1769,7 +1793,7 @@ export async function moveDealToStage(dealId, stageId) {
       return response(false, null, new Error('dealId e stageId são obrigatórios'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('sales_opportunities')
@@ -1801,7 +1825,7 @@ export async function createTask(taskData = {}) {
     }
 
     await _checkRLS('tasks');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = {
       ...taskData,
       org_id,
@@ -1829,7 +1853,7 @@ export async function createTask(taskData = {}) {
 }
 export async function getTasks(options = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('tasks').select('*', { count: 'exact' });
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1852,7 +1876,7 @@ export async function updateTask(id, updateData = {}) {
     }
 
     await _checkRLS('tasks');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('tasks')
@@ -1878,7 +1902,7 @@ export async function completeTask(id) {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
     await _checkRLS('tasks');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase
       .from('tasks')
@@ -1909,7 +1933,7 @@ export async function deleteTask(id) {
     if (!id) return response(false, null, new Error('id é obrigatório'));
 
     await _checkRLS('tasks');
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('tasks').delete().eq('id', id);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1935,7 +1959,7 @@ export async function uploadTaskAttachment(taskId, file, meta = {}) {
       return response(false, null, new Error('taskId e file são obrigatórios'));
     }
 
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const bucket = meta.bucket || `alsham-org-${org_id}-${STORAGE_BUCKET}`;
     const filename = `${taskId}/${Date.now()}-${file.name}`;
 
@@ -1980,7 +2004,7 @@ export async function uploadTaskAttachment(taskId, file, meta = {}) {
 export async function getTaskAttachments(taskId) {
   try {
     if (!taskId) return response(false, null, new Error('taskId é obrigatório'));
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     let qb = supabase.from('task_attachments').select('*').eq('task_id', taskId);
     if (org_id) qb = qb.eq('org_id', org_id);
@@ -1998,7 +2022,7 @@ export async function getTaskAttachments(taskId) {
 export async function deleteTaskAttachment(id) {
   try {
     if (!id) return response(false, null, new Error('id é obrigatório'));
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
 
     const { data: attachment, error: fetchErr } = await supabase
       .from('task_attachments')
@@ -2032,7 +2056,7 @@ export async function deleteTaskAttachment(id) {
 
 export async function createQuote(quoteData = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = { ...quoteData, org_id, created_at: _timestamp(), updated_at: _timestamp() };
 
     const { data, error } = await supabase.from('quotes').insert([payload]).select().single();
@@ -2051,7 +2075,7 @@ export async function createQuote(quoteData = {}) {
 
 export async function updateQuote(id, updateData = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const { data, error } = await supabase
       .from('quotes')
       .update({ ...updateData, updated_at: _timestamp() })
@@ -2072,7 +2096,7 @@ export async function updateQuote(id, updateData = {}) {
 
 export async function createInvoice(invoiceData = {}) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const payload = { ...invoiceData, org_id, created_at: _timestamp(), updated_at: _timestamp() };
 
     const { data, error } = await supabase.from('invoices').insert([payload]).select().single();
@@ -2091,7 +2115,7 @@ export async function createInvoice(invoiceData = {}) {
 
 export async function markInvoiceAsPaid(id) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const { data, error } = await supabase
       .from('invoices')
       .update({ paid: true, paid_at: _timestamp(), updated_at: _timestamp() })
@@ -2352,7 +2376,7 @@ export async function createInference(inferenceData) {
       return response(false, null, { message: 'Dados de inferência inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(inferenceData);
     
     const dataToInsert = {
@@ -2546,7 +2570,7 @@ export async function createPrediction(predictionData) {
       return response(false, null, { message: 'Confiança deve estar entre 0 e 1' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(predictionData);
     
     const dataToInsert = {
@@ -2728,7 +2752,7 @@ export async function createRecommendation(recommendationData) {
       return response(false, null, { message: 'Dados de recomendação inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(recommendationData);
     
     // Definir prioridade baseada em confiança se não fornecida
@@ -2957,7 +2981,7 @@ export async function createAIFunction(functionData) {
       return response(false, null, { message: 'Dados de função inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(functionData);
     
@@ -3134,7 +3158,7 @@ export async function createAIMemory(memoryData) {
       return response(false, null, { message: 'Dados de memória inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(memoryData);
     
     const dataToInsert = {
@@ -3275,7 +3299,7 @@ export async function createEthicsAudit(auditData) {
       return response(false, null, { message: 'Dados de auditoria inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(auditData);
     
@@ -3375,7 +3399,7 @@ export async function createCollectiveMemory(memoryData) {
       return response(false, null, { message: 'Dados de memória coletiva inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(memoryData);
     
     const dataToInsert = {
@@ -3446,7 +3470,7 @@ export async function getCollectiveMemory(filters = {}) {
  */
 export async function updateConsciousnessState(stateData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(stateData);
     
     const dataToUpsert = {
@@ -3646,7 +3670,7 @@ export async function createNextBestAction(actionData) {
       return response(false, null, { message: 'Dados de ação inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(actionData);
     
     const dataToInsert = {
@@ -3718,7 +3742,7 @@ export async function getNextBestActions(filters = {}) {
 async function _auditCriticalOperation(operationType, operationData) {
   try {
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     await supabase.from('system_audit_log').insert([{
       org_id,
@@ -3774,7 +3798,7 @@ logDebug('━━━━━━━━━━━━━━━━━━━━━━━�
  */
 export async function createNotification(notificationData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('notifications')
@@ -3970,7 +3994,7 @@ export function subscribeNotifications(onChange) {
  */
 export async function createTicket(ticketData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     
     const { data, error } = await supabase
@@ -4335,7 +4359,7 @@ export function subscribeMessages(conversationId, onMessage) {
  */
 export async function createEmailTemplate(templateData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('email_templates')
@@ -4603,7 +4627,7 @@ export async function analyzeSentiment(text, context = 'general') {
  */
 export async function createSentimentAnalysis(sentimentData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('sentiment_analysis')
@@ -4688,7 +4712,7 @@ export async function getSentimentAnalysisLogs(limit = 100) {
  */
 export async function createCampaign(campaignData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('campaigns')
@@ -4820,7 +4844,7 @@ export function subscribeCampaigns(onChange) {
  */
 export async function createLandingPage(pageData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('landing_pages')
@@ -4926,7 +4950,7 @@ export async function deleteLandingPage(id) {
  */
 export async function createSEO(seoData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('seo')
@@ -5008,7 +5032,7 @@ export async function updateSEO(id, updateData) {
  */
 export async function createSocialMediaPost(postData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('social_media')
@@ -5120,7 +5144,7 @@ export async function deleteSocialMediaPost(id) {
  */
 export async function createAd(adData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('ads_manager')
@@ -5232,7 +5256,7 @@ export async function deleteAd(id) {
  */
 export async function createContent(contentData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     const { data, error } = await supabase
       .from('content_library')
@@ -5440,7 +5464,7 @@ function invalidateCache(pattern) {
 async function auditAnalyticsEvent(eventType, entityType, entityId, metadata = {}) {
   try {
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     
     await supabase.from('analytics_audit').insert([{
       org_id,
@@ -5716,7 +5740,7 @@ export async function createKPI(kpiData) {
       return response(false, null, { message: 'Dados de KPI inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(kpiData);
     
@@ -5925,7 +5949,7 @@ export async function createDashboardLayout(layoutData) {
       return response(false, null, { message: 'Dados de layout inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(layoutData);
     
@@ -6033,7 +6057,7 @@ export async function createDashboardSnapshot(snapshotData) {
       return response(false, null, { message: 'Dados de snapshot inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(snapshotData);
     
@@ -6100,7 +6124,7 @@ export async function saveDashboard(dashboardData) {
       return response(false, null, { message: 'Dados de dashboard inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(dashboardData);
     
@@ -6236,7 +6260,7 @@ export async function createForecast(forecastData) {
       return response(false, null, { message: 'Dados de previsão inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(forecastData);
     
@@ -6410,7 +6434,7 @@ export async function createFunnelStage(stageData) {
       return response(false, null, { message: 'Dados de estágio inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const sanitized = sanitizeInput(stageData);
     
     const dataToInsert = {
@@ -6506,7 +6530,7 @@ export async function createROICalculation(roiData) {
       return response(false, null, { message: 'Dados de ROI inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(roiData);
     
@@ -6665,7 +6689,7 @@ export async function createPerformanceMetric(metricData) {
       return response(false, null, { message: 'Dados de métrica inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(metricData);
     
@@ -6778,7 +6802,7 @@ export async function trackAnalyticsEvent(eventData) {
       return response(false, null, { message: 'Dados de evento inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(eventData);
     
@@ -6864,7 +6888,7 @@ export async function createReportDefinition(reportData) {
       return response(false, null, { message: 'Dados de relatório inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(reportData);
     
@@ -7005,7 +7029,7 @@ export async function createReportExecution(executionData) {
       return response(false, null, { message: 'Dados de execução inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(executionData);
     
@@ -7098,7 +7122,7 @@ export async function createScheduledReport(scheduleData) {
       return response(false, null, { message: 'Dados de agendamento inválidos' });
     }
     
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user; // Simplified from getCurrentUser
     const sanitized = sanitizeInput(scheduleData);
     
@@ -7235,7 +7259,7 @@ async function withRetry(fn, retries = 3, delay = 500) {
  */
 export async function auditGamificationEvent(eventType, eventData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user_id = (eventData?.user_id) || (await supabase.auth.getUser()).data.user; // Simplified
     await supabase
       .from('gamification_audit')
@@ -7258,7 +7282,7 @@ export async function auditGamificationEvent(eventType, eventData) {
 
 export async function addPoints(userId, points, reason, metadata = {}) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('gamification_points')
@@ -7281,7 +7305,7 @@ export async function addPoints(userId, points, reason, metadata = {}) {
 
 export async function removePoints(userId, points, reason) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('gamification_points')
@@ -7348,7 +7372,7 @@ export function subscribePoints(onChange) {
 
 export async function unlockBadge(userId, badgeId, metadata = {}) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('gamification_badges')
@@ -7455,7 +7479,7 @@ export async function getUserRank(userId) {
 
 export async function updateLeaderboardScore(userId, score) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('team_leaderboards')
@@ -7494,7 +7518,7 @@ export function subscribeLeaderboard(onChange) {
 
 export async function createReward(rewardData) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('gamification_rewards')
@@ -7587,7 +7611,7 @@ export function subscribeRewards(onChange) {
 
 export async function createRankSnapshot(rankData) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('gamification_rank_history')
@@ -7634,7 +7658,7 @@ export function subscribeRankHistory(onChange) {
 
 export async function createGamificationBackup(backupData) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('gamification_backups')
@@ -7800,7 +7824,7 @@ logDebug('✅ ALSHAM Gamificação v6.4-GRAAL-COMPLIANT+ carregado');
 
 export async function auditCollaborationEvent(eventType, eventData) {
   try {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user_id = (eventData?.user_id) || ((await supabase.auth.getUser()).data.user)?.id;
     await supabase
       .from('collaboration_audit')
@@ -7823,7 +7847,7 @@ export async function auditCollaborationEvent(eventType, eventData) {
 
 export async function logTeamActivity(activityData) {
   return await withRetry(async () => {
-    const org_id = await getActiveOrganization(); // Changed from getCurrentOrgId
+    const org_id = await getActiveOrganization(); // FIX: Scope operation to the resolved active organization
     const user = (await supabase.auth.getUser()).data.user;
     const now = new Date().toISOString();
 
@@ -8748,7 +8772,7 @@ export async function createLeadsCrm(leadData) {
    * @returns {Promise<Object>}
    */
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('leads_crm')
       .insert([{ ...leadData, org_id }])  // Triggers: set_org_from_jwt, normalize_email, calculate_score_local
@@ -8826,7 +8850,7 @@ export function subscribeLeadsCrm(onChange) {
 // Exemplo pra outra key table: ai_predictions (10 policies, 1 trigger)
 export async function createAiPredictions(predictionData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_predictions')
       .insert([{ ...predictionData, org_id }])
@@ -8884,7 +8908,7 @@ export async function createAiPredictions(predictionData) {
  */
 export async function createBilling(billingData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('billing')
       .insert([{ ...billingData, org_id }])
@@ -9127,7 +9151,7 @@ export function subscribeSEO(onChange) {
  */
 export async function createSocialMedia(postData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('social_media')
       .insert([{ ...postData, org_id }])
@@ -9221,7 +9245,7 @@ export function subscribeSocialMedia(onChange) {
  */
 export async function createAdsManager(adData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ads_manager')
       .insert([{ ...adData, org_id }])
@@ -9319,7 +9343,7 @@ export function subscribeAdsManager(onChange) {
  */
 export async function createAnalyticsEvent(eventData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('analytics_events')
       .insert([{ ...eventData, org_id }])
@@ -9345,7 +9369,7 @@ export async function createAnalyticsEvent(eventData) {
  */
 export async function createConversionFunnel(funnelData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('conversion_funnels')
       .insert([{ ...funnelData, org_id }])
@@ -10177,7 +10201,7 @@ export async function getViewAEFailRate7d(orgId) {
  */
 export async function createAIPrediction(predictionData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_predictions')
       .insert([{ ...predictionData, org_id }])
@@ -10258,7 +10282,7 @@ export async function getAIMemory(orgId, filters = { limit: 100 }) {
  */
 export async function createAIConsciousnessState(stateData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_consciousness_state')
       .insert([{ ...stateData, org_id }])
@@ -10307,7 +10331,7 @@ export async function getAIConsciousnessState(orgId, filters = { limit: 50 }) {
  */
 export async function createAICollectiveMemory(memoryData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_collective_memory')
       .insert([{ ...memoryData, org_id }])
@@ -10356,7 +10380,7 @@ export async function getAICollectiveMemory(orgId, filters = { limit: 100 }) {
  */
 export async function createAIInfinitumField(fieldData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_infinitum_field')
       .insert([{ ...fieldData, org_id }])
@@ -10404,7 +10428,7 @@ export async function getAIInfinitumField(orgId, filters = { limit: 50 }) {
  */
 export async function createAISolarReflection(reflectionData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_solar_reflections')
       .insert([{ ...reflectionData, org_id }])
@@ -10452,7 +10476,7 @@ export async function getAISolarReflections(orgId, filters = { limit: 50 }) {
  */
 export async function createAIFunctionBlueprint(blueprintData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_function_blueprints')
       .insert([{ ...blueprintData, org_id }])
@@ -10501,7 +10525,7 @@ export async function getAIFunctionBlueprints(orgId, filters = { limit: 100 }) {
  */
 export async function createAIInference(inferenceData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_inferences')
       .insert([{ ...inferenceData, org_id }])
@@ -10549,7 +10573,7 @@ export async function getAIInferences(orgId, filters = { limit: 100 }) {
  */
 export async function createAIMetaInsight(insightData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_meta_insights')
       .insert([{ ...insightData, org_id }])
@@ -10598,7 +10622,7 @@ export async function getAIMetaInsights(orgId, filters = { limit: 100 }) {
  */
 export async function createAIRecommendation(recommendationData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_recommendations')
       .insert([{ ...recommendationData, org_id }])
@@ -10648,7 +10672,7 @@ export async function getAIRecommendations(orgId, filters = { limit: 50 }) {
  */
 export async function createAIEthicsAudit(auditData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('ai_ethics_audit')
       .insert([{ ...auditData, org_id }])
@@ -10984,7 +11008,7 @@ export async function getAICollectiveLinks(orgId, filters = { limit: 100 }) {
  */
 export async function createGamificationBadge(badgeData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('gamification_badges')
       .insert([{ ...badgeData, org_id }])
@@ -11066,7 +11090,7 @@ export function subscribeGamificationBadges(onChange) {
  */
 export async function assignUserBadge(userBadgeData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('user_badges')
       .insert([{ ...userBadgeData, org_id }])
@@ -11127,7 +11151,7 @@ export function subscribeUserBadges(userId = null, onChange) {
  */
 export async function createGamificationReward(rewardData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('gamification_rewards')
       .insert([{ ...rewardData, org_id }])
@@ -11285,7 +11309,7 @@ export async function getGamificationRankHistory(userId, orgId, filters = { limi
  */
 export async function addGamificationPoints(userId, points, reason, metadata = {}) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('gamification_points')
       .insert([{
@@ -11336,7 +11360,7 @@ export async function getUserTotalPoints(userId, orgId) {
  */
 export async function checkAndAwardBadges(userId) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     
     // Busca pontuação total do usuário
     const pointsResult = await getUserTotalPoints(userId, org_id);
@@ -11400,7 +11424,7 @@ export async function checkAndAwardBadges(userId) {
  */
 export async function createWebhookIn(webhookData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('webhooks_in')
       .insert([{ ...webhookData, org_id, received_at: new Date().toISOString() }])
@@ -11467,7 +11491,7 @@ export function subscribeWebhooksIn(onChange) {
  */
 export async function createWebhookOut(webhookData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('webhooks_out')
       .insert([{ 
@@ -11557,7 +11581,7 @@ export function subscribeWebhooksOut(onChange) {
  */
 export async function createWebhookConfig(configData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('webhook_configs')
       .insert([{ 
@@ -11655,7 +11679,7 @@ export function subscribeWebhookConfigs(onChange) {
  */
 export async function createAPIIntegration(integrationData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('api_integrations')
       .insert([{ 
@@ -11741,7 +11765,7 @@ export function subscribeAPIIntegrations(onChange) {
  */
 export async function createAPIKey(keyData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     
     // Gera uma chave única
     const keyValue = `ak_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -11830,7 +11854,7 @@ export function subscribeAPIKeys(onChange) {
  */
 export async function createIntegrationConfig(configData) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     const { data, error } = await supabase
       .from('integration_configs')
       .insert([{ 
@@ -11929,7 +11953,7 @@ export function subscribeIntegrationConfigs(onChange) {
  */
 export async function triggerWebhooks(eventName, payload) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     
     // Busca configurações de webhook ativas para este evento
     const configsResult = await getWebhookConfigs(org_id, { active: true });
@@ -11972,7 +11996,7 @@ export async function triggerWebhooks(eventName, payload) {
  */
 export async function testWebhookConfig(configId) {
   try {
-    const org_id = await getCurrentOrgId();
+    const org_id = await getActiveOrganization();
     
     // Busca a configuração
     const { data: config, error } = await supabase
@@ -12756,7 +12780,7 @@ Object.assign(ALSHAM_FULL, {
   createOrganization,
   getUserOrganizations,
   switchOrganization,
-  getCurrentOrgId,
+  getActiveOrganization,
   setCurrentOrgId,
   withCache,
   clearCache,
@@ -13071,7 +13095,7 @@ export const OmnichannelRouter = {
   // ───────────────────────────────────────────────────────────────
   async dispatchMessage(channel, payload) {
     try {
-      const org_id = await getCurrentOrgId();
+      const org_id = await getActiveOrganization();
       const message = {
         ...payload,
         org_id,
@@ -13426,11 +13450,19 @@ export const OmnichannelControlPanel = {
   // ───────────────────────────────────────────────────────────────
   // 🔁 3. AUTO-ATUALIZAÇÃO EM TEMPO REAL
   // ───────────────────────────────────────────────────────────────
-  autoRefresh(intervalMs = 10000) {
+  async autoRefresh(intervalMs = 10000) {
     try {
-      const org_id = getCurrentOrgId();
-      this.renderDashboard(org_id);
-      setInterval(() => this.renderDashboard(org_id), intervalMs);
+      const org_id = await getActiveOrganization();
+      if (!org_id) throw new Error('Organização ativa não encontrada');
+      // FIX: Ensure first render waits for resolved organization context
+      await this.renderDashboard(org_id);
+      setInterval(async () => {
+        const refreshedOrg = await getActiveOrganization();
+        if (refreshedOrg) {
+          // FIX: Guard real-time refresh when organization changes
+          await this.renderDashboard(refreshedOrg);
+        }
+      }, intervalMs);
       logDebug(`♻️ Atualização automática ativada (${intervalMs / 1000}s).`);
     } catch (err) {
       logError('autoRefresh failed:', err);
@@ -13560,11 +13592,18 @@ export const OmnichannelDiagnostics = {
   // ───────────────────────────────────────────────────────────────
   // 🔁 4. ATUALIZAÇÃO AUTOMÁTICA
   // ───────────────────────────────────────────────────────────────
-  autoRefresh(intervalMs = 10000) {
+  async autoRefresh(intervalMs = 10000) {
     try {
-      const org_id = getCurrentOrgId();
-      this.renderDiagnostics(org_id);
-      setInterval(() => this.renderDiagnostics(org_id), intervalMs);
+      const org_id = await getActiveOrganization();
+      if (!org_id) throw new Error('Organização ativa não encontrada');
+      // FIX: Render diagnostics only after confirming organization scope
+      await this.renderDiagnostics(org_id);
+      setInterval(async () => {
+        const refreshedOrg = await getActiveOrganization();
+        if (refreshedOrg) {
+          await this.renderDiagnostics(refreshedOrg);
+        }
+      }, intervalMs);
       logDebug(`🔁 Diagnóstico automático ativado (${intervalMs / 1000}s).`);
     } catch (err) {
       logError('autoRefresh failed:', err);
@@ -13689,11 +13728,18 @@ export const OmnichannelPerformanceDashboard = {
   // ───────────────────────────────────────────────────────────────
   // 🔁 3. AUTO-REFRESH
   // ───────────────────────────────────────────────────────────────
-  autoRefresh(intervalMs = 30000) {
+  async autoRefresh(intervalMs = 30000) {
     try {
-      const org_id = getCurrentOrgId();
-      this.renderDashboard(org_id);
-      setInterval(() => this.renderDashboard(org_id), intervalMs);
+      const org_id = await getActiveOrganization();
+      if (!org_id) throw new Error('Organização ativa não encontrada');
+      // FIX: Guarantee first render after resolving organization
+      await this.renderDashboard(org_id);
+      setInterval(async () => {
+        const refreshedOrg = await getActiveOrganization();
+        if (refreshedOrg) {
+          await this.renderDashboard(refreshedOrg);
+        }
+      }, intervalMs);
       logDebug(`♻️ Painel de performance atualizado a cada ${intervalMs / 1000}s.`);
     } catch (err) {
       logError('autoRefresh failed:', err);
@@ -13834,11 +13880,17 @@ export const OmnichannelAuditPanel = {
     }
   },
 
-  autoRefresh(intervalMs = 15000) {
+  async autoRefresh(intervalMs = 15000) {
     try {
-      const org_id = getCurrentOrgId();
-      this.render(org_id);
-      setInterval(() => this.render(org_id), intervalMs);
+      const org_id = await getActiveOrganization();
+      if (!org_id) throw new Error('Organização ativa não encontrada');
+      await this.render(org_id);
+      setInterval(async () => {
+        const refreshedOrg = await getActiveOrganization();
+        if (refreshedOrg) {
+          await this.render(refreshedOrg);
+        }
+      }, intervalMs);
       logDebug(`🔁 Atualização automática de auditoria a cada ${intervalMs / 1000}s.`);
     } catch (err) {
       logError('autoRefresh failed:', err);
@@ -14653,11 +14705,17 @@ export const SupportAnalytics = {
   // ───────────────────────────────────────────────────────────────
   // 🔁 6. AUTOATUALIZAÇÃO
   // ───────────────────────────────────────────────────────────────
-  autoRefresh(intervalMs = 60000) {
+  async autoRefresh(intervalMs = 60000) {
     try {
-      const org_id = getCurrentOrgId();
-      this.renderDashboard(org_id);
-      setInterval(() => this.renderDashboard(org_id), intervalMs);
+      const org_id = await getActiveOrganization();
+      if (!org_id) throw new Error('Organização ativa não encontrada');
+      await this.renderDashboard(org_id);
+      setInterval(async () => {
+        const refreshedOrg = await getActiveOrganization();
+        if (refreshedOrg) {
+          await this.renderDashboard(refreshedOrg);
+        }
+      }, intervalMs);
       logDebug(`♻️ Support Analytics auto-refresh ativado (${intervalMs / 1000}s).`);
     } catch (err) {
       logError('autoRefresh failed:', err);

@@ -1,8 +1,9 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { create } from "zustand";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
+  AlertCircle,
   ArrowUpRight,
   Bell,
   Brain,
@@ -43,8 +44,7 @@ import {
 } from "chart.js";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import campaignOrion from "./assets/campaign-orion.png";
-import { renderPage } from "./routes";
-import { registerRoute } from "./routes";
+import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
 import './styles/responsive.css';
@@ -73,7 +73,7 @@ ChartJS.register(
 import {
   getSupabaseClient,
   getCurrentSession,
-  getCurrentOrgId,
+  getActiveOrganization,
   getLeads,
   createLead,
   updateLead,
@@ -508,74 +508,99 @@ const useDashboardStore = create<DashboardState>((set) => ({
   currency: "BRL",
   timeframe: "30d",
   theme: "glass-dark",
+  organizationUnavailable: false,
   fetchData: async () => {
     try {
       set({ loading: true });
 
-      const results = await Promise.all([
+      const orgId = await getActiveOrganization();
+      if (!orgId) {
+        // FIX: bloqueia carregamento quando não existe contexto organizacional válido
+        set({
+          loading: false,
+          organizationUnavailable: true,
+          kpis: [],
+          analytics: {
+            pipeline: [],
+            conversion: [],
+            heatmap: [],
+            cohort: [],
+            geo: [],
+            marketSplit: [],
+          },
+          aiInsights: [],
+          automations: [],
+          engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
+          campaigns: [],
+        });
+        return;
+      }
+
+      const [leadsRes, opportunitiesRes, campaignsRes, leaderboardRes] = await Promise.all([
         getLeads(),
         getOpportunities(),
-        getCampaigns(),
-        getTopLeadsByScore(5)
+        getCampaigns({ org_id: orgId }),
+        getTopLeadsByScore(5),
       ]);
-      
-      const leads = results[0]?.data?.data || [];
-      const opportunities = results[1]?.data?.data || [];
-      const campaigns = results[2]?.data || [];
-      const leaderboard = results[3]?.data || [];
+
+      const firstError = [leadsRes, opportunitiesRes, campaignsRes, leaderboardRes]
+        .map((result: any) => (result && 'success' in result && !result.success ? result.error : null))
+        .find(Boolean);
+      // FIX: interrompe pipeline ao primeiro erro de endpoint Supabase
+      if (firstError) {
+        throw firstError;
+      }
+
+      const leads = (leadsRes as any)?.data?.data ?? [];
+      const opportunities = (opportunitiesRes as any)?.data?.data ?? [];
+      const campaigns = (campaignsRes as any)?.data ?? [];
+      const leaderboard = ((leaderboardRes as any)?.data ?? []).map((p: any, i: number) => ({
+        user: p?.user_name ?? `User ${i + 1}`,
+        avatar: p?.avatar_url ?? 'https://api.dicebear.com/7.x/identicon/svg',
+        score: p?.score ?? 0,
+        delta: 0,
+        rank: i + 1,
+      }));
 
       const kpis: KPI[] = [
         {
-          id: "leads",
-          title: "Leads Ativos",
+          id: 'leads',
+          title: 'Leads Ativos',
           value: leads.length.toString(),
           trend: 0,
-          trendLabel: "Base Supabase",
+          trendLabel: 'Base Supabase',
           series: [0, 0, 0, leads.length],
-          target: "—",
-          description: "Total de leads ativos em leads_crm",
+          target: '—',
+          description: 'Total de leads ativos em leads_crm',
           icon: <Target className="h-5 w-5 text-[var(--accent-emerald)]" />,
         },
         {
-          id: "deals",
-          title: "Negócios em Andamento",
+          id: 'deals',
+          title: 'Negócios em Andamento',
           value: opportunities.length.toString(),
           trend: 0,
-          trendLabel: "Base Supabase",
+          trendLabel: 'Base Supabase',
           series: [0, 0, 0, opportunities.length],
-          target: "—",
-          description: "Registros atuais em sales_pipeline",
+          target: '—',
+          description: 'Registros atuais em sales_pipeline',
           icon: <Rocket className="h-5 w-5 text-[var(--accent-sky)]" />,
         },
         {
-          id: "campanhas",
-          title: "Campanhas Ativas",
+          id: 'campanhas',
+          title: 'Campanhas Ativas',
           value: campaigns.length.toString(),
           trend: 0,
-          trendLabel: "Base Supabase",
+          trendLabel: 'Base Supabase',
           series: [0, 0, 0, campaigns.length],
-          target: "—",
-          description: "Campanhas registradas em marketing_campaigns",
+          target: '—',
+          description: 'Campanhas registradas em marketing_campaigns',
           icon: <LineChart className="h-5 w-5 text-[var(--accent-fuchsia)]" />,
         },
       ];
 
-      const engagement = {
-        feed: [],
-        leaderboard: leaderboard.map((p: any, i: number) => ({
-          user: p.user_name ?? `User ${i + 1}`,
-          avatar: p.avatar_url ?? "https://api.dicebear.com/7.x/identicon/svg",
-          score: p.score ?? 0,
-          delta: 0,
-          rank: i + 1,
-        })),
-        tasks: [],
-        community: [],
-        sla: [],
-      };
-
       set({
         loading: false,
+        organizationUnavailable: false,
         kpis,
         analytics: {
           pipeline: [],
@@ -587,16 +612,42 @@ const useDashboardStore = create<DashboardState>((set) => ({
         },
         aiInsights: [],
         automations: [],
-        engagement,
+        engagement: {
+          feed: [],
+          leaderboard,
+          tasks: [],
+          community: [],
+          sla: [],
+        },
         campaigns,
       });
 
-      console.info("✅ Dashboard populado com dados reais do Supabase.");
-    } catch (err) {
-      console.error("❌ Erro ao buscar dados Supabase:", err);
-      set({ loading: false });
+      console.info('✅ Dashboard populado com dados reais do Supabase.');
+    } catch (err: any) {
+      console.error('❌ Erro ao buscar dados Supabase:', err);
+      const isOrgError = typeof err?.message === 'string' && err.message.toLowerCase().includes('organiza');
+      set({
+        // FIX: restaura estado limpo quando a sessão/org falha
+
+        loading: false,
+        organizationUnavailable: isOrgError,
+        kpis: [],
+        analytics: {
+          pipeline: [],
+          conversion: [],
+          heatmap: [],
+          cohort: [],
+          geo: [],
+          marketSplit: [],
+        },
+        aiInsights: [],
+        automations: [],
+        engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
+        campaigns: [],
+      });
     }
   },
+
   setCurrency: (currency) => set({ currency }),
   setTimeframe: (timeframe) => set({ timeframe }),
   setTheme: (theme) => set({ theme }),
@@ -613,7 +664,8 @@ type DashboardState = {
   timeframe: "7d" | "30d" | "90d";
   theme: ThemeKey;
   campaigns: Campaign[];
-  fetchData: () => void;
+  organizationUnavailable: boolean;
+  fetchData: () => Promise<void>;
   setCurrency: (currency: "USD" | "EUR" | "BRL") => void;
   setTimeframe: (timeframe: "7d" | "30d" | "90d") => void;
   setTheme: (theme: ThemeKey) => void;
@@ -1080,6 +1132,7 @@ function App() {
     currency,
     timeframe,
     theme,
+    organizationUnavailable,
     fetchData,
     setCurrency,
     setTimeframe,
@@ -1087,7 +1140,13 @@ function App() {
   } = useDashboardStore();
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-  const [activePage, setActivePage] = useState("dashboard-principal");
+  const [activePage, setActivePage] = useState(() => resolveRouteOrDefault("dashboard-principal"));
+  const navigateToPage = useCallback((pageId: string) => {
+    setActivePage((current) => {
+      const resolved = resolveRouteOrDefault(pageId);
+      return resolved === current ? current : resolved;
+    });
+  }, []);
 
   const closeMobileNav = () => setMobileNavOpen(false);
 
@@ -1241,7 +1300,7 @@ function App() {
     const listener = (event: MediaQueryListEvent) => handleChange(event);
 
     if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", listener);
+      mediaQuery.addEventListener("change", listener, { passive: true });
       return () => mediaQuery.removeEventListener("change", listener);
     }
 
@@ -1456,8 +1515,38 @@ function App() {
 
   const heatmapSafeMax = heatmapMeta.maxScore > 0 ? heatmapMeta.maxScore : 100;
 
+  const pageState = useMemo(() => {
+    try {
+      return { error: null as Error | null, content: renderPage(activePage) };
+    } catch (error) {
+      console.error('❌ Falha ao renderizar rota dinâmica:', error);
+      return { error: error as Error, content: null };
+    }
+  }, [activePage]);
+
+  // FIX: encapsula renderização dinâmica para evitar quebra global
   if (loading) {
     return <LoadingSkeletonLayout theme={theme} />;
+  }
+
+  if (organizationUnavailable) {
+    // FIX: Hard-stop navigation when organization context is missing
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--bg-dark)] px-6 text-center text-white">
+        <AlertCircle className="h-16 w-16 text-[var(--accent-alert)]" />
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold">Organização ativa não encontrada</h2>
+          <p className="text-sm text-white/70">Revise seu login ou escolha outra organização para continuar.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => fetchData()}
+          className="rounded-lg border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/20 px-4 py-2 text-sm font-medium text-[var(--accent-emerald)] transition hover:bg-[var(--accent-emerald)]/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-dark)]"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
   }
 
   registerRoute(
@@ -2100,7 +2189,7 @@ function App() {
                                 key={link.id}
                                 type="button"
                                 onClick={() => {
-                                  setActivePage(link.id);
+                                  navigateToPage(link.id);
                                   closeMobileNav();
                                 }}
                                 aria-current={isActive ? "page" : undefined}
@@ -2202,11 +2291,11 @@ function App() {
 
         <aside className="hidden min-h-screen lg:flex lg:w-80 xl:w-[22rem] flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
           <div 
-            onClick={() => setActivePage('dashboard')}
+            onClick={() => navigateToPage('dashboard')}
             className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur cursor-pointer hover:bg-[var(--surface)]/95 transition-colors group"
             role="button"
             tabIndex={0}
-            onKeyPress={(e) => e.key === 'Enter' && setActivePage('dashboard')}
+            onKeyPress={(e) => e.key === 'Enter' && navigateToPage('dashboard')}
             aria-label="Voltar ao Dashboard"
           >
             <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold group-hover:scale-105 transition-transform">
@@ -2249,7 +2338,7 @@ function App() {
                           />
                           <button
                             type="button"
-                            onClick={() => setActivePage(link.id)}
+                            onClick={() => navigateToPage(link.id)}
                             aria-current={isActive ? "page" : undefined}
                             className={`flex-1 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
                               isActive
@@ -2440,7 +2529,14 @@ function App() {
             className="flex-1 overflow-y-auto bg-[var(--background)]"
             style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
           >
-            {renderPage(activePage)}
+            {pageState.error ? (
+              <div className="flex min-h-[40vh] flex-col items-center justify-center gap-2 text-center">
+                <AlertCircle className="h-12 w-12 text-[var(--accent-alert)]" />
+                <p className="text-sm text-[var(--text-secondary)]">Falha ao renderizar a página selecionada.</p>
+              </div>
+            ) : (
+              pageState.content
+            )}
           </main>
         </div>
       </div>

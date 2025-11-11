@@ -7,6 +7,7 @@
 export * from './supabase-full.js';
 
 // Log para debug
+import { getActiveOrganization, supabase as supabaseClient } from './supabase-full.js';
 import * as supabaseFull from './supabase-full.js';
 console.log('✅ Supabase Master carregado:', Object.keys(supabaseFull).length, 'exports');
 
@@ -18,7 +19,19 @@ export async function getLead(id: string) {
 }
 
 export async function updateLead(id: string, updates: any) {
-  const { data, error } = await genericUpdate('leads_crm', { id }, updates);
+  const updateFn = (supabaseFull as {
+    genericUpdate?: (
+      table: string,
+      filters: Record<string, any>,
+      payload: Record<string, any>,
+    ) => Promise<{ data: any; error: { message: string } | null }>;
+  }).genericUpdate;
+
+  if (typeof updateFn !== 'function') {
+    throw new Error('genericUpdate não está disponível no bridge do Supabase');
+  }
+
+  const { data, error } = await updateFn('leads_crm', { id }, updates);
   if (error) throw new Error(error.message);
   return data;
 }
@@ -45,19 +58,17 @@ export const genericSelect = async (
   }
 ) => {
   try {
-    const orgId = await getCurrentOrgId();
+    const orgId = await getActiveOrganization();
     if (!orgId) {
+      // FIX: impede consultas sem escopo organizacional resolvido
       throw new Error('Organização não identificada');
     }
 
-    let query = supabase
+    let query = supabaseClient
       .from(table)
-      .select(options?.columns || '*', { count: 'exact' });
+      .select(options?.columns || '*', { count: 'exact' })
+      .eq('org_id', orgId);
 
-    // Aplicar filtro de organização (SEMPRE)
-    query = query.eq('org_id', orgId);
-
-    // Aplicar filtros adicionais
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -66,21 +77,19 @@ export const genericSelect = async (
       });
     }
 
-    // Aplicar ordenação
     if (options?.orderBy) {
-      query = query.order(options.orderBy.column, { 
-        ascending: options.orderBy.ascending ?? true 
+      query = query.order(options.orderBy.column, {
+        ascending: options.orderBy.ascending ?? true
       });
     }
 
-    // Aplicar paginação
     if (options?.limit) {
       query = query.limit(options.limit);
     }
     if (options?.offset) {
-      const start = options.offset;
-      const end = start + (options.limit || 10) - 1;
-      query = query.range(start, end);
+      const startRange = options.offset;
+      const endRange = startRange + (options.limit || 10) - 1;
+      query = query.range(startRange, endRange);
     }
 
     const { data, error, count } = await query;
@@ -89,17 +98,10 @@ export const genericSelect = async (
 
     console.log(`✅ genericSelect: ${count} registros em ${table}`);
 
-    return { 
-      data, 
-      error: null, 
-      count 
-    };
+    return { data, error: null, count };
   } catch (error: any) {
     console.error(`❌ Erro em genericSelect (${table}):`, error);
-    return { 
-      data: null, 
-      error, 
-      count: 0 
-    };
+    return { data: null, error, count: 0 };
   }
 };
+ 
