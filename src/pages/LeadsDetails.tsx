@@ -1,6 +1,5 @@
 // src/pages/LeadsDetails.tsx
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   getLead,
@@ -65,23 +64,14 @@ interface Interaction {
 }
 
 interface LeadsDetailsProps {
-  leadId?: string;
+  leadId: string;
   onBack?: () => void;
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎯 COMPONENTE PRINCIPAL
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetailsProps) {
-  // ✅ HOOKS DE NAVEGAÇÃO
-  const params = useParams<{ id?: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // ✅ PEGA leadId de 3 FONTES (prioridade: props > params > location.state)
-  const leadId = propLeadId || params.id || (location.state as any)?.leadId;
-
-  // ✅ STATES
+export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
   const [lead, setLead] = useState<Lead | null>(null);
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -266,14 +256,13 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
       return;
     }
     
-    // ✅ Tenta voltar no histórico
+    // ✅ Fallback: window.history.back() sem React Router
     if (window.history.length > 2) {
-      navigate(-1);
+      window.history.back();
     } else {
-      // ✅ Fallback: redireciona para /leads
-      navigate('/leads');
+      window.location.href = '/';
     }
-  }, [onBack, navigate]);
+  }, [onBack]);
 
   const handleDelete = useCallback(async () => {
     if (!leadId) return;
@@ -333,7 +322,7 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
             onClick={handleBack}
             className="px-6 py-3 bg-[var(--accent-emerald)] rounded-lg hover:opacity-80 transition"
           >
-            Voltar para Leads
+            Voltar
           </button>
           <button 
             onClick={() => window.location.reload()}
@@ -352,9 +341,7 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
       animate={{ opacity: 1, y: 0 }} 
       className="min-h-screen bg-[var(--bg-dark)] text-white p-4 sm:p-8"
     >
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {/* 🎯 HEADER */}
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-4">
           <button 
@@ -423,9 +410,7 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
         </div>
       </div>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {/* 📊 KPIS */}
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* KPIS */}
       {kpis && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <KPICard 
@@ -455,45 +440,15 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
         </div>
       )}
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {/* 📝 PERFIL */}
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* PERFIL */}
       <div className="bg-[var(--surface)] p-6 rounded-2xl mb-8 border border-[var(--border)]">
         <h2 className="text-xl font-semibold mb-4">Perfil do Lead</h2>
         
         <div className="grid md:grid-cols-2 gap-4">
-          <InfoField
-            icon={<Mail />}
-            label="Email"
-            value={isEditing ? undefined : lead.email}
-            isEditing={isEditing}
-            onChange={(value) => setEditedLead({ ...editedLead, email: value })}
-            editValue={editedLead.email}
-          />
-          <InfoField
-            icon={<Phone />}
-            label="Telefone"
-            value={isEditing ? undefined : (lead.phone || 'Não informado')}
-            isEditing={isEditing}
-            onChange={(value) => setEditedLead({ ...editedLead, phone: value })}
-            editValue={editedLead.phone}
-          />
-          <InfoField
-            icon={<Briefcase />}
-            label="Cargo"
-            value={isEditing ? undefined : (lead.position || 'Não informado')}
-            isEditing={isEditing}
-            onChange={(value) => setEditedLead({ ...editedLead, position: value })}
-            editValue={editedLead.position}
-          />
-          <InfoField
-            icon={<MapPin />}
-            label="Localização"
-            value={isEditing ? undefined : (lead.location || 'Não informada')}
-            isEditing={isEditing}
-            onChange={(value) => setEditedLead({ ...editedLead, location: value })}
-            editValue={editedLead.location}
-          />
+          <InfoField icon={<Mail />} label="Email" value={isEditing ? undefined : lead.email} isEditing={isEditing} onChange={(value) => setEditedLead({ ...editedLead, email: value })} editValue={editedLead.email} />
+          <InfoField icon={<Phone />} label="Telefone" value={isEditing ? undefined : (lead.phone || 'Não informado')} isEditing={isEditing} onChange={(value) => setEditedLead({ ...editedLead, phone: value })} editValue={editedLead.phone} />
+          <InfoField icon={<Briefcase />} label="Cargo" value={isEditing ? undefined : (lead.position || 'Não informado')} isEditing={isEditing} onChange={(value) => setEditedLead({ ...editedLead, position: value })} editValue={editedLead.position} />
+          <InfoField icon={<MapPin />} label="Localização" value={isEditing ? undefined : (lead.location || 'Não informada')} isEditing={isEditing} onChange={(value) => setEditedLead({ ...editedLead, location: value })} editValue={editedLead.location} />
         </div>
 
         {lead.notes && (
@@ -505,10 +460,7 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
         {lead.tags && lead.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {lead.tags.map((tag, index) => (
-              <span 
-                key={index}
-                className="flex items-center gap-1 px-3 py-1 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)] rounded-full text-xs"
-              >
+              <span key={index} className="flex items-center gap-1 px-3 py-1 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)] rounded-full text-xs">
                 <Tag className="h-3 w-3" />
                 {tag}
               </span>
@@ -517,9 +469,7 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
         )}
       </div>
 
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {/* 📅 TIMELINE */}
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* TIMELINE */}
       <div className="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)]">
         <h2 className="text-xl font-semibold mb-4">Timeline de Interações</h2>
         
@@ -564,17 +514,9 @@ export default function LeadsDetails({ leadId: propLeadId, onBack }: LeadsDetail
   );
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🧩 SUB-COMPONENTES
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function KPICard({ icon, label, value, color }: { 
-  icon: React.ReactNode; 
-  label: string; 
-  value: string; 
-  color: 'emerald' | 'sky' | 'fuchsia' | 'amber';
-}) {
+// SUB-COMPONENTES
+function KPICard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: 'emerald' | 'sky' | 'fuchsia' | 'amber'; }) {
   const colorClass = `var(--accent-${color})`;
-  
   return (
     <div className="bg-[var(--surface)] p-4 rounded-xl border border-[var(--border)] hover:border-[var(--accent-emerald)]/50 transition-all hover:scale-[1.02]">
       <div className="flex items-center gap-2 mb-2" style={{ color: colorClass }}>
@@ -586,38 +528,16 @@ function KPICard({ icon, label, value, color }: {
   );
 }
 
-function InfoField({ 
-  icon, 
-  label, 
-  value, 
-  isEditing, 
-  onChange, 
-  editValue 
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
-  value?: string; 
-  isEditing: boolean; 
-  onChange?: (value: string) => void; 
-  editValue?: string;
-}) {
+function InfoField({ icon, label, value, isEditing, onChange, editValue }: { icon: React.ReactNode; label: string; value?: string; isEditing: boolean; onChange?: (value: string) => void; editValue?: string; }) {
   return (
     <div className="flex items-start gap-3">
       <div className="p-2 bg-[var(--accent-emerald)]/10 rounded-lg text-[var(--accent-emerald)] flex-shrink-0">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <label className="text-xs uppercase tracking-wider text-gray-400 block mb-1">
-          {label}
-        </label>
+        <label className="text-xs uppercase tracking-wider text-gray-400 block mb-1">{label}</label>
         {isEditing ? (
-          <input
-            type="text"
-            value={editValue || ''}
-            onChange={(e) => onChange?.(e.target.value)}
-            className="w-full bg-[var(--bg-dark)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm focus:border-[var(--accent-emerald)] focus:ring-2 focus:ring-[var(--accent-emerald)]/20 outline-none transition"
-            placeholder={`Digite ${label.toLowerCase()}...`}
-          />
+          <input type="text" value={editValue || ''} onChange={(e) => onChange?.(e.target.value)} className="w-full bg-[var(--bg-dark)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm focus:border-[var(--accent-emerald)] focus:ring-2 focus:ring-[var(--accent-emerald)]/20 outline-none transition" placeholder={`Digite ${label.toLowerCase()}...`} />
         ) : (
           <p className="text-sm break-words">{value}</p>
         )}
@@ -626,9 +546,7 @@ function InfoField({
   );
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🛠️ HELPER FUNCTIONS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// HELPER FUNCTIONS
 function getStatusColor(status: Lead['status']): string {
   const colors = {
     new: 'bg-blue-500/20 text-blue-400',
