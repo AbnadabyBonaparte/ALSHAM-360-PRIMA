@@ -332,13 +332,12 @@ export async function getActiveOrganization(options = {}) {
       return null;
     }
     
-    // FIX: Query without is_active column (does not exist in schema)
-    // Get first organization for user, ordered by creation date
+    // FIX: Removed .order('created_at') because the column does not exist in user_organizations table
+    // If ordering is needed, use .order('id') or add the column in Supabase
     const { data: orgList, error: orgErr } = await client
       .from('user_organizations')
       .select('org_id')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: true })
       .limit(1);
     
     if (orgErr) {
@@ -410,11 +409,12 @@ export async function getUserOrganizations() {
     const { data } = await supabase.auth.getUser();
     const user = data?.user;
     if (!user) return [];
+    // FIX: Removed .order('created_at') because the column does not exist in user_organizations table
+    // If ordering is needed, use .order('id') or add the column in Supabase
     const { data: memberships, error } = await supabase
       .from('user_organizations')
       .select('organization_id')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: true});
+      .eq('user_id', user.id);
     if (error) throw error;
     return memberships?.map((membership) => membership.organization_id).filter(Boolean) ?? [];
   } catch (err) {
