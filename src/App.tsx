@@ -1186,61 +1186,7 @@ useEffect(() => {
 // 🔚 FIM DA INTEGRAÇÃO REAL-TIME
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-
-  useEffect(() => {
-    if (!campaigns.length) return;
-    setCampaignIndex((prev) => (prev >= campaigns.length ? 0 : prev));
-  }, [campaigns.length]);
-
-  useEffect(() => {
-    if (campaigns.length <= 1) return;
-    const timer = setInterval(() => {
-      setCampaignIndex((prev) => (prev + 1) % campaigns.length);
-    }, 9000);
-    return () => clearInterval(timer);
-  }, [campaigns.length]);
-
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    if (isMobileNavOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [isMobileNavOpen]);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    const handleChange = (event: MediaQueryList | MediaQueryListEvent) => {
-      if (event.matches) {
-        setMobileNavOpen(false);
-      }
-    };
-
-    handleChange(mediaQuery);
-
-    const listener = (event: MediaQueryListEvent) => handleChange(event);
-
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", listener);
-      return () => mediaQuery.removeEventListener("change", listener);
-    }
-
-    mediaQuery.addListener(listener);
-    return () => mediaQuery.removeListener(listener);
-  }, []);
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-
-  useEffect(() => {
+    useEffect(() => {
     if (!campaigns.length) return;
     setCampaignIndex((prev) => (prev >= campaigns.length ? 0 : prev));
   }, [campaigns.length]);
