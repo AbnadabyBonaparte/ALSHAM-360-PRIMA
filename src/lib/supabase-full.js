@@ -135,14 +135,17 @@ const resolveEnvValue = (key, fallback = '') => {
   }
   return fallback;
 };
+
 const SUPABASE_URL =
   resolveEnvValue('VITE_SUPABASE_URL', resolveEnvValue('SUPABASE_URL', 'https://example.supabase.co'));
 const SUPABASE_ANON_KEY =
   resolveEnvValue('VITE_SUPABASE_ANON_KEY', resolveEnvValue('SUPABASE_ANON_KEY', 'public-anon-key'));
+
 const SUPABASE_CONFIG = Object.freeze({
   url: SUPABASE_URL,
   anonKey: SUPABASE_ANON_KEY
 });
+
 function ensureSupabaseClient() {
   if (typeof window !== 'undefined') {
     if (!window.__VITE_SUPABASE_URL__) {
@@ -176,11 +179,15 @@ function ensureSupabaseClient() {
   }
   return supabase;
 }
+
 ensureSupabaseClient();
+
 export function getSupabaseClient() {
   return ensureSupabaseClient();
 }
+
 export { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIG };
+
 export async function getCurrentSession() {
   try {
     const client = ensureSupabaseClient();
@@ -192,6 +199,57 @@ export async function getCurrentSession() {
     throw err;
   }
 }
+
+// FIX: Improved active organization resolution without is_active column
+export async function getActiveOrganization(options = {}) {
+  const { forceRefresh = false } = options || {};
+  
+  try {
+    const client = ensureSupabaseClient();
+    
+    // Check encrypted cache first (unless force refresh)
+    if (!forceRefresh) {
+      const cached = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
+      if (cached?.org_id) {
+        return cached.org_id;
+      }
+    }
+    
+    // Get authenticated user
+    const { data: { user } = {} } = await client.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+    
+    // FIX: Query without is_active column (does not exist in schema)
+    // Get first organization for user, ordered by creation date
+    const { data: orgList, error: orgErr } = await client
+      .from('user_organizations')
+      .select('org_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true })
+      .limit(1);
+    
+    if (orgErr) throw orgErr;
+    
+    const orgId = orgList?.[0]?.org_id ?? null;
+    
+    if (orgId) {
+      // Persist to encrypted cache
+      await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
+        org_id: orgId,
+        synced_at: new Date().toISOString()
+      });
+      return orgId;
+    }
+    
+    logWarn('No organization found for user:', user.id);
+    return null;
+    
+  } catch (err) {
+    logError('getActiveOrganization failed:', err);
+    return null;
+  }
+}
+
 const supabaseClient = supabase;
 export { supabaseClient as supabase };
 
