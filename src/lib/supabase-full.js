@@ -502,6 +502,34 @@ export async function orgPolicyCheck(table) {
 }
 
 // ---------------------------------------------------------------------------
+// SWITCH ORGANIZATION (mantida, usa funções padronizadas do topo)
+export async function switchOrganization(org_id) {
+  try {
+    if (!org_id) return response(false, null, new Error('org_id é obrigatório'));
+    const user = (await supabase.auth.getUser()).data?.user;
+    if (!user) return response(false, null, new Error('Usuário não autenticado'));
+    const { data: membership, error } = await supabase
+      .from('user_organizations')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('organization_id', org_id)
+      .maybeSingle();
+    if (error) return response(false, null, error);
+    if (!membership) return response(false, null, new Error('Usuário não pertence à organização'));
+    await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
+      org_id,
+      switched_at: new Date().toISOString()
+    });
+    logDebug('[AUDIT]', { action: 'switchOrganization', org_id, user_id: user.id });
+    if (typeof window !== 'undefined')
+      window.dispatchEvent(new CustomEvent('orgSwitched', { detail: org_id }));
+    return response(true, { org_id });
+  } catch (err) {
+    logError('switchOrganization exception:', err);
+    return response(false, null, err);
+  }
+}
+// ---------------------------------------------------------------------------
 // CRUD GENÉRICO
 function normalizeFilters(filters) {
   if (Array.isArray(filters)) {
