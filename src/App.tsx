@@ -1091,102 +1091,112 @@ function App() {
 
   const closeMobileNav = () => setMobileNavOpen(false);
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 1️⃣ FETCH DATA INICIAL
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - FIXED v3
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-useEffect(() => {
-  let mounted = true;
-  const channels: any[] = [];
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 2️⃣ REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - v3.1 OPTIMIZED
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => {
+    let mounted = true;
+    const channels: any[] = [];
 
-  const setupSubscriptions = async () => {
-    console.log('🔴 Iniciando subscriptions Real-time...');
+    const setupSubscriptions = async () => {
+      console.log('🔴 Iniciando subscriptions Real-time...');
 
-    // Subscribe para mudanças em leads
-    const leadsChannel = supabase
-      .channel('leads_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'leads_crm'
-        },
-        (payload) => {
-          if (mounted) {
-            console.log('📊 Lead atualizado:', payload);
-            fetchData();
+      // Subscribe para mudanças em leads
+      const leadsChannel = supabase
+        .channel('leads_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'leads_crm'
+          },
+          (payload) => {
+            if (mounted) {
+              console.log('📊 Lead atualizado:', payload);
+              fetchData();
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
 
-    channels.push(leadsChannel);
+      channels.push(leadsChannel);
 
-    // Subscribe para mudanças em campanhas
-    const campaignsChannel = supabase
-      .channel('campaigns_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'marketing_campaigns'
-        },
-        (payload) => {
-          if (mounted) {
-            console.log('🚀 Campanha atualizada:', payload);
-            fetchData();
+      // Subscribe para mudanças em campanhas
+      const campaignsChannel = supabase
+        .channel('campaigns_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'marketing_campaigns'
+          },
+          (payload) => {
+            if (mounted) {
+              console.log('🚀 Campanha atualizada:', payload);
+              fetchData();
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
 
-    channels.push(campaignsChannel);
+      channels.push(campaignsChannel);
 
-    // Subscribe para mudanças em gamificação
-    const gamificationChannel = supabase
-      .channel('gamification_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'gamification_points'
-        },
-        (payload) => {
-          if (mounted) {
-            console.log('🏆 Pontuação atualizada:', payload);
-            fetchData();
+      // Subscribe para mudanças em gamificação
+      const gamificationChannel = supabase
+        .channel('gamification_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'gamification_points'
+          },
+          (payload) => {
+            if (mounted) {
+              console.log('🏆 Pontuação atualizada:', payload);
+              fetchData();
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
 
-    channels.push(gamificationChannel);
+      channels.push(gamificationChannel);
 
-    console.log('✅ Subscriptions Real-time iniciadas');
-  };
+      console.log('✅ Subscriptions Real-time iniciadas');
+    };
 
-  setupSubscriptions();
+    setupSubscriptions();
 
-  // Cleanup ao desmontar
-  return () => {
-    mounted = false;
-    console.log('🔴 Desconectando subscriptions...');
-    channels.forEach(channel => {
-      supabase.removeChannel(channel);
-    });
-  };
-}, []); // ⚠️ IMPORTANTE: array vazio - executar só uma vez
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🔚 FIM DA INTEGRAÇÃO REAL-TIME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-    useEffect(() => {
+    // Cleanup ao desmontar
+    return () => {
+      mounted = false;
+      console.log('🔴 Desconectando subscriptions...');
+      channels.forEach(channel => {
+        supabase.removeChannel(channel);
+      });
+    };
+  }, []); // ⚠️ IMPORTANTE: array vazio - executar só uma vez
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 3️⃣ THEME MANAGEMENT
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 4️⃣ CAMPAIGN CAROUSEL MANAGEMENT
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => {
     if (!campaigns.length) return;
     setCampaignIndex((prev) => (prev >= campaigns.length ? 0 : prev));
   }, [campaigns.length]);
@@ -1199,6 +1209,9 @@ useEffect(() => {
     return () => clearInterval(timer);
   }, [campaigns.length]);
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 5️⃣ MOBILE NAV OVERFLOW CONTROL
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     if (isMobileNavOpen) {
@@ -1212,6 +1225,9 @@ useEffect(() => {
     };
   }, [isMobileNavOpen]);
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 6️⃣ RESPONSIVE MEDIA QUERY LISTENER
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
     const handleChange = (event: MediaQueryList | MediaQueryListEvent) => {
@@ -1233,6 +1249,9 @@ useEffect(() => {
     return () => mediaQuery.removeListener(listener);
   }, []);
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🎨 CHART DATA MEMOIZATION
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const pipelineBarData = useMemo(() => {
     const labels = analytics.pipeline.map((stage) => stage.stage);
     const values = analytics.pipeline.map((stage) => stage.value ?? 0);
@@ -1258,7 +1277,7 @@ useEffect(() => {
     return {
       responsive: true,
       maintainAspectRatio: false,
-      indexAxis: "y",
+      indexAxis: "y" as const,
       layout: { padding: { top: 8, bottom: 8 } },
       plugins: {
         legend: { display: false },
@@ -1445,170 +1464,171 @@ useEffect(() => {
     "dashboard",
     async () => ({
       default: () => (
-                  <section className="px-4 pb-14 pt-10 sm:px-6 md:pb-16 md:pt-12 lg:px-10"
-                    style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 3.5rem)" }}
+        <section 
+          className="px-4 pb-14 pt-10 sm:px-6 md:pb-16 md:pt-12 lg:px-10"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 3.5rem)" }}
+        >
+          <div className="flex flex-col gap-6">
+            {campaigns.length > 0 && (
+              <CampaignSpotlight
+                campaigns={campaigns}
+                activeIndex={campaignIndex}
+                onSelect={setCampaignIndex}
+              />
+            )}
+
+            <motion.section
+              className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/90 p-6 shadow-lifted sm:p-8 lg:p-10"
+              initial={{ opacity: 0, y: 36 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true, amount: 0.4 }}
+            >
+              <div className="pointer-events-none absolute inset-0 opacity-90" style={{ background: "var(--gradient-wash)" }} />
+              <div className="absolute -left-32 top-0 hidden h-full w-32 bg-gradient-to-r from-black/10 to-transparent blur-3xl lg:block" />
+              <div className="absolute -right-24 bottom-0 hidden h-56 w-48 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl lg:block" />
+
+              <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)] lg:gap-12">
+                <div className="flex flex-col gap-8">
+                  <div className="space-y-4">
+                    <span className="inline-flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/60 px-4 py-2 text-[11px] uppercase tracking-[0.5em] text-[var(--accent-sky)]">
+                      <span className="h-1.5 w-6 rounded-full bg-[var(--accent-emerald)]/70" /> You are in control
+                    </span>
+                    <h1 className="text-4xl font-light leading-tight text-[var(--text-primary)] sm:text-[46px]">
+                      Dashboard Executivo 360° — Obsessão em Resultados Visíveis.
+                    </h1>
+                    <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)] sm:text-lg">
+                      Uma visão holística que combina CRM, Inteligência Artificial, Automação, Comunidade e Gamificação em tempo real. Cada interação mapeada em valor, cada decisão orientada por dados, cada resultado amplificado por IA.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 text-sm">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-emerald)]/40 bg-wash-sage px-5 py-2.5 text-[var(--accent-emerald)]">
+                      <Sparkles className="h-4 w-4" /> Copilot 360° integrado
+                    </span>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-sky)]/40 bg-wash-mist px-5 py-2.5 text-[var(--accent-sky)]">
+                      <HeartPulse className="h-4 w-4" /> ROI em tempo real
+                    </span>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-fuchsia)]/40 bg-wash-clay px-5 py-2.5 text-[var(--accent-fuchsia)]">
+                      <Flame className="h-4 w-4" /> Automação proativa
+                    </span>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="group relative overflow-hidden rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-emerald)]/45 hover:shadow-lifted">
+                      <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl transition duration-500 group-hover:scale-110" />
+                      <p className="text-sm text-[var(--accent-emerald)]">Valor agregado</p>
+                      <p className="mt-3 text-4xl font-semibold text-[var(--text-primary)]">R$ 18,7M</p>
+                      <p className="mt-4 text-xs text-[var(--text-secondary)]">+328% vs baseline pré-ALSHAM</p>
+                    </div>
+
+                    <div className="group relative overflow-hidden rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-sky)]/45 hover:shadow-lifted">
+                      <div className="absolute -left-20 top-1/2 h-44 w-44 -translate-y-1/2 rounded-full bg-[var(--accent-sky)]/14 blur-3xl transition duration-500 group-hover:translate-x-4" />
+                      <p className="text-sm text-[var(--accent-sky)]">IA & Automação</p>
+                      <p className="mt-3 text-4xl font-semibold text-[var(--text-primary)]">6.320h</p>
+                      <p className="mt-4 text-xs text-[var(--text-secondary)]">Horas poupadas no período</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-5 rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/75 p-6">
+                  <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                    <span>ROI acumulado nos últimos 12 meses</span>
+                    <span>Moeda: {currency}</span>
+                  </div>
+
+                  <div className="flex flex-col gap-4 rounded-3xl border border-[var(--border)] bg-[var(--surface)]/80 p-5">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Momento aha</p>
+                        <p className="mt-2 text-lg font-medium text-[var(--text-primary)]">Onboarding concierge completado</p>
+                      </div>
+                      <span className="rounded-full border border-[var(--accent-emerald)]/40 px-3 py-1 text-[11px] font-medium text-[var(--accent-emerald)]">92%</span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                      <span className="font-medium text-[var(--accent-emerald)]">Momento Aha em 3m42s</span> • NPS mensal 76 • Taxa de adoção de IA 94%.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 rounded-3xl border border-[var(--border)] bg-[var(--surface)]/80 p-5">
+                    <div className="flex items-center justify-between text-sm text-[var(--text-secondary)]">
+                      <span>Blueprint executivo</span>
+                      <span className="inline-flex items-center gap-1 text-[var(--accent-emerald)]">
+                        <ArrowUpRight className="h-4 w-4" /> Ver playbook
+                      </span>
+                    </div>
+                    <div className="grid gap-3 text-sm text-[var(--text-secondary)]">
+                      <div className="flex justify-between">
+                        <span>Valor incremental</span>
+                        <span className="text-[var(--text-primary)]">+R$ 720K</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Precisão de forecast</span>
+                        <span className="text-[var(--text-primary)]">92%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Eficiência IA</span>
+                        <span className="text-[var(--text-primary)]">+34pp</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            <section>
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">Radar de Performance</p>
+                  <h2 className="text-2xl font-semibold text-[var(--text-primary)]">KPIs estratégicos para decisões exponenciais</h2>
+                </div>
+                <p className="text-sm text-[var(--text-secondary)]">Atualizado • timeframe: {timeframe}</p>
+              </div>
+
+              <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {kpis.map((kpi, index) => (
+                  <motion.div
+                    key={kpi.id}
+                    role="article"
+                    aria-label={`KPI: ${kpi.title} — Valor ${kpi.value}`}
+                    className="relative overflow-hidden rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface)]/85 p-6 sm:p-7"
+                    style={
+                      kpi.highlight
+                        ? {
+                            backgroundImage:
+                              "linear-gradient(140deg, rgba(122,143,128,0.22) 0%, rgba(197,164,124,0.18) 48%, rgba(135,148,164,0.16) 100%)",
+                          }
+                        : undefined
+                    }
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -10, rotateX: 0.5 }}
+                    transition={{ duration: 0.6, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                    viewport={{ once: true, amount: 0.35 }}
                   >
-                    <div className="flex flex-col gap-6">
-                      {campaigns.length > 0 && (
-                        <CampaignSpotlight
-                          campaigns={campaigns}
-                          activeIndex={campaignIndex}
-                          onSelect={setCampaignIndex}
-                        />
-                      )}
-
-                      <motion.section
-                        className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/90 p-6 shadow-lifted sm:p-8 lg:p-10"
-                        initial={{ opacity: 0, y: 36 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                        viewport={{ once: true, amount: 0.4 }}
-                      >
-                        <div className="pointer-events-none absolute inset-0 opacity-90" style={{ background: "var(--gradient-wash)" }} />
-                        <div className="absolute -left-32 top-0 hidden h-full w-32 bg-gradient-to-r from-black/10 to-transparent blur-3xl lg:block" />
-                        <div className="absolute -right-24 bottom-0 hidden h-56 w-48 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl lg:block" />
-
-                        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)] lg:gap-12">
-                          <div className="flex flex-col gap-8">
-                            <div className="space-y-4">
-                              <span className="inline-flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/60 px-4 py-2 text-[11px] uppercase tracking-[0.5em] text-[var(--accent-sky)]">
-                                <span className="h-1.5 w-6 rounded-full bg-[var(--accent-emerald)]/70" /> You are in control
-                              </span>
-                              <h1 className="text-4xl font-light leading-tight text-[var(--text-primary)] sm:text-[46px]">
-                                Dashboard Executivo 360° — Obsessão em Resultados Visíveis.
-                              </h1>
-                              <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)] sm:text-lg">
-                                Uma visão holística que combina CRM, Inteligência Artificial, Automação, Comunidade e Gamificação em tempo real. Cada interação mapeada em valor, cada decisão orientada por dados, cada resultado amplificado por IA.
-                              </p>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-3 text-sm">
-                              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-emerald)]/40 bg-wash-sage px-5 py-2.5 text-[var(--accent-emerald)]">
-                                <Sparkles className="h-4 w-4" /> Copilot 360° integrado
-                              </span>
-                              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-sky)]/40 bg-wash-mist px-5 py-2.5 text-[var(--accent-sky)]">
-                                <HeartPulse className="h-4 w-4" /> ROI em tempo real
-                              </span>
-                              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-fuchsia)]/40 bg-wash-clay px-5 py-2.5 text-[var(--accent-fuchsia)]">
-                                <Flame className="h-4 w-4" /> Automação proativa
-                              </span>
-                            </div>
-
-                            <div className="grid gap-4 sm:grid-cols-2">
-                              <div className="group relative overflow-hidden rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-emerald)]/45 hover:shadow-lifted">
-                                <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl transition duration-500 group-hover:scale-110" />
-                                <p className="text-sm text-[var(--accent-emerald)]">Valor agregado</p>
-                                <p className="mt-3 text-4xl font-semibold text-[var(--text-primary)]">R$ 18,7M</p>
-                                <p className="mt-4 text-xs text-[var(--text-secondary)]">+328% vs baseline pré-ALSHAM</p>
-                              </div>
-
-                              <div className="group relative overflow-hidden rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 transition duration-500 hover:border-[var(--accent-sky)]/45 hover:shadow-lifted">
-                                <div className="absolute -left-20 top-1/2 h-44 w-44 -translate-y-1/2 rounded-full bg-[var(--accent-sky)]/14 blur-3xl transition duration-500 group-hover:translate-x-4" />
-                                <p className="text-sm text-[var(--accent-sky)]">IA & Automação</p>
-                                <p className="mt-3 text-4xl font-semibold text-[var(--text-primary)]">6.320h</p>
-                                <p className="mt-4 text-xs text-[var(--text-secondary)]">Horas poupadas no período</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col gap-5 rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/75 p-6">
-                            <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
-                              <span>ROI acumulado nos últimos 12 meses</span>
-                              <span>Moeda: {currency}</span>
-                            </div>
-
-                            <div className="flex flex-col gap-4 rounded-3xl border border-[var(--border)] bg-[var(--surface)]/80 p-5">
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <p className="text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Momento aha</p>
-                                  <p className="mt-2 text-lg font-medium text-[var(--text-primary)]">Onboarding concierge completado</p>
-                                </div>
-                                <span className="rounded-full border border-[var(--accent-emerald)]/40 px-3 py-1 text-[11px] font-medium text-[var(--accent-emerald)]">92%</span>
-                              </div>
-                              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                                <span className="font-medium text-[var(--accent-emerald)]">Momento Aha em 3m42s</span> • NPS mensal 76 • Taxa de adoção de IA 94%.
-                              </p>
-                            </div>
-
-                            <div className="grid gap-4 rounded-3xl border border-[var(--border)] bg-[var(--surface)]/80 p-5">
-                              <div className="flex items-center justify-between text-sm text-[var(--text-secondary)]">
-                                <span>Blueprint executivo</span>
-                                <span className="inline-flex items-center gap-1 text-[var(--accent-emerald)]">
-                                  <ArrowUpRight className="h-4 w-4" /> Ver playbook
-                                </span>
-                              </div>
-                              <div className="grid gap-3 text-sm text-[var(--text-secondary)]">
-                                <div className="flex justify-between">
-                                  <span>Valor incremental</span>
-                                  <span className="text-[var(--text-primary)]">+R$ 720K</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>Precisão de forecast</span>
-                                  <span className="text-[var(--text-primary)]">92%</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>Eficiência IA</span>
-                                  <span className="text-[var(--text-primary)]">+34pp</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.section>
-
-                      <section>
-                        <div className="flex flex-wrap items-end justify-between gap-3">
-                          <div>
-                            <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">Radar de Performance</p>
-                            <h2 className="text-2xl font-semibold text-[var(--text-primary)]">KPIs estratégicos para decisões exponenciais</h2>
-                          </div>
-                          <p className="text-sm text-[var(--text-secondary)]">Atualizado • timeframe: {timeframe}</p>
-                        </div>
-
-                        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                          {kpis.map((kpi, index) => (
-                            <motion.div
-                              key={kpi.id}
-                              role="article"
-                              aria-label={`KPI: ${kpi.title} — Valor ${kpi.value}`}
-                              className="relative overflow-hidden rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface)]/85 p-6 sm:p-7"
-                              style={
-                                kpi.highlight
-                                  ? {
-                                      backgroundImage:
-                                        "linear-gradient(140deg, rgba(122,143,128,0.22) 0%, rgba(197,164,124,0.18) 48%, rgba(135,148,164,0.16) 100%)",
-                                    }
-                                  : undefined
-                              }
-                              initial={{ opacity: 0, y: 40 }}
-                              whileInView={{ opacity: 1, y: 0 }}
-                              whileHover={{ y: -10, rotateX: 0.5 }}
-                              transition={{ duration: 0.6, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
-                              viewport={{ once: true, amount: 0.35 }}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="grid h-12 w-12 place-content-center rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
-                                  {kpi.icon}
-                                </span>
-                                <span className={`text-xs font-medium ${kpi.trend >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"}`}>
-                                  {kpi.trend >= 0 ? "+" : ""}
-                                  {kpi.trend}%
-                                </span>
-                              </div>
-                              <h3 className="mt-5 text-lg font-medium tracking-tight text-[var(--text-primary)]">{kpi.title}</h3>
-                              <p className="mt-3 text-4xl font-semibold tracking-tight text-[var(--text-primary)]">{kpi.value}</p>
-                              <p className="mt-3 text-xs text-[var(--accent-emerald)]/80">{kpi.trendLabel}</p>
-                              <div className="mt-5 flex items-start justify-between text-xs text-[var(--text-secondary)]">
-                                <span className="max-w-[45%] leading-relaxed">{kpi.target}</span>
-                                <span className="max-w-[50%] text-right leading-relaxed">{kpi.description}</span>
-                              </div>
-                              <div className="mt-6 h-16 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)]/55 p-3">
-                                <Sparkline series={kpi.series} highlight={kpi.highlight} />
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </section>
+                    <div className="flex items-center justify-between">
+                      <span className="grid h-12 w-12 place-content-center rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
+                        {kpi.icon}
+                      </span>
+                      <span className={`text-xs font-medium ${kpi.trend >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"}`}>
+                        {kpi.trend >= 0 ? "+" : ""}
+                        {kpi.trend}%
+                      </span>
+                    </div>
+                    <h3 className="mt-5 text-lg font-medium tracking-tight text-[var(--text-primary)]">{kpi.title}</h3>
+                    <p className="mt-3 text-4xl font-semibold tracking-tight text-[var(--text-primary)]">{kpi.value}</p>
+                    <p className="mt-3 text-xs text-[var(--accent-emerald)]/80">{kpi.trendLabel}</p>
+                    <div className="mt-5 flex items-start justify-between text-xs text-[var(--text-secondary)]">
+                      <span className="max-w-[45%] leading-relaxed">{kpi.target}</span>
+                      <span className="max-w-[50%] text-right leading-relaxed">{kpi.description}</span>
+                    </div>
+                    <div className="mt-6 h-16 rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)]/55 p-3">
+                      <Sparkline series={kpi.series} highlight={kpi.highlight} />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
 
                       <section className="grid gap-8 xl:grid-cols-[1.45fr_0.85fr]">
                         <motion.div
