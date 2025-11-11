@@ -1,28 +1,22 @@
 # ========================================
 # ALSHAM 360° PRIMA - .gitignore
-# Version: 2.1.0 (Fixed)
+# Version: 2.1.0 - Cloud Deploy Ready
 # ========================================
 
-# ==================
 # DEPENDENCIES
-# ==================
 node_modules/
 .npm/
 .yarn/
 .pnp.*
 
-# ==================
 # BUILD OUTPUTS
-# ==================
 dist/
 build/
 *.tsbuildinfo
 .vite/
 vite.config.js.timestamp-*
 
-# ==================
 # ENVIRONMENT
-# ==================
 .env
 .env.local
 .env.*.local
@@ -31,97 +25,43 @@ vite.config.js.timestamp-*
 .env.production
 *.pem
 
-# ==================
 # LOGS
-# ==================
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-# ==================
 # OS FILES
-# ==================
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 desktop.ini
-$RECYCLE.BIN/
 
-# ==================
 # EDITORS
-# ==================
 .vscode/
 !.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 .idea/
 *.swp
-*.swo
-*.swn
 *~
-.project
-.classpath
-.settings/
-*.sublime-project
-*.sublime-workspace
 
-# ==================
 # TESTING
-# ==================
 coverage/
 .nyc_output/
 cypress/videos/
 cypress/screenshots/
-.cache/
 .eslintcache
-.stylelintcache
 
-# ==================
 # TEMPORARY
-# ==================
 tmp/
 temp/
 *.tmp
 *.bak
-*.backup
 
-# ==================
-# DEPLOYMENT (apenas cache)
-# ==================
+# DEPLOYMENT
 .vercel/
 .netlify/
-.firebase/
 
-# ==================
-# DATABASE
-# ==================
-*.sqlite
-*.sqlite3
-*.db
-
-# ==================
 # SECURITY
-# ==================
 *.key
 *.cert
-*.csr
 secrets/
-.secrets/
-
-# ==================
-# MISC
-# ==================
-.turbo/
-.next/
-.nuxt/
-.cache/
-.parcel-cache/
