@@ -7,14 +7,11 @@
 // 📊 ESTATÍSTICAS: ~570 funções, 141 tabelas, 40+ views, 45 canais real-time, 10 módulos, ~8850 linhas
 // 🧩 ARQUIVO ÚNICO: Consolidação de 10 partes sem remoções
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 const supabaseModule =
   typeof window !== 'undefined' && window?.supabase?.createClient
     ? window.supabase
     : await import('@supabase/supabase-js');
-
 const { createClient } = supabaseModule;
-
 if (typeof window !== 'undefined') {
   window.ALSHAM = window.ALSHAM || {};
   window.ALSHAM.METADATA = window.ALSHAM.METADATA || {};
@@ -35,15 +32,12 @@ if (typeof window !== 'undefined') {
     };
   }
 }
-
 if (typeof createClient !== 'function') {
   throw new Error('Supabase client factory not available.');
 }
-
 if (typeof window !== 'undefined' && !window.supabase) {
   window.supabase = supabaseModule;
 }
-
 // ═══════════════════════════════════════════════════════
 // PARTE 1: CORE - Configuração Base + Autenticação
 // ═══════════════════════════════════════════════════════
@@ -55,15 +49,14 @@ if (typeof window !== 'undefined' && !window.supabase) {
 // 📅 DATA: 2025-10-22
 // 🧩 MÓDULO: Core - Extensões (Organizações, CRUD Genérico, Segurança)
 // 🔒 ALTERAÇÕES: crypto versioning, SSR crypto fallback, PBKDF2 iterations env,
-//                org event dispatch, slug auto-gen, stricter pagination,
-//                audit logs, validateSession returns user, batchInsert counts
+// org event dispatch, slug auto-gen, stricter pagination,
+// audit logs, validateSession returns user, batchInsert counts
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 /**
  * Instruções rápidas:
  * - Substitua o arquivo de extensão atual por este (ou mescle as mudanças).
  * - Recomenda-se criar a função SQL `alsham_is_rls_enabled(table_name text)` no DB
- *   para que orgPolicyCheck retorne resultado definitivo.
+ * para que orgPolicyCheck retorne resultado definitivo.
  *
  * Notas de configuração (opcionais):
  * - VITE_ALSHAM_ENCRYPTION_KEY: string principal para derivação (recomendado).
@@ -73,7 +66,6 @@ if (typeof window !== 'undefined' && !window.supabase) {
  * - payload = base64( header | iv (12 bytes) | ciphertext )
  * - header = `${ALSHAM_CRYPTO_VERSION}|` as UTF-8
  */
-
 // As funções supabase, response, logDebug, logError, logWarn serão definidas a partir do core
 // e usadas pelas outras partes.
 let supabase;
@@ -84,6 +76,34 @@ const logDebug = console.log;
 const logError = console.error;
 const logWarn = console.warn;
 
+// Função para obter o ID da organização ativa (padronizada)
+export async function getActiveOrganization() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+    const { data, error } = await supabase
+      .from('user_organizations')
+      .select('org_id')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .single();
+    if (error) throw error;
+    if (!data.org_id) {
+      logError('Org ID not found for active organization');
+      throw new Error('No active organization found');
+    }
+    return data.org_id;
+  } catch (err) {
+    logWarn('getActiveOrganization falhou:', err);
+    return null;
+  }
+}
+
+// Alias para compatibilidade retroativa com chamadas antigas de getCurrentOrgId
+export async function getCurrentOrgId() {
+  return await getActiveOrganization();
+}
+
 const resolveEnvValue = (key, fallback = '') => {
   if (typeof process !== 'undefined' && process?.env?.[key]) {
     return process.env[key];
@@ -93,7 +113,6 @@ const resolveEnvValue = (key, fallback = '') => {
   }
   return fallback;
 };
-
 const SUPABASE_URL =
   resolveEnvValue('VITE_SUPABASE_URL', resolveEnvValue('SUPABASE_URL', 'https://example.supabase.co'));
 const SUPABASE_ANON_KEY =
@@ -102,7 +121,6 @@ const SUPABASE_CONFIG = Object.freeze({
   url: SUPABASE_URL,
   anonKey: SUPABASE_ANON_KEY
 });
-
 function ensureSupabaseClient() {
   if (typeof window !== 'undefined') {
     if (!window.__VITE_SUPABASE_URL__) {
@@ -121,11 +139,9 @@ function ensureSupabaseClient() {
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
       }
     });
-
     if (typeof globalContainer !== 'undefined') {
       globalContainer[GLOBAL_CLIENT_KEY] = supabase;
     }
-
     if (typeof window !== 'undefined') {
       window.AlshamSupabase = window.AlshamSupabase || {};
       if (!window.AlshamSupabase.supabase) {
@@ -138,15 +154,11 @@ function ensureSupabaseClient() {
   }
   return supabase;
 }
-
 ensureSupabaseClient();
-
 export function getSupabaseClient() {
   return ensureSupabaseClient();
 }
-
 export { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIG };
-
 export async function getCurrentSession() {
   try {
     const client = ensureSupabaseClient();
@@ -158,7 +170,6 @@ export async function getCurrentSession() {
     throw err;
   }
 }
-
 const supabaseClient = supabase;
 export { supabaseClient as supabase };
 
