@@ -88,9 +88,17 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
     let mounted = true;
     const fetchLead = async () => {
       try {
-        if (!leadId) {
+        // ✅ VALIDAÇÃO MELHORADA:
+        if (!leadId || leadId === 'undefined' || leadId === 'null') {
           throw new Error('Identificador de lead inválido');
         }
+        
+        // ✅ VALIDAÇÃO DE FORMATO UUID:
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(leadId)) {
+          throw new Error('Formato de ID inválido. Esperado UUID v4.');
+        }
+
         setLoading(true);
         setError(null);
 
@@ -214,8 +222,14 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
       onBack();
       return;
     }
-    // FIX: fallback para navegação quando onBack não é fornecido
-    window.history.back();
+    
+    // ✅ Fallback inteligente quando onBack não é fornecido
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Se não houver histórico, redirecionar para listagem de leads
+      window.location.href = '/leads';
+    }
   }, [onBack]);
 
   const handleDelete = useCallback(async () => {
@@ -260,7 +274,7 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
         <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
         <p className="text-xl">Erro: {error || 'Lead não encontrado'}</p>
         <button 
-          onClick={onBack}
+          onClick={handleBack}
           className="mt-4 px-4 py-2 bg-[var(--accent-emerald)] rounded-lg hover:opacity-80"
         >
           Voltar
@@ -280,14 +294,12 @@ export default function LeadsDetails({ leadId, onBack }: LeadsDetailsProps) {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          {onBack && (
-            <button 
-              onClick={onBack}
-              className="p-2 hover:bg-[var(--surface)] rounded-lg transition"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          )}
+          <button 
+            onClick={handleBack}
+            className="p-2 hover:bg-[var(--surface)] rounded-lg transition"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
           <div>
             <h1 className="text-3xl font-bold">{lead.name}</h1>
             <p className="text-sm text-gray-400">{lead.company || 'Sem empresa'}</p>
