@@ -1096,91 +1096,76 @@ function App() {
   }, [fetchData]);
 
  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  useEffect(() => {
-    console.log('🔴 Iniciando subscriptions Real-time...');
+// ⚡ FASE 3 – REAL-TIME SUBSCRIPTIONS (ALSHAM 360° PRIMA) - FIXED
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+useEffect(() => {
+  console.log('🔴 Iniciando subscriptions Real-time...');
 
-    // Subscribe para mudanças em leads
-    const leadsChannel = supabase
-      .channel('leads_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'leads_crm'
-        },
-        (payload) => {
-          console.log('📊 Lead atualizado:', payload);
-          fetchData(); // Re-carregar dados
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Subscription para leads ativa');
-        } else if (status === 'CLOSED') {
-          console.log('❌ Subscription para leads fechada');
-        }
-      });
+  // Subscribe para mudanças em leads
+  const leadsChannel = supabase
+    .channel('leads_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'leads_crm'
+      },
+      (payload) => {
+        console.log('📊 Lead atualizado:', payload);
+        fetchData(); // Re-carregar dados
+      }
+    )
+    .subscribe();
 
-    // Subscribe para mudanças em campanhas
-    const campaignsChannel = supabase
-      .channel('campaigns_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'marketing_campaigns' // Corrigido para tabela real (baseado em supabase-full.js)
-        },
-        (payload) => {
-          console.log('🚀 Campanha atualizada:', payload);
-          fetchData();
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Subscription para campanhas ativa');
-        } else if (status === 'CLOSED') {
-          console.log('❌ Subscription para campanhas fechada');
-        }
-      });
+  // Subscribe para mudanças em campanhas
+  const campaignsChannel = supabase
+    .channel('campaigns_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'marketing_campaigns'
+      },
+      (payload) => {
+        console.log('🚀 Campanha atualizada:', payload);
+        fetchData();
+      }
+    )
+    .subscribe();
 
-    // Subscribe para mudanças em gamificação
-    const gamificationChannel = supabase
-      .channel('gamification_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'gamification_points'
-        },
-        (payload) => {
-          console.log('🏆 Pontuação atualizada:', payload);
-          fetchData();
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Subscription para gamificação ativa');
-        } else if (status === 'CLOSED') {
-          console.log('❌ Subscription para gamificação fechada');
-        }
-      });
+  // Subscribe para mudanças em gamificação
+  const gamificationChannel = supabase
+    .channel('gamification_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'gamification_points'
+      },
+      (payload) => {
+        console.log('🏆 Pontuação atualizada:', payload);
+        fetchData();
+      }
+    )
+    .subscribe();
 
-    // Cleanup ao desmontar
-    return () => {
-      console.log('🔴 Desconectando subscriptions...');
-      leadsChannel.unsubscribe();
-      campaignsChannel.unsubscribe();
-      gamificationChannel.unsubscribe();
-    };
-  }, [fetchData]);
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🔚 FIM DA INTEGRAÇÃO REAL-TIME
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  console.log('✅ Subscriptions Real-time iniciadas');
+
+  // Cleanup ao desmontar
+  return () => {
+    console.log('🔴 Desconectando subscriptions...');
+    supabase.removeChannel(leadsChannel);
+    supabase.removeChannel(campaignsChannel);
+    supabase.removeChannel(gamificationChannel);
+  };
+}, [fetchData]);
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🔚 FIM DA INTEGRAÇÃO REAL-TIME
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
