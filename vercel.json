@@ -2,13 +2,9 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-
-  // 🔁 SPA fallback: envia qualquer rota para o index.html
   "routes": [
     { "src": "/(.*)", "dest": "/index.html" }
   ],
-
-  // 🔐 CSP ajustada: GA4, Supabase e Toolbar da Vercel permitidos
   "headers": [
     {
       "source": "/(.*)",
