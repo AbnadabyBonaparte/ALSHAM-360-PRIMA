@@ -1,25 +1,17 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-ALSHAM-Test",
-          "value": "vercel-json-working"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src-elem 'self' 'unsafe-inline' https://us-assets.i.posthog.com https://*.posthog.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; worker-src 'self' blob:; frame-src 'self';"
-        }
-      ]
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src-elem 'self' 'unsafe-inline' https://us-assets.i.posthog.com https://app.posthog.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; worker-src 'self' blob:; frame-src 'self';",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "SAMEORIGIN",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      }
     }
   ],
   "cleanUrls": true,
