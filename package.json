@@ -1,7 +1,6 @@
 {
-  "name": "youware-react-template",
-  "private": true,
-  "version": "0.0.0",
+  "name": "alsham-360-prima",
+  "version": "10.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
