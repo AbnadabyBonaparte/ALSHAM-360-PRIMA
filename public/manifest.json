@@ -3,46 +3,86 @@
   "short_name": "ALSHAM360",
   "lang": "pt-BR",
   "description": "CRM Inteligente com IA, Gamificação e Automações.",
-  "start_url": "/dashboard.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#F9FAFB",
-  "theme_color": "#0176D3",
+  "background_color": "#0a0a0a",
+  "theme_color": "#10b981",
   "categories": ["business", "productivity", "crm", "sales", "automation", "analytics"],
   "icons": [
     {
-      "src": "/pwa-192x192.png",
+      "src": "/icons/pwa-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/pwa-512x512.png",
+      "src": "/icons/pwa-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon.png",
+      "src": "/icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
-    },
-    {
-      "src": "/favicon.ico",
-      "sizes": "48x48",
-      "type": "image/x-icon"
     }
   ],
   "shortcuts": [
-    { "name": "Dashboard", "url": "/dashboard.html" },
-    { "name": "Leads", "url": "/leads-real.html" },
-    { "name": "Pipeline", "url": "/pipeline.html" },
-    { "name": "Relatórios", "url": "/relatorios.html" }
-  ]
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Painel principal",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icons/icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    },
+    {
+      "name": "Leads",
+      "short_name": "Leads",
+      "description": "Gestão de Leads",
+      "url": "/leads",
+      "icons": [
+        {
+          "src": "/icons/icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    },
+    {
+      "name": "Pipeline",
+      "short_name": "Pipeline",
+      "description": "Funil de vendas",
+      "url": "/pipeline",
+      "icons": [
+        {
+          "src": "/icons/icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "short_name": "Relatórios",
+      "description": "Analytics e KPIs",
+      "url": "/reports",
+      "icons": [
+        {
+          "src": "/icons/icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
 }

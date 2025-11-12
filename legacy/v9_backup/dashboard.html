@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Executivo — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Dashboard Executivo ALSHAM 360° PRIMA - KPIs e Analytics em tempo real" />
+
+  <!-- PWA & ÍCONES -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- SUPABASE INIT (MÓDULO) - CARREGA PRIMEIRO -->
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+
+  <!-- MAIN.JS - CARREGA DEPOIS DO SUPABASE -->
+  <script type="module" src="/src/js/main.js"></script>
+
+  <!-- ESTILOS -->
+  <style>
+    :root {
+      color-scheme: light only;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .dashboard-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    .dashboard-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .dashboard-header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .dashboard-header p {
+      margin: 0.25rem 0 0 0;
+      font-size: 1rem;
+      color: #475569;
+    }
+
+    .snapshot-card {
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: #f8fafc;
+      border-radius: 1.25rem;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 24px 48px -20px rgba(29, 78, 216, 0.45);
+    }
+
+    .snapshot-card h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .snapshot-card strong {
+      display: block;
+      font-size: 2.25rem;
+      font-weight: 700;
+    }
+
+    .snapshot-card span {
+      display: block;
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+      color: rgba(248, 250, 252, 0.75);
+    }
+
+    .metrics-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 3rem;
+    }
+
+    .metric-card {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 20px 35px -22px rgba(15, 23, 42, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .metric-card span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .metric-card strong {
+      font-size: 2rem;
+      color: #1d4ed8;
+      line-height: 1.2;
+    }
+
+    .metric-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    .insights-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      margin-bottom: 3rem;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 24px 50px -25px rgba(15, 23, 42, 0.35);
+    }
+
+    .panel h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      color: #0f172a;
+    }
+
+    .panel ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    .panel ul li + li {
+      margin-top: 0.65rem;
+    }
+
+    .trend-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .trend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.95rem;
+      color: #0f172a;
+    }
+
+    .trend-item strong {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    .activity-section {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 24px 50px -25px rgba(15, 23, 42, 0.35);
+    }
+
+    .activity-section h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+    }
+
+    .activity-timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .activity-timeline li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1.1rem;
+      border-radius: 1rem;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    .activity-timeline span {
+      font-size: 0.85rem;
+      color: #475569;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 1rem 3rem;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 10000;
+      backdrop-filter: blur(4px);
+    }
+
+    #loading-overlay .loading-card {
+      background: #ffffff;
+      padding: 2.5rem 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 55px -15px rgba(15, 23, 42, 0.5);
+      text-align: center;
+      max-width: 380px;
+      min-width: 320px;
+    }
+
+    #loading-overlay .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #e2e8f0;
+      border-top-color: #1d4ed8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #loading-overlay h2 {
+      margin: 0 0 0.75rem 0;
+      color: #1d4ed8;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    #loading-overlay p {
+      margin: 0;
+      color: #475569;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    #loading-overlay .error-state {
+      color: #dc2626;
+    }
+
+    #loading-overlay .error-state h2 {
+      color: #dc2626;
+    }
+
+    #loading-overlay .error-details {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #fef2f2;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      color: #991b1b;
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #loading-overlay .btn-group {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    #loading-overlay button,
+    #loading-overlay a {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    #loading-overlay .btn-primary {
+      background: #1d4ed8;
+      color: white;
+    }
+
+    #loading-overlay .btn-primary:hover {
+      background: #1e40af;
+    }
+
+    #loading-overlay .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    #loading-overlay .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h2 id="loading-title">Carregando Dashboard...</h2>
+      <p id="loading-message">Validando sessão e carregando dados em tempo real.</p>
+      <div id="loading-details" class="error-details hidden"></div>
+      <div id="loading-actions" class="btn-group hidden"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD CONTENT -->
+  <main class="dashboard-container hidden" id="dashboard-root">
+    <header class="dashboard-header">
+      <div>
+        <h1>Dashboard Executivo</h1>
+        <p>KPIs consolidados da operação ALSHAM 360° PRIMA</p>
+      </div>
+      <div class="snapshot-card" aria-label="Resumo do dia">
+        <h2>Snapshot Diário</h2>
+        <strong id="snapshot-value">R$ 482K</strong>
+        <span>MRR projetado com base em 415 contas ativas</span>
+      </div>
+    </header>
+
+    <section class="metrics-grid" aria-label="Indicadores principais">
+      <article class="metric-card">
+        <span>Leads Hoje</span>
+        <strong id="leads-today">42</strong>
+        <p>Novos cadastros nas últimas 24 horas</p>
+      </article>
+      <article class="metric-card">
+        <span>Conversão semanal</span>
+        <strong id="conversion-rate">18,5%</strong>
+        <p>Taxa média de avanço no funil comercial</p>
+      </article>
+      <article class="metric-card">
+        <span>Previsão de fechamento</span>
+        <strong id="forecast-value">R$ 1,8M</strong>
+        <p>Pipeline ponderado para os próximos 30 dias</p>
+      </article>
+      <article class="metric-card">
+        <span>Tempo médio de resposta</span>
+        <strong id="response-time">1h 14m</strong>
+        <p>Atendimento omnichannel real-time</p>
+      </article>
+      <article class="metric-card">
+        <span>Tickets abertos</span>
+        <strong id="open-tickets">28</strong>
+        <p>Chamados aguardando tratativa</p>
+      </article>
+      <article class="metric-card">
+        <span>Satisfação NPS</span>
+        <strong id="nps-score">76</strong>
+        <p>Índice calculado a partir de 415 respostas</p>
+      </article>
+      <article class="metric-card">
+        <span>Campanhas ativas</span>
+        <strong id="active-campaigns">12</strong>
+        <p>Fluxos rodando em canais digitais</p>
+      </article>
+      <article class="metric-card">
+        <span>Retenção líquida</span>
+        <strong id="retention-rate">118%</strong>
+        <p>Expansão via upsell e cross-sell nas contas</p>
+      </article>
+    </section>
+
+    <section class="insights-grid" aria-label="Análises consolidadas">
+      <article class="panel" aria-labelledby="funnel-progress-title">
+        <h2 id="funnel-progress-title">Progresso do Funil</h2>
+        <ul>
+          <li id="funnel-1">140 oportunidades em prospecção ativa</li>
+          <li id="funnel-2">68 propostas aguardando assinatura</li>
+          <li id="funnel-3">21 negociações críticas com follow-up diário</li>
+          <li id="funnel-4">Receita conquistada no mês: <strong>R$ 920K</strong></li>
+        </ul>
+      </article>
+
+      <article class="panel" aria-labelledby="retention-panel-title">
+        <h2 id="retention-panel-title">Retenção & Experiência</h2>
+        <ul>
+          <li id="retention-1">Churn voluntário reduziu 12% vs. mês anterior</li>
+          <li id="retention-2">83% dos tickets resolvidos no primeiro contato</li>
+          <li id="retention-3">Comunidade ativa com 1.250 interações semanais</li>
+          <li id="retention-4">CSAT médio de <strong>4,6/5</strong> em 3.100 avaliações</li>
+        </ul>
+      </article>
+
+      <article class="panel" aria-labelledby="trend-panel-title">
+        <h2 id="trend-panel-title">Tendências Prioritárias</h2>
+        <ul class="trend-list">
+          <li class="trend-item" id="trend-1"><span>IA aplicada ao onboarding</span><strong>+32% adoção</strong></li>
+          <li class="trend-item" id="trend-2"><span>Playbook de vendas consultivas</span><strong>+19% taxa de ganho</strong></li>
+          <li class="trend-item" id="trend-3"><span>Campanhas de automação por e-mail</span><strong>+24% engajamento</strong></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="activity-section" aria-label="Atividades recentes">
+      <h2>Linha do tempo executiva</h2>
+      <ul class="activity-timeline" id="activity-timeline">
+        <li id="activity-1"><span>09:20</span> Fechamento da conta Enterprise — Setor Energia</li>
+        <li id="activity-2"><span>11:05</span> Aprovação de orçamento em Gamificação & Onboarding</li>
+        <li id="activity-3"><span>13:40</span> Renegociação concluída com upsell de plataforma IA</li>
+        <li id="activity-4"><span>16:15</span> Comitê executivo confirmou OKRs do próximo trimestre</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 ALSHAM 360° PRIMA — Dados processados automaticamente pela suíte de inteligência.
+  </footer>
+
+  <!-- DASHBOARD INITIALIZATION SCRIPT -->
+  <script type="module">
+    console.log('🚀 [DASHBOARD] Módulo dashboard.js carregado');
+
+    // Função para atualizar o loading overlay
+    function updateLoadingState(title, message, isError = false, details = null) {
+      const titleEl = document.getElementById('loading-title');
+      const messageEl = document.getElementById('loading-message');
+      const detailsEl = document.getElementById('loading-details');
+      const actionsEl = document.getElementById('loading-actions');
+      const loadingCard = document.querySelector('#loading-overlay .loading-card');
+      
+      if (titleEl) titleEl.textContent = title;
+      if (messageEl) messageEl.textContent = message;
+      
+      if (isError) {
+        loadingCard?.classList.add('error-state');
+        
+        if (details && detailsEl) {
+          detailsEl.textContent = details;
+          detailsEl.classList.remove('hidden');
+        }
+        
+        if (actionsEl) {
+          actionsEl.innerHTML = `
+            <button class="btn-primary" onclick="location.reload()">🔄 Tentar Novamente</button>
+            <a href="/login.html" class="btn-secondary">🔐 Voltar ao Login</a>
+          `;
+          actionsEl.classList.remove('hidden');
+        }
+        
+        // Remove spinner
+        const spinner = document.querySelector('#loading-overlay .spinner');
+        if (spinner) spinner.style.display = 'none';
+      }
+    }
+
+    // Função principal de inicialização do dashboard
+    async function initializeDashboard() {
+      try {
+        console.log('✅ [DASHBOARD] DOM já carregado');
+        console.log('🚀 [DASHBOARD] Iniciando carregamento do dashboard...');
+        console.log('🌐 [DASHBOARD] URL:', window.location.href);
+        console.log('📍 [DASHBOARD] Pathname:', window.location.pathname);
+
+        // 1. Aguarda Supabase
+        updateLoadingState('Inicializando...', 'Conectando ao Supabase...');
+        console.log('⏳ [DASHBOARD] Aguardando Supabase...');
+        
+        await new Promise((resolve, reject) => {
+          let attempts = 0;
+          const maxAttempts = 100; // 10 segundos
+          
+          const check = () => {
+            attempts++;
+            
+            if (window.AlshamSupabase?.supabase) {
+              console.log('✅ [DASHBOARD] Supabase disponível');
+              resolve();
+            } else if (attempts >= maxAttempts) {
+              reject(new Error('Timeout: Supabase não inicializou'));
+            } else {
+              setTimeout(check, 100);
+            }
+          };
+          
+          check();
+        });
+
+        // 2. Aguarda Main.js
+        updateLoadingState('Inicializando...', 'Carregando módulos do sistema...');
+        console.log('⏳ [DASHBOARD] Aguardando Main.js...');
+        
+        await new Promise((resolve, reject) => {
+          let attempts = 0;
+          const maxAttempts = 150; // 15 segundos
+          
+          const check = () => {
+            attempts++;
+            
+            if (window.AlshamMain?.initializeMain) {
+              console.log('✅ [DASHBOARD] Main.js disponível');
+              resolve();
+            } else if (attempts >= maxAttempts) {
+              reject(new Error('Timeout: Main.js não carregou'));
+            } else {
+              setTimeout(check, 100);
+            }
+          };
+          
+          check();
+        });
+
+        // 3. Inicializa o Main.js (se ainda não foi)
+        if (window.AlshamMain && !window.AlshamMain.AppState.isInitialized) {
+          console.log('🔄 [DASHBOARD] Inicializando Main.js...');
+          await window.AlshamMain.initializeMain();
+        }
+
+        // 4. Valida sessão
+        updateLoadingState('Validando acesso...', 'Verificando suas credenciais...');
+        console.log('🔐 [DASHBOARD] Iniciando validação de sessão...');
+        
+        const { getCurrentSession } = window.AlshamSupabase;
+        const session = await getCurrentSession();
+
+        if (!session?.user) {
+          console.warn('⚠️ [DASHBOARD] Sessão inválida - redirecionando para login');
+          updateLoadingState('Redirecionando...', 'Você precisa fazer login primeiro.');
+          
+          setTimeout(() => {
+            window.location.replace('/login.html');
+          }, 1500);
+          return;
+        }
+
+        console.log('✅ [DASHBOARD] Sessão válida confirmada');
+        console.log('👤 [DASHBOARD] Usuário:', session.user.email);
+
+        // 5. Carrega dados do dashboard
+        updateLoadingState('Quase pronto...', 'Carregando seus dados...');
+        console.log('📊 [DASHBOARD] Carregando dados do dashboard...');
+        
+        // Aqui você pode adicionar chamadas para carregar dados reais
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simula carregamento
+
+        // 6. Mostra dashboard
+        console.log('✅ [DASHBOARD] Sessão validada com sucesso');
+        
+        const overlay = document.getElementById('loading-overlay');
+        const dashboardRoot = document.getElementById('dashboard-root');
+        
+        if (overlay) overlay.classList.add('hidden');
+        if (dashboardRoot) {
+          dashboardRoot.classList.remove('hidden');
+          dashboardRoot.classList.add('fade-in');
+        }
+        
+        console.log('🎉 [DASHBOARD] Dashboard carregado com sucesso!');
+
+      } catch (error) {
+        console.error('❌ [DASHBOARD] Erro ao carregar:', error);
+        
+        updateLoadingState(
+          'Erro ao Carregar',
+          'Não foi possível carregar o dashboard.',
+          true,
+          `Erro: ${error.message}\n\nTente recarregar a página ou faça login novamente.`
+        );
+      }
+    }
+
+    // Timeout de segurança
+    setTimeout(() => {
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay && !overlay.classList.contains('hidden')) {
+        console.error('⏰ [DASHBOARD] Timeout de 15 segundos atingido');
+        updateLoadingState(
+          'Tempo Esgotado',
+          'O dashboard demorou muito para carregar.',
+          true,
+          'O carregamento excedeu 15 segundos. Isso pode indicar:\n- Conexão lenta\n- Problemas com o servidor\n- Scripts bloqueados pelo navegador'
+        );
+      }
+    }, 15000);
+
+    // Inicia quando DOM estiver pronto
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeDashboard);
+    } else {
+      initializeDashboard();
+    }
+
+    // Captura erros globais
+    window.addEventListener('error', e => {
+      console.error('❌ [DASHBOARD] Erro global:', e.message);
+    });
+    
+    window.addEventListener('unhandledrejection', e => {
+      console.error('❌ [DASHBOARD] Promise rejeitada:', e.reason);
+    });
+  </script>
+</body>
+</html>

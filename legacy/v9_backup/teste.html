@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+  <title>🔧 ALSHAM - Teste de Sistema</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .test-item {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #95a5a6;
+      background: #f8f9fa;
+    }
+    .test-item.loading {
+      border-color: #f39c12;
+      background: #fff3cd;
+    }
+    .test-item.success {
+      border-color: #27ae60;
+      background: #d4edda;
+    }
+    .test-item.error {
+      border-color: #e74c3c;
+      background: #f8d7da;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn:hover { opacity: 0.9; }
+    code {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+    pre {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 ALSHAM 360° - Diagnóstico de Sistema</h1>
+    
+    <div id="tests">
+      <div class="test-item loading" id="test-1">
+        ⏳ <strong>Teste 1:</strong> Verificando HTML básico...
+      </div>
+      <div class="test-item loading" id="test-2">
+        ⏳ <strong>Teste 2:</strong> Verificando JavaScript...
+      </div>
+      <div class="test-item loading" id="test-3">
+        ⏳ <strong>Teste 3:</strong> Verificando CSS...
+      </div>
+      <div class="test-item loading" id="test-4">
+        ⏳ <strong>Teste 4:</strong> Testando conexão Supabase CDN...
+      </div>
+      <div class="test-item loading" id="test-5">
+        ⏳ <strong>Teste 5:</strong> Verificando arquivos locais...
+      </div>
+      <div class="test-item loading" id="test-6">
+        ⏳ <strong>Teste 6:</strong> Testando Chart.js...
+      </div>
+    </div>
+
+    <div id="summary" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; display: none;">
+      <h3>📊 Resumo dos Testes</h3>
+      <div id="summary-content"></div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="runTests()">🔄 Executar Testes Novamente</button>
+      <a href="/dashboard.html" class="btn btn-success">📊 Ir para Dashboard</a>
+      <a href="/login.html" class="btn btn-success">🔐 Ir para Login</a>
+      <button class="btn btn-danger" onclick="clearCache()">🗑️ Limpar Cache</button>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #e8f4f8; border-radius: 8px;">
+      <h3>ℹ️ Informações do Sistema</h3>
+      <div id="system-info"></div>
+    </div>
+  </div>
+
+  <script>
+    let testResults = {
+      passed: 0,
+      failed: 0,
+      total: 6
+    };
+
+    // Informações do sistema
+    function showSystemInfo() {
+      const info = {
+        'User Agent': navigator.userAgent,
+        'Plataforma': navigator.platform,
+        'Idioma': navigator.language,
+        'Online': navigator.onLine ? '✅ Sim' : '❌ Não',
+        'Service Worker': 'serviceWorker' in navigator ? '✅ Suportado' : '❌ Não suportado',
+        'URL Atual': window.location.href,
+        'LocalStorage': typeof localStorage !== 'undefined' ? '✅ Disponível' : '❌ Indisponível',
+        'Cookies': navigator.cookieEnabled ? '✅ Habilitados' : '❌ Desabilitados'
+      };
+
+      const infoEl = document.getElementById('system-info');
+      infoEl.innerHTML = Object.entries(info)
+        .map(([key, value]) => `<div style="margin: 5px 0;"><strong>${key}:</strong> <code>${value}</code></div>`)
+        .join('');
+    }
+
+    // Teste 1: HTML básico
+    function test1() {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          updateTest('test-1', true, 'HTML carregado corretamente');
+          resolve();
+        }, 100);
+      });
+    }
+
+    // Teste 2: JavaScript
+    function test2() {
+      return new Promise((resolve) => {
+        try {
+          const test = JSON.parse('{"test": true}');
+          const arrow = () => true;
+          updateTest('test-2', true, 'JavaScript funcionando (ES6+, JSON)');
+          resolve();
+        } catch (e) {
+          updateTest('test-2', false, 'Erro no JavaScript: ' + e.message);
+          resolve();
+        }
+      });
+    }
+
+    // Teste 3: CSS
+    function test3() {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const el = document.getElementById('test-1');
+          const styles = window.getComputedStyle(el);
+          const hasStyles = styles.padding !== '0px';
+          updateTest('test-3', hasStyles, hasStyles ? 'CSS carregado' : 'CSS pode não estar funcionando');
+          resolve();
+        }, 100);
+      });
+    }
+
+    // Teste 4: Supabase CDN
+    function test4() {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        
+        const timeout = setTimeout(() => {
+          updateTest('test-4', false, 'Timeout: Supabase CDN demorou mais de 5s');
+          resolve();
+        }, 5000);
+
+        script.onload = () => {
+          clearTimeout(timeout);
+          updateTest('test-4', true, 'Supabase CDN carregado ✅');
+          resolve();
+        };
+
+        script.onerror = () => {
+          clearTimeout(timeout);
+          updateTest('test-4', false, 'Falha ao carregar Supabase CDN ❌');
+          resolve();
+        };
+
+        document.head.appendChild(script);
+      });
+    }
+
+    // Teste 5: Arquivos locais
+    async function test5() {
+      const filesToTest = [
+        '/css/style.css',
+        '/css/tokens.css',
+        '/manifest.json'
+      ];
+
+      let allPassed = true;
+      let details = [];
+
+      for (const file of filesToTest) {
+        try {
+          const response = await fetch(file, { method: 'HEAD' });
+          if (response.ok) {
+            details.push(`✅ ${file}`);
+          } else {
+            details.push(`❌ ${file} (${response.status})`);
+            allPassed = false;
+          }
+        } catch (e) {
+          details.push(`❌ ${file} (erro: ${e.message})`);
+          allPassed = false;
+        }
+      }
+
+      updateTest('test-5', allPassed, 'Verificação de arquivos:\n' + details.join('\n'));
+    }
+
+    // Teste 6: Chart.js
+    function test6() {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js';
+        
+        const timeout = setTimeout(() => {
+          updateTest('test-6', false, 'Timeout: Chart.js demorou mais de 5s');
+          resolve();
+        }, 5000);
+
+        script.onload = () => {
+          clearTimeout(timeout);
+          const hasChart = typeof window.Chart !== 'undefined';
+          updateTest('test-6', hasChart, hasChart ? 'Chart.js carregado ✅' : 'Chart.js não encontrado');
+          resolve();
+        };
+
+        script.onerror = () => {
+          clearTimeout(timeout);
+          updateTest('test-6', false, 'Falha ao carregar Chart.js ❌');
+          resolve();
+        };
+
+        document.head.appendChild(script);
+      });
+    }
+
+    // Atualizar status do teste
+    function updateTest(id, success, message) {
+      const el = document.getElementById(id);
+      el.className = 'test-item ' + (success ? 'success' : 'error');
+      const emoji = success ? '✅' : '❌';
+      const testNum = id.split('-')[1];
+      el.innerHTML = `${emoji} <strong>Teste ${testNum}:</strong> ${message.replace(/\n/g, '<br>')}`;
+      
+      if (success) testResults.passed++;
+      else testResults.failed++;
+    }
+
+    // Executar todos os testes
+    async function runTests() {
+      testResults = { passed: 0, failed: 0, total: 6 };
+      
+      // Reset
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById(`test-${i}`);
+        el.className = 'test-item loading';
+        el.innerHTML = `⏳ <strong>Teste ${i}:</strong> Executando...`;
+      }
+
+      await test1();
+      await test2();
+      await test3();
+      await test4();
+      await test5();
+      await test6();
+
+      showSummary();
+    }
+
+    // Mostrar resumo
+    function showSummary() {
+      const summaryEl = document.getElementById('summary');
+      const contentEl = document.getElementById('summary-content');
+      
+      const percentage = Math.round((testResults.passed / testResults.total) * 100);
+      const status = percentage === 100 ? '🎉 Todos os testes passaram!' : 
+                     percentage >= 70 ? '⚠️ Alguns problemas detectados' :
+                     '🚨 Problemas críticos detectados';
+
+      contentEl.innerHTML = `
+        <div style="margin-top: 15px;">
+          <div style="font-size: 18px; font-weight: bold; color: ${percentage >= 70 ? '#27ae60' : '#e74c3c'};">
+            ${status}
+          </div>
+          <div style="margin-top: 10px;">
+            <strong>Aprovados:</strong> ${testResults.passed}/${testResults.total} (${percentage}%)
+          </div>
+          ${testResults.failed > 0 ? `
+            <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 6px;">
+              <strong>⚠️ Recomendação:</strong><br>
+              ${percentage < 70 ? 
+                'Há problemas críticos. Verifique o console do navegador (F12) e entre em contato com o suporte.' :
+                'Alguns recursos podem não funcionar corretamente. Tente limpar o cache do navegador.'
+              }
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      summaryEl.style.display = 'block';
+    }
+
+    // Limpar cache
+    async function clearCache() {
+      if (confirm('⚠️ Isso irá limpar todo o cache e dados locais. Continuar?')) {
+        try {
+          // Limpar localStorage
+          localStorage.clear();
+          
+          // Limpar Service Workers
+          if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const reg of registrations) {
+              await reg.unregister();
+            }
+          }
+          
+          // Limpar Cache API
+          if ('caches' in window) {
+            const names = await caches.keys();
+            await Promise.all(names.map(name => caches.delete(name)));
+          }
+          
+          alert('✅ Cache limpo! A página será recarregada.');
+          window.location.reload();
+        } catch (e) {
+          alert('❌ Erro ao limpar cache: ' + e.message);
+        }
+      }
+    }
+
+    // Executar ao carregar
+    window.addEventListener('load', () => {
+      showSystemInfo();
+      runTests();
+    });
+  </script>
+</body>
+</html>
