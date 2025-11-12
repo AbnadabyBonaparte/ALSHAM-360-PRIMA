@@ -15,7 +15,7 @@ console.log('✅ Supabase Master carregado:', Object.keys(supabaseFull).length, 
 export async function getLead(id: string) {
   const { data, error } = await genericSelect('leads_crm', { id });
   if (error) throw new Error(error.message);
-  return data[0]; // Retorna o lead único ou undefined se não existir
+  return data?.[0]; // Retorna o lead único ou undefined se não existir
 }
 
 export async function updateLead(id: string, updates: any) {
@@ -44,9 +44,9 @@ export async function getLeadInteractions(leadId: string) {
 
 // subscribeLeads já existe no full.js, então o re-export deve funcionar
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🔧 GENERIC SELECT - EXPORTAÇÃO OBRIGATÓRIA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ═══════════════════════════════════════════════════════════════════════
+// 🔧 GENERIC SELECT - EXPORTAÇÃO OBRIGATÓRIA (FIX: sem created_at)
+// ═══════════════════════════════════════════════════════════════════════
 export const genericSelect = async (
   table: string,
   filters?: Record<string, any>,
@@ -77,10 +77,14 @@ export const genericSelect = async (
       });
     }
 
+    // ✅ FIX: Ordenação segura - usa 'id' se não especificado
     if (options?.orderBy) {
       query = query.order(options.orderBy.column, {
         ascending: options.orderBy.ascending ?? true
       });
+    } else {
+      // Default: ordenar por id (coluna que sempre existe)
+      query = query.order('id', { ascending: false });
     }
 
     if (options?.limit) {
@@ -104,4 +108,3 @@ export const genericSelect = async (
     return { data: null, error, count: 0 };
   }
 };
- 
