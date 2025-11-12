@@ -1,0 +1,298 @@
+/**
+ * ⚡ ALSHAM 360° PRIMA — Design Tokens v7.0.0 (SUPREME)
+ * Fonte única de verdade para todas as variáveis CSS
+ * Alinhado com ALSHAM Visual System 360° + SLDS + Docs Oficiais
+ * Última atualização: 2025-01-13 11:05 UTC
+ */
+
+:root {
+  /* ============================================ */
+  /* === CORES PRIMÁRIAS (SLDS Blue) === */
+  /* ============================================ */
+  --alsham-primary: #0176D3;
+  --alsham-primary-hover: #0369B3;
+  --alsham-primary-light: #DBEAFE;
+  --alsham-primary-dark: #014A7F;
+
+  /* === CORES SECUNDÁRIAS & ACCENT === */
+  --alsham-secondary: #6B7280;        /* Gray neutral */
+  --alsham-secondary-light: #9CA3AF;
+  --alsham-secondary-dark: #4B5563;
+  
+  --alsham-accent: #667EEA;           /* Indigo premium */
+  --alsham-accent-light: #818CF8;
+  --alsham-accent-dark: #4C51BF;
+
+  /* === CORES SEMÂNTICAS === */
+  --alsham-success: #059669;
+  --alsham-warning: #D97706;
+  --alsham-error: #DC2626;
+  --alsham-info: #3B82F6;
+
+  --alsham-success-bg: #D1FAE5;
+  --alsham-success-border: #6EE7B7;
+  --alsham-success-text: #065F46;
+
+  --alsham-warning-bg: #FEF3C7;
+  --alsham-warning-border: #FCD34D;
+  --alsham-warning-text: #92400E;
+
+  --alsham-error-bg: #FEE2E2;
+  --alsham-error-border: #FCA5A5;
+  --alsham-error-text: #991B1B;
+
+  --alsham-info-bg: #DBEAFE;
+  --alsham-info-border: #93C5FD;
+  --alsham-info-text: #1E40AF;
+
+  /* ============================================ */
+  /* === NEUTROS (MODO CLARO) === */
+  /* ============================================ */
+  --alsham-bg-canvas: #F9FAFB;
+  --alsham-bg-surface: #FFFFFF;
+  --alsham-bg-hover: #F3F4F6;
+  --alsham-bg-active: #E5E7EB;
+
+  --alsham-text-primary: #111827;
+  --alsham-text-secondary: #6B7280;
+  --alsham-text-tertiary: #9CA3AF;
+  --alsham-text-disabled: #D1D5DB;
+
+  --alsham-border-light: #F3F4F6;
+  --alsham-border-default: #E5E7EB;
+  --alsham-border-strong: #D1D5DB;
+
+  /* ============================================ */
+  /* === GRADIENTES PREMIUM === */
+  /* ============================================ */
+  --alsham-gradient-hero: linear-gradient(135deg, #0176D3 0%, #667EEA 100%);
+  --alsham-gradient-card: linear-gradient(to bottom, #FFFFFF, #F9FAFB);
+  --alsham-gradient-accent: linear-gradient(90deg, #0176D3, #3B82F6);
+  --alsham-gradient-surface: linear-gradient(145deg, #FFFFFF, #F3F4F6);
+  --alsham-gradient-primary: linear-gradient(135deg, #0176D3, #0369B3);
+
+  /* ============================================ */
+  /* === SOMBRAS PREMIUM === */
+  /* ============================================ */
+  --alsham-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --alsham-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --alsham-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --alsham-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* === Sombras Premium (Glow Effects) === */
+  --alsham-shadow-premium: 0 20px 60px rgba(1, 118, 211, 0.15);
+  --alsham-shadow-glow: 0 0 30px rgba(1, 118, 211, 0.3);
+  --alsham-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --alsham-shadow-card-hover: 0 8px 30px rgba(1, 118, 211, 0.2);
+
+  /* ============================================ */
+  /* === MOTION SYSTEM (ALSHAM Framework) === */
+  /* ============================================ */
+  --alsham-motion-micro: 150ms;       /* Microinterações (hover, click) */
+  --alsham-motion-macro: 300ms;       /* Transições (modal, drawer) */
+  --alsham-motion-ambient: 600ms;     /* Animações ambientes (fade, parallax) */
+
+  /* === Legacy (Manter para compatibilidade) === */
+  --alsham-motion-instant: 70ms;
+  --alsham-motion-productive: 150ms;
+  --alsham-motion-expressive: 300ms;
+
+  /* === Easing Curves === */
+  --alsham-ease-productive: cubic-bezier(0.4, 0, 0.2, 1);
+  --alsham-ease-expressive: cubic-bezier(0.4, 0, 0, 1);
+  --alsham-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ============================================ */
+  /* === BORDAS === */
+  /* ============================================ */
+  --alsham-radius-sm: 0.375rem;
+  --alsham-radius-md: 0.5rem;
+  --alsham-radius-lg: 0.75rem;
+  --alsham-radius-xl: 1rem;
+  --alsham-radius-2xl: 1.5rem;
+  --alsham-radius-full: 9999px;
+
+  /* ============================================ */
+  /* === ESPAÇAMENTO (Sistema 8px) === */
+  /* ============================================ */
+  --alsham-space-1: 0.25rem;   /* 4px */
+  --alsham-space-2: 0.5rem;    /* 8px */
+  --alsham-space-3: 0.75rem;   /* 12px */
+  --alsham-space-4: 1rem;      /* 16px */
+  --alsham-space-6: 1.5rem;    /* 24px */
+  --alsham-space-8: 2rem;      /* 32px */
+  --alsham-space-10: 2.5rem;   /* 40px */
+  --alsham-space-12: 3rem;     /* 48px */
+  --alsham-space-16: 4rem;     /* 64px */
+
+  /* ============================================ */
+  /* === TIPOGRAFIA === */
+  /* ============================================ */
+  --alsham-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --alsham-text-xs: 0.75rem;    /* 12px */
+  --alsham-text-sm: 0.875rem;   /* 14px */
+  --alsham-text-base: 1rem;     /* 16px */
+  --alsham-text-lg: 1.125rem;   /* 18px */
+  --alsham-text-xl: 1.25rem;    /* 20px */
+  --alsham-text-2xl: 1.5rem;    /* 24px */
+  --alsham-text-3xl: 1.875rem;  /* 30px */
+  --alsham-text-4xl: 2.25rem;   /* 36px */
+
+  --alsham-font-normal: 400;
+  --alsham-font-medium: 500;
+  --alsham-font-semibold: 600;
+  --alsham-font-bold: 700;
+
+  /* ============================================ */
+  /* === LAYOUT SYSTEM === */
+  /* ============================================ */
+  --alsham-grid-columns: 12;
+  --alsham-grid-gap: 1.5rem;
+  --alsham-container-max: 1280px;
+  --alsham-container-padding: 1rem;
+
+  /* ============================================ */
+  /* === Z-INDEX === */
+  /* ============================================ */
+  --alsham-z-base: 0;
+  --alsham-z-dropdown: 10;
+  --alsham-z-sticky: 20;
+  --alsham-z-fixed: 30;
+  --alsham-z-modal: 40;
+  --alsham-z-toast: 50;
+}
+
+/* ============================================ */
+/* === 🌙 MODO ESCURO === */
+/* ============================================ */
+html.dark {
+  color-scheme: dark;
+  
+  /* === Cores Primárias Dark === */
+  --alsham-primary: #3B82F6;
+  --alsham-primary-hover: #60A5FA;
+  --alsham-primary-light: #2563EB;
+  --alsham-primary-dark: #1E40AF;
+
+  /* === Accent Dark === */
+  --alsham-accent: #818CF8;
+  --alsham-accent-light: #A5B4FC;
+  --alsham-accent-dark: #6366F1;
+
+  /* === Neutros Dark === */
+  --alsham-bg-canvas: #0F172A;
+  --alsham-bg-surface: #1E293B;
+  --alsham-bg-hover: #334155;
+  --alsham-bg-active: #475569;
+
+  --alsham-text-primary: #F1F5F9;
+  --alsham-text-secondary: #94A3B8;
+  --alsham-text-tertiary: #64748B;
+  --alsham-text-disabled: #475569;
+
+  --alsham-border-light: #1E293B;
+  --alsham-border-default: #334155;
+  --alsham-border-strong: #475569;
+
+  /* === Gradientes Dark === */
+  --alsham-gradient-hero: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  --alsham-gradient-card: linear-gradient(to bottom, #1E293B, #0F172A);
+  --alsham-gradient-accent: linear-gradient(90deg, #0176D3, #667EEA);
+  --alsham-gradient-surface: linear-gradient(145deg, #1E293B, #0F172A);
+
+  /* === Sombras Dark === */
+  --alsham-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --alsham-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --alsham-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --alsham-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  
+  --alsham-shadow-premium: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --alsham-shadow-glow: 0 0 30px rgba(59, 130, 246, 0.4);
+  --alsham-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --alsham-shadow-card-hover: 0 8px 30px rgba(59, 130, 246, 0.3);
+}
+
+/* ============================================ */
+/* === BADGES DARK MODE (Tailwind Override) === */
+/* ============================================ */
+html.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.25) !important;
+  color: #bfdbfe !important;
+}
+html.dark .bg-yellow-100 {
+  background-color: rgba(251, 191, 36, 0.25) !important;
+  color: #fde68a !important;
+}
+html.dark .bg-purple-100 {
+  background-color: rgba(139, 92, 246, 0.25) !important;
+  color: #ddd6fe !important;
+}
+html.dark .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.25) !important;
+  color: #86efac !important;
+}
+html.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+}
+html.dark .bg-orange-100 {
+  background-color: rgba(249, 115, 22, 0.25) !important;
+  color: #fed7aa !important;
+}
+html.dark .bg-indigo-100 {
+  background-color: rgba(99, 102, 241, 0.25) !important;
+  color: #c7d2fe !important;
+}
+
+/* ============================================ */
+/* === TRANSIÇÃO SUAVE (Theme Switch) === */
+/* ============================================ */
+html {
+  transition: background-color var(--alsham-motion-macro) var(--alsham-ease-productive),
+              color var(--alsham-motion-macro) var(--alsham-ease-productive);
+}
+
+/* ============================================ */
+/* === ACESSIBILIDADE (Reduced Motion) === */
+/* ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================ */
+/* === ALTO CONTRASTE (Opcional) === */
+/* ============================================ */
+html.high-contrast {
+  --alsham-bg-canvas: #000000;
+  --alsham-bg-surface: #1A1A1A;
+  --alsham-text-primary: #FFFFFF;
+  --alsham-text-secondary: #CCCCCC;
+  --alsham-border-default: #FFFFFF;
+}
+
+/* ============================================ */
+/* === UTILITIES (Helpers) === */
+/* ============================================ */
+.alsham-gradient-hero {
+  background: var(--alsham-gradient-hero);
+}
+
+.alsham-gradient-card {
+  background: var(--alsham-gradient-card);
+}
+
+.alsham-shadow-premium {
+  box-shadow: var(--alsham-shadow-premium);
+}
+
+.alsham-shadow-glow {
+  box-shadow: var(--alsham-shadow-glow);
+}

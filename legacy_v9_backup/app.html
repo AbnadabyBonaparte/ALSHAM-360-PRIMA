@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ALSHAM 360° PRIMA — Dashboard React Suprema</title>
+    <meta name="description" content="Interface React híbrida da plataforma ALSHAM 360° PRIMA — inteligência, automação e design supremo." />
+
+    <!-- Manifest e ícones -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/public/icons/pwa-192x192.png" />
+    <link rel="apple-touch-icon" href="/public/icons/apple-touch-icon.png" />
+
+    <!-- Tailwind + estilos globais -->
+    <link rel="stylesheet" href="/src/react/index.css" />
+
+    <!-- Segurança básica -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://esm.sh;
+               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://cdn.jsdelivr.net https://esm.sh;
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               font-src 'self' data:;
+               connect-src 'self' https://*.supabase.co https://api.vercel.com wss://*.supabase.co;
+               frame-ancestors 'none';
+               base-uri 'self';" />
+
+  </head>
+
+  <body class="bg-neutral-950 text-white antialiased">
+    <!-- 🚀 Root container React -->
+    <div id="root" class="min-h-screen flex items-center justify-center">
+      <noscript>Ative o JavaScript para visualizar o painel React ALSHAM.</noscript>
+    </div>
+
+    <!-- Ponto de entrada React (Vite) -->
+    <script type="module" src="/src/react/main.tsx"></script>
+  </body>
+</html>

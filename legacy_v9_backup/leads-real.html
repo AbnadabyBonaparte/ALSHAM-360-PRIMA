@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- ✅ Theme Init Inline (Evita FOUC) -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('alsham-theme') || 'light';
+      const contrast = localStorage.getItem('alsham-contrast') || 'normal';
+
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      if (contrast === 'high') {
+        document.documentElement.classList.add('high-contrast');
+      }
+    })();
+  </script>
+
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+
+  <title>Leads — ALSHAM 360° PRIMA</title>
+  <meta name="description" content="Gestão Completa de Leads - ALSHAM 360° PRIMA CRM Enterprise com IA, kanban board, analytics avançados e gamificação integrada." />
+
+  <!-- ✅ CSP COMPLETO -->
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self'; 
+  script-src 
+    'self' 
+    'unsafe-inline' 
+    'unsafe-eval' 
+    https://cdn.tailwindcss.com 
+    https://cdn.jsdelivr.net 
+    https://cdnjs.cloudflare.com 
+    https://unpkg.com 
+    https://apis.google.com 
+    https://accounts.google.com; 
+  style-src 
+    'self' 
+    'unsafe-inline' 
+    https://cdn.tailwindcss.com 
+    https://fonts.googleapis.com 
+    https://cdn.jsdelivr.net 
+    https://cdnjs.cloudflare.com 
+    https://unpkg.com; 
+  font-src 
+    'self' 
+    data: 
+    https://fonts.gstatic.com 
+    https://fonts.googleapis.com; 
+  img-src 
+    'self' 
+    data: 
+    blob: 
+    https:; 
+  connect-src 
+    'self' 
+    https://*.supabase.co 
+    wss://*.supabase.co 
+    https://api.openai.com 
+    https://app.posthog.com 
+    https://us-assets.i.posthog.com 
+    https://cdnjs.cloudflare.com 
+    https://cdn.jsdelivr.net 
+    https://unpkg.com 
+    https://fonts.googleapis.com; 
+  frame-src 
+    'self' 
+    https://accounts.google.com; 
+  object-src 
+    'none'; 
+  base-uri 
+    'self'; 
+  form-action 
+    'self'; 
+  manifest-src 
+    'self'; 
+  worker-src 
+    'self' 
+    blob:;
+">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0176D3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ALSHAM Leads">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/confetti-js/0.0.18/confetti.min.js"></script>
+
+  <!-- Critical CSS Inline -->
+  <style>
+    :root {
+      --alsham-text-primary: #111827;
+      --alsham-text-secondary: #6b7280;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #f9fafb;
+      --alsham-bg-surface: #ffffff;
+      --alsham-bg-hover: #f3f4f6;
+      --alsham-border-default: #e5e7eb;
+      --alsham-border-light: #f3f4f6;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.05);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.1);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.15);
+    }
+    html.dark {
+      --alsham-text-primary: #f9fafb;
+      --alsham-text-secondary: #d1d5db;
+      --alsham-text-tertiary: #9ca3af;
+      --alsham-bg-canvas: #0f172a;
+      --alsham-bg-surface: #1e293b;
+      --alsham-bg-hover: #334155;
+      --alsham-border-default: #334155;
+      --alsham-border-light: #475569;
+      --alsham-shadow-sm: rgba(0, 0, 0, 0.3);
+      --alsham-shadow-md: rgba(0, 0, 0, 0.4);
+      --alsham-shadow-lg: rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+    html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.2) !important; color: #93c5fd !important; }
+    html.dark .text-blue-800 { color: #93c5fd !important; }
+    html.dark .bg-yellow-100 { background-color: rgba(251, 191, 36, 0.2) !important; color: #fcd34d !important; }
+    html.dark .text-yellow-800 { color: #fcd34d !important; }
+    html.dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.2) !important; color: #c4b5fd !important; }
+    html.dark .text-purple-800 { color: #c4b5fd !important; }
+    html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.2) !important; color: #86efac !important; }
+    html.dark .text-green-800 { color: #86efac !important; }
+    html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; color: #fca5a5 !important; }
+    html.dark .text-red-800 { color: #fca5a5 !important; }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 4rem;
+      height: 4rem;
+      border: 4px solid rgba(59, 130, 246, 0.3);
+      border-top-color: #3B82F6;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .card {
+      background: var(--alsham-bg-surface);
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px var(--alsham-shadow-md);
+      padding: 1.5rem;
+      border: 1px solid var(--alsham-border-default);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 10px 15px var(--alsham-shadow-lg);
+      transform: translateY(-2px);
+    }
+    
+    .side-nav {
+      position: fixed;
+      left: 0;
+      top: 64px;
+      width: 220px;
+      height: calc(100vh - 64px);
+      background: var(--alsham-bg-surface);
+      border-right: 1px solid var(--alsham-border-default);
+      padding: 1rem 0;
+      z-index: 20;
+      overflow-y: auto;
+    }
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      color: var(--alsham-text-secondary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .side-nav a:hover {
+      background: var(--alsham-bg-hover);
+      color: #0176D3;
+    }
+    .side-nav a.active {
+      background: rgba(1, 118, 211, 0.1);
+      color: #0176D3;
+      border-right: 3px solid #0176D3;
+      font-weight: 600;
+    }
+    
+    .main-content-wrapper {
+      margin-left: 220px;
+    }
+    
+    @media (max-width: 768px) {
+      .side-nav {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      .side-nav.open {
+        transform: translateX(0);
+      }
+      .main-content-wrapper {
+        margin-left: 0;
+      }
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 350px;
+      width: 100%;
+      padding: 1rem 0;
+    }
+    .chart-container canvas {
+      max-height: 100%;
+    }
+    
+    *:focus-visible {
+      outline: 2px solid #0176D3;
+      outline-offset: 2px;
+      border-radius: 0.25rem;
+    }
+    
+    .text-primary { color: var(--alsham-text-primary); }
+    .text-secondary { color: var(--alsham-text-secondary); }
+    .text-tertiary { color: var(--alsham-text-tertiary); }
+    
+    nav {
+      background: var(--alsham-bg-surface);
+      border-bottom: 1px solid var(--alsham-border-default);
+    }
+    
+    .theme-toggle-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--alsham-bg-hover);
+      border: 1px solid var(--alsham-border-default);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(1, 118, 211, 0.1);
+      border-color: #0176D3;
+      transform: scale(1.05);
+    }
+    .theme-toggle-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--alsham-text-secondary);
+      transition: all 0.3s ease;
+    }
+    .theme-toggle-btn:hover svg {
+      color: #0176D3;
+    }
+    html:not(.dark) .moon-icon { display: none; }
+    html.dark .sun-icon { display: none; }
+    
+    .kanban-board { display: flex; overflow-x: auto; gap: 1rem; }
+    .kanban-column { min-width: 250px; background: var(--alsham-bg-hover); border-radius: 8px; padding: 1rem; }
+    .kanban-card { background: var(--alsham-bg-surface); border: 1px solid var(--alsham-border-default); border-radius: 4px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: move; }
+    .leaderboard { background: var(--alsham-bg-surface); border-radius: 8px; padding: 1rem; }
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
+    .heatmap-cell { width: 20px; height: 20px; background: var(--alsham-bg-hover); border-radius: 4px; }
+    .empty-state { text-align: center; padding: 2rem; color: var(--alsham-text-secondary); }
+    .skeleton { background: var(--alsham-bg-hover); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--alsham-border-default);
+      background: var(--alsham-bg-surface);
+      color: var(--alsham-text-secondary);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover { background: var(--alsham-bg-hover); }
+    .tab-btn.active {
+      background: #0176D3;
+      color: white;
+      border-color: #0176D3;
+    }
+    
+    input[type="text"], input[type="email"] {
+      background: var(--alsham-bg-surface);
+      color: var(--alsham-text-primary);
+      border-color: var(--alsham-border-default);
+    }
+    
+    .email-editor {
+      min-height: 100px;
+      border: 1px solid var(--alsham-border-default);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      background: var(--alsham-bg-surface);
+      color: var(--alsham-text-primary);
+    }
+  </style>
+</head>
+
+<body class="font-inter min-h-screen" style="background: var(--alsham-bg-canvas);">
+  <div id="loading-indicator" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--alsham-bg-canvas);">
+    <div class="text-center">
+      <div class="loading-spinner mb-4"></div>
+      <h2 class="text-xl font-bold text-primary mb-2">ALSHAM 360° PRIMA</h2>
+      <p class="text-secondary font-medium">Carregando gestão de leads...</p>
+    </div>
+  </div>
+  
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
+  
+  <nav class="sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto flex justify-between items-center h-16 px-4">
+      <div class="flex items-center gap-4">
+        <button id="menu-toggle" class="md:hidden p-2 hover:bg-hover rounded-lg transition-colors text-secondary" aria-label="Abrir menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+          ALSHAM 360°
+        </h1>
+      </div>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/dashboard.html" class="text-secondary hover:text-primary transition-colors">Dashboard</a>
+        <a href="/leads-real.html" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1" aria-current="page">Leads</a>
+        <a href="/pipeline.html" class="text-secondary hover:text-primary transition-colors">Pipeline</a>
+        <a href="/automacoes.html" class="text-secondary hover:text-primary transition-colors">Automações</a>
+        <a href="/gamificacao.html" class="text-secondary hover:text-primary transition-colors">Gamificação</a>
+        <a href="/relatorios.html" class="text-secondary hover:text-primary transition-colors">Relatórios</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden border-t" style="background: var(--alsham-bg-surface); border-color: var(--alsham-border-default);">
+      <a href="/dashboard.html" class="block px-4 py-3 hover:bg-hover text-secondary">Dashboard</a>
+      <a href="/leads-real.html" class="block px-4 py-3 hover:bg-hover font-semibold text-blue-600" aria-current="page">Leads</a>
+      <a href="/pipeline.html" class="block px-4 py-3 hover:bg-hover text-secondary">Pipeline</a>
+      <a href="/automacoes.html" class="block px-4 py-3 hover:bg-hover text-secondary">Automações</a>
+      <a href="/gamificacao.html" class="block px-4 py-3 hover:bg-hover text-secondary">Gamificação</a>
+      <a href="/relatorios.html" class="block px-4 py-3 hover:bg-hover text-secondary">Relatórios</a>
+    </div>
+  </nav>
+  
+  <aside class="side-nav" id="sidebar">
+    <a href="/dashboard.html">
+      <span>📊</span> Dashboard
+    </a>
+    <a href="/leads-real.html" class="active" aria-current="page">
+      <span>👥</span> Leads
+    </a>
+    <a href="/pipeline.html">
+      <span>🎯</span> Pipeline
+    </a>
+    <a href="/automacoes.html">
+      <span>⚙️</span> Automações
+    </a>
+    <a href="/gamificacao.html">
+      <span>🎮</span> Gamificação
+    </a>
+    <a href="/relatorios.html">
+      <span>📈</span> Relatórios
+    </a>
+    <a href="/configuracoes.html">
+      <span>⚙️</span> Configurações
+    </a>
+  </aside>
+  
+  <main class="main-content-wrapper max-w-7xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-primary mb-2">Leads</h1>
+      <p class="text-secondary">Gerencie seus leads com eficiência</p>
+    </header>
+    
+    <div id="leads-kpis"></div>
+    
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição por Status</h3>
+        <div class="chart-container">
+          <canvas id="leads-status-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Novos Leads (Últimos <span id="current-period">7</span> dias)</h3>
+        <div class="chart-container">
+          <canvas id="leads-daily-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Funil de Vendas</h3>
+        <div class="chart-container">
+          <canvas id="leads-funnel-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Leads por Origem</h3>
+        <div class="chart-container">
+          <canvas id="leads-origin-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição de Temperatura</h3>
+        <div class="chart-container">
+          <canvas id="leads-temperature-gauge"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Distribuição de Score IA</h3>
+        <div class="chart-container histogram">
+          <canvas id="leads-score-histogram"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Heatmap de Atividades</h3>
+        <div id="activity-heatmap" class="heatmap"></div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Mapa de Leads</h3>
+        <div id="leads-map" class="map-container" style="height: 350px;"></div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Análise de Cohort</h3>
+        <table id="cohort-table" class="cohort-table w-full"></table>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Curvas de Retenção</h3>
+        <div class="chart-container retention-curve">
+          <canvas id="retention-curve-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Valor do Pipeline</h3>
+        <div class="pipeline-value-chart">
+          <canvas id="pipeline-value-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-primary">Movimentações Recentes</h3>
+        <table id="movements-table" class="w-full"></table>
+      </div>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Visualizações Alternativas</h3>
+      <div class="tabs">
+        <button class="tab-btn active" data-view="table">Tabela</button>
+        <button class="tab-btn" data-view="kanban">Kanban</button>
+        <button class="tab-btn" data-view="cards">Cards</button>
+        <button class="tab-btn" data-view="list">Lista Compacta</button>
+      </div>
+      <div id="leads-view-container"></div>
+    </section>
+    
+    <div class="mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-primary">Lista de Leads</h3>
+        <div class="flex gap-2">
+          <button onclick="window.openNewLeadModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">+ Novo Lead</button>
+          <button id="import-leads-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">Importar</button>
+          <button id="export-leads-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">Exportar</button>
+        </div>
+      </div>
+      <div id="leads-filters" class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4" data-cy="leads-filters"></div>
+      <div id="leads-table" data-cy="leads-table"></div>
+      <div class="flex justify-between mt-4">
+        <button id="prev-page" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium disabled:opacity-50 text-primary">Anterior</button>
+        <span class="text-sm text-secondary">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
+        <button id="next-page" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium disabled:opacity-50 text-primary">Próxima</button>
+      </div>
+    </div>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Analytics Avançados</h3>
+      <div id="advanced-analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Gamificação</h3>
+      <div id="gamification-section" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="leaderboard card">
+          <h4 class="font-semibold mb-2 text-primary">Leaderboard</h4>
+          <table id="leaderboard-table" class="w-full"></table>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Seus Badges</h4>
+          <div id="badges-showcase" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Missões</h4>
+          <div id="missions-list" class="space-y-2"></div>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Catálogo de Prêmios</h4>
+          <div id="prize-catalog" class="prize-catalog"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Automações</h3>
+      <div id="automations-section" class="space-y-4"></div>
+      <button id="new-automation-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">+ Nova Automação</button>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Colaboração</h3>
+      <div id="collaboration-section" class="card">
+        <div class="activity-feed">
+          <h4 class="font-semibold mb-2 text-primary">Feed de Atividades</h4>
+          <div id="activity-list" class="space-y-2"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Integrações e Comunicação</h3>
+      <div id="integrations-section" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Email</h4>
+          <div id="email-editor" class="email-editor" contenteditable="true">Escreva seu email...</div>
+          <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Enviar</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">WhatsApp</h4>
+          <input type="text" placeholder="Mensagem..." class="w-full border rounded px-2 py-1 mb-2">
+          <button class="bg-green-600 text-white px-4 py-2 rounded">Enviar</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Calendário</h4>
+          <button class="bg-purple-600 text-white px-4 py-2 rounded">Agendar Reunião</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">SMS</h4>
+          <input type="text" placeholder="Mensagem..." class="w-full border rounded px-2 py-1 mb-2">
+          <button class="bg-indigo-600 text-white px-4 py-2 rounded">Enviar</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Telefonia</h4>
+          <button class="bg-red-600 text-white px-4 py-2 rounded">Ligar</button>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold mb-2 text-primary">Videoconferência</h4>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded">Iniciar Reunião</button>
+        </div>
+      </div>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Relatórios Customizáveis</h3>
+      <div id="reports-section" class="card">
+        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Gerar Relatório</button>
+      </div>
+    </section>
+    
+    <section class="mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-primary">Configurações</h3>
+      <div id="settings-section" class="card space-y-4">
+        <div>
+          <label class="text-primary">Status Customizados</label>
+          <input type="text" placeholder="Adicionar novo status..." class="border rounded px-2 py-1 w-full">
+        </div>
+        <div>
+          <label class="text-primary">Campos Customizados</label>
+          <input type="text" placeholder="Adicionar campo..." class="border rounded px-2 py-1 w-full">
+        </div>
+        <div>
+          <label class="text-primary">Regras de Automação</label>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded">Adicionar Regra</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Scripts -->
+  <script type="module">
+    import * as SupabaseLib from '/src/lib/supabase.js';
+    window.AlshamSupabase = SupabaseLib;
+    console.log('✅ Supabase integrado no Leads:', Object.keys(window.AlshamSupabase).length, 'funções');
+  </script>
+  
+  <script type="module" src="/src/js/leads-real.js"></script>
+  
+  <!-- Theme Toggle -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const html = document.documentElement;
+          const isDark = html.classList.toggle('dark');
+          localStorage.setItem('alsham-theme', isDark ? 'dark' : 'light');
+        });
+      }
+      
+      const menuToggle = document.getElementById('menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const sidebar = document.getElementById('sidebar');
+      if (menuToggle && (mobileMenu || sidebar)) {
+        menuToggle.addEventListener('click', function() {
+          if (mobileMenu) mobileMenu.classList.toggle('hidden');
+          if (sidebar) sidebar.classList.toggle('open');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

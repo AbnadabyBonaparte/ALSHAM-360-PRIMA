@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - ALSHAM 360°</title>
+
+  <!-- PWA & ÍCONES -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- SUPABASE INIT (MÓDULO) -->
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+
+  <!-- ESTILOS INLINE -->
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f1c46, #4c1d95);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #1f2937;
+      padding: 1.5rem;
+      margin: 0;
+    }
+    .login-card {
+      width: min(24rem, 100%);
+      background: #fff;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(15, 28, 70, 0.35);
+      padding: 2.5rem 2rem;
+    }
+    .login-card h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      text-align: center;
+      color: #1d4ed8;
+      margin-bottom: 1.5rem;
+    }
+    .login-card form {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .login-card label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #4b5563;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .login-card input {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .login-card input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+    .login-card button {
+      margin-top: 0.5rem;
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .login-card button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+    .login-card button:active {
+      transform: translateY(0);
+    }
+    .login-card button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .feedback {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      text-align: center;
+      display: none;
+    }
+    .feedback.visible {
+      display: block;
+    }
+    .feedback.success {
+      color: #047857;
+      font-weight: 600;
+    }
+    .feedback.error {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+    .login-footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    .login-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card" role="main" data-cy="login-page">
+    <h1>ALSHAM 360°</h1>
+    <form id="login-form" data-cy="login-form">
+      <div>
+        <label for="email">E-mail corporativo</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="seu@email.com"
+          autocomplete="email"
+          required
+          data-cy="login-email"
+        />
+      </div>
+      <div>
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          minlength="6"
+          required
+          data-cy="login-password"
+        />
+      </div>
+      <button type="submit" data-cy="login-submit">Entrar</button>
+    </form>
+    <p id="success-message" class="feedback success" role="status" data-cy="login-success"></p>
+    <p id="error-message" class="feedback error" role="alert" data-cy="login-error"></p>
+    <div class="login-footer">
+      <a href="/reset-password.html">Esqueceu sua senha?</a>
+    </div>
+  </main>
+
+  <!-- LÓGICA DO LOGIN (SEM TOP-LEVEL AWAIT) -->
+  <script type="module">
+    // Aguarda o Supabase estar pronto
+    const waitForSupabase = () => {
+      return new Promise((resolve) => {
+        const check = () => {
+          if (window.AlshamSupabase?.supabase) {
+            resolve(window.AlshamSupabase);
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+    };
+
+    // Função de login
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const submitBtn = document.querySelector('[data-cy="login-submit"]');
+      const errorEl = document.getElementById('error-message');
+      const successEl = document.getElementById('success-message');
+
+      errorEl.classList.remove('visible');
+      successEl.classList.remove('visible');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Entrando...';
+
+      try {
+        const { supabase } = await waitForSupabase();
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        successEl.textContent = 'Login bem-sucedido! Redirecionando...';
+        successEl.classList.add('visible');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 1000);
+      } catch (err) {
+        errorEl.textContent = err.message || 'Erro ao fazer login.';
+        errorEl.classList.add('visible');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrar';
+      }
+    }
+
+    // Ativa o formulário
+    document.getElementById('login-form').addEventListener('submit', handleLogin);
+  </script>
+</body>
+</html>
