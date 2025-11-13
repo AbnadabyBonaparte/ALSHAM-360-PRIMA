@@ -52,13 +52,22 @@ interface PipelineStage {
   leads: Lead[];
 }
 
-export default function Leads() {
+interface LeadsProps {
+  onNavigateToDetails: (leadId: string) => void;
+}
+
+export default function Leads({ onNavigateToDetails }: LeadsProps) {
   const { leads, loading, error, refetch } = useLeadsAI();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [filters, setFilters] = useState<LeadFilters>({});
   const [organizationUnavailable, setOrganizationUnavailable] = useState(false);
+
+  const handleLeadClick = (lead: Lead) => {
+    setSelectedLead(lead);
+    onNavigateToDetails(lead.id);
+  };
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -500,7 +509,7 @@ export default function Leads() {
                       key={lead.id}
                       lead={lead}
                       delay={index * 0.05}
-                      onView={setSelectedLead}
+                      onView={handleLeadClick}
                     />
                   ))} {/* Para listas grandes: use react-window para virtualização */}
                 </motion.div>
@@ -561,7 +570,7 @@ export default function Leads() {
                       {filteredLeads.map((lead) => (
                         <tr
                           key={lead.id}
-                          onClick={() => setSelectedLead(lead)}
+                          onClick={() => handleLeadClick(lead)}
                           className="hover:bg-[var(--neutral-950)] cursor-pointer transition-colors"
                         >
                           <td className="px-4 sm:px-6 py-4 text-[var(--text-white)] font-medium text-[clamp(0.875rem,3vw,1.125rem)]">{lead.nome ?? '-'}</td>
