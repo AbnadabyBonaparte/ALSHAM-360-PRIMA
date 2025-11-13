@@ -17,9 +17,6 @@ export default function LayoutSupremo() {
           <NavLink to="/app/analytics" className={linkClasses}>
             Analytics
           </NavLink>
-          <NavLink to="/app/leads" className={linkClasses}>
-            Leads
-          </NavLink>
           <NavLink to="/app/financeiro" className={linkClasses}>
             Financeiro
           </NavLink>
