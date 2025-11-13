@@ -47,29 +47,6 @@ import campaignOrion from "./assets/campaign-orion.png";
 import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
-import './styles/responsive.css';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚜️ ALSHAM 360° PRIMA – INTEGRAÇÃO SUPABASE (Fase 1)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🜂 IMPORTAÇÃO: Funções do supabase.js master (17.389 linhas)
-// 📅 DATA: 01 de Novembro de 2025
-// 🎯 OBJETIVO: Conectar dashboard 10/10 com backend completo
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import {
   getSupabaseClient,
   getCurrentSession,
@@ -95,6 +72,28 @@ import {
   getOpportunities,
   getTopLeadsByScore,
 } from "./lib/supabase";
+import "./styles/responsive.css";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ⚜️ ALSHAM 360° PRIMA – INTEGRAÇÃO SUPABASE (Fase 1)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🜂 IMPORTAÇÃO: Funções do supabase.js master (17.389 linhas)
+// 📅 DATA: 01 de Novembro de 2025
+// 🎯 OBJETIVO: Conectar dashboard 10/10 com backend completo
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // Inicializar cliente Supabase
 const supabase = getSupabaseClient();
@@ -153,7 +152,6 @@ const sidebarGroups = [
     links: [
       { id: "dashboard-principal", label: "Dashboard Principal" },
       { id: "leads-lista", label: "Leads - Lista" },
-      { id: "leads-detalhes", label: "Leads - Detalhes" },
       { id: "leads-importacao", label: "Leads - Importação" },
       { id: "contatos-lista", label: "Contatos - Lista" },
       { id: "contatos-detalhes", label: "Contatos - Detalhes" },
@@ -509,6 +507,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
   timeframe: "30d",
   theme: "glass-dark",
   organizationUnavailable: false,
+  selectedLeadId: null,
   fetchData: async () => {
     try {
       set({ loading: true });
@@ -651,6 +650,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
   setCurrency: (currency) => set({ currency }),
   setTimeframe: (timeframe) => set({ timeframe }),
   setTheme: (theme) => set({ theme }),
+  setSelectedLeadId: (id) => set({ selectedLeadId: id }),
 }));
 
 type DashboardState = {
@@ -669,6 +669,8 @@ type DashboardState = {
   setCurrency: (currency: "USD" | "EUR" | "BRL") => void;
   setTimeframe: (timeframe: "7d" | "30d" | "90d") => void;
   setTheme: (theme: ThemeKey) => void;
+  selectedLeadId: string | null;
+  setSelectedLeadId: (id: string | null) => void;
 };
 
 type ThemeKey =
@@ -1138,6 +1140,8 @@ function App() {
     setTimeframe,
     setTheme,
   } = useDashboardStore();
+  const selectedLeadId = useDashboardStore((state) => state.selectedLeadId);
+  const setSelectedLeadId = useDashboardStore((state) => state.setSelectedLeadId);
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [activePage, setActivePage] = useState(() => resolveRouteOrDefault("dashboard-principal"));
@@ -1517,12 +1521,47 @@ function App() {
 
   const pageState = useMemo(() => {
     try {
-      return { error: null as Error | null, content: renderPage(activePage) };
+      if (activePage === 'leads-lista') {
+        return {
+          error: null,
+          content: (
+            <Leads
+              onNavigateToDetails={(leadId: string) => {
+                setSelectedLeadId(leadId);
+                navigateToPage('leads-detalhes');
+              }}
+            />
+          )
+        };
+      }
+
+      if (activePage === 'leads-detalhes') {
+        if (!selectedLeadId) {
+          console.warn('Tentativa de acesso a leads-detalhes sem ID. Redirecionando...');
+          setTimeout(() => navigateToPage('leads-lista'), 0);
+          return { error: null, content: null };
+        }
+
+        return {
+          error: null,
+          content: (
+            <LeadsDetails
+              leadId={selectedLeadId}
+              onBack={() => {
+                setSelectedLeadId(null);
+                navigateToPage('leads-lista');
+              }}
+            />
+          )
+        };
+      }
+
+      return { error: null, content: renderPage(activePage) };
     } catch (error) {
       console.error('❌ Falha ao renderizar rota dinâmica:', error);
       return { error: error as Error, content: null };
     }
-  }, [activePage]);
+  }, [activePage, navigateToPage, selectedLeadId, setSelectedLeadId]);
 
   // FIX: encapsula renderização dinâmica para evitar quebra global
   if (loading) {
@@ -2106,7 +2145,19 @@ function App() {
     })
   );
 
-  registerRoute("leads", async () => ({ default: () => <Leads /> }));
+  registerRoute(
+    "leads",
+    async () => ({
+      default: () => (
+        <Leads
+          onNavigateToDetails={(leadId: string) => {
+            setSelectedLeadId(leadId);
+            navigateToPage('leads-detalhes');
+          }}
+        />
+      ),
+    })
+  );
 
   return (
     <div

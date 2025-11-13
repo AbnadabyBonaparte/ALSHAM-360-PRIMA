@@ -59,8 +59,8 @@ app.use(
                 "https://cdnjs.cloudflare.com",
                 "https://cdn.tailwindcss.com",
                 "https://*.supabase.co",
-                "https://us-assets.i.posthog.com",
-                "https://app.posthog.com",
+                "https://www.googletagmanager.com",
+                "https://www.google-analytics.com",
                 "https://apis.google.com"
               ],
               styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
@@ -70,8 +70,7 @@ app.use(
                 "https://*.supabase.co",
                 "wss://*.supabase.co",
                 "https://api.openai.com",
-                "https://app.posthog.com",
-                "https://us-assets.i.posthog.com"
+                "https://www.google-analytics.com"
               ],
               imgSrc: ["'self'", "data:", "blob:", "https:"],
               workerSrc: ["'self'", "blob:"],
