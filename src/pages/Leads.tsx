@@ -1,55 +1,15 @@
-import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  LayoutGrid, List, Kanban, Network, Sparkles, TrendingUp
-} from 'lucide-react';
-import { useLeadsAI } from '../hooks/useLeadsAI';
-import AIInsightsPanel from '../components/leads/AIInsightsPanel';
-import SmartFilters from '../components/leads/SmartFilters';
-import LeadCard from '../components/leads/LeadCard';
-import LeadsPipeline from '../components/leads/LeadsPipeline';
-import PredictiveChart from '../components/leads/PredictiveChart';
-import ActivityTimeline from '../components/leads/ActivityTimeline';
-import RelationshipNetwork from '../components/leads/RelationshipNetwork';
-import LeadActions from '../components/leads/LeadActions';
-import { createLead, getActiveOrganization } from '../lib/supabase-full.js';
-// import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
+import { useMemo } from "react";
+import { getLeads, type Lead } from "../lib/leads";
 
-type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
-
-interface Lead {
-  id: string;
-  nome?: string;
-  email?: string;
-  empresa?: string;
-  status?: string;
-  score_ia?: number;
-  origem?: string;
-  ai_risk_score?: number;
-  ai_conversion_probability?: number;
-  ai_similar_leads?: { similarity: number; lead: Lead }[];
-  ai_insights?: Array<{ title: string; description: string }>;
-  ai_health_score?: number;
-  ai_next_best_action?: string;
-  first_name?: string;
-  last_name?: string;
-  // ...outros campos que você usar
+interface LeadsProps {
+  onNavigateToDetails: (leadId: string) => void;
 }
 
-interface LeadFilters {
-  search?: string;
-  status?: string;
-  score?: 'hot' | 'warm' | 'cold' | 'ice' | 'all';
-  source?: string;
-  risk?: 'high' | 'medium' | 'low' | 'all';
-  conversion?: 'vhigh' | 'high' | 'medium' | 'low' | 'all';
-}
-
-interface PipelineStage {
-  id: string;
-  name: string;
-  color: string;
-  leads: Lead[];
+function formatCurrency(value: number) {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
 }
 
 interface LeadsProps {
@@ -285,146 +245,63 @@ export default function Leads({ onNavigateToDetails }: LeadsProps) {
     }
   };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8 flex items-center justify-center">
-        <div role="alert" aria-live="assertive" className="bg-red-500/10 border border-red-500 rounded-xl p-6 max-w-md">
-          <h2 className="text-2xl font-bold text-red-400 mb-2">Erro ao carregar leads</h2>
-          <p className="text-gray-300">{error}</p>
-          <button onClick={refetch} className="mt-4 bg-emerald-500 text-white px-4 py-2 rounded">Tentar novamente</button>
-        </div>
-      </div>
-    );
-  }
+  return map[status];
+}
+
+export default function Leads({ onNavigateToDetails }: LeadsProps) {
+  const leads = useMemo(() => getLeads(), []);
 
   return (
-    <div
-      className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] p-4 sm:p-6 lg:p-8 container-responsive"
-      tabIndex={-1}
-      aria-label="Painel de Leads"
-    >
-      {organizationUnavailable && (
-        <div
-          role="alert"
-          className="mb-6 rounded-xl border border-[var(--accent-alert)]/40 bg-[var(--accent-alert)]/10 p-4 text-[var(--accent-alert)]"
-        >
-          <p className="font-semibold">Não encontramos uma organização ativa.</p>
-          <p className="text-sm text-[color-mix(in srgb,var(--accent-alert) 70%,white)]">
-            Faça login novamente ou selecione uma organização válida para carregar os dados de leads.
-          </p>
-        </div>
-      )}
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+    <div className="space-y-8">
+      <header className="flex flex-col gap-3">
         <div>
-          <h1
-            className="text-[clamp(1.5rem,5vw,2.25rem)] font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent"
-          >
-            🎯 Leads Intelligence
-          </h1>
-          <p className="text-[clamp(0.75rem,3vw,1rem)] text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p>
+          <p className="uppercase text-xs tracking-widest text-emerald-400/70">
+            CRM • Inteligência Comercial
+          </p>
+          <h1 className="text-3xl font-bold text-white">Leads estratégicos</h1>
         </div>
-        <LeadActions
-          leads={leads ?? []}
-          onImport={() => {
-            if (refetch) refetch();
-          }}
-          onExport={() => {}}
-          onNewLead={handleCreateLead}
-        />
+        <p className="text-sm text-gray-400 max-w-3xl">
+          Acompanhe a temperatura de cada oportunidade, próximas ações e o potencial de receita
+          diretamente do núcleo ALSHAM 360°. Clique em um lead para abrir o painel mestre-detalhe e
+          sincronizar com Supabase em tempo real.
+        </p>
       </header>
 
-      {!loading && (
-        <section className="kpi-grid mb-6 sm:mb-8" aria-label="KPI de Leads">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {leads.map((lead) => (
+          <article
+            key={lead.id}
+            className="group rounded-2xl border border-white/5 bg-white/5 p-6 backdrop-blur transition hover:border-emerald-400/60 hover:bg-emerald-400/10"
           >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-indigo)] flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-white)]" aria-hidden="true" />
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">{lead.nome}</h2>
+                <p className="text-sm text-gray-400">{lead.empresa}</p>
               </div>
-              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Qualificados</span>
+              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadge(lead.status)}`}>
+                {lead.status.replace("-", " ")}
+              </span>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-emerald)]">{analytics.qualified}</div>
-            <div className="text-xs text-[var(--accent-emerald)] mt-1" aria-label="Taxa de conversão">
-              +{analytics.conversionRate.toFixed(1)}% taxa
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-orange)] to-[var(--accent-red)] flex items-center justify-center text-base sm:text-lg">
-                🔥
-              </div>
-              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Quentes</span>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-orange)]">{analytics.hot}</div>
-            <div className="text-xs text-[var(--accent-orange)] mt-1">alta conversão</div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-yellow)] to-[var(--accent-orange)] flex items-center justify-center text-base sm:text-lg">
-                ⚠️
-              </div>
-              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Em Risco</span>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-yellow)]">{analytics.atRisk}</div>
-            <div className="text-xs text-[var(--accent-yellow)] mt-1">precisam atenção</div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-[var(--neutral-900)] to-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-base sm:text-lg">
-                💚
-              </div>
-              <span className="text-[clamp(0.875rem,3vw,1.125rem)] text-[var(--text-gray)]">Health Score</span>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-[var(--accent-purple)]">{analytics.healthScore}%</div>
-            <div className="text-xs text-[var(--accent-purple)] mt-1">saúde geral</div>
-          </motion.div>
-        </section>
-      )}
 
-      <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6" role="navigation" aria-label="Seleção de visualização">
-        <div className="theme-selector-container">
-          {[
-            { mode: 'grid', icon: LayoutGrid, label: 'Grade' },
-            { mode: 'list', icon: List, label: 'Lista' },
-            { mode: 'kanban', icon: Kanban, label: 'Kanban' },
-            { mode: 'network', icon: Network, label: 'Rede' },
-          ].map(({ mode, icon: Icon, label }) => (
-            <motion.button
-              key={mode}
-              aria-pressed={viewMode === mode}
-              onClick={() => setViewMode(mode as ViewMode)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`
-                theme-selector-button
-                ${viewMode === mode
-                  ? 'bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] text-[var(--text-white)]'
-                  : 'bg-[var(--neutral-900)] border border-[var(--neutral-800)] text-[var(--text-gray)] hover:text-[var(--text-white)] hover:border-[var(--neutral-700)]'
-                }
-              `}
-              aria-label={`Visualizar em ${label}`}
+            <dl className="mt-6 space-y-2 text-sm text-gray-300">
+              <div className="flex justify-between">
+                <dt>Valor potencial</dt>
+                <dd className="font-semibold text-emerald-300">{formatCurrency(lead.valorPotencial)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt>Score</dt>
+                <dd>{lead.score}%</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt>Origem</dt>
+                <dd className="text-right text-gray-400">{lead.origem}</dd>
+              </div>
+            </dl>
+
+            <button
+              type="button"
+              onClick={() => onNavigateToDetails(lead.id)}
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500/90 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-emerald-400"
             >
               <Icon className="theme-selector-icon" aria-hidden="true" />
               <span className="hidden sm:inline text-[clamp(0.875rem,3vw,1.125rem)] font-medium ml-2">{label}</span>

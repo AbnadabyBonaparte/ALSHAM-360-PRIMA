@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="module" src="/src/lib/init-supabase.js"></script>
+  <title>Pipeline de Vendas — ALSHAM 360°</title>
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    :root {
+      --stage-bg: #f3f4f6;
+      --stage-border: #e5e7eb;
+      --card-bg: #fff;
+      --card-shadow: 0 14px 24px -16px rgba(15, 23, 42, 0.45);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #111827, #1e3a8a);
+      color: #111827;
+    }
+
+    header {
+      padding: 2.5rem 3rem 1rem;
+      color: #fff;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.25rem;
+    }
+
+    header p {
+      margin: 0;
+      max-width: 48ch;
+      opacity: 0.85;
+    }
+
+    .pipeline-container {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0 3rem 3rem;
+      overflow-x: auto;
+    }
+
+    .pipeline-column {
+      background: var(--stage-bg);
+      border: 1px solid var(--stage-border);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      min-width: 16rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .pipeline-column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pipeline-column-header h3 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      color: #1e3a8a;
+      letter-spacing: 0.08em;
+      margin: 0;
+    }
+
+    .pipeline-column-header span {
+      font-size: 0.75rem;
+      color: #4b5563;
+    }
+
+    .pipeline-column-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      min-height: 6rem;
+    }
+
+    .pipeline-column-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .opportunity-card {
+      background: var(--card-bg);
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: var(--card-shadow);
+      display: grid;
+      gap: 0.5rem;
+      cursor: grab;
+    }
+
+    .opportunity-card:active {
+      cursor: grabbing;
+    }
+
+    .opportunity-card strong {
+      font-size: 1rem;
+      color: #1f2937;
+    }
+
+    .opportunity-card span {
+      font-size: 0.875rem;
+      color: #4b5563;
+    }
+
+    .pipeline-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0 3rem 2.5rem;
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .notification-container {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      z-index: 50;
+    }
+
+    .notification {
+      min-width: 220px;
+      padding: 0.85rem 1.25rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px -12px rgba(15, 23, 42, 0.45);
+      color: #fff;
+      font-weight: 600;
+      display: none;
+    }
+
+    .notification.success {
+      background: #16a34a;
+    }
+
+    .notification.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body data-cy="pipeline-page">
+  <div id="notification-container" class="notification-container" aria-live="polite" data-cy="pipeline-notification-container"></div>
+  <header>
+    <h1 data-cy="pipeline-title">Pipeline de Vendas</h1>
+    <p>Monitoramento das oportunidades em tempo real com distribuição por estágio, valor e prioridade de follow-up.</p>
+  </header>
+
+  <section class="pipeline-container" aria-label="Pipeline de vendas" data-cy="pipeline-columns">
+    <article class="pipeline-column" data-stage="lead" data-weight="0.2" data-cy="pipeline-column">
+      <div class="pipeline-column-header">
+        <h3>Leads</h3>
+        <span>Entrada do funil</span>
+      </div>
+      <div class="pipeline-column-body" data-stage="lead">
+        <div class="opportunity-card" data-opportunity-id="lead-1027" data-value="10000" draggable="true" data-cy="pipeline-card">
+          <strong>Lead #1027</strong>
+          <span>R$ 10.000 · Inbound · aguardando qualificação</span>
+        </div>
+        <div class="opportunity-card" data-opportunity-id="lead-1028" data-value="7500" draggable="true" data-cy="pipeline-card">
+          <strong>Lead #1028</strong>
+          <span>R$ 7.500 · Evento · agendamento de discovery</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="qualification" data-weight="0.35" data-cy="pipeline-column">
+      <div class="pipeline-column-header">
+        <h3>Qualificação</h3>
+        <span>Fit comercial</span>
+      </div>
+      <div class="pipeline-column-body" data-stage="qualification">
+        <div class="opportunity-card" data-opportunity-id="qual-2001" data-value="35000" draggable="true" data-cy="pipeline-card">
+          <strong>Conta Atlas</strong>
+          <span>R$ 35.000 · Fit alto · aguardando proposta técnica</span>
+        </div>
+        <div class="opportunity-card" data-opportunity-id="qual-2002" data-value="19000" draggable="true" data-cy="pipeline-card">
+          <strong>Startup Boreal</strong>
+          <span>R$ 19.000 · Fit médio · demo marcada para hoje</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="proposal" data-weight="0.55" data-cy="pipeline-column">
+      <div class="pipeline-column-header">
+        <h3>Proposta</h3>
+        <span>Documentos enviados</span>
+      </div>
+      <div class="pipeline-column-body" data-stage="proposal">
+        <div class="opportunity-card" data-opportunity-id="prop-3001" data-value="58000" draggable="true" data-cy="pipeline-card">
+          <strong>Grupo Helios</strong>
+          <span>R$ 58.000 · Proposta enviada · aguardando jurídico</span>
+        </div>
+        <div class="opportunity-card" data-opportunity-id="prop-3002" data-value="42000" draggable="true" data-cy="pipeline-card">
+          <strong>Vision Tech</strong>
+          <span>R$ 42.000 · Cláusulas revisadas · retorno até amanhã</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="negotiation" data-weight="0.75" data-cy="pipeline-column">
+      <div class="pipeline-column-header">
+        <h3>Negociação</h3>
+        <span>Follow-up ativo</span>
+      </div>
+      <div class="pipeline-column-body" data-stage="negotiation">
+        <div class="opportunity-card" data-opportunity-id="neg-4001" data-value="64000" draggable="true" data-cy="pipeline-card">
+          <strong>Infinity Labs</strong>
+          <span>R$ 64.000 · Desconto estratégico · follow-up diário</span>
+        </div>
+        <div class="opportunity-card" data-opportunity-id="neg-4002" data-value="51000" draggable="true" data-cy="pipeline-card">
+          <strong>Orbital Ventures</strong>
+          <span>R$ 51.000 · Comitê de compras · retorno em 48h</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pipeline-column" data-stage="closing" data-weight="1" data-cy="pipeline-column">
+      <div class="pipeline-column-header">
+        <h3>Fechamento</h3>
+        <span>Fase final</span>
+      </div>
+      <div class="pipeline-column-body" data-stage="closing">
+        <div class="opportunity-card" data-opportunity-id="close-5001" data-value="68000" draggable="true" data-cy="pipeline-card">
+          <strong>Neon Global</strong>
+          <span>R$ 68.000 · Contrato enviado · assinatura pendente</span>
+        </div>
+        <div class="opportunity-card" data-opportunity-id="close-5002" data-value="75000" draggable="true" data-cy="pipeline-card">
+          <strong>Quantum Systems</strong>
+          <span>R$ 75.000 · Implantação agendada · go-live em 10 dias</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <div id="pipeline-total" class="pipeline-footer" data-cy="pipeline-total">Total ponderado: R$ 150.000</div>
+
+  <script type="module">
+    const STAGE_WEIGHTS = {
+      lead: 0.2,
+      qualification: 0.35,
+      proposal: 0.55,
+      negotiation: 0.75,
+      closing: 1
+    };
+
+    let draggedCard = null;
+
+    function formatCurrency(value) {
+      return value.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 0
+      });
+    }
+
+    function updateTotal() {
+      const columns = document.querySelectorAll('.pipeline-column');
+      let weightedTotal = 0;
+
+      columns.forEach((column) => {
+        const weight = Number(column.dataset.weight || STAGE_WEIGHTS[column.dataset.stage] || 0);
+        column.querySelectorAll('.opportunity-card').forEach((card) => {
+          const value = Number(card.dataset.value || 0);
+          weightedTotal += value * weight;
+        });
+      });
+
+      const totalElement = document.getElementById('pipeline-total');
+      if (totalElement) {
+        totalElement.textContent = `Total ponderado: ${formatCurrency(Math.round(weightedTotal))}`;
+      }
+    }
+
+    function showNotification(message) {
+      const container = document.getElementById('notification-container');
+      if (!container) return;
+
+      let notification = container.querySelector('.notification.success');
+      if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification success';
+        notification.dataset.cy = 'pipeline-notification';
+        container.appendChild(notification);
+      }
+
+      notification.dataset.cy = 'pipeline-notification';
+      notification.textContent = message;
+      notification.classList.add('visible');
+
+      setTimeout(() => {
+        notification.classList.remove('visible');
+      }, 1800);
+    }
+
+    function handleDragStart(event) {
+      draggedCard = event.currentTarget;
+      event.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      if (!draggedCard) return;
+
+      const targetColumn = event.currentTarget;
+      if (targetColumn.contains(draggedCard)) {
+        return;
+      }
+
+      targetColumn.appendChild(draggedCard);
+      showNotification('Oportunidade movida com sucesso');
+      updateTotal();
+    }
+
+    function handleDragEnd() {
+      draggedCard = null;
+    }
+
+    document.querySelectorAll('.opportunity-card').forEach((card) => {
+      card.addEventListener('dragstart', handleDragStart);
+      card.addEventListener('dragend', handleDragEnd);
+    });
+
+    document.querySelectorAll('.pipeline-column-body').forEach((columnBody) => {
+      columnBody.addEventListener('dragover', handleDragOver);
+      columnBody.addEventListener('drop', handleDrop);
+    });
+
+    updateTotal();
+  </script>
+</body>
+</html>

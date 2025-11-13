@@ -1,50 +1,18 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { create } from "zustand";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Activity,
-  AlertCircle,
-  ArrowUpRight,
-  Bell,
-  Brain,
-  ChevronDown,
-  Command,
-  Compass,
-  Flame,
-  Globe2,
-  HeartPulse,
-  Layers,
-  LineChart,
-  MonitorPlay,
-  Menu,
-  MessageCircle,
-  Palette,
-  PieChart as PieChartIcon,
-  Rocket,
-  Search,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Target,
-  Users,
-  X,
-} from "lucide-react";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  Filler,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import campaignOrion from "./assets/campaign-orion.png";
-import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from "react-router-dom";
+import { getSupabaseClient, getCurrentSession } from "./lib/supabase";
+
+// Layout
+import LayoutSupremo from "./components/LayoutSupremo";
+
+// Páginas
+import Home from "./pages/Home";
+import Analytics from "./pages/Analytics";
+import Financeiro from "./pages/Financeiro";
+import Gamificacao from "./pages/Gamificacao";
+import Automacoes from "./pages/Automacoes";
+import Seguranca from "./pages/Seguranca";
+import Publicacao from "./pages/Publicacao";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
 import {
@@ -532,118 +500,13 @@ const useDashboardStore = create<DashboardState>((set) => ({
           engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
           campaigns: [],
         });
-        return;
+        unsubscribe = () => listener.subscription.unsubscribe();
+      } catch (error) {
+        console.error("Erro ao inicializar Supabase:", error);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-
-      const [leadsRes, opportunitiesRes, campaignsRes, leaderboardRes] = await Promise.all([
-        getLeads(),
-        getOpportunities(),
-        getCampaigns({ org_id: orgId }),
-        getTopLeadsByScore(5),
-      ]);
-
-      const firstError = [leadsRes, opportunitiesRes, campaignsRes, leaderboardRes]
-        .map((result: any) => (result && 'success' in result && !result.success ? result.error : null))
-        .find(Boolean);
-      // FIX: interrompe pipeline ao primeiro erro de endpoint Supabase
-      if (firstError) {
-        throw firstError;
-      }
-
-      const leads = (leadsRes as any)?.data?.data ?? [];
-      const opportunities = (opportunitiesRes as any)?.data?.data ?? [];
-      const campaigns = (campaignsRes as any)?.data ?? [];
-      const leaderboard = ((leaderboardRes as any)?.data ?? []).map((p: any, i: number) => ({
-        user: p?.user_name ?? `User ${i + 1}`,
-        avatar: p?.avatar_url ?? 'https://api.dicebear.com/7.x/identicon/svg',
-        score: p?.score ?? 0,
-        delta: 0,
-        rank: i + 1,
-      }));
-
-      const kpis: KPI[] = [
-        {
-          id: 'leads',
-          title: 'Leads Ativos',
-          value: leads.length.toString(),
-          trend: 0,
-          trendLabel: 'Base Supabase',
-          series: [0, 0, 0, leads.length],
-          target: '—',
-          description: 'Total de leads ativos em leads_crm',
-          icon: <Target className="h-5 w-5 text-[var(--accent-emerald)]" />,
-        },
-        {
-          id: 'deals',
-          title: 'Negócios em Andamento',
-          value: opportunities.length.toString(),
-          trend: 0,
-          trendLabel: 'Base Supabase',
-          series: [0, 0, 0, opportunities.length],
-          target: '—',
-          description: 'Registros atuais em sales_pipeline',
-          icon: <Rocket className="h-5 w-5 text-[var(--accent-sky)]" />,
-        },
-        {
-          id: 'campanhas',
-          title: 'Campanhas Ativas',
-          value: campaigns.length.toString(),
-          trend: 0,
-          trendLabel: 'Base Supabase',
-          series: [0, 0, 0, campaigns.length],
-          target: '—',
-          description: 'Campanhas registradas em marketing_campaigns',
-          icon: <LineChart className="h-5 w-5 text-[var(--accent-fuchsia)]" />,
-        },
-      ];
-
-      set({
-        loading: false,
-        organizationUnavailable: false,
-        kpis,
-        analytics: {
-          pipeline: [],
-          conversion: [],
-          heatmap: [],
-          cohort: [],
-          geo: [],
-          marketSplit: [],
-        },
-        aiInsights: [],
-        automations: [],
-        engagement: {
-          feed: [],
-          leaderboard,
-          tasks: [],
-          community: [],
-          sla: [],
-        },
-        campaigns,
-      });
-
-      console.info('✅ Dashboard populado com dados reais do Supabase.');
-    } catch (err: any) {
-      console.error('❌ Erro ao buscar dados Supabase:', err);
-      const isOrgError = typeof err?.message === 'string' && err.message.toLowerCase().includes('organiza');
-      set({
-        // FIX: restaura estado limpo quando a sessão/org falha
-
-        loading: false,
-        organizationUnavailable: isOrgError,
-        kpis: [],
-        analytics: {
-          pipeline: [],
-          conversion: [],
-          heatmap: [],
-          cohort: [],
-          geo: [],
-          marketSplit: [],
-        },
-        aiInsights: [],
-        automations: [],
-        engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
-        campaigns: [],
-      });
     }
   },
 
@@ -967,100 +830,7 @@ const mockAutomations: Automation[] = [
   },
 ];
 
-const mockEngagement: EngagementData = {
-  feed: [
-    {
-      id: "event-1",
-      type: "Deal",
-      title: "Fechado ganhou • R$ 280K",
-      description: "Conta: Nubra AgroTech • Squad Orion",
-      timestamp: "há 12 min",
-      icon: <ArrowUpRight className="h-4 w-4 text-[var(--accent-emerald)]" />,
-    },
-    {
-      id: "event-2",
-      type: "AI",
-      title: "Copilot gerou 24 propostas",
-      description: "Eficiência +34% vs média",
-      timestamp: "há 27 min",
-      icon: <Sparkles className="h-4 w-4 text-[var(--accent-fuchsia)]" />,
-    },
-    {
-      id: "event-3",
-      type: "Gamification",
-      title: "Badge Diamante desbloqueado",
-      description: "Maria P. atingiu 98% de metas consecutivas",
-      timestamp: "há 41 min",
-      icon: <Flame className="h-4 w-4 text-[var(--accent-amber)]" />,
-    },
-  ],
-  leaderboard: [
-    { user: "Maria Pereira", avatar: "MP", score: 982, delta: 34, rank: 1 },
-    { user: "João Carvalho", avatar: "JC", score: 941, delta: 22, rank: 2 },
-    { user: "Ana Souza", avatar: "AS", score: 918, delta: 18, rank: 3 },
-  ],
-  tasks: [
-    {
-      id: "task-1",
-      title: "Revisar proposta Fortune + Copilot",
-      owner: "Você",
-      dueIn: "4h",
-      progress: 72,
-    },
-    {
-      id: "task-2",
-      title: "Kick-off Aliança Phobos",
-      owner: "Squad Vega",
-      dueIn: "AMANHÃ",
-      progress: 28,
-    },
-    {
-      id: "task-3",
-      title: "Auditar SLA Premium",
-      owner: "Time Suporte",
-      dueIn: "2 dias",
-      progress: 54,
-    },
-  ],
-  community: [
-    {
-      id: "post-1",
-      title: "Playbook de abordagem híbrida com IA",
-      author: "Lorena Campos",
-      likes: 284,
-      comments: 47,
-      trend: 26,
-    },
-    {
-      id: "post-2",
-      title: "Integração Supabase × Data Warehouse",
-      author: "Rafael A.",
-      likes: 198,
-      comments: 22,
-      trend: 14,
-    },
-  ],
-  sla: [
-    {
-      metric: "First Response Time",
-      value: "07m",
-      target: "Meta: 10m",
-      status: "OK",
-    },
-    {
-      metric: "Resolução Prioridade A",
-      value: "2h18",
-      target: "Meta: 2h",
-      status: "Alerta",
-    },
-    {
-      metric: "Backlog crítico",
-      value: "12 casos",
-      target: "Meta: ≤ 8",
-      status: "Crítico",
-    },
-  ],
-};
+    initializeSession();
 
 const mockCampaigns: Campaign[] = [
   {
@@ -1241,75 +1011,9 @@ function App() {
 
     // Cleanup ao desmontar
     return () => {
-      mounted = false;
-      console.log('🔴 Desconectando subscriptions...');
-      channels.forEach(channel => {
-        supabase.removeChannel(channel);
-      });
+      isMounted = false;
+      unsubscribe?.();
     };
-  }, []); // ⚠️ IMPORTANTE: array vazio - executar só uma vez
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 3️⃣ THEME MANAGEMENT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 4️⃣ CAMPAIGN CAROUSEL MANAGEMENT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  useEffect(() => {
-    if (!campaigns.length) return;
-    setCampaignIndex((prev) => (prev >= campaigns.length ? 0 : prev));
-  }, [campaigns.length]);
-
-  useEffect(() => {
-    if (campaigns.length <= 1) return;
-    const timer = setInterval(() => {
-      setCampaignIndex((prev) => (prev + 1) % campaigns.length);
-    }, 9000);
-    return () => clearInterval(timer);
-  }, [campaigns.length]);
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 5️⃣ MOBILE NAV OVERFLOW CONTROL
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    if (isMobileNavOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [isMobileNavOpen]);
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 6️⃣ RESPONSIVE MEDIA QUERY LISTENER
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    const handleChange = (event: MediaQueryList | MediaQueryListEvent) => {
-      if (event.matches) {
-        setMobileNavOpen(false);
-      }
-    };
-
-    handleChange(mediaQuery);
-
-    const listener = (event: MediaQueryListEvent) => handleChange(event);
-
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", listener, { passive: true });
-      return () => mediaQuery.removeEventListener("change", listener);
-    }
-
-    mediaQuery.addListener(listener);
-    return () => mediaQuery.removeListener(listener);
   }, []);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1565,25 +1269,9 @@ function App() {
 
   // FIX: encapsula renderização dinâmica para evitar quebra global
   if (loading) {
-    return <LoadingSkeletonLayout theme={theme} />;
-  }
-
-  if (organizationUnavailable) {
-    // FIX: Hard-stop navigation when organization context is missing
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--bg-dark)] px-6 text-center text-white">
-        <AlertCircle className="h-16 w-16 text-[var(--accent-alert)]" />
-        <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Organização ativa não encontrada</h2>
-          <p className="text-sm text-white/70">Revise seu login ou escolha outra organização para continuar.</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => fetchData()}
-          className="rounded-lg border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/20 px-4 py-2 text-sm font-medium text-[var(--accent-emerald)] transition hover:bg-[var(--accent-emerald)]/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-dark)]"
-        >
-          Tentar novamente
-        </button>
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-gray-400">
+        Carregando sessão...
       </div>
     );
   }
@@ -2167,827 +1855,99 @@ function App() {
     >
       <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
         <button
-          className="fixed right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-xl shadow-[color-mix(in_srgb,var(--accent-emerald)_25%,transparent)] backdrop-blur md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-          style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
-          onClick={() => setMobileNavOpen((prev) => !prev)}
-          aria-expanded={isMobileNavOpen}
-          aria-controls="mobile-command-center"
-          aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
+          onClick={async () => {
+            const client = await getSupabaseClient();
+            await client.auth.signInWithOAuth({ provider: "google" });
+          }}
+          className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-semibold transition-all"
         >
-          {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          Entrar com Google
         </button>
-
-        <AnimatePresence>
-          {isMobileNavOpen && (
-            <motion.div
-              className="fixed inset-0 z-40 bg-[color-mix(in_srgb,var(--background)_75%,transparent)] backdrop-blur-xl md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeMobileNav}
-            >
-              <motion.div
-                id="mobile-command-center"
-                className="absolute left-0 top-0 flex h-full w-[min(88vw,360px)] flex-col border-r border-[var(--border-strong)] bg-[var(--surface)]/92 shadow-2xl"
-                style={{
-                  paddingTop: "calc(env(safe-area-inset-top) + 1.25rem)",
-                  paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)",
-                }}
-                initial={{ x: "-100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={{ type: "spring", stiffness: 260, damping: 32 }}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className="flex items-center justify-between px-6 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
-                      A∞
-                    </div>
-                    <div>
-                      <p className="text-[11px] uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
-                      <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={closeMobileNav}
-                    className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                    aria-label="Fechar menu"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-
-                <div className="h-[1px] w-full bg-[var(--border)]/60" />
-
-                <div className="flex-1 overflow-y-auto px-6">
-                  <div className="space-y-4 pt-4">
-                    {sidebarGroups.map((group) => (
-                      <div key={`mobile-${group.id}`} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-4">
-                        <div className="flex items-center gap-3">
-                          <span className="grid h-9 w-9 place-content-center rounded-xl bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
-                            {group.icon}
-                          </span>
-                          <p className="text-sm font-semibold text-[var(--text-primary)]">{group.label}</p>
-                        </div>
-                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                          {group.links.map((link) => {
-                            const isActive = activePage === link.id;
-
-                            return (
-                              <button
-                                key={link.id}
-                                type="button"
-                                onClick={() => {
-                                  navigateToPage(link.id);
-                                  closeMobileNav();
-                                }}
-                                aria-current={isActive ? "page" : undefined}
-                                className={`rounded-full border px-3 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                  isActive
-                                    ? "border-[var(--accent-emerald)]/60 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
-                                    : "border-[var(--border)]/70 text-[var(--text-secondary)] hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
-                                }`}
-                              >
-                                {link.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
-                    <p className="text-[11px] uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
-                    <div className="space-y-3 text-sm">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Moeda</p>
-                        <div className="mt-2 flex gap-2">
-                          {currencyOptions.map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => setCurrency(option.value)}
-                              aria-label={`Selecionar moeda ${option.label}`}
-                              aria-pressed={currency === option.value}
-                              className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                currency === option.value
-                                  ? "border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
-                                  : "border-[var(--border)] bg-[var(--surface-strong)]/60 text-[var(--text-secondary)]"
-                              }`}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Timeframe</p>
-                        <div className="mt-2 flex gap-2">
-                          {timeframeOptions.map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => setTimeframe(option.value)}
-                              aria-label={`Selecionar período ${option.label}`}
-                              aria-pressed={timeframe === option.value}
-                              className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                timeframe === option.value
-                                  ? "border-[var(--accent-sky)]/40 bg-[var(--accent-sky)]/15 text-[var(--accent-sky)]"
-                                  : "border-[var(--border)] bg-[var(--surface-strong)]/60 text-[var(--text-secondary)]"
-                              }`}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Tema</p>
-                        <div className="mt-2 grid grid-cols-2 gap-2">
-                          {themeOptions.map((option) => (
-                            <button
-                              key={option.key}
-                              type="button"
-                              onClick={() => setTheme(option.key)}
-                              aria-label={`Mudar para tema ${option.label}`}
-                              aria-current={theme === option.key ? "true" : "false"}
-                              className={`min-h-[48px] rounded-xl border px-3 py-2 text-left text-xs uppercase tracking-[0.2em] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                theme === option.key
-                                  ? "border-[var(--accent-fuchsia)]/40 bg-[var(--accent-fuchsia)]/10 text-[var(--accent-fuchsia)]"
-                                  : "border-[var(--border)] bg-[var(--surface-strong)]/55 text-[var(--text-secondary)]"
-                              }`}
-                            >
-                              <span className="flex items-center gap-2">
-                                <span
-                                  className="h-4 w-4 rounded-full"
-                                  style={{ background: themeSwatches[option.key], boxShadow: "0 0 10px rgba(135, 148, 164, 0.28)" }}
-                                />
-                                {option.label}
-                              </span>
-                              <span className="mt-1 block text-[10px] capitalize text-[var(--text-secondary)]/80">{option.description}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <aside className="hidden min-h-screen lg:flex lg:w-80 xl:w-[22rem] flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
-          <div 
-            onClick={() => navigateToPage('dashboard')}
-            className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur cursor-pointer hover:bg-[var(--surface)]/95 transition-colors group"
-            role="button"
-            tabIndex={0}
-            onKeyPress={(e) => e.key === 'Enter' && navigateToPage('dashboard')}
-            aria-label="Voltar ao Dashboard"
-          >
-            <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold group-hover:scale-105 transition-transform">
-              A∞
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)] group-hover:text-[var(--accent-sky)] transition-colors">ALSHAM</p>
-              <p className="text-lg font-medium group-hover:text-[var(--accent-emerald)] transition-colors">360° PRIMA</p>
-            </div>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-4 pb-6">
-            <div className="space-y-5">
-              {sidebarGroups.map((group) => (
-                <div key={group.id} className="space-y-3">
-                  <button
-                    className="flex w-full items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] transition hover:border-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                    aria-label={`Abrir categoria ${group.label}`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="grid h-8 w-8 place-content-center rounded-full bg-[var(--surface)] text-[var(--accent-emerald)]">
-                        {group.icon}
-                      </span>
-                      {group.label}
-                    </span>
-                    <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
-                  </button>
-                  <ul className="ml-4 space-y-2 border-l border-[var(--border)] pl-4 text-sm">
-                    {group.links.map((link) => {
-                      const isActive = activePage === link.id;
-
-                      return (
-                        <li key={link.id} className="flex items-center gap-2">
-                          <span
-                            className={`h-[1px] w-2 transition ${
-                              isActive
-                                ? "bg-[var(--accent-emerald)]"
-                                : "bg-[var(--accent-emerald)]/60"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => navigateToPage(link.id)}
-                            aria-current={isActive ? "page" : undefined}
-                            className={`flex-1 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                              isActive
-                                ? "text-[var(--accent-emerald)]"
-                                : "text-[var(--text-secondary)] hover:text-[var(--accent-emerald)]"
-                            }`}
-                          >
-                            {link.label}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </nav>
-
-          <div className="border-t border-[var(--border)] px-6 py-6">
-            <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-              <div className="grid h-10 w-10 place-content-center rounded-full bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Copilot 360°</p>
-                <p className="text-xs text-[var(--text-secondary)]">Integração profunda com IA generativa e preditiva.</p>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <div className="flex flex-col">
-          <header
-            className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
-            style={{ paddingTop: "env(safe-area-inset-top)" }}
-          >
-            <div className="flex flex-wrap items-center gap-4 px-6 py-4 sm:py-5">
-              <button
-                type="button"
-                className="grid h-10 w-10 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                onClick={() => setMobileNavOpen((prev) => !prev)}
-                aria-expanded={isMobileNavOpen}
-                aria-controls="mobile-command-center"
-                aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
-              >
-                {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-secondary)]" />
-                <input
-                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] py-3 pl-12 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-[var(--accent-emerald)] focus:outline-none focus:ring-0"
-                  placeholder="Pesquisar qualquer interação, deal, automação ou insight"
-                />
-                <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-2 py-1 text-[11px] uppercase tracking-[0.2em] text-[var(--text-secondary)]">
-                  <Command className="h-3.5 w-3.5" /> K
-                </span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
-                  <Globe2 className="h-4 w-4 text-[var(--accent-emerald)]" />
-                  <button
-                    onClick={() => setCurrency("BRL")}
-                    aria-label="Selecionar moeda Real Brasileiro"
-                    aria-pressed={currency === "BRL"}
-                    className={`${
-                      currency === "BRL"
-                        ? "text-[var(--accent-emerald)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    BRL
-                  </button>
-                  <button
-                    onClick={() => setCurrency("USD")}
-                    aria-label="Selecionar moeda Dólar Americano"
-                    aria-pressed={currency === "USD"}
-                    className={`${
-                      currency === "USD"
-                        ? "text-[var(--accent-sky)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    USD
-                  </button>
-                  <button
-                    onClick={() => setCurrency("EUR")}
-                    aria-label="Selecionar moeda Euro"
-                    aria-pressed={currency === "EUR"}
-                    className={`${
-                      currency === "EUR"
-                        ? "text-[var(--accent-fuchsia)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    EUR
-                  </button>
-                  <span className="mx-1 h-4 w-[1px] bg-[var(--surface-strong)]" />
-                  <button
-                    onClick={() => setTimeframe("7d")}
-                    aria-label="Selecionar período de 7 dias"
-                    aria-pressed={timeframe === "7d"}
-                    className={`${
-                      timeframe === "7d"
-                        ? "text-[var(--accent-emerald)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    7D
-                  </button>
-                  <button
-                    onClick={() => setTimeframe("30d")}
-                    aria-label="Selecionar período de 30 dias"
-                    aria-pressed={timeframe === "30d"}
-                    className={`${
-                      timeframe === "30d"
-                        ? "text-[var(--accent-sky)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    30D
-                  </button>
-                  <button
-                    onClick={() => setTimeframe("90d")}
-                    aria-label="Selecionar período de 90 dias"
-                    aria-pressed={timeframe === "90d"}
-                    className={`${
-                      timeframe === "90d"
-                        ? "text-[var(--accent-fuchsia)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    90D
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--text-secondary)]">
-                  <Palette className="h-4 w-4 text-[var(--accent-sky)]" />
-                  <div className="flex items-center gap-2">
-                    {themeOptions.map((option) => (
-                      <button
-                        key={option.key}
-                        onClick={() => setTheme(option.key)}
-                        aria-label={`Mudar para tema ${option.label}`}
-                        aria-current={theme === option.key ? "true" : "false"}
-                        className={`flex items-center gap-2 rounded-xl border px-2 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                          theme === option.key
-                            ? "border-[var(--accent-emerald)] bg-[var(--surface-strong)] text-[var(--text-primary)]"
-                            : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-sky)]"
-                        }`}
-                        title={`${option.label} • ${option.description}`}
-                      >
-                        <span
-                          className="h-4 w-4 rounded-full"
-                          style={{ background: themeSwatches[option.key], boxShadow: "0 0 10px rgba(135, 148, 164, 0.28)" }}
-                        />
-                        <span className="text-[10px] font-medium uppercase tracking-[0.2em]">
-                          {option.label}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  className="grid h-11 w-11 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-secondary)] transition hover:text-[var(--accent-emerald)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                  aria-label="Abrir notificações"
-                >
-                  <Bell className="h-5 w-5" />
-                </button>
-
-                <div className="flex items-center gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-2">
-                  <div className="grid h-9 w-9 place-content-center rounded-full bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-sm font-semibold text-slate-950">
-                    VP
-                  </div>
-                  <div className="hidden text-sm leading-tight lg:block">
-                    <p className="font-medium">Victor Prado</p>
-                    <p className="text-xs text-[var(--accent-emerald)]">Chief Growth Architect</p>
-                  </div>
-                  <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
-                </div>
-              </div>
-            </div>
-          </header>
-
-          <main
-            className="flex-1 overflow-y-auto bg-[var(--background)]"
-            style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
-          >
-            {pageState.error ? (
-              <div className="flex min-h-[40vh] flex-col items-center justify-center gap-2 text-center">
-                <AlertCircle className="h-12 w-12 text-[var(--accent-alert)]" />
-                <p className="text-sm text-[var(--text-secondary)]">Falha ao renderizar a página selecionada.</p>
-              </div>
-            ) : (
-              pageState.content
-            )}
-          </main>
-        </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/app" element={<LayoutSupremo />}>
+          <Route index element={<Navigate to="/app/home" replace />} />
+          <Route path="home" element={<Home />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route
+            path="leads"
+            element={<LeadsRoute onSelect={(leadId) => setSelectedLeadId(leadId)} />}
+          />
+          <Route
+            path="leads/:leadId"
+            element={
+              <LeadsDetailsRoute
+                selectedLeadId={selectedLeadId}
+                onSync={setSelectedLeadId}
+                onClear={() => setSelectedLeadId(null)}
+              />
+            }
+          />
+          <Route path="financeiro" element={<Financeiro />} />
+          <Route path="gamificacao" element={<Gamificacao />} />
+          <Route path="automacoes" element={<Automacoes />} />
+          <Route path="seguranca" element={<Seguranca />} />
+          <Route path="publicacao" element={<Publicacao />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/app/home" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
-function CampaignSpotlight({
-  campaigns,
-  activeIndex,
-  onSelect,
-}: {
-  campaigns: Campaign[];
-  activeIndex: number;
-  onSelect: (index: number) => void;
-}) {
-  const activeCampaign = campaigns[activeIndex];
-  const isSingle = campaigns.length <= 1;
+function LeadsRoute({ onSelect }: { onSelect: (leadId: string) => void }) {
+  const navigate = useNavigate();
 
-  if (!activeCampaign) {
+  return (
+    <Leads
+      onNavigateToDetails={(leadId) => {
+        onSelect(leadId);
+        navigate(`/app/leads/${leadId}`);
+      }}
+    />
+  );
+}
+
+interface LeadsDetailsRouteProps {
+  selectedLeadId: string | null;
+  onSync: (leadId: string) => void;
+  onClear: () => void;
+}
+
+function LeadsDetailsRoute({ selectedLeadId, onSync, onClear }: LeadsDetailsRouteProps) {
+  const params = useParams();
+  const navigate = useNavigate();
+  const leadIdFromParams = params.leadId ?? null;
+  const effectiveLeadId = leadIdFromParams ?? selectedLeadId;
+
+  useEffect(() => {
+    if (leadIdFromParams) {
+      onSync(leadIdFromParams);
+      return;
+    }
+
+    if (!selectedLeadId) {
+      navigate("/app/leads", { replace: true });
+    }
+  }, [leadIdFromParams, selectedLeadId, navigate, onSync]);
+
+  if (!effectiveLeadId) {
     return null;
   }
 
-  const renderMedia = (campaign: Campaign) => {
-    switch (campaign.mediaType) {
-      case "video":
-        return (
-          <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-black/40">
-            <video
-              key={campaign.id}
-              src={campaign.mediaSrc}
-              className="h-full w-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
-              controls
-            >
-              <track kind="captions" label="Sem legendas" />
-            </video>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/45 via-transparent to-black/10" />
-          </div>
-        );
-      case "iframe":
-        return (
-          <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-black/50">
-            <iframe
-              key={campaign.id}
-              src={campaign.mediaSrc}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="aspect-video h-full w-full"
-            />
-          </div>
-        );
-      default:
-        return (
-          <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)]">
-            <img
-              src={campaign.mediaSrc}
-              alt={campaign.name}
-              className="h-full w-full object-cover"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-black/5" />
-          </div>
-        );
-    }
-  };
-
   return (
-    <motion.section
-      className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:p-8"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      viewport={{ once: true, amount: 0.45 }}
-    >
-      <div className="pointer-events-none absolute inset-0 opacity-[0.28]" style={{ background: "var(--gradient-wash)" }} />
-      <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.32em] ${badgePalette[activeCampaign.badgeTone]}`}>
-              {activeCampaign.badge}
-            </span>
-            <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/80 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[var(--text-secondary)]">
-              {activeCampaign.name}
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            <h2 className="text-3xl font-semibold text-[var(--text-primary)] sm:text-4xl">
-              {activeCampaign.headline}
-            </h2>
-            <p className="text-base text-[var(--text-secondary)] sm:text-lg">{activeCampaign.subheadline}</p>
-            <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
-              {activeCampaign.description}
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {activeCampaign.metrics.map((metric) => (
-              <div
-                key={metric.label}
-                className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3"
-              >
-                <p className="text-[11px] uppercase tracking-[0.32em] text-[var(--text-secondary)]">
-                  {metric.label}
-                </p>
-                <p className="mt-2 text-xl font-semibold text-[var(--text-primary)]">
-                  {metric.value}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <a
-              href={activeCampaign.ctaHref}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-emerald)]/45 bg-[var(--surface-strong)]/70 px-5 py-2 text-sm font-medium text-[var(--accent-emerald)] transition hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
-            >
-              {activeCampaign.mediaType === "video" ? <MonitorPlay className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
-              {activeCampaign.ctaLabel}
-            </a>
-            <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-              {campaigns.map((campaign, index) => (
-                <button
-                  key={campaign.id}
-                  onClick={() => onSelect(index)}
-                  className={`h-1.5 w-10 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                    index === activeIndex ? "bg-[var(--accent-emerald)]" : "bg-[var(--border)] hover:bg-[var(--accent-emerald)]/40"
-                  }`}
-                  aria-label={`Selecionar campanha ${campaign.name}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="min-h-[260px] space-y-4">
-          {renderMedia(activeCampaign)}
-          <div className="flex items-center justify-between rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3 text-sm text-[var(--text-secondary)]">
-            <span>
-              {activeIndex + 1}/{campaigns.length} • {activeCampaign.name}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                className={`grid h-9 w-9 place-content-center rounded-full border border-[var(--border)]/80 bg-[var(--surface-strong)]/70 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                  isSingle ? "cursor-not-allowed opacity-40" : "hover:border-[var(--accent-emerald)]/45"
-                }`}
-                onClick={() => !isSingle && onSelect((activeIndex - 1 + campaigns.length) % campaigns.length)}
-                aria-label="Campanha anterior"
-                disabled={isSingle}
-              >
-                ‹
-              </button>
-              <button
-                className={`grid h-9 w-9 place-content-center rounded-full border border-[var(--border)]/80 bg-[var(--surface-strong)]/70 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                  isSingle ? "cursor-not-allowed opacity-40" : "hover:border-[var(--accent-emerald)]/45"
-                }`}
-                onClick={() => !isSingle && onSelect((activeIndex + 1) % campaigns.length)}
-                aria-label="Próxima campanha"
-                disabled={isSingle}
-              >
-                ›
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.section>
+    <LeadsDetails
+      leadId={effectiveLeadId}
+      onBack={() => {
+        onClear();
+        navigate("/app/leads");
+      }}
+    />
   );
 }
-
-function Sparkline({ series, highlight }: { series: number[]; highlight?: boolean }) {
-  const max = Math.max(...series);
-  const normalized = series.map((value) => value / max);
-
-  return (
-    <div className="flex h-full items-end gap-1.5">
-      {normalized.map((value, index) => (
-        <div
-          key={index}
-          className="flex-1 rounded-lg"
-          style={{
-            height: `${Math.max(value * 100, 12)}%`,
-            opacity: highlight ? 1 : 0.7,
-            background: "linear-gradient(180deg, rgba(122,143,128,0.72) 0%, rgba(197,164,124,0.45) 100%)",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function LoadingSkeletonLayout({ theme }: { theme: ThemeKey }) {
-  return (
-    <div
-      data-theme={theme}
-      className="min-h-screen text-[var(--text-primary)]"
-      style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
-    >
-      <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
-        <aside className="hidden min-h-screen flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl lg:flex lg:w-80 xl:w-[22rem]">
-          <div className="sticky top-0 space-y-6 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur">
-            <div className="flex items-center gap-3">
-              <div className="skeleton-shimmer h-10 w-10 rounded-2xl" />
-              <div className="space-y-2">
-                <div className="skeleton-shimmer h-3 w-24 rounded-full" />
-                <div className="skeleton-shimmer h-4 w-36 rounded-full" />
-              </div>
-            </div>
-            <div className="skeleton-shimmer h-10 w-full rounded-2xl" />
-          </div>
-          <div className="flex-1 space-y-4 px-4 pb-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="space-y-3">
-                <div className="skeleton-shimmer h-12 w-full rounded-xl" />
-                <div className="space-y-2 border-l border-[var(--border)] pl-4">
-                  {Array.from({ length: 4 }).map((_, linkIndex) => (
-                    <div key={linkIndex} className="skeleton-shimmer h-3 w-[70%] rounded-full" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="border-t border-[var(--border)] px-6 py-6">
-            <div className="skeleton-shimmer h-16 w-full rounded-2xl" />
-          </div>
-        </aside>
-
-        <div className="flex flex-col">
-          <header
-            className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
-            style={{ paddingTop: "env(safe-area-inset-top)" }}
-          >
-            <div className="flex flex-wrap items-center gap-4 px-6 py-4 sm:py-5">
-              <div className="skeleton-shimmer h-10 w-10 rounded-2xl lg:hidden" />
-              <div className="skeleton-shimmer h-12 flex-1 rounded-2xl" />
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="skeleton-shimmer h-11 w-48 rounded-2xl" />
-                <div className="skeleton-shimmer h-11 w-48 rounded-2xl" />
-                <div className="skeleton-shimmer h-11 w-11 rounded-2xl" />
-                <div className="skeleton-shimmer h-11 w-36 rounded-2xl" />
-              </div>
-            </div>
-          </header>
-
-          <main
-            className="flex-1 overflow-y-auto bg-[var(--background)]"
-            style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
-          >
-            <section
-              className="px-4 pb-14 pt-10 sm:px-6 md:pb-16 md:pt-12 lg:px-10"
-              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 3.5rem)" }}
-            >
-              <div className="flex flex-col gap-6">
-                <motion.section
-                  className="relative overflow-hidden rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/90 p-6 shadow-lifted sm:p-8 lg:p-10"
-                  initial={{ opacity: 0.6 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-                >
-                  <div className="absolute inset-0 opacity-70" style={{ background: "var(--gradient-wash)" }} />
-                  <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)] lg:gap-12">
-                    <div className="flex flex-col gap-6">
-                      <div className="space-y-4">
-                        <div className="skeleton-shimmer h-8 w-40 rounded-full" />
-                        <div className="skeleton-shimmer h-14 w-[90%] rounded-3xl" />
-                        <div className="skeleton-shimmer h-4 w-[70%] rounded-full" />
-                        <div className="skeleton-shimmer h-4 w-[60%] rounded-full" />
-                        <div className="skeleton-shimmer h-4 w-[80%] rounded-full" />
-                      </div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        {Array.from({ length: 3 }).map((_, index) => (
-                          <div key={index} className="skeleton-shimmer h-9 w-40 rounded-full" />
-                        ))}
-                      </div>
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        {Array.from({ length: 2 }).map((_, index) => (
-                          <div key={index} className="skeleton-shimmer h-28 rounded-3xl" />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-4 rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/75 p-6">
-                      <div className="skeleton-shimmer h-3 w-40 rounded-full" />
-                      <div className="skeleton-shimmer h-28 rounded-3xl" />
-                      <div className="grid gap-3">
-                        {Array.from({ length: 3 }).map((_, index) => (
-                          <div key={index} className="skeleton-shimmer h-4 w-full rounded-full" />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.section>
-
-                <section>
-                  <div className="flex flex-wrap items-end justify-between gap-3">
-                    <div className="space-y-2">
-                      <div className="skeleton-shimmer h-3 w-52 rounded-full" />
-                      <div className="skeleton-shimmer h-5 w-72 rounded-full" />
-                    </div>
-                    <div className="skeleton-shimmer h-3 w-32 rounded-full" />
-                  </div>
-                  <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                    {Array.from({ length: 4 }).map((_, index) => (
-                      <div key={index} className="skeleton-shimmer h-72 rounded-[28px]" />
-                    ))}
-                  </div>
-                </section>
-
-                <section className="grid gap-8 xl:grid-cols-[1.45fr_0.85fr]">
-                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted sm:p-8">
-                    <div className="space-y-2">
-                      <div className="skeleton-shimmer h-3 w-40 rounded-full" />
-                      <div className="skeleton-shimmer h-5 w-64 rounded-full" />
-                      <div className="skeleton-shimmer h-4 w-72 rounded-full" />
-                    </div>
-                    <div className="grid gap-5 lg:grid-cols-2">
-                      {Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-72 rounded-[28px]" />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-48 rounded-full" />
-                    <div className="skeleton-shimmer h-64 rounded-[28px]" />
-                    <div className="space-y-2">
-                      {Array.from({ length: 4 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-3 w-full rounded-full" />
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-                <section className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-44 rounded-full" />
-                    <div className="grid gap-3">
-                      {Array.from({ length: 4 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-16 rounded-2xl" />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-5 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-56 rounded-full" />
-                    <div className="skeleton-shimmer h-56 rounded-2xl" />
-                  </div>
-                </section>
-
-                <section className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)_minmax(0,0.7fr)]">
-                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-48 rounded-full" />
-                    <div className="space-y-3 border-l border-[var(--border)] pl-4">
-                      {Array.from({ length: 4 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-14 rounded-2xl" />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-40 rounded-full" />
-                    <div className="space-y-3">
-                      {Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-20 rounded-2xl" />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-32 rounded-full" />
-                    <div className="space-y-3">
-                      {Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-16 rounded-2xl" />
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-                <section className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-52 rounded-full" />
-                    <div className="skeleton-shimmer h-64 rounded-2xl" />
-                  </div>
-                  <div className="space-y-4 rounded-[32px] border border-[var(--border-strong)] bg-[var(--surface)]/88 p-6 shadow-lifted">
-                    <div className="skeleton-shimmer h-4 w-48 rounded-full" />
-                    <div className="grid gap-3">
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <div key={index} className="skeleton-shimmer h-14 rounded-2xl" />
-                      ))}
-                    </div>
-                  </div>
-                </section>
-              </div>
-            </section>
-          </main>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default App;
