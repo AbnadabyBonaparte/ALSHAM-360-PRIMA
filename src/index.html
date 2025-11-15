@@ -1,29 +1,77 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    
+    <!-- SEO -->
+    <meta name="description" content="ALSHAM 360° PRIMA - CRM Enterprise com IA, Gamificação e Automações" />
+    <meta name="keywords" content="CRM, IA, Automação, Leads, Pipeline, Analytics, Gamificação" />
+    <meta name="author" content="ALSHAM GLOBAL" />
+
+    <!-- PWA -->
+    <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#F6F4F1" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="apple-mobile-web-app-title" content="ALSHAM 360° PRIMA" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Youware App</title>
-    <!-- Google tag (gtag.js) -->
+    <meta name="apple-mobile-web-app-title" content="ALSHAM360" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/pwa-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/pwa-512x512.png" />
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Title -->
+    <title>ALSHAM 360° PRIMA - Dashboard Supremo com IA</title>
+
+    <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QD7WY3H84E"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
+      function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-QD7WY3H84E');
+      gtag('config', 'G-QD7WY3H84E', {
+        page_title: 'ALSHAM 360° PRIMA',
+        page_location: window.location.href,
+        page_path: window.location.pathname
+      });
     </script>
   </head>
+
   <body>
     <div id="root"></div>
-    <script type="module" src="./src/main.tsx"></script>
+    <script type="module" src="/main.tsx"></script>
   </body>
 </html>
+```
+
+**O QUE MUDOU:**
+- ✅ **CORRIGIDO:** Título de "Youware App" para "ALSHAM 360° PRIMA"
+- ✅ **ADICIONADO:** Meta tags SEO completas
+- ✅ **MELHORADO:** Configuração do Google Analytics com page tracking
+- ✅ **CORRIGIDO:** `lang="pt-BR"` em vez de `lang="en"`
+
+---
+
+### **3. `main.tsx` - JÁ ESTÁ CORRETO! ✅**
+
+O arquivo `main.tsx` já está limpo e correto. Não precisa mudar nada!
+
+---
+
+## 📝 **PRÓXIMOS PASSOS:**
+
+1. **Copiar** o `vercel.json` corrigido e colar no GitHub
+2. **Copiar** o `index.html` corrigido e colar no GitHub  
+3. **Fazer commit:**
+```
+   fix: remove PostHog from CSP and add Google Analytics permissions
