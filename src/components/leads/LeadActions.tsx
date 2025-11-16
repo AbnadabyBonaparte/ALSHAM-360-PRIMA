@@ -104,7 +104,12 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleImport}
-        className="px-4 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-blue-20)] transition-colors"
+        style={{ 
+          backgroundColor: 'rgba(135, 148, 164, 0.1)',
+          borderColor: 'rgba(135, 148, 164, 0.3)',
+          color: 'var(--accent-sky)'
+        }}
+        className="px-4 py-2 border rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-80 transition-opacity"
       >
         <Upload className="w-4 h-4" />
         <span className="hidden sm:inline">Importar</span>
@@ -115,7 +120,12 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         whileTap={{ scale: 0.95 }}
         onClick={showExportMenu}
         disabled={isExporting}
-        className="px-4 py-2 bg-[var(--accent-orange-10)] border border-[var(--accent-orange-20)] text-[var(--accent-orange)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-orange-20)] transition-colors disabled:opacity-50"
+        style={{ 
+          backgroundColor: 'rgba(184, 154, 108, 0.1)',
+          borderColor: 'rgba(184, 154, 108, 0.3)',
+          color: 'var(--accent-amber)'
+        }}
+        className="px-4 py-2 border rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-80 transition-opacity disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
         <span className="hidden sm:inline">{isExporting ? 'Exportando...' : 'Exportar'}</span>
@@ -125,7 +135,12 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={onNewLead}
-        className="px-4 py-2 bg-[var(--accent-emerald-10)] border border-[var(--accent-emerald-20)] text-[var(--accent-emerald)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-emerald-20)] transition-colors"
+        style={{ 
+          backgroundColor: 'rgba(122, 143, 128, 0.1)',
+          borderColor: 'rgba(122, 143, 128, 0.3)',
+          color: 'var(--accent-emerald)'
+        }}
+        className="px-4 py-2 border rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-80 transition-opacity"
       >
         <Plus className="w-4 h-4" />
         <span className="hidden sm:inline">Novo Lead</span>
