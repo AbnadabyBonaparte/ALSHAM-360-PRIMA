@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Importar temas */
+/* Importar temas e responsive */
 @import './themes.css';
+@import './responsive.css';
 
 /* Variáveis globais APENAS (sem temas) */
 :root {
