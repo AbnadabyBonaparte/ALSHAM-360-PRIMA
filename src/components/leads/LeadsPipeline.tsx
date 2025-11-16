@@ -1,8 +1,8 @@
 // src/components/leads/LeadsPipeline.tsx
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { Plus, TrendingUp, DollarSign } from 'lucide-react';
+import { Plus, DollarSign } from 'lucide-react';
 import LeadCard from './LeadCard';
 
 interface Stage {
@@ -36,12 +36,8 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
     newDestLeads.splice(destination.index, 0, movedLead);
 
     const newStages = stages.map(stage => {
-      if (stage.id === source.droppableId) {
-        return { ...stage, leads: newSourceLeads };
-      }
-      if (stage.id === destination.droppableId) {
-        return { ...stage, leads: newDestLeads };
-      }
+      if (stage.id === source.droppableId) return { ...stage, leads: newSourceLeads };
+      if (stage.id === destination.droppableId) return { ...stage, leads: newDestLeads };
       return stage;
     });
 
@@ -50,7 +46,6 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
   };
 
   const handleAddLead = (stageId: string) => {
-    console.log('➕ Adicionar lead ao stage:', stageId);
     const leadName = prompt(`Criar novo lead no stage "${stages.find(s => s.id === stageId)?.name}".\n\nNome do lead:`);
     if (!leadName) return;
 
@@ -65,14 +60,12 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
     };
 
     const newStages = stages.map(stage => {
-      if (stage.id === stageId) {
-        return { ...stage, leads: [...stage.leads, newLead] };
-      }
+      if (stage.id === stageId) return { ...stage, leads: [...stage.leads, newLead] };
       return stage;
     });
 
     setStages(newStages);
-    alert(`Lead "${leadName}" criado! (Salvar no banco em breve)`);
+    alert(`Lead "${leadName}" criado!`);
   };
 
   const getTotalValue = (leads: any[]) => {
@@ -88,14 +81,15 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`flex-shrink-0 w-80 ${snapshot.isDraggingOver ? 'bg-[var(--neutral-gray-800-50)] rounded-lg' : ''}`}
+                className="flex-shrink-0 w-80"
+                style={snapshot.isDraggingOver ? { backgroundColor: 'rgba(122, 143, 128, 0.1)', borderRadius: '8px' } : {}}
               >
-                <div className="bg-[var(--neutral-800)] rounded-t-lg p-4 border-b border-[var(--neutral-700)]">
+                <div className="bg-[var(--surface-strong)] rounded-t-lg p-4 border-b border-[var(--border)]">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-[var(--text-white)]">{stage.name}</h3>
-                    <span className="text-xs text-[var(--text-gray-400)]">{stage.leads.length}</span>
+                    <h3 className="font-semibold text-[var(--text-primary)]">{stage.name}</h3>
+                    <span className="text-xs text-[var(--text-secondary)]">{stage.leads.length}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-[var(--text-gray-400)]">
+                  <div className="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
                     <DollarSign className="w-3 h-3" />
                     <span>{getTotalValue(stage.leads).toLocaleString()}</span>
                   </div>
@@ -103,10 +97,10 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
 
                 <button
                   onClick={() => handleAddLead(stage.id)}
-                  className="p-1 hover:bg-[var(--text-white-10)] rounded transition-colors"
+                  className="p-1 hover:opacity-70 rounded transition-opacity"
                   title={`Adicionar lead em ${stage.name}`}
                 >
-                  <Plus className="w-4 h-4 text-[var(--text-gray-400)]" />
+                  <Plus className="w-4 h-4 text-[var(--text-secondary)]" />
                 </button>
 
                 <div className="space-y-2 p-2">
@@ -117,7 +111,11 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={`transition-all ${snapshot.isDragging ? 'rotate-12' : ''}`}
+                          className="transition-all"
+                          style={{
+                            ...provided.draggableProps.style,
+                            transform: snapshot.isDragging ? 'rotate(2deg)' : provided.draggableProps.style?.transform
+                          }}
                         >
                           <LeadCard lead={lead} />
                         </div>
@@ -128,19 +126,17 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                 </div>
 
                 {stage.leads.length === 0 && (
-                  <div className="text-center py-8 text-[var(--text-gray-500)]">
+                  <div className="text-center py-8 text-[var(--text-secondary)]">
                     Nenhum lead nesta etapa
+                    <button
+                      onClick={() => handleAddLead(stage.id)}
+                      className="w-full mt-2 px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:opacity-80 transition-opacity inline-flex items-center justify-center gap-2"
+                      style={{ backgroundColor: 'rgba(122, 143, 128, 0.1)', color: 'var(--accent-emerald)' }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Adicionar primeiro lead
+                    </button>
                   </div>
-                )}
-
-                {stage.leads.length === 0 && (
-                  <button
-                    onClick={() => handleAddLead(stage.id)}
-                    className="w-full mt-2 px-4 py-2 bg-[var(--accent-emerald-10)] border border-[var(--accent-emerald-20)] text-[var(--accent-emerald)] rounded-lg text-sm hover:bg-[var(--accent-emerald-20)] transition-colors inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Adicionar primeiro lead
-                  </button>
                 )}
               </div>
             )}
