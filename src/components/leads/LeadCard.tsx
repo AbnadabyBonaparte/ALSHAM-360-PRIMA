@@ -33,9 +33,6 @@ interface LeadCardProps {
 export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: LeadCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🎨 CORES DO STATUS - AGORA USA CSS VARIABLES DO TEMA
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const getStatusColor = (status: string) => {
     const colors = {
       new: 'from-[var(--accent-blue)] to-[var(--accent-indigo)]',
@@ -55,9 +52,6 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
 
   const daysSinceContact = lead.last_contact ? Math.floor((Date.now() - new Date(lead.last_contact).getTime()) / (1000 * 60 * 60 * 24)) : null;
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 📞 FUNÇÕES DOS BOTÕES - AGORA FUNCIONAM!
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleCall = () => {
     if (!lead.phone) {
       alert('Lead sem telefone cadastrado');
@@ -96,24 +90,21 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6 relative overflow-hidden" // AJUSTE: Vars para bg/border
+      className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6 relative overflow-hidden"
     >
-      {/* Header with Avatar */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-white font-bold text-sm"> // AJUSTE: Vars
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-white font-bold text-sm">
             {getInitials()}
           </div>
-          {/* Status Badge */}
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getStatusColor(lead.status)} text-white`}> // AJUSTE: Vars no getStatusColor
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getStatusColor(lead.status)} text-white`}>
             {lead.status}
           </span>
         </div>
         <motion.button
           onClick={() => setShowMenu(!showMenu)}
           whileHover={{ scale: 1.05 }}
-          className="text-[var(--text-gray)] hover:text-[var(--text-white)]" // AJUSTE: Vars
+          className="text-[var(--text-gray)] hover:text-[var(--text-white)]"
         >
           <MoreVertical className="w-5 h-5" />
         </motion.button>
@@ -121,108 +112,98 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute top-8 right-4 bg-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-lg shadow-lg py-2 z-10" // AJUSTE: Vars
+            className="absolute top-8 right-4 bg-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-lg shadow-lg py-2 z-10"
           >
             {onEdit && (
-              <button onClick={() => onEdit(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full"> // AJUSTE: Vars
+              <button onClick={() => onEdit(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full">
                 <Edit className="w-4 h-4" /> Editar
               </button>
             )}
             {onDelete && (
-              <button onClick={() => onDelete(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full"> // AJUSTE: Vars
+              <button onClick={() => onDelete(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full">
                 <Trash2 className="w-4 h-4" /> Excluir
               </button>
             )}
             {onView && (
-              <button onClick={() => onView(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full"> // AJUSTE: Vars
+              <button onClick={() => onView(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full">
                 <Eye className="w-4 h-4" /> Ver Detalhes
               </button>
             )}
           </motion.div>
         )}
       </div>
-      {/* Content */}
+
       <div className="space-y-3">
-        {/* Name and Position */}
-        <h3 className="font-semibold text-[var(--text-white)] text-lg"> // AJUSTE: Var
+        <h3 className="font-semibold text-[var(--text-white)] text-lg">
           {lead.first_name} {lead.last_name}
         </h3>
         {lead.position && (
-          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
             <User className="w-4 h-4" />
             {lead.position}
           </div>
         )}
         {lead.company && (
-          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
             <Building className="w-4 h-4" />
             {lead.company}
           </div>
         )}
         
-        {/* Contact Info */}
-        <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+        <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
           <Mail className="w-4 h-4" />
           {lead.email}
         </div>
         {lead.phone && (
-          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]"> // AJUSTE: Var
+          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
             <Phone className="w-4 h-4" />
             {lead.phone}
           </div>
         )}
         
-        {/* AI Metrics */}
         <div className="flex items-center justify-between">
           <LeadScoreGauge score={lead.score_ia || 50} size={60} />
           <div className="text-right">
-            <div className="text-xs text-[var(--text-gray)]">Conversão</div> // AJUSTE: Var
-            <div className="font-bold text-[var(--accent-emerald)]">{lead.ai_conversion_probability || 0}%</div> // AJUSTE: Var
+            <div className="text-xs text-[var(--text-gray)]">Conversão</div>
+            <div className="font-bold text-[var(--accent-emerald)]">{lead.ai_conversion_probability || 0}%</div>
           </div>
         </div>
         
-        {/* Next Action */}
         {lead.ai_next_best_action && (
-          <div className="bg-[var(--neutral-950)] p-3 rounded-lg"> // AJUSTE: Var
-            <div className="flex items-center gap-2 text-sm font-medium text-[var(--accent-blue)] mb-1"> // AJUSTE: Var
+          <div className="bg-[var(--neutral-950)] p-3 rounded-lg">
+            <div className="flex items-center gap-2 text-sm font-medium text-[var(--accent-blue)] mb-1">
               {lead.ai_next_best_action.icon} Próxima Ação
             </div>
-            <p className="text-xs text-[var(--text-gray)]">{lead.ai_next_best_action.script}</p> // AJUSTE: Var
+            <p className="text-xs text-[var(--text-gray)]">{lead.ai_next_best_action.script}</p>
           </div>
         )}
         
-        {/* Footer Info */}
-        <div className="flex justify-between text-xs text-[var(--text-gray)] mt-4"> // AJUSTE: Var
+        <div className="flex justify-between text-xs text-[var(--text-gray)] mt-4">
           <span>{new Date(lead.created_at).toLocaleDateString('pt-BR')}</span>
           {daysSinceContact !== null && (
-            <span className="text-[var(--accent-orange)]">{daysSinceContact}d sem contato</span> // AJUSTE: Var
+            <span className="text-[var(--accent-orange)]">{daysSinceContact}d sem contato</span>
           )}
         </div>
       </div>
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      {/* 🎨 BOTÕES COM ÍCONES + CSS VARIABLES DO TEMA */}
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+
       <div className="flex gap-2 mt-4">
-        {/* Botão Ligar - Azul */}
         <button 
           onClick={handleCall}
-          className="flex-1 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-lg text-sm hover:bg-[var(--accent-blue-20)] transition-colors flex items-center justify-center gap-1" // AJUSTE: Vars + cor azul
+          className="flex-1 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-lg text-sm hover:bg-[var(--accent-blue-20)] transition-colors flex items-center justify-center gap-1"
         >
           <Phone className="w-4 h-4" />
           Ligar
         </button>
-        {/* Botão WhatsApp - Verde */}
         <button 
           onClick={handleWhatsApp}
-          className="flex-1 py-2 bg-[var(--accent-green-10)] border border-[var(--accent-green-20)] text-[var(--accent-green)] rounded-lg text-sm hover:bg-[var(--accent-green-20)] transition-colors flex items-center justify-center gap-1" // AJUSTE: Vars + cor verde
+          className="flex-1 py-2 bg-[var(--accent-green-10)] border border-[var(--accent-green-20)] text-[var(--accent-green)] rounded-lg text-sm hover:bg-[var(--accent-green-20)] transition-colors flex items-center justify-center gap-1"
         >
           <MessageSquare className="w-4 h-4" />
           Zap
         </button>
-        {/* Botão Email - Rosa/Roxo */}
         <button 
           onClick={handleEmail}
-          className="flex-1 py-2 bg-[var(--accent-pink-10)] border border-[var(--accent-pink-20)] text-[var(--accent-pink)] rounded-lg text-sm hover:bg-[var(--accent-pink-20)] transition-colors flex items-center justify-center gap-1" // AJUSTE: Vars + cor rosa/roxo
+          className="flex-1 py-2 bg-[var(--accent-pink-10)] border border-[var(--accent-pink-20)] text-[var(--accent-pink)] rounded-lg text-sm hover:bg-[var(--accent-pink-20)] transition-colors flex items-center justify-center gap-1"
         >
           <Mail className="w-4 h-4" />
           Email
