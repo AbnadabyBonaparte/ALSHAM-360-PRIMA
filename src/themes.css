@@ -1,0 +1,155 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 🎨 ALSHAM 360° PRIMA - TEMAS DINÂMICOS (SÓ CORES) */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* 🌑 GLASS DARK (Padrão) */
+[data-theme="glass-dark"], :root {
+  --background: #111417;
+  --background-gradient-1: rgba(122, 143, 128, 0.16);
+  --background-gradient-2: rgba(197, 164, 124, 0.14);
+  --surface: rgba(21, 23, 24, 0.78);
+  --surface-strong: rgba(36, 40, 42, 0.86);
+  --surface-elevated: rgba(52, 56, 58, 0.8);
+  --glass-highlight: rgba(168, 178, 173, 0.25);
+  --border: rgba(210, 215, 212, 0.16);
+  --border-strong: rgba(235, 238, 234, 0.24);
+  --text-primary: #f5f5f1;
+  --text-secondary: rgba(229, 229, 222, 0.72);
+  --accent-emerald: #7a8f80;
+  --accent-sky: #8794a4;
+  --accent-fuchsia: #c5a47c;
+  --accent-amber: #b89a6c;
+  --accent-alert: #c77f65;
+  --gradient-wash: linear-gradient(135deg, rgba(122, 143, 128, 0.22), rgba(197, 164, 124, 0.16));
+  --gradient-veiled: radial-gradient(circle at 12% 18%, rgba(122, 143, 128, 0.22), transparent 58%), radial-gradient(circle at 88% 82%, rgba(197, 164, 124, 0.18), transparent 60%);
+  
+  /* Cores para Tailwind */
+  --color-primary-from: #10b981;
+  --color-primary-to: #14b8a6;
+  --color-secondary-from: #3b82f6;
+  --color-secondary-to: #06b6d4;
+}
+
+/* 🪙 PLATINUM GLASS */
+[data-theme="platinum-glass"] {
+  --background: radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.28), transparent 60%), #e9ecef;
+  --background-gradient-1: rgba(143, 153, 163, 0.22);
+  --background-gradient-2: rgba(209, 192, 166, 0.18);
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(245, 247, 249, 0.88);
+  --glass-highlight: rgba(232, 234, 236, 0.75);
+  --border: rgba(153, 161, 170, 0.32);
+  --border-strong: rgba(98, 110, 124, 0.38);
+  --text-primary: #1f2933;
+  --text-secondary: rgba(60, 72, 86, 0.72);
+  --accent-emerald: #6f7f74;
+  --accent-sky: #7d889c;
+  --accent-fuchsia: #b08968;
+  --accent-amber: #a67c52;
+  --accent-alert: #b96f55;
+  
+  --color-primary-from: #94a3b8;
+  --color-primary-to: #cbd5e1;
+  --color-secondary-from: #9ca3af;
+  --color-secondary-to: #d1d5db;
+}
+
+/* 🌌 MIDNIGHT AURORA */
+[data-theme="midnight-aurora"] {
+  --background: radial-gradient(circle at 82% 12%, rgba(122, 143, 128, 0.28), transparent 60%), #10141c;
+  --background-gradient-1: rgba(119, 137, 150, 0.18);
+  --background-gradient-2: rgba(173, 149, 116, 0.16);
+  --surface: rgba(24, 28, 34, 0.82);
+  --surface-strong: rgba(39, 46, 56, 0.86);
+  --glass-highlight: rgba(110, 128, 140, 0.32);
+  --border: rgba(155, 168, 179, 0.22);
+  --border-strong: rgba(198, 206, 212, 0.28);
+  --text-primary: #f7f7f4;
+  --text-secondary: rgba(218, 224, 228, 0.74);
+  --accent-emerald: #80998a;
+  --accent-sky: #7c8da1;
+  --accent-fuchsia: #b8976d;
+  --accent-amber: #a88459;
+  --accent-alert: #c27a60;
+  
+  --color-primary-from: #8b5cf6;
+  --color-primary-to: #a855f7;
+  --color-secondary-from: #6366f1;
+  --color-secondary-to: #3b82f6;
+}
+
+/* 🏜️ DESERT QUARTZ */
+[data-theme="desert-quartz"] {
+  --background: linear-gradient(140deg, rgba(249, 241, 229, 0.65), rgba(227, 213, 194, 0.8)), #efe4d4;
+  --background-gradient-1: rgba(204, 173, 132, 0.24);
+  --background-gradient-2: rgba(189, 159, 118, 0.22);
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: rgba(250, 247, 242, 0.9);
+  --glass-highlight: rgba(232, 210, 184, 0.72);
+  --border: rgba(201, 178, 146, 0.38);
+  --border-strong: rgba(163, 135, 100, 0.45);
+  --text-primary: #3f2f24;
+  --text-secondary: rgba(110, 86, 63, 0.76);
+  --accent-emerald: #8a9c90;
+  --accent-sky: #7c8896;
+  --accent-fuchsia: #c58d5e;
+  --accent-amber: #a56f3c;
+  --accent-alert: #c27755;
+  
+  --color-primary-from: #f59e0b;
+  --color-primary-to: #f97316;
+  --color-secondary-from: #eab308;
+  --color-secondary-to: #f59e0b;
+}
+
+/* ⚡ NEON ENERGY */
+[data-theme="neon-energy"] {
+  --background: radial-gradient(circle at 10% 12%, rgba(52, 211, 153, 0.18), transparent 55%), #0a0f14;
+  --background-gradient-1: rgba(34, 197, 94, 0.22);
+  --background-gradient-2: rgba(59, 130, 246, 0.18);
+  --surface: rgba(13, 20, 28, 0.88);
+  --surface-strong: rgba(18, 27, 36, 0.94);
+  --glass-highlight: rgba(56, 189, 248, 0.32);
+  --border: rgba(52, 211, 153, 0.18);
+  --border-strong: rgba(56, 189, 248, 0.28);
+  --text-primary: rgba(255, 255, 255, 0.96);
+  --text-secondary: rgba(226, 244, 255, 0.72);
+  --accent-emerald: rgb(52, 211, 153);
+  --accent-sky: rgb(56, 189, 248);
+  --accent-fuchsia: rgb(182, 116, 255);
+  --accent-amber: rgb(251, 146, 60);
+  --accent-alert: rgb(239, 68, 68);
+  --gradient-wash: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.12));
+  --gradient-veiled: radial-gradient(circle at 18% 18%, rgba(52, 211, 153, 0.18), transparent 58%), radial-gradient(circle at 82% 82%, rgba(168, 85, 247, 0.14), transparent 60%);
+  
+  --color-primary-from: #06b6d4;
+  --color-primary-to: #3b82f6;
+  --color-secondary-from: #3b82f6;
+  --color-secondary-to: #6366f1;
+}
+
+/* 🔮 CYBER VIVID */
+[data-theme="cyber-vivid"] {
+  --background: radial-gradient(circle at 14% 20%, rgba(251, 146, 60, 0.16), transparent 55%), #0c0a14;
+  --background-gradient-1: rgba(251, 146, 60, 0.22);
+  --background-gradient-2: rgba(244, 114, 182, 0.18);
+  --surface: rgba(16, 13, 28, 0.9);
+  --surface-strong: rgba(22, 18, 34, 0.95);
+  --glass-highlight: rgba(244, 114, 182, 0.32);
+  --border: rgba(251, 146, 60, 0.18);
+  --border-strong: rgba(139, 92, 246, 0.28);
+  --text-primary: rgba(255, 255, 255, 0.96);
+  --text-secondary: rgba(231, 219, 255, 0.76);
+  --accent-emerald: rgb(52, 211, 153);
+  --accent-sky: rgb(244, 114, 182);
+  --accent-fuchsia: rgb(139, 92, 246);
+  --accent-amber: rgb(251, 146, 60);
+  --accent-alert: rgb(239, 68, 68);
+  --gradient-wash: linear-gradient(135deg, rgba(251, 146, 60, 0.12), rgba(244, 114, 182, 0.1), rgba(139, 92, 246, 0.12));
+  --gradient-veiled: radial-gradient(circle at 26% 22%, rgba(251, 146, 60, 0.18), transparent 58%), radial-gradient(circle at 74% 78%, rgba(139, 92, 246, 0.16), transparent 60%);
+  
+  --color-primary-from: #d946ef;
+  --color-primary-to: #a855f7;
+  --color-secondary-from: #a855f7;
+  --color-secondary-to: #8b5cf6;
+}

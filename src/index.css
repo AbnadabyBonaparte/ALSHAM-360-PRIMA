@@ -2,143 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Importar temas (NÃO duplicar aqui!) */
+@import './themes.css';
+@import './responsive.css';
+
+/* Variáveis globais APENAS (sem temas) */
 :root {
-  --background: #111417;
-  --background-gradient-1: rgba(122, 143, 128, 0.14);
-  --background-gradient-2: rgba(197, 164, 124, 0.12);
-  --surface: rgba(23, 25, 27, 0.75);
-  --surface-strong: rgba(34, 37, 39, 0.82);
-  --surface-elevated: rgba(52, 56, 58, 0.8);
-  --glass-highlight: rgba(168, 178, 173, 0.22);
-  --border: rgba(225, 229, 224, 0.12);
-  --border-strong: rgba(225, 229, 224, 0.22);
-  --text-primary: #f6f6f3;
-  --text-secondary: rgba(226, 226, 220, 0.74);
-  --accent-emerald: #7a8f80; /* sage */
-  --accent-sky: #8794a4; /* mist */
-  --accent-fuchsia: #c5a47c; /* clay */
-  --accent-amber: #b89a6c; /* brass */
-  --accent-alert: #c77f65;
-  --accent-neutral: rgba(255, 255, 255, 0.04);
-  --gradient-spectrum: linear-gradient(120deg, rgba(122, 143, 128, 0.55) 0%, rgba(135, 148, 164, 0.55) 48%, rgba(197, 164, 124, 0.55) 100%);
-  --gradient-wash: linear-gradient(135deg, rgba(122, 143, 128, 0.22), rgba(197, 164, 124, 0.16));
-  --gradient-veiled: radial-gradient(circle at 12% 18%, rgba(122, 143, 128, 0.22), transparent 58%),
-    radial-gradient(circle at 88% 82%, rgba(197, 164, 124, 0.18), transparent 60%);
   --shadow-lift: 0 22px 80px rgba(10, 12, 13, 0.58);
-}
-
-[data-theme="glass-dark"] {
-  --background: #111417;
-  --background-gradient-1: rgba(122, 143, 128, 0.16);
-  --background-gradient-2: rgba(197, 164, 124, 0.14);
-  --surface: rgba(21, 23, 24, 0.78);
-  --surface-strong: rgba(36, 40, 42, 0.86);
-  --glass-highlight: rgba(168, 178, 173, 0.25);
-  --border: rgba(210, 215, 212, 0.16);
-  --border-strong: rgba(235, 238, 234, 0.24);
-  --text-primary: #f5f5f1;
-  --text-secondary: rgba(229, 229, 222, 0.72);
-  --accent-emerald: #7a8f80;
-  --accent-sky: #8794a4;
-  --accent-fuchsia: #c5a47c;
-  --accent-amber: #b89a6c;
-  --accent-alert: #c77f65;
-}
-
-[data-theme="platinum-glass"] {
-  --background: radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.28), transparent 60%), #e9ecef;
-  --background-gradient-1: rgba(143, 153, 163, 0.22);
-  --background-gradient-2: rgba(209, 192, 166, 0.18);
-  --surface: rgba(255, 255, 255, 0.72);
-  --surface-strong: rgba(245, 247, 249, 0.88);
-  --glass-highlight: rgba(232, 234, 236, 0.75);
-  --border: rgba(153, 161, 170, 0.32);
-  --border-strong: rgba(98, 110, 124, 0.38);
-  --text-primary: #1f2933;
-  --text-secondary: rgba(60, 72, 86, 0.72);
-  --accent-emerald: #6f7f74;
-  --accent-sky: #7d889c;
-  --accent-fuchsia: #b08968;
-  --accent-amber: #a67c52;
-  --accent-alert: #b96f55;
-}
-
-[data-theme="midnight-aurora"] {
-  --background: radial-gradient(circle at 82% 12%, rgba(122, 143, 128, 0.28), transparent 60%), #10141c;
-  --background-gradient-1: rgba(119, 137, 150, 0.18);
-  --background-gradient-2: rgba(173, 149, 116, 0.16);
-  --surface: rgba(24, 28, 34, 0.82);
-  --surface-strong: rgba(39, 46, 56, 0.86);
-  --glass-highlight: rgba(110, 128, 140, 0.32);
-  --border: rgba(155, 168, 179, 0.22);
-  --border-strong: rgba(198, 206, 212, 0.28);
-  --text-primary: #f7f7f4;
-  --text-secondary: rgba(218, 224, 228, 0.74);
-  --accent-emerald: #80998a;
-  --accent-sky: #7c8da1;
-  --accent-fuchsia: #b8976d;
-  --accent-amber: #a88459;
-  --accent-alert: #c27a60;
-}
-
-[data-theme="desert-quartz"] {
-  --background: linear-gradient(140deg, rgba(249, 241, 229, 0.65), rgba(227, 213, 194, 0.8)), #efe4d4;
-  --background-gradient-1: rgba(204, 173, 132, 0.24);
-  --background-gradient-2: rgba(189, 159, 118, 0.22);
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: rgba(250, 247, 242, 0.9);
-  --glass-highlight: rgba(232, 210, 184, 0.72);
-  --border: rgba(201, 178, 146, 0.38);
-  --border-strong: rgba(163, 135, 100, 0.45);
-  --text-primary: #3f2f24;
-  --text-secondary: rgba(110, 86, 63, 0.76);
-  --accent-emerald: #8a9c90;
-  --accent-sky: #7c8896;
-  --accent-fuchsia: #c58d5e;
-  --accent-amber: #a56f3c;
-  --accent-alert: #c27755;
-}
-
-[data-theme="neon-energy"] {
-  --background: radial-gradient(circle at 10% 12%, rgba(52, 211, 153, 0.18), transparent 55%), #0a0f14;
-  --background-gradient-1: rgba(34, 197, 94, 0.22);
-  --background-gradient-2: rgba(59, 130, 246, 0.18);
-  --surface: rgba(13, 20, 28, 0.88);
-  --surface-strong: rgba(18, 27, 36, 0.94);
-  --glass-highlight: rgba(56, 189, 248, 0.32);
-  --border: rgba(52, 211, 153, 0.18);
-  --border-strong: rgba(56, 189, 248, 0.28);
-  --text-primary: rgba(255, 255, 255, 0.96);
-  --text-secondary: rgba(226, 244, 255, 0.72);
-  --accent-emerald: rgb(52, 211, 153);
-  --accent-sky: rgb(56, 189, 248);
-  --accent-fuchsia: rgb(182, 116, 255);
-  --accent-amber: rgb(251, 146, 60);
-  --accent-alert: rgb(239, 68, 68);
-  --gradient-wash: linear-gradient(135deg, rgba(52, 211, 153, 0.12) 0%, rgba(56, 189, 248, 0.1) 50%, rgba(168, 85, 247, 0.12) 100%);
-  --gradient-veiled: radial-gradient(circle at 18% 18%, rgba(52, 211, 153, 0.18), transparent 58%),
-    radial-gradient(circle at 82% 82%, rgba(168, 85, 247, 0.14), transparent 60%);
-}
-
-[data-theme="cyber-vivid"] {
-  --background: radial-gradient(circle at 14% 20%, rgba(251, 146, 60, 0.16), transparent 55%), #0c0a14;
-  --background-gradient-1: rgba(251, 146, 60, 0.22);
-  --background-gradient-2: rgba(244, 114, 182, 0.18);
-  --surface: rgba(16, 13, 28, 0.9);
-  --surface-strong: rgba(22, 18, 34, 0.95);
-  --glass-highlight: rgba(244, 114, 182, 0.32);
-  --border: rgba(251, 146, 60, 0.18);
-  --border-strong: rgba(139, 92, 246, 0.28);
-  --text-primary: rgba(255, 255, 255, 0.96);
-  --text-secondary: rgba(231, 219, 255, 0.76);
-  --accent-emerald: rgb(52, 211, 153);
-  --accent-sky: rgb(244, 114, 182);
-  --accent-fuchsia: rgb(139, 92, 246);
-  --accent-amber: rgb(251, 146, 60);
-  --accent-alert: rgb(239, 68, 68);
-  --gradient-wash: linear-gradient(135deg, rgba(251, 146, 60, 0.12) 0%, rgba(244, 114, 182, 0.1) 50%, rgba(139, 92, 246, 0.12) 100%);
-  --gradient-veiled: radial-gradient(circle at 26% 22%, rgba(251, 146, 60, 0.18), transparent 58%),
-    radial-gradient(circle at 74% 78%, rgba(139, 92, 246, 0.16), transparent 60%);
 }
 
 html {
@@ -150,7 +20,7 @@ html {
 body {
   background: var(--background);
   color: var(--text-primary);
-  font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   transition: background 0.6s ease, color 0.6s ease;
   position: relative;
 }
@@ -171,6 +41,7 @@ body::before {
   min-width: 0;
 }
 
+/* Scrollbar customizado */
 ::-webkit-scrollbar {
   width: 9px;
   height: 9px;
@@ -189,16 +60,11 @@ body::before {
   background: color-mix(in srgb, var(--accent-emerald) 45%, rgba(12, 14, 15, 0.6));
 }
 
+/* Skeleton shimmer */
 @keyframes skeleton-shine {
-  0% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
 }
 
 .skeleton-shimmer {
@@ -212,32 +78,24 @@ body::before {
   content: "";
   position: absolute;
   inset: -1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--glass-highlight) 65%, transparent),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--glass-highlight) 65%, transparent), transparent);
   animation: skeleton-shine 1.4s ease-in-out infinite;
 }
 
+/* Utilitários Tailwind customizados */
 @layer utilities {
   .bg-wash-sage {
     background: color-mix(in srgb, var(--accent-emerald) 12%, transparent);
   }
-
   .bg-wash-mist {
     background: color-mix(in srgb, var(--accent-sky) 14%, transparent);
   }
-
   .bg-wash-clay {
     background: color-mix(in srgb, var(--accent-fuchsia) 16%, transparent);
   }
-
   .border-tonal {
     border-color: color-mix(in srgb, var(--text-primary) 15%, transparent);
   }
-
   .shadow-lifted {
     box-shadow: var(--shadow-lift);
   }
