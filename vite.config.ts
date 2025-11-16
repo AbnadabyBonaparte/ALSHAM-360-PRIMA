@@ -1,9 +1,7 @@
-cat > vite.config.ts << 'EOF'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   root: './src',
@@ -27,17 +25,16 @@ export default defineConfig({
     reportCompressedSize: false,
     rollupOptions: {
       output: {
-        // ✅ REMOVIDO manualChunks - força rebuild completo de todos os vendors
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.')
           const ext = info?.[info.length - 1]
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext || '')) {
-            return `assets/images/[name]-[hash][extname]`
+            return 'assets/images/[name]-[hash][extname]'
           }
           if (/woff2?|ttf|eot/i.test(ext || '')) {
-            return `assets/fonts/[name]-[hash][extname]`
+            return 'assets/fonts/[name]-[hash][extname]'
           }
-          return `assets/[name]-[hash][extname]`
+          return 'assets/[name]-[hash][extname]'
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js'
@@ -80,4 +77,3 @@ export default defineConfig({
   logLevel: 'warn',
   clearScreen: false
 })
-EOF
