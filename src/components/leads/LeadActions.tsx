@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { Upload, Download, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { createLead } from '../../lib/supabase'; // Mantido como no original, mas é supabase-full.js no repo
+import { createLead } from '../../lib/supabase';
 
 interface LeadActionsProps {
   onImport?: () => void;
@@ -14,9 +14,6 @@ interface LeadActionsProps {
 export default function LeadActions({ leads, onImport, onExport, onNewLead }: LeadActionsProps) {
   const [isExporting, setIsExporting] = useState(false);
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 📥 IMPORTAR LEADS (CSV/JSON)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleImport = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -30,7 +27,6 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         if (file.name.endsWith('.json')) {
           data = JSON.parse(text);
         } else if (file.name.endsWith('.csv')) {
-          // Parse CSV simples
           const lines = text.split('\n');
           const headers = lines[0].split(',');
           for (let i = 1; i < lines.length; i++) {
@@ -55,9 +51,6 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
     input.click();
   };
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 📤 EXPORTAR LEADS (CSV/JSON)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const handleExport = async (format: 'csv' | 'json') => {
     setIsExporting(true);
     try {
@@ -67,7 +60,6 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         content = JSON.stringify(leads, null, 2);
         filename = `leads-${new Date().toISOString().split('T')[0]}.json`;
       } else {
-        // CSV
         const headers = ['Nome', 'Email', 'Telefone', 'Empresa', 'Status', 'Score', 'Data'];
         const rows = leads.map(lead => [
           `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
@@ -84,7 +76,6 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         ].join('\n');
         filename = `leads-${new Date().toISOString().split('T')[0]}.csv`;
       }
-      // Download
       const blob = new Blob([content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -109,35 +100,32 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
 
   return (
     <div className="flex items-center gap-3">
-      {/* Botão Importar */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleImport}
-        className="px-4 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-blue-20)] transition-colors" // AJUSTE: Vars + cor azul
+        className="px-4 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-blue-20)] transition-colors"
       >
         <Upload className="w-4 h-4" />
         <span className="hidden sm:inline">Importar</span>
       </motion.button>
 
-      {/* Botão Exportar */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={showExportMenu}
         disabled={isExporting}
-        className="px-4 py-2 bg-[var(--accent-orange-10)] border border-[var(--accent-orange-20)] text-[var(--accent-orange)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-orange-20)] transition-colors disabled:opacity-50" // AJUSTE: Vars + cor orange
+        className="px-4 py-2 bg-[var(--accent-orange-10)] border border-[var(--accent-orange-20)] text-[var(--accent-orange)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-orange-20)] transition-colors disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
         <span className="hidden sm:inline">{isExporting ? 'Exportando...' : 'Exportar'}</span>
       </motion.button>
 
-      {/* Botão Novo Lead - COM CSS VARIABLE DO TEMA! */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={onNewLead}
-        className="px-4 py-2 bg-[var(--accent-emerald-10)] border border-[var(--accent-emerald-20)] text-[var(--accent-emerald)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-emerald-20)] transition-colors" // AJUSTE: Vars + cor emerald (corrigindo "botão verde")
+        className="px-4 py-2 bg-[var(--accent-emerald-10)] border border-[var(--accent-emerald-20)] text-[var(--accent-emerald)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-emerald-20)] transition-colors"
       >
         <Plus className="w-4 h-4" />
         <span className="hidden sm:inline">Novo Lead</span>
