@@ -1,17 +1,6 @@
 // src/components/leads/AIInsightsPanel.tsx
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Brain,
-  TrendingUp,
-  AlertTriangle,
-  Target,
-  Lightbulb,
-  Zap,
-  ThumbsUp,
-  Clock,
-  Award,
-  ArrowRight,
-} from 'lucide-react';
+import { Brain, TrendingUp, AlertTriangle, Target, Lightbulb, Zap, ThumbsUp, Award, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 interface AIInsight {
@@ -40,49 +29,29 @@ export default function AIInsightsPanel({
 }: AIInsightsPanelProps) {
   const [expanded, setExpanded] = useState(true);
 
-  const getInsightColor = (type: string) => {
-    switch (type) {
-      case 'opportunity':
-        return 'from-[var(--accent-emerald)] to-[var(--accent-teal)]';
-      case 'warning':
-        return 'from-[var(--accent-orange)] to-[var(--accent-red)]';
-      case 'action':
-        return 'from-[var(--accent-blue)] to-[var(--accent-indigo)]';
-      default:
-        return 'from-[var(--neutral-gray)] to-[var(--neutral-gray-dark)]';
-    }
-  };
-
   const getInsightIcon = (type: string) => {
     switch (type) {
-      case 'opportunity':
-        return <TrendingUp className="w-5 h-5" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5" />;
-      case 'action':
-        return <Target className="w-5 h-5" />;
-      default:
-        return <Lightbulb className="w-5 h-5" />;
+      case 'opportunity': return <TrendingUp className="w-5 h-5" />;
+      case 'warning': return <AlertTriangle className="w-5 h-5" />;
+      case 'action': return <Target className="w-5 h-5" />;
+      default: return <Lightbulb className="w-5 h-5" />;
     }
   };
 
   return (
-    <div className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl overflow-hidden">
+    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
       <div
-        className="bg-gradient-to-r from-[var(--neutral-800)] to-[var(--neutral-900)] p-4 cursor-pointer flex items-center justify-between"
+        className="bg-[var(--surface-strong)] p-4 cursor-pointer flex items-center justify-between"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
-          <Brain className="w-6 h-6 text-[var(--text-white)]" />
-          <h2 className="text-xl font-semibold text-[var(--text-white)]">Insights IA</h2>
+          <Brain className="w-6 h-6 text-[var(--text-primary)]" />
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">Insights IA</h2>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--text-gray-300)]">Análise inteligente em tempo real</span>
-          <motion.div
-            animate={{ rotate: expanded ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ArrowRight className="w-5 h-5 text-[var(--text-gray-400)]" />
+          <span className="text-sm text-[var(--text-secondary)]">Análise inteligente em tempo real</span>
+          <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.3 }}>
+            <ArrowRight className="w-5 h-5 text-[var(--text-secondary)]" />
           </motion.div>
         </div>
       </div>
@@ -94,69 +63,69 @@ export default function AIInsightsPanel({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="overflow-hidden bg-[var(--neutral-50)] border-x border-b border-[var(--neutral-200)]"
+            className="overflow-hidden"
           >
             <div className="grid grid-cols-3 gap-4 p-4">
-              <div className="bg-gradient-to-br from-[var(--accent-emerald-50)] to-[var(--accent-teal-50)] p-4 rounded-lg border border-[var(--accent-emerald-200)]">
+              <div className="p-4 rounded-lg border border-[var(--border)]" style={{ backgroundColor: 'rgba(122, 143, 128, 0.1)' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <Zap className="w-5 h-5 text-[var(--accent-emerald-600)]" />
-                  <span className="text-xs font-medium text-[var(--accent-emerald-700)]">Conversão</span>
+                  <Zap className="w-5 h-5" style={{ color: 'var(--accent-emerald)' }} />
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">Conversão</span>
                 </div>
-                <div className="text-2xl font-bold text-[var(--accent-emerald-900)]">{conversionProb}%</div>
+                <div className="text-2xl font-bold text-[var(--text-primary)]">{conversionProb}%</div>
                 {conversionProb > 70 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <ThumbsUp className="w-4 h-4 text-[var(--accent-emerald-600)]" />
-                    <span className="text-xs text-[var(--accent-emerald-700)]">Quente</span>
+                    <ThumbsUp className="w-4 h-4" style={{ color: 'var(--accent-emerald)' }} />
+                    <span className="text-xs" style={{ color: 'var(--accent-emerald)' }}>Quente</span>
                   </div>
                 )}
               </div>
 
-              <div className="bg-gradient-to-br from-[var(--accent-blue-50)] to-[var(--accent-indigo-50)] p-4 rounded-lg border border-[var(--accent-blue-200)]">
+              <div className="p-4 rounded-lg border border-[var(--border)]" style={{ backgroundColor: 'rgba(135, 148, 164, 0.1)' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <Award className="w-5 h-5 text-[var(--accent-blue-600)]" />
-                  <span className="text-xs font-medium text-[var(--accent-blue-700)]">Saúde</span>
+                  <Award className="w-5 h-5" style={{ color: 'var(--accent-sky)' }} />
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">Saúde</span>
                 </div>
-                <div className="text-2xl font-bold text-[var(--accent-blue-900)]">{healthScore}%</div>
+                <div className="text-2xl font-bold text-[var(--text-primary)]">{healthScore}%</div>
                 {healthScore > 80 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <Award className="w-4 h-4 text-[var(--accent-green-600)]" />
-                    <span className="text-xs text-[var(--accent-green-700)]">Ótimo</span>
+                    <Award className="w-4 h-4" style={{ color: 'var(--accent-emerald)' }} />
+                    <span className="text-xs" style={{ color: 'var(--accent-emerald)' }}>Ótimo</span>
                   </div>
                 )}
               </div>
 
-              <div className="bg-gradient-to-br from-[var(--accent-orange-50)] to-[var(--accent-red-50)] p-4 rounded-lg border border-[var(--accent-orange-200)]">
+              <div className="p-4 rounded-lg border border-[var(--border)]" style={{ backgroundColor: 'rgba(199, 127, 101, 0.1)' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <AlertTriangle className="w-5 h-5 text-[var(--accent-orange-600)]" />
-                  <span className="text-xs font-medium text-[var(--accent-orange-700)]">Risco</span>
+                  <AlertTriangle className="w-5 h-5" style={{ color: 'var(--accent-alert)' }} />
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">Risco</span>
                 </div>
-                <div className="text-2xl font-bold text-[var(--accent-orange-900)]">{riskScore}%</div>
+                <div className="text-2xl font-bold text-[var(--text-primary)]">{riskScore}%</div>
                 {riskScore > 60 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <AlertTriangle className="w-4 h-4 text-[var(--accent-red-600)]" />
-                    <span className="text-xs text-[var(--accent-red-700)]">Alto</span>
+                    <AlertTriangle className="w-4 h-4" style={{ color: 'var(--accent-alert)' }} />
+                    <span className="text-xs" style={{ color: 'var(--accent-alert)' }}>Alto</span>
                   </div>
                 )}
               </div>
             </div>
 
             {nextAction && (
-              <div className="border-t border-[var(--neutral-200)] p-4 bg-[var(--text-white)]">
+              <div className="border-t border-[var(--border)] p-4 bg-[var(--surface)]">
                 <div className="flex items-start gap-3">
-                  <div className="bg-[var(--accent-blue-100)] p-2 rounded-lg">
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(135, 148, 164, 0.2)' }}>
                     {nextAction.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-[var(--neutral-900)]">Próxima Melhor Ação</h3>
+                    <h3 className="font-semibold text-[var(--text-primary)]">Próxima Melhor Ação</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm font-medium text-[var(--neutral-600)]">
+                      <span className="text-sm font-medium text-[var(--text-secondary)]">
                         {nextAction.priority?.toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--neutral-600)] mt-2">{nextAction.reason}</p>
+                    <p className="text-sm text-[var(--text-secondary)] mt-2">{nextAction.reason}</p>
                     {nextAction.script && (
-                      <div className="mt-3 p-3 bg-[var(--neutral-50)] rounded-lg border border-[var(--neutral-200)]">
-                        <p className="text-sm text-[var(--neutral-700)] font-mono">{nextAction.script}</p>
+                      <div className="mt-3 p-3 bg-[var(--surface-strong)] rounded-lg border border-[var(--border)]">
+                        <p className="text-sm text-[var(--text-secondary)] font-mono">{nextAction.script}</p>
                       </div>
                     )}
                   </div>
@@ -164,9 +133,9 @@ export default function AIInsightsPanel({
               </div>
             )}
 
-            <div className="border-t border-[var(--neutral-200)] p-4 bg-[var(--text-white)]">
+            <div className="border-t border-[var(--border)] p-4 bg-[var(--surface)]">
               {insights.length === 0 ? (
-                <p className="text-center text-[var(--neutral-500)] py-8">Nenhum insight disponível no momento</p>
+                <p className="text-center text-[var(--text-secondary)] py-8">Nenhum insight disponível no momento</p>
               ) : (
                 <div className="space-y-4">
                   {insights.map((insight, index) => (
@@ -175,17 +144,16 @@ export default function AIInsightsPanel({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className={`p-4 rounded-lg bg-gradient-to-r ${getInsightColor(
-                        insight.type
-                      )} bg-opacity-10 border border-opacity-20`}
+                      className="p-4 rounded-lg border border-[var(--border)]"
+                      style={{ backgroundColor: 'rgba(122, 143, 128, 0.05)' }}
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-0.5">{getInsightIcon(insight.type)}</div>
                         <div className="flex-1">
-                          <h4 className="font-semibold text-[var(--neutral-900)]">{insight.title}</h4>
-                          <p className="text-sm text-[var(--neutral-700)] mt-1">{insight.message}</p>
+                          <h4 className="font-semibold text-[var(--text-primary)]">{insight.title}</h4>
+                          <p className="text-sm text-[var(--text-secondary)] mt-1">{insight.message}</p>
                           {insight.action && (
-                            <button className="mt-2 text-sm font-medium text-[var(--neutral-900)] hover:text-[var(--neutral-700)] flex items-center gap-1">
+                            <button className="mt-2 text-sm font-medium text-[var(--accent-emerald)] hover:opacity-80 flex items-center gap-1">
                               {insight.action}
                               <ArrowRight className="w-4 h-4" />
                             </button>
