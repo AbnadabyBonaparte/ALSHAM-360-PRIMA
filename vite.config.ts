@@ -1,3 +1,4 @@
+cat > vite.config.ts << 'EOF'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -26,12 +27,7 @@ export default defineConfig({
     reportCompressedSize: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
-          // ✅ REMOVIDO: 'posthog' chunk (causava warning)
-        },
+        // ✅ REMOVIDO manualChunks - força rebuild completo de todos os vendors
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.')
           const ext = info?.[info.length - 1]
@@ -84,3 +80,4 @@ export default defineConfig({
   logLevel: 'warn',
   clearScreen: false
 })
+EOF
