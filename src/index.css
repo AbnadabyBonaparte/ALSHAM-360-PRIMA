@@ -2,11 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Importar temas e responsive */
-@import './themes.css';
-@import './responsive.css';
-
-/* Variáveis globais APENAS (sem temas) */
+/* Variáveis globais */
 :root {
   --shadow-lift: 0 22px 80px rgba(10, 12, 13, 0.58);
 }
@@ -41,7 +37,6 @@ body::before {
   min-width: 0;
 }
 
-/* Scrollbar customizado */
 ::-webkit-scrollbar {
   width: 9px;
   height: 9px;
@@ -60,7 +55,6 @@ body::before {
   background: color-mix(in srgb, var(--accent-emerald) 45%, rgba(12, 14, 15, 0.6));
 }
 
-/* Skeleton shimmer */
 @keyframes skeleton-shine {
   0% { transform: translateX(-100%); }
   50% { transform: translateX(0%); }
@@ -82,7 +76,6 @@ body::before {
   animation: skeleton-shine 1.4s ease-in-out infinite;
 }
 
-/* Utilitários Tailwind customizados */
 @layer utilities {
   .bg-wash-sage {
     background: color-mix(in srgb, var(--accent-emerald) 12%, transparent);
