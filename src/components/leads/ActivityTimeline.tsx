@@ -27,15 +27,15 @@ export default function ActivityTimeline({
   
   const getIcon = (type: string) => {
     const icons = {
-      call: <Phone className="w-4 h-4" />,
-      email: <Mail className="w-4 h-4" />,
-      meeting: <Calendar className="w-4 h-4" />,
-      note: <FileText className="w-4 h-4" />,
-      task: <CheckCircle className="w-4 h-4" />,
-      whatsapp: <MessageSquare className="w-4 h-4" />,
-      video: <Video className="w-4 h-4" />
+      call: <Phone className="w-3 h-3" />,
+      email: <Mail className="w-3 h-3" />,
+      meeting: <Calendar className="w-3 h-3" />,
+      note: <FileText className="w-3 h-3" />,
+      task: <CheckCircle className="w-3 h-3" />,
+      whatsapp: <MessageSquare className="w-3 h-3" />,
+      video: <Video className="w-3 h-3" />
     };
-    return icons[type as keyof typeof icons] || <Clock className="w-4 h-4" />;
+    return icons[type as keyof typeof icons] || <Clock className="w-3 h-3" />;
   };
 
   const getColor = (type: string) => {
@@ -62,9 +62,9 @@ export default function ActivityTimeline({
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4" />;
-      case 'pending': return <AlertCircle className="w-4 h-4" />;
-      case 'scheduled': return <Clock className="w-4 h-4" />;
+      case 'completed': return <CheckCircle className="w-3 h-3" />;
+      case 'pending': return <AlertCircle className="w-3 h-3" />;
+      case 'scheduled': return <Clock className="w-3 h-3" />;
       default: return null;
     }
   };
@@ -96,30 +96,26 @@ export default function ActivityTimeline({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl p-3"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-xl font-bold text-white mb-1">Timeline de Atividades</h3>
-          <p className="text-sm text-gray-400">{activities.length} interações registradas</p>
+          <h3 className="text-base font-bold text-white mb-0.5">Timeline de Atividades</h3>
+          <p className="text-xs text-gray-400">{activities.length} interações registradas</p>
         </div>
-        <button className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg text-sm font-semibold text-white transition-colors">
+        <button className="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg text-xs font-semibold text-white transition-colors">
           Ver Todas
         </button>
       </div>
 
-      {/* Timeline */}
       <div className="relative">
-        {/* Vertical Line */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-neutral-800 via-neutral-700 to-neutral-800" />
+        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-neutral-800 via-neutral-700 to-neutral-800" />
 
-        {/* Activities */}
-        <div className="space-y-6">
+        <div className="space-y-3">
           {displayActivities.length === 0 ? (
-            <div className="text-center py-12">
-              <Clock className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="text-gray-500">Nenhuma atividade registrada</p>
+            <div className="text-center py-8">
+              <Clock className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+              <p className="text-xs text-gray-500">Nenhuma atividade registrada</p>
             </div>
           ) : (
             displayActivities.map((activity, index) => (
@@ -127,71 +123,44 @@ export default function ActivityTimeline({
                 key={activity.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative pl-16"
+                transition={{ delay: index * 0.05 }}
+                className="relative pl-11"
               >
-                {/* Icon Circle */}
                 <div className="absolute left-0 top-0">
                   <motion.div
                     whileHover={{ scale: 1.1 }}
-                    className={`
-                      w-12 h-12 rounded-xl flex items-center justify-center
-                      bg-gradient-to-br ${getColor(activity.type)}
-                      shadow-lg
-                    `}
-                    style={{
-                      boxShadow: `0 0 20px ${getColor(activity.type).includes('blue') ? '#3b82f6' : 
-                                              getColor(activity.type).includes('purple') ? '#a855f7' : 
-                                              getColor(activity.type).includes('emerald') ? '#10b981' : '#6b7280'}40`
-                    }}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br ${getColor(activity.type)} shadow-lg`}
                   >
                     {getIcon(activity.type)}
                   </motion.div>
                 </div>
 
-                {/* Content */}
-                <motion.div
-                  whileHover={{ scale: 1.01, x: 4 }}
-                  className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 hover:border-neutral-700 transition-all cursor-pointer backdrop-blur-sm"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h4 className="font-semibold text-white mb-1">{activity.title}</h4>
-                      <p className="text-sm text-gray-400">{activity.description}</p>
+                <div className="bg-neutral-800/50 border border-neutral-700 rounded-lg p-2">
+                  <div className="flex items-start justify-between mb-1">
+                    <div className="flex-1">
+                      <h4 className="text-sm font-semibold text-white">{activity.title}</h4>
+                      <p className="text-xs text-gray-400 mt-0.5">{activity.description}</p>
                     </div>
                     {activity.status && (
                       <div className={`flex items-center gap-1 ${getStatusColor(activity.status)}`}>
                         {getStatusIcon(activity.status)}
-                        <span className="text-xs font-medium capitalize">{activity.status}</span>
                       </div>
                     )}
                   </div>
-                  
-                  <div className="flex items-center gap-4 text-xs text-gray-500 mt-3">
-                    <div className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      {activity.user}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {formatDate(activity.date)}
-                    </div>
+
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <User className="w-3 h-3" />
+                    <span>{activity.user}</span>
+                    <span>•</span>
+                    <Clock className="w-3 h-3" />
+                    <span>{formatDate(activity.date)}</span>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
             ))
           )}
         </div>
       </div>
-
-      {/* Add Activity Button */}
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-semibold transition-all shadow-lg shadow-emerald-500/20"
-      >
-        + Adicionar Atividade
-      </motion.button>
     </motion.div>
   );
 }
