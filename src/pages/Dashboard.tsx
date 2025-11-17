@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  * 📄 ARQUIVO: src/pages/Dashboard.tsx
  * 🎯 FUNÇÃO: Dashboard Principal com KPIs + Real-time + AI Insights
- * 📅 ATUALIZADO: 17/11/2025
+ * 📅 ATUALIZADO: 17/11/2025 16:45
  * 👤 AUTOR: AbnadabyBonaparte (Aragominas, Tocantins)
  * 🏗️ PROJETO: ALSHAM 360° PRIMA
  * ═══════════════════════════════════════════════════════════════════════
@@ -109,17 +109,18 @@ export default function Dashboard() {
       try {
         setLoading(true);
 
-        // ✅ FIX: Buscar dados com fallback seguro
-        const leadsResult = await getLeads().catch(() => ({ data: [] }));
+        // ✅ FIX CRÍTICO: getLeads retorna { success, data: { data: [], count } }
+        const leadsResult = await getLeads().catch(() => ({ success: false, data: null }));
         const dealsResult = await (getDeals?.() || Promise.resolve([])).catch(() => []);
         const contactsResult = await (getContacts?.() || Promise.resolve([])).catch(() => []);
         const activitiesResult = await (getRecentActivities?.() || Promise.resolve([])).catch(() => []);
 
         if (!mounted) return;
 
-        // ✅ FIX: Garantir que sempre sejam arrays
-        const leads = Array.isArray(leadsResult) ? leadsResult : 
-                     (leadsResult?.data ? (Array.isArray(leadsResult.data) ? leadsResult.data : []) : []);
+        // ✅ EXTRAIR DADOS CORRETAMENTE
+        const leads = leadsResult?.success && leadsResult?.data?.data 
+          ? leadsResult.data.data 
+          : [];
         
         const deals = Array.isArray(dealsResult) ? dealsResult : [];
         const contacts = Array.isArray(contactsResult) ? contactsResult : [];
@@ -147,7 +148,7 @@ export default function Dashboard() {
         const convRate = leads.length > 0 ? (wonDeals.length / leads.length) * 100 : 0;
 
         // Calcular crescimentos (simulados por enquanto)
-        const leadsGrowth = Math.random() * 20 - 5; // -5% a +15%
+        const leadsGrowth = Math.random() * 20 - 5;
         const revenueGrowth = Math.random() * 30 - 10;
         const dealsGrowth = Math.random() * 25 - 5;
         const conversionGrowth = Math.random() * 15 - 5;
@@ -159,7 +160,7 @@ export default function Dashboard() {
           totalRevenue: totalRev,
           conversionRate: convRate,
           avgDealSize: avgDeal,
-          responseTime: 2.5, // em horas
+          responseTime: 2.5,
           teamActivities: recentActivities.length,
           leadsGrowth,
           revenueGrowth,
@@ -182,7 +183,7 @@ export default function Dashboard() {
 
         setTopLeads(sortedLeads);
 
-        // ✅ Mapear activities para o formato esperado
+        // Mapear activities
         const mappedActivities = recentActivities.slice(0, 10).map((act: any, i: number) => ({
           id: act.id || `act-${i}`,
           type: act.type || act.interaction_type || 'note',
