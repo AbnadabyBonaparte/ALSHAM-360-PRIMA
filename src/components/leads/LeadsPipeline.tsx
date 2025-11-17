@@ -81,8 +81,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex-shrink-0 w-80"
-                style={snapshot.isDraggingOver ? { backgroundColor: 'rgba(122, 143, 128, 0.1)', borderRadius: '8px' } : {}}
+                className={`flex-shrink-0 w-80 ${snapshot.isDraggingOver ? 'bg-emerald-500/5 rounded-lg' : ''}`}
               >
                 <div className="bg-[var(--surface-strong)] rounded-t-lg p-4 border-b border-[var(--border)]">
                   <div className="flex items-center justify-between mb-2">
@@ -97,7 +96,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
 
                 <button
                   onClick={() => handleAddLead(stage.id)}
-                  className="p-1 hover:opacity-70 rounded transition-opacity"
+                  className="p-1 hover:bg-white/5 rounded transition-colors"
                   title={`Adicionar lead em ${stage.name}`}
                 >
                   <Plus className="w-4 h-4 text-[var(--text-secondary)]" />
@@ -111,11 +110,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="transition-all"
-                          style={{
-                            ...provided.draggableProps.style,
-                            transform: snapshot.isDragging ? 'rotate(2deg)' : provided.draggableProps.style?.transform
-                          }}
+                          className={`transition-all ${snapshot.isDragging ? 'rotate-2 scale-105' : ''}`}
                         >
                           <LeadCard lead={lead} />
                         </div>
@@ -126,12 +121,11 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                 </div>
 
                 {stage.leads.length === 0 && (
-                  <div className="text-center py-8 text-[var(--text-secondary)]">
-                    Nenhum lead nesta etapa
+                  <div className="text-center py-8">
+                    <p className="text-[var(--text-secondary)] mb-2">Nenhum lead nesta etapa</p>
                     <button
                       onClick={() => handleAddLead(stage.id)}
-                      className="w-full mt-2 px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:opacity-80 transition-opacity inline-flex items-center justify-center gap-2"
-                      style={{ backgroundColor: 'rgba(122, 143, 128, 0.1)', color: 'var(--accent-emerald)' }}
+                      className="w-full px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm hover:bg-emerald-500/20 transition-colors inline-flex items-center justify-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
                       Adicionar primeiro lead
