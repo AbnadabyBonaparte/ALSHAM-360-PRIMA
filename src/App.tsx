@@ -47,7 +47,6 @@ import campaignOrion from "./assets/campaign-orion.png";
 import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
-import DashboardSupremo from "./pages/Dashboard";
 import './styles/responsive.css';
 
 ChartJS.register(
@@ -114,14 +113,6 @@ const PlaceholderPage = ({ title }: { title: string }) => (
     </div>
   </div>
 );
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📊 DASHBOARD SUPREMO - Wrapper com useDashboardStore
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const Dashboard = () => {
-  const dashboardStore = useDashboardStore();
-  return <DashboardSupremo dashboardStore={dashboardStore} />;
-};
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 CHART.JS - Paleta de cores neutras e helpers
@@ -336,10 +327,7 @@ const sidebarGroups = [
 ];
 
 // Registre todas as rotas de uma vez (com placeholders para pendentes)
-registerRoute("dashboard-principal", async () => {
-  const DashboardModule = await import('./pages/Dashboard');
-  return { default: DashboardModule.default };
-});
+registerRoute("dashboard-principal", async () => ({ default: Dashboard }));
 registerRoute("leads-lista", async () => ({ default: Leads }));
 registerRoute("leads-detalhes", async () => ({ default: LeadsDetails }));
 registerRoute("leads-importacao", async () => ({ default: () => <PlaceholderPage title="Leads - Importação" /> }));
@@ -655,6 +643,15 @@ const useDashboardStore = create<DashboardState>((set) => ({
   setTimeframe: (timeframe) => set({ timeframe }),
   setTheme: (theme) => set({ theme }),
 }));
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📊 DASHBOARD COMPONENT - Wrapper com useDashboardStore
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const Dashboard = () => {
+  const dashboardStore = useDashboardStore();
+  return <DashboardSupremo dashboardStore={dashboardStore} />;
+};
+
 
 type DashboardState = {
   loading: boolean;
