@@ -33,17 +33,22 @@ interface LeadCardProps {
 export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: LeadCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
+  // ✅ PROTEÇÃO CONTRA LEAD UNDEFINED
+  if (!lead) {
+    return null;
+  }
+
   const getStatusColor = (status: string) => {
     const colors = {
-      new: 'from-[var(--accent-blue)] to-[var(--accent-indigo)]',
-      contacted: 'from-[var(--accent-purple)] to-[var(--accent-pink)]',
-      qualified: 'from-[var(--accent-emerald)] to-[var(--accent-teal)]',
-      proposal: 'from-[var(--accent-orange)] to-[var(--accent-yellow)]',
-      negotiation: 'from-[var(--accent-cyan)] to-[var(--accent-blue)]',
-      won: 'from-[var(--accent-green)] to-[var(--accent-emerald)]',
-      lost: 'from-[var(--accent-red)] to-[var(--accent-pink)]'
+      new: 'bg-blue-500',
+      contacted: 'bg-purple-500',
+      qualified: 'bg-emerald-500',
+      proposal: 'bg-orange-500',
+      negotiation: 'bg-cyan-500',
+      won: 'bg-green-500',
+      lost: 'bg-red-500'
     };
-    return colors[status as keyof typeof colors] || 'from-[var(--neutral-gray)] to-[var(--neutral-gray-dark)]';
+    return colors[status as keyof typeof colors] || 'bg-gray-500';
   };
 
   const getInitials = () => {
@@ -90,125 +95,114 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl p-4 sm:p-6 relative overflow-hidden"
+      className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-xl p-3 relative overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)] flex items-center justify-center text-white font-bold text-sm">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
             {getInitials()}
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getStatusColor(lead.status)} text-white`}>
-            {lead.status}
-          </span>
+          <div>
+            <h3 className="font-semibold text-white text-sm">{lead.first_name} {lead.last_name}</h3>
+            <p className="text-xs text-gray-400">{lead.company || 'Sem empresa'}</p>
+          </div>
         </div>
-        <motion.button
-          onClick={() => setShowMenu(!showMenu)}
-          whileHover={{ scale: 1.05 }}
-          className="text-[var(--text-gray)] hover:text-[var(--text-white)]"
-        >
-          <MoreVertical className="w-5 h-5" />
-        </motion.button>
-        {showMenu && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="absolute top-8 right-4 bg-[var(--neutral-950)] border border-[var(--neutral-800)] rounded-lg shadow-lg py-2 z-10"
+        
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-1 hover:bg-white/5 rounded-lg transition-colors"
           >
-            {onEdit && (
-              <button onClick={() => onEdit(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full">
-                <Edit className="w-4 h-4" /> Editar
+            <MoreVertical className="w-4 h-4 text-gray-400" />
+          </button>
+          
+          {showMenu && (
+            <div className="absolute right-0 top-8 bg-[var(--neutral-800)] border border-[var(--neutral-700)] rounded-lg shadow-xl z-10 py-1 min-w-[140px]">
+              <button
+                onClick={() => { onView?.(lead); setShowMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2"
+              >
+                <Eye className="w-3 h-3" />
+                Ver Detalhes
               </button>
-            )}
-            {onDelete && (
-              <button onClick={() => onDelete(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full">
-                <Trash2 className="w-4 h-4" /> Excluir
+              <button
+                onClick={() => { onEdit?.(lead); setShowMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2"
+              >
+                <Edit className="w-3 h-3" />
+                Editar
               </button>
-            )}
-            {onView && (
-              <button onClick={() => onView(lead)} className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-gray)] hover:bg-[var(--neutral-900)] w-full">
-                <Eye className="w-4 h-4" /> Ver Detalhes
+              <button
+                onClick={() => { onDelete?.(lead); setShowMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-red-400 hover:bg-white/5 flex items-center gap-2"
+              >
+                <Trash2 className="w-3 h-3" />
+                Excluir
               </button>
-            )}
-          </motion.div>
-        )}
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="font-semibold text-[var(--text-white)] text-lg">
-          {lead.first_name} {lead.last_name}
-        </h3>
-        {lead.position && (
-          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
-            <User className="w-4 h-4" />
-            {lead.position}
-          </div>
-        )}
-        {lead.company && (
-          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
-            <Building className="w-4 h-4" />
-            {lead.company}
-          </div>
-        )}
-        
-        <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
-          <Mail className="w-4 h-4" />
-          {lead.email}
-        </div>
-        {lead.phone && (
-          <div className="flex items-center gap-2 text-sm text-[var(--text-gray)]">
-            <Phone className="w-4 h-4" />
-            {lead.phone}
-          </div>
-        )}
-        
-        <div className="flex items-center justify-between">
-          <LeadScoreGauge score={lead.score_ia || 50} size={60} />
-          <div className="text-right">
-            <div className="text-xs text-[var(--text-gray)]">Conversão</div>
-            <div className="font-bold text-[var(--accent-emerald)]">{lead.ai_conversion_probability || 0}%</div>
-          </div>
-        </div>
-        
-        {lead.ai_next_best_action && (
-          <div className="bg-[var(--neutral-950)] p-3 rounded-lg">
-            <div className="flex items-center gap-2 text-sm font-medium text-[var(--accent-blue)] mb-1">
-              {lead.ai_next_best_action.icon} Próxima Ação
             </div>
-            <p className="text-xs text-[var(--text-gray)]">{lead.ai_next_best_action.script}</p>
-          </div>
-        )}
-        
-        <div className="flex justify-between text-xs text-[var(--text-gray)] mt-4">
-          <span>{new Date(lead.created_at).toLocaleDateString('pt-BR')}</span>
-          {daysSinceContact !== null && (
-            <span className="text-[var(--accent-orange)]">{daysSinceContact}d sem contato</span>
           )}
         </div>
       </div>
 
-      <div className="flex gap-2 mt-4">
-        <button 
+      <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(lead.status)} text-white inline-block mb-2`}>
+        {lead.status}
+      </div>
+
+      <div className="space-y-1.5 mb-3">
+        {lead.email && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Mail className="w-3 h-3" />
+            <span className="truncate">{lead.email}</span>
+          </div>
+        )}
+        {lead.phone && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Phone className="w-3 h-3" />
+            <span>{lead.phone}</span>
+          </div>
+        )}
+        {lead.position && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <User className="w-3 h-3" />
+            <span className="truncate">{lead.position}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center mb-3">
+        <LeadScoreGauge score={lead.score_ia || 0} size="sm" showLabel={false} />
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <button
           onClick={handleCall}
-          className="flex-1 py-2 bg-[var(--accent-blue-10)] border border-[var(--accent-blue-20)] text-[var(--accent-blue)] rounded-lg text-sm hover:bg-[var(--accent-blue-20)] transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-2 py-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-xs font-semibold hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-1"
         >
-          <Phone className="w-4 h-4" />
+          <Phone className="w-3 h-3" />
           Ligar
         </button>
-        <button 
+        <button
           onClick={handleWhatsApp}
-          className="flex-1 py-2 bg-[var(--accent-green-10)] border border-[var(--accent-green-20)] text-[var(--accent-green)] rounded-lg text-sm hover:bg-[var(--accent-green-20)] transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-2 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-1"
         >
-          <MessageSquare className="w-4 h-4" />
+          <MessageSquare className="w-3 h-3" />
           Zap
         </button>
-        <button 
+        <button
           onClick={handleEmail}
-          className="flex-1 py-2 bg-[var(--accent-pink-10)] border border-[var(--accent-pink-20)] text-[var(--accent-pink)] rounded-lg text-sm hover:bg-[var(--accent-pink-20)] transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-2 py-1.5 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-lg text-xs font-semibold hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-1"
         >
-          <Mail className="w-4 h-4" />
+          <Mail className="w-3 h-3" />
           Email
         </button>
       </div>
+
+      {daysSinceContact !== null && daysSinceContact > 7 && (
+        <div className="mt-2 px-2 py-1 bg-orange-500/10 border border-orange-500/30 rounded text-xs text-orange-400 flex items-center gap-1">
+          <Calendar className="w-3 h-3" />
+          <span>Sem contato há {daysSinceContact} dias</span>
+        </div>
+      )}
     </motion.div>
   );
 }
