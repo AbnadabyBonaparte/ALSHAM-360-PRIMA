@@ -47,6 +47,7 @@ import campaignOrion from "./assets/campaign-orion.png";
 import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
+import Dashboard from "./pages/Dashboard";
 import './styles/responsive.css';
 
 ChartJS.register(
@@ -111,15 +112,6 @@ const PlaceholderPage = ({ title }: { title: string }) => (
       <p className="text-xl text-gray-400">Em desenvolvimento...</p>
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto" />
     </div>
-  </div>
-);
-
-// Componente simples para Dashboard Principal (wrapper do conteúdo existente)
-const Dashboard = () => (
-  <div className="min-h-screen bg-[var(--bg-dark)] text-white p-8">
-    {/* Aqui vai o conteúdo do dashboard principal existente, ex.: KPIs, gráficos, etc. */}
-    <h1 className="text-3xl font-bold">Dashboard Principal</h1>
-    {/* Copie o <main> do código original aqui se necessário */}
   </div>
 );
 
