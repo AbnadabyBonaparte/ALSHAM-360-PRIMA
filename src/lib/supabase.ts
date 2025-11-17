@@ -9,9 +9,13 @@ export * from './supabase-full.js';
 // Log para debug
 import { getActiveOrganization, supabase as supabaseClient } from './supabase-full.js';
 import * as supabaseFull from './supabase-full.js';
+
 console.log('✅ Supabase Master carregado:', Object.keys(supabaseFull).length, 'exports');
 
-// Funções personalizadas para LeadsDetails (usando genéricas do full.js)
+// ═══════════════════════════════════════════════════════════════════════
+// 🔧 FUNÇÕES PERSONALIZADAS PARA LEADS
+// ═══════════════════════════════════════════════════════════════════════
+
 export async function getLead(id: string) {
   const { data, error } = await genericSelect('leads_crm', { id });
   if (error) throw new Error(error.message);
@@ -47,6 +51,7 @@ export async function getLeadInteractions(leadId: string) {
 // ═══════════════════════════════════════════════════════════════════════
 // 🔧 GENERIC SELECT - EXPORTAÇÃO OBRIGATÓRIA (FIX: sem created_at)
 // ═══════════════════════════════════════════════════════════════════════
+
 export const genericSelect = async (
   table: string,
   filters?: Record<string, any>,
@@ -90,6 +95,7 @@ export const genericSelect = async (
     if (options?.limit) {
       query = query.limit(options.limit);
     }
+
     if (options?.offset) {
       const startRange = options.offset;
       const endRange = startRange + (options.limit || 10) - 1;
@@ -101,10 +107,52 @@ export const genericSelect = async (
     if (error) throw error;
 
     console.log(`✅ genericSelect: ${count} registros em ${table}`);
-
     return { data, error: null, count };
   } catch (error: any) {
     console.error(`❌ Erro em genericSelect (${table}):`, error);
     return { data: null, error, count: 0 };
   }
 };
+
+// ═══════════════════════════════════════════════════════════════════════
+// 🔧 FUNÇÕES DASHBOARD - DEALS, ACTIVITIES E SUBSCRIPTIONS
+// ═══════════════════════════════════════════════════════════════════════
+
+export async function getDeals(filters?: any) {
+  const { data, error } = await genericSelect('deals_crm', filters, {
+    orderBy: { column: 'id', ascending: false }
+  });
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+export async function getRecentActivities(limit = 10) {
+  const { data, error } = await genericSelect('activities_log', {}, {
+    limit,
+    orderBy: { column: 'id', ascending: false }
+  });
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+export function subscribeDeals(callback: (deals: any[]) => void) {
+  const channel = supabaseClient
+    .channel('deals-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'deals_crm'
+      },
+      async () => {
+        const deals = await getDeals();
+        callback(deals);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    channel.unsubscribe();
+  };
+}
