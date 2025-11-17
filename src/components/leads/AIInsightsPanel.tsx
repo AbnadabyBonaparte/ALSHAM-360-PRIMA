@@ -66,44 +66,44 @@ export default function AIInsightsPanel({
             className="overflow-hidden"
           >
             <div className="grid grid-cols-3 gap-4 p-4">
-              <div className="p-4 rounded-lg border border-[var(--border)]" style={{ backgroundColor: 'rgba(122, 143, 128, 0.1)' }}>
+              <div className="p-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
                 <div className="flex items-center justify-between mb-2">
-                  <Zap className="w-5 h-5" style={{ color: 'var(--accent-emerald)' }} />
+                  <Zap className="w-5 h-5 text-emerald-400" />
                   <span className="text-xs font-medium text-[var(--text-secondary)]">Conversão</span>
                 </div>
                 <div className="text-2xl font-bold text-[var(--text-primary)]">{conversionProb}%</div>
                 {conversionProb > 70 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <ThumbsUp className="w-4 h-4" style={{ color: 'var(--accent-emerald)' }} />
-                    <span className="text-xs" style={{ color: 'var(--accent-emerald)' }}>Quente</span>
+                    <ThumbsUp className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-emerald-400">Quente</span>
                   </div>
                 )}
               </div>
 
-              <div className="p-4 rounded-lg border border-[var(--border)]" style={{ backgroundColor: 'rgba(135, 148, 164, 0.1)' }}>
+              <div className="p-4 rounded-lg border border-sky-500/20 bg-sky-500/5">
                 <div className="flex items-center justify-between mb-2">
-                  <Award className="w-5 h-5" style={{ color: 'var(--accent-sky)' }} />
+                  <Award className="w-5 h-5 text-sky-400" />
                   <span className="text-xs font-medium text-[var(--text-secondary)]">Saúde</span>
                 </div>
                 <div className="text-2xl font-bold text-[var(--text-primary)]">{healthScore}%</div>
                 {healthScore > 80 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <Award className="w-4 h-4" style={{ color: 'var(--accent-emerald)' }} />
-                    <span className="text-xs" style={{ color: 'var(--accent-emerald)' }}>Ótimo</span>
+                    <Award className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-emerald-400">Ótimo</span>
                   </div>
                 )}
               </div>
 
-              <div className="p-4 rounded-lg border border-[var(--border)]" style={{ backgroundColor: 'rgba(199, 127, 101, 0.1)' }}>
+              <div className="p-4 rounded-lg border border-orange-500/20 bg-orange-500/5">
                 <div className="flex items-center justify-between mb-2">
-                  <AlertTriangle className="w-5 h-5" style={{ color: 'var(--accent-alert)' }} />
+                  <AlertTriangle className="w-5 h-5 text-orange-400" />
                   <span className="text-xs font-medium text-[var(--text-secondary)]">Risco</span>
                 </div>
                 <div className="text-2xl font-bold text-[var(--text-primary)]">{riskScore}%</div>
                 {riskScore > 60 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <AlertTriangle className="w-4 h-4" style={{ color: 'var(--accent-alert)' }} />
-                    <span className="text-xs" style={{ color: 'var(--accent-alert)' }}>Alto</span>
+                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                    <span className="text-xs text-red-400">Alto</span>
                   </div>
                 )}
               </div>
@@ -112,7 +112,7 @@ export default function AIInsightsPanel({
             {nextAction && (
               <div className="border-t border-[var(--border)] p-4 bg-[var(--surface)]">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(135, 148, 164, 0.2)' }}>
+                  <div className="p-2 rounded-lg bg-sky-500/10">
                     {nextAction.icon}
                   </div>
                   <div className="flex-1">
@@ -144,8 +144,7 @@ export default function AIInsightsPanel({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="p-4 rounded-lg border border-[var(--border)]"
-                      style={{ backgroundColor: 'rgba(122, 143, 128, 0.05)' }}
+                      className="p-4 rounded-lg border border-[var(--border)] bg-emerald-500/5"
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-0.5">{getInsightIcon(insight.type)}</div>
@@ -153,7 +152,7 @@ export default function AIInsightsPanel({
                           <h4 className="font-semibold text-[var(--text-primary)]">{insight.title}</h4>
                           <p className="text-sm text-[var(--text-secondary)] mt-1">{insight.message}</p>
                           {insight.action && (
-                            <button className="mt-2 text-sm font-medium text-[var(--accent-emerald)] hover:opacity-80 flex items-center gap-1">
+                            <button className="mt-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
                               {insight.action}
                               <ArrowRight className="w-4 h-4" />
                             </button>
