@@ -1,0 +1,13 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 🎯 ALSHAM COMPACT MODE - TAMANHOS GLOBAIS            */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Sobrescrever classes Tailwind grandes */
+.p-6 { padding: 0.75rem !important; }      /* 12px ao invés de 24px */
+.p-4 { padding: 0.5rem !important; }       /* 8px ao invés de 16px */
+.text-2xl { font-size: 1.25rem !important; } /* 20px ao invés de 24px */
+.text-xl { font-size: 1.125rem !important; } /* 18px ao invés de 20px */
+.w-12 { width: 2rem !important; }          /* 32px ao invés de 48px */
+.h-12 { height: 2rem !important; }         /* 32px ao invés de 48px */
+.gap-6 { gap: 0.5rem !important; }         /* 8px ao invés de 24px */
+.gap-4 { gap: 0.375rem !important; }       /* 6px ao invés de 16px */
