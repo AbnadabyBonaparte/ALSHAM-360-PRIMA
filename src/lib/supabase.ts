@@ -1,6 +1,14 @@
 /**
- * Supabase Master Bridge
+ * ═══════════════════════════════════════════════════════════════════════
+ * 📄 ARQUIVO: src/lib/supabase.ts
+ * 🎯 FUNÇÃO: Supabase Master Bridge + Funções Dashboard
+ * 📅 ATUALIZADO: 17/11/2025
+ * 👤 AUTOR: AbnadabyBonaparte (Aragominas, Tocantins)
+ * 🏗️ PROJETO: ALSHAM 360° PRIMA
+ * ═══════════════════════════════════════════════════════════════════════
+ * 
  * Re-exporta TODAS as funções do supabase-full.js (17k linhas)
+ * + Funções personalizadas para Dashboard que usam as tabelas corretas
  */
 
 // Re-exportar TUDO sem filtro
@@ -115,26 +123,42 @@ export const genericSelect = async (
 };
 
 // ═══════════════════════════════════════════════════════════════════════
-// 🔧 FUNÇÕES DASHBOARD - DEALS, ACTIVITIES E SUBSCRIPTIONS
+// 🔧 FUNÇÕES DASHBOARD - USANDO TABELAS CORRETAS QUE EXISTEM
 // ═══════════════════════════════════════════════════════════════════════
 
+/**
+ * getDeals → USA sales_opportunities (tabela real do banco)
+ */
 export async function getDeals(filters?: any) {
-  const { data, error } = await genericSelect('deals_crm', filters, {
+  const { data, error } = await genericSelect('sales_opportunities', filters, {
     orderBy: { column: 'id', ascending: false }
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.warn('⚠️ Erro ao buscar deals:', error.message);
+    return [];
+  }
   return data || [];
 }
 
+/**
+ * getRecentActivities → USA lead_interactions (tabela real do banco)
+ * Combina interações de leads como atividades recentes
+ */
 export async function getRecentActivities(limit = 10) {
-  const { data, error } = await genericSelect('activities_log', {}, {
+  const { data, error } = await genericSelect('lead_interactions', {}, {
     limit,
     orderBy: { column: 'id', ascending: false }
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.warn('⚠️ Erro ao buscar atividades:', error.message);
+    return [];
+  }
   return data || [];
 }
 
+/**
+ * subscribeDeals → Subscription em sales_opportunities
+ */
 export function subscribeDeals(callback: (deals: any[]) => void) {
   const channel = supabaseClient
     .channel('deals-changes')
@@ -143,7 +167,7 @@ export function subscribeDeals(callback: (deals: any[]) => void) {
       {
         event: '*',
         schema: 'public',
-        table: 'deals_crm'
+        table: 'sales_opportunities'
       },
       async () => {
         const deals = await getDeals();
