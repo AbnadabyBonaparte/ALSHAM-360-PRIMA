@@ -1,5 +1,14 @@
-// src/pages/Dashboard.tsx
-import { useState, useEffect, useMemo } from 'react';
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * 📄 ARQUIVO: src/pages/Dashboard.tsx
+ * 🎯 FUNÇÃO: Dashboard Principal com KPIs + Real-time + AI Insights
+ * 📅 ATUALIZADO: 17/11/2025
+ * 👤 AUTOR: AbnadabyBonaparte (Aragominas, Tocantins)
+ * 🏗️ PROJETO: ALSHAM 360° PRIMA
+ * ═══════════════════════════════════════════════════════════════════════
+ */
+
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   TrendingUp,
@@ -15,12 +24,10 @@ import {
   Phone,
   MessageSquare,
   BarChart3,
-  PieChart,
-  LineChart,
-  AlertCircle,
   CheckCircle,
   Clock,
-  Flame
+  Flame,
+  AlertCircle
 } from 'lucide-react';
 import {
   getLeads,
@@ -102,26 +109,40 @@ export default function Dashboard() {
       try {
         setLoading(true);
 
-        // Buscar dados em paralelo
-        const [leadsResult, dealsResult, contactsResult, activitiesResult] = await Promise.all([
-          getLeads(),
-          getDeals?.() || Promise.resolve({ data: [], error: null }),
-          getContacts?.() || Promise.resolve({ data: [], error: null }),
-          getRecentActivities?.() || Promise.resolve({ data: [], error: null })
-        ]);
+        // ✅ FIX: Buscar dados com fallback seguro
+        const leadsResult = await getLeads().catch(() => ({ data: [] }));
+        const dealsResult = await (getDeals?.() || Promise.resolve([])).catch(() => []);
+        const contactsResult = await (getContacts?.() || Promise.resolve([])).catch(() => []);
+        const activitiesResult = await (getRecentActivities?.() || Promise.resolve([])).catch(() => []);
 
         if (!mounted) return;
 
-        const leads = leadsResult.data || [];
-        const deals = dealsResult.data || [];
-        const contacts = contactsResult.data || [];
-        const recentActivities = activitiesResult.data || [];
+        // ✅ FIX: Garantir que sempre sejam arrays
+        const leads = Array.isArray(leadsResult) ? leadsResult : 
+                     (leadsResult?.data ? (Array.isArray(leadsResult.data) ? leadsResult.data : []) : []);
+        
+        const deals = Array.isArray(dealsResult) ? dealsResult : [];
+        const contacts = Array.isArray(contactsResult) ? contactsResult : [];
+        const recentActivities = Array.isArray(activitiesResult) ? activitiesResult : [];
+
+        console.log('📊 Dashboard dados:', { 
+          leads: leads.length, 
+          deals: deals.length, 
+          contacts: contacts.length,
+          activities: recentActivities.length 
+        });
 
         // Calcular métricas
         const qualifiedCount = leads.filter((l: any) => l.status === 'qualified').length;
-        const activeDealsCount = deals.filter((d: any) => d.status !== 'won' && d.status !== 'lost').length;
+        const activeDealsCount = deals.filter((d: any) => 
+          d.status !== 'won' && d.status !== 'lost'
+        ).length;
+        
         const wonDeals = deals.filter((d: any) => d.status === 'won');
-        const totalRev = wonDeals.reduce((sum: number, d: any) => sum + (d.value || 0), 0);
+        const totalRev = wonDeals.reduce((sum: number, d: any) => 
+          sum + (parseFloat(d.value) || parseFloat(d.amount) || 0), 0
+        );
+        
         const avgDeal = wonDeals.length > 0 ? totalRev / wonDeals.length : 0;
         const convRate = leads.length > 0 ? (wonDeals.length / leads.length) * 100 : 0;
 
@@ -152,15 +173,27 @@ export default function Dashboard() {
           .slice(0, 5)
           .map((l: any) => ({
             id: l.id,
-            name: `${l.first_name} ${l.last_name}`,
+            name: `${l.first_name || ''} ${l.last_name || ''}`.trim() || 'Sem nome',
             company: l.company || 'Sem empresa',
             score: l.score_ia || 0,
-            value: l.deal_value || 0,
+            value: parseFloat(l.deal_value) || 0,
             status: l.status
           }));
 
         setTopLeads(sortedLeads);
-        setActivities(recentActivities.slice(0, 10));
+
+        // ✅ Mapear activities para o formato esperado
+        const mappedActivities = recentActivities.slice(0, 10).map((act: any, i: number) => ({
+          id: act.id || `act-${i}`,
+          type: act.type || act.interaction_type || 'note',
+          title: act.title || act.description || 'Atividade',
+          description: act.description || act.notes || '',
+          timestamp: act.created_at || act.timestamp || new Date().toISOString(),
+          user: act.user_name || act.created_by || 'Sistema',
+          status: act.status || 'completed'
+        }));
+
+        setActivities(mappedActivities);
 
       } catch (error) {
         console.error('Erro ao carregar dashboard:', error);
@@ -174,7 +207,7 @@ export default function Dashboard() {
     fetchDashboardData();
 
     // Real-time subscriptions
-    const unsubLeads = subscribeLeads(() => {
+    const unsubLeads = subscribeLeads?.(() => {
       fetchDashboardData();
     });
 
