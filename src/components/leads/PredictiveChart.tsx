@@ -1,242 +1,203 @@
-// src/components/leads/PredictiveChart.tsx
+// src/components/leads/LeadCard.tsx
 import { motion } from 'framer-motion';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
-import { TrendingUp, Zap, Target } from 'lucide-react';
+import { Mail, Phone, Building, Calendar, Star, TrendingUp, MoreVertical, Edit, Trash2, Eye, MessageSquare, User, MapPin } from 'lucide-react';
+import { useState } from 'react';
+import LeadScoreGauge from './LeadScoreGauge';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-interface PredictiveChartProps {
-  historicalData: number[];
-  predictions: number[];
-  labels: string[];
-  title?: string;
-  metric?: string;
+interface Lead {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  position?: string;
+  score_ia?: number;
+  status: string;
+  lead_source?: string;
+  created_at: string;
+  last_contact?: string;
+  ai_conversion_probability?: number;
+  ai_next_best_action?: any;
+  ai_sentiment?: any;
 }
 
-export default function PredictiveChart({
-  historicalData = [],
-  predictions = [],
-  labels = [],
-  title = "Previsão de Conversões",
-  metric = "leads"
-}: PredictiveChartProps) {
-  
-  // Dados do gráfico
-  const data = {
-    labels: labels,
-    datasets: [
-      {
-        label: 'Dados Reais',
-        data: historicalData,
-        borderColor: 'rgb(16, 185, 129)',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        pointBackgroundColor: 'rgb(16, 185, 129)',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointHoverBackgroundColor: 'rgb(16, 185, 129)',
-        pointHoverBorderColor: '#fff',
-      },
-      {
-        label: 'Previsão IA',
-        data: [...Array(historicalData.length - predictions.length).fill(null), ...predictions],
-        borderColor: 'rgb(168, 85, 247)',
-        backgroundColor: 'rgba(168, 85, 247, 0.1)',
-        borderWidth: 3,
-        borderDash: [10, 5],
-        fill: true,
-        tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        pointBackgroundColor: 'rgb(168, 85, 247)',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointHoverBackgroundColor: 'rgb(168, 85, 247)',
-        pointHoverBorderColor: '#fff',
-      }
-    ]
+interface LeadCardProps {
+  lead: Lead;
+  onEdit?: (lead: Lead) => void;
+  onDelete?: (lead: Lead) => void;
+  onView?: (lead: Lead) => void;
+  delay?: number;
+}
+
+export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: LeadCardProps) {
+  const [showMenu, setShowMenu] = useState(false);
+
+  const getStatusColor = (status: string) => {
+    const colors = {
+      new: 'bg-blue-500',
+      contacted: 'bg-purple-500',
+      qualified: 'bg-emerald-500',
+      proposal: 'bg-orange-500',
+      negotiation: 'bg-cyan-500',
+      won: 'bg-green-500',
+      lost: 'bg-red-500'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-500';
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top' as const,
-        labels: {
-          color: '#9ca3af',
-          font: {
-            size: 12,
-            weight: '600'
-          },
-          padding: 15,
-          usePointStyle: true,
-          pointStyle: 'circle'
-        }
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: 'rgba(16, 185, 129, 0.5)',
-        borderWidth: 1,
-        padding: 12,
-        displayColors: true,
-        callbacks: {
-          label: function(context: any) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.y !== null) {
-              label += context.parsed.y + ' ' + metric;
-            }
-            return label;
-          }
-        }
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(255, 255, 255, 0.05)',
-          drawBorder: false
-        },
-        ticks: {
-          color: '#6b7280',
-          font: {
-            size: 11
-          }
-        }
-      },
-      x: {
-        grid: {
-          display: false,
-          drawBorder: false
-        },
-        ticks: {
-          color: '#6b7280',
-          font: {
-            size: 11
-          }
-        }
-      }
-    },
-    interaction: {
-      intersect: false,
-      mode: 'index' as const,
-    },
+  const getInitials = () => {
+    return `${lead.first_name?.[0] || ''}${lead.last_name?.[0] || ''}`.toUpperCase();
   };
 
-  // Calcular insights
-  const lastReal = historicalData[historicalData.length - 1];
-  const lastPrediction = predictions[predictions.length - 1];
-  const growth = lastPrediction > lastReal 
-    ? ((lastPrediction - lastReal) / lastReal * 100).toFixed(1)
-    : 0;
+  const daysSinceContact = lead.last_contact ? Math.floor((Date.now() - new Date(lead.last_contact).getTime()) / (1000 * 60 * 60 * 24)) : null;
 
-  const avgPrediction = (predictions.reduce((a, b) => a + b, 0) / predictions.length).toFixed(0);
+  const handleCall = () => {
+    if (!lead.phone) {
+      alert('Lead sem telefone cadastrado');
+      return;
+    }
+    const cleanPhone = lead.phone.replace(/\D/g, '');
+    window.location.href = `tel:+55${cleanPhone}`;
+  };
+
+  const handleWhatsApp = () => {
+    if (!lead.phone) {
+      alert('Lead sem telefone cadastrado');
+      return;
+    }
+    const cleanPhone = lead.phone.replace(/\D/g, '');
+    const message = encodeURIComponent(
+      `Olá ${lead.first_name}! 👋\n\nVi que você demonstrou interesse e gostaria de conversar com você.\n\nQuando seria um bom momento?\n\nAtenciosamente,\nEquipe ALSHAM`
+    );
+    window.open(`https://wa.me/55${cleanPhone}?text=${message}`, '_blank');
+  };
+
+  const handleEmail = () => {
+    if (!lead.email) {
+      alert('Lead sem email cadastrado');
+      return;
+    }
+    const subject = encodeURIComponent('Contato - ALSHAM 360° PRIMA');
+    const body = encodeURIComponent(
+      `Olá ${lead.first_name} ${lead.last_name},\n\nEspero que este email encontre você bem.\n\nEntramos em contato sobre seu interesse em nossos serviços.\n\nAtenciosamente,\nEquipe ALSHAM 360° PRIMA`
+    );
+    window.location.href = `mailto:${lead.email}?subject=${subject}&body=${body}`;
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+      transition={{ delay }}
+      className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-xl p-3 relative overflow-hidden"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-xl font-bold text-white mb-1">{title}</h3>
-          <p className="text-sm text-gray-400">Baseado em Machine Learning</p>
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-          <Zap className="w-4 h-4 text-purple-400" />
-          <span className="text-sm font-semibold text-purple-400">IA Ativa</span>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs text-gray-400">Crescimento Previsto</span>
-          </div>
-          <div className="text-2xl font-bold text-emerald-400">+{growth}%</div>
-        </motion.div>
-
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-xl"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 text-blue-400" />
-            <span className="text-xs text-gray-400">Média Prevista</span>
-          </div>
-          <div className="text-2xl font-bold text-blue-400">{avgPrediction}</div>
-        </motion.div>
-
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-purple-400" />
-            <span className="text-xs text-gray-400">Confiança IA</span>
-          </div>
-          <div className="text-2xl font-bold text-purple-400">87%</div>
-        </motion.div>
-      </div>
-
-      {/* Chart */}
-      <div className="h-80">
-        <Line data={data} options={options} />
-      </div>
-
-      {/* Insights */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 border border-purple-500/10 rounded-xl">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-            <Zap className="w-5 h-5 text-white" />
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+            {getInitials()}
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-1">Insight da IA</h4>
-            <p className="text-sm text-gray-300">
-              Com base nos dados históricos, a IA prevê um crescimento de <span className="text-emerald-400 font-bold">+{growth}%</span> nas conversões. 
-              Continue com as estratégias atuais e monitore os leads de alta prioridade para maximizar resultados.
-            </p>
+            <h3 className="font-semibold text-white text-sm">{lead.first_name} {lead.last_name}</h3>
+            <p className="text-xs text-gray-400">{lead.company || 'Sem empresa'}</p>
           </div>
         </div>
+        
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-1 hover:bg-white/5 rounded-lg transition-colors"
+          >
+            <MoreVertical className="w-4 h-4 text-gray-400" />
+          </button>
+          
+          {showMenu && (
+            <div className="absolute right-0 top-8 bg-[var(--neutral-800)] border border-[var(--neutral-700)] rounded-lg shadow-xl z-10 py-1 min-w-[140px]">
+              <button
+                onClick={() => { onView?.(lead); setShowMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2"
+              >
+                <Eye className="w-3 h-3" />
+                Ver Detalhes
+              </button>
+              <button
+                onClick={() => { onEdit?.(lead); setShowMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2"
+              >
+                <Edit className="w-3 h-3" />
+                Editar
+              </button>
+              <button
+                onClick={() => { onDelete?.(lead); setShowMenu(false); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-red-400 hover:bg-white/5 flex items-center gap-2"
+              >
+                <Trash2 className="w-3 h-3" />
+                Excluir
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(lead.status)} text-white inline-block mb-2`}>
+        {lead.status}
+      </div>
+
+      <div className="space-y-1.5 mb-3">
+        {lead.email && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Mail className="w-3 h-3" />
+            <span className="truncate">{lead.email}</span>
+          </div>
+        )}
+        {lead.phone && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Phone className="w-3 h-3" />
+            <span>{lead.phone}</span>
+          </div>
+        )}
+        {lead.position && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <User className="w-3 h-3" />
+            <span className="truncate">{lead.position}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center mb-3">
+        <LeadScoreGauge score={lead.score_ia || 0} size="sm" showLabel={false} />
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={handleCall}
+          className="flex-1 px-2 py-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-xs font-semibold hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-1"
+        >
+          <Phone className="w-3 h-3" />
+          Ligar
+        </button>
+        <button
+          onClick={handleWhatsApp}
+          className="flex-1 px-2 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-1"
+        >
+          <MessageSquare className="w-3 h-3" />
+          Zap
+        </button>
+        <button
+          onClick={handleEmail}
+          className="flex-1 px-2 py-1.5 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-lg text-xs font-semibold hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-1"
+        >
+          <Mail className="w-3 h-3" />
+          Email
+        </button>
+      </div>
+
+      {daysSinceContact !== null && daysSinceContact > 7 && (
+        <div className="mt-2 px-2 py-1 bg-orange-500/10 border border-orange-500/30 rounded text-xs text-orange-400 flex items-center gap-1">
+          <Calendar className="w-3 h-3" />
+          <span>Sem contato há {daysSinceContact} dias</span>
+        </div>
+      )}
     </motion.div>
   );
 }
