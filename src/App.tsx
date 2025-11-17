@@ -47,7 +47,7 @@ import campaignOrion from "./assets/campaign-orion.png";
 import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./components/DashboardSupremo";
 import './styles/responsive.css';
 
 ChartJS.register(
