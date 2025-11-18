@@ -240,11 +240,11 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
 }
-
 .theme-selector-button {
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0.5rem;
+  min-width: 2.5rem;
+  width: auto;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 0.75rem;
   transition: all 0.2s;
 }
