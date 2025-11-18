@@ -487,7 +487,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
     geo: [],
     marketSplit: [],
   },
-  aiInsights,
+  aiInsights: [],
   automations: [],
   engagement: {
     feed: [],
@@ -520,7 +520,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
             geo: [],
             marketSplit: [],
           },
-          aiInsights,
+          aiInsights: [],
           automations: [],
           engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
           campaigns: [],
