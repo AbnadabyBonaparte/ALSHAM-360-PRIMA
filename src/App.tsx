@@ -627,30 +627,36 @@ const useDashboardStore = create<DashboardState>((set) => ({
       // Insight 1: Leads crescendo
       if (leads.length > 100) {
         aiInsights.push({
+          id: "insight-leads",
           title: "Volume de Leads Alto",
-          description: `Você tem ${leads.length} leads ativos. Considere aumentar a equipe de vendas para processar mais rápido.`,
-          priority: "medium",
+          impact: `Você tem ${leads.length} leads ativos. Considere aumentar a equipe de vendas para processar mais rápido.`,
+          confidence: "Média",
           action: "Ver Leads",
+          score: 75,
         });
       }
 
       // Insight 2: Oportunidades
       if (opportunities.length > 0) {
         aiInsights.push({
+          id: "insight-deals",
           title: `${opportunities.length} Negócios em Andamento`,
-          description: "Foque em fechar os negócios em estágio avançado. Priorize follow-ups.",
-          priority: "high",
+          impact: "Foque em fechar os negócios em estágio avançado. Priorize follow-ups.",
+          confidence: "Alta",
           action: "Ver Pipeline",
+          score: 90,
         });
       }
 
       // Insight 3: Campanhas
       if (campaigns.length === 0) {
         aiInsights.push({
+          id: "insight-campaigns",
           title: "Nenhuma Campanha Ativa",
-          description: "Crie campanhas de marketing para gerar mais leads qualificados.",
-          priority: "medium",
+          impact: "Crie campanhas de marketing para gerar mais leads qualificados.",
+          confidence: "Média",
           action: "Criar Campanha",
+          score: 60,
         });
       }
 
@@ -658,14 +664,14 @@ const useDashboardStore = create<DashboardState>((set) => ({
       if (leaderboard.length > 0) {
         const topUser = leaderboard[0];
         aiInsights.push({
+          id: "insight-leaderboard",
           title: `${topUser.user} lidera o ranking`,
-          description: `Com ${topUser.score} pontos. Reconheça o desempenho da equipe!`,
-          priority: "low",
+          impact: `Com ${topUser.score} pontos. Reconheça o desempenho da equipe!`,
+          confidence: "Baixa",
           action: "Ver Leaderboard",
+          score: 50,
         });
       }
-
-
       set({
         loading: false,
         organizationUnavailable: false,
