@@ -151,7 +151,7 @@ export default function DashboardSupremo({ dashboardStore }: DashboardProps) {
       labels: analytics.conversion.map((c: any) => c.stage),
       datasets: [{
         label: 'Taxa de Conversão',
-        data: analytics.conversion.map((c: any) => c.rate),
+        data: analytics.conversion.map((c: any) => c.value),
         fill: true,
         backgroundColor: hexToRgba(ALSHAM_COLORS.success, 0.2),
         borderColor: ALSHAM_COLORS.success,
@@ -167,7 +167,7 @@ export default function DashboardSupremo({ dashboardStore }: DashboardProps) {
     if (!analytics.marketSplit || analytics.marketSplit.length === 0) return null;
     
     return {
-      labels: analytics.marketSplit.map((m: any) => m.segment),
+      labels: analytics.marketSplit.map((m: any) => m.label),
       datasets: [{
         data: analytics.marketSplit.map((m: any) => m.value),
         backgroundColor: [
