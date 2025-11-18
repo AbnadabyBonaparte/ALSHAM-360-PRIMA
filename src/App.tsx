@@ -595,27 +595,29 @@ const useDashboardStore = create<DashboardState>((set) => ({
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
       // Pipeline por estágio (dos opportunities)
+      // Pipeline por estágio (dos opportunities)
       const pipelineStages = ["Qualificação", "Proposta", "Negociação", "Fechamento"];
       const pipeline = pipelineStages.map((stage, idx) => ({
         stage,
         value: Math.floor(opportunities.length * (0.7 - idx * 0.15)),
-        count: Math.floor(opportunities.length * (0.8 - idx * 0.2)),
+        delta: idx === 0 ? 5 : -2,
       }));
 
       // Conversion por estágio (dos leads)
       const conversionStages = ["Lead", "MQL", "SQL", "Oportunidade", "Cliente"];
       const conversion = conversionStages.map((stage, idx) => ({
         stage,
-        rate: Math.max(10, 100 - idx * 20),
-        count: Math.floor(leads.length * (1 - idx * 0.2)),
+        value: Math.max(10, 100 - idx * 20),
+        benchmark: Math.max(5, 95 - idx * 18),
       }));
 
       // Market Split (por origem dos leads)
       const sources = ["Website", "Indicação", "Mídia Paga", "Orgânico"];
-      const marketSplit = sources.map((segment, idx) => ({
-        segment,
+      const accents = ["emerald", "sky", "fuchsia", "amber"];
+      const marketSplit = sources.map((label, idx) => ({
+        label,
         value: Math.floor(leads.length * (0.4 - idx * 0.1)),
-        percentage: (40 - idx * 10),
+        accent: accents[idx],
       }));
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
