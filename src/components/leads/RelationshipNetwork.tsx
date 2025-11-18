@@ -292,7 +292,7 @@ export default function RelationshipNetwork({
             <span className="text-xs text-gray-400">Força Média</span>
           </div>
           <div className="text-2xl font-bold text-emerald-400">
-            {Math.round((edges.reduce((sum, e) => sum + e.strength, 0) / edges.length) * 100)}%
+            {edges.length > 0 ? Math.round((edges.reduce((sum, e) => sum + e.strength, 0) / edges.length) * 100) : 0}%
           </div>
         </div>
       </div>
