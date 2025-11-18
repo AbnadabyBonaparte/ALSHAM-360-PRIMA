@@ -480,14 +480,14 @@ const useDashboardStore = create<DashboardState>((set) => ({
   loading: true,
   kpis: [],
   analytics: {
-    pipeline,
-    conversion,
+    pipeline: [],
+    conversion: [],
     heatmap: [],
     cohort: [],
     geo: [],
-    marketSplit,
+    marketSplit: [],
   },
-  aiInsights,
+  aiInsights: [],
   automations: [],
   engagement: {
     feed: [],
@@ -513,14 +513,14 @@ const useDashboardStore = create<DashboardState>((set) => ({
           organizationUnavailable: true,
           kpis: [],
           analytics: {
-            pipeline,
-            conversion,
+            pipeline: [],
+            conversion: [],
             heatmap: [],
             cohort: [],
             geo: [],
-            marketSplit,
+            marketSplit: [],
           },
-          aiInsights,
+          aiInsights: [],
           automations: [],
           engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
           campaigns: [],
@@ -590,95 +590,19 @@ const useDashboardStore = create<DashboardState>((set) => ({
         },
       ];
 
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // 📊 CALCULAR ANALYTICS COM DADOS REAIS
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-      // Pipeline por estágio (dos opportunities)
-      const pipelineStages = ["Qualificação", "Proposta", "Negociação", "Fechamento"];
-      const pipeline = pipelineStages.map((stage, idx) => ({
-        stage,
-        value: Math.floor(opportunities.length * (0.7 - idx * 0.15)),
-        count: Math.floor(opportunities.length * (0.8 - idx * 0.2)),
-      }));
-
-      // Conversion por estágio (dos leads)
-      const conversionStages = ["Lead", "MQL", "SQL", "Oportunidade", "Cliente"];
-      const conversion = conversionStages.map((stage, idx) => ({
-        stage,
-        rate: Math.max(10, 100 - idx * 20),
-        count: Math.floor(leads.length * (1 - idx * 0.2)),
-      }));
-
-      // Market Split (por origem dos leads)
-      const sources = ["Website", "Indicação", "Mídia Paga", "Orgânico"];
-      const marketSplit = sources.map((segment, idx) => ({
-        segment,
-        value: Math.floor(leads.length * (0.4 - idx * 0.1)),
-        percentage: (40 - idx * 10),
-      }));
-
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // 🧠 GERAR AI INSIGHTS AUTOMÁTICOS
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-      const aiInsights: AIInsight[] = [];
-
-      // Insight 1: Leads crescendo
-      if (leads.length > 100) {
-        aiInsights.push({
-          title: "Volume de Leads Alto",
-          description: `Você tem ${leads.length} leads ativos. Considere aumentar a equipe de vendas para processar mais rápido.`,
-          priority: "medium",
-          action: "Ver Leads",
-        });
-      }
-
-      // Insight 2: Oportunidades
-      if (opportunities.length > 0) {
-        aiInsights.push({
-          title: `${opportunities.length} Negócios em Andamento`,
-          description: "Foque em fechar os negócios em estágio avançado. Priorize follow-ups.",
-          priority: "high",
-          action: "Ver Pipeline",
-        });
-      }
-
-      // Insight 3: Campanhas
-      if (campaigns.length === 0) {
-        aiInsights.push({
-          title: "Nenhuma Campanha Ativa",
-          description: "Crie campanhas de marketing para gerar mais leads qualificados.",
-          priority: "medium",
-          action: "Criar Campanha",
-        });
-      }
-
-      // Insight 4: Leaderboard
-      if (leaderboard.length > 0) {
-        const topUser = leaderboard[0];
-        aiInsights.push({
-          title: `${topUser.user} lidera o ranking`,
-          description: `Com ${topUser.score} pontos. Reconheça o desempenho da equipe!`,
-          priority: "low",
-          action: "Ver Leaderboard",
-        });
-      }
-
-
       set({
         loading: false,
         organizationUnavailable: false,
         kpis,
         analytics: {
-          pipeline,
-          conversion,
+          pipeline: [],
+          conversion: [],
           heatmap: [],
           cohort: [],
           geo: [],
-          marketSplit,
+          marketSplit: [],
         },
-        aiInsights,
+        aiInsights: [],
         automations: [],
         engagement: {
           feed: [],
@@ -701,14 +625,14 @@ const useDashboardStore = create<DashboardState>((set) => ({
         organizationUnavailable: isOrgError,
         kpis: [],
         analytics: {
-          pipeline,
-          conversion,
+          pipeline: [],
+          conversion: [],
           heatmap: [],
           cohort: [],
           geo: [],
-          marketSplit,
+          marketSplit: [],
         },
-        aiInsights,
+        aiInsights: [],
         automations: [],
         engagement: { feed: [], leaderboard: [], tasks: [], community: [], sla: [] },
         campaigns: [],
