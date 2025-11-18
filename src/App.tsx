@@ -1210,7 +1210,7 @@ function App() {
     loading,
     kpis,
     analytics,
-    aiInsights,
+    aiInsights = [],
     automations,
     engagement,
     campaigns,
