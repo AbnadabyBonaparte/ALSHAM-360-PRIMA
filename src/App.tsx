@@ -676,9 +676,9 @@ const useDashboardStore = create<DashboardState>((set) => ({
           heatmap: [],
           cohort: [],
           geo: [],
-          marketSplit: [],
+          marketSplit,
         },
-        aiInsights: [],
+        aiInsights,
         automations: [],
         engagement: {
           feed: [],
