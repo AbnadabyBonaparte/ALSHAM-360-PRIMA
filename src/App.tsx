@@ -2375,7 +2375,7 @@ function App() {
           )}
         </AnimatePresence>
 
-        <aside className="hidden min-h-screen lg:flex lg:w-80 xl:w-[22rem] flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
+        <aside className="hidden min-h-screen lg:flex lg:w-72 xl:w-80 flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
           <div 
             onClick={() => navigateToPage('dashboard')}
             className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur cursor-pointer hover:bg-[var(--surface)]/95 transition-colors group"
@@ -2827,8 +2827,8 @@ function LoadingSkeletonLayout({ theme }: { theme: ThemeKey }) {
       className="min-h-screen text-[var(--text-primary)]"
       style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
     >
-      <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
-        <aside className="hidden min-h-screen flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl lg:flex lg:w-80 xl:w-[22rem]">
+      <div className="min-h-screen lg:flex">
+        <aside className="hidden min-h-screen flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl lg:flex lg:w-72 xl:w-80">
           <div className="sticky top-0 space-y-6 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur">
             <div className="flex items-center gap-3">
               <div className="skeleton-shimmer h-10 w-10 rounded-2xl" />
