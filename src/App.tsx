@@ -49,6 +49,7 @@ import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
 import DashboardSupremo from "./pages/Dashboard";
 import './styles/responsive.css';
+import './styles/responsive-fix.css';
 
 ChartJS.register(
   CategoryScale,
