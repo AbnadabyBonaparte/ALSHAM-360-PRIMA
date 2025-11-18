@@ -514,8 +514,8 @@ const useDashboardStore = create<DashboardState>((set) => ({
           organizationUnavailable: true,
           kpis: [],
           analytics: {
-            pipeline,
-            conversion,
+            pipeline: [],
+            conversion: [],
             heatmap: [],
             cohort: [],
             geo: [],
