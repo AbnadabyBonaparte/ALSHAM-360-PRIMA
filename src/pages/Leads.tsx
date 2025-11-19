@@ -1,3 +1,6 @@
+// 📁 Caminho: src/pages/Leads.tsx
+// Descrição: Página principal de gestão de leads com IA
+
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -12,6 +15,7 @@ import PredictiveChart from '../components/leads/PredictiveChart';
 import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadActions from '../components/leads/LeadActions';
+import CreateLeadModal from '../components/leads/CreateLeadModal';
 import { createLead, getActiveOrganization } from '../lib/supabase-full.js';
 // import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
 
@@ -33,7 +37,6 @@ interface Lead {
   ai_next_best_action?: string;
   first_name?: string;
   last_name?: string;
-  // ...outros campos que você usar
 }
 
 interface LeadFilters {
@@ -59,6 +62,9 @@ export default function Leads() {
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [filters, setFilters] = useState<LeadFilters>({});
   const [organizationUnavailable, setOrganizationUnavailable] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [currentOrgId, setCurrentOrgId] = useState<string>('');
+  const [currentUserId, setCurrentUserId] = useState<string>('');
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -72,8 +78,20 @@ export default function Leads() {
     (async () => {
       const orgId = await getActiveOrganization({ forceRefresh: false });
       if (mounted) {
-        // FIX: expõe estado de autenticação/organização para feedback visual
         setOrganizationUnavailable(!orgId);
+        if (orgId) {
+          setCurrentOrgId(orgId);
+        }
+        // Capturar userId da sessão
+        try {
+          const { supabase } = await import('../lib/supabase');
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user?.id) {
+            setCurrentUserId(session.user.id);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar userId:', error);
+        }
       }
     })();
     return () => {
@@ -187,7 +205,7 @@ export default function Leads() {
       d.setMonth(d.getMonth() - (5 - i));
       return d.toLocaleDateString('pt-BR', { month: 'short' });
     });
-    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67]; // Sugestão: aqui, implemente gráfico REAL extraindo Qtd por mês usando 'created_at'
+    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67];
     const predictions = [72, 78, 85];
     return {
       labels: [...last6Months, 'Próx', '+2', '+3'],
@@ -255,24 +273,24 @@ export default function Leads() {
         user: 'Carlos Oliveira',
         status: 'completed' as const
       }
-    ]; // Mock de atividades de lead (ideal: trazer do backend no futuro!)
+    ];
   }, [selectedLead]);
 
   const handleCreateLead = async (newLeadData: Partial<Lead>) => {
-  try {
-    const orgId = await getActiveOrganization();
-    if (!orgId) {
-      console.error('Organização ativa não encontrada. Abortando criação de lead.');
-      return;
+    try {
+      const orgId = await getActiveOrganization();
+      if (!orgId) {
+        console.error('Organização ativa não encontrada. Abortando criação de lead.');
+        return;
+      }
+      await createLead(orgId, newLeadData);
+      await refetch?.();
+      setIsCreateModalOpen(false);
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230);
+    } catch (err: any) {
+      console.error(err);
     }
-    await createLead(orgId, newLeadData);
-    await refetch?.();
-    setIsCreateModalOpen(false); // Fechar modal após criar
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230);
-  } catch (err: any) {
-    console.error(err);
-  }
-};
+  };
 
   if (error) {
     return (
@@ -318,7 +336,7 @@ export default function Leads() {
             if (refetch) refetch();
           }}
           onExport={() => {}}
-         onNewLead={() => setIsCreateModalOpen(true)}
+          onNewLead={() => setIsCreateModalOpen(true)}
         />
       </header>
 
@@ -500,7 +518,7 @@ export default function Leads() {
                       delay={index * 0.05}
                       onView={setSelectedLead}
                     />
-                  ))} {/* Para listas grandes: use react-window para virtualização */}
+                  ))}
                 </motion.div>
               )}
               {viewMode === 'kanban' && (
@@ -514,7 +532,6 @@ export default function Leads() {
                     stages={pipelineStages}
                     onLeadMove={(leadId, newStageId) => {
                       console.log(`Lead ${leadId} movido para ${newStageId}`);
-                      // toast.info('Movendo lead...');
                     }}
                   />
                 </motion.div>
@@ -605,4 +622,3 @@ export default function Leads() {
     </div>
   );
 }
-      
