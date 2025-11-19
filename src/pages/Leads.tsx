@@ -1,3 +1,6 @@
+// 📁 Caminho: src/pages/Leads.tsx
+// Descrição: Página principal de gestão de leads com IA
+
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,7 +17,6 @@ import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadActions from '../components/leads/LeadActions';
 import { createLead, getActiveOrganization } from '../lib/supabase-full.js';
-// import { toast } from 'sonner'; // Descomente caso use a lib sonner para toasts modernos
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
@@ -34,7 +36,6 @@ interface Lead {
   ai_next_best_action?: string;
   first_name?: string;
   last_name?: string;
-  // ...outros campos que você usar
 }
 
 interface LeadFilters {
@@ -60,12 +61,12 @@ export default function Leads() {
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [filters, setFilters] = useState<LeadFilters>({});
   const [organizationUnavailable, setOrganizationUnavailable] = useState(false);
-
-  useEffect(() => {
-    if (import.meta.env.DEV) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [currentOrgId, setCurrentOrgId] = useState<string>('');
   const [currentUserId, setCurrentUserId] = useState<string>('');
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
       console.log('🔄 Leads carregados:', leads?.length || 0);
       console.log('📊 Leads:', leads);
     }
@@ -95,7 +96,7 @@ export default function Leads() {
       mounted = false;
     };
   }, []);
-          if (session?.user?.id) {
+
   const filteredLeads: Lead[] = useMemo(() => {
     if (!leads || leads.length === 0) return [];
     let result = [...leads];
@@ -202,7 +203,7 @@ export default function Leads() {
       d.setMonth(d.getMonth() - (5 - i));
       return d.toLocaleDateString('pt-BR', { month: 'short' });
     });
-    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67]; // Sugestão: aqui, implemente gráfico REAL extraindo Qtd por mês usando 'created_at'
+    const historical = leads ? [45, 52, 48, 61, 58, 67] : [45, 52, 48, 61, 58, 67];
     const predictions = [72, 78, 85];
     return {
       labels: [...last6Months, 'Próx', '+2', '+3'],
@@ -270,23 +271,21 @@ export default function Leads() {
         user: 'Carlos Oliveira',
         status: 'completed' as const
       }
-    ]; // Mock de atividades de lead (ideal: trazer do backend no futuro!)
+    ];
   }, [selectedLead]);
 
   const handleCreateLead = async (newLeadData: Partial<Lead>) => {
     try {
       const orgId = await getActiveOrganization();
       if (!orgId) {
-        // FIX: Evita tentativa de criação sem escopo de organização válido
         console.error('Organização ativa não encontrada. Abortando criação de lead.');
         return;
       }
       await createLead(orgId, newLeadData);
       await refetch?.();
-      // toast.success('Lead criado com sucesso!'); // Se usar biblioteca de toast
-      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230); // Ajuda feedback
+      setIsCreateModalOpen(false);
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230);
     } catch (err: any) {
-      // toast.error('Erro ao criar lead: ' + err.message); // Se usar biblioteca de toast
       console.error(err);
     }
   };
@@ -322,9 +321,7 @@ export default function Leads() {
       )}
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1
-            className="text-[clamp(1.5rem,5vw,2.25rem)] font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent"
-          >
+          <h1 className="text-[clamp(1.5rem,5vw,2.25rem)] font-bold mb-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] bg-clip-text text-transparent">
             🎯 Leads Intelligence
           </h1>
           <p className="text-[clamp(0.75rem,3vw,1rem)] text-[var(--text-gray)]">Gestão inteligente com IA e previsões em tempo real</p>
@@ -335,7 +332,7 @@ export default function Leads() {
             if (refetch) refetch();
           }}
           onExport={() => {}}
-          onNewLead={handleCreateLead}
+          onNewLead={() => setIsCreateModalOpen(true)}
         />
       </header>
 
@@ -517,7 +514,7 @@ export default function Leads() {
                       delay={index * 0.05}
                       onView={setSelectedLead}
                     />
-                  ))} {/* Para listas grandes: use react-window para virtualização */}
+                  ))}
                 </motion.div>
               )}
               {viewMode === 'kanban' && (
@@ -531,7 +528,6 @@ export default function Leads() {
                     stages={pipelineStages}
                     onLeadMove={(leadId, newStageId) => {
                       console.log(`Lead ${leadId} movido para ${newStageId}`);
-                      // toast.info('Movendo lead...');
                     }}
                   />
                 </motion.div>
@@ -610,6 +606,14 @@ export default function Leads() {
           metric="conversões"
         />
       </section>
+
+      <CreateLeadModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateLead}
+        orgId={currentOrgId}
+        userId={currentUserId}
+      />
     </div>
   );
 }
