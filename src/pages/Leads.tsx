@@ -96,18 +96,6 @@ export default function Leads() {
     };
   }, []);
           if (session?.user?.id) {
-            setCurrentUserId(session.user.id);
-          }
-        } catch (error) {
-          console.error('Erro ao buscar userId:', error);
-        }
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   const filteredLeads: Lead[] = useMemo(() => {
     if (!leads || leads.length === 0) return [];
     let result = [...leads];
