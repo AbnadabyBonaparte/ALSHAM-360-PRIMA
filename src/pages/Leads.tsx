@@ -259,22 +259,20 @@ export default function Leads() {
   }, [selectedLead]);
 
   const handleCreateLead = async (newLeadData: Partial<Lead>) => {
-    try {
-      const orgId = await getActiveOrganization();
-      if (!orgId) {
-        // FIX: Evita tentativa de criação sem escopo de organização válido
-        console.error('Organização ativa não encontrada. Abortando criação de lead.');
-        return;
-      }
-      await createLead(orgId, newLeadData);
-      await refetch?.();
-      // toast.success('Lead criado com sucesso!'); // Se usar biblioteca de toast
-      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230); // Ajuda feedback
-    } catch (err: any) {
-      // toast.error('Erro ao criar lead: ' + err.message); // Se usar biblioteca de toast
-      console.error(err);
+  try {
+    const orgId = await getActiveOrganization();
+    if (!orgId) {
+      console.error('Organização ativa não encontrada. Abortando criação de lead.');
+      return;
     }
-  };
+    await createLead(orgId, newLeadData);
+    await refetch?.();
+    setIsCreateModalOpen(false); // Fechar modal após criar
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 230);
+  } catch (err: any) {
+    console.error(err);
+  }
+};
 
   if (error) {
     return (
@@ -320,7 +318,7 @@ export default function Leads() {
             if (refetch) refetch();
           }}
           onExport={() => {}}
-          onNewLead={handleCreateLead}
+         onNewLead={() => setIsCreateModalOpen(true)}
         />
       </header>
 
@@ -595,6 +593,16 @@ export default function Leads() {
           metric="conversões"
         />
       </section>
+
+      {/* Modal de Criação de Lead */}
+      <CreateLeadModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateLead}
+        orgId={currentOrgId}
+        userId={currentUserId}
+      />
     </div>
   );
 }
+      
