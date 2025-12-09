@@ -1,6 +1,8 @@
 export interface PageDefinition {
   id: string;
   label: string;
+  icon?: string;
+  module?: string;
 }
 
 export const pagesList: PageDefinition[] = [
@@ -72,4 +74,10 @@ export const pagesList: PageDefinition[] = [
   { id: "audit-log", label: "Audit log" },
   { id: "onboarding", label: "Onboarding" },
   { id: "community", label: "Comunidade" },
+  { id: "analytics", label: "Analytics", icon: "ChartBarIcon", module: "Analytics" },
+  { id: "automacoes", label: "Automações", icon: "BoltIcon", module: "Automação" },
+  { id: "financeiro", label: "Financeiro", icon: "CurrencyDollarIcon", module: "Financeiro" },
+  { id: "gamificacao", label: "Gamificação", icon: "TrophyIcon", module: "Gamificação" },
+  { id: "publicacao", label: "Publicação", icon: "NewspaperIcon", module: "Marketing" },
+  { id: "seguranca", label: "Segurança", icon: "ShieldCheckIcon", module: "Segurança" },
 ];
