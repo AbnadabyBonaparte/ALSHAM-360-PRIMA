@@ -4,7 +4,7 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Whatsapp.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
+import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
   PhoneIcon,
@@ -14,8 +14,8 @@ import {
   UsersIcon,
   ArrowTrendingUpIcon,
   BoltIcon,
-  RobotIcon,
-  GlobeIcon
+  CpuChipIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
@@ -118,7 +118,7 @@ export default function WhatsappPage() {
             color="from-purple-500 to-pink-600"
           />
           <SupremeWhatsAppCard
-            icon={<RobotIcon />}
+            icon={<CpuChipIcon />}
             title="Automatizadas"
             value={stats?.automatedResponses.toLocaleString() || '0'}
             color="from-orange-500 to-red-600"
@@ -140,7 +140,7 @@ export default function WhatsappPage() {
           className="max-w-5xl mx-auto mb-32"
         >
           <div className="bg-gradient-to-br from-green-900/50 via-emerald-900/50 to-teal-900/50 rounded-3xl p-16 border-4 border-green-500/50 shadow-2xl shadow-green-500/30 text-center">
-            <RobotIcon className="w-48 h-48 text-green-400 mx-auto mb-12 animate-pulse" />
+            <CpuChipIcon className="w-48 h-48 text-green-400 mx-auto mb-12 animate-pulse" />
             <h2 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 mb-8">
               CHATBOT IA ATIVO 24/7
             </h2>
@@ -173,7 +173,7 @@ export default function WhatsappPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40"
         >
-          <GlobeIcon className="w-64 h-64 text-green-500 mx-auto mb-16 animate-pulse" />
+          <GlobeAltIcon className="w-64 h-64 text-green-500 mx-auto mb-16 animate-pulse" />
           <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600">
             O CLIENTE NÃO ESPERA
           </p>

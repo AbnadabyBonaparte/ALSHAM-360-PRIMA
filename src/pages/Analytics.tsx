@@ -3,7 +3,7 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Analytics.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { ChartBarIcon, CurrencyDollarIcon, TrendingUpIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, CurrencyDollarIcon, SparklesIcon, ArrowTrendingUpIcon, TrophyIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 
@@ -56,7 +56,7 @@ export default function AnalyticsPage() {
         const leadsInPeriod = leadsThisPeriod?.filter(l => new Date(l.created_at) >= since).length || 0;
         const activeDeals = opportunities?.filter(o => !o.closed_date).length || 0;
         const wonDeals = closedWon?.length || 0;
-        const totalRevenue = closedWon?.reduce((sum, o) => sum + (o.value, 0) || 0;
+        const totalRevenue = closedWon?.reduce((sum, o) => sum + (o.value || 0), 0) || 0;
         const revenueThisPeriod = opportunities
           ?.filter(o => o.stage === 'Ganho' && new Date(o.closed_date || '') >= since)
           .reduce((sum, o) => sum + o.value, 0) || 0;
@@ -164,7 +164,7 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-8 border border-purple-500/30 hover:scale-105 transition-all">
-            <TrendingUpIcon className="w-16 h-16 text-purple-400 mb-4" />
+            <ArrowTrendingUpIcon className="w-16 h-16 text-purple-400 mb-4" />
             <p className="text-5xl font-bold text-white">{metrics.conversionRate.toFixed(1)}%</p>
             <p className="text-xl text-purple-300 mt-2">Taxa de Conversão</p>
             <p className="text-2xl text-gray-400 mt-4">Lead → Cliente</p>

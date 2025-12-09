@@ -8,10 +8,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.39.0",
     "@types/react-beautiful-dnd": "^13.1.8",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.0",
+    "date-fns": "^4.1.0",
     "framer-motion": "^11.0.8",
     "lucide-react": "^0.533.0",
     "react": "^18.3.1",
