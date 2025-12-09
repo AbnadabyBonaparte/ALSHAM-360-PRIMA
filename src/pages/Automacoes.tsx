@@ -4,13 +4,8 @@
 
 import LayoutSupremo from '@/components/LayoutSupremo';
 import { BoltIcon, PlayIcon, PauseIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Automation {
   id: string;

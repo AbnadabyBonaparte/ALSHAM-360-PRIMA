@@ -17,15 +17,10 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Message {
   id: string;
@@ -49,7 +44,6 @@ export default function InboxPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'high' | 'whatsapp'>('all');
 
   useEffect(() => {
-    {
     async function loadSupremeInbox() {
       const { data, error } = await supabase
         .from('messages')
@@ -132,7 +126,7 @@ export default function InboxPage() {
                 <p className="text-5xl font-bold text-emerald-400">
                   99.7%
                 </p>
-                <p className="text-xl text-gray-400">taxa de resposta em < 5min</p>
+                <p className="text-xl text-gray-400">taxa de resposta em &lt; 5min</p>
               </div>
             </div>
 

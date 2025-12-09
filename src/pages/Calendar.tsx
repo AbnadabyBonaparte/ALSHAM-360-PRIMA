@@ -4,15 +4,10 @@
 
 import LayoutSupremo from '@/components/LayoutSupremo';
 import { CalendarIcon, ClockIcon, VideoCameraIcon, UserGroupIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Event {
   id: string;
@@ -150,7 +145,7 @@ export default function CalendarPage() {
                     ))}
                     {dayEvents.length > 4 && (
                       <p className="text-xs text-gray-500 mt-2">+{dayEvents.length - 4} mais</p>
-                    }
+                    )}
                   </div>
                 </div>
               );

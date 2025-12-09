@@ -15,13 +15,8 @@ import {
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Champion {
   id: string;
@@ -45,7 +40,6 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     async function loadHallOfFame() {
-      const { 
       const { data, error } = await supabase
         .from('gamification_rankings')
         .select('id, name, avatar_url, nivel, pontos, streak, badges, weekly_gain, title, department')

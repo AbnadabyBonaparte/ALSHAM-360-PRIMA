@@ -19,15 +19,10 @@ import {
   Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface SupremeMetrics {
   totalRevenue: number;
@@ -162,7 +157,7 @@ export default function DashboardSupremo() {
           transition={{ delay: 0.8 }}
           className="text-center py-20 bg-gradient-to-r from-purple-900/30 via-pink-900/20 to-purple-900/30 rounded-3xl border border-purple-500/30 backdrop-blur-xl"
         >
-          <SparklesIcon className="w-24 h-24 text-purple-400 mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-24 h-24 text-purple-400 mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
             "Você está no caminho de dominar o mercado brasileiro em 2026.
             <br />

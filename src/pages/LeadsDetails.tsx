@@ -27,15 +27,10 @@ import {
   FireIcon
 } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState, useMemo } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale'; // <-- CORRIGIDO AQUI
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { ptBR } from 'date-fns/locale';
 
 interface Lead {
   id: string;
