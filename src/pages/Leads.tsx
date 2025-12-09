@@ -17,6 +17,7 @@ import ActivityTimeline from '../components/leads/ActivityTimeline';
 import RelationshipNetwork from '../components/leads/RelationshipNetwork';
 import LeadActions from '../components/leads/LeadActions';
 import { createLead, getActiveOrganization } from '../lib/supabase-full.js';
+import { supabase } from '../lib/supabase';
 
 type ViewMode = 'grid' | 'list' | 'kanban' | 'network';
 
@@ -82,7 +83,6 @@ export default function Leads() {
           setCurrentOrgId(orgId);
         }
         try {
-          const supabase = (await import('../lib/supabase')).supabase;
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user?.id) {
             setCurrentUserId(session.user.id);

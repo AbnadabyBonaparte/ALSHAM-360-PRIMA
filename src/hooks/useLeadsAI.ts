@@ -8,6 +8,7 @@ interface UseLeadsAIResult {
   loading: boolean;
   error: string | null;
   refreshLeads: () => Promise<void>;
+  refetch?: () => Promise<void>;
 }
 
 export function useLeadsAI(): UseLeadsAIResult {
@@ -178,6 +179,7 @@ export function useLeadsAI(): UseLeadsAIResult {
     leads,
     loading,
     error,
-    refreshLeads
+    refreshLeads,
+    refetch: refreshLeads
   };
 }

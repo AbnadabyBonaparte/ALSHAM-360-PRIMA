@@ -37,10 +37,27 @@ export default defineConfig({
           return 'assets/[name]-[hash][extname]'
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js'
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        manualChunks: (id) => {
+          if (id.includes('supabase-full') || id.includes('@supabase/supabase-js')) {
+            return 'supabase';
+          }
+          if (id.includes('node_modules/react')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/chart.js') || id.includes('react-chartjs-2')) {
+            return 'charts';
+          }
+          if (id.includes('node_modules/framer-motion')) {
+            return 'motion';
+          }
+          if (id.includes('node_modules/lucide-react')) {
+            return 'icons';
+          }
+        }
       }
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
     assetsInlineLimit: 4096,
   },
   server: {
