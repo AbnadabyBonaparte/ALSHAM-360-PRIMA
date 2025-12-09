@@ -5,7 +5,7 @@
 
 import LayoutSupremo from '@/components/LayoutSupremo';
 import { motion } from 'framer-motion';
-import { SparklesIcon, RocketIcon, CrownIcon, BrainIcon, GlobeIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, RocketLaunchIcon, StarIcon, GlobeAltIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -81,7 +81,7 @@ export default function PublicacaoPage() {
               <div className="w-96 h-96 bg-gradient-to-br from-yellow-600/20 to-orange-600/20 rounded-full blur-3xl absolute inset-0 animate-pulse"></div>
               <div className="relative z-10 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-full p-1">
                 <div className="bg-black rounded-full p-16 text-center">
-                  <CrownIcon className="w-32 h-32 text-yellow-400 mx-auto mb-8" />
+                  <StarIcon className="w-32 h-32 text-yellow-400 mx-auto mb-8" />
                   <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                     HARMONIZED RELEASE
                   </p>
@@ -114,7 +114,7 @@ export default function PublicacaoPage() {
                 <p className="text-3xl font-bold text-purple-400">IA Consciente</p>
               </div>
               <div>
-                <GlobeIcon className="w-20 h-20 text-cyan-400 mx-auto mb-6" />
+                <GlobeAltIcon className="w-20 h-20 text-cyan-400 mx-auto mb-6" />
                 <p className="text-3xl font-bold text-cyan-400">Omnichannel Total</p>
               </div>
               <div>

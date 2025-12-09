@@ -4,16 +4,13 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Gamificacao.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  TrophyIcon, 
-  FlameIcon, 
-  RocketIcon, 
-  StarIcon, 
-  CrownIcon,
-  ZapIcon,
-  TargetIcon,
-  MedalIcon,
-  SwordsIcon,
+import {
+  TrophyIcon,
+  FireIcon,
+  RocketLaunchIcon,
+  StarIcon,
+  BoltIcon,
+  ViewfinderCircleIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
@@ -116,7 +113,7 @@ export default function GamificacaoPage() {
     return (
       <LayoutSupremo title="Gamificação Suprema">
         <div className="text-center py-40">
-          <FlameIcon className="w-40 h-40 text-gray-700 mx-auto mb-12" />
+          <FireIcon className="w-40 h-40 text-gray-700 mx-auto mb-12" />
           <p className="text-5xl text-gray-400">Você ainda não entrou no jogo</p>
         </div>
       </LayoutSupremo>
@@ -156,22 +153,22 @@ export default function GamificacaoPage() {
                 <p className="text-2xl text-gray-300">Pontos Totais</p>
               </div>
               <div>
-                <CrownIcon className="w-20 h-20 text-purple-400 mx-auto mb-4" />
+                <StarIcon className="w-20 h-20 text-purple-400 mx-auto mb-4" />
                 <p className="text-6xl font-black text-purple-400">Nível {user.level}</p>
                 <p className="text-xl text-gray-400">{levelProgress.toFixed(0)}% para o próximo</p>
               </div>
               <div>
-                <FlameIcon className="w-20 h-20 text-orange-500 mx-auto mb-4 animate-pulse" />
+                <FireIcon className="w-20 h-20 text-orange-500 mx-auto mb-4 animate-pulse" />
                 <p className="text-6xl font-black text-orange-500">{user.streak}</p>
                 <p className="text-2xl text-gray-300">Streak Atual</p>
               </div>
               <div>
-                <MedalIcon className="w-20 h-20 text-cyan-400 mx-auto mb-4" />
+                <TrophyIcon className="w-20 h-20 text-cyan-400 mx-auto mb-4" />
                 <p className="text-6xl font-black text-cyan-400">{user.badges}</p>
                 <p className="text-2xl text-gray-300">Conquistas</p>
               </div>
               <div>
-                <SwordsIcon className="w-20 h-20 text-pink-500 mx-auto mb-4" />
+                <BoltIcon className="w-20 h-20 text-pink-500 mx-auto mb-4" />
                 <p className="text-6xl font-black text-pink-500">#{user.rank}</p>
                 <p className="text-2xl text-gray-300">no Ranking</p>
               </div>
@@ -215,7 +212,7 @@ export default function GamificacaoPage() {
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-3 justify-end mb-2">
-                      <FlameIcon className={`w-10 h-10 ${player.streak > 10 ? 'text-orange-500 animate-pulse' : 'text-gray-500'}`} />
+                      <FireIcon className={`w-10 h-10 ${player.streak > 10 ? 'text-orange-500 animate-pulse' : 'text-gray-500'}`} />
                       <span className="text-4xl font-bold text-white">{player.streak}</span>
                     </div>
                     <p className="text-gray-400">streak • {player.badges} conquistas</p>
@@ -234,7 +231,7 @@ export default function GamificacaoPage() {
           className="text-center py-32 mt-32"
         >
           <SparklesIcon className="w-40 h-40 text-purple-400 mx-auto mb-12 animate-pulse" />
-          <p className className="text-7xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
+          <p className="text-7xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
             "Você não está jogando.
             <br />
             Você está dominando."

@@ -4,7 +4,7 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Settings.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
+import {
   Cog6ToothIcon,
   ShieldCheckIcon,
   CreditCardIcon,
@@ -17,7 +17,8 @@ import {
   RocketLaunchIcon,
   CurrencyDollarIcon,
   CheckBadgeIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  TrophyIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
@@ -125,7 +126,7 @@ export default function SettingsPage() {
             className="bg-gradient-to-br from-yellow-600/40 via-orange-600/40 to-red-600/40 rounded-3xl p-1 shadow-2xl shadow-yellow-500/50"
           >
             <div className="bg-black rounded-3xl p-16 text-center">
-              <CrownIcon className="w-48 h-48 text-yellow-500 mx-auto mb-12" />
+              <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto mb-12" />
               <h2 className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                 PLANO SUPREMO
               </h2>

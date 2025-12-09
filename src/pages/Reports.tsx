@@ -4,14 +4,14 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Reports.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
+import {
   DocumentChartBarIcon,
   CurrencyDollarIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   UsersIcon,
-  TargetIcon,
+  ViewfinderCircleIcon,
   FireIcon,
-  BrainIcon,
+  LightBulbIcon,
   SparklesIcon,
   CalendarIcon,
   ArrowUpRightIcon,
@@ -153,7 +153,7 @@ export default function ReportsPage() {
             color="from-emerald-500 to-teal-600"
           />
           <SupremeReportCard
-            icon={<TrendingUpIcon />}
+            icon={<ArrowTrendingUpIcon />}
             title="MRR Projetado"
             value={`R$ ${report?.monthlyRecurring.toLocaleString('pt-BR')}`}
             growth="+89%"
@@ -189,7 +189,7 @@ export default function ReportsPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40"
         >
-          <BrainIcon className="w-64 h-64 text-purple-500 mx-auto mb-16 animate-pulse" />
+          <LightBulbIcon className="w-64 h-64 text-purple-500 mx-auto mb-16 animate-pulse" />
           <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
             SEUS NÚMEROS NÃO MENTEM
           </p>

@@ -3,7 +3,7 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/LeadsDetails.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
+import {
   UserIcon,
   BuildingOfficeIcon,
   PhoneIcon,
@@ -12,19 +12,19 @@ import {
   BriefcaseIcon,
   CalendarIcon,
   ClockIcon,
-  TrendingUpIcon,
-  BrainIcon,
+  ArrowTrendingUpIcon,
+  LightBulbIcon,
   SparklesIcon,
-  ZapIcon,
-  TargetIcon,
+  BoltIcon,
+  ViewfinderCircleIcon,
   StarIcon,
   ArrowLeftIcon,
-  Edit3Icon,
-  SaveIcon,
-  XIcon,
-  AlertTriangleIcon,
+  PencilIcon,
+  ArrowDownTrayIcon,
+  XMarkIcon,
+  ExclamationTriangleIcon,
   TrophyIcon,
-  FlameIcon
+  FireIcon
 } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
@@ -194,7 +194,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
               className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-10 border border-purple-500/30"
             >
               <div className="flex items-center gap-4 mb-8">
-                <BrainIcon className="w-16 h-16 text-purple-400" />
+                <LightBulbIcon className="w-16 h-16 text-purple-400" />
                 <h3 className="text-4xl font-bold">Análise da IA</h3>
               </div>
               <div className="space-y-6">

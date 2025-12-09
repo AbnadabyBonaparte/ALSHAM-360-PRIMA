@@ -4,7 +4,7 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/UnderConstruction.tsx
 
 import { motion } from 'framer-motion';
-import { SparklesIcon, RocketIcon, ZapIcon, CrownIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, RocketLaunchIcon, BoltIcon, TrophyIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 
 interface UnderConstructionProps {
@@ -75,7 +75,7 @@ export default function UnderConstruction({
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="inline-block mb-16"
         >
-          <RocketIcon className="w-64 h-64 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400" />
+          <RocketLaunchIcon className="w-64 h-64 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400" />
         </motion.div>
 
         {/* Título Épico */}
@@ -153,7 +153,7 @@ export default function UnderConstruction({
           transition={{ delay: 2.5, type: "spring" }}
           className="mt-32"
         >
-          <CrownIcon className="w-48 h-48 text-yellow-500 mx-auto" />
+          <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto" />
         </motion.div>
       </motion.div>
     </div>
