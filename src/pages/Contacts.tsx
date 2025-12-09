@@ -4,13 +4,8 @@
 
 import LayoutSupremo from '@/components/LayoutSupremo';
 import { UserGroupIcon, PhoneIcon, EnvelopeIcon, BuildingOfficeIcon, SparklesIcon, ClockIcon, StarIcon } from '@heroicons/react/24/outline';
-import { createClient} from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Contact {
   id: string;
@@ -34,15 +29,17 @@ export default function ContactsPage() {
 
   useEffect(() => {
     async function loadSupremeContacts() {
-    const { data, error } = await supabase
-      .from('contacts')
-      .select('id, name, email, phone, company, title, avatar_url, created_at, last_contact, score, tags, revenue_potential')
-      .order(sortBy === 'score' ? 'score' : sortBy === 'revenue' ? 'revenue_potential' : 'last_contact', { ascending: false, nullsLast: true });
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('id, name, email, phone, company, title, avatar_url, created_at, last_contact, score, tags, revenue_potential')
+        .order(sortBy === 'score' ? 'score' : sortBy === 'revenue' ? 'revenue_potential' : 'last_contact', { ascending: false, nullsLast: true });
 
-    if (!error && data) {
-      setContacts(data);
+      if (!error && data) {
+        setContacts(data);
+      }
+      setLoading(false);
     }
-    setLoading(false);
+    loadSupremeContacts();
   }, [sortBy]);
 
   const totalRevenue = contacts.reduce((sum, c) => sum + (c.revenue_potential || 0), 0);

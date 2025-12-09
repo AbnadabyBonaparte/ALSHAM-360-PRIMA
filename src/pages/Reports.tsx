@@ -20,15 +20,10 @@ import {
   TrophyIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface SupremeReport {
   totalRevenue: number;
@@ -146,7 +141,7 @@ export default function ReportsPage() {
         {/* KPIS PRINCIPAIS */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-20">
           <SupremeReportCard
-            icon={<CurrencyDollarIcon />
+            icon={<CurrencyDollarIcon />}
             title="Receita Total"
             value={`R$ ${report?.totalRevenue.toLocaleString('pt-BR')}`}
             growth="+127%"
