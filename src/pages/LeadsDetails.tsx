@@ -1,6 +1,5 @@
 // src/pages/LeadsDetails.tsx
 // ALSHAM 360° PRIMA v10 SUPREMO — Lead Detail Alienígena 1000/1000
-// A página onde o lead vira cliente ou vira história.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/LeadsDetails.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
@@ -31,7 +30,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState, useMemo } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
-import { ptBR from 'date-fns/locale/pt-br';
+import { ptBR } from 'date-fns/locale'; // <-- CORRIGIDO AQUI
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -161,100 +160,85 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                       )}
                     </div>
                   </div>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <p className="text-6xl font-black text-emerald-400">
-                    R$ {lead.revenue_potential.toLocaleString('pt-BR')}
-                  </p>
-                  <p className="text-3xl text-gray-400">Potencial de receita</p>
-                  <button className="mt-8 px-12 py-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl font-bold text-3xl hover:scale-105 transition-all">
-                    CONVERTER EM CLIENTE
-                  </button>
                 </div>
               </div>
-            </div>
 
-            {/* NEXT BEST ACTION DA IA */}
+              <div className="text-right">
+                <p className="text-6xl font-black text-emerald-400">
+                  R$ {lead.revenue_potential.toLocaleString('pt-BR')}
+                </p>
+                <p className="text-3xl text-gray-400">Potencial de receita</p>
+                <button className="mt-8 px-12 py-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl font-bold text-3xl hover:scale-105 transition-all">
+                  CONVERTER EM CLIENTE
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12 p-12">
+          {/* COLUNA ESQUERDA — INFORMAÇÕES DO LEAD */}
+          <div className="space-y-8">
+            <InfoCard icon={<BuildingOfficeIcon />} title="Empresa" value={lead.company} />
+            <InfoCard icon={<BriefcaseIcon />} title="Cargo" value={lead.position} />
+            <InfoCard icon={<EnvelopeIcon />} title="E-mail" value={lead.email} />
+            <InfoCard icon={<PhoneIcon />} title="Telefone" value={lead.phone} />
+            <InfoCard icon={<MapPinIcon />} title="Origem" value={lead.origin} />
+            <InfoCard icon={<CalendarIcon />} title="Criado em" value={format(new Date(lead.created_at), 'dd/MM/yyyy')} />
+
+            {/* IA INSIGHTS */}
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-20 text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-10 border border-purple-500/30"
             >
-              <p className="text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">
-                PRÓXIMA MELHOR AÇÃO SEGUNDO A IA:
-              </p>
-              <p className="text-7xl font-black text-emerald-400 mt-8">
-                {lead.next_action}
-              </p>
+              <div className="flex items-center gap-4 mb-8">
+                <BrainIcon className="w-16 h-16 text-purple-400" />
+                <h3 className="text-4xl font-bold">Análise da IA</h3>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <p className="text-2xl text-gray-400">Probabilidade de conversão</p>
+                  <p className="text-7xl font-black text-emerald-400">{lead.probability}%</p>
+                </div>
+                <div>
+                  <p className="text-2xl text-gray-400">Risco de churn</p>
+                  <p className={`text-7xl font-black ${lead.risk >= 60 ? 'text-red-400' : 'text-emerald-400'}`}>{lead.risk}%</p>
+                </div>
+                <div>
+                  <p className="text-2xl text-gray-400">Health Score</p>
+                  <p className="text-7xl font-black text-cyan-400">{lead.health}/100</p>
+                </div>
+              </div>
             </motion.div>
           </div>
 
-          {/* MAIN CONTENT */}
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12 p-12">
-            {/* COLUNA ESQUERDA — INFORMAÇÕES DO LEAD */}
-            <div className="space-y-8">
-              <InfoCard icon={<BuildingOfficeIcon />} title="Empresa" value={lead.company} />
-              <InfoCard icon={<BriefcaseIcon />} title="Cargo" value={lead.position} />
-              <InfoCard icon={<EnvelopeIcon />} title="E-mail" value={lead.email} />
-              <InfoCard icon={<PhoneIcon />} title="Telefone" value={lead.phone} />
-              <InfoCard icon={<MapPinIcon />} title="Origem" value={lead.origin} />
-              <InfoCard icon={<CalendarIcon />} title="Criado em" value={format(new Date(lead.created_at), 'dd/MM/yyyy')} />
-
-              {/* IA INSIGHTS */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-10 border border-purple-500/30"
-              >
-                <div className="flex items-center gap-4 mb-8">
-                  <BrainIcon className="w-16 h-16 text-purple-400" />
-                  <h3 className="text-4xl font-bold">Análise da IA</h3>
-                </div>
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-2xl text-gray-400">Probabilidade de conversão</p>
-                    <p className="text-7xl font-black text-emerald-400">{lead.probability}%</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl text-gray-400">Risco de churn</p>
-                    <p className={`text-7xl font-black ${lead.risk >= 60 ? 'text-red-400' : 'text-emerald-400'}`}>{lead.risk}%</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl text-gray-400">Health Score</p>
-                    <p className="text-7xl font-black text-cyan-400">{lead.health}/100</p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* COLUNA DO MEIO — ATIVIDADES */}
-            <div className="lg:col-span-2">
-              <h2 className="text-5xl font-bold mb-8">Atividades Recentes</h2>
-              <div className="space-y-6">
-                <ActivityItem
-                  type="email"
-                  title="E-mail enviado"
-                  description="Proposta comercial enviada com sucesso"
-                  time="2h atrás"
-                  user="João Silva"
-                />
-                <ActivityItem
-                  type="call"
-                  title="Ligação realizada"
-                  description="Cliente interessado na versão Enterprise"
-                  time="1 dia atrás"
-                  user="Maria Santos"
-                />
-                <ActivityItem
-                  type="meeting"
-                  title="Reunião marcada"
-                  description="Demo agendada para 15/12 às 14h"
-                  time="em 3 dias"
-                  user="Você"
-                />
-              </div>
+          {/* COLUNA DO MEIO — ATIVIDADES */}
+          <div className="lg:col-span-2">
+            <h2 className="text-5xl font-bold mb-8">Atividades Recentes</h2>
+            <div className="space-y-6">
+              <ActivityItem
+                type="email"
+                title="E-mail enviado"
+                description="Proposta comercial enviada com sucesso"
+                time="2h atrás"
+                user="João Silva"
+              />
+              <ActivityItem
+                type="call"
+                title="Ligação realizada"
+                description="Cliente interessado na versão Enterprise"
+                time="1 dia atrás"
+                user="Maria Santos"
+              />
+              <ActivityItem
+                type="meeting"
+                title="Reunião marcada"
+                description="Demo agendada para 15/12 às 14h"
+                time="em 3 dias"
+                user="Você"
+              />
             </div>
           </div>
         </div>
