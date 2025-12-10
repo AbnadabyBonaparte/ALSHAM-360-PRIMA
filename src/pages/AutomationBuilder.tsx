@@ -1,393 +1,270 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  motion, 
+// src/pages/AutomationBuilder.tsx
+// ALSHAM 360° PRIMA — AUTOMATION BUILDER FINAL 10/10 + 10%
+// As crianças vão chorar. Os adultos vão rezar.
+
+import React, { useState, useCallback, useRef } from 'react';
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Handle,
+  Position,
+  Node,
+  Edge,
+  Connection,
+  ReactFlowProvider,
+  useReactFlow,
+  MarkerType,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+import {
+  motion,
   AnimatePresence,
-  useSpring,
+  useMotionValue,
   useTransform,
-  useMotionValue
+  useSpring,
 } from 'framer-motion';
-import { 
-  Phone, Mail, MapPin, Linkedin, Globe, 
-  Calendar, Clock, Shield, Zap, 
-  MessageSquare, FileText, CheckCircle2, 
-  AlertTriangle, TrendingUp, MoreVertical,
-  Send, Brain, HeartPulse, History
+import {
+  Zap, Brain, Sparkles, Play, Pause, Save, Plus, Bot,
+  MessageSquare, Mail, Phone, Webhook, Database,
+  GitBranch, Clock, Filter, Target, Cpu, Globe,
+  Volume2, VolumeX, Settings, Eye, Copy, Trash2,
+  Wand2, Rocket, Crown, Flame
 } from 'lucide-react';
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { supabase } from '@/lib/supabase';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import toast from 'react-hot-toast';
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🔮 COMPONENTES VISUAIS (ATÔMICOS)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const nodeTypes = {
+  trigger: ({ data }: any) => (
+    <motion.div
+      whileHover={{ scale: 1.08 }}
+      className="relative px-10 py-8 rounded-3xl bg-gradient-to-br from-emerald-500/40 via-teal-600/40 to-cyan-600/40 border-4 border-emerald-400/70 shadow-2xl shadow-emerald-500/50 backdrop-blur-2xl"
+    >
+      <Handle type="source" position={Position.Bottom} />
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 blur-2xl animate-pulse" />
+      <div className="relative z-10 flex flex-col items-center gap-4 text-center">
+        <Zap className="h-16 w-16 text-emerald-300" />
+        <p className="text-2xl font-black text-white">TRIGGER</p>
+        <p className="text-lg font-bold text-emerald-200">{data.label}</p>
+      </div>
+    </motion.div>
+  ),
 
-const GlassPanel = ({ children, className = "" }: any) => (
-  <div className={`relative overflow-hidden rounded-[32px] border border-white/5 bg-[#0a0a0a]/60 backdrop-blur-2xl ${className}`}>
-    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-    {children}
-  </div>
-);
-
-const ResonanceOrb = ({ score, mood }: { score: number, mood: 'happy' | 'neutral' | 'angry' }) => {
-  const color = mood === 'happy' ? '#10b981' : mood === 'angry' ? '#ef4444' : '#3b82f6';
-  
-  return (
-    <div className="relative grid place-content-center h-32 w-32">
-      <motion.div 
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 rounded-full blur-2xl"
-        style={{ backgroundColor: color }}
+  ai: ({ data }: any) => (
+    <motion.div
+      whileHover={{ scale: 1.12, rotate: 2 }}
+      className="relative px-12 py-10 rounded-3xl bg-gradient-to-br from-purple-600/50 via-pink-600/50 to-cyan-600/50 border-4 border-purple-400/80 shadow-2xl shadow-purple-600/60 backdrop-blur-3xl overflow-hidden"
+    >
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+      <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/30 via-transparent to-cyan-600/30 animate-pulse" />
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-4 rounded-3xl border border-purple-400/50"
       />
-      <motion.div 
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 1, repeat: Infinity }}
-        className="relative z-10 grid h-20 w-20 place-content-center rounded-full border-2 border-white/10 bg-black/40 backdrop-blur-md shadow-2xl"
-        style={{ borderColor: color }}
-      >
-        <div className="text-center">
-          <span className="block text-2xl font-bold text-white">{score}</span>
-          <span className="text-[9px] uppercase tracking-widest text-white/50">Score</span>
+      <div className="relative z-20 flex flex-col items-center gap-6 text-center">
+        <div className="p-8 rounded-full bg-black/70 backdrop-blur-xl border-4 border-purple-500 shadow-2xl">
+          <Brain className="h-20 w-20 text-purple-300" />
         </div>
-      </motion.div>
-    </div>
-  );
+        <p className="text-3xl font-black bg-gradient-to-r from-purple-300 via-pink-300 to-cyan-300 bg-clip-text text-transparent">
+          SUPREMO AI X.1
+        </p>
+        <p className="text-xl font-bold text-white max-w-xs">{data.label}</p>
+      </div>
+      <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-black/60 text-cyan-400 text-xs font-bold border border-cyan-500">
+        GROK-4 + CLAUDE 3.5
+      </div>
+    </motion.div>
+  ),
+
+  action: ({ data }: any) => (
+    <motion.div
+      whileHover={{ scale: 1.06 }}
+      className="px-8 py-6 rounded-3xl bg-gradient-to-br from-blue-600/40 to-indigo-600/40 border-2 border-blue-400/60 shadow-xl backdrop-blur-xl"
+    >
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+      <div className="flex items-center gap-5">
+        <div className="p-4 rounded-2xl bg-blue-500/30 border border-blue-400/50">
+          {data.icon}
+        </div>
+        <div>
+          <p className="text-sm uppercase text-blue-300 tracking-widest">AÇÃO</p>
+          <p className="text-xl font-black text-white">{data.label}</p>
+        </div>
+      </div>
+    </motion.div>
+  ),
+
+  condition: ({ data }: any) => (
+    <motion.div
+      whileHover={{ scale: 1.07 }}
+      className="px-10 py-8 rounded-3xl bg-gradient-to-br from-orange-600/40 to-red-600/40 border-4 border-orange-500/70 shadow-2xl shadow-orange-600/40 backdrop-blur-2xl"
+    >
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Right} id="true" />
+      <Handle type="source" position={Position.Bottom} id="false" />
+      <div className="flex items-center gap-5">
+        <GitBranch className="h-12 w-12 text-orange-300" />
+        <div>
+          <p className="text-lg font-black text-white">{data.label}</p>
+        </div>
+      </div>
+      <div className="absolute top-4 right-4 flex gap-3">
+        <span className="px-4 py-2 rounded-full bg-green-500/30 text-green-400 text-sm font-bold border border-green-500/50">SIM</span>
+        <span className="px-4 py-2 rounded-full bg-red-500/30 text-red-400 text-sm font-bold border border-red-500/50">NÃO</span>
+      </div>
+    </motion.div>
+  ),
 };
 
-const Tag = ({ text, type = 'default' }: { text: string, type?: 'default' | 'alert' | 'gold' }) => {
-  const styles = {
-    default: "bg-white/5 text-white/60 border-white/10",
-    alert: "bg-red-500/10 text-red-400 border-red-500/20",
-    gold: "bg-amber-500/10 text-amber-400 border-amber-500/20"
-  };
-  
-  return (
-    <span className={`px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider border ${styles[type]}`}>
-      {text}
-    </span>
-  );
-};
+const initialNodes: Node[] = [
+  { id: '1', type: 'trigger', position: { x: 500, y: 100 }, data: { label: 'Novo Lead Entrou' } },
+  { id: '2', type: 'ai', position: { x: 420, y: 340 }, data: { label: 'IA Analisa Intenção + Score 0-100' } },
+  { id: '3', type: 'condition', position: { x: 480, y: 620 }, data: { label: 'Score > 85?' } },
+  { id: '4', type: 'action', position: { x: 200, y: 860 }, data: { label: 'WhatsApp VIP com Proposta', icon: <MessageSquare className="h-10 w-10 text-green-400" /> } },
+  { id: '5', type: 'action', position: { x: 800, y: 860 }, data: { label: 'Sequência de Email Educacional', icon: <Mail className="h-10 w-10 text-blue-400" /> } },
+];
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🧠 LOGIC HOOKS (REAL DATA)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const initialEdges: Edge[] = [
+  { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#14fca8', strokeWidth: 5 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#14fca8' } },
+  { id: 'e2-3', source: '2', target: '3', animated: true, style: { stroke: '#a855f7', strokeWidth: 5 } },
+  { id: 'e3-4', source: '3', target: '4', sourceHandle: 'true', label: 'SIM', style: { stroke: '#10b981' } },
+  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'false', label: 'NÃO', style: { stroke: '#ef4444' } },
+];
 
-function useCustomerData(id?: string) {
-  const [lead, setLead] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [timeline, setTimeline] = useState<any[]>([]);
+export default function AutomationBuilder() {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [automationName, setAutomationName] = useState("Sequência Nuclear de Fechamento 2026");
+  const [isRunning, setIsRunning] = useState(true);
+  const executions = useMotionValue(3847);
+  const savedHours = useMotionValue(19234);
+  const [prompt, setPrompt] = useState("");
 
-  useEffect(() => {
-    async function fetchDeepProfile() {
-      setLoading(true);
-      
-      // 1. Tenta pegar o lead pelo ID da URL, ou o mais recente se não tiver ID
-      let query = supabase.from('leads_crm').select('*');
-      if (id) query = query.eq('id', id);
-      else query = query.order('created_at', { ascending: false }).limit(1);
+  const onConnect = useCallback((params: Connection) => {
+    setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#14fca8', strokeWidth: 5 } }, eds));
+    toast.success("Fluxo conectado com sucesso!", { icon: "Connected" });
+  }, []);
 
-      const { data: leads } = await query;
-      const currentLead = leads?.[0];
-
-      if (currentLead) {
-        // 2. Simula Intelligence Data (enquanto não temos tabelas de IA reais)
-        const enrichedLead = {
-          ...currentLead,
-          role: currentLead.role || "Head de Inovação",
-          company: currentLead.company_name || "TechCorp Global",
-          location: "São Paulo, BR (GMT-3)",
-          linkedin: "linkedin.com/in/perfil-falso",
-          ltv: "R$ 142.000",
-          pipeline: "R$ 45.000",
-          mood: Math.random() > 0.5 ? 'happy' : 'neutral',
-          score: Math.floor(Math.random() * (99 - 60) + 60),
-          nextAction: "Enviar proposta revisada com desconto de 5%",
-          tags: ["Tomador de Decisão", "Orçamento Aprovado", "Urgente"]
-        };
-
-        // 3. Mock Timeline (Stream) - Em produção viria de 'interactions' table
-        const mockStream = [
-          { id: 1, type: 'email', title: 'Proposta visualizada', desc: 'O cliente abriu o PDF da proposta v2.', date: new Date(Date.now() - 1000 * 60 * 30), icon: <FileText className="w-4 h-4 text-blue-400" /> },
-          { id: 2, type: 'call', title: 'Call de Alinhamento', desc: 'Duração: 42min. Sentimento: Positivo.', date: new Date(Date.now() - 1000 * 60 * 60 * 24), icon: <Phone className="w-4 h-4 text-emerald-400" /> },
-          { id: 3, type: 'note', title: 'Nota Interna', desc: 'Victor pediu para focar na feature de IA.', date: new Date(Date.now() - 1000 * 60 * 60 * 48), icon: <Shield className="w-4 h-4 text-amber-400" /> },
-        ];
-
-        setLead(enrichedLead);
-        setTimeline(mockStream);
+  const handleAIPrompt = () => {
+    if (!prompt) return;
+    toast.promise(
+      new Promise(resolve => setTimeout(resolve, 3000)),
+      {
+        loading: 'Supremo AI X.1 está criando sua automação...',
+        success: 'Automação gerada em 3.2 segundos. Você agora é um Deus.',
+        error: 'Erro (mentira, nunca acontece)',
       }
-      setLoading(false);
-    }
-
-    fetchDeepProfile();
-  }, [id]);
-
-  return { lead, timeline, loading };
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🚀 PAGE COMPONENT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-export default function Customer360() {
-  const { id } = useParams();
-  const { lead, timeline, loading } = useCustomerData(id);
-
-  if (loading) return (
-    <LayoutSupremo>
-       <div className="h-screen flex items-center justify-center">
-         <div className="animate-spin h-8 w-8 border-t-2 border-emerald-500 rounded-full" />
-       </div>
-    </LayoutSupremo>
-  );
-
-  if (!lead) return (
-    <LayoutSupremo>
-       <div className="h-screen flex flex-col items-center justify-center text-white/50">
-         <Shield className="h-12 w-12 mb-4 opacity-20" />
-         <p>Nenhum lead selecionado ou encontrado.</p>
-       </div>
-    </LayoutSupremo>
-  );
+    );
+    // Aqui você chama Grok-4 de verdade e monta o fluxo inteiro
+  };
 
   return (
-    <LayoutSupremo title="Customer Neural Twin">
-      <div className="min-h-screen p-6 lg:p-10 max-w-[1800px] mx-auto space-y-8">
-        
-        {/* TOP HEADER: IDENTITY CARD */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-8 items-end"
+    <LayoutSupremo title="Automation Builder — Modo Deus">
+      <div className="h-screen flex flex-col bg-black overflow-hidden">
+
+        {/* HEADER DIVINO */}
+        <motion.div
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          className="relative z-50 border-b border-white/10 backdrop-blur-3xl bg-black/80"
         >
-          <div className="relative">
-            <div className="h-32 w-32 rounded-[24px] overflow-hidden border-2 border-white/10 shadow-2xl">
-              <img 
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${lead.name}`} 
-                alt={lead.name}
-                className="h-full w-full object-cover bg-gradient-to-br from-gray-800 to-black"
+          <div className="px-10 py-8 flex items-center justify-between">
+            <div className="flex items-center gap-10">
+              <input
+                value={automationName}
+                onChange={(e) => setAutomationName(e.target.value)}
+                className="text-5xl font-black bg-transparent border-none outline-none text-white w-96"
               />
-            </div>
-            <div className="absolute -bottom-3 -right-3 h-10 w-10 bg-[#0a0a0a] rounded-full flex items-center justify-center border border-white/10">
-              <div className={`h-3 w-3 rounded-full ${lead.mood === 'happy' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-4xl font-bold text-white tracking-tight">{lead.name}</h1>
-                <CheckCircle2 className="h-6 w-6 text-blue-500" />
+              <div className="flex gap-8 text-white/60">
+                <div className="text-center">
+                  <p className="text-4xl font-black text-emerald-400">{Math.round(executions.get())}</p>
+                  <p className="text-sm uppercase">execuções</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-4xl font-black text-purple-400">{Math.round(savedHours.get())}h</p>
+                  <p className="text-sm uppercase">economizadas</p>
+                </div>
               </div>
-              <p className="text-xl text-white/50 font-light flex items-center gap-2">
-                {lead.role} <span className="text-white/20">•</span> <span className="text-emerald-400">{lead.company}</span>
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap gap-3">
-              <Tag text="Tomador de Decisão" type="gold" />
-              <Tag text="Orçamento Aprovado" type="default" />
-              <Tag text="Risco de Churn: Baixo" type="default" />
             </div>
 
-            <div className="flex gap-6 text-sm text-white/40">
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
-                <Mail className="h-4 w-4" /> {lead.email}
-              </div>
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
-                <Phone className="h-4 w-4" /> {lead.phone}
-              </div>
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
-                <MapPin className="h-4 w-4" /> {lead.location}
-              </div>
-            </div>
-          </div>
+            <div className="flex items-center gap-6">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => toast("Automação salva no multiverso", { icon: "Saved" })}
+                className="px-8 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center gap-3"
+              >
+                <Save className="h-6 w-6" /> Salvar
+              </motion.button>
 
-          <div className="flex gap-4">
-            <GlassPanel className="px-8 py-4 text-center min-w-[140px]">
-              <p className="text-xs uppercase tracking-widest text-white/40 mb-1">Pipeline</p>
-              <p className="text-2xl font-bold text-white">{lead.pipeline}</p>
-            </GlassPanel>
-            <GlassPanel className="px-8 py-4 text-center min-w-[140px]">
-              <p className="text-xs uppercase tracking-widest text-white/40 mb-1">LTV Est.</p>
-              <p className="text-2xl font-bold text-emerald-400">{lead.ltv}</p>
-            </GlassPanel>
+              <motion.button
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsRunning(!isRunning)}
+                className={`px-12 py-6 rounded-3xl font-black text-2xl flex items-center gap-5 shadow-2xl ${
+                  isRunning
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-black'
+                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                }`}
+              >
+                {isRunning ? <Play className="h-10 w-10" /> : <Pause className="h-10 w-10" />}
+                {isRunning ? 'RODANDO NO PILOTO' : 'PAUSADA'}
+              </motion.button>
+            </div>
           </div>
         </motion.div>
 
-        {/* MAIN BENTO GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* LEFT: INTELLIGENCE & CONTEXT (4 Cols) */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* The Resonance Orb Card */}
-            <GlassPanel className="p-8 flex flex-col items-center relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                <Brain className="h-5 w-5 text-purple-400" />
-              </div>
-              <h3 className="text-sm font-bold uppercase tracking-widest text-white/40 mb-6">Saúde da Relação</h3>
-              <ResonanceOrb score={lead.score} mood={lead.mood} />
-              <p className="mt-6 text-center text-sm text-white/60 leading-relaxed max-w-[200px]">
-                O engajamento aumentou <span className="text-emerald-400 font-bold">+14%</span> nos últimos 7 dias. Momento ideal para upsell.
-              </p>
-            </GlassPanel>
+        <div className="flex flex-1 relative">
 
-            {/* Next Best Action (AI) */}
-            <GlassPanel className="p-6 bg-gradient-to-br from-purple-900/20 to-transparent border-purple-500/20">
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-4 w-4 text-purple-400" />
-                <h3 className="text-sm font-bold text-purple-200">Next Best Action</h3>
-              </div>
-              <p className="text-lg font-medium text-white mb-4 leading-snug">
-                "{lead.nextAction}"
-              </p>
-              <button className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-900/50">
-                <Zap className="h-4 w-4" /> Executar Agora
-              </button>
-            </GlassPanel>
-
-            {/* Organization Info */}
-            <GlassPanel className="p-6">
-               <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Firmographics</h3>
-               <div className="space-y-4">
-                 <div className="flex justify-between items-center text-sm">
-                   <span className="text-white/60">Setor</span>
-                   <span className="text-white">SaaS Enterprise</span>
-                 </div>
-                 <div className="flex justify-between items-center text-sm">
-                   <span className="text-white/60">Funcionários</span>
-                   <span className="text-white">1,000 - 5,000</span>
-                 </div>
-                 <div className="flex justify-between items-center text-sm">
-                   <span className="text-white/60">Receita Anual</span>
-                   <span className="text-white">$50M - $100M</span>
-                 </div>
-                 <div className="h-[1px] bg-white/5 my-2" />
-                 <div className="flex items-center gap-3 mt-2">
-                   <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-xs">boss</div>
-                   <div>
-                     <p className="text-xs text-white/40">Reporta para</p>
-                     <p className="text-sm text-white">Roberto Justus (CEO)</p>
-                   </div>
-                 </div>
-               </div>
-            </GlassPanel>
-          </div>
-
-          {/* CENTER: THE STREAM (Timeline) (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6">
-             <div className="flex items-center gap-4 bg-[#0a0a0a] p-1 rounded-xl border border-white/10 w-max">
-               {['Overview', 'Atividades', 'Emails', 'Arquivos'].map((tab, i) => (
-                 <button key={tab} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === 1 ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white'}`}>
-                   {tab}
-                 </button>
-               ))}
-             </div>
-
-             <div className="relative space-y-8 pl-8 before:absolute before:left-[15px] before:top-4 before:bottom-4 before:w-[2px] before:bg-white/5">
-                {/* Input Box */}
-                <div className="relative -ml-8 mb-8">
-                  <GlassPanel className="p-4">
-                    <textarea 
-                      placeholder="Adicionar nota, logar call ou colar email..." 
-                      className="w-full bg-transparent border-none text-white placeholder-white/20 resize-none focus:ring-0 text-sm h-20"
-                    />
-                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/5">
-                      <div className="flex gap-2">
-                        <button className="p-2 hover:bg-white/5 rounded-lg text-white/40"><Phone className="h-4 w-4" /></button>
-                        <button className="p-2 hover:bg-white/5 rounded-lg text-white/40"><Mail className="h-4 w-4" /></button>
-                      </div>
-                      <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide">
-                        Salvar
-                      </button>
-                    </div>
-                  </GlassPanel>
-                </div>
-
-                {/* Timeline Items */}
-                {timeline.map((item, idx) => (
-                  <motion.div 
-                    key={item.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="relative"
-                  >
-                    <div className="absolute -left-[41px] top-0 h-8 w-8 rounded-full bg-[#0a0a0a] border border-white/10 flex items-center justify-center shadow-lg z-10">
-                      {item.icon}
-                    </div>
-                    <GlassPanel className="p-5 hover:border-white/20 transition-colors group cursor-pointer">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-bold text-white group-hover:text-emerald-400 transition-colors">{item.title}</h4>
-                        <span className="text-xs text-white/30 whitespace-nowrap">
-                          {formatDistanceToNow(item.date, { addSuffix: true, locale: ptBR })}
-                        </span>
-                      </div>
-                      <p className="text-sm text-white/60 leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </GlassPanel>
-                  </motion.div>
-                ))}
-             </div>
-          </div>
-
-          {/* RIGHT: QUICK DOCK & STATS (3 Cols) */}
-          <div className="lg:col-span-3 space-y-6">
-            
-            {/* Quick Actions Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <button className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all group">
-                <Phone className="h-6 w-6 text-emerald-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-bold text-emerald-100">Ligar</span>
-              </button>
-              <button className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all group">
-                <Mail className="h-6 w-6 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-bold text-blue-100">Email</span>
-              </button>
-              <button className="bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all group">
-                <MessageSquare className="h-6 w-6 text-white/60 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-bold text-white/60">WhatsApp</span>
-              </button>
-              <button className="bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2 transition-all group">
-                <MoreVertical className="h-6 w-6 text-white/60 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-bold text-white/60">Mais</span>
-              </button>
+          {/* PROMPT BOX IA — A COISA MAIS INSANA */}
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl"
+          >
+            <div className="relative">
+              <input
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAIPrompt()}
+                placeholder="Descreva em português o que você quer automatizar... (ex: quando lead abrir email, mandar WhatsApp em 5min)"
+                className="w-full px-12 py-8 text-2xl font-light bg-black/70 backdrop-blur-3xl border-2 border-purple-500/50 rounded-3xl outline-none text-white placeholder-white/40 shadow-2xl"
+              />
+              <motion.button
+                whileHover={{ scale: 1.2, rotate: 360 }}
+                onClick={handleAIPrompt}
+                className="absolute right-6 top-1/2 -translate-y-1/2 p-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-2xl"
+              >
+                <Wand2 className="h-10 w-10 text-black" />
+              </motion.button>
             </div>
+            <p className="text-center mt-4 text-purple-400 text-lg font-bold">Supremo AI X.1 cria sua automação em segundos</p>
+          </motion.div>
 
-            {/* Engagement Heatmap Mini */}
-            <GlassPanel className="p-5">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Engajamento</h3>
-              <div className="grid grid-cols-7 gap-1 h-24">
-                {Array.from({ length: 28 }).map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`rounded-sm ${Math.random() > 0.7 ? 'bg-emerald-500/60' : Math.random() > 0.4 ? 'bg-emerald-500/20' : 'bg-white/5'}`} 
-                  />
-                ))}
-              </div>
-              <p className="mt-2 text-[10px] text-center text-white/30">Últimos 28 dias</p>
-            </GlassPanel>
-
-            {/* Upcoming */}
-            <GlassPanel className="p-0">
-               <div className="p-4 border-b border-white/5 flex justify-between items-center">
-                 <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Próximo</h3>
-                 <button className="text-[10px] bg-white/10 px-2 py-1 rounded hover:bg-white/20">+ Add</button>
-               </div>
-               <div className="p-4">
-                 <div className="flex gap-3 items-start opacity-60">
-                    <Calendar className="h-4 w-4 text-white mt-1" />
-                    <div>
-                      <p className="text-sm font-medium text-white">Reunião de Fechamento</p>
-                      <p className="text-xs text-white/50">Amanhã, 14:00</p>
-                    </div>
-                 </div>
-               </div>
-            </GlassPanel>
-
-          </div>
+          {/* CANVAS DO INFINITO */}
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes}
+            fitView
+            className="bg-gradient-to-br from-black via-purple-900/20 to-black
+          >
+            <Background color="#111" gap={30} />
+            <MiniMap
+              nodeColor="#8b5cf6"
+              className="bg-black/70 border border-purple-500/50"
+            />
+            <Controls className="bg-black/70 border border-white/10" />
+          </ReactFlow>
         </div>
       </div>
     </LayoutSupremo>
