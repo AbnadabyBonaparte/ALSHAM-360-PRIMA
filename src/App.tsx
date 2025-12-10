@@ -1683,10 +1683,10 @@ function App() {
               <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)] lg:gap-12">
                 <div className="flex flex-col gap-8">
                   <div className="space-y-4">
-                    <span className="inline-flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/60 px-4 py-2 text-[11px] uppercase tracking-[0.5em] text-[var(--accent-sky)]">
+                    <span className="inline-flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/60 px-4 py-2 text-[0.6875rem] sm:text-xs uppercase tracking-[0.5em] text-[var(--accent-sky)]">
                       <span className="h-1.5 w-6 rounded-full bg-[var(--accent-emerald)]/70" /> You are in control
                     </span>
-                    <h1 className="text-4xl font-light leading-tight text-[var(--text-primary)] sm:text-[46px]">
+                    <h1 className="text-3xl sm:text-4xl md:text-[2.875rem] font-light leading-tight text-[var(--text-primary)]">
                       Dashboard Executivo 360° — Obsessão em Resultados Visíveis.
                     </h1>
                     <p className="max-w-2xl text-base leading-relaxed text-[var(--text-secondary)] sm:text-lg">
@@ -1735,7 +1735,7 @@ function App() {
                         <p className="text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Momento aha</p>
                         <p className="mt-2 text-lg font-medium text-[var(--text-primary)]">Onboarding concierge completado</p>
                       </div>
-                      <span className="rounded-full border border-[var(--accent-emerald)]/40 px-3 py-1 text-[11px] font-medium text-[var(--accent-emerald)]">92%</span>
+                      <span className="rounded-full border border-[var(--accent-emerald)]/40 px-3 py-1 text-[0.6875rem] sm:text-xs font-medium text-[var(--accent-emerald)]">92%</span>
                     </div>
                     <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                       <span className="font-medium text-[var(--accent-emerald)]">Momento Aha em 3m42s</span> • NPS mensal 76 • Taxa de adoção de IA 94%.
@@ -1831,7 +1831,7 @@ function App() {
                           viewport={{ once: true, amount: 0.35 }}
                         >
                           <header className="space-y-3">
-                            <p className="text-[11px] uppercase tracking-[0.45em] text-[var(--accent-sky)]">Analytics & Performance</p>
+                            <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.45em] text-[var(--accent-sky)]">Analytics & Performance</p>
                             <h3 className="text-xl font-semibold text-[var(--text-primary)]">Indicadores executivos em tempo real</h3>
                             <p className="text-sm text-[var(--text-secondary)]">
                               Visualize os pontos críticos do pipeline, evolução das conversões e composição de receita em um painel único.
@@ -1842,7 +1842,7 @@ function App() {
                             <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
                               <div className="flex items-center justify-between">
                                 <h4 className="text-sm font-semibold text-[var(--text-primary)]">Pipeline por estágio</h4>
-                                <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">volume</span>
+                                <span className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.28em] text-[var(--text-secondary)]">volume</span>
                               </div>
                               <div className="mt-5 h-56 sm:h-60 md:h-72" role="img" aria-label="Gráfico de Pipeline por Estágio">
                                 <Bar data={pipelineBarData} options={pipelineBarOptions} />
@@ -1852,7 +1852,7 @@ function App() {
                             <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
                               <div className="flex items-center justify-between">
                                 <h4 className="text-sm font-semibold text-[var(--text-primary)]">Funil de conversão</h4>
-                                <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">taxa %</span>
+                                <span className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.28em] text-[var(--text-secondary)]">taxa %</span>
                               </div>
                               <div className="mt-5 h-56 sm:h-60 md:h-72" role="img" aria-label="Gráfico de Funil de Conversão">
                                 <Line data={conversionLineData} options={conversionLineOptions} />
@@ -1862,7 +1862,7 @@ function App() {
                             <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6 lg:col-span-2">
                               <div className="flex flex-wrap items-center justify-between gap-3">
                                 <h4 className="text-sm font-semibold text-[var(--text-primary)]">Divisão de receita por mercado</h4>
-                                <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">{timeframe}</span>
+                                <span className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.28em] text-[var(--text-secondary)]">{timeframe}</span>
                               </div>
                               <div className="mt-5 flex flex-col gap-6 lg:flex-row">
                                 <div className="mx-auto h-52 w-52 sm:h-56 sm:w-56" role="img" aria-label="Gráfico de Participação por Mercado">
@@ -1896,7 +1896,7 @@ function App() {
                           <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                               <h4 className="text-sm font-semibold text-[var(--text-primary)]">Heatmap de energia por squad</h4>
-                              <span className="text-[11px] uppercase tracking-[0.28em] text-[var(--text-secondary)]">score 0-100</span>
+                              <span className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.28em] text-[var(--text-secondary)]">score 0-100</span>
                             </div>
                             {heatmapMeta.days.length === 0 || heatmapMeta.squads.length === 0 ? (
                               <p className="mt-6 text-sm text-[var(--text-secondary)]">Sem registros de atividade para o período selecionado.</p>
@@ -1953,7 +1953,7 @@ function App() {
                         >
                           <header className="flex flex-wrap items-center justify-between gap-4">
                             <div className="space-y-2">
-                              <p className="text-[11px] uppercase tracking-[0.45em] text-[var(--accent-sky)]">IA Next-Best-Action</p>
+                              <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.45em] text-[var(--accent-sky)]">IA Next-Best-Action</p>
                               <h3 className="text-xl font-semibold text-[var(--text-primary)]">Planos de ação sugeridos pela inteligência preditiva</h3>
                             </div>
                             <button
@@ -1974,11 +1974,11 @@ function App() {
                                 <div className="absolute inset-0 opacity-[0.32]" style={{ background: "var(--gradient-wash)" }} />
                                 <div className="relative flex flex-wrap items-start justify-between gap-4">
                                   <div className="max-w-2xl space-y-2">
-                                    <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-emerald)]">Confiança {insight.confidence}</p>
+                                    <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.42em] text-[var(--accent-emerald)]">Confiança {insight.confidence}</p>
                                     <h4 className="text-lg font-medium text-[var(--text-primary)]">{insight.title}</h4>
                                     <p className="text-sm text-[var(--text-secondary)]">{insight.impact}</p>
                                   </div>
-                                  <span className="rounded-full border border-[var(--border)]/75 bg-[var(--surface)]/75 px-4 py-1.5 text-[11px] font-medium tracking-[0.28em] text-[var(--accent-sky)]">
+                                  <span className="rounded-full border border-[var(--border)]/75 bg-[var(--surface)]/75 px-4 py-1.5 text-[0.6875rem] sm:text-xs font-medium tracking-[0.28em] text-[var(--accent-sky)]">
                                     Score IA • {insight.score}
                                   </span>
                                 </div>
@@ -2064,7 +2064,7 @@ function App() {
                         >
                           <header className="flex flex-wrap items-center justify-between gap-4">
                             <div className="space-y-2">
-                              <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Engajamento vivo</p>
+                              <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.42em] text-[var(--accent-sky)]">Engajamento vivo</p>
                               <h3 className="text-xl font-semibold text-[var(--text-primary)]">Ritmo operacional, comunidade e experiência</h3>
                             </div>
                             <button
@@ -2096,7 +2096,7 @@ function App() {
 
                             <div className="grid gap-5">
                               <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
-                                <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Leaderboard</p>
+                                <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.42em] text-[var(--accent-sky)]">Leaderboard</p>
                                 <div className="mt-5 space-y-3">
                                   {engagement.leaderboard.map((entry) => (
                                     <div key={entry.rank} className="flex items-center gap-3 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3 transition hover:border-[var(--accent-emerald)]/40">
@@ -2118,7 +2118,7 @@ function App() {
                               </div>
 
                               <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
-                                <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-fuchsia)]">Missões & tarefas</p>
+                                <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.42em] text-[var(--accent-fuchsia)]">Missões & tarefas</p>
                                 <div className="mt-5 space-y-3">
                                   {engagement.tasks.map((task) => (
                                     <div key={task.id} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 p-4">
@@ -2154,7 +2154,7 @@ function App() {
                           viewport={{ once: true, amount: 0.4 }}
                         >
                           <div className="space-y-2">
-                            <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Comunidade & SLA</p>
+                            <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.42em] text-[var(--accent-sky)]">Comunidade & SLA</p>
                             <h3 className="text-xl font-semibold text-[var(--text-primary)]">Inteligência coletiva + excelência operacional</h3>
                           </div>
                           <div className="space-y-4">
@@ -2178,7 +2178,7 @@ function App() {
                           </div>
 
                           <div className="rounded-[28px] border border-[var(--border-strong)] bg-[var(--surface-strong)]/70 p-6">
-                            <p className="text-[11px] uppercase tracking-[0.42em] text-[var(--accent-sky)]">Status SLA Premium</p>
+                            <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.42em] text-[var(--accent-sky)]">Status SLA Premium</p>
                             <div className="mt-5 grid gap-3">
                               {engagement.sla.map((record) => (
                                 <div key={record.metric} className="flex items-center justify-between rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3">
@@ -2257,7 +2257,7 @@ function App() {
                       A∞
                     </div>
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
+                      <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
                       <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
                     </div>
                   </div>
@@ -2312,7 +2312,7 @@ function App() {
                   </div>
 
                   <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
-                    <p className="text-[11px] uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
+                    <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
                     <div className="space-y-3 text-sm">
                       <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Moeda</p>
@@ -2496,7 +2496,7 @@ function App() {
                   className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] py-3 pl-12 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-[var(--accent-emerald)] focus:outline-none focus:ring-0"
                   placeholder="Pesquisar qualquer interação, deal, automação ou insight"
                 />
-                <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-2 py-1 text-[11px] uppercase tracking-[0.2em] text-[var(--text-secondary)]">
+                <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-2 py-1 text-[0.6875rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)]">
                   <Command className="h-3.5 w-3.5" /> K
                 </span>
               </div>
@@ -2722,7 +2722,7 @@ function CampaignSpotlight({
       <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-3">
-            <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.32em] ${badgePalette[activeCampaign.badgeTone]}`}>
+            <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[0.6875rem] sm:text-xs font-medium uppercase tracking-[0.32em] ${badgePalette[activeCampaign.badgeTone]}`}>
               {activeCampaign.badge}
             </span>
             <span className="rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/80 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[var(--text-secondary)]">
@@ -2746,7 +2746,7 @@ function CampaignSpotlight({
                 key={metric.label}
                 className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/75 px-4 py-3"
               >
-                <p className="text-[11px] uppercase tracking-[0.32em] text-[var(--text-secondary)]">
+                <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.32em] text-[var(--text-secondary)]">
                   {metric.label}
                 </p>
                 <p className="mt-2 text-xl font-semibold text-[var(--text-primary)]">

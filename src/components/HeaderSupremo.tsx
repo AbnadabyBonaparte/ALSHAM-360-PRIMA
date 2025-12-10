@@ -102,16 +102,16 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="absolute right-0 top-full z-50 mt-2 w-72 origin-top-right rounded-3xl border border-[var(--border-strong)] bg-[var(--surface)]/98 p-3 shadow-2xl backdrop-blur-2xl"
+            className="absolute right-0 top-full z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] sm:w-72 origin-top-right rounded-3xl border border-[var(--border-strong)] bg-[var(--surface)]/98 p-3 shadow-2xl backdrop-blur-2xl"
             style={{
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 30px color-mix(in srgb, var(--color-primary-from) 15%, transparent)',
             }}
           >
             <div className="mb-2 px-2">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--color-primary-from)]">
+              <p className="text-[0.625rem] sm:text-xs font-bold uppercase tracking-[0.3em] text-[var(--color-primary-from)]">
                 Temas Neon
               </p>
-              <p className="text-[10px] text-[var(--text-secondary)]">
+              <p className="text-[0.625rem] sm:text-xs text-[var(--text-secondary)]">
                 Escolha sua vibe cósmica
               </p>
             </div>
@@ -176,7 +176,7 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
                           {theme.name}
                         </span>
                       </div>
-                      <p className="mt-0.5 text-[10px] text-[var(--text-secondary)]">
+                      <p className="mt-0.5 text-[0.625rem] sm:text-xs text-[var(--text-secondary)]">
                         {theme.description}
                       </p>
                     </div>
@@ -198,7 +198,7 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
             {/* Footer */}
             <div className="mt-3 flex items-center gap-2 rounded-xl bg-[var(--surface-strong)]/50 px-3 py-2">
               <Sparkles className="h-3 w-3 text-[var(--color-primary-from)]" />
-              <span className="text-[10px] text-[var(--text-secondary)]">
+              <span className="text-[0.625rem] sm:text-xs text-[var(--text-secondary)]">
                 Tema atual: <strong className="text-[var(--color-primary-from)]">{currentThemeData.name}</strong>
               </span>
             </div>
@@ -243,7 +243,7 @@ function ControlGroup({ currency, onCurrencyChange, timeframe, onTimeframeChange
           <motion.button
             key={c.value}
             onClick={() => onCurrencyChange(c.value)}
-            className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
+            className={`rounded-lg px-2 py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-wider transition-all ${
               currency === c.value
                 ? 'text-[var(--text-primary)]'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -268,7 +268,7 @@ function ControlGroup({ currency, onCurrencyChange, timeframe, onTimeframeChange
           <motion.button
             key={t.value}
             onClick={() => onTimeframeChange(t.value)}
-            className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
+            className={`rounded-lg px-2 py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-wider transition-all ${
               timeframe === t.value
                 ? 'text-[var(--text-primary)]'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -297,7 +297,7 @@ function NotificationButton() {
 
   return (
     <motion.button
-      className="relative grid h-11 w-11 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-secondary)] transition-colors hover:text-[var(--color-primary-from)] hover:border-[var(--color-primary-from)]/30"
+      className="relative grid h-9 w-9 sm:h-11 sm:w-11 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-secondary)] transition-colors hover:text-[var(--color-primary-from)] hover:border-[var(--color-primary-from)]/30"
       whileHover={{
         scale: 1.05,
         boxShadow: '0 0 20px color-mix(in srgb, var(--color-primary-from) 20%, transparent)',
@@ -347,8 +347,8 @@ function UserProfile({ name, role, initials }: UserProfileProps) {
         <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-[var(--accent-emerald)] ring-2 ring-[var(--surface)]" />
       </div>
       <div className="hidden text-left lg:block">
-        <p className="text-sm font-semibold text-[var(--text-primary)]">{name}</p>
-        <p className="text-[10px] font-medium text-[var(--color-primary-from)]">{role}</p>
+        <p className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">{name}</p>
+        <p className="text-[0.625rem] sm:text-xs font-medium text-[var(--color-primary-from)]">{role}</p>
       </div>
       <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
     </motion.button>
@@ -393,7 +393,7 @@ function SearchBar() {
         }}
       >
         <Command className="h-3 w-3 text-[var(--text-secondary)]" />
-        <span className="text-[10px] font-bold tracking-wider text-[var(--text-secondary)]">K</span>
+        <span className="text-[0.625rem] sm:text-xs font-bold tracking-wider text-[var(--text-secondary)]">K</span>
       </motion.span>
     </motion.div>
   );

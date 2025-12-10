@@ -89,7 +89,7 @@ const TimeTravelDial = ({ mode, onChange }: { mode: string, onChange: (m: 'past'
         onClick={() => onChange(m.id as any)}
         aria-checked={mode === m.id}
         role="radio"
-        className={`relative rounded-full px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-medium uppercase tracking-wider transition-all ${mode === m.id ? 'text-[var(--text-on-accent)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+        className={`relative rounded-full px-3 sm:px-4 py-1.5 text-[0.625rem] sm:text-xs font-medium uppercase tracking-wider transition-all ${mode === m.id ? 'text-[var(--text-on-accent)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
       >
         {mode === m.id && (
           <motion.div layoutId="dial-pill" className={`absolute inset-0 rounded-full ${m.color}`} />
@@ -137,7 +137,7 @@ const OracleWidget = ({ kpis, mode }: { kpis: any[], mode: string }) => {
           </div>
           <div className="flex-1 space-y-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[var(--accent-purple)]">
+              <h3 className="text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest text-[var(--accent-purple)]">
                 Oracle Insight • {insight.confidence}
               </h3>
               <span className="flex h-2 w-2 flex-shrink-0 rounded-full bg-[var(--accent-purple)] shadow-[0_0_10px_currentColor]" />
@@ -347,7 +347,7 @@ export default function DashboardSupremo() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
               The Oracle Deck
             </h1>
-            <span className={`rounded-full border px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest ${timeMode === 'future' ? 'border-[var(--accent-purple)]/30 bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]' : 'border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]'}`}>
+            <span className={`rounded-full border px-2 sm:px-3 py-0.5 sm:py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest ${timeMode === 'future' ? 'border-[var(--accent-purple)]/30 bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]' : 'border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]'}`}>
               {timeMode === 'future' ? 'PREDICTIVE AI' : 'LIVE DATA'}
             </span>
           </div>
@@ -365,7 +365,7 @@ export default function DashboardSupremo() {
             aria-label="Comando de voz"
           >
             <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="absolute -bottom-8 w-max opacity-0 transition-opacity group-hover:opacity-100 text-[10px] bg-[var(--surface-strong)] text-[var(--text-primary)] px-2 py-1 rounded border border-[var(--border)] shadow-lg pointer-events-none hidden sm:block">Comando de Voz</span>
+            <span className="absolute -bottom-8 w-max opacity-0 transition-opacity group-hover:opacity-100 text-[0.625rem] sm:text-xs bg-[var(--surface-strong)] text-[var(--text-primary)] px-2 py-1 rounded border border-[var(--border)] shadow-lg pointer-events-none hidden sm:block">Comando de Voz</span>
           </button>
           <TimeTravelDial mode={timeMode} onChange={setTimeMode} />
         </div>
@@ -384,13 +384,13 @@ export default function DashboardSupremo() {
               <div className="rounded-lg sm:rounded-xl bg-[var(--surface-strong)]/50 p-2 sm:p-3 text-[var(--text-primary)]">
                 <kpi.icon className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-bold ${kpi.trend >= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-alert)]'}`}>
+              <div className={`flex items-center gap-0.5 sm:gap-1 text-[0.625rem] sm:text-xs font-bold ${kpi.trend >= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-alert)]'}`}>
                 {kpi.trend >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                 {Math.abs(kpi.trend)}%
               </div>
             </div>
             <div className="mt-3 sm:mt-4">
-              <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">{kpi.title}</p>
+              <p className="text-[0.625rem] sm:text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">{kpi.title}</p>
               <h3 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
                 {loading ? <span className="animate-pulse bg-[var(--surface-strong)] text-transparent rounded inline-block w-24">00000</span> : <NumberTicker value={kpi.val} prefix={kpi.prefix} />}
               </h3>
