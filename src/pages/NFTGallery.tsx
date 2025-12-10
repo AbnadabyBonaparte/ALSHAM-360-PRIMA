@@ -1,261 +1,274 @@
 // src/pages/NFTGallery.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — NFT Gallery Alienígena 1000/1000
-// Arte digital que vale ouro. Cada NFT é uma obra-prima única e eterna.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// ALSHAM ETERNAL VAULT — O cofre onde o dinheiro vira arte eterna
+// Tabela real: nft_gallery (já existe no seu banco)
 
-import LayoutSupremo from '@/components/LayoutSupremo';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  SparklesIcon,
-  CurrencyDollarIcon,
-  PhotoIcon,
-  HeartIcon,
-  ShoppingCartIcon,
-  ArrowTrendingUpIcon,
-  CubeIcon,
-  FireIcon
-} from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
+  Diamond, Crown, Flame, Zap, Eye, Heart,
+  Search, Filter, Plus, ExternalLink, X,
+  Wallet, Shield, Sparkles, Trophy
+} from 'lucide-react';
+import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface NFT {
   id: string;
-  nome: string;
-  colecao: string;
-  preco: number;
-  moeda: 'ETH' | 'SOL' | 'MATIC';
-  status: 'disponivel' | 'vendido' | 'leilao';
+  name: string;
+  collection: string;
+  price_eth: number;
+  image_url: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary' | 'divine';
   likes: number;
   views: number;
-  rarity: 'comum' | 'raro' | 'epico' | 'lendario';
+  owner: string;
+  minted_at: string;
+  contract_address: string;
 }
 
-interface NFTMetrics {
-  totalNFTs: number;
-  valorTotal: number;
-  vendidos: number;
-  volumeNegociado: number;
-  nfts: NFT[];
-}
+const RARITY = {
+  common: { color: 'from-gray-400 to-gray-600', glow: 'shadow-gray-500/30', badge: 'text-gray-300' },
+  rare: { color: 'from-blue-400 to-cyan-500', glow: 'shadow-cyan-500/40', badge: 'text-cyan-300' },
+  epic: { color: 'from-purple-500 to-pink-600', glow: 'shadow-purple-500/50', badge: 'text-purple-300' },
+  legendary: { color: 'from-amber-400 to-yellow-600', glow: 'shadow-amber-500/60', badge: 'text-amber-300' },
+  divine: { color: 'from-yellow-400 via-orange-500 to-red-600', glow: 'shadow-red-600/80', badge: 'text-red-400' }
+};
 
-export default function NFTGalleryPage() {
-  const [metrics, setMetrics] = useState<NFTMetrics | null>(null);
+export default function EternalVault() {
+  const [nfts, setNfts] = useState<NFT[]>([]);
+  const [selected, setSelected] = useState<NFT | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 100% REAL — pega direto da tabela nft_gallery
   useEffect(() => {
-    async function loadSupremeNFTs() {
-      try {
-        const { data: nfts } = await supabase
-          .from('nft_gallery')
-          .select('*')
-          .order('preco', { ascending: false });
+    const loadVault = async () => {
+      const { data, error } = await supabase
+        .from('nft_gallery')
+        .select('*')
+        .order('price_eth', { ascending: false });
 
-        const { data: stats } = await supabase
-          .from('nft_stats')
-          .select('*')
-          .order('data', { ascending: false })
-          .limit(1)
-          .single();
-
-        setMetrics({
-          totalNFTs: nfts?.length || 50,
-          valorTotal: stats?.valor_total || 125.5,
-          vendidos: stats?.vendidos || 35,
-          volumeNegociado: stats?.volume || 89.2,
-          nfts: (nfts || []).map(n => ({
-            id: n.id,
-            nome: n.nome || 'NFT #' + n.id,
-            colecao: n.colecao || 'Coleção Principal',
-            preco: n.preco || 0.1,
-            moeda: n.moeda || 'ETH',
-            status: n.status || 'disponivel',
-            likes: n.likes || 0,
-            views: n.views || 0,
-            rarity: n.rarity || 'comum'
-          }))
-        });
-      } catch (err) {
-        console.error('Erro na NFT Gallery Suprema:', err);
-        setMetrics({
-          totalNFTs: 50,
-          valorTotal: 125.5,
-          vendidos: 35,
-          volumeNegociado: 89.2,
-          nfts: []
-        });
-      } finally {
-        setLoading(false);
+      if (error) {
+        toast.error('Erro ao abrir o cofre eterno');
+        return;
       }
-    }
 
-    loadSupremeNFTs();
+      if (data) {
+        setNfts(data.map(n => ({
+          ...n,
+          rarity: n.rarity || 'epic',
+          likes: n.likes || 0,
+          views: n.views || 0
+        })));
+      }
+      setLoading(false);
+    };
+
+    loadVault();
+
+    // Realtime — novo NFT mintado aparece instantaneamente
+    const channel = supabase.channel('eternal-vault')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'nft_gallery' }, () => {
+        loadVault();
+        toast('Um novo artefato foi forjado no éter', { icon: 'Sparkles' });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
-  if (loading) {
-    return (
-      <LayoutSupremo title="NFT Gallery">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-40 h-40 border-8 border-t-transparent border-amber-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-amber-400 font-light">Carregando NFTs...</p>
-        </div>
-      </LayoutSupremo>
-    );
-  }
+  const totalValue = nfts.reduce((a, n) => a + (n.price_eth || 0), 0);
 
-  const rarityConfig: Record<string, { bg: string; border: string; text: string; label: string }> = {
-    comum: { bg: 'from-gray-800 to-gray-700', border: 'border-gray-500', text: 'text-gray-400', label: 'Comum' },
-    raro: { bg: 'from-blue-900 to-blue-800', border: 'border-blue-500', text: 'text-blue-400', label: 'Raro' },
-    epico: { bg: 'from-purple-900 to-purple-800', border: 'border-purple-500', text: 'text-purple-400', label: 'Épico' },
-    lendario: { bg: 'from-amber-900 to-yellow-800', border: 'border-yellow-500', text: 'text-yellow-400', label: 'Lendário' }
-  };
+  if (loading) return (
+    <LayoutSupremo>
+      <div className="h-screen flex flex-col items-center justify-center bg-black">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="w-32 h-32 border-8 border-t-transparent border-gradient-to-r from-amber-500 via-purple-500 to-cyan-500 rounded-full" />
+        <p className="text-4xl text-amber-400 mt-12 font-black">ABRINDO O COFRE ETERNO...</p>
+      </div>
+    </LayoutSupremo>
+  );
 
   return (
-    <LayoutSupremo title="NFT Gallery">
-      <div className="min-h-screen bg-black text-white p-8">
-        {/* HEADER ÉPICO */}
+    <LayoutSupremo title="ETERNAL VAULT — Propriedade Imortal">
+      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+
+        {/* AURA CÓSMICA */}
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-black to-amber-900/20" />
         <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <div className="flex justify-center gap-4 mb-4">
-            {['🎨', '💎', '🚀'].map((emoji, i) => (
-              <motion.span
-                key={i}
-                animate={{ y: [0, -10, 0] }}
-                transition={{ delay: i * 0.2, duration: 1, repeat: Infinity }}
-                className="text-6xl"
-              >
-                {emoji}
-              </motion.span>
-            ))}
+          animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
+          transition={{ duration: 60, repeat: Infinity }}
+          className="fixed inset-0 opacity-20"
+          style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, #7c3aed 0%, transparent 50%), radial-gradient(circle at 80% 20%, #f59e0b 0%, transparent 50%)' }}
+        />
+
+        {/* HEADER DO COFRE */}
+        <motion.div className="relative z-10 text-center py-20">
+          <motion.h1
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className="text-10xl font-black bg-gradient-to-r from-amber-300 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
+          >
+            ETERNAL VAULT
+          </motion.h1>
+          <div className="flex justify-center gap-32 mt-20">
+            <div>
+              <p className="text-9xl font-black text-amber-400">{totalValue.toFixed(2)} ETH</p>
+              <p className="text-4xl text-amber-300">Valor Total do Cofre</p>
+            </div>
+            <div>
+              <p className="text-9xl font-black text-purple-400">{nfts.length}</p>
+              <p className="text-4xl text-purple-300">Artefatos Imortais</p>
+            </div>
           </div>
-          <h1 className="text-8xl font-black bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-            NFT GALLERY
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Arte digital que vale ouro
-          </p>
         </motion.div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 max-w-5xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-amber-900/60 to-orange-900/60 rounded-2xl p-6 border border-amber-500/30">
-            <PhotoIcon className="w-12 h-12 text-amber-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalNFTs}</p>
-            <p className="text-gray-400">Total NFTs</p>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <CubeIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.valorTotal} ETH</p>
-            <p className="text-gray-400">Valor Total</p>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <ShoppingCartIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.vendidos}</p>
-            <p className="text-gray-400">Vendidos</p>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
-            <ArrowTrendingUpIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.volumeNegociado} ETH</p>
-            <p className="text-gray-400">Volume</p>
-          </motion.div>
-        </div>
-
-        {/* GALERIA DE NFTS */}
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-            Coleção Suprema
-          </h2>
-
-          {metrics?.nfts.length === 0 ? (
-            <div className="text-center py-20">
-              <PhotoIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhum NFT na coleção</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {metrics?.nfts.map((nft, i) => {
-                const config = rarityConfig[nft.rarity];
+        {/* GRID DOS ARTEFATOS */}
+        <div className="relative z-10 px-20 pb-40">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-12">
+            <AnimatePresence>
+              {nfts.map((nft, i) => {
+                const config = RARITY[nft.rarity];
                 return (
                   <motion.div
                     key={nft.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
+                    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ delay: i * 0.05 }}
-                    whileHover={{ y: -10, scale: 1.02 }}
-                    className={`bg-gradient-to-br ${config.bg} rounded-3xl overflow-hidden border-2 ${config.border} shadow-lg cursor-pointer`}
+                    whileHover={{ scale: 1.08, y: -20, zIndex: 50 }}
+                    onClick={() => setSelected(nft)}
+                    className="relative group cursor-pointer"
                   >
-                    {/* IMAGEM NFT (placeholder) */}
-                    <div className="aspect-square bg-gradient-to-br from-black/50 to-black/30 flex items-center justify-center relative">
-                      <CubeIcon className="w-24 h-24 text-white/30" />
-                      {nft.rarity === 'lendario' && (
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 border-4 border-yellow-500/30 rounded-t-3xl"
-                        />
-                      )}
-                      {nft.status === 'vendido' && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                          <span className="text-2xl font-bold text-white bg-red-500 px-4 py-2 rounded-full">VENDIDO</span>
-                        </div>
-                      )}
-                      {nft.status === 'leilao' && (
-                        <div className="absolute top-3 right-3 bg-red-500 px-3 py-1 rounded-full flex items-center gap-1">
-                          <FireIcon className="w-4 h-4 text-white" />
-                          <span className="text-white text-sm font-bold">Leilão</span>
-                        </div>
-                      )}
-                      <div className={`absolute top-3 left-3 px-3 py-1 rounded-full ${config.bg} border ${config.border}`}>
-                        <span className={`text-sm font-bold ${config.text}`}>{config.label}</span>
-                      </div>
-                    </div>
+                    {/* AURA DIVINA */}
+                    <motion.div
+                      animate={{ opacity: [0.3, 0.7, 0.3] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      className={`absolute -inset-8 rounded-3xl blur-3xl bg-gradient-to-br ${config.color} ${config.glow}`}
+                    />
 
-                    <div className="p-4">
-                      <p className="text-gray-500 text-sm">{nft.colecao}</p>
-                      <h3 className="text-lg font-bold text-white mb-3">{nft.nome}</h3>
+                    <div className={`relative bg-black/60 backdrop-blur-3xl rounded-3xl border-4 ${config.border} p-8 overflow-hidden`}>
+                      {nft.rarity === 'divine' && <Crown className="absolute top-4 right-4 h-12 w-12 text-yellow-400" />}
+                      {nft.rarity === 'legendary' && <Trophy className="absolute top-4 right-4 h-10 w-10 text-amber-400" />}
 
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-2xl font-black text-white">{nft.preco} {nft.moeda}</p>
-                        </div>
-                        <div className="flex items-center gap-3 text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <HeartIcon className="w-4 h-4" />
-                            <span className="text-sm">{nft.likes}</span>
+                      <div className="aspect-square rounded-2xl bg-gradient-to-br from-white/5 to-black/50 mb-6 overflow-hidden border border-white/10">
+                        {nft.image_url ? (
+                          <img src={nft.image_url} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="flex items-center justify-center">
+                            <Diamond className={`h-32 w-32 ${config.badge}`} />
                           </div>
+                        )}
+                      </div>
+
+                      <h3 className="text-2xl font-black text-white mb-2">{nft.name}</h3>
+                      <p className="text-lg text-white/60 mb-4">{nft.collection}</p>
+
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-4xl font-black text-white">{nft.price_eth} ETH</p>
                         </div>
+                        <div className="text-right">
+                          <p className="text-sm text-white/40 flex items-center gap-1"><Heart className="h-4 w-4" /> {nft.likes}</p>
+                          <p className="text-sm text-white/40 flex items-center gap-1"><Eye className="h-4 w-4" /> {nft.views}</p>
+                        </div>
+                      </div>
+
+                      <div className={`mt-6 px-6 py-3 rounded-2xl bg-black/50 border ${config.border} text-center`}>
+                        <p className={`text-xl font-black ${config.badge}`}>{nft.rarity.toUpperCase()}</p>
                       </div>
                     </div>
                   </motion.div>
                 );
               })}
-            </div>
-          )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-amber-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-amber-300 max-w-4xl mx-auto">
-            "NFTs não são apenas arte. São propriedade digital com valor eterno."
+        {/* MODAL HOLOGRÁFICO 3D */}
+        <AnimatePresence>
+          {selected && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-10">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelected(null)}
+                className="absolute inset-0 bg-black/95 backdrop-blur-3xl"
+              />
+
+              <motion.div
+                initial={{ scale: 0.8, rotateY: -180 }}
+                animate={{ scale: 1, rotateY: 0 }}
+                exit={{ scale: 0.8, rotateY: 180 }}
+                className="relative z-10 max-w-6xl w-full bg-gradient-to-br from-purple-900/40 via-black to-amber-900/40 rounded-3xl overflow-hidden border-4 border-white/20 shadow-2xl"
+              >
+                <button
+                  onClick={() => setSelected(null)}
+                  className="absolute top-8 right-8 z-20 p-4 rounded-full bg-white/10 hover:bg-white/20"
+                >
+                  <X className="h-10 w-10" />
+                </button>
+
+                <div className="grid lg:grid-cols-2">
+                  <div className="p-20 flex items-center justify-center bg-gradient-to-br from-black to-purple-950/50">
+                    <motion.div
+                      animate={{ rotateY: 360 }}
+                      transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                      className="relative"
+                    >
+                      {selected.image_url ? (
+                        <img src={selected.image_url} className="max-w-md rounded-2xl shadow-2xl" />
+                      ) : (
+                        <Diamond className="h-96 w-96 text-amber-400" />
+                      )}
+                      <motion.div
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 40, repeat: Infinity }}
+                        className="absolute -inset-20 blur-3xl bg-gradient-to-r from-purple-600/40 to-amber-600/40"
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div className="p-20 space-y-12">
+                    <div>
+                      <h2 className="text-7xl font-black text-white mb-4">{selected.name}</h2>
+                      <p className="text-4xl text-white/70">{selected.collection}</p>
+                    </div>
+
+                    <div className="text-8xl font-black text-amber-400">
+                      {selected.price_eth} ETH
+                    </div>
+
+                    <div className="space-y-6 text-2xl">
+                      <p>Proprietário: <span className="text-purple-300">{selected.owner}</span></p>
+                      <p>Mintado em: <span className="text-cyan-300">{new Date(selected.minted_at).toLocaleDateString('pt-BR')}</span></p>
+                      <p className="font-black text-4xl" style={{ color: RARITY[selected.rarity].badge }}>
+                        {selected.rarity.toUpperCase()}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-8">
+                      <button className="px-12 py-8 rounded-3xl bg-gradient-to-r from-purple-600 to-pink-600 text-3xl font-black shadow-2xl">
+                        Transferir
+                      </button>
+                      <button className="px-12 py-8 rounded-3xl bg-gradient-to-r from-amber-600 to-yellow-600 text-black text-3xl font-black shadow-2xl">
+                        Exibir no Metaverso
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* MENSAGEM FINAL */}
+        <motion.div className="fixed inset-x-0 bottom-20 text-center">
+          <p className="text-8xl font-black bg-gradient-to-r from-amber-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            ESTES ARTEFATOS SÃO ETERNOS
           </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Curador de Arte Digital
-          </p>
+          <p className="text-5xl text-white/60 mt-8">E pertencem apenas a você.</p>
         </motion.div>
       </div>
     </LayoutSupremo>
