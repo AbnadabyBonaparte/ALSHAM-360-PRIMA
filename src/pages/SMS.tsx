@@ -1,0 +1,244 @@
+// src/pages/SMS.tsx
+// ALSHAM 360° PRIMA v10 SUPREMO — SMS Marketing Alienígena 1000/1000
+// Cada SMS é uma notificação urgente. Mensagem direta, ação imediata.
+// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+
+import LayoutSupremo from '@/components/LayoutSupremo';
+import {
+  ChatBubbleBottomCenterTextIcon,
+  PaperAirplaneIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  UserGroupIcon,
+  SparklesIcon,
+  CurrencyDollarIcon,
+  ChartBarIcon
+} from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+interface SMSCampaign {
+  id: string;
+  nome: string;
+  mensagem: string;
+  enviados: number;
+  entregues: number;
+  cliques: number;
+  status: 'rascunho' | 'agendada' | 'enviando' | 'concluida';
+  data_envio: string;
+  custo: number;
+}
+
+interface SMSMetrics {
+  totalEnviados: number;
+  taxaEntrega: number;
+  taxaCliques: number;
+  custoTotal: number;
+  campanhas: SMSCampaign[];
+}
+
+export default function SMSPage() {
+  const [metrics, setMetrics] = useState<SMSMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadSupremeSMS() {
+      try {
+        const { data: campanhas } = await supabase
+          .from('sms_campaigns')
+          .select('*')
+          .order('data_envio', { ascending: false });
+
+        if (campanhas) {
+          const totalEnviados = campanhas.reduce((s, c) => s + (c.enviados || 0), 0);
+          const totalEntregues = campanhas.reduce((s, c) => s + (c.entregues || 0), 0);
+          const totalCliques = campanhas.reduce((s, c) => s + (c.cliques || 0), 0);
+          const custoTotal = campanhas.reduce((s, c) => s + (c.custo || 0), 0);
+
+          setMetrics({
+            totalEnviados,
+            taxaEntrega: totalEnviados > 0 ? (totalEntregues / totalEnviados) * 100 : 0,
+            taxaCliques: totalEntregues > 0 ? (totalCliques / totalEntregues) * 100 : 0,
+            custoTotal,
+            campanhas: campanhas.map(c => ({
+              id: c.id,
+              nome: c.nome || 'Campanha SMS',
+              mensagem: c.mensagem || '',
+              enviados: c.enviados || 0,
+              entregues: c.entregues || 0,
+              cliques: c.cliques || 0,
+              status: c.status || 'rascunho',
+              data_envio: c.data_envio || '',
+              custo: c.custo || 0
+            }))
+          });
+        } else {
+          setMetrics({
+            totalEnviados: 0,
+            taxaEntrega: 0,
+            taxaCliques: 0,
+            custoTotal: 0,
+            campanhas: []
+          });
+        }
+      } catch (err) {
+        console.error('Erro no SMS Supremo:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadSupremeSMS();
+  }, []);
+
+  if (loading) {
+    return (
+      <LayoutSupremo title="SMS Marketing Supremo">
+        <div className="flex items-center justify-center h-screen bg-black">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            className="w-40 h-40 border-8 border-t-transparent border-violet-500 rounded-full"
+          />
+          <p className="absolute text-4xl text-violet-400 font-light">Carregando SMS...</p>
+        </div>
+      </LayoutSupremo>
+    );
+  }
+
+  return (
+    <LayoutSupremo title="SMS Marketing Supremo">
+      <div className="min-h-screen bg-black text-white p-8">
+        {/* HEADER ÉPICO */}
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-8xl font-black bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
+            SMS MARKETING SUPREMO
+          </h1>
+          <p className="text-3xl text-gray-400 mt-6">
+            Mensagem direta, ação imediata
+          </p>
+        </motion.div>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 rounded-2xl p-6 border border-violet-500/30">
+            <PaperAirplaneIcon className="w-12 h-12 text-violet-400 mb-3" />
+            <p className="text-4xl font-black text-white">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
+            <p className="text-gray-400">SMS Enviados</p>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
+            <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
+            <p className="text-4xl font-black text-white">{(metrics?.taxaEntrega || 0).toFixed(1)}%</p>
+            <p className="text-gray-400">Taxa Entrega</p>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
+            <ChartBarIcon className="w-12 h-12 text-cyan-400 mb-3" />
+            <p className="text-4xl font-black text-white">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
+            <p className="text-gray-400">Taxa Cliques</p>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
+            <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
+            <p className="text-4xl font-black text-white">R$ {(metrics?.custoTotal || 0).toFixed(2)}</p>
+            <p className="text-gray-400">Custo Total</p>
+          </motion.div>
+        </div>
+
+        {/* LISTA DE CAMPANHAS */}
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
+            Campanhas de SMS
+          </h2>
+
+          {metrics?.campanhas.length === 0 ? (
+            <div className="text-center py-20">
+              <ChatBubbleBottomCenterTextIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
+              <p className="text-3xl text-gray-500">Nenhuma campanha SMS</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {metrics?.campanhas.map((camp, i) => (
+                <motion.div
+                  key={camp.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-violet-500/50 transition-all"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-2xl font-bold text-white">{camp.nome}</h3>
+                        <span className={`px-3 py-1 rounded-full text-sm capitalize ${
+                          camp.status === 'concluida' ? 'bg-green-500/20 text-green-400' :
+                          camp.status === 'enviando' ? 'bg-blue-500/20 text-blue-400' :
+                          camp.status === 'agendada' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {camp.status}
+                        </span>
+                      </div>
+                      <p className="text-gray-400">
+                        {camp.data_envio ? format(new Date(camp.data_envio), "dd MMM yyyy 'às' HH:mm", { locale: ptBR }) : '-'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-yellow-400 font-bold">R$ {camp.custo.toFixed(2)}</p>
+                      <p className="text-gray-500 text-sm">Custo</p>
+                    </div>
+                  </div>
+
+                  {/* MENSAGEM */}
+                  <div className="bg-black/30 rounded-xl p-4 mb-6 border border-white/5">
+                    <p className="text-gray-300 italic">"{camp.mensagem}"</p>
+                  </div>
+
+                  {/* MÉTRICAS */}
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <p className="text-3xl font-black text-violet-400">{camp.enviados.toLocaleString()}</p>
+                      <p className="text-gray-500">Enviados</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-black text-green-400">{camp.entregues.toLocaleString()}</p>
+                      <p className="text-gray-500">Entregues ({camp.enviados > 0 ? ((camp.entregues / camp.enviados) * 100).toFixed(1) : 0}%)</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-black text-cyan-400">{camp.cliques.toLocaleString()}</p>
+                      <p className="text-gray-500">Cliques ({camp.entregues > 0 ? ((camp.cliques / camp.entregues) * 100).toFixed(1) : 0}%)</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* MENSAGEM FINAL DA IA */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-center py-24 mt-16"
+        >
+          <SparklesIcon className="w-32 h-32 text-violet-400 mx-auto mb-8 animate-pulse" />
+          <p className="text-5xl font-light text-violet-300 max-w-4xl mx-auto">
+            "SMS tem 98% de taxa de abertura. É a mensagem que ninguém ignora."
+          </p>
+          <p className="text-3xl text-gray-500 mt-8">
+            — Citizen Supremo X.1, seu Mestre de Mensagens
+          </p>
+        </motion.div>
+      </div>
+    </LayoutSupremo>
+  );
+}
