@@ -38,97 +38,14 @@ import {
 } from 'lucide-react';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📊 ESTRUTURA DA SIDEBAR POR CATEGORIA
+// 📊 ESTRUTURA DA SIDEBAR - IMPORTADA DE CONFIG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export interface SidebarLink {
-  id: string;
-  label: string;
-  icon?: React.ReactNode;
-}
-
-export interface SidebarCategory {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  accentColor: string;
-  links: SidebarLink[];
-}
-
-// Categorias EXATAMENTE como solicitado
-export const sidebarCategories: SidebarCategory[] = [
-  {
-    id: 'crm-core',
-    label: 'CRM Core',
-    icon: <Target className="h-5 w-5" />,
-    accentColor: 'var(--accent-emerald)',
-    links: [
-      { id: 'dashboard-principal', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
-      { id: 'leads-lista', label: 'Leads', icon: <Users className="h-4 w-4" /> },
-      { id: 'contatos-lista', label: 'Contatos', icon: <UserCircle className="h-4 w-4" /> },
-      { id: 'oportunidades-lista', label: 'Oportunidades', icon: <Target className="h-4 w-4" /> },
-      { id: 'pipeline-de-vendas', label: 'Pipeline', icon: <GitBranch className="h-4 w-4" /> },
-    ],
-  },
-  {
-    id: 'vendas-financeiro',
-    label: 'Vendas & Financeiro',
-    icon: <Wallet className="h-5 w-5" />,
-    accentColor: 'var(--accent-sky)',
-    links: [
-      { id: 'cotacoes', label: 'Cotações', icon: <FileText className="h-4 w-4" /> },
-      { id: 'contratos-lista', label: 'Contratos', icon: <FileSignature className="h-4 w-4" /> },
-      { id: 'faturas-lista', label: 'Faturas', icon: <Receipt className="h-4 w-4" /> },
-      { id: 'financeiro', label: 'Financeiro', icon: <Wallet className="h-4 w-4" /> },
-    ],
-  },
-  {
-    id: 'comunicacao',
-    label: 'Comunicação',
-    icon: <MessageCircle className="h-5 w-5" />,
-    accentColor: 'var(--accent-fuchsia)',
-    links: [
-      { id: 'inbox', label: 'Inbox', icon: <Inbox className="h-4 w-4" /> },
-      { id: 'whatsapp-chat', label: 'WhatsApp', icon: <MessageCircle className="h-4 w-4" /> },
-      { id: 'email-marketing-dashboard', label: 'E-mail Marketing', icon: <Mail className="h-4 w-4" /> },
-      { id: 'sms-marketing', label: 'SMS', icon: <MessageSquare className="h-4 w-4" /> },
-    ],
-  },
-  {
-    id: 'inteligencia',
-    label: 'Inteligência',
-    icon: <Brain className="h-5 w-5" />,
-    accentColor: 'var(--color-primary-from)',
-    links: [
-      { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4 w-4" /> },
-      { id: 'relatorios-dashboard', label: 'Relatórios', icon: <PieChart className="h-4 w-4" /> },
-      { id: 'ai-assistant', label: 'AI Assistant', icon: <Brain className="h-4 w-4" /> },
-    ],
-  },
-  {
-    id: 'operacoes',
-    label: 'Operações',
-    icon: <Zap className="h-5 w-5" />,
-    accentColor: 'var(--accent-amber)',
-    links: [
-      { id: 'atividades-tarefas', label: 'Tarefas', icon: <CheckSquare className="h-4 w-4" /> },
-      { id: 'calendario', label: 'Calendário', icon: <Calendar className="h-4 w-4" /> },
-      { id: 'automacoes', label: 'Automações', icon: <Zap className="h-4 w-4" /> },
-      { id: 'gamificacao', label: 'Gamificação', icon: <Trophy className="h-4 w-4" /> },
-    ],
-  },
-  {
-    id: 'sistema',
-    label: 'Sistema',
-    icon: <Settings className="h-5 w-5" />,
-    accentColor: 'var(--text-secondary)',
-    links: [
-      { id: 'configuracoes', label: 'Configurações', icon: <Settings className="h-4 w-4" /> },
-      { id: 'seguranca', label: 'Segurança', icon: <Shield className="h-4 w-4" /> },
-      { id: 'publicacao', label: 'Publicação', icon: <Globe className="h-4 w-4" /> },
-    ],
-  },
-];
+import {
+  SIDEBAR_STRUCTURE,
+  type SidebarCategory,
+  type SidebarLink,
+} from '@/config/sidebarStructure';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 PROPS DO COMPONENTE
@@ -147,6 +64,7 @@ interface SidebarSupremoProps {
 
 export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: SidebarSupremoProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
+  const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
   const [isHovered, setIsHovered] = useState(false);
 
   const toggleCategory = useCallback((categoryId: string) => {
@@ -157,9 +75,17 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
     );
   }, []);
 
+  const toggleLink = useCallback((linkId: string) => {
+    setExpandedLinks((prev) =>
+      prev.includes(linkId)
+        ? prev.filter((id) => id !== linkId)
+        : [...prev, linkId]
+    );
+  }, []);
+
   // Auto-expand categoria da página ativa
   useEffect(() => {
-    const activeCategory = sidebarCategories.find((cat) =>
+    const activeCategory = SIDEBAR_STRUCTURE.find((cat) =>
       cat.links.some((link) => link.id === activePage)
     );
     if (activeCategory && !expandedCategories.includes(activeCategory.id)) {
@@ -168,6 +94,108 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
   }, [activePage]);
 
   const showLabels = !isCollapsed || isHovered;
+
+  // Função recursiva para renderizar links (suporta hierarquia)
+  const renderLink = useCallback(
+    (link: SidebarLink, category: SidebarCategory, depth: number = 0, index: number = 0) => {
+      const isActive = activePage === link.id;
+      const hasChildren = link.children && link.children.length > 0;
+      const isLinkExpanded = expandedLinks.includes(link.id);
+      const paddingLeft = depth * 12; // 12px por nível de profundidade
+
+      return (
+        <motion.li
+          key={link.id}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.05 }}
+        >
+          <motion.button
+            onClick={() => {
+              if (hasChildren) {
+                toggleLink(link.id);
+              } else {
+                onNavigate(link.id);
+              }
+            }}
+            className={`group/link flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
+              isActive
+                ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)] shadow-md'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]/60'
+            }`}
+            style={{
+              paddingLeft: `${12 + paddingLeft}px`,
+              boxShadow: isActive
+                ? `0 4px 20px color-mix(in srgb, ${category.accentColor} 25%, transparent)`
+                : 'none',
+            }}
+            whileHover={{ x: 4, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {link.icon && (
+              <span className={`transition-all duration-200 ${isActive ? 'scale-110' : 'group-hover/link:scale-110'}`}>
+                {link.icon}
+              </span>
+            )}
+            <span className="text-sm font-medium flex-1">{link.label}</span>
+
+            {/* Badge de status */}
+            {link.status === 'placeholder' && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-amber)]/20 text-[var(--accent-amber)] font-medium">
+                Dev
+              </span>
+            )}
+            {link.badge && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-fuchsia)]/20 text-[var(--accent-fuchsia)] font-medium">
+                {link.badge}
+              </span>
+            )}
+
+            {/* Indicador de children */}
+            {hasChildren && (
+              <motion.span
+                animate={{ rotate: isLinkExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="h-3 w-3" />
+              </motion.span>
+            )}
+
+            {/* Indicador ativo */}
+            {isActive && !hasChildren && (
+              <motion.span
+                className="h-2 w-2 rounded-full bg-[var(--color-primary-from)]"
+                layoutId={`activeIndicator-${category.id}`}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                style={{
+                  boxShadow: `0 0 10px ${category.accentColor}`,
+                }}
+              />
+            )}
+          </motion.button>
+
+          {/* Renderizar children recursivamente */}
+          {hasChildren && isLinkExpanded && (
+            <AnimatePresence>
+              <motion.ul
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-1 overflow-hidden"
+              >
+                {link.children!.map((childLink, childIndex) =>
+                  renderLink(childLink, category, depth + 1, childIndex)
+                )}
+              </motion.ul>
+            </AnimatePresence>
+          )}
+        </motion.li>
+      );
+    },
+    [activePage, expandedLinks, toggleLink, onNavigate]
+  );
 
   return (
     <aside
@@ -210,7 +238,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
         <div className="space-y-2">
-          {sidebarCategories.map((category) => {
+          {SIDEBAR_STRUCTURE.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveLink = category.links.some((link) => link.id === activePage);
 
@@ -272,50 +300,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
                       className="ml-3 space-y-1 overflow-hidden border-l-2 border-[var(--border)]/50 pl-3"
                     >
-                      {category.links.map((link, index) => {
-                        const isActive = activePage === link.id;
-
-                        return (
-                          <motion.li
-                            key={link.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                          >
-                            <motion.button
-                              onClick={() => onNavigate(link.id)}
-                              className={`group/link flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
-                                isActive
-                                  ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)] shadow-md'
-                                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]/60'
-                              }`}
-                              whileHover={{ x: 4, scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              style={{
-                                boxShadow: isActive
-                                  ? `0 4px 20px color-mix(in srgb, ${category.accentColor} 25%, transparent)`
-                                  : 'none',
-                              }}
-                            >
-                              <span className={`transition-all duration-200 ${isActive ? 'scale-110' : 'group-hover/link:scale-110'}`}>
-                                {link.icon}
-                              </span>
-                              <span className="text-sm font-medium">{link.label}</span>
-                              {isActive && (
-                                <motion.span
-                                  className="ml-auto h-2 w-2 rounded-full bg-[var(--color-primary-from)]"
-                                  layoutId="activeIndicator"
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  style={{
-                                    boxShadow: `0 0 10px ${category.accentColor}`,
-                                  }}
-                                />
-                              )}
-                            </motion.button>
-                          </motion.li>
-                        );
-                      })}
+                      {category.links.map((link, index) => renderLink(link, category, 0, index))}
                     </motion.ul>
                   )}
                 </AnimatePresence>
@@ -369,12 +354,21 @@ interface SidebarMobileProps extends SidebarSupremoProps {
 
 export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: SidebarMobileProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
+  const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
 
   const toggleCategory = useCallback((categoryId: string) => {
     setExpandedCategories((prev) =>
       prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId]
+    );
+  }, []);
+
+  const toggleLink = useCallback((linkId: string) => {
+    setExpandedLinks((prev) =>
+      prev.includes(linkId)
+        ? prev.filter((id) => id !== linkId)
+        : [...prev, linkId]
     );
   }, []);
 
@@ -394,6 +388,89 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
     onNavigate(pageId);
     onClose();
   };
+
+  // Função recursiva para renderizar links no mobile
+  const renderLinkMobile = useCallback(
+    (link: SidebarLink, category: SidebarCategory, depth: number = 0) => {
+      const isActive = activePage === link.id;
+      const hasChildren = link.children && link.children.length > 0;
+      const isLinkExpanded = expandedLinks.includes(link.id);
+      const paddingLeft = depth * 16;
+
+      return (
+        <div key={link.id}>
+          <motion.button
+            onClick={() => {
+              if (hasChildren) {
+                toggleLink(link.id);
+              } else {
+                handleNavigate(link.id);
+              }
+            }}
+            className={`flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left transition-all ${
+              isActive
+                ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--surface)]/80 hover:text-[var(--text-primary)]'
+            }`}
+            style={{ paddingLeft: `${16 + paddingLeft}px` }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {link.icon && (
+              <span className={isActive ? 'text-[var(--color-primary-from)]' : ''}>
+                {link.icon}
+              </span>
+            )}
+            <span className="font-medium flex-1">{link.label}</span>
+
+            {/* Badge de status */}
+            {link.status === 'placeholder' && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-amber)]/20 text-[var(--accent-amber)] font-medium">
+                Dev
+              </span>
+            )}
+            {link.badge && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-fuchsia)]/20 text-[var(--accent-fuchsia)] font-medium">
+                {link.badge}
+              </span>
+            )}
+
+            {/* Indicador de children */}
+            {hasChildren && (
+              <motion.span
+                animate={{ rotate: isLinkExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="h-3 w-3" />
+              </motion.span>
+            )}
+
+            {/* Indicador ativo */}
+            {isActive && !hasChildren && (
+              <span className="h-2 w-2 rounded-full bg-[var(--color-primary-from)] shadow-[0_0_10px_var(--color-primary-from)]" />
+            )}
+          </motion.button>
+
+          {/* Children */}
+          {hasChildren && isLinkExpanded && (
+            <AnimatePresence>
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-1 overflow-hidden"
+              >
+                {link.children!.map((childLink) =>
+                  renderLinkMobile(childLink, category, depth + 1)
+                )}
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
+      );
+    },
+    [activePage, expandedLinks, toggleLink, handleNavigate]
+  );
 
   return (
     <AnimatePresence>
@@ -444,7 +521,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto px-4 py-4">
               <div className="space-y-3">
-                {sidebarCategories.map((category) => {
+                {SIDEBAR_STRUCTURE.map((category) => {
                   const isExpanded = expandedCategories.includes(category.id);
                   const hasActiveLink = category.links.some((link) => link.id === activePage);
 
@@ -493,30 +570,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                             className="border-t border-[var(--border)]/30 px-3 py-2"
                           >
                             <div className="space-y-1">
-                              {category.links.map((link) => {
-                                const isActive = activePage === link.id;
-
-                                return (
-                                  <motion.button
-                                    key={link.id}
-                                    onClick={() => handleNavigate(link.id)}
-                                    className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-all ${
-                                      isActive
-                                        ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)]'
-                                        : 'text-[var(--text-secondary)] hover:bg-[var(--surface)]/80 hover:text-[var(--text-primary)]'
-                                    }`}
-                                    whileTap={{ scale: 0.98 }}
-                                  >
-                                    <span className={isActive ? 'text-[var(--color-primary-from)]' : ''}>
-                                      {link.icon}
-                                    </span>
-                                    <span className="font-medium">{link.label}</span>
-                                    {isActive && (
-                                      <span className="ml-auto h-2 w-2 rounded-full bg-[var(--color-primary-from)] shadow-[0_0_10px_var(--color-primary-from)]" />
-                                    )}
-                                  </motion.button>
-                                );
-                              })}
+                              {category.links.map((link) => renderLinkMobile(link, category, 0))}
                             </div>
                           </motion.div>
                         )}
