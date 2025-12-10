@@ -68,19 +68,25 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
   const [isHovered, setIsHovered] = useState(false);
 
   const toggleCategory = useCallback((categoryId: string) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryId)
+    console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
+    setExpandedCategories((prev) => {
+      const newState = prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
+        : [...prev, categoryId];
+      console.log(`[Sidebar] Expanded categories:`, newState); // Debug log
+      return newState;
+    });
   }, []);
 
   const toggleLink = useCallback((linkId: string) => {
-    setExpandedLinks((prev) =>
-      prev.includes(linkId)
+    console.log(`[Sidebar] Toggling link: ${linkId}`); // Debug log
+    setExpandedLinks((prev) => {
+      const newState = prev.includes(linkId)
         ? prev.filter((id) => id !== linkId)
-        : [...prev, linkId]
-    );
+        : [...prev, linkId];
+      console.log(`[Sidebar] Expanded links:`, newState); // Debug log
+      return newState;
+    });
   }, []);
 
   // Auto-expand categoria da página ativa
@@ -291,19 +297,21 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                 </motion.button>
 
                 {/* Category Links */}
-                <AnimatePresence>
-                  {isExpanded && showLabels && (
-                    <motion.ul
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: 'easeInOut' }}
-                      className="ml-3 space-y-1 overflow-hidden border-l-2 border-[var(--border)]/50 pl-3"
-                    >
-                      {category.links.map((link, index) => renderLink(link, category, 0, index))}
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
+                {showLabels && (
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.ul
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="ml-3 space-y-1 overflow-hidden border-l-2 border-[var(--border)]/50 pl-3"
+                      >
+                        {category.links.map((link, index) => renderLink(link, category, 0, index))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                )}
               </div>
             );
           })}
@@ -357,19 +365,25 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
   const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
 
   const toggleCategory = useCallback((categoryId: string) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryId)
+    console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
+    setExpandedCategories((prev) => {
+      const newState = prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
+        : [...prev, categoryId];
+      console.log(`[Sidebar] Expanded categories:`, newState); // Debug log
+      return newState;
+    });
   }, []);
 
   const toggleLink = useCallback((linkId: string) => {
-    setExpandedLinks((prev) =>
-      prev.includes(linkId)
+    console.log(`[Sidebar] Toggling link: ${linkId}`); // Debug log
+    setExpandedLinks((prev) => {
+      const newState = prev.includes(linkId)
         ? prev.filter((id) => id !== linkId)
-        : [...prev, linkId]
-    );
+        : [...prev, linkId];
+      console.log(`[Sidebar] Expanded links:`, newState); // Debug log
+      return newState;
+    });
   }, []);
 
   // Prevent body scroll when drawer is open
