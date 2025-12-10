@@ -51,7 +51,8 @@ export default function AnalyticsPage() {
         const leadsInPeriod = leadsThisPeriod?.filter(l => new Date(l.created_at) >= since).length || 0;
         const activeDeals = opportunities?.filter(o => !o.closed_date).length || 0;
         const wonDeals = closedWon?.length || 0;
-        const totalRevenue = closedWon?.reduce((sum, o) => sum + (o.value || 0), 0) || 0;
+        const totalRevenue =
+          closedWon?.reduce((sum, o) => sum + (o.value || 0), 0) || 0;
         const revenueThisPeriod = opportunities
           ?.filter(o => o.stage === 'Ganho' && new Date(o.closed_date || '') >= since)
           .reduce((sum, o) => sum + o.value, 0) || 0;
