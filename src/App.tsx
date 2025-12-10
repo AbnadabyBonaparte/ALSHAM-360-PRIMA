@@ -335,7 +335,7 @@ const sidebarGroups = [
 ];
 
 // Registre todas as rotas de uma vez (com placeholders para pendentes)
-registerRoute("dashboard-principal", async () => ({ default: Dashboard }));
+registerRoute("dashboard-principal", async () => ({ default: DashboardSupremo }));
 registerRoute("leads-lista", async () => ({ default: Leads }));
 registerRoute("leads-detalhes", async () => ({ default: LeadsDetails }));
 registerRoute("leads-importacao", async () => ({ default: () => <PlaceholderPage title="Leads - Importação" /> }));

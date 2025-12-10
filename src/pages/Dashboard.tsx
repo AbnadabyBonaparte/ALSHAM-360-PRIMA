@@ -4,19 +4,12 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Dashboard.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  Target, 
-  Activity, 
+import {
+  TrendingUp,
+  DollarSign,
   Zap,
   Sparkles,
-  Flame,
-  Rocket,
-  Crown,
-  Brain,
-  Globe
+  Brain
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
