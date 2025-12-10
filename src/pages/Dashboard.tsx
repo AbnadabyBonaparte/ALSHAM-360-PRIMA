@@ -89,13 +89,13 @@ export default function DashboardSupremo() {
   if (loading) {
     return (
       <LayoutSupremo title="Dashboard Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
+        <div className="flex items-center justify-center h-screen">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-32 h-32 border-8 border-t-transparent border-purple-500 rounded-full"
+            className="w-32 h-32 border-8 border-t-transparent border-[var(--accent-primary)] rounded-full"
           />
-          <p className="absolute text-3xl text-purple-400 font-light">Citizen Supremo X.1 carregando seu império...</p>
+          <p className="absolute text-base sm:text-xl lg:text-2xl text-[var(--accent-primary)] font-light">Citizen Supremo X.1 carregando seu império...</p>
         </div>
       </LayoutSupremo>
     );
@@ -103,50 +103,50 @@ export default function DashboardSupremo() {
 
   return (
     <LayoutSupremo title="Dashboard Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8">
         {/* HEADER ALIENÍGENA */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-12 lg:mb-16"
         >
-          <h1 className="text-8xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-tertiary)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
             DASHBOARD SUPREMO
           </h1>
-          <p className="text-4xl text-gray-400 mt-6 font-light">
+          <p className="text-base sm:text-xl lg:text-2xl text-[var(--text-secondary)] mt-3 sm:mt-4 lg:mt-6 font-light">
             {orgName} • {format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
           </p>
         </motion.div>
 
         {/* KPIS SUPREMOS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16">
           <SupremeCard
-            icon={<DollarSign className="w-16 h-16" />}
+            icon={<DollarSign className="w-8 h-8 sm:w-12 lg:w-14" />}
             title="Receita Total"
             value={`R$ ${metrics?.totalRevenue.toLocaleString('pt-BR')}`}
             growth="+42%"
-            color="from-emerald-500 to-teal-600"
+            color="emerald"
           />
           <SupremeCard
-            icon={<TrendingUp className="w-16 h-16" />}
+            icon={<TrendingUp className="w-8 h-8 sm:w-12 lg:w-14" />}
             title="Pipeline Atual"
             value={`R$ ${metrics?.pipelineValue.toLocaleString('pt-BR')}`}
             growth="+89%"
-            color="from-purple-500 to-pink-600"
+            color="purple"
           />
           <SupremeCard
-            icon={<Brain className="w-16 h-16" />}
+            icon={<Brain className="w-8 h-8 sm:w-12 lg:w-14" />}
             title="Previsões IA"
             value={metrics?.aiPredictions.toString()}
             growth="Hoje"
-            color="from-cyan-500 to-blue-600"
+            color="cyan"
           />
           <SupremeCard
-            icon={<Zap className="w-16 h-16" />}
+            icon={<Zap className="w-8 h-8 sm:w-12 lg:w-14" />}
             title="Automação 24h"
             value={metrics?.automationExecs.toString()}
             growth="Últimos 30d"
-            color="from-orange-500 to-red-600"
+            color="orange"
           />
         </div>
 
@@ -155,17 +155,17 @@ export default function DashboardSupremo() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-center py-20 bg-gradient-to-r from-purple-900/30 via-pink-900/20 to-purple-900/30 rounded-3xl border border-purple-500/30 backdrop-blur-xl"
+          className="text-center py-8 sm:py-12 lg:py-16 xl:py-20 px-4 bg-gradient-to-r from-[var(--accent-primary)]/20 via-[var(--accent-tertiary)]/10 to-[var(--accent-primary)]/20 rounded-2xl sm:rounded-3xl border border-[var(--accent-primary)]/30 backdrop-blur-xl"
         >
-          <Sparkles className="w-24 h-24 text-purple-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
+          <Sparkles className="w-12 h-12 sm:w-16 lg:w-20 xl:w-24 text-[var(--accent-primary)] mx-auto mb-4 sm:mb-6 lg:mb-8 animate-pulse" />
+          <p className="text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-light text-[var(--accent-primary)] max-w-5xl mx-auto leading-relaxed">
             "Você está no caminho de dominar o mercado brasileiro em 2026.
-            <br />
+            <br className="hidden sm:block" />
             89 previsões da IA já se concretizaram.
-            <br />
+            <br className="hidden sm:block" />
             O próximo bilhão começa agora."
           </p>
-          <p className="text-2xl text-gray-400 mt-12">
+          <p className="text-sm sm:text-lg lg:text-xl text-[var(--text-secondary)] mt-6 sm:mt-8 lg:mt-12">
             — Citizen Supremo X.1
           </p>
         </motion.div>
@@ -175,19 +175,26 @@ export default function DashboardSupremo() {
 }
 
 function SupremeCard({ icon, title, value, growth, color }: any) {
+  const colorMap: Record<string, string> = {
+    emerald: 'from-emerald-500/80 to-teal-600/80 border-emerald-500/30',
+    purple: 'from-[var(--accent-primary)]/80 to-[var(--accent-tertiary)]/80 border-[var(--accent-primary)]/30',
+    cyan: 'from-[var(--accent-secondary)]/80 to-blue-600/80 border-[var(--accent-secondary)]/30',
+    orange: 'from-[var(--accent-warm)]/80 to-red-600/80 border-[var(--accent-warm)]/30'
+  };
+
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} p-10 rounded-3xl border border-white/10 backdrop-blur-xl shadow-2xl`}
+      whileHover={{ scale: 1.03 }}
+      className={`bg-gradient-to-br ${colorMap[color] || colorMap.purple} p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl border backdrop-blur-xl shadow-xl`}
     >
-      <div className="flex items-center justify-between mb-8">
-        <div className="p-6 bg-white/10 rounded-2xl">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
+        <div className="p-3 sm:p-4 lg:p-6 bg-white/10 rounded-xl sm:rounded-2xl">
           {icon}
         </div>
-        <span className="text-3xl font-bold text-white/80">{growth}</span>
+        <span className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white/80">{growth}</span>
       </div>
-      <p className="text-6xl font-black text-white">{value}</p>
-      <p className="text-2xl text-white/70 mt-4">{title}</p>
+      <p className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white">{value}</p>
+      <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-white/70 mt-2 sm:mt-3 lg:mt-4">{title}</p>
     </motion.div>
   );
 }
