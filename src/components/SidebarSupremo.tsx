@@ -172,7 +172,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
   return (
     <aside
       className={`hidden lg:flex flex-col min-h-screen border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-2xl transition-all duration-500 ease-out ${
-        isCollapsed && !isHovered ? 'w-20' : 'w-72 xl:w-80'
+        isCollapsed && !isHovered ? 'w-16 lg:w-20' : 'w-64 md:w-72 lg:w-80 xl:w-[22rem]'
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -198,8 +198,8 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <p className="text-[10px] uppercase tracking-[0.4em] text-[var(--color-primary-from)] font-semibold">ALSHAM</p>
-              <p className="text-base font-bold bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)] bg-clip-text text-transparent">
+              <p className="text-[0.625rem] sm:text-xs uppercase tracking-[0.4em] text-[var(--color-primary-from)] font-semibold">ALSHAM</p>
+              <p className="text-sm sm:text-base font-bold bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)] bg-clip-text text-transparent">
                 360° PRIMA
               </p>
             </motion.div>
@@ -410,7 +410,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
 
           {/* Drawer */}
           <motion.div
-            className="fixed left-0 top-0 z-50 flex h-full w-[85vw] max-w-[360px] flex-col bg-[var(--surface)]/98 backdrop-blur-2xl shadow-2xl lg:hidden"
+            className="fixed left-0 top-0 z-50 flex h-full w-[85vw] sm:w-[75vw] md:w-[60vw] max-w-[min(400px,90vw)] flex-col bg-[var(--surface)]/98 backdrop-blur-2xl shadow-2xl lg:hidden"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
@@ -427,8 +427,8 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                   A∞
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.35em] text-[var(--color-primary-from)] font-semibold">ALSHAM</p>
-                  <p className="text-sm font-bold text-[var(--text-primary)]">360° PRIMA</p>
+                  <p className="text-[0.625rem] sm:text-xs uppercase tracking-[0.35em] text-[var(--color-primary-from)] font-semibold">ALSHAM</p>
+                  <p className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">360° PRIMA</p>
                 </div>
               </div>
               <motion.button
@@ -559,9 +559,9 @@ export function MobileNavButton({ isOpen, onClick }: MobileNavButtonProps) {
   return (
     <motion.button
       onClick={onClick}
-      className="fixed right-4 z-40 flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-primary-from)]/30 bg-[var(--surface)]/95 text-[var(--color-primary-from)] shadow-xl backdrop-blur-xl lg:hidden"
+      className="fixed right-3 sm:right-4 z-40 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl border border-[var(--color-primary-from)]/30 bg-[var(--surface)]/95 text-[var(--color-primary-from)] shadow-xl backdrop-blur-xl lg:hidden"
       style={{
-        bottom: 'calc(env(safe-area-inset-bottom) + 1rem)',
+        bottom: 'clamp(0.75rem, calc(env(safe-area-inset-bottom) + 1rem), 2rem)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px color-mix(in srgb, var(--color-primary-from) 30%, transparent)',
       }}
       whileHover={{ scale: 1.05 }}

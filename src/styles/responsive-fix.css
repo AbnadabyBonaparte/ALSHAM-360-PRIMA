@@ -52,9 +52,9 @@
     font-size: 1.5rem !important;
   }
   
-  /* FORÇA botões para largura total */
-  .inline-flex button,
-  .flex button {
+  /* FORÇA botões em containers flex específicos para largura total */
+  .button-group-mobile > button,
+  .mobile-actions > button {
     width: 100% !important;
     justify-content: center !important;
   }
@@ -106,17 +106,13 @@
     margin: 0 !important;
   }
   
-  /* FORÇA action buttons em coluna */
-  .flex.gap-2,
-  .flex.gap-3,
-  .flex.gap-4 {
+  /* FORÇA action buttons em coluna apenas em containers específicos */
+  .mobile-stack.flex {
     flex-direction: column !important;
     width: 100% !important;
   }
-  
-  .flex.gap-2 > *,
-  .flex.gap-3 > *,
-  .flex.gap-4 > * {
+
+  .mobile-stack > * {
     width: 100% !important;
   }
 }

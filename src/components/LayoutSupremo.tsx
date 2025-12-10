@@ -306,7 +306,7 @@ export default function LayoutSupremo({
       }}
     >
       {/* Layout Grid */}
-      <div className="min-h-screen lg:grid lg:grid-cols-[auto_1fr]">
+      <div className="min-h-screen md:grid md:grid-cols-1 lg:grid-cols-[auto_1fr]">
         {/* Desktop Sidebar */}
         <SidebarDesktop
           activePage={activePage}
@@ -361,7 +361,7 @@ export default function LayoutSupremo({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h1 className="text-xl font-bold sm:text-2xl">
+                <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">
                   <span className="bg-gradient-to-r from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] bg-clip-text text-transparent animate-gradient-x">
                     {title}
                   </span>
