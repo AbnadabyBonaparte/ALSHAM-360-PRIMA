@@ -10,7 +10,7 @@ import {
 import {
   TrendingUp, TrendingDown, Target, Rocket, Zap, Brain, Clock,
   ArrowRight, MoreHorizontal, Activity, Calendar, Mic, Sparkles,
-  Lock, Unlock, Command
+  Lock, Unlock, Command, Users
 } from "lucide-react";
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
@@ -80,23 +80,23 @@ const NumberTicker = ({ value, prefix = "" }: { value: number | string, prefix?:
 const TimeTravelDial = ({ mode, onChange }: { mode: string, onChange: (m: 'past' | 'present' | 'future') => void }) => (
   <div className="flex items-center gap-1 rounded-full border border-[var(--border)]/50 bg-[var(--surface-strong)]/50 p-1 backdrop-blur-md" role="radiogroup" aria-label="Seletor Temporal">
     {[
-      { id: 'past', label: 'Retro', icon: Clock, color: 'from-amber-500 to-orange-500' },
+      { id: 'past', label: 'Retro', icon: Clock, color: 'bg-[var(--accent-warning)]' },
       { id: 'present', label: 'Agora', icon: Activity, color: 'bg-[var(--accent-emerald)]' },
-      { id: 'future', label: 'Predição', icon: Sparkles, color: 'from-purple-500 to-indigo-500' }
+      { id: 'future', label: 'Predição', icon: Sparkles, color: 'bg-[var(--accent-purple)]' }
     ].map((m) => (
       <button
         key={m.id}
         onClick={() => onChange(m.id as any)}
         aria-checked={mode === m.id}
         role="radio"
-        className={`relative rounded-full px-4 py-1.5 text-xs font-medium uppercase tracking-wider transition-all ${mode === m.id ? 'text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+        className={`relative rounded-full px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-medium uppercase tracking-wider transition-all ${mode === m.id ? 'text-[var(--text-on-accent)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
       >
         {mode === m.id && (
-          <motion.div layoutId="dial-pill" className={`absolute inset-0 rounded-full ${m.id === 'present' ? m.color : `bg-gradient-to-r ${m.color}`}`} />
+          <motion.div layoutId="dial-pill" className={`absolute inset-0 rounded-full ${m.color}`} />
         )}
-        <span className="relative z-10 flex items-center gap-2">
-          <m.icon className="h-3.5 w-3.5" />
-          {m.label}
+        <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+          <m.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+          <span className="hidden sm:inline">{m.label}</span>
         </span>
       </button>
     ))}
@@ -128,22 +128,22 @@ const OracleWidget = ({ kpis, mode }: { kpis: any[], mode: string }) => {
   const insight = getInsight();
 
   return (
-    <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-[var(--surface)] p-[1px]">
-      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 blur-xl animate-pulse" />
-      <div className="relative h-full rounded-[23px] bg-[var(--surface)]/90 p-5 backdrop-blur-xl">
-        <div className="flex items-start gap-4">
-          <div className="relative grid h-12 w-12 place-content-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25">
-            <Brain className="h-6 w-6" />
+    <div className="relative overflow-hidden rounded-[16px] sm:rounded-[24px] bg-[var(--surface)]/50 border border-[var(--accent-purple)]/20 p-[1px]">
+      <div className="absolute inset-0 bg-[var(--accent-purple)]/10 blur-xl animate-pulse" />
+      <div className="relative h-full rounded-[15px] sm:rounded-[23px] bg-[var(--surface)]/90 p-4 sm:p-5 backdrop-blur-xl">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 place-content-center rounded-full bg-[var(--accent-purple)]/20 text-[var(--accent-purple)] shadow-lg">
+            <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
-          <div className="flex-1 space-y-1">
-            <div className="flex items-center justify-between">
-              <h3 className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-xs font-bold uppercase tracking-widest text-transparent">
+          <div className="flex-1 space-y-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[var(--accent-purple)]">
                 Oracle Insight • {insight.confidence}
               </h3>
-              <span className="flex h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_10px_currentColor]" />
+              <span className="flex h-2 w-2 flex-shrink-0 rounded-full bg-[var(--accent-purple)] shadow-[0_0_10px_currentColor]" />
             </div>
-            <p className="font-medium text-[var(--text-primary)]">{insight.title}</p>
-            <p className="text-sm text-[var(--text-secondary)]">{insight.impact}</p>
+            <p className="text-sm sm:text-base font-medium text-[var(--text-primary)]">{insight.title}</p>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{insight.impact}</p>
           </div>
         </div>
       </div>
@@ -326,11 +326,11 @@ export default function DashboardSupremo() {
   // 3. RENDERIZAÇÃO CONDICIONAL (MATRIX MODE)
   if (matrixMode) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black font-mono text-green-500">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--background)] font-mono text-[var(--accent-emerald)]">
         <div className="text-center space-y-4">
-          <h1 className="text-6xl font-bold animate-pulse">ALSHAM SYSTEM</h1>
-          <p className="typing-effect">Acessando mainframe... Consciência situacional ativada.</p>
-          <button onClick={() => setMatrixMode(false)} className="border border-green-500 px-4 py-2 hover:bg-green-500 hover:text-black">DESATIVAR</button>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold animate-pulse">ALSHAM SYSTEM</h1>
+          <p className="typing-effect text-sm sm:text-base">Acessando mainframe... Consciência situacional ativada.</p>
+          <button onClick={() => setMatrixMode(false)} className="border border-[var(--accent-emerald)] px-4 py-2 hover:bg-[var(--accent-emerald)] hover:text-[var(--background)] transition-colors">DESATIVAR</button>
         </div>
       </div>
     );
@@ -341,73 +341,74 @@ export default function DashboardSupremo() {
     <div className="mx-auto max-w-[1600px] space-y-8 p-6 lg:p-10">
       
       {/* HEADER DINÂMICO */}
-      <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <header className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
               The Oracle Deck
             </h1>
-            <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${timeMode === 'future' ? 'border-purple-500/30 bg-purple-500/10 text-purple-400' : 'border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]'}`}>
+            <span className={`rounded-full border px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest ${timeMode === 'future' ? 'border-[var(--accent-purple)]/30 bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]' : 'border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]'}`}>
               {timeMode === 'future' ? 'PREDICTIVE AI' : 'LIVE DATA'}
             </span>
           </div>
-          <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            {timeMode === 'future' 
+          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl">
+            {timeMode === 'future'
               ? "Projeção matemática baseada no comportamento dos últimos 30 dias."
               : "Monitoramento em tempo real do ecossistema empresarial."}
           </p>
         </motion.div>
 
-        <div className="flex items-center gap-4">
-          <button 
+        <div className="flex items-center gap-3 sm:gap-4">
+          <button
             onClick={startListening}
-            className={`group relative flex h-10 w-10 items-center justify-center rounded-full border transition-all ${isListening ? 'border-red-500 bg-red-500/10 text-red-500 animate-pulse' : 'border-[var(--border)] hover:border-[var(--accent-sky)] text-[var(--text-secondary)]'}`}
+            className={`group relative flex h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-full border transition-all ${isListening ? 'border-[var(--accent-alert)] bg-[var(--accent-alert)]/10 text-[var(--accent-alert)] animate-pulse' : 'border-[var(--border)] hover:border-[var(--accent-sky)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            aria-label="Comando de voz"
           >
-            <Mic className="h-5 w-5" />
-            <span className="absolute -bottom-8 w-max opacity-0 transition-opacity group-hover:opacity-100 text-[10px] bg-black text-white px-2 py-1 rounded">Comando de Voz</span>
+            <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="absolute -bottom-8 w-max opacity-0 transition-opacity group-hover:opacity-100 text-[10px] bg-[var(--surface-strong)] text-[var(--text-primary)] px-2 py-1 rounded border border-[var(--border)] shadow-lg pointer-events-none hidden sm:block">Comando de Voz</span>
           </button>
           <TimeTravelDial mode={timeMode} onChange={setTimeMode} />
         </div>
       </header>
 
       {/* KPI GRID (REAL DATA) */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { id: 'revenue', title: 'Receita Total', val: realData.revenue, icon: Target, prefix: 'R$ ', trend: timeMode === 'future' ? 15 : 8 },
           { id: 'leads', title: 'Novos Leads', val: realData.leads, icon: Users, prefix: '', trend: timeMode === 'future' ? 12 : -3 },
           { id: 'deals', title: 'Deals Ativos', val: realData.deals, icon: Activity, prefix: '', trend: 2 },
           { id: 'campaigns', title: 'Campanhas', val: realData.activeCampaigns, icon: Rocket, prefix: '', trend: 0 },
         ].map((kpi, idx) => (
-          <GlassCard key={kpi.id} className="p-6" onClick={() => {}}>
+          <GlassCard key={kpi.id} className="p-4 sm:p-6" onClick={() => {}}>
             <div className="flex justify-between items-start">
-              <div className="rounded-xl bg-[var(--surface-strong)]/50 p-3 text-[var(--text-primary)]">
-                <kpi.icon className="h-6 w-6" />
+              <div className="rounded-lg sm:rounded-xl bg-[var(--surface-strong)]/50 p-2 sm:p-3 text-[var(--text-primary)]">
+                <kpi.icon className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div className={`flex items-center gap-1 text-xs font-bold ${kpi.trend >= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-alert)]'}`}>
+              <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-bold ${kpi.trend >= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-alert)]'}`}>
                 {kpi.trend >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                 {Math.abs(kpi.trend)}%
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">{kpi.title}</p>
-              <h3 className="mt-1 text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-                {loading ? <span className="animate-pulse bg-[var(--surface-strong)] text-transparent rounded">00000</span> : <NumberTicker value={kpi.val} prefix={kpi.prefix} />}
+            <div className="mt-3 sm:mt-4">
+              <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">{kpi.title}</p>
+              <h3 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+                {loading ? <span className="animate-pulse bg-[var(--surface-strong)] text-transparent rounded inline-block w-24">00000</span> : <NumberTicker value={kpi.val} prefix={kpi.prefix} />}
               </h3>
             </div>
             {/* Real Chart Logic - Sparkline */}
-            <div className="mt-4 h-12 opacity-50">
-               <Line 
+            <div className="mt-3 sm:mt-4 h-10 sm:h-12 opacity-50">
+               <Line
                  data={{
                    labels: realData.monthlyRevenue.map((_:any, i:number) => i),
                    datasets: [{
                      data: realData.monthlyRevenue.length ? realData.monthlyRevenue : [0,0,0,0,0],
-                     borderColor: kpi.trend >= 0 ? '#10b981' : '#ef4444',
+                     borderColor: kpi.trend >= 0 ? 'rgb(16, 185, 129)' : 'rgb(239, 68, 68)',
                      borderWidth: 2,
                      pointRadius: 0,
                      tension: 0.4
                    }]
                  }}
-                 options={{ responsive: true, maintainAspectRatio: false, scales: { x: {display:false}, y: {display:false} }, plugins: { legend: {display: false} } }}
+                 options={{ responsive: true, maintainAspectRatio: false, scales: { x: {display:false}, y: {display:false} }, plugins: { legend: {display: false}, tooltip: {enabled: false} } }}
                />
             </div>
           </GlassCard>
@@ -415,28 +416,28 @@ export default function DashboardSupremo() {
       </div>
 
       {/* BENTO GRID */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Main Chart */}
-        <div className="lg:col-span-2 space-y-6">
-          <GlassCard className="min-h-[400px] p-6">
-            <div className="flex items-center justify-between mb-6">
-               <h3 className="font-bold text-[var(--text-primary)] flex items-center gap-2">
-                 <Activity className="h-5 w-5 text-[var(--accent-sky)]" />
-                 Revenue Performance {timeMode === 'future' && '(Projeção)'}
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <GlassCard className="min-h-[300px] sm:min-h-[400px] p-4 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
+               <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                 <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--accent-sky)]" />
+                 <span className="truncate">Revenue Performance {timeMode === 'future' && '(Projeção)'}</span>
                </h3>
-               {timeMode === 'future' && <Lock className="h-4 w-4 text-[var(--text-secondary)]" />}
+               {timeMode === 'future' && <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[var(--text-secondary)] flex-shrink-0" />}
             </div>
-            <div className="h-[300px] w-full">
-              <Line 
+            <div className="h-[250px] sm:h-[300px] w-full">
+              <Line
                 data={{
                   labels: Array.from({length: 30}, (_, i) => `D${i+1}`),
                   datasets: [{
                     label: 'Receita Diária',
                     data: realData.monthlyRevenue,
-                    borderColor: timeMode === 'future' ? '#8b5cf6' : '#38bdf8',
+                    borderColor: timeMode === 'future' ? 'rgb(139, 92, 246)' : 'rgb(56, 189, 248)',
                     backgroundColor: (ctx) => {
                       const grad = ctx.chart.ctx.createLinearGradient(0,0,0,300);
-                      grad.addColorStop(0, timeMode === 'future' ? 'rgba(139, 92, 246, 0.4)' : 'rgba(56, 189, 248, 0.4)');
+                      grad.addColorStop(0, timeMode === 'future' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(56, 189, 248, 0.3)');
                       grad.addColorStop(1, 'rgba(0,0,0,0)');
                       return grad;
                     },
@@ -451,58 +452,82 @@ export default function DashboardSupremo() {
                   interaction: { mode: 'index', intersect: false },
                   plugins: { legend: { display: false } },
                   scales: {
-                    x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                    x: {
+                      grid: { display: false },
+                      ticks: { maxRotation: 0, autoSkipPadding: 20 }
+                    },
+                    y: {
+                      grid: { color: 'rgba(255,255,255,0.05)' },
+                      ticks: { maxTicksLimit: 5 }
+                    }
                   }
                 }}
               />
             </div>
           </GlassCard>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
              <OracleWidget kpis={[{id:'revenue', raw: realData.revenue}, {id:'leads', raw: realData.leads}]} mode={timeMode} />
-             <GlassCard className="p-6 flex flex-col justify-center items-center text-center">
-                <div className="mb-4 rounded-full bg-orange-500/20 p-4 text-orange-500">
-                  <Zap className="h-8 w-8" />
+             <GlassCard className="p-4 sm:p-6 flex flex-col justify-center items-center text-center">
+                <div className="mb-3 sm:mb-4 rounded-full bg-[var(--accent-warning)]/20 p-3 sm:p-4 text-[var(--accent-warning)]">
+                  <Zap className="h-6 w-6 sm:h-8 sm:w-8" />
                 </div>
-                <h4 className="text-lg font-bold">Automação Ativa</h4>
-                <p className="text-sm text-[var(--text-secondary)] mt-2">
-                  Seu sistema está rodando <span className="text-white font-bold">12 workflows</span> em background, economizando est. 42h/semana.
+                <h4 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">Automação Ativa</h4>
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-2">
+                  Seu sistema está rodando <span className="text-[var(--text-primary)] font-bold">12 workflows</span> em background, economizando est. 42h/semana.
                 </p>
              </GlassCard>
           </div>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
-          <GlassCard className="p-6">
-            <h3 className="font-bold mb-4">Pipeline Distribution</h3>
-            <div className="h-[200px] w-full flex justify-center">
-              <Doughnut 
+        <div className="space-y-4 sm:space-y-6">
+          <GlassCard className="p-4 sm:p-6">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] mb-3 sm:mb-4">Pipeline Distribution</h3>
+            <div className="h-[180px] sm:h-[200px] w-full flex justify-center">
+              <Doughnut
                 data={{
                   labels: realData.pipelineData.map((d:any) => d.stage),
                   datasets: [{
                     data: realData.pipelineData.length ? realData.pipelineData.map((d:any) => d.value) : [1],
-                    backgroundColor: ['#10b981', '#38bdf8', '#8b5cf6', '#f59e0b', '#ef4444'],
+                    backgroundColor: ['rgb(16, 185, 129)', 'rgb(56, 189, 248)', 'rgb(139, 92, 246)', 'rgb(245, 158, 11)', 'rgb(239, 68, 68)'],
                     borderWidth: 0
                   }]
                 }}
-                options={{ cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#888', font: {size: 10} } } } }}
+                options={{
+                  cutout: '70%',
+                  plugins: {
+                    legend: {
+                      position: 'bottom',
+                      labels: {
+                        color: 'rgb(156, 163, 175)',
+                        font: { size: 10 },
+                        padding: 10,
+                        usePointStyle: true
+                      }
+                    }
+                  }
+                }}
               />
             </div>
           </GlassCard>
 
           <GlassCard className="p-0">
-            <div className="p-4 border-b border-[var(--border)]/50">
-              <h3 className="font-bold flex items-center gap-2">
-                <Command className="h-4 w-4" /> Live Actions
+            <div className="p-3 sm:p-4 border-b border-[var(--border)]/50">
+              <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Command className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span>Live Actions</span>
               </h3>
             </div>
-            <div className="p-2">
+            <div className="p-1 sm:p-2">
               {['Criar Campanha', 'Importar Leads', 'Relatório PDF', 'Chat com Time'].map((action, i) => (
-                <button key={i} className="w-full text-left px-4 py-3 rounded-lg hover:bg-[var(--surface-strong)] text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-between group">
-                  {action}
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <button
+                  key={i}
+                  className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-[var(--surface-strong)] text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-between group"
+                  aria-label={action}
+                >
+                  <span className="truncate">{action}</span>
+                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
                 </button>
               ))}
             </div>
