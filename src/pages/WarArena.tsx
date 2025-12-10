@@ -4,316 +4,431 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Shield, Crown, Flame } from 'lucide-react';
+import { motion, AnimatePresence, useAnimation, type AnimationControls } from 'framer-motion';
+import { 
+  Crown, Flame, Sword, Skull, 
+  Trophy
+} from 'lucide-react';
 import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
+import confetti from 'canvas-confetti';
 
-type Mode = 'telao' | 'dashboard';
-type SortBy = 'damage' | 'xp' | 'rage' | 'members';
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ⚙️ CONFIGURAÇÃO & TYPES (MODULAR)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-interface Settings {
-  boss_max: number;
-  boss_name: string;
-  period_start: string;
-  period_end: string;
-}
+const ARENA_CONFIG = {
+  BOSS_NAME: "Q4 DOOMSDAY",
+  BOSS_TOTAL_HP: 5000000,
+  CRITICAL_THRESHOLD: 0.3,
+  REFRESH_RATE: 10000, // Polling a cada 10s
+};
 
-interface Member {
+type Mode = 'tv' | 'manager';
+
+interface Warrior {
   id: string;
   name: string;
-  avatar?: string;
-  xp: number;
-  level: number;
-  class: 'BERSERKER' | 'PALADIN' | 'SORCERER' | 'ASSASSIN';
-  damage: number;
+  avatar: string;
+  damage: number; 
+  class: 'TITAN' | 'SLAYER' | 'MAGE' | 'ROOKIE';
 }
 
 interface Legion {
   id: string;
   name: string;
-  avatar?: string;
-  totalDamage: number;
-  totalXP: number;
-  level: number;
-  members: Member[];
-  mvp: Member | null;
-  stamina: number;
-  rage: number;
+  avatar: string;
+  total_damage: number;
+  members: Warrior[];
+  rage: number; // % da meta do time
 }
 
-const BossBar = ({ current, max, mode }: { current: number; max: number; mode: Mode }) => {
-  const progress = Math.min(100, (current / max) * 100);
-  const shouldReduceMotion = useReducedMotion();
+interface KillEvent {
+  id: string;
+  warrior: string;
+  damage: number;
+  timestamp: number;
+  type: 'CRITICAL' | 'NORMAL';
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎨 COMPONENT: BOSS HUD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const BossHUD: React.FC<{ current: number; max: number; shakeControls: AnimationControls }> = ({ current, max, shakeControls }) => {
+  const percent = Math.min((current / max) * 100, 100);
+  const hpLeft = max - current;
+  const isEnraged = (hpLeft / max) < ARENA_CONFIG.CRITICAL_THRESHOLD;
+  const isDead = hpLeft <= 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`relative ${mode === 'telao' ? 'h-48' : 'h-32'} mx-auto max-w-7xl bg-black/70 rounded-3xl border-8 border-red-900 overflow-hidden shadow-2xl`}
+    <motion.div 
+      animate={shakeControls}
+      className="relative w-full max-w-7xl mx-auto mb-20 z-20"
     >
-      <motion.div
-        animate={{ width: `${progress}%` }}
-        transition={{ duration: shouldReduceMotion ? 0 : 1.8, ease: "easeOut" }}
-        className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500"
-        style={{ filter: 'blur(40px)' }}
-      />
-      <motion.div
-        animate={{ width: `${progress}%` }}
-        transition={{ duration: shouldReduceMotion ? 0 : 1.8, ease: "easeOut" }}
-        className="absolute inset-0 bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600"
-      />
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className={`font-black drop-shadow-2xl ${mode === 'telao' ? 'text-10xl' : 'text-7xl'} text-white`}>
-          {progress.toFixed(1)}%
-        </p>
-        <p className={`mt-4 ${mode === 'telao' ? 'text-5xl' : 'text-3xl'} text-white/80`}>
-          R$ {current.toLocaleString('pt-BR')} / R$ {max.toLocaleString('pt-BR')}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
-const LegionCard = ({ legion, mode }: { legion: Legion; mode: Mode }) => {
-  const shouldReduceMotion = useReducedMotion();
-  const size = mode === 'telao' ? 'w-28 h-28' : 'w-20 h-20';
-  const textSize = mode === 'telao' ? 'text-5xl' : 'text-3xl';
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={shouldReduceMotion ? {} : { scale: 1.06, y: -20 }}
-      className="relative group"
-    >
-      <motion.div
-        animate={shouldReduceMotion ? {} : { opacity: [0.4, 0.8, 0.4] }}
-        transition={{ duration: 5, repeat: Infinity }}
-        className="absolute -inset-12 blur-3xl bg-gradient-to-br from-purple-600/50 to-pink-600/50 rounded-3xl"
-      />
-
-      <div className="relative bg-black/70 backdrop-blur-3xl rounded-3xl border-4 border-purple-500/60 p-10">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-6">
-            <div className={`${size} rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 p-1`}>
-              <div className="w-full h-full rounded-3xl bg-black flex items-center justify-center">
-                {legion.avatar ? (
-                  <img src={legion.avatar} className="rounded-3xl" />
-                ) : (
-                  <Shield className="w-16 h-16 text-purple-400" />
-                )}
-              </div>
-            </div>
-            <div>
-              <h3 className={`font-black text-white ${textSize}`}>{legion.name}</h3>
-              <p className={`${mode === 'telao' ? 'text-3xl' : 'text-xl'} text-purple-300`}>
-                LVL {legion.level} • {legion.members.length} guerreiros
+      {/* Boss Status */}
+      <div className="flex justify-between items-end mb-6 px-4">
+        <div className="flex items-center gap-6">
+          <motion.div 
+            animate={isEnraged ? { scale: [1, 1.1, 1], filter: ["hue-rotate(0deg)", "hue-rotate(90deg)", "hue-rotate(0deg)"] } : {}}
+            transition={{ duration: 0.5, repeat: isEnraged ? Infinity : 0 }}
+            className={`p-4 rounded-2xl border-4 ${isEnraged ? 'bg-red-900 border-red-500' : 'bg-gray-900 border-gray-600'} shadow-2xl`}
+          >
+            {isDead ? <Trophy className="w-12 h-12 text-yellow-400" /> : <Skull className={`w-12 h-12 ${isEnraged ? 'text-red-500' : 'text-white'}`} />}
+          </motion.div>
+          <div>
+            <h2 className="text-5xl font-black text-white uppercase tracking-widest drop-shadow-lg">
+              {isDead ? "BOSS ELIMINADO" : ARENA_CONFIG.BOSS_NAME}
+            </h2>
+            <div className="flex items-center gap-3">
+              {isEnraged && !isDead && <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase rounded animate-pulse">ENRAGED</span>}
+              <p className={`font-mono text-xl ${isEnraged ? 'text-red-400' : 'text-gray-400'}`}>
+                {Math.max(0, hpLeft).toLocaleString('pt-BR')} HP RESTANTES
               </p>
             </div>
           </div>
-          {legion.mvp && <Crown className={`${mode === 'telao' ? 'h-20 w-20' : 'h-16 w-16'} text-yellow-400 animate-pulse`} />}
         </div>
+        <div className="text-right">
+          <motion.span 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            key={percent}
+            className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-l from-red-500 via-orange-500 to-yellow-500 drop-shadow-2xl"
+          >
+            {percent.toFixed(1)}%
+          </motion.span>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-3 gap-8">
-          <div className="text-center">
-            <p className={`${textSize} font-black text-emerald-400`}>R$ {(legion.totalDamage / 1000).toFixed(0)}k</p>
-            <p className="text-white/60">DANO</p>
-          </div>
-          <div className="text-center">
-            <p className={`${textSize} font-black text-purple-400`}>{(legion.totalXP / 1000).toFixed(1)}k</p>
-            <p className="text-white/60">XP</p>
-          </div>
-          <div className="text-center">
-            <p className={`${textSize} font-black text-orange-400`}>{legion.rage}%</p>
-            <p className="text-white/60">RAGE</p>
-          </div>
-        </div>
+      {/* The Bar */}
+      <div className="h-20 bg-[#0a0000] rounded-full border-4 border-white/10 overflow-hidden relative shadow-[0_0_100px_rgba(220,38,38,0.4)]">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: `${percent}%` }}
+          transition={{ type: 'spring', damping: 15, stiffness: 50 }}
+          className={`absolute top-0 left-0 h-full bg-gradient-to-r ${isDead ? 'from-emerald-600 to-green-400' : 'from-red-900 via-red-600 to-orange-500'}`}
+        >
+          <motion.div 
+            animate={{ x: [-1000, 2000] }} 
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-64 -skew-x-12 opacity-50"
+          />
+          <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/50 blur-sm" />
+        </motion.div>
       </div>
     </motion.div>
   );
 };
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 💎 COMPONENT: LEGION CARD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
+  const isLeader = rank === 1;
+  const isRaging = legion.rage > 90;
+  
+  return (
+    <motion.div 
+      layout
+      transition={{ type: 'spring', damping: 25 }}
+      className={`
+        relative overflow-hidden rounded-[40px] border-2 backdrop-blur-2xl p-8 group
+        ${isLeader 
+          ? 'bg-gradient-to-b from-yellow-900/40 via-black/80 to-black border-yellow-500/50 shadow-[0_0_80px_rgba(234,179,8,0.25)] z-10 scale-105' 
+          : 'bg-black/60 border-white/10 hover:border-white/30'
+        }
+      `}
+    >
+      {/* Rank Badge */}
+      <div className={`absolute top-0 right-0 p-6 font-black text-9xl opacity-10 pointer-events-none ${isLeader ? 'text-yellow-500' : 'text-white'}`}>
+        #{rank}
+      </div>
+
+      {/* Header */}
+      <div className="flex flex-col items-center text-center mb-10 relative z-10">
+        <div className={`
+          w-32 h-32 rounded-3xl p-1 mb-6 relative
+          ${isLeader ? 'bg-gradient-to-br from-yellow-400 to-orange-600 animate-pulse-slow' : 'bg-gradient-to-br from-gray-700 to-gray-900'}
+        `}>
+          <img src={legion.avatar} className="w-full h-full rounded-[20px] object-cover bg-black" />
+          {isLeader && (
+            <motion.div 
+              animate={{ y: [-10, 0, -10] }} 
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute -top-12 left-1/2 -translate-x-1/2 text-yellow-400"
+            >
+              <Crown className="w-12 h-12 fill-yellow-400" />
+            </motion.div>
+          )}
+        </div>
+        
+        <h3 className="text-4xl font-black text-white uppercase tracking-tight">{legion.name}</h3>
+        <div className="mt-4 flex items-baseline gap-2">
+          <span className="text-lg text-white/40 font-mono">DANO TOTAL</span>
+          <span className={`text-5xl font-black tracking-tighter ${isLeader ? 'text-yellow-400' : 'text-emerald-400'}`}>
+            {(legion.total_damage / 1000).toFixed(0)}k
+          </span>
+        </div>
+      </div>
+
+      {/* Warriors List */}
+      <div className="space-y-4 relative z-10">
+        {legion.members.slice(0, 3).map((warrior, i) => {
+          // Progress Calculation (Share of Legion Damage)
+          const share = legion.total_damage > 0 ? (warrior.damage / legion.total_damage) * 100 : 0;
+
+          return (
+            <div key={warrior.id} className="flex items-center gap-4 p-3 rounded-2xl bg-white/5 border border-white/5 relative overflow-hidden">
+              {/* Progress Bar Background */}
+              <div className="absolute left-0 top-0 bottom-0 bg-white/5 z-0" style={{ width: `${share}%` }} />
+              
+              <img src={warrior.avatar} className="w-12 h-12 rounded-full border-2 border-white/10 z-10 object-cover" />
+              
+              <div className="flex-1 z-10">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-white text-lg">{warrior.name}</span>
+                  {i === 0 && <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />}
+                </div>
+                <p className="text-xs text-emerald-400 font-mono font-bold">R$ {warrior.damage.toLocaleString()}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Rage Effect */}
+      {isRaging && (
+        <div className="absolute inset-0 bg-gradient-to-t from-red-600/20 to-transparent opacity-50 animate-pulse pointer-events-none" />
+      )}
+    </motion.div>
+  );
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 💎 COMPONENT: KILL FEED
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const KillFeed = ({ events }: { events: KillEvent[] }) => (
+  <div className="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/90 to-transparent z-50 flex items-center overflow-hidden border-t border-white/10 backdrop-blur-md">
+    <div className="flex gap-20 animate-marquee whitespace-nowrap px-10">
+      {events.length === 0 && (
+        <div className="flex items-center gap-3 text-xl text-white/40 font-mono">
+          <Sword className="w-6 h-6 text-white/30" />
+          <span>AGUARDANDO O PRÓXIMO GOLPE...</span>
+        </div>
+      )}
+      {events.map((ev) => (
+        <div key={ev.id} className="flex items-center gap-4">
+          <div className="relative">
+            <Sword className={`w-8 h-8 ${ev.type === 'CRITICAL' ? 'text-red-500 animate-pulse' : 'text-emerald-500'}`} />
+            {ev.type === 'CRITICAL' && <div className="absolute -inset-2 bg-red-500/20 blur-lg rounded-full" />}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-black text-white uppercase">{ev.warrior}</span>
+              <span className="text-sm text-white/40 font-mono">
+                {Math.floor((Date.now() - ev.timestamp) / 1000)}s AGO
+              </span>
+            </div>
+            <p className={`text-xl font-bold font-mono ${ev.type === 'CRITICAL' ? 'text-red-400' : 'text-emerald-400'}`}>
+              CAUSOU R$ {ev.damage.toLocaleString()} DE DANO {ev.type === 'CRITICAL' && '🔥'}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🚀 PAGE: WAR ARENA V3.1 (FINAL)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 export default function WarArena() {
   const [searchParams] = useSearchParams();
-  const mode: Mode = (searchParams.get('mode') as Mode) || 'telao';
+  const mode = (searchParams.get('mode') as Mode) || 'tv';
+  
   const [legions, setLegions] = useState<Legion[]>([]);
   const [bossHP, setBossHP] = useState(0);
-  const [settings, setSettings] = useState<Settings>({
-    boss_max: 5000000,
-    boss_name: 'A Guerra é Agora',
-    period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
-    period_end: new Date().toISOString(),
-  });
-  const [sortBy, setSortBy] = useState<SortBy>('damage');
-  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const shouldReduceMotion = useReducedMotion();
+  const [feed, setFeed] = useState<KillEvent[]>([]);
+  const [flash, setFlash] = useState(false);
+  
+  const shakeControls = useAnimation();
 
-  const getSortValue = (l: Legion, key: SortBy) => {
-    switch (key) {
-      case 'damage': return l.totalDamage;
-      case 'xp': return l.totalXP;
-      case 'rage': return l.rage;
-      case 'members': return l.members.length;
-      default: return l.totalDamage;
-    }
-  };
+  // FX
+  const triggerThunder = useCallback(() => {
+    setFlash(true);
+    setTimeout(() => setFlash(false), 150);
+    shakeControls.start({
+      x: [0, -10, 10, -10, 10, 0],
+      transition: { duration: 0.4 }
+    });
+  }, [shakeControls]);
 
-  const loadWar = useCallback(async () => {
-    setLoading(true);
+  const triggerVictory = useCallback(() => {
+    confetti({
+      particleCount: 300,
+      spread: 100,
+      origin: { y: 0.6 },
+      colors: ['#FFD700', '#FFA500', '#FF4500']
+    });
+  }, []);
 
-    const { data: config } = await supabase
-      .from('war_settings')
-      .select('*')
-      .single()
-      .catch(() => ({ data: null }));
-
-    const finalSettings = config || settings;
-    setSettings(finalSettings);
+  // 1. ENGINE
+  const loadWar = useCallback(async (isRealtimeUpdate = false) => {
+    if (!isRealtimeUpdate) setLoading(true);
 
     const { data: teams } = await supabase.from('teams').select('id, name, avatar_url');
     const { data: members } = await supabase.from('team_members').select('team_id, user_id');
-    const { data: profiles } = await supabase.from('user_profiles').select('id, full_name, avatar_url, role');
-    const { data: points } = await supabase.from('gamification_points').select('user_id, points');
+    const { data: profiles } = await supabase.from('user_profiles').select('id, full_name, avatar_url');
+    
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
     const { data: deals } = await supabase
       .from('opportunities')
-      .select('owner_id, value, stage, created_at')
-      .gte('created_at', finalSettings.period_start)
-      .lte('created_at', finalSettings.period_end);
+      .select('owner_id, value, stage')
+      .eq('stage', 'Ganho')
+      .gte('created_at', startOfMonth);
 
-    const legionsReal: Legion[] = (teams || []).map(team => {
-      const teamMembers = (members || [])
-        .filter(m => m.team_id === team.id)
-        .map(m => {
-          const profile = profiles?.find(p => p.id === m.user_id) || { full_name: 'Guerreiro', avatar_url: '', role: '' };
-          const xp = points?.filter(p => p.user_id === m.user_id).reduce((a, b) => a + b.points, 0) || 0;
-          const damage = deals
-            ?.filter(d => d.owner_id === m.user_id && d.stage === 'Ganho')
-            .reduce((a, b) => a + (b.value || 0), 0) || 0;
+    if (teams && deals) {
+      let totalBossDamage = 0;
+      // Meta dinâmica por time para cálculo de Rage
+      const perTeamTarget = ARENA_CONFIG.BOSS_TOTAL_HP / (teams.length || 1);
 
-          let cls: Member['class'] = 'BERSERKER';
-          if (profile.role?.toLowerCase().includes('support')) cls = 'PALADIN';
-          if (profile.role?.toLowerCase().includes('analyst')) cls = 'SORCERER';
-          if (damage > 1500000) cls = 'ASSASSIN';
-
+      const enrichedLegions: Legion[] = teams.map(team => {
+        const teamMembers = members?.filter(m => m.team_id === team.id) || [];
+        
+        const warriors: Warrior[] = teamMembers.map(tm => {
+          const profile = profiles?.find(p => p.id === tm.user_id);
+          const damage = deals.filter(d => d.owner_id === tm.user_id).reduce((a,b) => a + b.value, 0);
+          
           return {
-            id: m.user_id,
-            name: profile.full_name || 'Guerreiro',
-            avatar: profile.avatar_url || '',
-            xp,
-            level: Math.max(1, Math.floor(xp / 1000)),
-            class: cls,
-            damage
+            id: tm.user_id,
+            name: profile?.full_name || 'Soldado',
+            avatar: profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tm.user_id}`,
+            damage,
+            class: damage > 50000 ? 'TITAN' : 'ROOKIE'
           };
-        })
-        .sort((a, b) => b.damage - a.damage);
+        }).sort((a,b) => b.damage - a.damage);
 
-      const totalDamage = teamMembers.reduce((a, m) => a + m.damage, 0);
-      const totalXP = teamMembers.reduce((a, m) => a + m.xp, 0);
+        const legionDamage = warriors.reduce((a,b) => a + b.damage, 0);
+        totalBossDamage += legionDamage;
 
-      return {
-        id: team.id,
-        name: team.name || 'Legião Sem Nome',
-        avatar: team.avatar_url || '',
-        totalDamage,
-        totalXP,
-        level: Math.max(1, Math.floor(totalXP / 12000)),
-        members: teamMembers,
-        mvp: teamMembers[0] || null,
-        stamina: Math.max(20, 100 - teamMembers.filter(m => m.damage === 0).length * 4),
-        rage: Math.max(0, 100 - Math.round((totalDamage / finalSettings.boss_max) * 100))
-      };
-    });
+        return {
+          id: team.id,
+          name: team.name,
+          avatar: team.avatar_url || '',
+          total_damage: legionDamage,
+          members: warriors,
+          // Rage calculado com base na meta do time (cap em 999% para overkill)
+          rage: Math.min((legionDamage / perTeamTarget) * 100, 999) 
+        };
+      }).sort((a,b) => b.total_damage - a.total_damage);
 
-    const globalDamage = legionsReal.reduce((a, l) => a + l.totalDamage, 0);
-    setBossHP(globalDamage);
-    setLegions(legionsReal.sort((a, b) => getSortValue(b, sortBy) - getSortValue(a, sortBy)));
+      setLegions(enrichedLegions);
+      setBossHP(totalBossDamage);
+
+      if (totalBossDamage >= ARENA_CONFIG.BOSS_TOTAL_HP && !isRealtimeUpdate) {
+        triggerVictory(); // Só toca confete no load se já estiver ganho
+      }
+    }
     setLoading(false);
-  }, [settings.period_start, settings.period_end, sortBy]);
+  }, [triggerVictory]);
 
+  // 2. LIFECYCLE (Realtime + Polling)
   useEffect(() => {
     loadWar();
 
-    const channel = supabase.channel('war-arena-final')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'opportunities' }, loadWar)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'gamification_points' }, loadWar)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'team_members' }, loadWar)
+    // Realtime
+    const channel = supabase.channel('war_room_v3')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'opportunities' }, async (payload: any) => {
+        if (payload.new.stage === 'Ganho' && payload.old.stage !== 'Ganho') {
+          triggerThunder();
+          
+          const { data: profile } = await supabase.from('user_profiles').select('full_name').eq('id', payload.new.owner_id).single();
+          const warriorName = profile?.full_name || 'Guerreiro';
+          
+          const newKill: KillEvent = {
+            id: payload.new.id,
+            warrior: warriorName,
+            damage: payload.new.value,
+            timestamp: Date.now(),
+            type: payload.new.value > 10000 ? 'CRITICAL' : 'NORMAL'
+          };
+          
+          setFeed(prev => [newKill, ...prev].slice(0, 10));
+          loadWar(true);
+        }
+      })
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
-  }, [loadWar]);
+    // Safety Polling
+    const interval = setInterval(() => {
+      loadWar(true);
+    }, ARENA_CONFIG.REFRESH_RATE);
 
-  const filtered = legions.filter(l => 
-    l.name.toLowerCase().includes(search.toLowerCase())
+    return () => { 
+      supabase.removeChannel(channel); 
+      clearInterval(interval);
+    };
+  }, [loadWar, triggerThunder]);
+
+  if (loading) return (
+    <div className="h-screen bg-black flex items-center justify-center">
+      <div className="flex flex-col items-center gap-6">
+        <Skull className="w-24 h-24 text-red-600 animate-pulse" />
+        <h1 className="text-4xl font-black text-white tracking-[0.5em] animate-pulse">SUMMONING BOSS...</h1>
+      </div>
+    </div>
   );
 
-  if (loading) {
-    return (
-      <LayoutSupremo title="WAR ARENA — Sincronizando...">
-        <div className="h-screen grid place-content-center bg-black">
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity }} className="w-40 h-40 border-8 border-t-transparent border-red-600 rounded-full" />
-          <p className="text-6xl text-red-500 font-black mt-16 animate-pulse">PREPARANDO A GUERRA...</p>
-        </div>
-      </LayoutSupremo>
-    );
-  }
-
   return (
-    <LayoutSupremo title={`WAR ARENA — ${settings.boss_name}`}>
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
-        <div className="fixed inset-0 bg-gradient-to-br from-red-950/60 via-black to-purple-950/60" />
-        <motion.div animate={{ opacity: [0.2, 0.5, 0.2] }} transition={{ duration: 10, repeat: Infinity }} className="fixed inset-0 bg-red-600/15 blur-3xl" />
+    <LayoutSupremo title="WAR ARENA V3">
+      <div className={`min-h-screen bg-[#020202] text-white relative overflow-hidden ${mode === 'tv' ? 'p-0' : 'p-8'}`}>
+        
+        {/* FLASH FX */}
+        <AnimatePresence>
+          {flash && (
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 0.8 }} 
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-white z-[100] pointer-events-none mix-blend-overlay"
+            />
+          )}
+        </AnimatePresence>
 
-        {mode === 'dashboard' && (
-          <div className="relative z-50 p-8 border-b border-white/10 bg-black/60 backdrop-blur-xl">
-            <div className="flex items-center justify-between">
-              <h1 className="text-6xl font-black text-white">WAR ARENA</h1>
-              <div className="flex items-center gap-6">
-                <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)} className="bg-white/10 border border-white/20 rounded-xl px-6 py-3 text-lg">
-                  <option value="damage">Mais dano</option>
-                  <option value="xp">Mais XP</option>
-                  <option value="rage">Mais rage</option>
-                  <option value="members">Mais membros</option>
-                </select>
-                <input
-                  placeholder="Buscar legião..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="bg-white/10 border border-white/20 rounded-xl px-6 py-3 text-lg w-80"
-                />
-              </div>
+        {/* BACKGROUND */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-black to-black" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+        </div>
+
+        {/* TV HEADER */}
+        {mode === 'tv' && (
+          <div className="absolute top-8 left-8 flex items-center gap-4 z-30">
+            <div className="flex items-center gap-2 px-4 py-2 bg-red-900/30 border border-red-500/30 rounded-full">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-ping" />
+              <span className="text-red-500 font-bold tracking-widest text-xs">LIVE BATTLE</span>
             </div>
           </div>
         )}
 
-        <BossBar current={bossHP} max={settings.boss_max} mode={mode} />
+        <div className="relative z-10 max-w-[1920px] mx-auto pt-16 pb-32">
+          <BossHUD current={bossHP} max={ARENA_CONFIG.BOSS_TOTAL_HP} shakeControls={shakeControls} />
 
-        <div className="relative z-10 py-20 px-12">
-          <h2 className={`text-center mb-20 bg-gradient-to-r from-purple-400 via-pink-400 to-emerald-400 bg-clip-text text-transparent font-black ${mode === 'telao' ? 'text-9xl' : 'text-6xl'}`}>
-            LEGIÕES EM COMBATE
-          </h2>
-
-          <div className={`grid ${mode === 'telao' ? 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4'} gap-16`}>
-            {filtered.map((legion, i) => (
-              <LegionCard key={legion.id} legion={legion} mode={mode} />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 px-12">
+            <AnimatePresence>
+              {legions.map((legion, i) => (
+                <LegionCard key={legion.id} legion={legion} rank={i + 1} />
+              ))}
+            </AnimatePresence>
           </div>
         </div>
 
-        {mode === 'telao' && (
-          <motion.div className="fixed inset-x-0 bottom-32 text-center">
-            <motion.p
-              animate={shouldReduceMotion ? {} : { scale: [1, 1.1, 1] }}
-              transition={{ duration: 6, repeat: Infinity }}
-              className="text-10xl font-black bg-gradient-to-r from-red-500 via-purple-500 to-emerald-500 bg-clip-text text-transparent"
-            >
-              NÃO EXISTE DERROTA
-            </motion.p>
-            <p className="text-7xl text-white/90 mt-12">SÓ EXISTE O PRÓXIMO BOSS</p>
-          </motion.div>
-        )}
+        <KillFeed events={feed} />
       </div>
     </LayoutSupremo>
   );
