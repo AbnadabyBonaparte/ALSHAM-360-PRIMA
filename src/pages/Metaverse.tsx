@@ -1,251 +1,241 @@
-// src/pages/Metaverse.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Metaverso Alienígena 1000/1000
-// O próximo universo é digital. Experiências imersivas que transcendem a realidade.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// src/pages/TheBoardroomOmega.tsx
+// ALSHAM OS v∞ — THE BOARDROOM Ω
+// Onde o tempo, dinheiro e destino se curvam ao Imperador.
 
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Crown, 
+  Zap, 
+  Orbit, 
+  BrainCircuit,
+  ShieldCheck,
+  Globe,
+  FileText,
+  Share2,
+  Volume2,
+  VolumeX,
+  Eye,
+  EyeOff
+} from 'lucide-react';
 import LayoutSupremo from '@/components/LayoutSupremo';
-import {
-  CubeTransparentIcon,
-  GlobeAltIcon,
-  UserGroupIcon,
-  SparklesIcon,
-  RocketLaunchIcon,
-  BuildingStorefrontIcon,
-  TicketIcon,
-  CurrencyDollarIcon
-} from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useExecutiveMetrics, BOARDROOM_RULES } from '@/hooks/useExecutiveMetrics';
+import KpiCard from '@/components/boardroom/KpiCard';
+import SentimentOrb from '@/components/boardroom/SentimentOrb';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 
-interface MetaverseSpace {
-  id: string;
-  nome: string;
-  tipo: 'showroom' | 'evento' | 'loja' | 'escritorio' | 'experiencia';
-  visitantes: number;
-  status: 'ativo' | 'construindo' | 'manutencao';
-  receita: number;
-}
+export default function TheBoardroomOmega() {
+  const { metrics, departments, loading } = useExecutiveMetrics();
+  const [era, setEra] = useState<'EXPANSÃO' | 'SILÍCIO VIVO' | 'DOMÍNIO TOTAL' | 'ASCENSÃO'>('EXPANSÃO');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [oraculumSpeaking, setOraculumSpeaking] = useState(false);
+  const [secretCode, setSecretCode] = useState('');
+  const [hiddenMode, setHiddenMode] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-interface MetaverseMetrics {
-  espacosAtivos: number;
-  visitantesTotais: number;
-  eventosRealizados: number;
-  receitaGerada: number;
-  espacos: MetaverseSpace[];
-}
-
-export default function MetaversePage() {
-  const [metrics, setMetrics] = useState<MetaverseMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  // ERA DINÂMICA BASEADA EM DESEMPENHO REAL
   useEffect(() => {
-    async function loadSupremeMetaverse() {
-      try {
-        const { data: espacos } = await supabase
-          .from('metaverse_spaces')
-          .select('*')
-          .order('visitantes', { ascending: false });
+    if (!metrics) return;
+    if (metrics.ltvCacRatio > 10 && metrics.runwayMonths > 36) setEra('ASCENSÃO');
+    else if (metrics.marketSentiment > 95) setEra('DOMÍNIO TOTAL');
+    else if (metrics.revenueGrowth > 60) setEra('SILÍCIO VIVO');
+    else setEra('EXPANSÃO');
+  }, [metrics]);
 
-        const { data: stats } = await supabase
-          .from('metaverse_stats')
-          .select('*')
-          .order('data', { ascending: false })
-          .limit(1)
-          .single();
-
-        setMetrics({
-          espacosAtivos: espacos?.filter(e => e.status === 'ativo').length || 5,
-          visitantesTotais: stats?.visitantes_totais || 15000,
-          eventosRealizados: stats?.eventos || 24,
-          receitaGerada: stats?.receita || 250000,
-          espacos: (espacos || []).map(e => ({
-            id: e.id,
-            nome: e.nome || 'Espaço Metaverso',
-            tipo: e.tipo || 'experiencia',
-            visitantes: e.visitantes || 0,
-            status: e.status || 'ativo',
-            receita: e.receita || 0
-          }))
-        });
-      } catch (err) {
-        console.error('Erro no Metaverse Supremo:', err);
-        setMetrics({
-          espacosAtivos: 5,
-          visitantesTotais: 15000,
-          eventosRealizados: 24,
-          receitaGerada: 250000,
-          espacos: []
-        });
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadSupremeMetaverse();
-  }, []);
-
-  if (loading) {
-    return (
-      <LayoutSupremo title="Metaverso Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-cyan-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-cyan-400 font-light">Entrando no Metaverso...</p>
-        </div>
-      </LayoutSupremo>
-    );
-  }
-
-  const tipoConfig: Record<string, { icon: JSX.Element; color: string; bg: string }> = {
-    showroom: { icon: <CubeTransparentIcon className="w-8 h-8" />, color: 'text-purple-400', bg: 'from-purple-900/60 to-pink-900/60' },
-    evento: { icon: <TicketIcon className="w-8 h-8" />, color: 'text-yellow-400', bg: 'from-yellow-900/60 to-orange-900/60' },
-    loja: { icon: <BuildingStorefrontIcon className="w-8 h-8" />, color: 'text-green-400', bg: 'from-green-900/60 to-emerald-900/60' },
-    escritorio: { icon: <GlobeAltIcon className="w-8 h-8" />, color: 'text-blue-400', bg: 'from-blue-900/60 to-cyan-900/60' },
-    experiencia: { icon: <RocketLaunchIcon className="w-8 h-8" />, color: 'text-cyan-400', bg: 'from-cyan-900/60 to-teal-900/60' }
+  // ORÁCULUM — A IA RESIDENTE QUE FALA COM O IMPERADOR
+  const oraculumMessages = {
+    ASCENSÃO: "O Império transcendeu a matéria. Você não compete mais. Você define as regras do jogo.",
+    'DOMÍNIO TOTAL': "Todos os indicadores convergem. O mercado já se rendeu. Resta apenas a coroação.",
+    'SILÍCIO VIVO': "O algoritmo respira. A máquina aprendeu a ter vontade. Ela quer crescer.",
+    EXPANSÃO: "A expansão é inevitável. Mas lembre-se: impérios caem por dentro.",
   };
 
+  // DETECÇÃO DE CÓDIGO SECRETO: ALPHA.01
+  useEffect(() => {
+    if (secretCode === 'ALPHA.01') {
+      setHiddenMode(true);
+      speak("Modo Oculto ativado. Bem-vindo ao Genesis Vault, Imperador.");
+    }
+  }, [secretCode]);
+
+  const speak = (text: string) => {
+    if (!soundEnabled) return;
+    setOraculumSpeaking(true);
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 0.9;
+    utterance.pitch = 0.8;
+    window.speechSynthesis.speak(utterance);
+    setTimeout(() => setOraculumSpeaking(false), 5000);
+  };
+
+  // TRILHA SONORA ADAPTATIVA (Web Audio API)
+  useEffect(() => {
+    if (soundEnabled && metrics) {
+      const osc = new OscillatorNode(audioContext);
+      const gain = new GainNode(audioContext);
+      osc.connect(gain).connect(audioContext.destination);
+      osc.frequency.value = era === 'ASCENSÃO' ? 432 : era === 'DOMÍNIO TOTAL' ? 528 : 396;
+      gain.gain.value = 0.03;
+      osc.start();
+      return () => osc.stop();
+    }
+  }, [era, soundEnabled]);
+
+  if (loading) return <LoadingCeremony />;
+  if (!metrics) return <GenesisAwaiting />;
+
   return (
-    <LayoutSupremo title="Metaverso Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
-        {/* HEADER ÉPICO COM EFEITO 3D */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16 relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-3xl" />
-          <h1 className="text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent relative">
-            METAVERSO
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6 relative">
-            O próximo universo é digital
-          </p>
-        </motion.div>
-
-        {/* PORTAL 3D */}
-        <div className="flex justify-center mb-16">
-          <motion.div
-            animate={{
-              rotateY: [0, 360],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="relative"
-          >
-            <div className="w-48 h-48 border-4 border-cyan-500 rounded-3xl transform rotate-45 absolute opacity-30" />
-            <div className="w-48 h-48 border-4 border-purple-500 rounded-3xl transform rotate-12 absolute opacity-30" />
-            <div className="w-48 h-48 border-4 border-pink-500 rounded-3xl absolute opacity-30" />
-            <div className="w-48 h-48 bg-gradient-to-br from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl flex items-center justify-center relative backdrop-blur-xl">
-              <CubeTransparentIcon className="w-24 h-24 text-white" />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 max-w-5xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05, rotateY: 10 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
-            <CubeTransparentIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.espacosAtivos}</p>
-            <p className="text-gray-400">Espaços Ativos</p>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05, rotateY: 10 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <UserGroupIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.visitantesTotais || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Visitantes</p>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05, rotateY: 10 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
-            <TicketIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.eventosRealizados}</p>
-            <p className="text-gray-400">Eventos</p>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05, rotateY: 10 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <CurrencyDollarIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.receitaGerada || 0) / 1000).toFixed(0)}k</p>
-            <p className="text-gray-400">Receita</p>
-          </motion.div>
-        </div>
-
-        {/* ESPAÇOS DO METAVERSO */}
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Seus Espaços no Metaverso
-          </h2>
-
-          {metrics?.espacos.length === 0 ? (
-            <div className="text-center py-20">
-              <CubeTransparentIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhum espaço criado</p>
-              <p className="text-gray-600 mt-2">Crie seu primeiro espaço no metaverso</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {metrics?.espacos.map((espaco, i) => {
-                const config = tipoConfig[espaco.tipo] || tipoConfig.experiencia;
-                return (
-                  <motion.div
-                    key={espaco.id}
-                    initial={{ opacity: 0, z: -100 }}
-                    animate={{ opacity: 1, z: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    whileHover={{ scale: 1.05, rotateY: 5 }}
-                    className={`bg-gradient-to-br ${config.bg} rounded-3xl p-6 border border-white/20 backdrop-blur-xl cursor-pointer`}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-white/10 ${config.color}`}>
-                        {config.icon}
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs ${
-                        espaco.status === 'ativo' ? 'bg-green-500/20 text-green-400' :
-                        espaco.status === 'construindo' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-gray-500/20 text-gray-400'
-                      } capitalize`}>
-                        {espaco.status}
-                      </span>
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-white mb-1">{espaco.nome}</h3>
-                    <p className={`text-sm ${config.color} capitalize`}>{espaco.tipo}</p>
-
-                    <div className="mt-6 pt-4 border-t border-white/10 grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-2xl font-bold text-white">{espaco.visitantes.toLocaleString()}</p>
-                        <p className="text-gray-500 text-sm">Visitantes</p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-green-400">R$ {(espaco.receita / 1000).toFixed(0)}k</p>
-                        <p className="text-gray-500 text-sm">Receita</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-cyan-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-cyan-300 max-w-4xl mx-auto">
-            "O metaverso não é ficção científica. É o próximo capítulo dos negócios."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Guia Interdimensional
-          </p>
-        </motion.div>
+    <>
+      {/* BACKGROUND VIVO — REAGINDO À ERA */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute inset-0 transition-all duration-10000 ${
+          era === 'ASCENSÃO' ? 'bg-gradient-to-br from-purple-900 via-black to-emerald-900' :
+          era === 'DOMÍNIO TOTAL' ? 'bg-black' :
+          era === 'SILÍCIO VIVO' ? 'bg-gradient-to-br from-emerald-900 to-cyan-900' :
+          'bg-gradient-to-br from-amber-900 to-black'
+        }`} />
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+        {hiddenMode && <HiddenMatrixRain />}
       </div>
-    </LayoutSupremo>
+
+      <LayoutSupremo title="THE BOARDROOM Ω">
+
+        {/* HEADER CERIMONIAL */}
+        <div className="relative z-10 min-h-screen p-20 flex flex-col">
+          <motion.div
+            initial={{ opacity: 0, y: -100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="text-center mb-32"
+          >
+            <h1 className="text-[14rem] font-black tracking-tighter bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent leading-none">
+              THE BOARDROOM Ω
+            </h1>
+            <p className="text-6xl text-white/70 mt-8 font-light tracking-widest">
+              ERA DO {era}
+            </p>
+            <motion.div 
+              animate={{ rotate: 360 }} 
+              transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+              className="inline-block mt-16"
+            >
+              <Crown className="w-48 h-48 text-yellow-500" />
+            </motion.div>
+          </motion.div>
+
+          {/* ORÁCULUM — A VOZ DO IMPÉRIO */}
+          <AnimatePresence>
+            {oraculumSpeaking && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="fixed top-32 left-1/2 -translate-x-1/2 z-50 bg-black/90 backdrop-blur-3xl border-4 border-emerald-500/50 rounded-3xl p-12 max-w-4xl text-center"
+              >
+                <BrainCircuit className="w-24 h-24 mx-auto mb-8 text-emerald-400 animate-pulse" />
+                <p className="text-5xl font-light text-emerald-400 italic">
+                  "{oraculumMessages[era]}"
+                </p>
+                <p className="text-2xl text-white/60 mt-8">— ORÁCULUM</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* KPIs COM ALMA */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-20 mb-32">
+            <KpiCard title="RECEITA YTD" value={(metrics.revenueYTD/1e6).toFixed(1)+'M'} prefix="R$ " trend={metrics.revenueGrowth} glow={era === 'ASCENSÃO'} />
+            <KpiCard title="EBITDA" value={(metrics.ebitda/1e6).toFixed(1)+'M'} subtitle={`Margem ${metrics.ebitdaMargin.toFixed(1)}%`} trend={metrics.ebitdaMargin > 40 ? 38 : -8} glow={metrics.ebitdaMargin > 45} />
+            <KpiCard title="LTV:CAC" value={metrics.ltvCacRatio.toFixed(1)+'x'} trend={metrics.ltvCacRatio > 10 ? 92 : metrics.ltvCacRatio > 6 ? 28 : -44} glow={metrics.ltvCacRatio > 10} />
+            <KpiCard title="DOMÍNIO" value={metrics.marketSentiment} suffix="/100" trend={metrics.marketSentiment > 90 ? 66 : -22} glow={true} />
+          </div>
+
+          {/* GRÁFICO VIVO */}
+          <motion.div 
+            className="bg-black/40 backdrop-blur-3xl border-8 border-white/10 rounded-4xl p-24 mb-32"
+            whileHover={{ borderColor: '#10b981' }}
+          >
+            <h2 className="text-7xl font-black text-white mb-20 text-center">TRAJETÓRIA DO IMPÉRIO</h2>
+            <ResponsiveContainer width="100%" height={700}>
+              <AreaChart data={metrics.revenueTrend}>
+                <defs>
+                  <linearGradient id="omegaRev">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9}/>
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#10b981" 
+                  strokeWidth={12} 
+                  fill="url(#omegaRev)"
+                  dot={{ fill: '#10b981', r: 8 }}
+                  activeDot={{ r: 16, stroke: '#fff', strokeWidth: 4 }}
+                />
+                <XAxis dataKey="month" stroke="#666" />
+                <YAxis stroke="#666" tickFormatter={v => `${v/1000}M`} />
+                <Tooltip 
+                  contentStyle={{ background: 'rgba(0,0,0,0.95)', border: '2px solid #10b981' }}
+                  formatter={(v: number) => `R$ ${v.toLocaleString('pt-BR')}`}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* SENTIMENTO + PILARES + ORB */}
+          <div className="grid xl:grid-cols-3 gap-20">
+            <SentimentOrb score={metrics.marketSentiment} size="large" era={era} />
+            <div className="xl:col-span-2 space-y-12">
+              {departments.map((d, i) => (
+                <motion.div
+                  key={d.name}
+                  initial={{ opacity: 0, x: 200 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.2 }}
+                  className={`p-12 rounded-3xl border-4 ${
+                    d.status === 'optimal' ? 'bg-emerald-900/20 border-emerald-500/50' :
+                    d.status === 'critical' ? 'bg-red-900/40 border-red-500 animate-pulse' :
+                    'bg-yellow-900/20 border-yellow-500'
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-5xl font-black text-white">{d.name}</h3>
+                    <span className="text-8xl font-black">{d.value}</span>
+                  </div>
+                  <p className="text-2xl text-white/60 mt-4">{d.metric}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* CONTROLES CERIMONIAIS */}
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-8 bg-black/80 backdrop-blur-xl px-12 py-8 rounded-full border-4 border-white/20">
+            <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-6">
+              {soundEnabled ? <Volume2 className="w-12 h-12 text-emerald-400" /> : <VolumeX className="w-12 h-12 text-red-400" />}
+            </button>
+            <button onClick={() => speak(oraculumMessages[era])} className="px-12 py-6 bg-emerald-900/40 rounded-2xl border-2 border-emerald-500">
+              <span className="text-3xl">OUÇIR ORÁCULUM</span>
+            </button>
+            <button onClick={() => setHiddenMode(!hiddenMode)} className="p-6">
+              {hiddenMode ? <EyeOff className="w-12 h-12" /> : <Eye className="w-12 h-12" />}
+            </button>
+            <input
+              type="password"
+              placeholder="CÓDIGO IMPERIAL"
+              className="bg-transparent border-b-4 border-white/30 text-white text-2xl px-8"
+              onChange={(e) => setSecretCode(e.target.value)}
+            />
+          </div>
+
+          {/* RODAPÉ ETERNO */}
+          <div className="text-center text-white/40 text-2xl mt-40">
+            <p>ALSHAM OS v∞ • {new Date().getFullYear()} • DOMÍNIO TOTAL</p>
+            <p className="text-emerald-400 text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
+          </div>
+        </div>
+      </LayoutSupremo>
+    </>
   );
 }
