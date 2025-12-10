@@ -3,14 +3,9 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Analytics.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { ChartBarIcon, CurrencyDollarIcon, TrendingUpIcon, UserGroupIcon } from '@heroicons/react/24/outline';
-import { createClient } from '@supabase/supabase-js';
+import { ChartBarIcon, CurrencyDollarIcon, SparklesIcon, ArrowTrendingUpIcon, TrophyIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Metrics {
   totalLeads: number;
@@ -165,7 +160,7 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-8 border border-purple-500/30 hover:scale-105 transition-all">
-            <TrendingUpIcon className="w-16 h-16 text-purple-400 mb-4" />
+            <ArrowTrendingUpIcon className="w-16 h-16 text-purple-400 mb-4" />
             <p className="text-5xl font-bold text-white">{metrics.conversionRate.toFixed(1)}%</p>
             <p className="text-xl text-purple-300 mt-2">Taxa de Conversão</p>
             <p className="text-2xl text-gray-400 mt-4">Lead → Cliente</p>

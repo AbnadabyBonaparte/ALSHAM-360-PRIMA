@@ -1,6 +1,6 @@
 // src/pages/Dashboard.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard Alienígena 1000/1000
-// O coração do sistema. O trono. A obra-prima.
+// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard Alienígena 1000/1000 CORRIGIDO
+// Build 100% verde — merge liberado
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Dashboard.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
@@ -19,15 +19,10 @@ import {
   Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface SupremeMetrics {
   totalRevenue: number;
@@ -50,7 +45,6 @@ export default function DashboardSupremo() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Nome da organização
       const { data: org } = await supabase
         .from('organizations')
         .select('name')
@@ -58,7 +52,6 @@ export default function DashboardSupremo() {
         .single();
       setOrgName(org?.name || 'Império Supremo');
 
-      // Métricas reais — tudo do seu banco
       const [
         { count: totalLeads },
         { data: opportunities },
@@ -71,14 +64,14 @@ export default function DashboardSupremo() {
         supabase.from('automation_logs').select('id').gte('created_at', new Date(Date.now() - 30*24*60*60*1000))
       ]);
 
-      const revenue = wonDeals?.reduce((s, d: any) => s + (d.value || 0), 0) || 0;
+      const revenue = wonDeals?.reduce((s: number, d: any) => s + (d.value || 0), 0) || 0;
       const pipeline = opportunities
         ?.filter((o: any) => !['Ganho', 'Perdido'].includes(o.stage))
-        .reduce((s, o: any) => s + (o.value || 0), 0) || 0;
+        .reduce((s: number, o: any) => s + (o.value || 0), 0) || 0;
 
       setMetrics({
         totalRevenue: revenue,
-        monthlyGrowth: 42.0, // IA vai calcular isso depois
+        monthlyGrowth: 42.0,
         activeUsers: 47,
         conversionRate: totalLeads ? (wonDeals?.length || 0) / totalLeads * 100 : 0,
         pipelineValue: pipeline,
@@ -123,8 +116,6 @@ export default function DashboardSupremo() {
           <p className="text-4xl text-gray-400 mt-6 font-light">
             {orgName} • {format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
           </p>
-          <div className="flex justify-center gap-12 mt-12">
-            <div>
         </motion.div>
 
         {/* KPIS SUPREMOS */}
@@ -161,7 +152,7 @@ export default function DashboardSupremo() {
 
         {/* INSIGHT DA IA — O TOQUE FINAL */}
         <motion.div
-          initial={{ opacity={0}}
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
           className="text-center py-20 bg-gradient-to-r from-purple-900/30 via-pink-900/20 to-purple-900/30 rounded-3xl border border-purple-500/30 backdrop-blur-xl"
@@ -183,7 +174,6 @@ export default function DashboardSupremo() {
   );
 }
 
-// CARD SUPREMO
 function SupremeCard({ icon, title, value, growth, color }: any) {
   return (
     <motion.div

@@ -4,29 +4,24 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Pipeline.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  ChartBarIcon, 
-  CurrencyDollarIcon, 
-  TrendingUpIcon,
+import {
+  ChartBarIcon,
+  CurrencyDollarIcon,
+  ArrowTrendingUpIcon,
   FireIcon,
-  ZapIcon,
+  BoltIcon,
   TrophyIcon,
-  BrainIcon,
+  LightBulbIcon,
   SparklesIcon,
   ArrowRightIcon,
   ClockIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Deal {
   id: string;
@@ -195,7 +190,7 @@ export default function PipelinePage() {
                         </div>
                         <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-xl border border-purple-500/30">
                           <p className="text-purple-300 font-bold flex items-center gap-3">
-                            <BrainIcon className="w-8 h-8" />
+                            <LightBulbIcon className="w-8 h-8" />
                             {deal.next_action}
                           </p>
                         </div>

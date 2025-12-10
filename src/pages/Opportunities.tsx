@@ -4,10 +4,10 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Opportunities.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  BriefcaseIcon, 
-  CurrencyDollarIcon, 
-  TrendingUpIcon, 
+import {
+  BriefcaseIcon,
+  CurrencyDollarIcon,
+  ArrowTrendingUpIcon,
   CalendarIcon,
   UserIcon,
   BuildingOfficeIcon,
@@ -15,19 +15,14 @@ import {
   SparklesIcon,
   FireIcon,
   TrophyIcon,
-  TargetIcon,
-  ZapIcon
+  ViewfinderCircleIcon,
+  BoltIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Opportunity {
   id: string;
@@ -124,7 +119,7 @@ export default function OpportunitiesPage() {
             color="from-emerald-500 to-teal-600"
           />
           <SupremeDealCard
-            icon={<TrendingUpIcon />}
+            icon={<ArrowTrendingUpIcon />}
             title="Valor Ponderado"
             value={`R$ ${stats.weightedValue.toLocaleString('pt-BR')}`}
             color="from-purple-500 to-pink-600"
@@ -136,13 +131,13 @@ export default function OpportunitiesPage() {
             color="from-orange-500 to-red-600"
           />
           <SupremeDealCard
-            icon={<TargetIcon />}
+            icon={<ViewfinderCircleIcon />}
             title="Fechando Este Mês"
             value={stats.closingThisMonth.toString()}
             color="from-cyan-500 to-blue-600"
           />
           <SupremeDealCard
-            icon={<ZapIcon />}
+            icon={<BoltIcon />}
             title="Win Rate Médio"
             value={`${(stats.weightedValue / stats.totalValue * 100 || 0).toFixed(1)}%`}
             color="from-yellow-500 to-amber-600"

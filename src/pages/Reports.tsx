@@ -4,14 +4,14 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Reports.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
+import {
   DocumentChartBarIcon,
   CurrencyDollarIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   UsersIcon,
-  TargetIcon,
+  ViewfinderCircleIcon,
   FireIcon,
-  BrainIcon,
+  LightBulbIcon,
   SparklesIcon,
   CalendarIcon,
   ArrowUpRightIcon,
@@ -20,15 +20,10 @@ import {
   TrophyIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface SupremeReport {
   totalRevenue: number;
@@ -146,14 +141,14 @@ export default function ReportsPage() {
         {/* KPIS PRINCIPAIS */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-20">
           <SupremeReportCard
-            icon={<CurrencyDollarIcon />
+            icon={<CurrencyDollarIcon />}
             title="Receita Total"
             value={`R$ ${report?.totalRevenue.toLocaleString('pt-BR')}`}
             growth="+127%"
             color="from-emerald-500 to-teal-600"
           />
           <SupremeReportCard
-            icon={<TrendingUpIcon />}
+            icon={<ArrowTrendingUpIcon />}
             title="MRR Projetado"
             value={`R$ ${report?.monthlyRecurring.toLocaleString('pt-BR')}`}
             growth="+89%"
@@ -189,7 +184,7 @@ export default function ReportsPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40"
         >
-          <BrainIcon className="w-64 h-64 text-purple-500 mx-auto mb-16 animate-pulse" />
+          <LightBulbIcon className="w-64 h-64 text-purple-500 mx-auto mb-16 animate-pulse" />
           <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
             SEUS NÚMEROS NÃO MENTEM
           </p>

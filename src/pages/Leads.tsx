@@ -4,14 +4,14 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Leads.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  SparklesIcon, 
-  TrendingUpIcon, 
+import {
+  SparklesIcon,
+  ArrowTrendingUpIcon,
   UserGroupIcon,
   FireIcon,
-  BrainIcon,
-  ZapIcon,
-  TargetIcon,
+  LightBulbIcon,
+  BoltIcon,
+  ViewfinderCircleIcon,
   ClockIcon,
   StarIcon,
   ArrowUpRightIcon,
@@ -19,15 +19,10 @@ import {
   FunnelIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Lead {
   id: string;
@@ -207,7 +202,7 @@ export default function LeadsPage() {
                 {/* NEXT BEST ACTION */}
                 <div className="bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-2xl p-4 mb-6 border border-purple-500/30">
                   <p className="text-purple-300 font-bold flex items-center gap-3">
-                    <ZapIcon className="w-6 h-6" />
+                    <BoltIcon className="w-6 h-6" />
                     Próxima ação: {lead.next_action}
                   </p>
                 </div>
@@ -237,7 +232,7 @@ export default function LeadsPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40 mt-32"
         >
-          <BrainIcon className="w-48 h-48 text-purple-500 mx-auto mb-12 animate-pulse" />
+          <LightBulbIcon className="w-48 h-48 text-purple-500 mx-auto mb-12 animate-pulse" />
           <p className="text-8xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600">
             94% dos leads quentes convertem em menos de 7 dias
           </p>

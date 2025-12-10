@@ -4,12 +4,12 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Home.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  RocketIcon, 
-  BrainIcon, 
-  ZapIcon, 
+import {
+  RocketLaunchIcon,
+  LightBulbIcon,
+  BoltIcon,
   TrophyIcon,
-  GlobeIcon,
+  GlobeAltIcon,
   ShieldCheckIcon,
   SparklesIcon,
   UsersIcon,
@@ -17,15 +17,10 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface SupremeStats {
   totalLeads: number;
@@ -160,7 +155,7 @@ export default function HomePage() {
             <SupremeMetric icon={<UsersIcon />} title="Leads Ativos" value={stats?.totalLeads || 0} color="from-cyan-500 to-blue-600" />
             <SupremeMetric icon={<ChartBarIcon />} title="Deals em Andamento" value={stats?.activeDeals || 0} color="from-purple-500 to-pink-600" />
             <SupremeMetric icon={<CurrencyDollarIcon />} title="Receita do Mês" value={`R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR')}`} color="from-emerald-500 to-teal-600" />
-            <SupremeMetric icon={<ZapIcon />} title="Automação 24h" value={stats?.automationsRunning || 0} color="from-orange-500 to-red-600" />
+            <SupremeMetric icon={<BoltIcon />} title="Automação 24h" value={stats?.automationsRunning || 0} color="from-orange-500 to-red-600" />
           </div>
         </div>
 

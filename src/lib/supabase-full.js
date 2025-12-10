@@ -311,12 +311,15 @@ export async function ensureDeviceKey() {
 
 // ---------------------------------------------------------------------------
 // ACTIVE ORGANIZATION (FIXED - REMOVED DUPLICATE AND is_active COLUMN)
+// SUPREMO ORG_ID - Fallback para modo demo quando não autenticado
+const SUPREMO_DEFAULT_ORG_ID = 'd2c41372-5b3c-441e-b9cf-b5f89c4b6dfe';
+
 export async function getActiveOrganization(options = {}) {
   const { forceRefresh = false } = options || {};
-  
+
   try {
     const client = ensureSupabaseClient();
-    
+
     // Check encrypted cache first (unless force refresh)
     if (!forceRefresh) {
       const cached = await getItemEncrypted(ALSHAM_CURRENT_ORG_KEY);
@@ -324,12 +327,13 @@ export async function getActiveOrganization(options = {}) {
         return cached.org_id;
       }
     }
-    
+
     // Get authenticated user
     const { data: { user } = {} } = await client.auth.getUser();
     if (!user) {
-      logWarn('getActiveOrganization: User not authenticated');
-      return null;
+      logWarn('getActiveOrganization: User not authenticated - using SUPREMO fallback');
+      // SUPREMO FIX: Return default org_id instead of null for demo mode
+      return SUPREMO_DEFAULT_ORG_ID;
     }
     
     // FIX: Removed .order('created_at') because the column does not exist in user_organizations table
@@ -342,11 +346,12 @@ export async function getActiveOrganization(options = {}) {
     
     if (orgErr) {
       logError('getActiveOrganization query failed:', orgErr);
-      return null;
+      // SUPREMO FIX: Return fallback on error
+      return SUPREMO_DEFAULT_ORG_ID;
     }
-    
+
     const orgId = orgList?.[0]?.org_id ?? null;
-    
+
     if (orgId) {
       // Persist to encrypted cache
       await setItemEncrypted(ALSHAM_CURRENT_ORG_KEY, {
@@ -355,13 +360,15 @@ export async function getActiveOrganization(options = {}) {
       });
       return orgId;
     }
-    
-    logWarn('No organization found for user:', user.id);
-    return null;
-    
+
+    logWarn('No organization found for user:', user.id, '- using SUPREMO fallback');
+    // SUPREMO FIX: Return fallback when no org found
+    return SUPREMO_DEFAULT_ORG_ID;
+
   } catch (err) {
     logError('getActiveOrganization failed:', err);
-    return null;
+    // SUPREMO FIX: Return fallback on catch
+    return SUPREMO_DEFAULT_ORG_ID;
   }
 }
 

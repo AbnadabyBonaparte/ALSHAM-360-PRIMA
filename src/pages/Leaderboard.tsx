@@ -4,26 +4,19 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Leaderboard.tsx
 
 import LayoutSupremo from '@/components/LayoutSupremo';
-import { 
-  TrophyIcon, 
-  FlameIcon, 
-  StarIcon, 
-  RocketIcon,
-  CrownIcon,
+import {
+  TrophyIcon,
   FireIcon,
+  StarIcon,
+  RocketLaunchIcon,
   BoltIcon,
   SparklesIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface Champion {
   id: string;
@@ -47,7 +40,6 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     async function loadHallOfFame() {
-      const { 
       const { data, error } = await supabase
         .from('gamification_rankings')
         .select('id, name, avatar_url, nivel, pontos, streak, badges, weekly_gain, title, department')
@@ -137,7 +129,7 @@ export default function LeaderboardPage() {
                       transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                       className="absolute -top-12 left-1/2 -translate-x-1/2"
                     >
-                      <CrownIcon className="w-32 h-32 text-yellow-400" />
+                      <TrophyIcon className="w-32 h-32 text-yellow-400" />
                     </motion.div>
                   )}
 
@@ -234,7 +226,7 @@ export default function LeaderboardPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40 mt-32"
         >
-          <FlameIcon className="w-48 h-48 text-orange-500 mx-auto mb-12 animate-pulse" />
+          <FireIcon className="w-48 h-48 text-orange-500 mx-auto mb-12 animate-pulse" />
           <p className="text-8xl font-light text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-pink-600">
             O FOGO NUNCA APAGA
           </p>
