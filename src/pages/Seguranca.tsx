@@ -40,30 +40,57 @@ export default function SegurancaPage() {
 
   useEffect(() => {
     async function loadSupremeDefense() {
-      // Dados reais do seu Guardian Sentinel
-      const mockRealData: SecurityStatus = {
-        rls_policies: 268,
-        active_sessions: 47,
-        failed_logins_last24h: 3,
-        security_alerts: 0,
-        encryption_status: 'full',
-        last_audit: new Date().toISOString(),
-        guardian_version: 'v16.6-FINAL',
-        compliance_score: 99.9,
-        active_defenses: [
-          'Row Level Security (RLS)',
-          'Realtime Guardian Sentinel',
-          'End-to-End Encryption',
-          'Zero Trust Architecture',
-          'AI Anomaly Detection',
-          'Automated Threat Response',
-          'Immutable Audit Trail',
-          'Quantum-Resistant Keys'
-        ]
-      };
+      try {
+        setLoading(true);
 
-      setStatus(mockRealData);
-      setLoading(false);
+        const [
+          { data: securityDashboard },
+          { count: activeSessionsCount },
+          { count: alertsCount },
+          { count: incidentsCount },
+        ] = await Promise.all([
+          supabase.from('vw_security_dashboard').select('*').single(),
+          supabase.from('active_sessions').select('*', { count: 'exact', head: true }),
+          supabase.from('security_alerts').select('*', { count: 'exact', head: true }),
+          supabase.from('security_incidents').select('*', { count: 'exact', head: true }),
+        ]);
+
+        const fallbackLastAudit = new Date().toISOString();
+
+        setStatus({
+          rls_policies: securityDashboard?.rls_policies ?? 0,
+          active_sessions: securityDashboard?.active_sessions ?? activeSessionsCount ?? 0,
+          failed_logins_last24h: securityDashboard?.failed_logins_last24h ?? 0,
+          security_alerts: securityDashboard?.security_alerts ?? alertsCount ?? 0,
+          encryption_status: securityDashboard?.encryption_status ?? 'partial',
+          last_audit: securityDashboard?.last_audit ?? fallbackLastAudit,
+          guardian_version: securityDashboard?.guardian_version ?? 'v16.6-FINAL',
+          compliance_score: securityDashboard?.compliance_score ?? 0,
+          active_defenses: securityDashboard?.active_defenses ?? [
+            'Row Level Security (RLS)',
+            'Realtime Guardian Sentinel',
+            'End-to-End Encryption',
+            'Zero Trust Architecture',
+            'AI Anomaly Detection',
+            'Immutable Audit Trail',
+          ],
+        });
+      } catch (err) {
+        console.error('Erro ao carregar painel de segurança', err);
+        setStatus({
+          rls_policies: 0,
+          active_sessions: 0,
+          failed_logins_last24h: 0,
+          security_alerts: 0,
+          encryption_status: 'partial',
+          last_audit: new Date().toISOString(),
+          guardian_version: 'v16.6-FINAL',
+          compliance_score: 0,
+          active_defenses: [],
+        });
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadSupremeDefense();
