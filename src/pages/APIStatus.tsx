@@ -1,17 +1,23 @@
 // src/pages/APIStatus.tsx
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef, Suspense, lazy } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupremePage } from '@/components/SupremePageFactory'
 import { supremeConfigs } from './supremeConfigs'
-import { NeuralGraph } from '@/components/visualizations/NeuralGraph'
-import { GlitchText } from '@/components/effects/GlitchText'
-import { ReplayDebugger } from '@/components/dev/ReplayDebugger'
 import { useSupabaseRealtime } from '@/hooks/useSupabaseRealtime'
 import { useAnalytics } from '@/hooks/useAnalytics'
+import { useTheme } from '@/hooks/useTheme'
 import { AlertTriangle, Activity, Zap, DollarSign, RefreshCw } from 'lucide-react'
-import debounce from 'lodash/debounce'
+import { GlitchText } from '@/components/effects/GlitchText'
 import useSound from 'use-sound'
+
+// Lazy-load resiliente dos componentes pesados
+const NeuralGraph = lazy(() =>
+  import('@/components/visualizations/NeuralGraph').then(m => ({ default: m.NeuralGraph || m.default }))
+)
+const ReplayDebugger = lazy(() =>
+  import('@/components/dev/ReplayDebugger').then(m => ({ default: m.ReplayDebugger || m.default }))
+)
 
 // Enum e tipagem rigorosa
 enum HealthStatus {
@@ -37,17 +43,7 @@ const BOOT_STEPS = [
   'Finalizing HUD…',
 ]
 
-// Loading skeletons
-const LoadingBar = () => <div className="h-4 w-20 rounded bg-[var(--surface-3)] animate-pulse" />
-
-const MetricSkeleton = () => (
-  <div className="flex flex-col">
-    <div className="h-3 w-16 rounded bg-[var(--surface-3)] animate-pulse mb-2" />
-    <div className="h-8 w-24 rounded bg-[var(--surface-3)] animate-pulse" />
-  </div>
-)
-
-// ErrorBoundary local para o Mesh
+// ErrorBoundary local para o Mesh (WebGL)
 class MeshBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   state = { hasError: false }
 
@@ -70,20 +66,21 @@ class MeshBoundary extends React.Component<{ children: React.ReactNode }, { hasE
   }
 }
 
-// LongPressButton com acessibilidade completa (teclado + screen reader)
+// LongPressButton com a11y completa e suporte a props arbitrárias
 function LongPressButton({
   onLongPress,
   className = '',
   children,
   ms = 1600,
   ariaLabel,
+  ...buttonProps
 }: {
   onLongPress: () => void
   className?: string
   children: React.ReactNode
   ms?: number
   ariaLabel?: string
-}) {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const [pressing, setPressing] = useState(false)
   const [progress, setProgress] = useState(0)
 
@@ -106,6 +103,7 @@ function LongPressButton({
 
   return (
     <button
+      type="button"
       onMouseDown={() => setPressing(true)}
       onMouseUp={() => setPressing(false)}
       onMouseLeave={() => setPressing(false)}
@@ -123,11 +121,9 @@ function LongPressButton({
           setPressing(false)
         }
       }}
-      role="button"
-      tabIndex={0}
       aria-label={ariaLabel}
-      aria-live="polite"
       className={`relative overflow-hidden ${className}`}
+      {...buttonProps}
     >
       <span className="relative z-10">{children}</span>
       <span
@@ -135,6 +131,9 @@ function LongPressButton({
         className="absolute left-0 top-0 h-full bg-[var(--status-crit)]/30 transition-[width]"
         style={{ width: `${progress * 100}%` }}
       />
+      <span className="sr-only" aria-live="polite">
+        {Math.round(progress * 100)}% complete
+      </span>
     </button>
   )
 }
@@ -175,7 +174,7 @@ const MetricTicker = React.memo(
               : 'text-[var(--status-crit)]'
           }`}
         >
-          {trend === 'up' ? '▲' : trend === 'stable' ? '—' : '▼'}
+          {trend === 'up' ? '▲' : '▼'}
         </span>
       </div>
     </div>
@@ -183,6 +182,7 @@ const MetricTicker = React.memo(
 )
 
 const APIStatusPage = () => {
+  const { theme, setTheme } = useTheme()
   const { logEvent } = useAnalytics()
   const { data: healthData, status: realtimeStatus, error: supabaseError } = useSupabaseRealtime<SystemHealth>('system_health', {
     order: { column: 'last_updated', ascending: false },
@@ -202,18 +202,21 @@ const APIStatusPage = () => {
   const [showDegradationBanner, setShowDegradationBanner] = useState(false)
   const [bootStep, setBootStep] = useState(0)
   const [cleared, setCleared] = useState(false)
+  const [audioEnabled, setAudioEnabled] = useState(false)
+
+  const lastAlertAtRef = useRef(0)
 
   const bootDone = bootStep >= BOOT_STEPS.length
   const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-  // Sons sutis (volume baixo + safe SSR)
-  const allowAudio = typeof window !== 'undefined' && !prefersReducedMotion
+  // Áudio só após interação do usuário
+  const allowAudio = typeof window !== 'undefined' && !prefersReducedMotion && audioEnabled
   const [playAlert] = useSound('/sounds/glitch-alert.mp3', { volume: 0.18, soundEnabled: allowAudio })
   const [playHover] = useSound('/sounds/tech-hover.mp3', { volume: 0.08, soundEnabled: allowAudio })
 
   // Boot sequence
   useEffect(() => {
-    if (healthData) {
+    if (healthData?.length) {
       setBootStep(BOOT_STEPS.length)
       return
     }
@@ -235,15 +238,20 @@ const APIStatusPage = () => {
     setShowDegradationBanner(realtimeStatus !== 'connected' || !!supabaseError)
   }, [realtimeStatus, supabaseError])
 
-  // Alerta sonoro crítico
+  // Alerta sonoro crítico (throttle 2s via ref)
   useEffect(() => {
-    if (health.status === HealthStatus.critical) playAlert()
+    if (health.status !== HealthStatus.critical) return
+    const now = Date.now()
+    if (now - lastAlertAtRef.current > 2000) {
+      playAlert()
+      lastAlertAtRef.current = now
+    }
   }, [health.status, playAlert])
 
   // Telemetria de abertura
   useEffect(() => {
-    logEvent('APIStatus_Opened', { ts: Date.now(), realtimeStatus })
-  }, [logEvent, realtimeStatus])
+    logEvent('APIStatus_Opened', { ts: Date.now(), realtimeStatus, theme })
+  }, [logEvent, realtimeStatus, theme])
 
   // Telemetria de status realtime
   useEffect(() => {
@@ -290,12 +298,12 @@ const APIStatusPage = () => {
   }, [logEvent])
 
   // Custo dinâmico
-  const costPerMin = useMemo(() => {
+  const costPerMin = useMemo<string | null>(() => {
     if (!healthData) return null
     const base = 3.75
     const factor = Math.max(1, health.latency_ms / 100) + health.active_incidents * 0.15
     return (base * factor).toFixed(2)
-  }, [healthData, health])
+  }, [healthData, health.latency_ms, health.active_incidents])
 
   // Normalização do error_rate
   const errorRatePct = health.error_rate * 100
@@ -309,21 +317,41 @@ const APIStatusPage = () => {
   // Formatação de números
   const nf = useMemo(() => new Intl.NumberFormat('en-US'), [])
 
+  // Status colors dinâmicos via tokens
+  const statusColor = {
+    [HealthStatus.operational]: 'from-[var(--status-ok)] to-[var(--status-ok)]',
+    [HealthStatus.degraded]: 'from-[var(--status-warn)] to-[var(--status-warn)]',
+    [HealthStatus.critical]: 'from-[var(--status-crit)] to-[var(--status-crit)]',
+  }
+
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden font-sans relative" data-theme="glass-dark">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden font-sans relative" data-theme={theme}>
+      {/* Toggle de som (sempre visível) */}
+      <button
+        type="button"
+        data-testid="sound-toggle"
+        onClick={() => setAudioEnabled(v => !v)}
+        className="fixed top-4 right-4 z-50 text-[10px] px-3 py-1.5 rounded border border-[var(--border)] hover:bg-white/5 transition"
+        aria-pressed={audioEnabled}
+      >
+        {audioEnabled ? 'Sound: ON' : 'Sound: OFF'}
+      </button>
+
       {/* Background NeuralGraph */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <NeuralGraph active={health.status === HealthStatus.operational} />
+        <Suspense fallback={<div className="p-6 text-[10px] font-mono text-[var(--text-secondary)]">Booting Integration Mesh…</div>}>
+          <NeuralGraph active={health.status === HealthStatus.operational} />
+        </Suspense>
       </div>
 
       {/* Banner de degradação */}
       {showDegradationBanner && (
-        <div role="alert" className="relative z-20 m-4 p-3 text-sm bg-[var(--status-warn)]/10 border border-[var(--status-warn)] rounded-lg text-center">
+        <div role="alert" data-testid="realtime-degraded" className="relative z-20 m-4 p-3 text-sm bg-[var(--status-warn)]/10 border border-[var(--status-warn)] rounded-lg text-center">
           Conexão degradada ao Realtime — exibindo dados parciais ou desatualizados.
         </div>
       )}
 
-      {/* Header HUD */}
+      {/* Header HUD – The Synapse */}
       <header className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center p-6 backdrop-blur-md border-b border-[var(--border)]">
         <div className="flex items-center gap-4">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tighter flex items-center gap-4">
@@ -336,16 +364,9 @@ const APIStatusPage = () => {
             )}
             <div
               className={`w-4 h-4 rounded-full shadow-lg ${
-                prefersReducedMotion
-                  ? ''
-                  : 'animate-pulse'
-              } ${
-                health.status === HealthStatus.operational
-                  ? 'bg-[var(--status-ok)] shadow-[0_0_0_6px_rgba(34,197,94,0.15)]'
-                  : health.status === HealthStatus.degraded
-                  ? 'bg-[var(--status-warn)] shadow-[0_0_0_6px_rgba(234,179,8,0.15)]'
-                  : 'bg-[var(--status-crit)] shadow-[0_0_0_6px_rgba(239,68,68,0.2)]'
-              }`}
+                prefersReducedMotion ? '' : 'animate-pulse'
+              } ${statusColor[health.status]}`}
+              data-testid={`status-dot-${health.status}`}
             />
           </h1>
           <p className="text-sm uppercase tracking-widest text-[var(--text-secondary)] mt-1 md:mt-0">
@@ -356,7 +377,7 @@ const APIStatusPage = () => {
         {/* Métricas com boot sequence */}
         <div className="flex flex-wrap gap-8 mt-4 md:mt-0">
           {!healthData || !bootDone ? (
-            <div role="status" aria-live="polite" className="font-mono text-xs bg-[var(--surface-glass)] px-4 py-3 rounded-lg border border-[var(--border)]">
+            <div role="status" aria-live="polite" data-testid="boot-status" className="font-mono text-xs bg-[var(--surface-glass)] px-4 py-3 rounded-lg border border-[var(--border)]">
               <span className="opacity-70">
                 {BOOT_STEPS[Math.min(bootStep, BOOT_STEPS.length - 1)]}
               </span>
@@ -365,7 +386,7 @@ const APIStatusPage = () => {
             <>
               <MetricTicker icon={<Zap />} label="Latency" value={`${health.latency_ms}ms`} trend={trendLatency} data-testid="latency-metric" />
               <MetricTicker icon={<Activity />} label="Error Rate" value={errorRateDisplay} trend={trendError} data-testid="error-metric" />
-              <MetricTicker icon={<DollarSign />} label={costPerMin ? "Cost/min" : "Cost/min (est.)"} value={costPerMin ?? 'Calculating…'} trend="up" isCurrency data-testid="cost-metric" />
+              <MetricTicker icon={<DollarSign />} label={costPerMin ? "Cost/min" : "Cost/min (est.)"} value={costPerMin ?? 'Calculating…'} trend="up" isCurrency={!!costPerMin} data-testid="cost-metric" />
               <MetricTicker icon={<AlertTriangle />} label="Active Incidents" value={health.active_incidents.toString()} trend={health.active_incidents === 0 ? 'good' : 'critical'} data-testid="incidents-metric" />
             </>
           )}
@@ -383,11 +404,13 @@ const APIStatusPage = () => {
             </h2>
           </div>
 
-          <MeshBoundary>
-            <div className="w-full h-full flex items-center justify-center">
-              <NeuralGraph selectedNode={selectedNode} onNodeSelect={handleNodeSelect} className="w-full h-full" />
-            </div>
-          </MeshBoundary>
+          <Suspense fallback={<div className="p-6 text-[10px] font-mono text-[var(--text-secondary)]">Booting Integration Mesh…</div>}>
+            <MeshBoundary>
+              <div className="w-full h-full flex items-center justify-center">
+                <NeuralGraph selectedNode={selectedNode} onNodeSelect={handleNodeSelect} className="w-full h-full" />
+              </div>
+            </MeshBoundary>
+          </Suspense>
 
           {/* Node Details Card */}
           <AnimatePresence initial={false}>
@@ -412,14 +435,18 @@ const APIStatusPage = () => {
                   <div className="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-[var(--status-ok)] to-[var(--status-ok)] w-[98%]" />
                   </div>
-                  <button
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={handleReplayOpen}
                     onMouseEnter={() => playHover()}
+                    onFocus={() => playHover()}
                     className="w-full py-3 bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] text-black font-bold rounded-lg hover:brightness-110 transition-all shadow-lg"
                     data-testid="replay-open-btn"
                   >
                     Deep Inspect & Replay
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             )}
@@ -434,8 +461,8 @@ const APIStatusPage = () => {
             <div className="flex items-end justify-between mb-4">
               <div className="text-5xl font-mono font-bold text-[var(--status-ok)]">99.9%</div>
               <div className="text-xs text-right text-[var(--text-muted)]">
-                IN: {new Intl.NumberFormat('en-US').format(14203)}/min<br />
-                OUT: {new Intl.NumberFormat('en-US').format(2401)}/min
+                IN: {nf.format(14203)}/min<br />
+                OUT: {nf.format(2401)}/min
               </div>
             </div>
             <div className="flex gap-1 h-12 items-end">
@@ -460,6 +487,7 @@ const APIStatusPage = () => {
                 onLongPress={handleClearAllConfirmed}
                 className="text-xs px-2 py-1 rounded text-[var(--status-crit)] hover:text-white border border-transparent hover:border-[var(--status-crit)]/40 transition"
                 ariaLabel="Pressione e segure para limpar todas as falhas"
+                data-testid="clear-all-longpress"
               >
                 CLEAR ALL (hold)
               </LongPressButton>
@@ -494,18 +522,26 @@ const APIStatusPage = () => {
                       Error: Database connection timeout in 'api_integrations' table...
                     </div>
                     <div className="mt-3 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         onMouseEnter={() => playHover()}
+                        onFocus={() => playHover()}
                         className="bg-[var(--status-crit)]/30 px-3 py-1 rounded text-[var(--status-crit)] hover:bg-[var(--status-crit)] hover:text-white transition"
                       >
                         Fix with AI
-                      </button>
-                      <button
+                      </motion.button>
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         onMouseEnter={() => playHover()}
+                        onFocus={() => playHover()}
                         className="bg-white/10 px-3 py-1 rounded hover:bg-white/20 transition"
                       >
                         Trace
-                      </button>
+                      </motion.button>
                     </div>
                   </motion.div>
                 )}
@@ -516,7 +552,9 @@ const APIStatusPage = () => {
       </main>
 
       {/* Replay Debugger */}
-      <ReplayDebugger isOpen={isReplayOpen} onClose={() => setIsReplayOpen(false)} />
+      <Suspense fallback={<div className="p-4 text-[10px] font-mono text-[var(--text-secondary)]">Loading debugger…</div>}>
+        <ReplayDebugger isOpen={isReplayOpen} onClose={() => setIsReplayOpen(false)} />
+      </Suspense>
     </div>
   )
 }
