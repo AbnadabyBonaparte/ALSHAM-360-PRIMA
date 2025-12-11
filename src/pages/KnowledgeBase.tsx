@@ -3,7 +3,6 @@
 // Todo o conhecimento em um só lugar. Autoatendimento que elimina tickets.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   BookOpenIcon,
   DocumentTextIcon,
@@ -102,16 +101,14 @@ export default function KnowledgeBasePage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Base de Conhecimento">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-amber-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-amber-400 font-light">Carregando conhecimento...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-amber-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-amber-400 font-light">Carregando conhecimento...</p>
+      </div>
     );
   }
 
@@ -122,8 +119,7 @@ export default function KnowledgeBasePage() {
   }) || [];
 
   return (
-    <LayoutSupremo title="Base de Conhecimento">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -147,7 +143,7 @@ export default function KnowledgeBasePage() {
               placeholder="Buscar artigos..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="w-full bg-white/10 border border-white/20 rounded-2xl py-4 pl-14 pr-6 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-colors"
+              className="w-full bg-white/10 border border-white/20 rounded-2xl py-4 pl-14 pr-6 text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-colors"
             />
           </div>
         </div>
@@ -156,25 +152,25 @@ export default function KnowledgeBasePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-amber-900/60 to-yellow-900/60 rounded-2xl p-6 border border-amber-500/30">
             <BookOpenIcon className="w-12 h-12 text-amber-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalArtigos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalArtigos || 0}</p>
             <p className="text-gray-400">Artigos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <FolderIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalCategorias || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalCategorias || 0}</p>
             <p className="text-gray-400">Categorias</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-2xl p-6 border border-blue-500/30">
             <EyeIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-gray-400">Visualizações</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <HandThumbUpIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.satisfacao || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.satisfacao || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Satisfação</p>
           </motion.div>
         </div>
@@ -222,7 +218,7 @@ export default function KnowledgeBasePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   whileHover={{ x: 10 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-amber-500/50 transition-all cursor-pointer"
+                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)] hover:border-amber-500/50 transition-all cursor-pointer"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -232,7 +228,7 @@ export default function KnowledgeBasePage() {
                           {artigo.categoria}
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-2">{artigo.titulo}</h3>
+                      <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">{artigo.titulo}</h3>
                       <p className="text-gray-400 line-clamp-2">{artigo.resumo}</p>
                     </div>
 
@@ -271,6 +267,5 @@ export default function KnowledgeBasePage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

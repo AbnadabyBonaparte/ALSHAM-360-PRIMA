@@ -3,7 +3,6 @@
 // Cada ticket resolvido é um cliente encantado. Suporte que transforma problemas em fãs.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   TicketIcon,
   ClockIcon,
@@ -99,16 +98,14 @@ export default function SupportTicketsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Suporte Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-teal-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-teal-400 font-light">Carregando tickets...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-teal-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-teal-400 font-light">Carregando tickets...</p>
+      </div>
     );
   }
 
@@ -128,8 +125,7 @@ export default function SupportTicketsPage() {
   };
 
   return (
-    <LayoutSupremo title="Suporte Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -148,25 +144,25 @@ export default function SupportTicketsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-teal-900/60 to-cyan-900/60 rounded-2xl p-6 border border-teal-500/30">
             <TicketIcon className="w-12 h-12 text-teal-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalTickets || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalTickets || 0}</p>
             <p className="text-gray-400">Total Tickets</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ExclamationTriangleIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.abertos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.abertos || 0}</p>
             <p className="text-gray-400">Abertos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
             <ClockIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.tempoMedioResposta || 0).toFixed(0)}min</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.tempoMedioResposta || 0).toFixed(0)}min</p>
             <p className="text-gray-400">Tempo Médio</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.satisfacao || 0}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.satisfacao || 0}%</p>
             <p className="text-gray-400">Satisfação</p>
           </motion.div>
         </div>
@@ -198,7 +194,7 @@ export default function SupportTicketsPage() {
                     className={`bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border transition-all ${
                       ticket.prioridade === 'urgente'
                         ? 'border-red-500/50 shadow-lg shadow-red-500/20'
-                        : 'border-white/10 hover:border-teal-500/50'
+                        : 'border-[var(--border)] hover:border-teal-500/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -216,7 +212,7 @@ export default function SupportTicketsPage() {
                               {ticket.status.replace('_', ' ')}
                             </span>
                           </div>
-                          <h3 className="text-xl font-bold text-white">{ticket.titulo}</h3>
+                          <h3 className="text-xl font-bold text-[var(--text-primary)]">{ticket.titulo}</h3>
                           <p className="text-gray-400">{ticket.cliente} • {ticket.categoria}</p>
                         </div>
                       </div>
@@ -266,6 +262,5 @@ export default function SupportTicketsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

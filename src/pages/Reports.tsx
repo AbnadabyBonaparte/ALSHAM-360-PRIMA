@@ -3,7 +3,6 @@
 // Onde os números falam. Onde a verdade aparece. Onde você reina.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Reports.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   DocumentChartBarIcon,
   CurrencyDollarIcon,
@@ -105,22 +104,19 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Relatórios Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-12 border-t-transparent border-cyan-500 rounded-full"
-          />
-          <p className="absolute text-5xl text-cyan-400 font-light">Citizen Supremo X.1 calculando seu império...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-12 border-t-transparent border-cyan-500 rounded-full"
+        />
+        <p className="absolute text-5xl text-cyan-400 font-light">Citizen Supremo X.1 calculando seu império...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Relatórios Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -199,7 +195,6 @@ export default function ReportsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }
 
@@ -207,16 +202,16 @@ function SupremeReportCard({ icon, title, value, growth, color }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-white/10 backdrop-blur-xl shadow-2xl`}
+      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl`}
     >
       <div className="flex items-center justify-center mb-8">
         <div className="p-8 bg-white/10 rounded-3xl">
           {icon}
         </div>
       </div>
-      <p className="text-7xl font-black text-white text-center">{value}</p>
-      <p className="text-3xl text-white/80 text-center mt-6">{title}</p>
-      <p className="text-2xl text-white/60 text-center mt-4">{growth}</p>
+      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
+      <p className="text-2xl text-[var(--text-primary)]/60 text-center mt-4">{growth}</p>
     </motion.div>
   );
 }
@@ -224,7 +219,7 @@ function SupremeReportCard({ icon, title, value, growth, color }: any) {
 function MiniCard({ title, value, color }: any) {
   return (
     <div className={`bg-gradient-to-br from-${color}-900/50 to-${color}-900/30 rounded-3xl p-8 border border-${color}-500/30`}>
-      <p className="text-5xl font-black text-white">{value}</p>
+      <p className="text-5xl font-black text-[var(--text-primary)]">{value}</p>
       <p className="text-2xl text-gray-300 mt-4">{title}</p>
     </div>
   );

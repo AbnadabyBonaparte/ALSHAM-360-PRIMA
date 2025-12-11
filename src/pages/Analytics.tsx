@@ -2,7 +2,6 @@
 // ALSHAM 360° PRIMA v10 SUPREMO — Analytics 1000/1000
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Analytics.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { ChartBarIcon, CurrencyDollarIcon, SparklesIcon, ArrowTrendingUpIcon, TrophyIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -83,28 +82,23 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Analytics Supremo">
-        <div className="p-12 text-center">
-          <div className="inline-block animate-spin w-20 h-20 border-8 border-primary border-t-transparent rounded-full"></div>
-          <p className="text-3xl text-gray-400 mt-8">Citizen Supremo X.1 analisando seu império...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="p-12 text-center">
+        <div className="inline-block animate-spin w-20 h-20 border-8 border-primary border-t-transparent rounded-full"></div>
+        <p className="text-3xl text-gray-400 mt-8">Citizen Supremo X.1 analisando seu império...</p>
+      </div>
     );
   }
 
   if (!metrics) {
     return (
-      <LayoutSupremo title="Analytics Supremo">
-        <div className="p-12 text-center">
-          <p className="text-3xl text-red-400">Erro ao carregar dados reais</p>
-        </div>
-      </LayoutSupremo>
+      <div className="p-12 text-center">
+        <p className="text-3xl text-red-400">Erro ao carregar dados reais</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Analytics Supremo">
-      <div className="p-8 max-w-full">
+    <div className="p-8 max-w-full">
         {/* Header Supremo */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-8">
@@ -127,7 +121,7 @@ export default function AnalyticsPage() {
                 onClick={() => setTimeRange(range)}
                 className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${
                   timeRange === range
-                    ? 'bg-primary text-white shadow-2xl shadow-primary/50'
+                    ? 'bg-primary text-[var(--text-primary)] shadow-2xl shadow-primary/50'
                     : 'bg-white/10 hover:bg-white/20 text-gray-300'
                 }`}
               >
@@ -141,7 +135,7 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div className="bg-gradient-to-br from-emerald-900/50 to-teal-900/50 rounded-3xl p-8 border border-emerald-500/30 hover:scale-105 transition-all">
             <UserGroupIcon className="w-16 h-16 text-emerald-400 mb-4" />
-            <p className="text-5xl font-bold text-white">{metrics.totalLeads.toLocaleString()}</p>
+            <p className="text-5xl font-bold text-[var(--text-primary)]">{metrics.totalLeads.toLocaleString()}</p>
             <p className="text-xl text-emerald-300 mt-2">Leads Totais</p>
             <p className="text-3xl text-emerald-400 mt-4">+{metrics.leadsThisMonth}</p>
             <p className="text-gray-400">neste período</p>
@@ -149,7 +143,7 @@ export default function AnalyticsPage() {
 
           <div className="bg-gradient-to-br from-blue-900/50 to-cyan-900/50 rounded-3xl p-8 border border-blue-500/30 hover:scale-105 transition-all">
             <CurrencyDollarIcon className="w-16 h-16 text-cyan-400 mb-4" />
-            <p className="text-5xl font-bold text-white">
+            <p className="text-5xl font-bold text-[var(--text-primary)]">
               R$ {metrics.totalRevenue.toLocaleString('pt-BR')}
             </p>
             <p className="text-xl text-cyan-300 mt-2">Receita Total</p>
@@ -161,14 +155,14 @@ export default function AnalyticsPage() {
 
           <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-8 border border-purple-500/30 hover:scale-105 transition-all">
             <ArrowTrendingUpIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-5xl font-bold text-white">{metrics.conversionRate.toFixed(1)}%</p>
+            <p className="text-5xl font-bold text-[var(--text-primary)]">{metrics.conversionRate.toFixed(1)}%</p>
             <p className="text-xl text-purple-300 mt-2">Taxa de Conversão</p>
             <p className="text-2xl text-gray-400 mt-4">Lead → Cliente</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-900/50 to-red-900/50 rounded-3xl p-8 border border-orange-500/30 hover:scale-105 transition-all">
             <TrophyIcon className="w-16 h-16 text-orange-400 mb-4" />
-            <p className="text-5xl font-bold text-white">{metrics.winRate.toFixed(1)}%</p>
+            <p className="text-5xl font-bold text-[var(--text-primary)]">{metrics.winRate.toFixed(1)}%</p>
             <p className="text-xl text-orange-300 mt-2">Win Rate</p>
             <p className="text-2xl text-gray-400 mt-4">Fechamentos / Oportunidades</p>
           </div>
@@ -179,7 +173,7 @@ export default function AnalyticsPage() {
           <div className="flex items-center gap-6">
             <SparklesIcon className="w-16 h-16 text-purple-400 animate-pulse" />
             <div>
-              <h2 className="text-4xl font-bold text-white mb-4">Insight Supremo da IA</h2>
+              <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-4">Insight Supremo da IA</h2>
               <p className="text-2xl text-purple-200 leading-relaxed">
                 {metrics.conversionRate > 15
                   ? "Você está no top 3% mundial de conversão. Continue assim e dominaremos o mercado em 90 dias."
@@ -191,6 +185,5 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }
