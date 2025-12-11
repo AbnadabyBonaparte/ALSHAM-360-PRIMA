@@ -45,7 +45,7 @@ const DealCard = ({ deal }: { deal: Deal }) => {
           relative p-6 rounded-2xl backdrop-blur-2xl border cursor-grab active:cursor-grabbing overflow-hidden
           ${deal.health === 'divine' ? 'bg-gradient-to-br from-yellow-600/40 via-amber-500/50 to-orange-600/40 border-yellow-500 shadow-2xl shadow-yellow-600/60' :
             deal.stage === 'Ganho' ? 'bg-emerald-900/30 border-emerald-500/40' :
-            'bg-white/5 border-[var(--border)]'}
+            'bg-[var(--surface)] border-[var(--border)]'}
           ${isStale ? 'opacity-60 grayscale' : ''}
         `}
         whileHover={{ scale: 1.04, borderColor: 'rgba(255,255,255,0.3)' }}
@@ -139,8 +139,7 @@ export default function PipelineQuantico() {
               placeholder="Buscar deals..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none text-[var(--text-primary)]"
-              className="bg-white/5 border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none"
+              className="bg-[var(--surface-strong)] border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none text-[var(--text-primary)]"
             />
           </div>
         </div>
@@ -172,7 +171,6 @@ export default function PipelineQuantico() {
                     </Reorder.Group>
                   </div>
                 </div>
-              </div>
               );
             })}
           </div>

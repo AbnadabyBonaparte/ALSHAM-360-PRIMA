@@ -209,9 +209,10 @@ export default function AutomationForgeInfinity() {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 onClick={save}
-                className="px-12 py-6 rounded-3xl bg-white/10 hover:bg-white/20 border-2 border-white/20 flex items-center gap-6 text-2xl font-bold"
+                className="px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-2xl bg-[var(--surface-strong)] hover:bg-[var(--surface)] border-2 border-[var(--border)] flex items-center gap-4 text-lg sm:text-xl font-semibold text-[var(--text-primary)]"
               >
-                <Save Salvar no Éter
+                <Save className="h-6 w-6" />
+                Salvar no Éter
               </motion.button>
 
               <motion.button
@@ -242,7 +243,7 @@ export default function AutomationForgeInfinity() {
               onChange={e => setPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && createWithAI()}
               placeholder="Fale com o Supremo AI: 'quando lead abrir proposta, mandar WhatsApp com desconto de 7% em 5min'"
-className="w-full px-20 py-12 text-4xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-4 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder-white/40 shadow-2xl")
+              className="w-full px-20 py-12 text-4xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-4 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder-white/40 shadow-2xl"
             />
             <motion.button
               whileHover={{ scale: 1.4, rotate: 360 }}

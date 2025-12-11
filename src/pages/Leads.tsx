@@ -106,13 +106,13 @@ export default function LeadsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">
             LEADS INTELLIGENCE
           </h1>
-          <p className="text-5xl text-gray-300 mt-8 font-light">
+          <p className="text-lg sm:text-xl md:text-2xl text-[var(--text-secondary)] mt-8 font-light">
             {stats.total} leads • {stats.hot} quentes • R$ {stats.revenue.toLocaleString('pt-BR')} em potencial
           </p>
-          <p className="text-3xl text-gray-400 mt-8">
+          <p className="text-base sm:text-lg md:text-xl text-[var(--text-secondary)] mt-8">
             Citizen Supremo X.1 já analisou todos eles. E sabe exatamente quem vai converter.
           </p>
         </motion.div>
@@ -122,25 +122,25 @@ export default function LeadsPage() {
           <div className="flex flex-wrap gap-6 justify-center">
             <button
               onClick={() => setFilter('all')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${filter === 'all' ? 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl shadow-purple-500/50' : 'bg-white/10'}`}
+              className={`px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all ${filter === 'all' ? 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl shadow-purple-500/50' : 'bg-[var(--surface-strong)]'}`}
             >
               Todos ({stats.total})
             </button>
             <button
               onClick={() => setFilter('hot')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${filter === 'hot' ? 'bg-gradient-to-r from-orange-600 to-red-600 shadow-2xl shadow-orange-500/50' : 'bg-white/10'}`}
+              className={`px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all ${filter === 'hot' ? 'bg-gradient-to-r from-orange-600 to-red-600 shadow-2xl shadow-orange-500/50' : 'bg-[var(--surface-strong)]'}`}
             >
               Quentes ({stats.hot})
             </button>
             <button
               onClick={() => setFilter('risk')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${filter === 'risk' ? 'bg-gradient-to-r from-red-600 to-pink-amber-600 shadow-2xl shadow-red-500/50' : 'bg-white/10'}`}
+              className={`px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all ${filter === 'risk' ? 'bg-gradient-to-r from-red-600 to-pink-amber-600 shadow-2xl shadow-red-500/50' : 'bg-[var(--surface-strong)]'}`}
             >
               Em Risco ({stats.atRisk})
             </button>
             <button
               onClick={() => setFilter('new')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${filter === 'new' ? 'bg-gradient-to-r from-emerald-600 to-cyan-600 shadow-2xl shadow-emerald-500/50' : 'bg-white/10'}`}
+              className={`px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all ${filter === 'new' ? 'bg-gradient-to-r from-emerald-600 to-cyan-600 shadow-2xl shadow-emerald-500/50' : 'bg-[var(--surface-strong)]'}`}
             >
               Novos Esta Semana
             </button>
@@ -148,13 +148,13 @@ export default function LeadsPage() {
 
           {/* BUSCA INTELIGENTE */}
           <div className="mt-12 max-w-3xl mx-auto relative">
-            <MagnifyingGlassIcon className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 text-gray-400" />
+            <MagnifyingGlassIcon className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 text-[var(--text-secondary)]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nome, empresa, e-mail, tags... (IA entende contexto)"
-              className="w-full pl-28 pr-12 py-8 bg-white/10 backdrop-blur-2xl rounded-3xl text-3xl border border-white/20 focus:border-primary/70 outline-none transition-all placeholder-gray-500"
+              className="w-full pl-28 pr-12 py-8 bg-[var(--surface-strong)] backdrop-blur-2xl rounded-3xl text-2xl sm:text-3xl border border-[var(--border)] focus:border-primary/70 outline-none transition-all placeholder-[var(--text-secondary)]"
             />
           </div>
         </div>
@@ -180,21 +180,21 @@ export default function LeadsPage() {
                 {lead.score >= 90 && <SparklesIcon className="w-10 h-10 inline ml-3 animate-pulse" />}
               </div>
 
-              <div className="bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl p-10 border-2 border-[var(--border)] hover:border-primary/70 transition-all hover:shadow-2xl hover:shadow-primary/30">
+              <div className="bg-gradient-to-br from-[var(--surface)]/90 via-[var(--background)]/95 to-[var(--surface)]/90 backdrop-blur-2xl rounded-3xl p-10 border-2 border-[var(--border)] hover:border-primary/70 transition-all hover:shadow-2xl hover:shadow-primary/30">
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-24 h-24 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center text-5xl font-bold text-[var(--text-primary)] shadow-2xl">
                     {lead.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                   </div>
                   <div className="text-right">
-                    <p className="text-4xl font-black text-emerald-400">
+                    <p className="text-xl sm:text-2xl font-bold text-emerald-400">
                       R$ {lead.revenue_potential.toLocaleString('pt-BR')}
                     </p>
-                    <p className="text-gray-500 text-sm">potencial</p>
+                    <p className="text-[var(--text-muted)] text-sm">potencial</p>
                   </div>
                 </div>
 
                 <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-3">{lead.name}</h3>
-                <p className="text-xl text-gray-300 mb-2">{lead.company}</p>
+                <p className="text-base sm:text-lg text-[var(--text-secondary)] mb-2">{lead.company}</p>
                 <p className="text-cyan-400 mb-6">{lead.email}</p>
 
                 {/* NEXT BEST ACTION */}
@@ -215,7 +215,7 @@ export default function LeadsPage() {
                   </span>
                 </div>
 
-                <p className="text-gray-500 text-sm mt-6 flex items-center gap-2">
+                <p className="text-[var(--text-muted)] text-sm mt-6 flex items-center gap-2">
                   <ClockIcon className="w-5 h-5" />
                   Último contato: {formatDistanceToNow(new Date(lead.last_contact), { locale: ptBR, addSuffix: true })}
                 </p>
@@ -234,7 +234,7 @@ export default function LeadsPage() {
           <p className="text-2xl md:text-3xl lg:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600">
             94% dos leads quentes convertem em menos de 7 dias
           </p>
-          <p className="text-4xl text-gray-400 mt-16">
+          <p className="text-xl sm:text-2xl text-[var(--text-secondary)] mt-16">
             — Citizen Supremo X.1 já sabe quem vai fechar.
           </p>
         </motion.div>

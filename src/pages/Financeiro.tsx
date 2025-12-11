@@ -53,7 +53,7 @@ const StatCard = ({
 }) => (
   <motion.div
     whileHover={{ y: -8, scale: 1.03 }}
-    className="relative overflow-hidden rounded-3xl bg-[#0a0a0a] border border-[var(--border)] p-8 group cursor-default"
+    className="relative overflow-hidden rounded-3xl bg-[var(--surface)] border border-[var(--border)] p-8 group cursor-default"
   >
     <div className={`absolute inset-0 bg-gradient-to-br ${
       color.includes('emerald') ? 'from-emerald-600/20' :
@@ -252,7 +252,7 @@ export default function Financeiro() {
 
         {/* CHARTS + INSIGHTS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 rounded-3xl p-12">
+        <div className="lg:col-span-2 bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-12">
             <h3 className="text-3xl font-black text-[var(--text-primary)] mb-10">FLUXO DE CAIXA — 12 MESES</h3>
             <ResponsiveContainer width="100%" height={480}>
               <AreaChart data={metrics.monthlyData}>
@@ -299,7 +299,7 @@ export default function Financeiro() {
               </button>
             </div>
 
-            <div className="bg-[#0a0a0a] border border-[var(--border)] rounded-3xl p-10">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-10">
               <h4 className="text-xl font-black text-[var(--text-primary)]/60 mb-10">DISTRIBUIÇÃO DE GASTOS</h4>
               {[
                 { label: 'Marketing', val: 48, gradient: 'from-purple-500 to-pink-500' },
@@ -312,7 +312,7 @@ export default function Financeiro() {
                     <span className="text-[var(--text-primary)]/60 font-bold">{item.label}</span>
                     <span className="font-black text-[var(--text-primary)] text-xl">{item.val}%</span>
                   </div>
-                  <div className="h-4 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-4 bg-[var(--surface-strong)] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${item.val}%` }}

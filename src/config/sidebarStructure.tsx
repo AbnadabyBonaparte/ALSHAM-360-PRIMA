@@ -186,6 +186,12 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         description: 'Visão geral do CRM',
       },
       {
+        id: 'customer-360',
+        label: 'Customer 360',
+        icon: <Users className="h-4 w-4" />,
+        description: 'Visão 360° do cliente',
+      },
+      {
         id: 'leads-lista',
         label: 'Leads',
         icon: <Users className="h-4 w-4" />,
@@ -264,10 +270,14 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'pipeline-de-vendas',
+        id: 'pipeline-vendas',
         label: 'Pipeline de Vendas',
         icon: <GitBranch className="h-4 w-4" />,
-        status: 'placeholder',
+      },
+      {
+        id: 'financeiro',
+        label: 'Financeiro',
+        icon: <Wallet className="h-4 w-4" />,
       },
       {
         id: 'atividades-tarefas',
@@ -359,9 +369,8 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
             status: 'placeholder',
           },
           {
-            id: 'landing-pages-builder',
+            id: 'landing-builder',
             label: 'Builder',
-            status: 'placeholder',
           },
         ],
       },
@@ -488,6 +497,11 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     description: 'Análises, métricas e relatórios',
     links: [
       {
+        id: 'executive-dashboard',
+        label: 'Executive Dashboard',
+        icon: <BarChart className="h-4 w-4" />,
+      },
+      {
         id: 'analytics-dashboard',
         label: 'Analytics Dashboard',
         icon: <BarChart className="h-4 w-4" />,
@@ -579,6 +593,11 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
+        id: 'automation-builder',
+        label: 'Automation Builder',
+        icon: <Zap className="h-4 w-4" />,
+      },
+      {
         id: 'sequences-de-vendas',
         label: 'Sequences de Vendas',
         icon: <Send className="h-4 w-4" />,
@@ -594,7 +613,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'ai-assistant',
         label: 'AI Assistant',
         icon: <Sparkles className="h-4 w-4" />,
-        status: 'placeholder',
       },
       {
         id: 'playbooks-de-vendas',
@@ -628,6 +646,11 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         status: 'placeholder',
       },
       {
+        id: 'achievements',
+        label: 'Achievements',
+        icon: <Award className="h-4 w-4" />,
+      },
+      {
         id: 'badges-e-conquistas',
         label: 'Badges e Conquistas',
         icon: <Award className="h-4 w-4" />,
@@ -646,10 +669,20 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         status: 'placeholder',
       },
       {
+        id: 'nft-gallery',
+        label: 'NFT Gallery',
+        icon: <Sparkles className="h-4 w-4" />,
+      },
+      {
         id: 'competitions',
         label: 'Competitions',
         icon: <Flame className="h-4 w-4" />,
         status: 'placeholder',
+      },
+      {
+        id: 'war-arena',
+        label: 'War Arena',
+        icon: <Flame className="h-4 w-4" />,
       },
       {
         id: 'rewards-store',
@@ -683,10 +716,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     description: 'Comunicação unificada multicanal',
     links: [
       {
-        id: 'inbox-unificada',
-        label: 'Inbox Unificada',
+        id: 'omnichannel-inbox',
+        label: 'Inbox Omnichannel',
         icon: <Inbox className="h-4 w-4" />,
-        status: 'placeholder',
       },
       {
         id: 'email-inbox',
@@ -892,7 +924,35 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
   },
 
   // ────────────────────────────────────────────────────────────────────
-  // 10. CONFIGURAÇÕES & ADMIN
+  // 10. EXPERIÊNCIAS IMERSIVAS
+  // ────────────────────────────────────────────────────────────────────
+  {
+    id: 'experiencias-imersivas',
+    label: 'Experiências Imersivas',
+    icon: <Globe2 className="h-5 w-5" />,
+    accentColor: 'var(--accent-teal)',
+    description: 'Metaverso, OS e boardrooms avançadas',
+    links: [
+      {
+        id: 'metaverse',
+        label: 'Metaverse',
+        icon: <Globe2 className="h-4 w-4" />,
+      },
+      {
+        id: 'alsham-os',
+        label: 'Alsham OS',
+        icon: <Layout className="h-4 w-4" />,
+      },
+      {
+        id: 'boardroom-omega',
+        label: 'The Boardroom Ω',
+        icon: <Briefcase className="h-4 w-4" />,
+      },
+    ],
+  },
+
+  // ────────────────────────────────────────────────────────────────────
+  // 11. CONFIGURAÇÕES & ADMIN
   // ────────────────────────────────────────────────────────────────────
   {
     id: 'configuracoes-admin',
@@ -995,7 +1055,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
   },
 
   // ────────────────────────────────────────────────────────────────────
-  // 11. COMUNIDADE & SUPORTE
+  // 12. COMUNIDADE & SUPORTE
   // ────────────────────────────────────────────────────────────────────
   {
     id: 'comunidade-suporte',
