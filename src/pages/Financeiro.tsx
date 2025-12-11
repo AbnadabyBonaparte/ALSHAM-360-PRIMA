@@ -8,7 +8,6 @@ import {
   TrendingUp, TrendingDown, Wallet, Activity,
   AlertTriangle
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -177,8 +176,7 @@ export default function Financeiro() {
   // Loading state imperial
   if (loading) {
     return (
-      <LayoutSupremo title="THE QUANTUM TREASURY">
-        <div className="h-screen bg-[#050505] flex items-center justify-center">
+      <div className="h-screen bg-[var(--background)] flex items-center justify-center">
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360 }}
@@ -192,13 +190,11 @@ export default function Financeiro() {
             </p>
           </div>
         </div>
-      </LayoutSupremo>
     );
   }
 
   return (
-    <LayoutSupremo title="THE QUANTUM TREASURY">
-      <div className="min-h-screen bg-[#050505] p-8 space-y-12">
+    <div className="min-h-screen bg-[var(--background)] p-8 space-y-12">
 
         {/* HEADER — SALDO + RUNWAY SIMULATOR */}
         <div className="bg-gradient-to-r from-[#0f0f0f] via-[#111] to-[#0a0a0a] rounded-[40px] border border-white/5 p-12 flex flex-col lg:flex-row justify-between items-end gap-12">
@@ -330,6 +326,5 @@ export default function Financeiro() {
           </div>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }

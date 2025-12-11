@@ -17,7 +17,6 @@ import { EffectComposer, Bloom, Glitch, Noise, Vignette } from '@react-three/pos
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import * as THREE from 'three';
-import LayoutSupremo from '@/components/LayoutSupremo';
 
 // --- TYPES ---
 interface SpatialNode {
@@ -332,8 +331,7 @@ export default function MetaversePage() {
   }, []);
 
   return (
-    <LayoutSupremo title="Omniverse" hideSidebar={true}> {/* Assume layout supports hiding sidebar for immersion */}
-      <div className="relative w-full h-screen bg-black overflow-hidden">
+    <div className="relative w-full h-screen bg-[var(--background)] overflow-hidden">
         
         {/* LOADING STATE */}
         <AnimatePresence>
@@ -399,6 +397,5 @@ export default function MetaversePage() {
           </Canvas>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }

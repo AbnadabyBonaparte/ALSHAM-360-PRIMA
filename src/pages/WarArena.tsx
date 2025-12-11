@@ -9,7 +9,6 @@ import {
   Crown, Flame, Sword, Skull, 
   Trophy
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import confetti from 'canvas-confetti';
 
@@ -385,8 +384,7 @@ export default function WarArena() {
   );
 
   return (
-    <LayoutSupremo title="WAR ARENA V3">
-      <div className={`min-h-screen bg-[#020202] text-white relative overflow-hidden ${mode === 'tv' ? 'p-0' : 'p-8'}`}>
+    <div className={`min-h-screen bg-[var(--background)] text-[var(--text-primary)] relative overflow-hidden ${mode === 'tv' ? 'p-0' : 'p-8'}`}>
         
         {/* FLASH FX */}
         <AnimatePresence>
@@ -430,6 +428,5 @@ export default function WarArena() {
 
         <KillFeed events={feed} />
       </div>
-    </LayoutSupremo>
   );
 }

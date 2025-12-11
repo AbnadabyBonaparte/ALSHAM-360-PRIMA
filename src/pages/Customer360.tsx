@@ -10,14 +10,13 @@ import {
   Brain, HeartPulse, Zap, Trophy, Flame, Calendar,
   Clock, FileText, CheckCircle2
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const GlassPanel = ({ children, className = "" }: any) => (
-  <div className={`relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 backdrop-blur-2xl ${className}`}>
-    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+  <div className={`relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] backdrop-blur-2xl ${className}`}>
+    <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-strong)]/30 to-transparent" />
     <div className="relative z-10">{children}</div>
   </div>
 );
@@ -41,8 +40,8 @@ const ResonanceOrb = ({ score }: { score: number }) => {
         className="relative grid place-content-center w-36 h-36 rounded-full border-4 shadow-2xl"
         style={{ borderColor: color, background: `radial-gradient(circle at 30% 30%, ${color}20, black)` }}
       >
-        <span className="text-6xl font-black text-white">{score}</span>
-        <p className="text-xs uppercase tracking-widest text-white/60 mt-2">Health Score</p>
+        <span className="text-6xl font-black text-[var(--text-primary)]">{score}</span>
+        <p className="text-xs uppercase tracking-widest text-[var(--text-secondary)] mt-2">Health Score</p>
       </motion.div>
     </div>
   );
@@ -136,19 +135,16 @@ export default function Customer360Real() {
   }, [id]);
 
   if (loading) return (
-    <LayoutSupremo>
-      <div className="h-screen flex items-center justify-center bg-black">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-8 border-t-transparent border-purple-500 rounded-full" />
-        <p className="absolute text-2xl text-purple-400 font-light">Construindo gêmeo neural real...</p>
-      </div>
-    </LayoutSupremo>
+    <div className="h-screen flex items-center justify-center bg-[var(--background)]">
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-8 border-t-transparent border-purple-500 rounded-full" />
+      <p className="absolute text-2xl text-purple-400 font-light">Construindo gêmeo neural real...</p>
+    </div>
   );
 
-  if (!lead) return <LayoutSupremo><div className="text-center py-32 text-4xl text-white/30">Lead não encontrado</div></LayoutSupremo>;
+  if (!lead) return <div className="text-center py-32 text-4xl text-[var(--text-tertiary)]">Lead não encontrado</div>;
 
   return (
-    <LayoutSupremo title={`${lead.name} — Neural Twin Real`}>
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
 
         {/* HEADER DIVINO REAL */}
         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="text-center py-20">
@@ -157,15 +153,15 @@ export default function Customer360Real() {
               {lead.name}
             </h1>
           </motion.div>
-          <p className="text-5xl text-white/70 mt-8">{lead.company_name || lead.company}</p>
+          <p className="text-5xl text-[var(--text-secondary)] mt-8">{lead.company_name || lead.company}</p>
           <div className="flex justify-center gap-20 mt-16">
             <div className="text-center">
               <p className="text-8xl font-black text-emerald-400">{lead.pipeline}</p>
-              <p className="text-3xl text-white/60">Pipeline Atual</p>
+              <p className="text-3xl text-[var(--text-secondary)]">Pipeline Atual</p>
             </div>
             <div className="text-center">
               <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
-              <p className="text-3xl text-white/60">LTV Previsto (IA)</p>
+              <p className="text-3xl text-[var(--text-secondary)]">LTV Previsto (IA)</p>
             </div>
           </div>
         </motion.div>
@@ -175,7 +171,7 @@ export default function Customer360Real() {
           {/* ESQUERDA — ORB + NEXT ACTION */}
           <div className="lg:col-span-5 space-y-10">
             <GlassPanel className="p-12 text-center">
-              <h2 className="text-3xl font-black text-white mb-10">Saúde Neural do Lead</h2>
+              <h2 className="text-3xl font-black text-[var(--text-primary)] mb-10">Saúde Neural do Lead</h2>
               <ResonanceOrb score={lead.score} />
               {lead.health === 'divine' && <p className="mt-8 text-4xl font-black text-yellow-400">DEUS DO PIPELINE</p>}
             </GlassPanel>
@@ -205,17 +201,17 @@ export default function Customer360Real() {
                     transition={{ delay: i * 0.1 }}
                     className="flex gap-6"
                   >
-                    <div className="shrink-0 w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                    <div className="shrink-0 w-16 h-16 rounded-full bg-[var(--surface)] flex items-center justify-center border border-[var(--border)]">
                       {item.icon}
                     </div>
-                    <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10">
+                    <div className="flex-1 bg-[var(--surface)] rounded-2xl p-6 border border-[var(--border)]">
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-xl font-bold text-white">{item.title}</h4>
-                        <span className="text-sm text-white/40">
+                        <h4 className="text-xl font-bold text-[var(--text-primary)]">{item.title}</h4>
+                        <span className="text-sm text-[var(--text-tertiary)]">
                           {formatDistanceToNow(item.date, { addSuffix: true, locale: ptBR })}
                         </span>
                       </div>
-                      <p className="text-gray-300">{item.desc}</p>
+                      <p className="text-[var(--text-secondary)]">{item.desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -230,10 +226,9 @@ export default function Customer360Real() {
           <p className="text-8xl font-black bg-gradient-to-r from-emerald-400 to-purple-400 bg-clip-text text-transparent">
             ESTE LEAD JÁ DECIDIU
           </p>
-          <p className="text-5xl text-gray-400 mt-10">Você só precisa apertou o botão.</p>
+          <p className="text-5xl text-[var(--text-secondary)] mt-10">Você só precisa apertou o botão.</p>
         </motion.div>
 
       </div>
-    </LayoutSupremo>
   );
 }

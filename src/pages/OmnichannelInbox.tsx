@@ -11,7 +11,6 @@ import {
   Mic, Paperclip, Smile, Search, MoreVertical,
   Volume2, VolumeX, Play, Pause, CheckCheck
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -173,16 +172,15 @@ export default function NexusCommand() {
   const current = threads.find(t => t.lead_id === activeThread);
 
   return (
-    <LayoutSupremo title="NEXUS COMMAND — A Mente Coletiva">
-      <div className="h-screen flex bg-black text-white">
+    <div className="h-screen flex bg-[var(--background)] text-[var(--text-primary)]">
 
         {/* COLUNA ESQUERDA — AS ALMAS */}
-        <div className="w-96 border-r border-white/5 bg-gradient-to-b from-black/90 to-purple-950/20">
-          <div className="p-8 border-b border-white/5">
+        <div className="w-96 border-r border-[var(--border)] bg-gradient-to-b from-[var(--background)]/90 to-purple-950/20">
+          <div className="p-8 border-b border-[var(--border)]">
             <h1 className="text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               NEXUS COMMAND
             </h1>
-            <p className="text-white/60 mt-2">47 almas aguardando sua voz</p>
+            <p className="text-[var(--text-secondary)] mt-2">47 almas aguardando sua voz</p>
           </div>
 
           <div className="overflow-y-auto h-full pb-32">
@@ -191,8 +189,8 @@ export default function NexusCommand() {
                 key={thread.lead_id}
                 whileHover={{ x: 10 }}
                 onClick={() => setActiveThread(thread.lead_id)}
-                className={`p-6 border-b border-white/5 cursor-pointer transition-all ${
-                  activeThread === thread.lead_id ? 'bg-purple-900/30 border-l-4 border-l-purple-500' : 'hover:bg-white/5'
+                className={`p-6 border-b border-[var(--border)] cursor-pointer transition-all ${
+                  activeThread === thread.lead_id ? 'bg-purple-900/30 border-l-4 border-l-purple-500' : 'hover:bg-[var(--surface)]'
                 }`}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -202,14 +200,14 @@ export default function NexusCommand() {
                       <img src={thread.avatar} className="w-full h-full rounded-full" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg">{thread.name}</h3>
-                      <p className="text-sm text-white/60">{thread.company}</p>
+                      <h3 className="font-bold text-lg text-[var(--text-primary)]">{thread.name}</h3>
+                      <p className="text-sm text-[var(--text-secondary)]">{thread.company}</p>
                     </div>
                   </div>
                   {thread.mood === 'divine' && <Crown className="h-8 w-8 text-yellow-400" />}
                   {thread.mood === 'angry' && <Flame className="h-8 w-8 text-red-500 animate-pulse" />}
                 </div>
-                <p className="text-sm text-white/70 line-clamp-2">{thread.last_message}</p>
+                <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{thread.last_message}</p>
                 <div className="flex justify-between items-center mt-3">
                   <span className={`text-xs px-3 py-1 rounded-full font-bold ${
                     thread.channel === 'whatsapp' ? 'bg-emerald-500/20 text-emerald-300' :
@@ -218,7 +216,7 @@ export default function NexusCommand() {
                   }`}>
                     {thread.channel.toUpperCase()}
                   </span>
-                  <span className="text-xs text-white/40">
+                  <span className="text-xs text-[var(--text-tertiary)]">
                     {formatDistanceToNow(new Date(thread.last_time), { addSuffix: true, locale: ptBR })}
                   </span>
                 </div>
@@ -232,14 +230,14 @@ export default function NexusCommand() {
           {current ? (
             <>
               {/* HEADER DO LEAD ATIVO */}
-              <div className="h-24 border-b border-white/5 bg-gradient-to-r from-purple-900/30 to-pink-900/20 flex items-center justify-between px-10">
+              <div className="h-24 border-b border-[var(--border)] bg-gradient-to-r from-purple-900/30 to-pink-900/20 flex items-center justify-between px-10">
                 <div className="flex items-center gap-6">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-1">
                     <img src={current.avatar} className="w-full h-full rounded-2xl" />
                   </div>
                   <div>
-                    <h2 className="text-4xl font-black text-white">{current.name}</h2>
-                    <p className="text-xl text-white/70">{current.company} • R$ 280k em jogo</p>
+                    <h2 className="text-4xl font-black text-[var(--text-primary)]">{current.name}</h2>
+                    <p className="text-xl text-[var(--text-secondary)]">{current.company} • R$ 280k em jogo</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
@@ -262,9 +260,9 @@ export default function NexusCommand() {
                       animate={{ opacity: 1, x: 0 }}
                       className={`flex ${msg.direction === 'out' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`max-w-2xl ${msg.direction === 'out' ? 'bg-gradient-to-br from-purple-600/80 to-pink-600/80' : 'bg-white/10'} p-8 rounded-3xl backdrop-blur-2xl border ${msg.direction === 'out' ? 'border-purple-500/50' : 'border-white/10'}`}>
-                        <p className="text-2xl leading-relaxed">{msg.content}</p>
-                        <div className="flex items-center gap-4 mt-4 text-white/40 text-sm">
+                      <div className={`max-w-2xl ${msg.direction === 'out' ? 'bg-gradient-to-br from-purple-600/80 to-pink-600/80' : 'bg-[var(--surface)]'} p-8 rounded-3xl backdrop-blur-2xl border ${msg.direction === 'out' ? 'border-purple-500/50' : 'border-[var(--border)]'}`}>
+                        <p className="text-2xl leading-relaxed text-[var(--text-primary)]">{msg.content}</p>
+                        <div className="flex items-center gap-4 mt-4 text-[var(--text-tertiary)] text-sm">
                           <span>{formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true, locale: ptBR })}</span>
                           {msg.direction === 'out' && <CheckCheck className="h-5 w-5 text-emerald-400" />}
                         </div>
@@ -275,7 +273,7 @@ export default function NexusCommand() {
 
                 {aiTyping && (
                   <div className="flex justify-start">
-                    <div className="bg-white/10 p-8 rounded-3xl">
+                    <div className="bg-[var(--surface)] p-8 rounded-3xl">
                       <p className="text-purple-300 text-xl">Nexus AI está digitando...</p>
                     </div>
                   </div>
@@ -283,14 +281,14 @@ export default function NexusCommand() {
               </div>
 
               {/* INPUT + BOTÃO MÁGICO */}
-              <div className="p-10 bg-gradient-to-t from-black to-transparent">
+              <div className="p-10 bg-gradient-to-t from-[var(--background)] to-transparent">
                 <div className="max-w-5xl mx-auto relative">
                   <textarea
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
                     placeholder="Fale com a alma... ou deixe o Nexus falar por você"
-                    className="w-full px-12 py-10 text-3xl bg-white/5 backdrop-blur-3xl border border-white/10 rounded-3xl outline-none resize-none h-32"
+                    className="w-full px-12 py-10 text-3xl bg-[var(--surface)] backdrop-blur-3xl border border-[var(--border)] rounded-3xl outline-none resize-none h-32 text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
                   />
                   <motion.button
                     whileHover={{ scale: 1.2, rotate: 360 }}
@@ -305,13 +303,13 @@ export default function NexusCommand() {
           ) : (
             <div className="flex-1 grid place-content-center text-center">
               <Brain className="h-32 w-32 text-purple-500 mx-auto mb-10 opacity-30" />
-              <p className="text-6xl font-black text-white/20">Selecione uma alma para começar</p>
+              <p className="text-6xl font-black text-[var(--text-tertiary)]">Selecione uma alma para começar</p>
             </div>
           )}
         </div>
 
         {/* COLUNA DIREITA — PANEL DE PODER */}
-        <div className="w-96 border-l border-white/5 bg-gradient-to-b from-black/90 to-purple-950/20 p-8">
+        <div className="w-96 border-l border-[var(--border)] bg-gradient-to-b from-[var(--background)]/90 to-purple-950/20 p-8">
           <h2 className="text-4xl font-black text-center mb-10 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             CONTROLE DIVINO
           </h2>
@@ -322,9 +320,8 @@ export default function NexusCommand() {
           >
             NEXUS AI RESPONDER TUDO
           </motion.button>
-          <p className="text-center text-white/40 mt-6">47 mensagens pendentes • 12 em risco • 3 divinas</p>
+          <p className="text-center text-[var(--text-tertiary)] mt-6">47 mensagens pendentes • 12 em risco • 3 divinas</p>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }
