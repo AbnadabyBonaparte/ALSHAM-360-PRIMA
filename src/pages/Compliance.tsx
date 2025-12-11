@@ -3,7 +3,6 @@
 // Cada regra seguida é uma fortaleza. Compliance que blinda o império.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   ShieldCheckIcon,
   DocumentCheckIcon,
@@ -96,8 +95,8 @@ export default function CompliancePage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Compliance Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -105,7 +104,7 @@ export default function CompliancePage() {
           />
           <p className="absolute text-4xl text-blue-400 font-light">Verificando conformidade...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
@@ -124,8 +123,8 @@ export default function CompliancePage() {
   };
 
   return (
-    <LayoutSupremo title="Compliance Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -156,7 +155,7 @@ export default function CompliancePage() {
               (metrics?.taxaConformidade || 0) >= 70 ? 'text-yellow-400' :
               'text-red-400'
             }`} />
-            <p className="text-7xl font-black text-white">{(metrics?.taxaConformidade || 0).toFixed(0)}%</p>
+            <p className="text-7xl font-black text-[var(--text-primary)]">{(metrics?.taxaConformidade || 0).toFixed(0)}%</p>
             <p className="text-2xl text-gray-400 mt-2">Taxa de Conformidade</p>
           </motion.div>
         </div>
@@ -165,25 +164,25 @@ export default function CompliancePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-2xl p-6 border border-gray-500/30">
             <DocumentCheckIcon className="w-12 h-12 text-gray-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalItens || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalItens || 0}</p>
             <p className="text-gray-400">Total Itens</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.conformes || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.conformes || 0}</p>
             <p className="text-gray-400">Conformes</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ExclamationTriangleIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.atencao || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.atencao || 0}</p>
             <p className="text-gray-400">Atenção</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-red-900/60 to-pink-900/60 rounded-2xl p-6 border border-red-500/30">
             <ExclamationTriangleIcon className="w-12 h-12 text-red-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.naoConformes || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.naoConformes || 0}</p>
             <p className="text-gray-400">Não Conformes</p>
           </motion.div>
         </div>
@@ -214,7 +213,7 @@ export default function CompliancePage() {
                     className={`bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border transition-all ${
                       item.status === 'nao_conforme' ? 'border-red-500/50' :
                       item.status === 'atencao' ? 'border-yellow-500/50' :
-                      'border-white/10'
+                      'border-[var(--border)]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -223,7 +222,7 @@ export default function CompliancePage() {
                           <span className={statConfig.text}>{statConfig.icon}</span>
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white">{item.nome}</h3>
+                          <h3 className="text-xl font-bold text-[var(--text-primary)]">{item.nome}</h3>
                           <p className="text-gray-400 text-sm">
                             {item.categoria.toUpperCase()} • Responsável: {item.responsavel || 'Não definido'}
                           </p>
@@ -233,7 +232,7 @@ export default function CompliancePage() {
                       <div className="flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-gray-400 text-sm">Última Auditoria</p>
-                          <p className="text-white">
+                          <p className="text-[var(--text-primary)]">
                             {item.ultima_auditoria ? format(new Date(item.ultima_auditoria), 'dd/MM/yy') : '-'}
                           </p>
                         </div>
@@ -269,6 +268,6 @@ export default function CompliancePage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

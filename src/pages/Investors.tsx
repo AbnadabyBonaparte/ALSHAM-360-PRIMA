@@ -3,7 +3,6 @@
 // Cada investidor é um foguete de crescimento. Capital inteligente que acelera impérios.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   BanknotesIcon,
   ChartBarIcon,
@@ -95,8 +94,8 @@ export default function InvestorsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Investidores Supremos">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -104,7 +103,7 @@ export default function InvestorsPage() {
           />
           <p className="absolute text-4xl text-emerald-400 font-light">Calculando valuations...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
@@ -117,8 +116,8 @@ export default function InvestorsPage() {
   };
 
   return (
-    <LayoutSupremo title="Investidores Supremos">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -137,25 +136,25 @@ export default function InvestorsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-emerald-900/60 to-green-900/60 rounded-2xl p-6 border border-emerald-500/30">
             <UserGroupIcon className="w-12 h-12 text-emerald-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalInvestidores || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalInvestidores || 0}</p>
             <p className="text-gray-400">Investidores</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <BanknotesIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.capitalTotal || 0) / 1000000).toFixed(1)}M</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.capitalTotal || 0) / 1000000).toFixed(1)}M</p>
             <p className="text-gray-400">Capital Levantado</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <ChartBarIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.valuationAtual || 0) / 1000000).toFixed(0)}M</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valuationAtual || 0) / 1000000).toFixed(0)}M</p>
             <p className="text-gray-400">Valuation Atual</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
             <ArrowTrendingUpIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.multiplicador || 0).toFixed(1)}x</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.multiplicador || 0).toFixed(1)}x</p>
             <p className="text-gray-400">Multiplicador</p>
           </motion.div>
         </div>
@@ -183,7 +182,7 @@ export default function InvestorsPage() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-emerald-500/50 transition-all"
+                    className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)] hover:border-emerald-500/50 transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
@@ -192,7 +191,7 @@ export default function InvestorsPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-3">
-                            <h3 className="text-xl font-bold text-white">{inv.nome}</h3>
+                            <h3 className="text-xl font-bold text-[var(--text-primary)]">{inv.nome}</h3>
                             <span className={`text-sm ${config.color}`}>{config.label}</span>
                             {inv.status === 'saiu' && (
                               <span className="px-2 py-1 bg-gray-500/20 rounded text-gray-400 text-xs">Exit</span>
@@ -250,6 +249,6 @@ export default function InvestorsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

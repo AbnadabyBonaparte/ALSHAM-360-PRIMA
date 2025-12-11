@@ -3,7 +3,6 @@
 // Onde tarefas viram conquistas. Onde atraso vira vergonha. Onde você domina o tempo.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Tasks.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { 
   CheckCircleIcon,
   ClockIcon,
@@ -88,8 +87,7 @@ export default function TasksPage() {
   };
 
   return (
-    <LayoutSupremo title="Tarefas Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -185,7 +183,6 @@ export default function TasksPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }
 
@@ -196,16 +193,16 @@ function TaskColumn({ title, tasks, color }: any) {
       animate={{ opacity: 1, x: 0 }}
       className={`bg-gradient-to-br ${color} rounded-3xl p-10 border-4 border-white/20 backdrop-blur-xl`}
     >
-      <h2 className="text-5xl font-black text-white mb-8 text-center">{title}</h2>
+      <h2 className="text-5xl font-black text-[var(--text-primary)] mb-8 text-center">{title}</h2>
       <div className="space-y-6">
         {tasks.map((task: any) => (
           <motion.div
             key={task.id}
             whileHover={{ scale: 1.05 }}
-            className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-primary/50 transition-all"
+            className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-white">{task.title}</h3>
+              <h3 className="text-2xl font-bold text-[var(--text-primary)]">{task.title}</h3>
               <div className={`px-6 py-3 rounded-full font-black text-xl bg-gradient-to-r ${getPriorityColor(task.priority)}`}>
                 {task.priority.toUpperCase()}
               </div>
@@ -238,15 +235,15 @@ function SupremeTaskCard({ icon, title, value, color }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-white/10 backdrop-blur-xl shadow-2xl`}
+      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl`}
     >
       <div className="flex items-center justify-center mb-8">
         <div className="p-8 bg-white/10 rounded-3xl">
           {icon}
         </div>
       </div>
-      <p className="text-7xl font-black text-white text-center">{value}</p>
-      <p className="text-3xl text-white/80 text-center mt-6">{title}</p>
+      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
     </motion.div>
   );
 }

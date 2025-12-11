@@ -3,7 +3,6 @@
 // Cada pedido é uma vitória. O funil que transforma cliques em dinheiro.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   ShoppingCartIcon,
   CurrencyDollarIcon,
@@ -95,8 +94,8 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Pedidos Supremos">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -104,7 +103,7 @@ export default function OrdersPage() {
           />
           <p className="absolute text-4xl text-blue-400 font-light">Processando pedidos...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
@@ -121,8 +120,8 @@ export default function OrdersPage() {
     : metrics?.pedidos.filter(p => p.status === filtroStatus) || [];
 
   return (
-    <LayoutSupremo title="Pedidos Supremos">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -141,25 +140,25 @@ export default function OrdersPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-purple-900/60 rounded-2xl p-6 border border-blue-500/30">
             <ShoppingCartIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalPedidos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalPedidos || 0}</p>
             <p className="text-gray-400">Total Pedidos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Receita Total</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {(metrics?.ticketMedio || 0).toFixed(0)}</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {(metrics?.ticketMedio || 0).toFixed(0)}</p>
             <p className="text-gray-400">Ticket Médio</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-emerald-900/60 to-teal-900/60 rounded-2xl p-6 border border-emerald-500/30">
             <CheckCircleIcon className="w-12 h-12 text-emerald-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.taxaConclusao || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaConclusao || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Taxa Conclusão</p>
           </motion.div>
         </div>
@@ -172,7 +171,7 @@ export default function OrdersPage() {
               onClick={() => setFiltroStatus(status)}
               className={`px-5 py-2 rounded-xl font-medium transition-all capitalize ${
                 filtroStatus === status
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-blue-500 text-[var(--text-primary)]'
                   : 'bg-white/10 text-gray-400 hover:bg-white/20'
               }`}
             >
@@ -198,7 +197,7 @@ export default function OrdersPage() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-blue-500/50 transition-all"
+                    className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)] hover:border-blue-500/50 transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
@@ -207,7 +206,7 @@ export default function OrdersPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-3">
-                            <h3 className="text-xl font-bold text-white">{pedido.numero}</h3>
+                            <h3 className="text-xl font-bold text-[var(--text-primary)]">{pedido.numero}</h3>
                             <span className={`px-3 py-1 rounded-full text-sm ${config.bg} ${config.text} capitalize`}>
                               {pedido.status}
                             </span>
@@ -257,6 +256,6 @@ export default function OrdersPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

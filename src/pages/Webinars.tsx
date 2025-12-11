@@ -3,7 +3,6 @@
 // Cada webinar é um palco de autoridade. O conhecimento ao vivo conquista.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   VideoCameraIcon,
   UserGroupIcon,
@@ -100,16 +99,14 @@ export default function WebinarsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Webinars Supremos">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-red-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-red-400 font-light">Preparando o palco...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-red-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-red-400 font-light">Preparando o palco...</p>
+      </div>
     );
   }
 
@@ -121,8 +118,7 @@ export default function WebinarsPage() {
   };
 
   return (
-    <LayoutSupremo title="Webinars Supremos">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -141,25 +137,25 @@ export default function WebinarsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-red-900/60 to-orange-900/60 rounded-2xl p-6 border border-red-500/30">
             <VideoCameraIcon className="w-12 h-12 text-red-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalWebinars || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalWebinars || 0}</p>
             <p className="text-gray-400">Total Webinars</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
             <CalendarDaysIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.agendados || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
             <p className="text-gray-400">Agendados</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <UserGroupIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
             <p className="text-gray-400">Total Inscritos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <ChartBarIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.mediaParticipacao || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.mediaParticipacao || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Participação</p>
           </motion.div>
         </div>
@@ -188,18 +184,18 @@ export default function WebinarsPage() {
                     className={`rounded-3xl p-8 border backdrop-blur-xl ${
                       webinar.status === 'ao_vivo'
                         ? 'bg-gradient-to-r from-red-900/40 to-orange-900/40 border-red-500/50 shadow-2xl shadow-red-500/20'
-                        : 'bg-gradient-to-r from-white/5 to-white/10 border-white/10'
+                        : 'bg-gradient-to-r from-white/5 to-white/10 border-[var(--border)]'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         {/* STATUS BADGE */}
-                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${config.bg} text-white text-sm font-bold mb-4`}>
+                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${config.bg} text-[var(--text-primary)] text-sm font-bold mb-4`}>
                           {config.icon}
                           {config.text}
                         </div>
 
-                        <h3 className="text-3xl font-bold text-white mb-2">{webinar.titulo}</h3>
+                        <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{webinar.titulo}</h3>
                         <p className="text-gray-400 mb-4">{webinar.descricao}</p>
 
                         <div className="flex items-center gap-6 text-gray-400">
@@ -213,7 +209,7 @@ export default function WebinarsPage() {
 
                       <div className="text-right space-y-4">
                         <div className="bg-white/10 rounded-2xl p-4">
-                          <p className="text-3xl font-black text-white">{webinar.inscritos}</p>
+                          <p className="text-3xl font-black text-[var(--text-primary)]">{webinar.inscritos}</p>
                           <p className="text-gray-400 text-sm">Inscritos</p>
                         </div>
                         {(webinar.status === 'encerrado' || webinar.status === 'gravado') && (
@@ -255,6 +251,5 @@ export default function WebinarsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

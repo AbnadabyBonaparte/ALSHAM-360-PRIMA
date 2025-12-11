@@ -1,14 +1,8 @@
 // src/pages/AIAssistant.tsx
 
-import React, { useState, useEffect, useRef, Suspense, lazy, useCallback } from 'react'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { useTheme } from '@/hooks/useTheme'
-import { useAnalytics } from '@/hooks/useAnalytics'
-import { SplitPane } from '@/components/ui/split-pane'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Mic, Send, Paperclip, Sparkles, Terminal, Layout } from 'lucide-react'
-import { Typewriter } from 'react-simple-typewriter'
+import { SparklesIcon, PaperAirplaneIcon, MicrophoneIcon, StopIcon } from '@heroicons/react/24/outline';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState, useRef } from 'react';)
 
 // Lazy-load dos módulos pesados
 const Canvas = lazy(() => import('@react-three/fiber').then(mod => ({ default: mod.Canvas })))
@@ -193,31 +187,22 @@ export default function AIAssistantPage() {
   }, [isSending, inputValue, logEvent])
 
   return (
-    <div className="h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden flex flex-col font-sans selection:bg-[var(--color-primary)] selection:text-white">
-      {/* Header */}
-      <div className="h-[140px] relative shrink-0 border-b border-[var(--border)] bg-[var(--surface-1)]">
-        <Suspense fallback={<div className="absolute inset-0 bg-black/40 flex items-center justify-center">Carregando esfera...</div>}>
-          <SafeBoundary>
-            <div className="absolute inset-0 z-0 opacity-80">
-              <Canvas camera={{ position: [0, 0, 4.5], fov: 50 }}>
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} intensity={1.5} color="#bd93f9" />
-                <Sphere args={[1, 64, 64]}>
-                  <MeshDistortMaterial
-                    color={thinkingState === 'listening' ? '#ff5555' : 'var(--color-primary)'}
-                    distort={thinkingState === 'thinking' ? 0.8 : 0.3}
-                    speed={thinkingState === 'thinking' ? 4 : 1.5}
-                    metalness={0.6}
-                    roughness={0.2}
-                  />
-                </Sphere>
-                <OrbitControls
-                  enableZoom={false}
-                  enablePan={false}
-                  autoRotate={!prefersReducedMotion}
-                  autoRotateSpeed={1}
-                />
-              </Canvas>
+<div className="h-screen flex flex-col bg-[var(--background)]/30">
+        {/* Header Supremo */}
+        <div className="border-b border-[var(--border)] bg-gradient-to-r from-purple-900/30 via-pink-900/20 to-purple-900/30 backdrop-blur-2xl">
+          <div className="p-6 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <SparklesIcon className="w-14 h-14 text-purple-400 animate-pulse" />
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                  Citizen Supremo X.1
+                </h1>
+                <p className="text-green-400 text-lg">● Online • {orgName}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-gray-400">Modelo: ALSHAM-GRAAL-v10</p>
+              <p className="text-cyan-400 text-sm">Conexão 100% real-time</p>)
             </div>
           </SafeBoundary>
         </Suspense>
@@ -242,20 +227,21 @@ export default function AIAssistantPage() {
         </div>
       </div>
 
-      {/* Main Workspace */}
-      <SplitPane
-        initialSizes={[35, 65]}
-        minSize={350}
-        className="flex-1 overflow-hidden"
-        resizerClassName="w-[1px] bg-[var(--border)] hover:bg-[var(--color-primary)] transition-colors cursor-col-resize"
-      >
-        {/* Chat Stream */}
-        <div className="h-full flex flex-col bg-[var(--surface-1)]/50 backdrop-blur-sm relative">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
-            {/* Mensagem do usuário */}
-            <div className="flex justify-end">
-              <div className="max-w-[90%] bg-[var(--surface-3)] rounded-2xl rounded-tr-sm px-5 py-3 text-sm leading-relaxed shadow-sm border border-[var(--border)]">
-                <p>Preciso analisar a performance de vendas. Crie um app React agora.</p>
+{/* Mensagens */}
+        <div className="flex-1 overflow-y-auto p-8 pb-32">
+          <div className="max-w-5xl mx-auto space-y-6">
+            {messages.map(msg => (
+              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-3xl rounded-3xl px-8 py-6 ${
+                  msg.role === 'user'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-[var(--text-primary)]'
+                    : 'bg-gradient-to-r from-purple-900/70 to-pink-900/70 border border-purple-500/40 text-[var(--text-primary)]'
+                }`}>
+                  <p className="text-lg leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-xs opacity-60 mt-3">
+                    {new Date(msg.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>)
               </div>
             </div>
 
@@ -311,34 +297,23 @@ export default function AIAssistantPage() {
             )}
           </div>
 
-          {/* Input Area */}
-          <div className="p-4 border-t border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-xl">
-            <div className="relative flex items-end gap-2 bg-[var(--surface-2)] rounded-xl p-2 shadow-inner border border-[var(--border)] focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)]/30 transition-all">
-              <Button
-                size="icon"
-                variant="ghost"
-                className={`rounded-lg h-10 w-10 shrink-0 text-[var(--text-secondary)] hover:text-[var(--color-primary)] ${thinkingState === 'listening' ? 'animate-pulse text-red-500' : ''}`}
-                onMouseDown={() => setThinkingState('listening')}
-                onMouseUp={() => setThinkingState('idle')}
-                aria-label="Gravar áudio"
+{/* Input */}
+        <div className="border-t border-[var(--border)] bg-gradient-to-t from-black/80 to-transparent backdrop-blur-2xl">
+          <div className="max-w-5xl mx-auto p-6">
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 px-6 py-5">
+              <button
+                onClick={() => setIsListening(!isListening)}
+                className={`p-4 rounded-2xl transition-all ${isListening ? 'bg-red-600/40 border-red-500' : 'bg-white/10 hover:bg-white/20'} border`}
               >
-                <Mic className="w-5 h-5" />
-              </Button>
-
-              <textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={e => setInputValue(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSend()
-                  }
-                }}
-                placeholder="Comande a IA..."
-                className="flex-1 bg-transparent outline-none text-sm min-h-[40px] max-h-[120px] py-2.5 resize-none placeholder:text-[var(--text-tertiary)] focus:ring-0"
-                rows={1}
-                aria-label="Campo de entrada para comando da IA"
+                {isListening ? <StopIcon className="w-8 h-8 text-red-400" /> : <MicrophoneIcon className="w-8 h-8 text-primary" />}
+              </button>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                placeholder="Fale com seu AI Supremo..."
+                className="flex-1 bg-transparent outline-none text-[var(--text-primary)] text-lg placeholder-gray-500")
               />
 
               <Button size="icon" variant="ghost" className="rounded-lg h-10 w-10 shrink-0 text-[var(--text-secondary)]" aria-label="Anexar arquivo">
@@ -353,93 +328,12 @@ export default function AIAssistantPage() {
                 aria-label="Enviar mensagem"
                 data-testid="send-button"
               >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="text-[10px] text-center mt-2 text-[var(--text-tertiary)] opacity-60">
-              Pressione ⌘ + K para comandos • Enter para enviar
+<PaperAirplaneIcon className="w-8 h-8 text-[var(--text-primary)] -rotate-45" />
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Fabrication Hall */}
-        <div className="h-full bg-[#050505] relative flex flex-col">
-          <div className="h-10 border-b border-white/10 flex items-center justify-between px-4 bg-black/40">
-            <div className="flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-[var(--text-secondary)]" />
-              <span className="text-xs font-mono text-[var(--text-secondary)]">dashboard_v1.tsx</span>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                className={`h-6 text-[10px] uppercase tracking-wider ${artifactView === 'preview' ? 'bg-[var(--color-primary)]/20' : ''}`}
-                onClick={() => setArtifactView('preview')}
-                aria-label="Visualizar preview"
-                data-testid="artifact-preview-button"
-              >
-                Preview
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className={`h-6 text-[10px] uppercase tracking-wider ${artifactView === 'code' ? 'bg-[var(--color-primary)]/20' : ''}`}
-                onClick={() => setArtifactView('code')}
-                aria-label="Visualizar código"
-                data-testid="artifact-code-button"
-              >
-                Code
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex-1 relative overflow-hidden">
-            <AnimatePresence mode="wait">
-              {mode === 'app' ? (
-                <motion.div
-                  key="sandpack"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5 }}
-                  className="h-full"
-                >
-                  <Suspense fallback={<div className="h-full flex items-center justify-center text-[var(--text-tertiary)]">Carregando Sandpack...</div>}>
-                    <SafeBoundary>
-                      <SandpackProvider
-                        template="react-ts"
-                        theme={alshamSandpackTheme}
-                        files={{ '/App.tsx': GENERATED_CODE }}
-                        options={{ externalResources: ['https://cdn.tailwindcss.com'] }}
-                      >
-                        <div className="h-full grid grid-rows-2 md:grid-rows-1 md:grid-cols-2">
-                          {artifactView === 'code' ? (
-                            <SandpackCodeEditor showTabs={false} showLineNumbers style={{ height: '100%' }} />
-                          ) : (
-                            <SandpackPreview showNavigator={false} style={{ height: '100%' }} />
-                          )}
-                        </div>
-                      </SandpackProvider>
-                    </SafeBoundary>
-                  </Suspense>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.4 }}
-                  className="h-full flex flex-col items-center justify-center text-[var(--text-tertiary)]"
-                >
-                  <div className="w-24 h-24 rounded-full bg-[var(--surface-2)] flex items-center justify-center mb-4 animate-pulse">
-                    <Layout className="w-10 h-10 opacity-50" />
-                  </div>
-                  <p>Aguardando geração de artefatos...</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </SplitPane>
-    </div>
-  )
+      </div>
+    
+  );)
 }

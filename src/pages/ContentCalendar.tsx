@@ -3,7 +3,6 @@
 // Cada dia é uma oportunidade de dominação. O conteúdo nunca para.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   CalendarDaysIcon,
   DocumentTextIcon,
@@ -92,8 +91,8 @@ export default function ContentCalendarPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Calendário de Conteúdo">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -101,7 +100,7 @@ export default function ContentCalendarPage() {
           />
           <p className="absolute text-4xl text-indigo-400 font-light">Carregando calendário...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
@@ -137,8 +136,8 @@ export default function ContentCalendarPage() {
   };
 
   return (
-    <LayoutSupremo title="Calendário de Conteúdo">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -157,25 +156,25 @@ export default function ContentCalendarPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-indigo-900/60 to-purple-900/60 rounded-2xl p-6 border border-indigo-500/30">
             <CalendarDaysIcon className="w-12 h-12 text-indigo-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalConteudos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalConteudos || 0}</p>
             <p className="text-gray-400">Total no Mês</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.publicados || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.publicados || 0}</p>
             <p className="text-gray-400">Publicados</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ClockIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.agendados || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
             <p className="text-gray-400">Agendados</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-2xl p-6 border border-gray-500/30">
             <PencilSquareIcon className="w-12 h-12 text-gray-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.rascunhos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.rascunhos || 0}</p>
             <p className="text-gray-400">Rascunhos</p>
           </motion.div>
         </div>
@@ -188,7 +187,7 @@ export default function ContentCalendarPage() {
           >
             ←
           </button>
-          <h2 className="text-3xl font-bold text-white">
+          <h2 className="text-3xl font-bold text-[var(--text-primary)]">
             {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
           </h2>
           <button
@@ -200,7 +199,7 @@ export default function ContentCalendarPage() {
         </div>
 
         {/* CALENDÁRIO */}
-        <div className="max-w-6xl mx-auto bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 border border-white/10 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 border border-[var(--border)] backdrop-blur-xl">
           {/* DIAS DA SEMANA */}
           <div className="grid grid-cols-7 gap-2 mb-4">
             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
@@ -228,7 +227,7 @@ export default function ContentCalendarPage() {
                   className={`aspect-square rounded-xl p-2 border transition-all cursor-pointer ${
                     isToday ? 'bg-indigo-500/30 border-indigo-500' :
                     dayContent.length > 0 ? 'bg-white/10 border-white/20' :
-                    'bg-white/5 border-transparent hover:border-white/10'
+                    'bg-white/5 border-transparent hover:border-[var(--border)]'
                   }`}
                 >
                   <div className="text-sm font-medium text-gray-300 mb-1">
@@ -238,7 +237,7 @@ export default function ContentCalendarPage() {
                     {dayContent.slice(0, 3).map(content => (
                       <div
                         key={content.id}
-                        className={`${typeColor(content.tipo)} rounded px-1 py-0.5 flex items-center gap-1 text-xs text-white truncate`}
+                        className={`${typeColor(content.tipo)} rounded px-1 py-0.5 flex items-center gap-1 text-xs text-[var(--text-primary)] truncate`}
                       >
                         {typeIcon(content.tipo)}
                         <span className="truncate">{content.titulo}</span>
@@ -294,6 +293,6 @@ export default function ContentCalendarPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

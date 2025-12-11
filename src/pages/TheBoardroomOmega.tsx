@@ -90,7 +90,7 @@ export default function TheBoardroomOmega() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className={`absolute inset-0 transition-all duration-10000 ${
           era === 'ASCENSÃO' ? 'bg-gradient-to-br from-purple-900 via-black to-emerald-900' :
-          era === 'DOMÍNIO TOTAL' ? 'bg-black' :
+          era === 'DOMÍNIO TOTAL' ? 'bg-[var(--background)]' :
           era === 'SILÍCIO VIVO' ? 'bg-gradient-to-br from-emerald-900 to-cyan-900' :
           'bg-gradient-to-br from-amber-900 to-black'
         }`} />
@@ -99,7 +99,8 @@ export default function TheBoardroomOmega() {
         {hiddenMode && <HiddenMatrixRain />}
       </div>
 
-      <div className="relative z-10 min-h-screen bg-[var(--background)] p-20 flex flex-col">
+{/* HEADER CERIMONIAL */}
+        <div className="relative z-10 min-h-screen p-20 flex flex-col">)
           <motion.div
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
@@ -109,7 +110,7 @@ export default function TheBoardroomOmega() {
             <h1 className="text-[14rem] font-black tracking-tighter bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent leading-none">
               THE BOARDROOM Ω
             </h1>
-            <p className="text-6xl text-white/70 mt-8 font-light tracking-widest">
+            <p className="text-6xl text-[var(--text-primary)]/70 mt-8 font-light tracking-widest">
               ERA DO {era}
             </p>
             <motion.div 
@@ -128,13 +129,13 @@ export default function TheBoardroomOmega() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="fixed top-32 left-1/2 -translate-x-1/2 z-50 bg-black/90 backdrop-blur-3xl border-4 border-emerald-500/50 rounded-3xl p-12 max-w-4xl text-center"
+                className="fixed top-32 left-1/2 -translate-x-1/2 z-50 bg-[var(--background)]/90 backdrop-blur-3xl border-4 border-emerald-500/50 rounded-3xl p-12 max-w-4xl text-center"
               >
                 <BrainCircuit className="w-24 h-24 mx-auto mb-8 text-emerald-400 animate-pulse" />
                 <p className="text-5xl font-light text-emerald-400 italic">
                   "{oraculumMessages[era]}"
                 </p>
-                <p className="text-2xl text-white/60 mt-8">— ORÁCULUM</p>
+                <p className="text-2xl text-[var(--text-primary)]/60 mt-8">— ORÁCULUM</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -149,10 +150,10 @@ export default function TheBoardroomOmega() {
 
           {/* GRÁFICO VIVO */}
           <motion.div 
-            className="bg-black/40 backdrop-blur-3xl border-8 border-white/10 rounded-4xl p-24 mb-32"
+            className="bg-[var(--background)]/40 backdrop-blur-3xl border-8 border-[var(--border)] rounded-4xl p-24 mb-32"
             whileHover={{ borderColor: '#10b981' }}
           >
-            <h2 className="text-7xl font-black text-white mb-20 text-center">TRAJETÓRIA DO IMPÉRIO</h2>
+            <h2 className="text-7xl font-black text-[var(--text-primary)] mb-20 text-center">TRAJETÓRIA DO IMPÉRIO</h2>
             <ResponsiveContainer width="100%" height={700}>
               <AreaChart data={metrics.revenueTrend}>
                 <defs>
@@ -197,17 +198,17 @@ export default function TheBoardroomOmega() {
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <h3 className="text-5xl font-black text-white">{d.name}</h3>
+                    <h3 className="text-5xl font-black text-[var(--text-primary)]">{d.name}</h3>
                     <span className="text-8xl font-black">{d.value}</span>
                   </div>
-                  <p className="text-2xl text-white/60 mt-4">{d.metric}</p>
+                  <p className="text-2xl text-[var(--text-primary)]/60 mt-4">{d.metric}</p>
                 </motion.div>
               ))}
             </div>
           </div>
 
           {/* CONTROLES CERIMONIAIS */}
-          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-8 bg-black/80 backdrop-blur-xl px-12 py-8 rounded-full border-4 border-white/20">
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-8 bg-[var(--background)]/80 backdrop-blur-xl px-12 py-8 rounded-full border-4 border-white/20">
             <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-6">
               {soundEnabled ? <Volume2 className="w-12 h-12 text-emerald-400" /> : <VolumeX className="w-12 h-12 text-red-400" />}
             </button>
@@ -220,13 +221,13 @@ export default function TheBoardroomOmega() {
             <input
               type="password"
               placeholder="CÓDIGO IMPERIAL"
-              className="bg-transparent border-b-4 border-white/30 text-white text-2xl px-8"
+              className="bg-transparent border-b-4 border-white/30 text-[var(--text-primary)] text-2xl px-8"
               onChange={(e) => setSecretCode(e.target.value)}
             />
           </div>
 
           {/* RODAPÉ ETERNO */}
-          <div className="text-center text-white/40 text-2xl mt-40">
+          <div className="text-center text-[var(--text-primary)]/40 text-2xl mt-40">
             <p>ALSHAM OS v∞ • {new Date().getFullYear()} • DOMÍNIO TOTAL</p>
             <p className="text-emerald-400 text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
           </div>

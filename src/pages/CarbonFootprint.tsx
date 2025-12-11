@@ -3,7 +3,6 @@
 // Cada tonelada de CO2 evitada é um passo para o futuro. Net Zero é o destino.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   CloudIcon,
   ArrowTrendingDownIcon,
@@ -97,8 +96,8 @@ export default function CarbonFootprintPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Pegada de Carbono">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -106,15 +105,15 @@ export default function CarbonFootprintPage() {
           />
           <p className="absolute text-4xl text-cyan-400 font-light">Medindo emissões...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
   const totalCategoria = Object.values(metrics?.porCategoria || {}).reduce((a, b) => a + b, 0);
 
   return (
-    <LayoutSupremo title="Pegada de Carbono">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -136,7 +135,7 @@ export default function CarbonFootprintPage() {
             className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-3xl p-8 border border-gray-500/30 text-center"
           >
             <CloudIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.emissaoTotal || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.emissaoTotal || 0).toLocaleString()}</p>
             <p className="text-gray-400 mt-2">Ton CO₂ Total</p>
           </motion.div>
 
@@ -182,14 +181,14 @@ export default function CarbonFootprintPage() {
 
         {/* EMISSÕES POR CATEGORIA */}
         <div className="max-w-4xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8 text-white">Emissões por Categoria</h2>
+          <h2 className="text-3xl font-bold text-center mb-8 text-[var(--text-primary)]">Emissões por Categoria</h2>
 
           <div className="space-y-6">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <BoltIcon className="w-6 h-6 text-yellow-400" />
-                  <span className="text-white">Energia</span>
+                  <span className="text-[var(--text-primary)]">Energia</span>
                 </div>
                 <span className="text-gray-400">{metrics?.porCategoria.energia.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.energia || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
@@ -206,7 +205,7 @@ export default function CarbonFootprintPage() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <TruckIcon className="w-6 h-6 text-blue-400" />
-                  <span className="text-white">Transporte</span>
+                  <span className="text-[var(--text-primary)]">Transporte</span>
                 </div>
                 <span className="text-gray-400">{metrics?.porCategoria.transporte.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.transporte || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
@@ -223,7 +222,7 @@ export default function CarbonFootprintPage() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <BuildingOfficeIcon className="w-6 h-6 text-purple-400" />
-                  <span className="text-white">Operações</span>
+                  <span className="text-[var(--text-primary)]">Operações</span>
                 </div>
                 <span className="text-gray-400">{metrics?.porCategoria.operacoes.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.operacoes || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
@@ -240,7 +239,7 @@ export default function CarbonFootprintPage() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <FireIcon className="w-6 h-6 text-red-400" />
-                  <span className="text-white">Cadeia de Suprimentos</span>
+                  <span className="text-[var(--text-primary)]">Cadeia de Suprimentos</span>
                 </div>
                 <span className="text-gray-400">{metrics?.porCategoria.cadeia.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.cadeia || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
@@ -271,6 +270,6 @@ export default function CarbonFootprintPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }
