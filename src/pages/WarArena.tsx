@@ -73,14 +73,14 @@ const BossHUD: React.FC<{ current: number; max: number; shakeControls: Animation
             transition={{ duration: 0.5, repeat: isEnraged ? Infinity : 0 }}
             className={`p-4 rounded-2xl border-4 ${isEnraged ? 'bg-red-900 border-red-500' : 'bg-gray-900 border-gray-600'} shadow-2xl`}
           >
-            {isDead ? <Trophy className="w-12 h-12 text-yellow-400" /> : <Skull className={`w-12 h-12 ${isEnraged ? 'text-red-500' : 'text-white'}`} />}
+            {isDead ? <Trophy className="w-12 h-12 text-yellow-400" /> : <Skull className={`w-12 h-12 ${isEnraged ? 'text-red-500' : 'text-[var(--text-primary)]'}`} />}
           </motion.div>
           <div>
-            <h2 className="text-5xl font-black text-white uppercase tracking-widest drop-shadow-lg">
+            <h2 className="text-5xl font-black text-[var(--text-primary)] uppercase tracking-widest drop-shadow-lg">
               {isDead ? "BOSS ELIMINADO" : ARENA_CONFIG.BOSS_NAME}
             </h2>
             <div className="flex items-center gap-3">
-              {isEnraged && !isDead && <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase rounded animate-pulse">ENRAGED</span>}
+              {isEnraged && !isDead && <span className="px-3 py-1 bg-red-600 text-[var(--text-primary)] text-xs font-bold uppercase rounded animate-pulse">ENRAGED</span>}
               <p className={`font-mono text-xl ${isEnraged ? 'text-red-400' : 'text-gray-400'}`}>
                 {Math.max(0, hpLeft).toLocaleString('pt-BR')} HP RESTANTES
               </p>
@@ -100,7 +100,7 @@ const BossHUD: React.FC<{ current: number; max: number; shakeControls: Animation
       </div>
 
       {/* The Bar */}
-      <div className="h-20 bg-[#0a0000] rounded-full border-4 border-white/10 overflow-hidden relative shadow-[0_0_100px_rgba(220,38,38,0.4)]">
+      <div className="h-20 bg-[#0a0000] rounded-full border-4 border-[var(--border)] overflow-hidden relative shadow-[0_0_100px_rgba(220,38,38,0.4)]">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
         <motion.div 
           initial={{ width: 0 }}
@@ -136,12 +136,12 @@ const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
         relative overflow-hidden rounded-[40px] border-2 backdrop-blur-2xl p-8 group
         ${isLeader 
           ? 'bg-gradient-to-b from-yellow-900/40 via-black/80 to-black border-yellow-500/50 shadow-[0_0_80px_rgba(234,179,8,0.25)] z-10 scale-105' 
-          : 'bg-black/60 border-white/10 hover:border-white/30'
+          : 'bg-[var(--background)]/60 border-[var(--border)] hover:border-white/30'
         }
       `}
     >
       {/* Rank Badge */}
-      <div className={`absolute top-0 right-0 p-6 font-black text-9xl opacity-10 pointer-events-none ${isLeader ? 'text-yellow-500' : 'text-white'}`}>
+      <div className={`absolute top-0 right-0 p-6 font-black text-9xl opacity-10 pointer-events-none ${isLeader ? 'text-yellow-500' : 'text-[var(--text-primary)]'}`}>
         #{rank}
       </div>
 
@@ -151,7 +151,7 @@ const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
           w-32 h-32 rounded-3xl p-1 mb-6 relative
           ${isLeader ? 'bg-gradient-to-br from-yellow-400 to-orange-600 animate-pulse-slow' : 'bg-gradient-to-br from-gray-700 to-gray-900'}
         `}>
-          <img src={legion.avatar} className="w-full h-full rounded-[20px] object-cover bg-black" />
+          <img src={legion.avatar} className="w-full h-full rounded-[20px] object-cover bg-[var(--background)]" />
           {isLeader && (
             <motion.div 
               animate={{ y: [-10, 0, -10] }} 
@@ -163,9 +163,9 @@ const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
           )}
         </div>
         
-        <h3 className="text-4xl font-black text-white uppercase tracking-tight">{legion.name}</h3>
+        <h3 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tight">{legion.name}</h3>
         <div className="mt-4 flex items-baseline gap-2">
-          <span className="text-lg text-white/40 font-mono">DANO TOTAL</span>
+          <span className="text-lg text-[var(--text-primary)]/40 font-mono">DANO TOTAL</span>
           <span className={`text-5xl font-black tracking-tighter ${isLeader ? 'text-yellow-400' : 'text-emerald-400'}`}>
             {(legion.total_damage / 1000).toFixed(0)}k
           </span>
@@ -183,11 +183,11 @@ const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
               {/* Progress Bar Background */}
               <div className="absolute left-0 top-0 bottom-0 bg-white/5 z-0" style={{ width: `${share}%` }} />
               
-              <img src={warrior.avatar} className="w-12 h-12 rounded-full border-2 border-white/10 z-10 object-cover" />
+              <img src={warrior.avatar} className="w-12 h-12 rounded-full border-2 border-[var(--border)] z-10 object-cover" />
               
               <div className="flex-1 z-10">
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-white text-lg">{warrior.name}</span>
+                  <span className="font-bold text-[var(--text-primary)] text-lg">{warrior.name}</span>
                   {i === 0 && <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />}
                 </div>
                 <p className="text-xs text-emerald-400 font-mono font-bold">R$ {warrior.damage.toLocaleString()}</p>
@@ -210,11 +210,11 @@ const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const KillFeed = ({ events }: { events: KillEvent[] }) => (
-  <div className="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/90 to-transparent z-50 flex items-center overflow-hidden border-t border-white/10 backdrop-blur-md">
+  <div className="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/90 to-transparent z-50 flex items-center overflow-hidden border-t border-[var(--border)] backdrop-blur-md">
     <div className="flex gap-20 animate-marquee whitespace-nowrap px-10">
       {events.length === 0 && (
-        <div className="flex items-center gap-3 text-xl text-white/40 font-mono">
-          <Sword className="w-6 h-6 text-white/30" />
+        <div className="flex items-center gap-3 text-xl text-[var(--text-primary)]/40 font-mono">
+          <Sword className="w-6 h-6 text-[var(--text-primary)]/30" />
           <span>AGUARDANDO O PRÓXIMO GOLPE...</span>
         </div>
       )}
@@ -226,8 +226,8 @@ const KillFeed = ({ events }: { events: KillEvent[] }) => (
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-black text-white uppercase">{ev.warrior}</span>
-              <span className="text-sm text-white/40 font-mono">
+              <span className="text-2xl font-black text-[var(--text-primary)] uppercase">{ev.warrior}</span>
+              <span className="text-sm text-[var(--text-primary)]/40 font-mono">
                 {Math.floor((Date.now() - ev.timestamp) / 1000)}s AGO
               </span>
             </div>
@@ -375,16 +375,16 @@ export default function WarArena() {
   }, [loadWar, triggerThunder]);
 
   if (loading) return (
-    <div className="h-screen bg-black flex items-center justify-center">
+    <div className="h-screen bg-[var(--background)] flex items-center justify-center">
       <div className="flex flex-col items-center gap-6">
         <Skull className="w-24 h-24 text-red-600 animate-pulse" />
-        <h1 className="text-4xl font-black text-white tracking-[0.5em] animate-pulse">SUMMONING BOSS...</h1>
+        <h1 className="text-4xl font-black text-[var(--text-primary)] tracking-[0.5em] animate-pulse">SUMMONING BOSS...</h1>
       </div>
     </div>
   );
 
   return (
-    <div className={`min-h-screen bg-[var(--background)] text-[var(--text-primary)] relative overflow-hidden ${mode === 'tv' ? 'p-0' : 'p-8'}`}>
+<div className={`min-h-screen bg-[#020202] text-[var(--text-primary)] relative overflow-hidden ${mode === 'tv' ? 'p-0' : 'p-8'}`}>)
         
         {/* FLASH FX */}
         <AnimatePresence>

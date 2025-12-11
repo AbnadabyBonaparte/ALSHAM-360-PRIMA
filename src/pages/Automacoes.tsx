@@ -2,7 +2,6 @@
 // ALSHAM 360° PRIMA v10 SUPREMO — Automação Omnichannel 1000/1000
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Automacoes.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { BoltIcon, PlayIcon, PauseIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -57,8 +56,7 @@ export default function AutomacoesPage() {
   };
 
   return (
-    <LayoutSupremo title="Automação Omnichannel Suprema">
-      <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
         {/* Header Supremo */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-8">
@@ -87,11 +85,11 @@ export default function AutomacoesPage() {
             {automations.map(auto => (
               <div
                 key={auto.id}
-                className="bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl border border-white/10 p-10 hover:border-yellow-500/50 transition-all hover:shadow-2xl hover:shadow-yellow-500/20"
+                className="bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl border border-[var(--border)] p-10 hover:border-yellow-500/50 transition-all hover:shadow-2xl hover:shadow-yellow-500/20"
               >
                 <div className="flex items-start justify-between mb-8">
                   <div>
-                    <h2 className="text-3xl font-bold text-white">{auto.name}</h2>
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)]">{auto.name}</h2>
                     <p className="text-gray-400 mt-2">Trigger: {auto.trigger}</p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -153,6 +151,5 @@ export default function AutomacoesPage() {
           </div>
         )}
       </div>
-    </LayoutSupremo>
   );
 }

@@ -3,7 +3,6 @@
 // O fogo que transforma trabalho em vício. O trono que transforma esforço em glória.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Gamificacao.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   TrophyIcon,
   FireIcon,
@@ -97,35 +96,30 @@ export default function GamificacaoPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Gamificação Suprema">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-orange-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-orange-400 font-light">Acendendo o fogo da glória...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-orange-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-orange-400 font-light">Acendendo o fogo da glória...</p>
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <LayoutSupremo title="Gamificação Suprema">
-        <div className="text-center py-40">
-          <FireIcon className="w-40 h-40 text-gray-700 mx-auto mb-12" />
-          <p className="text-5xl text-gray-400">Você ainda não entrou no jogo</p>
-        </div>
-      </LayoutSupremo>
+      <div className="text-center py-40">
+        <FireIcon className="w-40 h-40 text-gray-700 mx-auto mb-12" />
+        <p className="text-5xl text-gray-400">Você ainda não entrou no jogo</p>
+      </div>
     );
   }
 
   const levelProgress = (user.points % 500) / 5; // 500 pontos por nível
 
   return (
-    <LayoutSupremo title="Gamificação Suprema">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -193,7 +187,7 @@ export default function GamificacaoPage() {
                   player.rank === 1 ? 'bg-gradient-to-r from-yellow-600/40 to-orange-600/40 border-yellow-500 shadow-2xl shadow-yellow-500/50' :
                   player.rank === 2 ? 'bg-gradient-to-r from-gray-600/30 to-gray-500/30 border-gray-400' :
                   player.rank === 3 ? 'bg-gradient-to-r from-orange-700/30 to-yellow-600/30 border-orange-500' :
-                  'bg-white/5 border-white/10'
+                  'bg-white/5 border-[var(--border)]'
                 } backdrop-blur-xl`}
               >
                 <div className="flex items-center justify-between">
@@ -207,14 +201,14 @@ export default function GamificacaoPage() {
                       {player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : `#${player.rank}`}
                     </div>
                     <div>
-                      <h3 className="text-3xl font-bold text-white">{player.name}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--text-primary)]">{player.name}</h3>
                       <p className="text-xl text-gray-400">Nível {player.level} • {player.points.toLocaleString()} pts</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-3 justify-end mb-2">
                       <FireIcon className={`w-10 h-10 ${player.streak > 10 ? 'text-orange-500 animate-pulse' : 'text-gray-500'}`} />
-                      <span className="text-4xl font-bold text-white">{player.streak}</span>
+                      <span className="text-4xl font-bold text-[var(--text-primary)]">{player.streak}</span>
                     </div>
                     <p className="text-gray-400">streak • {player.badges} conquistas</p>
                   </div>
@@ -242,6 +236,5 @@ export default function GamificacaoPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }
