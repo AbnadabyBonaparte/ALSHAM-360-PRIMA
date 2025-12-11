@@ -189,7 +189,7 @@ export default function Financeiro() {
             SINCRONIZANDO O LEDGER QUÂNTICO
           </p>
         </div>
-      </div>)
+      </div>
     );
   }
 
