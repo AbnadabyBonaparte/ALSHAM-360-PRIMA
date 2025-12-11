@@ -24,7 +24,6 @@ import {
   MessageSquare, Mail, Webhook, GitBranch, Bot, Crown,
   Rocket, Volume2, Settings, Trash2, Copy, Plus
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -181,11 +180,10 @@ export default function AutomationForgeInfinity() {
   }, [setEdges]);
 
   return (
-    <LayoutSupremo title="ALSHAM AUTOMATION FORGE ∞">
-      <div className="h-screen flex flex-col bg-black overflow-hidden relative">
+    <div className="h-screen flex flex-col bg-[var(--background)] overflow-hidden relative">
 
         {/* FUNDO CÓSMICO VIVO */}
-        <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-black to-emerald-900/20" />
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-[var(--background)] to-emerald-900/20" />
         <motion.div
           animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
           transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
@@ -196,13 +194,13 @@ export default function AutomationForgeInfinity() {
         />
 
         {/* HEADER DO TRONO ETERNO */}
-        <motion.div initial={{ y: -200 }} animate={{ y: 0 }} className="relative z-50 border-b border-white/10 backdrop-blur-3xl bg-black/80">
+        <motion.div initial={{ y: -200 }} animate={{ y: 0 }} className="relative z-50 border-b border-[var(--border)] backdrop-blur-3xl bg-[var(--background)]/80">
           <div className="px-16 py-12 flex items-center justify-between">
             <div>
               <input
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="text-8xl font-black bg-transparent border-none outline-none text-white"
+                className="text-8xl font-black bg-transparent border-none outline-none text-[var(--text-primary)]"
               />
               <p className="text-4xl text-emerald-400 mt-4">{executions} execuções eternas</p>
             </div>
@@ -244,7 +242,7 @@ export default function AutomationForgeInfinity() {
               onChange={e => setPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && createWithAI()}
               placeholder="Fale com o Supremo AI: 'quando lead abrir proposta, mandar WhatsApp com desconto de 7% em 5min'"
-              className="w-full px-20 py-12 text-4xl font-light bg-black/80 backdrop-blur-3xl border-4 border-purple-500/70 rounded-3xl outline-none text-white placeholder-white/40 shadow-2xl"
+              className="w-full px-20 py-12 text-4xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-4 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] shadow-2xl"
             />
             <motion.button
               whileHover={{ scale: 1.4, rotate: 360 }}
@@ -271,8 +269,8 @@ export default function AutomationForgeInfinity() {
           className="bg-transparent"
         >
           <Background color="#0f0f0f" gap={50} />
-          <MiniMap nodeColor="#a855f7" className="bg-black/80 border border-purple-500/50" />
-          <Controls className="bg-black/80 border border-white/10" />
+          <MiniMap nodeColor="#a855f7" className="bg-[var(--background)]/80 border border-purple-500/50" />
+          <Controls className="bg-[var(--background)]/80 border border-[var(--border)]" />
         </ReactFlow>
 
         {/* MENSAGEM FINAL */}
