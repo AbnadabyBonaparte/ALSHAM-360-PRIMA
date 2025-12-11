@@ -3,7 +3,6 @@
 // Aqui você não configura. Aqui você REINA.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Settings.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   Cog6ToothIcon,
   ShieldCheckIcon,
@@ -77,22 +76,19 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Configurações Supremas">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-12 border-t-transparent border-yellow-500 rounded-full"
-          />
-          <p className="absolute text-5xl text-yellow-400 font-light">Citizen Supremo X.1 configurando seu império...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-12 border-t-transparent border-yellow-500 rounded-full"
+        />
+        <p className="absolute text-5xl text-yellow-400 font-light">Citizen Supremo X.1 configurando seu império...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Configurações Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER BILIONÁRIO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -120,7 +116,7 @@ export default function SettingsPage() {
             animate={{ scale: 1, opacity: 1 }}
             className="bg-gradient-to-br from-yellow-600/40 via-orange-600/40 to-red-600/40 rounded-3xl p-1 shadow-2xl shadow-yellow-500/50"
           >
-            <div className="bg-black rounded-3xl p-16 text-center">
+            <div className="bg-[var(--background)] rounded-3xl p-16 text-center">
               <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto mb-12" />
               <h2 className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                 PLANO SUPREMO
@@ -160,7 +156,7 @@ export default function SettingsPage() {
                 className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-10 border border-purple-500/30 hover:border-purple-500 transition-all"
               >
                 <SparklesIcon className="w-20 h-20 text-purple-400 mx-auto mb-6" />
-                <p className="text-3xl font-bold text-center text-white">{feature}</p>
+                <p className="text-3xl font-bold text-center text-[var(--text-primary)]">{feature}</p>
               </motion.div>
             ))}
           </div>
@@ -204,6 +200,5 @@ export default function SettingsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

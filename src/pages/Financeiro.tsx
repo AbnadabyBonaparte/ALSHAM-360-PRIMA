@@ -44,7 +44,7 @@ const StatCard = ({
   title,
   value,
   trend,
-  color = "text-white"
+  color = "text-[var(--text-primary)]"
 }: {
   title: string;
   value: number;
@@ -53,7 +53,7 @@ const StatCard = ({
 }) => (
   <motion.div
     whileHover={{ y: -8, scale: 1.03 }}
-    className="relative overflow-hidden rounded-3xl bg-[#0a0a0a] border border-white/10 p-8 group cursor-default"
+    className="relative overflow-hidden rounded-3xl bg-[#0a0a0a] border border-[var(--border)] p-8 group cursor-default"
   >
     <div className={`absolute inset-0 bg-gradient-to-br ${
       color.includes('emerald') ? 'from-emerald-600/20' :
@@ -62,7 +62,7 @@ const StatCard = ({
       'from-purple-600/20'
     } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
-    <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-4">{title}</p>
+    <p className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)]/40 mb-4">{title}</p>
     <div className="flex items-end justify-between">
       <h3 className={`text-5xl font-black ${color}`}>
         R$ {value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
@@ -177,19 +177,19 @@ export default function Financeiro() {
   if (loading) {
     return (
       <div className="h-screen bg-[var(--background)] flex items-center justify-center">
-          <div className="text-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              className="inline-block"
-            >
-              <Activity className="w-32 h-32 text-emerald-500" />
-            </motion.div>
-            <p className="mt-12 text-5xl font-black text-emerald-500 tracking-widest">
-              SINCRONIZANDO O LEDGER QUÂNTICO
-            </p>
-          </div>
+<div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            className="inline-block"
+          >
+            <Activity className="w-32 h-32 text-emerald-500" />
+          </motion.div>
+          <p className="mt-12 text-5xl font-black text-emerald-500 tracking-widest">
+            SINCRONIZANDO O LEDGER QUÂNTICO
+          </p>
         </div>
+      </div>)
     );
   }
 
@@ -199,10 +199,10 @@ export default function Financeiro() {
         {/* HEADER — SALDO + RUNWAY SIMULATOR */}
         <div className="bg-gradient-to-r from-[#0f0f0f] via-[#111] to-[#0a0a0a] rounded-[40px] border border-white/5 p-12 flex flex-col lg:flex-row justify-between items-end gap-12">
           <div>
-            <p className="text-sm font-black uppercase tracking-widest text-white/40 mb-4 flex items-center gap-3">
+            <p className="text-sm font-black uppercase tracking-widest text-[var(--text-primary)]/40 mb-4 flex items-center gap-3">
               <Wallet className="w-6 h-6" /> SALDO GLOBAL EM CAIXA
             </p>
-            <h1 className="text-9xl font-black text-white leading-none">
+            <h1 className="text-9xl font-black text-[var(--text-primary)] leading-none">
               R$ {(metrics.simulatedIncome * 10).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
             </h1>
             <p className="text-emerald-400 text-3xl font-black mt-6 flex items-center gap-4">
@@ -210,16 +210,16 @@ export default function Financeiro() {
             </p>
           </div>
 
-          <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-3xl p-10 w-full max-w-xl">
+          <div className="bg-[var(--background)]/60 backdrop-blur-2xl border border-[var(--border)] rounded-3xl p-10 w-full max-w-xl">
             <div className="flex justify-between items-center mb-8">
-              <p className="text-xs font-black uppercase tracking-widest text-white/40">RUNWAY SIMULATOR</p>
+              <p className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)]/40">RUNWAY SIMULATOR</p>
               <span className={`text-5xl font-black ${metrics.runway < 6 ? 'text-red-500' : 'text-emerald-400'}`}>
                 {metrics.runway.toFixed(1)} meses
               </span>
             </div>
 
             <div className="space-y-6">
-              <div className="flex justify-between text-xs text-white/30 font-black">
+              <div className="flex justify-between text-xs text-[var(--text-primary)]/30 font-black">
                 <span>CENÁRIO ATUAL</span>
                 <span>APOCALIPSE (-50%)</span>
               </div>
@@ -234,8 +234,8 @@ export default function Financeiro() {
                   background: `linear-gradient(to right, #10b981 ${(100 - simulationDrop * 2)}%, #ef4444 ${(100 - simulationDrop * 2)}%)`
                 }}
               />
-              <p className="text-center text-white font-mono text-xl">
-                Queda simulada: <span className="text-4xl font-black text-white">{simulationDrop}%</span>
+              <p className="text-center text-[var(--text-primary)] font-mono text-xl">
+                Queda simulada: <span className="text-4xl font-black text-[var(--text-primary)]">{simulationDrop}%</span>
               </p>
             </div>
           </div>
@@ -246,14 +246,14 @@ export default function Financeiro() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <StatCard title="RECEITA MENSAL" value={metrics.totalIncome} trend={18} color="text-emerald-400" />
           <StatCard title="DESPESAS TOTAIS" value={metrics.totalExpense} trend={-3} color="text-red-400" />
-          <StatCard title="LUCRO LÍQUIDO" value={metrics.netProfit} trend={28} color="text-white" />
+          <StatCard title="LUCRO LÍQUIDO" value={metrics.netProfit} trend={28} color="text-[var(--text-primary)]" />
           <StatCard title="BURN RATE" value={metrics.burnRate} trend={-8} color="text-orange-400" />
         </div>
 
         {/* CHARTS + INSIGHTS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 rounded-3xl p-12">
-            <h3 className="text-3xl font-black text-white mb-10">FLUXO DE CAIXA — 12 MESES</h3>
+            <h3 className="text-3xl font-black text-[var(--text-primary)] mb-10">FLUXO DE CAIXA — 12 MESES</h3>
             <ResponsiveContainer width="100%" height={480}>
               <AreaChart data={metrics.monthlyData}>
                 <defs>
@@ -291,16 +291,16 @@ export default function Financeiro() {
                   <p className="text-xs text-purple-200/70">AI detectou em tempo real</p>
                 </div>
               </div>
-              <p className="text-white/90 text-lg leading-relaxed">
+              <p className="text-[var(--text-primary)]/90 text-lg leading-relaxed">
                 Infraestrutura em nuvem subiu <span className="text-red-400 text-4xl font-black">47%</span> em 72h.
               </p>
-              <button className="mt-8 w-full py-5 bg-purple-600 hover:bg-purple-500 rounded-2xl font-black text-white text-xl uppercase tracking-wider transition-all hover:scale-105 shadow-2xl">
+              <button className="mt-8 w-full py-5 bg-purple-600 hover:bg-purple-500 rounded-2xl font-black text-[var(--text-primary)] text-xl uppercase tracking-wider transition-all hover:scale-105 shadow-2xl">
                 Iniciar Investigação Automática
               </button>
             </div>
 
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-10">
-              <h4 className="text-xl font-black text-white/60 mb-10">DISTRIBUIÇÃO DE GASTOS</h4>
+            <div className="bg-[#0a0a0a] border border-[var(--border)] rounded-3xl p-10">
+              <h4 className="text-xl font-black text-[var(--text-primary)]/60 mb-10">DISTRIBUIÇÃO DE GASTOS</h4>
               {[
                 { label: 'Marketing', val: 48, gradient: 'from-purple-500 to-pink-500' },
                 { label: 'Equipe', val: 28, gradient: 'from-blue-500 to-cyan-500' },
@@ -309,8 +309,8 @@ export default function Financeiro() {
               ].map(item => (
                 <div key={item.label} className="mb-8 last:mb-0">
                   <div className="flex justify-between text-sm mb-3">
-                    <span className="text-white/60 font-bold">{item.label}</span>
-                    <span className="font-black text-white text-xl">{item.val}%</span>
+                    <span className="text-[var(--text-primary)]/60 font-bold">{item.label}</span>
+                    <span className="font-black text-[var(--text-primary)] text-xl">{item.val}%</span>
                   </div>
                   <div className="h-4 bg-white/10 rounded-full overflow-hidden">
                     <motion.div

@@ -3,7 +3,6 @@
 // Cada fatura é dinheiro no bolso. Cobrança automatizada, caixa cheio.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   DocumentTextIcon,
   CurrencyDollarIcon,
@@ -96,16 +95,14 @@ export default function InvoicesPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Faturas Supremas">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-green-400 font-light">Contando dinheiro...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-green-400 font-light">Contando dinheiro...</p>
+      </div>
     );
   }
 
@@ -118,8 +115,7 @@ export default function InvoicesPage() {
   };
 
   return (
-    <LayoutSupremo title="Faturas Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -138,31 +134,31 @@ export default function InvoicesPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-2xl p-6 border border-gray-500/30">
             <DocumentTextIcon className="w-12 h-12 text-gray-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalFaturas || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalFaturas || 0}</p>
             <p className="text-gray-400">Total Faturas</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
             <BanknotesIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.valorEmitido || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorEmitido || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Emitido</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.valorRecebido || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorRecebido || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Recebido</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ClockIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.valorPendente || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorPendente || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Pendente</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-red-900/60 to-pink-900/60 rounded-2xl p-6 border border-red-500/30">
             <ExclamationTriangleIcon className="w-12 h-12 text-red-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.atrasadas || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.atrasadas || 0}</p>
             <p className="text-gray-400">Atrasadas</p>
           </motion.div>
         </div>
@@ -182,7 +178,7 @@ export default function InvoicesPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
+                  <tr className="border-b border-[var(--border)]">
                     <th className="text-left py-4 px-6 text-gray-400">Fatura</th>
                     <th className="text-left py-4 px-6 text-gray-400">Cliente</th>
                     <th className="text-right py-4 px-6 text-gray-400">Valor</th>
@@ -207,7 +203,7 @@ export default function InvoicesPage() {
                         className="border-b border-white/5 hover:bg-white/5 transition-colors"
                       >
                         <td className="py-4 px-6">
-                          <span className="font-mono font-bold text-white">{fatura.numero}</span>
+                          <span className="font-mono font-bold text-[var(--text-primary)]">{fatura.numero}</span>
                         </td>
                         <td className="py-4 px-6 text-gray-300">{fatura.cliente}</td>
                         <td className="py-4 px-6 text-right">
@@ -255,6 +251,5 @@ export default function InvoicesPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

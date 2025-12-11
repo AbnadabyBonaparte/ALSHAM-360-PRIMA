@@ -138,7 +138,7 @@ export const supremeConfigs: Record<string, SupremeConfigItem> = Object.fromEntr
       {
         id,
         title: `⚡ ${title}`,
-        subtitle: "LayoutSupremo • Tema Cyber Vivid • Dados 100% reais do Supabase",
+        subtitle: "Layout único • Tema Cyber Vivid • Dados 100% reais do Supabase",
         message:
           "Citizen Supremo X.1: este módulo está vivo, conectado e monitorando cada métrica em tempo real.",
         gradient,
