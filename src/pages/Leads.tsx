@@ -61,7 +61,7 @@ export default function LeadsPage() {
           name: l.name || 'Sem nome',
           email: l.email,
           company: l.company || 'Sem empresa',
-          score: l.ai_lead_score || Math.floor(Math.random() * 40) + 60,
+          score: l.ai_lead_score || 0,
           probability: l.ai_conversion_probability || 0,
           risk: l.ai_risk_score || 0,
           health: l.ai_health_score || 0,
