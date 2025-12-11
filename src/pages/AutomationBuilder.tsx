@@ -284,6 +284,5 @@ export default function AutomationForgeInfinity() {
           </motion.p>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }
