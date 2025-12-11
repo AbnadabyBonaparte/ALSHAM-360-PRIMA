@@ -256,13 +256,15 @@ export default function NexusCommand() {
                 <AnimatePresence>
                   {messages.map(msg => (
                     <motion.div
-                      key={ opacity: 0, x: msg.direction === 'in' ? -50 : 50 }}
+                      key={msg.id ?? msg.timestamp}
+                      initial={{ opacity: 0, x: msg.direction === 'in' ? -50 : 50 }}
                       animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: msg.direction === 'in' ? -50 : 50 }}
                       className={`flex ${msg.direction === 'out' ? 'justify-end' : 'justify-start'}`}
                     >
-<div className={`max-w-2xl ${msg.direction === 'out' ? 'bg-gradient-to-br from-purple-600/80 to-pink-600/80' : 'bg-white/10'} p-8 rounded-3xl backdrop-blur-2xl border ${msg.direction === 'out' ? 'border-purple-500/50' : 'border-[var(--border)]'}`}>
+                      <div className={`max-w-2xl ${msg.direction === 'out' ? 'bg-gradient-to-br from-purple-600/80 to-pink-600/80' : 'bg-[var(--surface-strong)]'} p-8 rounded-3xl backdrop-blur-2xl border ${msg.direction === 'out' ? 'border-purple-500/50' : 'border-[var(--border)]'}`}>
                         <p className="text-2xl leading-relaxed">{msg.content}</p>
-                        <div className="flex items-center gap-4 mt-4 text-[var(--text-primary)]/40 text-sm">)
+                        <div className="flex items-center gap-4 mt-4 text-[var(--text-secondary)] text-sm">
                           <span>{formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true, locale: ptBR })}</span>
                           {msg.direction === 'out' && <CheckCheck className="h-5 w-5 text-emerald-400" />}
                         </div>
@@ -288,7 +290,7 @@ export default function NexusCommand() {
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
                     placeholder="Fale com a alma... ou deixe o Nexus falar por você"
-className="w-full px-12 py-10 text-3xl bg-white/5 backdrop-blur-3xl border border-[var(--border)] rounded-3xl outline-none resize-none h-32")
+                  className="w-full px-12 py-10 text-3xl bg-[var(--surface-strong)] backdrop-blur-3xl border border-[var(--border)] rounded-3xl outline-none resize-none h-32"
                   />
                   <motion.button
                     whileHover={{ scale: 1.2, rotate: 360 }}

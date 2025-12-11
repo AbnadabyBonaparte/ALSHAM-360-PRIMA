@@ -48,7 +48,7 @@ const KpiCard = ({ title, value, subtitle, trend, prefix = "" }: any) => (
     animate={{ opacity: 1, scale: 1 }}
     whileHover={{ y: -10, scale: 1.02 }}
     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    className="p-10 rounded-[2.5rem] bg-[#0a0a0a] border border-[var(--border)] relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
+    className="p-10 rounded-[2.5rem] bg-[var(--surface)] border border-[var(--border)] relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
     role="region"
     aria-label={`${title}: ${value}`}
   >
@@ -245,7 +245,7 @@ export default function ExecutiveDashboard() {
               transition={{ delay: 0.3 }}
               className="mt-8 flex items-center gap-6"
             >
-              <span className="px-6 py-2 rounded-full border border-[var(--border)] bg-white/5 text-[var(--text-primary)]/40 text-sm font-bold uppercase tracking-widest">
+              <span className="px-6 py-2 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]/40 text-sm font-bold uppercase tracking-widest">
                 Q4 2025 • Era da Expansão
               </span>
               <p className="text-3xl text-[var(--text-primary)]/60 font-light italic">
@@ -353,13 +353,13 @@ export default function ExecutiveDashboard() {
 
           {/* Pillars & Sentiment */}
           <div className="space-y-12">
-            <div className="bg-[#0a0a0a] border border-[var(--border)] rounded-[3rem] p-12 text-center relative overflow-hidden">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[3rem] p-12 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-500 via-purple-500 to-emerald-500" />
               <h3 className="text-sm font-black text-[var(--text-primary)]/40 uppercase tracking-[0.3em] mb-10">Confiança do Mercado</h3>
               <SentimentOrb score={metrics.marketSentiment} />
             </div>
 
-            <div className="bg-[#0a0a0a] border border-[var(--border)] rounded-[3rem] p-12">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[3rem] p-12">
               <h3 className="text-xl font-black text-[var(--text-primary)] mb-10">PILASTRES ESTRATÉGICOS</h3>
               <div className="space-y-8">
                 {departments.map(dept => (

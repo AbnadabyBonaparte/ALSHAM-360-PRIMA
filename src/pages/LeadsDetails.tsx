@@ -94,7 +94,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
     return (
       <div className="text-center py-40">
         <AlertTriangleIcon className="w-40 h-40 text-red-500 mx-auto mb-12" />
-        <p className="text-6xl text-gray-400">Lead não encontrado</p>
+        <p className="text-2xl sm:text-3xl text-[var(--text-secondary)]">Lead não encontrado</p>
       </div>
     );
   }
@@ -106,13 +106,13 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
         {/* HEADER SUPREMO */}
-        <div className="border-b border-[var(--border)] bg-gradient-to-r from-purple-900/30 via-black to-pink-900/30 backdrop-blur-2xl">
+        <div className="border-b border-[var(--border)] bg-gradient-to-r from-purple-900/30 via-[var(--background)] to-pink-900/30 backdrop-blur-2xl">
           <div className="p-12 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-8">
                 <button
                   onClick={() => window.history.back()}
-                  className="p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all"
+                  className="p-4 bg-[var(--surface)] hover:bg-[var(--surface-strong)] rounded-2xl transition-all"
                 >
                   <ArrowLeftIcon className="w-10 h-10" />
                 </button>
@@ -128,22 +128,22 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                     )}
                   </div>
                   <div>
-                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                       {lead.name}
                     </h1>
-                    <p className="text-4xl text-gray-300 mt-4">
+                    <p className="text-lg sm:text-xl md:text-2xl text-[var(--text-secondary)] mt-4">
                       {lead.company} • {lead.position || 'Cargo não informado'}
                     </p>
                     <div className="flex items-center gap-6 mt-6">
-                      <div className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-3xl">
+                      <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
                         IA Score: {lead.score}/100
                         {isHot && <SparklesIcon className="w-12 h-12 inline ml-4 animate-pulse" />}
                       </div>
-                      <div className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl font-bold text-3xl">
+                      <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
                         {lead.probability}% conversão
                       </div>
                       {isRisk && (
-                        <div className="px-8 py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl font-bold text-3xl">
+                        <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
                           RISCO ALTO
                         </div>
                       )}
@@ -153,11 +153,11 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
               </div>
 
               <div className="text-right">
-                <p className="text-6xl font-black text-emerald-400">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-400">
                   R$ {lead.revenue_potential.toLocaleString('pt-BR')}
                 </p>
-                <p className="text-3xl text-gray-400">Potencial de receita</p>
-                <button className="mt-8 px-12 py-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl font-bold text-3xl hover:scale-105 transition-all">
+                <p className="text-base sm:text-lg text-[var(--text-secondary)]">Potencial de receita</p>
+                <button className="mt-8 px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg hover:scale-105 transition-all">
                   CONVERTER EM CLIENTE
                 </button>
               </div>
@@ -184,19 +184,19 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
             >
               <div className="flex items-center gap-4 mb-8">
                 <LightBulbIcon className="w-16 h-16 text-purple-400" />
-                <h3 className="text-4xl font-bold">Análise da IA</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">Análise da IA</h3>
               </div>
               <div className="space-y-6">
                 <div>
-                  <p className="text-2xl text-gray-400">Probabilidade de conversão</p>
+                  <p className="text-base sm:text-lg text-[var(--text-secondary)]">Probabilidade de conversão</p>
                   <p className="text-xl md:text-2xl lg:text-3xl font-black text-emerald-400">{lead.probability}%</p>
                 </div>
                 <div>
-                  <p className="text-2xl text-gray-400">Risco de churn</p>
+                  <p className="text-base sm:text-lg text-[var(--text-secondary)]">Risco de churn</p>
                   <p className={`text-xl md:text-2xl lg:text-3xl font-black ${lead.risk >= 60 ? 'text-red-400' : 'text-emerald-400'}`}>{lead.risk}%</p>
                 </div>
                 <div>
-                  <p className="text-2xl text-gray-400">Health Score</p>
+                  <p className="text-base sm:text-lg text-[var(--text-secondary)]">Health Score</p>
                   <p className="text-xl md:text-2xl lg:text-3xl font-black text-cyan-400">{lead.health}/100</p>
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
 
           {/* COLUNA DO MEIO — ATIVIDADES */}
           <div className="lg:col-span-2">
-            <h2 className="text-5xl font-bold mb-8">Atividades Recentes</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-8">Atividades Recentes</h2>
             <div className="space-y-6">
               <ActivityItem
                 type="email"
@@ -239,15 +239,15 @@ function InfoCard({ icon: Icon, title, value }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className="bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 border border-[var(--border)]"
+      className="bg-gradient-to-br from-[var(--surface)] to-[var(--surface-strong)] rounded-3xl p-8 border border-[var(--border)]"
     >
       <div className="flex items-center gap-6">
-        <div className="p-6 bg-white/10 rounded-2xl">
+        <div className="p-6 bg-[var(--surface-strong)] rounded-2xl">
           <Icon className="w-12 h-12 text-primary" />
         </div>
         <div>
-          <p className="text-2xl text-gray-400">{title}</p>
-          <p className="text-4xl font-bold text-[var(--text-primary)]">{value || '—'}</p>
+          <p className="text-base sm:text-lg text-[var(--text-secondary)]">{title}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">{value || '—'}</p>
         </div>
       </div>
     </motion.div>
@@ -259,7 +259,7 @@ function ActivityItem({ type, title, description, time, user }: any) {
     <motion.div
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
-      className="bg-gradient-to-r from-gray-900/50 to-black/50 rounded-3xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
+      className="bg-gradient-to-r from-[var(--surface)]/70 to-[var(--background)]/70 rounded-3xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
@@ -267,9 +267,9 @@ function ActivityItem({ type, title, description, time, user }: any) {
             {type === 'email' ? '✉️' : type === 'call' ? '📞' : '🗓️'}
           </div>
           <div>
-            <h3 className="text-3xl font-bold text-[var(--text-primary)]">{title}</h3>
-            <p className="text-xl text-gray-300">{description}</p>
-            <p className="text-gray-500 mt-2">por {user} • {time}</p>
+            <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{title}</h3>
+            <p className="text-base sm:text-lg text-[var(--text-secondary)]">{description}</p>
+            <p className="text-[var(--text-muted)] mt-2">por {user} • {time}</p>
           </div>
         </div>
       </div>

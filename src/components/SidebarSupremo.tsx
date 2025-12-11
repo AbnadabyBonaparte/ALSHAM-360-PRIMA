@@ -4,7 +4,7 @@
 // 🎨 DOMINAÇÃO VISUAL TOTAL - Sidebar por Categoria com Responsividade Alienígena
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -35,6 +35,7 @@ import {
   Sparkles,
   X,
   Menu,
+  Search,
 } from 'lucide-react';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -66,6 +67,21 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
   const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
   const [isHovered, setIsHovered] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredStructure = useMemo(() => {
+    if (!searchTerm.trim()) return SIDEBAR_STRUCTURE;
+
+    const term = searchTerm.toLowerCase();
+    return SIDEBAR_STRUCTURE.map((category) => ({
+      ...category,
+      links: category.links.filter(
+        (link) =>
+          link.label.toLowerCase().includes(term) ||
+          link.id.toLowerCase().includes(term)
+      ),
+    })).filter((category) => category.links.length > 0);
+  }, [searchTerm]);
 
   const toggleCategory = useCallback((categoryId: string) => {
     console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
@@ -243,8 +259,28 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
+        <div className="px-3 py-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar página..."
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--surface)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[var(--color-primary-from)] transition-colors"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-[var(--surface-strong)] rounded"
+              >
+                <X className="h-3 w-3 text-[var(--text-secondary)]" />
+              </button>
+            )}
+          </div>
+        </div>
         <div className="space-y-2">
-          {SIDEBAR_STRUCTURE.map((category) => {
+          {filteredStructure.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveLink = category.links.some((link) => link.id === activePage);
 
