@@ -8,7 +8,6 @@ import {
   FileText, Share2, ShieldCheck, Globe, Briefcase, 
   Crown, Download, Target, TrendingUp, Zap
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 // Assumindo que os hooks e componentes auxiliares já existem (ou mantendo a lógica local se preferir)
@@ -209,8 +208,7 @@ export default function ExecutiveDashboard() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="The Boardroom">
-        <div className="h-screen bg-[#050505] flex items-center justify-center">
+      <div className="h-screen bg-[var(--background)] flex items-center justify-center">
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360, scale: [1, 1.2, 1] }}
@@ -223,15 +221,13 @@ export default function ExecutiveDashboard() {
             </p>
           </div>
         </div>
-      </LayoutSupremo>
     );
   }
 
   if (!metrics) return null;
 
   return (
-    <LayoutSupremo title="The Boardroom">
-      <div className={`min-h-screen bg-[#050505] p-12 lg:p-20 space-y-24 transition-colors duration-1000 ${easterEggActive ? 'hue-rotate-90' : ''}`}>
+    <div className={`min-h-screen bg-[var(--background)] p-12 lg:p-20 space-y-24 transition-colors duration-1000 ${easterEggActive ? 'hue-rotate-90' : ''}`}>
 
         {/* HERO: NARRATIVA IMPERIAL */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-16 border-b-4 border-white/5 pb-20">
@@ -398,6 +394,5 @@ export default function ExecutiveDashboard() {
         </div>
 
       </div>
-    </LayoutSupremo>
   );
 }
