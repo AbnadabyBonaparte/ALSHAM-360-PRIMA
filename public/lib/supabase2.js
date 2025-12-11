@@ -2,21 +2,30 @@
 // VERSÃO 9.3 - CORREÇÃO FINAL DOS EXPORTS PARA BROWSER
 // CORRIGIDO: Exports funcionando + API key válida
 
-// Verificar se as variáveis foram injetadas
-let SUPABASE_URL, SUPABASE_ANON_KEY;
+// Supabase Configuration - Uses environment variables (no hardcoded secrets)
+const resolveEnv = (key) => {
+  if (typeof import.meta !== 'undefined' && import.meta.env?.[key]) {
+    return import.meta.env[key];
+  }
+  if (typeof process !== 'undefined' && process.env?.[key]) {
+    return process.env[key];
+  }
+  if (typeof window !== 'undefined') {
+    const winKey = `__${key}__`;
+    if (window[winKey]) {
+      return window[winKey];
+    }
+  }
+  return null;
+};
 
-if (typeof window !== 'undefined') {
-  // Tentar pegar das variáveis window primeiro
-  SUPABASE_URL = window.__VITE_SUPABASE_URL__ || 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-  SUPABASE_ANON_KEY = window.__VITE_SUPABASE_ANON_KEY__ || 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
-} else {
-  // Fallback para suas credenciais reais
-  SUPABASE_URL = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
-  SUPABASE_ANON_KEY = 'sb_publishable_AGXjFzibpEtaLIwAu-ZNfA_BAdNLyF_2tPHhCZPRMBCZBY';
+const SUPABASE_URL = resolveEnv('VITE_SUPABASE_URL');
+const SUPABASE_ANON_KEY = resolveEnv('VITE_SUPABASE_ANON_KEY');
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('❌ Supabase credentials not configured. Check environment variables.');
+  throw new Error('Supabase credentials missing');
 }
-
-console.log('🔑 Supabase URL:', SUPABASE_URL);
-console.log('🔑 Supabase Key (primeiros chars):', SUPABASE_ANON_KEY?.substring(0, 20) + '...');
 
 // Verificar se o Supabase CDN foi carregado
 if (!window.supabase) {
