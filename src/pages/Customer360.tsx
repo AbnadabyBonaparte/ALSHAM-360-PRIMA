@@ -141,11 +141,8 @@ export default function Customer360Real() {
     </div>
   );
 
-<<<<<<< HEAD
   if (!lead) return <div className="text-center py-32 text-4xl text-[var(--text-tertiary)]">Lead não encontrado</div>;
-=======
   if (!lead) return <div className="text-center py-32 text-4xl text-[var(--text-primary)]/30">Lead não encontrado</div>;
->>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
@@ -157,7 +154,6 @@ export default function Customer360Real() {
               {lead.name}
             </h1>
           </motion.div>
-<<<<<<< HEAD
           <p className="text-5xl text-[var(--text-secondary)] mt-8">{lead.company_name || lead.company}</p>
           <div className="flex justify-center gap-20 mt-16">
             <div className="text-center">
@@ -167,7 +163,6 @@ export default function Customer360Real() {
             <div className="text-center">
               <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
               <p className="text-3xl text-[var(--text-secondary)]">LTV Previsto (IA)</p>
-=======
           <p className="text-5xl text-[var(--text-primary)]/70 mt-8">{lead.company_name || lead.company}</p>
           <div className="flex justify-center gap-20 mt-16">
             <div className="text-center">
@@ -177,7 +172,6 @@ export default function Customer360Real() {
             <div className="text-center">
               <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
               <p className="text-3xl text-[var(--text-primary)]/60">LTV Previsto (IA)</p>
->>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
             </div>
           </div>
         </motion.div>
@@ -220,17 +214,14 @@ export default function Customer360Real() {
                     <div className="shrink-0 w-16 h-16 rounded-full bg-[var(--surface)] flex items-center justify-center border border-[var(--border)]">
                       {item.icon}
                     </div>
-<<<<<<< HEAD
                     <div className="flex-1 bg-[var(--surface)] rounded-2xl p-6 border border-[var(--border)]">
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="text-xl font-bold text-[var(--text-primary)]">{item.title}</h4>
                         <span className="text-sm text-[var(--text-tertiary)]">
-=======
                     <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-[var(--border)]">
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="text-xl font-bold text-[var(--text-primary)]">{item.title}</h4>
                         <span className="text-sm text-[var(--text-primary)]/40">
->>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
                           {formatDistanceToNow(item.date, { addSuffix: true, locale: ptBR })}
                         </span>
                       </div>
@@ -253,9 +244,6 @@ export default function Customer360Real() {
         </motion.div>
 
       </div>
-<<<<<<< HEAD
-=======
     </div>
->>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
   );
 }

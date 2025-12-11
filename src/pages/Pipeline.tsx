@@ -128,13 +128,10 @@ export default function PipelineQuantico() {
                 DOMÍNIO REAL
               </h1>
               <div className="flex gap-12 mt-6">
-<<<<<<< HEAD
                 <div><p className="text-5xl font-black text-emerald-400">R$ {total.toLocaleString('pt-BR')}</p><p className="text-[var(--text-secondary)]">Total</p></div>
                 <div><p className="text-5xl font-black text-purple-400">R$ {weighted.toLocaleString('pt-BR')}</p><p className="text-[var(--text-secondary)]">Previsão IA</p></div>
-=======
                 <div><p className="text-5xl font-black text-emerald-400">R$ {total.toLocaleString('pt-BR')}</p><p className="text-[var(--text-primary)]/60">Total</p></div>
                 <div><p className="text-5xl font-black-purple-400">R$ {weighted.toLocaleString('pt-BR')}</p><p className="text-[var(--text-primary)]/60">Previsão IA</p></div>
->>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
               </div>
             </div>
             <input
@@ -142,11 +139,8 @@ export default function PipelineQuantico() {
               placeholder="Buscar deals..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-<<<<<<< HEAD
               className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none text-[var(--text-primary)]"
-=======
               className="bg-white/5 border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none"
->>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
             />
           </div>
         </div>
