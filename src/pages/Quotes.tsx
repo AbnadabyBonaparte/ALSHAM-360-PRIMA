@@ -57,8 +57,8 @@ export default function QuotesPage() {
           status: q.status || 'draft',
           validity_date: q.validity_date || new Date(Date.now() + 30*24*60*60*1000).toISOString(),
           created_at: q.created_at,
-          items_count: q.items?.length || Math.floor(Math.random() * 10) + 1,
-          conversion_probability: q.ai_conversion_probability || Math.floor(Math.random() * 40) + 60,
+          items_count: q.items?.length || 0,
+          conversion_probability: q.ai_conversion_probability || 0,
           owner: q.owner_name || 'Você'
         })));
       }
