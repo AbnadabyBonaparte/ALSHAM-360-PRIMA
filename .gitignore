@@ -65,3 +65,6 @@ temp/
 *.key
 *.cert
 secrets/
+
+# Build output
+dist/
