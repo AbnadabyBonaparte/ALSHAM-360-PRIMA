@@ -8,7 +8,6 @@ import {
   Layout, Type, MousePointer2, Monitor, Tablet, Smartphone,
   Globe, Wand2, Plus, X, Crown, Zap, Save, Trash2, Copy
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -176,10 +175,9 @@ export default function VortexArchitect() {
   const selected = blocks.find(b => b.id === selectedId);
 
   return (
-    <LayoutSupremo title="VORTEX ARCHITECT — O Criador de Portais">
-      <div className="h-screen flex bg-black text-white">
+    <div className="h-screen flex bg-[var(--background)] text-[var(--text-primary)]">
         {/* BIBLIOTECA DIVINA */}
-        <div className="w-96 border-r border-white/5 bg-gradient-to-b from-black to-purple-950/30 p-12">
+        <div className="w-96 border-r border-[var(--border)] bg-gradient-to-b from-[var(--background)] to-purple-950/30 p-12">
           <h2 className="text-6xl font-black mb-20 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             BIBLIOTECA DIVINA
           </h2>
@@ -309,6 +307,5 @@ export default function VortexArchitect() {
           )}
         </AnimatePresence>
       </div>
-    </LayoutSupremo>
   );
 }

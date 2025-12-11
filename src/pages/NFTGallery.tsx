@@ -9,7 +9,6 @@ import {
   Search, Filter, Plus, ExternalLink, X,
   Wallet, Shield, Sparkles, Trophy
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -80,17 +79,14 @@ export default function EternalVault() {
   const totalValue = nfts.reduce((a, n) => a + (n.price_eth || 0), 0);
 
   if (loading) return (
-    <LayoutSupremo>
-      <div className="h-screen flex flex-col items-center justify-center bg-black">
+    <div className="h-screen flex flex-col items-center justify-center bg-[var(--background)]">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="w-32 h-32 border-8 border-t-transparent border-gradient-to-r from-amber-500 via-purple-500 to-cyan-500 rounded-full" />
         <p className="text-4xl text-amber-400 mt-12 font-black">ABRINDO O COFRE ETERNO...</p>
       </div>
-    </LayoutSupremo>
   );
 
   return (
-    <LayoutSupremo title="ETERNAL VAULT — Propriedade Imortal">
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] relative overflow-hidden">
 
         {/* AURA CÓSMICA */}
         <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-black to-amber-900/20" />
@@ -271,6 +267,5 @@ export default function EternalVault() {
           <p className="text-5xl text-white/60 mt-8">E pertencem apenas a você.</p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }
