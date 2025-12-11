@@ -57,10 +57,10 @@ export default function OpportunitiesPage() {
           company: d.company || 'Empresa X',
           value: d.value || 0,
           stage: d.stage || 'Qualificação',
-          probability: d.ai_probability || Math.floor(Math.random() * 40) + 50,
+          probability: d.ai_probability || 0,
           owner: d.owner_name || 'Você',
           close_date: d.close_date || new Date(Date.now() + 30*24*60*60*1000).toISOString(),
-          days_in_stage: d.days_in_stage || Math.floor(Math.random() * 60),
+          days_in_stage: d.days_in_stage || (d.updated_at ? Math.max(0, Math.floor((Date.now() - new Date(d.updated_at).getTime()) / (1000 * 60 * 60 * 24))) : 0),
           next_action: d.ai_next_action || 'Enviar proposta personalizada',
           health: d.ai_health === 'hot' ? 'hot' : d.ai_health === 'cold' ? 'cold' : 'warm',
           revenue_potential: d.value || 0
