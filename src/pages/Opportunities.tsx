@@ -3,7 +3,6 @@
 // Onde deals viram dinheiro. Onde IA decide quem ganha. Onde você domina.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Opportunities.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   BriefcaseIcon,
   CurrencyDollarIcon,
@@ -91,8 +90,7 @@ export default function OpportunitiesPage() {
   };
 
   return (
-    <LayoutSupremo title="Oportunidades Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -166,14 +164,14 @@ export default function OpportunitiesPage() {
                   } backdrop-blur-xl`}
                 >
                   <div className="text-center mb-8">
-                    <h3 className="text-4xl font-black text-white">{stage}</h3>
-                    <p className="text-6xl font-black text-white mt-6">
+                    <h3 className="text-4xl font-black text-[var(--text-primary)]">{stage}</h3>
+                    <p className="text-6xl font-black text-[var(--text-primary)] mt-6">
                       R$ {stageValue.toLocaleString('pt-BR')}
                     </p>
-                    <p className="text-2xl text-white/80 mt-2">
+                    <p className="text-2xl text-[var(--text-primary)]/80 mt-2">
                       {stageDeals.length} deals
                     </p>
-                    <p className="text-xl text-white/60 mt-4">
+                    <p className="text-xl text-[var(--text-primary)]/60 mt-4">
                       {stageWeighted.toLocaleString('pt-BR')} ponderado
                     </p>
                   </div>
@@ -181,7 +179,7 @@ export default function OpportunitiesPage() {
                   <div className="space-y-4">
                     {stageDeals.slice(0, 5).map(deal => (
                       <div key={deal.id} className="bg-white/10 rounded-2xl p-4 hover:bg-white/20 transition-all cursor-pointer">
-                        <p className="font-bold text-white truncate">{deal.name}</p>
+                        <p className="font-bold text-[var(--text-primary)] truncate">{deal.name}</p>
                         <p className="text-sm text-gray-300">{deal.company}</p>
                         <p className="text-lg font-bold text-emerald-400">
                           R$ {deal.value.toLocaleString('pt-BR')}
@@ -216,7 +214,6 @@ export default function OpportunitiesPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }
 
@@ -224,15 +221,15 @@ function SupremeDealCard({ icon, title, value, color }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-white/10 backdrop-blur-xl shadow-2xl`}
+      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl`}
     >
       <div className="flex items-center justify-center mb-8">
         <div className="p-8 bg-white/10 rounded-3xl">
-          {React.cloneElement(icon, { className: "w-20 h-20 text-white" })}
+          {React.cloneElement(icon, { className: "w-20 h-20 text-[var(--text-primary)]" })}
         </div>
       </div>
-      <p className="text-7xl font-black text-white text-center">{value}</p>
-      <p className="text-3xl text-white/80 text-center mt-6">{title}</p>
+      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
     </motion.div>
   );
 }

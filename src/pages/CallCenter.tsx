@@ -3,7 +3,6 @@
 // Cada ligação é uma conexão humana. A voz que fecha negócios.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   PhoneIcon,
   PhoneArrowDownLeftIcon,
@@ -104,16 +103,14 @@ export default function CallCenterPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Call Center Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-blue-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-blue-400 font-light">Conectando linhas...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-blue-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-blue-400 font-light">Conectando linhas...</p>
+      </div>
     );
   }
 
@@ -124,8 +121,7 @@ export default function CallCenterPage() {
   };
 
   return (
-    <LayoutSupremo title="Call Center Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -152,7 +148,7 @@ export default function CallCenterPage() {
                 <SignalIcon className="w-8 h-8 text-blue-400 animate-pulse" />
                 <span className="text-2xl font-bold text-blue-400">LIGAÇÕES AO VIVO</span>
               </div>
-              <p className="text-center text-6xl font-black text-white">{metrics.emAndamento}</p>
+              <p className="text-center text-6xl font-black text-[var(--text-primary)]">{metrics.emAndamento}</p>
             </div>
           </motion.div>
         )}
@@ -161,31 +157,31 @@ export default function CallCenterPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
             <UserGroupIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.atendentesAtivos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.atendentesAtivos || 0}</p>
             <p className="text-gray-400">Atendentes</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <PhoneIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.ligacoesHoje || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ligacoesHoje || 0}</p>
             <p className="text-gray-400">Ligações Hoje</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <PhoneIcon className="w-12 h-12 text-green-400 mb-3 animate-pulse" />
-            <p className="text-4xl font-black text-white">{metrics?.emAndamento || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.emAndamento || 0}</p>
             <p className="text-gray-400">Em Andamento</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ClockIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">{formatDuration(metrics?.tempoMedioLigacao || 0)}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{formatDuration(metrics?.tempoMedioLigacao || 0)}</p>
             <p className="text-gray-400">Tempo Médio</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-emerald-900/60 to-teal-900/60 rounded-2xl p-6 border border-emerald-500/30">
             <PhoneArrowDownLeftIcon className="w-12 h-12 text-emerald-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.taxaAtendimento || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaAtendimento || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Atendimento</p>
           </motion.div>
         </div>
@@ -212,7 +208,7 @@ export default function CallCenterPage() {
                   className={`bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-xl p-5 border transition-all ${
                     call.status === 'em_andamento'
                       ? 'border-green-500/50 shadow-lg shadow-green-500/10'
-                      : 'border-white/10 hover:border-blue-500/50'
+                      : 'border-[var(--border)] hover:border-blue-500/50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -226,7 +222,7 @@ export default function CallCenterPage() {
                         }
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-white">{call.contato}</h3>
+                        <h3 className="text-lg font-bold text-[var(--text-primary)]">{call.contato}</h3>
                         <p className="text-gray-400 text-sm">{call.numero}</p>
                       </div>
                     </div>
@@ -234,7 +230,7 @@ export default function CallCenterPage() {
                     <div className="flex items-center gap-6">
                       <div className="text-gray-400">{call.atendente}</div>
                       <div className="text-right">
-                        <p className="text-white font-medium">{formatDuration(call.duracao)}</p>
+                        <p className="text-[var(--text-primary)] font-medium">{formatDuration(call.duracao)}</p>
                         <p className="text-gray-500 text-sm">
                           {call.inicio ? format(new Date(call.inicio), "HH:mm") : '-'}
                         </p>
@@ -274,6 +270,5 @@ export default function CallCenterPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

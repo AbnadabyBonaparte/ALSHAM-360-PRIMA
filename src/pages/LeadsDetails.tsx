@@ -2,7 +2,6 @@
 // ALSHAM 360° PRIMA v10 SUPREMO — Lead Detail Alienígena 1000/1000
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/LeadsDetails.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   UserIcon,
   BuildingOfficeIcon,
@@ -80,27 +79,23 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Lead Detail">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-32 h-32 border-8 border-t-transparent border-purple-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-purple-400 font-light">Citizen Supremo X.1 carregando o destino deste lead...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-32 h-32 border-8 border-t-transparent border-purple-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-purple-400 font-light">Citizen Supremo X.1 carregando o destino deste lead...</p>
+      </div>
     );
   }
 
   if (!lead) {
     return (
-      <LayoutSupremo title="Lead não encontrado">
-        <div className="text-center py-40">
-          <AlertTriangleIcon className="w-40 h-40 text-red-500 mx-auto mb-12" />
-          <p className="text-6xl text-gray-400">Lead não encontrado</p>
-        </div>
-      </LayoutSupremo>
+      <div className="text-center py-40">
+        <AlertTriangleIcon className="w-40 h-40 text-red-500 mx-auto mb-12" />
+        <p className="text-6xl text-gray-400">Lead não encontrado</p>
+      </div>
     );
   }
 
@@ -109,10 +104,9 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
   const isRisk = lead.risk >= 60;
 
   return (
-    <LayoutSupremo title={`Lead • ${lead.name}`}>
-      <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
         {/* HEADER SUPREMO */}
-        <div className="border-b border-white/10 bg-gradient-to-r from-purple-900/30 via-black to-pink-900/30 backdrop-blur-2xl">
+        <div className="border-b border-[var(--border)] bg-gradient-to-r from-purple-900/30 via-black to-pink-900/30 backdrop-blur-2xl">
           <div className="p-12 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-8">
@@ -124,12 +118,12 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                 </button>
                 <div className="flex items-center gap-8">
                   <div className="relative">
-                    <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-3xl flex items-center justify-center text-8xl font-black text-white shadow-2xl">
+                    <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-3xl flex items-center justify-center text-8xl font-black text-[var(--text-primary)] shadow-2xl">
                       {lead.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </div>
                     {isHot && (
                       <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center animate-pulse">
-                        <FlameIcon className="w-16 h-16 text-white" />
+                        <FlameIcon className="w-16 h-16 text-[var(--text-primary)]" />
                       </div>
                     )}
                   </div>
@@ -237,8 +231,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
             </div>
           </div>
         </div>
-      </div>
-    </LayoutSupremo>
+    </div>
   );
 }
 
@@ -246,7 +239,7 @@ function InfoCard({ icon: Icon, title, value }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className="bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 border border-white/10"
+      className="bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 border border-[var(--border)]"
     >
       <div className="flex items-center gap-6">
         <div className="p-6 bg-white/10 rounded-2xl">
@@ -254,7 +247,7 @@ function InfoCard({ icon: Icon, title, value }: any) {
         </div>
         <div>
           <p className="text-2xl text-gray-400">{title}</p>
-          <p className="text-4xl font-bold text-white">{value || '—'}</p>
+          <p className="text-4xl font-bold text-[var(--text-primary)]">{value || '—'}</p>
         </div>
       </div>
     </motion.div>
@@ -266,7 +259,7 @@ function ActivityItem({ type, title, description, time, user }: any) {
     <motion.div
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
-      className="bg-gradient-to-r from-gray-900/50 to-black/50 rounded-3xl p-8 border border-white/10 hover:border-primary/50 transition-all"
+      className="bg-gradient-to-r from-gray-900/50 to-black/50 rounded-3xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
@@ -274,7 +267,7 @@ function ActivityItem({ type, title, description, time, user }: any) {
             {type === 'email' ? '✉️' : type === 'call' ? '📞' : '🗓️'}
           </div>
           <div>
-            <h3 className="text-3xl font-bold text-white">{title}</h3>
+            <h3 className="text-3xl font-bold text-[var(--text-primary)]">{title}</h3>
             <p className="text-xl text-gray-300">{description}</p>
             <p className="text-gray-500 mt-2">por {user} • {time}</p>
           </div>

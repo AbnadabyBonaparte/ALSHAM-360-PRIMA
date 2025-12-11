@@ -3,7 +3,6 @@
 // A primeira impressão que faz o cliente pensar: "caralho... isso aqui é outro nível"
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Home.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   RocketLaunchIcon,
   LightBulbIcon,
@@ -87,8 +86,8 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Portal Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -98,13 +97,13 @@ export default function HomePage() {
             Citizen Supremo X.1 ativando seu império...
           </p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
   return (
-    <LayoutSupremo title="Portal Supremo">
-      <div className="min-h-screen bg-black text-white overflow-hidden">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">
         {/* HERO SUPREMO */}
         <motion.div 
           initial={{ opacity: 0 }}
@@ -136,7 +135,7 @@ export default function HomePage() {
               className="mt-20 inline-block"
             >
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-1 rounded-3xl">
-                <div className="bg-black rounded-3xl px-16 py-8">
+                <div className="bg-[var(--background)] rounded-3xl px-16 py-8">
                   <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
                     Citizen Supremo X.1 está online
                   </p>
@@ -176,7 +175,7 @@ export default function HomePage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }
 
@@ -184,13 +183,13 @@ function SupremeMetric({ icon, title, value, color }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.1, rotate: 2 }}
-      className={`relative bg-gradient-to-br ${color} rounded-3xl p-12 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden`}
+      className={`relative bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl overflow-hidden`}
     >
       <div className="absolute inset-0 bg-white/5"></div>
       <div className="relative z-10">
-        <div className className="w-20 h-20 text-white/90 mb-6" />
-        <p className="text-6xl font-black text-white">{value}</p>
-        <p className="text-2xl text-white/80 mt-4">{title}</p>
+        <div className className="w-20 h-20 text-[var(--text-primary)]/90 mb-6" />
+        <p className="text-6xl font-black text-[var(--text-primary)]">{value}</p>
+        <p className="text-2xl text-[var(--text-primary)]/80 mt-4">{title}</p>
       </div>
     </motion.div>
   );

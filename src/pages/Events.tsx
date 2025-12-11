@@ -3,7 +3,6 @@
 // Cada evento é uma experiência inesquecível. Conexões que transformam negócios.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   CalendarDaysIcon,
   MapPinIcon,
@@ -101,8 +100,8 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Eventos Supremos">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -110,7 +109,7 @@ export default function EventsPage() {
           />
           <p className="absolute text-4xl text-violet-400 font-light">Organizando eventos...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
@@ -123,8 +122,8 @@ export default function EventsPage() {
   };
 
   return (
-    <LayoutSupremo title="Eventos Supremos">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -143,25 +142,25 @@ export default function EventsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 rounded-2xl p-6 border border-violet-500/30">
             <CalendarDaysIcon className="w-12 h-12 text-violet-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalEventos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalEventos || 0}</p>
             <p className="text-gray-400">Total Eventos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-2xl p-6 border border-blue-500/30">
             <ClockIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.proximos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.proximos || 0}</p>
             <p className="text-gray-400">Próximos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
             <UserGroupIcon className="w-12 h-12 text-pink-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
             <p className="text-gray-400">Total Inscritos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <TicketIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Receita Total</p>
           </motion.div>
         </div>
@@ -191,11 +190,11 @@ export default function EventsPage() {
                       ? 'bg-gradient-to-br from-violet-900/60 to-purple-900/60 border-violet-500/50 shadow-2xl shadow-violet-500/20'
                       : evento.status === 'cancelado'
                       ? 'bg-gradient-to-br from-gray-900/60 to-gray-800/60 border-gray-500/30 opacity-60'
-                      : 'bg-gradient-to-br from-white/5 to-white/10 border-white/10'
+                      : 'bg-gradient-to-br from-white/5 to-white/10 border-[var(--border)]'
                   }`}
                 >
                   {/* HEADER DO EVENTO */}
-                  <div className="p-6 border-b border-white/10">
+                  <div className="p-6 border-b border-[var(--border)]">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-sm">
                         {tipoIcon(evento.tipo)}
@@ -211,7 +210,7 @@ export default function EventsPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-white mb-2">{evento.nome}</h3>
+                    <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{evento.nome}</h3>
                     <p className="text-gray-400 text-sm line-clamp-2">{evento.descricao}</p>
                   </div>
 
@@ -229,9 +228,9 @@ export default function EventsPage() {
                       <span>{evento.local || 'Local a definir'}</span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
                       <div>
-                        <p className="text-2xl font-bold text-white">{evento.inscritos}/{evento.capacidade}</p>
+                        <p className="text-2xl font-bold text-[var(--text-primary)]">{evento.inscritos}/{evento.capacidade}</p>
                         <p className="text-gray-500 text-sm">Inscritos</p>
                       </div>
                       <div className="text-right">
@@ -279,6 +278,6 @@ export default function EventsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

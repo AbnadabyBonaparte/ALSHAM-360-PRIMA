@@ -34,7 +34,7 @@ const nodeTypes = {
       <motion.div animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 3, repeat: Infinity }} className="absolute inset-0 bg-gradient-to-r from-emerald-500/30 to-cyan-500/30 blur-2xl" />
       <div className="relative z-10 text-center">
         <Zap className="h-20 w-20 text-emerald-300 mx-auto mb-6" />
-        <p className="text-3xl font-black text-white">TRIGGER</p>
+        <p className="text-3xl font-black text-[var(--text-primary)]">TRIGGER</p>
         <p className="text-xl text-emerald-200 mt-2">{data.label}</p>
       </div>
     </div>
@@ -53,8 +53,8 @@ const nodeTypes = {
         <p className="text-5xl font-black bg-gradient-to-r from-purple-300 via-pink-rose-300 to-cyan-300 bg-clip-text text-transparent">
           SUPREMO AI X.∞
         </p>
-        <p className="text-2xl text-white mt-4 font-bold">{data.label}</p>
-        <div className="mt-6 px-8 py-3 rounded-full bg-black/60 border border-purple-500 text-purple-300 text-sm font-bold">
+        <p className="text-2xl text-[var(--text-primary)] mt-4 font-bold">{data.label}</p>
+        <div className="mt-6 px-8 py-3 rounded-full bg-[var(--background)]/60 border border-purple-500 text-purple-300 text-sm font-bold">
           GROK-4 + CLAUDE 3.5 + GEMINI 2
         </div>
       </div>
@@ -71,7 +71,7 @@ const nodeTypes = {
         </div>
         <div>
           <p className="text-lg uppercase tracking-widest text-blue-300">AÇÃO</p>
-          <p className="text-3xl font-black text-white">{data.label}</p>
+          <p className="text-3xl font-black text-[var(--text-primary)]">{data.label}</p>
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@ const nodeTypes = {
       <Handle type="source" position={Position.Bottom} id="false" className="w-6 h-6" />
       <div className="text-center">
         <GitBranch className="h-24 w-24 text-orange-300 mx-auto mb-8" />
-        <p className="text-4xl font-black text-white mb-8">{data.label}</p>
+        <p className="text-4xl font-black text-[var(--text-primary)] mb-8">{data.label}</p>
         <div className="flex justify-center gap-12">
           <span className="px-10 py-5 rounded-2xl bg-green-600/60 text-green-300 text-2xl font-black border-2 border-green-400">SIM</span>
           <span className="px-10 py-5 rounded-2xl bg-red-600/60 text-red-300 text-2xl font-black border-2 border-red-400">NÃO</span>
@@ -220,7 +220,7 @@ export default function AutomationForgeInfinity() {
                 className={`px-20 py-10 rounded-3xl font-black text-5xl flex items-center gap-8 shadow-2xl ${
                   isActive
                     ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-black'
-                    : 'bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 text-white'
+                    : 'bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 text-[var(--text-primary)]'
                 }`}
               >
                 {isActive ? <Play className="h-16 w-16" /> : <Pause className="h-16 w-16" />}
@@ -242,7 +242,7 @@ export default function AutomationForgeInfinity() {
               onChange={e => setPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && createWithAI()}
               placeholder="Fale com o Supremo AI: 'quando lead abrir proposta, mandar WhatsApp com desconto de 7% em 5min'"
-              className="w-full px-20 py-12 text-4xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-4 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] shadow-2xl"
+className="w-full px-20 py-12 text-4xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-4 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder-white/40 shadow-2xl")
             />
             <motion.button
               whileHover={{ scale: 1.4, rotate: 360 }}

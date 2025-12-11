@@ -80,9 +80,9 @@ export default function EternalVault() {
 
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center bg-[var(--background)]">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="w-32 h-32 border-8 border-t-transparent border-gradient-to-r from-amber-500 via-purple-500 to-cyan-500 rounded-full" />
-        <p className="text-4xl text-amber-400 mt-12 font-black">ABRINDO O COFRE ETERNO...</p>
-      </div>
+<motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="w-32 h-32 border-8 border-t-transparent border-gradient-to-r from-amber-500 via-purple-500 to-cyan-500 rounded-full" />
+      <p className="text-4xl text-amber-400 mt-12 font-black">ABRINDO O COFRE ETERNO...</p>
+    </div>)
   );
 
   return (
@@ -143,11 +143,11 @@ export default function EternalVault() {
                       className={`absolute -inset-8 rounded-3xl blur-3xl bg-gradient-to-br ${config.color} ${config.glow}`}
                     />
 
-                    <div className={`relative bg-black/60 backdrop-blur-3xl rounded-3xl border-4 ${config.border} p-8 overflow-hidden`}>
+                    <div className={`relative bg-[var(--background)]/60 backdrop-blur-3xl rounded-3xl border-4 ${config.border} p-8 overflow-hidden`}>
                       {nft.rarity === 'divine' && <Crown className="absolute top-4 right-4 h-12 w-12 text-yellow-400" />}
                       {nft.rarity === 'legendary' && <Trophy className="absolute top-4 right-4 h-10 w-10 text-amber-400" />}
 
-                      <div className="aspect-square rounded-2xl bg-gradient-to-br from-white/5 to-black/50 mb-6 overflow-hidden border border-white/10">
+                      <div className="aspect-square rounded-2xl bg-gradient-to-br from-white/5 to-black/50 mb-6 overflow-hidden border border-[var(--border)]">
                         {nft.image_url ? (
                           <img src={nft.image_url} className="w-full h-full object-cover" />
                         ) : (
@@ -157,20 +157,20 @@ export default function EternalVault() {
                         )}
                       </div>
 
-                      <h3 className="text-2xl font-black text-white mb-2">{nft.name}</h3>
-                      <p className="text-lg text-white/60 mb-4">{nft.collection}</p>
+                      <h3 className="text-2xl font-black text-[var(--text-primary)] mb-2">{nft.name}</h3>
+                      <p className="text-lg text-[var(--text-primary)]/60 mb-4">{nft.collection}</p>
 
                       <div className="flex justify-between items-end">
                         <div>
-                          <p className="text-4xl font-black text-white">{nft.price_eth} ETH</p>
+                          <p className="text-4xl font-black text-[var(--text-primary)]">{nft.price_eth} ETH</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-white/40 flex items-center gap-1"><Heart className="h-4 w-4" /> {nft.likes}</p>
-                          <p className="text-sm text-white/40 flex items-center gap-1"><Eye className="h-4 w-4" /> {nft.views}</p>
+                          <p className="text-sm text-[var(--text-primary)]/40 flex items-center gap-1"><Heart className="h-4 w-4" /> {nft.likes}</p>
+                          <p className="text-sm text-[var(--text-primary)]/40 flex items-center gap-1"><Eye className="h-4 w-4" /> {nft.views}</p>
                         </div>
                       </div>
 
-                      <div className={`mt-6 px-6 py-3 rounded-2xl bg-black/50 border ${config.border} text-center`}>
+                      <div className={`mt-6 px-6 py-3 rounded-2xl bg-[var(--background)]/50 border ${config.border} text-center`}>
                         <p className={`text-xl font-black ${config.badge}`}>{nft.rarity.toUpperCase()}</p>
                       </div>
                     </div>
@@ -190,7 +190,7 @@ export default function EternalVault() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setSelected(null)}
-                className="absolute inset-0 bg-black/95 backdrop-blur-3xl"
+                className="absolute inset-0 bg-[var(--background)]/95 backdrop-blur-3xl"
               />
 
               <motion.div
@@ -228,8 +228,8 @@ export default function EternalVault() {
 
                   <div className="p-20 space-y-12">
                     <div>
-                      <h2 className="text-7xl font-black text-white mb-4">{selected.name}</h2>
-                      <p className="text-4xl text-white/70">{selected.collection}</p>
+                      <h2 className="text-7xl font-black text-[var(--text-primary)] mb-4">{selected.name}</h2>
+                      <p className="text-4xl text-[var(--text-primary)]/70">{selected.collection}</p>
                     </div>
 
                     <div className="text-8xl font-black text-amber-400">
@@ -264,7 +264,7 @@ export default function EternalVault() {
           <p className="text-8xl font-black bg-gradient-to-r from-amber-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
             ESTES ARTEFATOS SÃO ETERNOS
           </p>
-          <p className="text-5xl text-white/60 mt-8">E pertencem apenas a você.</p>
+          <p className="text-5xl text-[var(--text-primary)]/60 mt-8">E pertencem apenas a você.</p>
         </motion.div>
       </div>
   );

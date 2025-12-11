@@ -3,7 +3,6 @@
 // Cada proposta é uma oferta irrecusável. O cliente assina antes de terminar de ler.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   DocumentTextIcon,
   CurrencyDollarIcon,
@@ -92,16 +91,14 @@ export default function ProposalsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Propostas Supremas">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-emerald-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-emerald-400 font-light">Preparando propostas...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-emerald-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-emerald-400 font-light">Preparando propostas...</p>
+      </div>
     );
   }
 
@@ -115,8 +112,7 @@ export default function ProposalsPage() {
   };
 
   return (
-    <LayoutSupremo title="Propostas Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -135,25 +131,25 @@ export default function ProposalsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-emerald-900/60 to-teal-900/60 rounded-2xl p-6 border border-emerald-500/30">
             <DocumentTextIcon className="w-12 h-12 text-emerald-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalPropostas || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalPropostas || 0}</p>
             <p className="text-gray-400">Total Propostas</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.valorTotal || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Valor Total</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.aceitas || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.aceitas || 0}</p>
             <p className="text-gray-400">Aceitas</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
             <ArrowTrendingUpIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.taxaAceitacao || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaAceitacao || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Taxa Aceitação</p>
           </motion.div>
         </div>
@@ -179,7 +175,7 @@ export default function ProposalsPage() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-emerald-500/50 transition-all"
+                    className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)] hover:border-emerald-500/50 transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
@@ -187,7 +183,7 @@ export default function ProposalsPage() {
                           <span className={config.text}>{config.icon}</span>
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white">{proposta.titulo}</h3>
+                          <h3 className="text-xl font-bold text-[var(--text-primary)]">{proposta.titulo}</h3>
                           <p className="text-gray-400">{proposta.cliente}</p>
                         </div>
                       </div>
@@ -199,7 +195,7 @@ export default function ProposalsPage() {
                         </div>
 
                         <div className="text-right">
-                          <p className="text-xl font-bold text-white">{proposta.probabilidade}%</p>
+                          <p className="text-xl font-bold text-[var(--text-primary)]">{proposta.probabilidade}%</p>
                           <p className="text-gray-500 text-sm">Probabilidade</p>
                         </div>
 
@@ -246,6 +242,5 @@ export default function ProposalsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

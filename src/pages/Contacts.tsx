@@ -2,7 +2,6 @@
 // ALSHAM 360° PRIMA v10 SUPREMO — Contatos Alienígena 1000/1000
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Contacts.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { UserGroupIcon, PhoneIcon, EnvelopeIcon, BuildingOfficeIcon, SparklesIcon, ClockIcon, StarIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -46,8 +45,7 @@ export default function ContactsPage() {
   const hotContacts = contacts.filter(c => c.score >= 90).length;
 
   return (
-    <LayoutSupremo title="Contatos Alienígena">
-      <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
         {/* Header Supremo */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-8">
@@ -89,7 +87,7 @@ export default function ContactsPage() {
           {contacts.map((contact) => (
             <div
               key={contact.id}
-              className="group relative bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl p-10 border border-white/10 hover:border-primary/70 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-4"
+              className="group relative bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl p-10 border border-[var(--border)] hover:border-primary/70 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-4"
             >
               {/* IA Score Badge */}
               <div className={`absolute -top-4 -right-4 px-6 py-3 rounded-full font-bold text-lg shadow-2xl ${
@@ -104,17 +102,17 @@ export default function ContactsPage() {
               {/* Avatar + Nome */}
               <div className="flex items-center gap-6 mb-8">
                 <div className="relative">
-                  <div className="w-28 h-28 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-5xl font-bold text-white shadow-2xl">
+                  <div className="w-28 h-28 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-5xl font-bold text-[var(--text-primary)] shadow-2xl">
                     {contact.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                   </div>
                   {contact.score >= 90 && (
                     <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center animate-bounce">
-                      <StarIcon className="w-8 h-8 text-white" />
+                      <StarIcon className="w-8 h-8 text-[var(--text-primary)]" />
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-white">{contact.name}</h2>
+                  <h2 className="text-3xl font-bold text-[var(--text-primary)]">{contact.name}</h2>
                   <p className="text-xl text-gray-300 mt-2">{contact.title || 'Sem cargo'}</p>
                   <div className="flex items-center gap-3 mt-4">
                     <BuildingOfficeIcon className="w-6 h-6 text-gray-500" />
@@ -181,6 +179,5 @@ export default function ContactsPage() {
           </div>
         )}
       </div>
-    </LayoutSupremo>
   );
 }

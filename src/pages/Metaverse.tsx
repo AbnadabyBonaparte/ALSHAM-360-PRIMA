@@ -154,11 +154,11 @@ const SpatialNodeMesh = ({ node, onSelect }: { node: SpatialNode; onSelect: (n: 
         {/* Label Flutuante */}
         {hovered && (
           <Html distanceFactor={15} transform position={[0, 2.5, 0]}>
-            <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 p-3 rounded-lg w-48 text-center select-none pointer-events-none transform transition-all duration-300">
+            <div className="bg-[var(--background)]/80 backdrop-blur-md border border-cyan-500/50 p-3 rounded-lg w-48 text-center select-none pointer-events-none transform transition-all duration-300">
               <h3 className="text-cyan-400 font-bold text-lg">{node.name}</h3>
               <div className="flex justify-between text-xs text-gray-300 mt-2">
                 <span>Visitors</span>
-                <span className="font-mono text-white">{node.metrics.visitors}</span>
+                <span className="font-mono text-[var(--text-primary)]">{node.metrics.visitors}</span>
               </div>
               <div className="flex justify-between text-xs text-gray-300">
                 <span>Revenue</span>
@@ -201,7 +201,7 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
 
         <div className="flex space-x-4 pointer-events-auto">
           {['VISÃO', 'DADOS', 'SEGURANÇA', 'AI CORE'].map((item) => (
-            <button key={item} className="px-4 py-2 border border-cyan-500/30 bg-black/40 backdrop-blur-sm text-cyan-400 text-xs font-bold hover:bg-cyan-500/20 transition-all clip-path-polygon">
+            <button key={item} className="px-4 py-2 border border-cyan-500/30 bg-[var(--background)]/40 backdrop-blur-sm text-cyan-400 text-xs font-bold hover:bg-cyan-500/20 transition-all clip-path-polygon">
               {item}
             </button>
           ))}
@@ -213,13 +213,13 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
         <motion.div 
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="bg-black/60 backdrop-blur-xl border-l-2 border-cyan-500 p-6 rounded-l-2xl"
+          className="bg-[var(--background)]/60 backdrop-blur-xl border-l-2 border-cyan-500 p-6 rounded-l-2xl"
         >
           <h3 className="text-gray-400 text-sm uppercase mb-4">Real-time Telemetry</h3>
           <div className="space-y-6">
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-white">Active Avatars</span>
+                <span className="text-[var(--text-primary)]">Active Avatars</span>
                 <span className="text-cyan-400 font-mono">14,205</span>
               </div>
               <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -231,7 +231,7 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-white">Global Revenue (1h)</span>
+                <span className="text-[var(--text-primary)]">Global Revenue (1h)</span>
                 <span className="text-green-400 font-mono">$842,390</span>
               </div>
               <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -243,7 +243,7 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-white">Sentiment Analysis</span>
+                <span className="text-[var(--text-primary)]">Sentiment Analysis</span>
                 <span className="text-purple-400 font-mono">POSITIVE (0.84)</span>
               </div>
               <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -264,20 +264,20 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
            className="bg-cyan-900/20 backdrop-blur-2xl border border-cyan-500/50 p-6 rounded-xl"
          >
            <div className="flex items-center justify-between mb-4">
-             <h2 className="text-2xl font-bold text-white">{selectedNode.name}</h2>
+             <h2 className="text-2xl font-bold text-[var(--text-primary)]">{selectedNode.name}</h2>
              <span className={`w-3 h-3 rounded-full ${selectedNode.status === 'active' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
            </div>
            <p className="text-gray-400 text-sm mb-4">
              Node ID: <span className="font-mono text-cyan-300">{selectedNode.id.toUpperCase()}</span>
            </p>
            <div className="grid grid-cols-2 gap-4">
-             <button className="col-span-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded transition-colors">
+             <button className="col-span-2 bg-cyan-600 hover:bg-cyan-500 text-[var(--text-primary)] font-bold py-2 rounded transition-colors">
                ENTER IMMERSION
              </button>
-             <button className="border border-white/20 text-white hover:bg-white/10 py-2 rounded text-sm">
+             <button className="border border-white/20 text-[var(--text-primary)] hover:bg-white/10 py-2 rounded text-sm">
                Audit Logs
              </button>
-             <button className="border border-white/20 text-white hover:bg-white/10 py-2 rounded text-sm">
+             <button className="border border-white/20 text-[var(--text-primary)] hover:bg-white/10 py-2 rounded text-sm">
                Config
              </button>
            </div>
@@ -290,14 +290,14 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
         <motion.div 
           initial={{ y: 100 }}
           animate={{ y: 0 }}
-          className="flex space-x-6 bg-black/50 backdrop-blur-2xl border border-white/10 px-8 py-4 rounded-full"
+          className="flex space-x-6 bg-[var(--background)]/50 backdrop-blur-2xl border border-[var(--border)] px-8 py-4 rounded-full"
         >
            {/* Simulando ícones de controle */}
            {[1,2,3,4,5].map((i) => (
              <motion.button
               key={i}
               whileHover={{ scale: 1.2, y: -5 }}
-              className="w-12 h-12 rounded-xl bg-gradient-to-tr from-gray-800 to-gray-700 border border-white/10 flex items-center justify-center hover:border-cyan-500 transition-colors"
+              className="w-12 h-12 rounded-xl bg-gradient-to-tr from-gray-800 to-gray-700 border border-[var(--border)] flex items-center justify-center hover:border-cyan-500 transition-colors"
              >
                <div className="w-6 h-6 bg-white/20 rounded-sm" />
              </motion.button>
@@ -339,7 +339,7 @@ export default function MetaversePage() {
             <motion.div 
               initial={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 2 }}
-              className="absolute inset-0 z-50 flex items-center justify-center bg-black"
+              className="absolute inset-0 z-50 flex items-center justify-center bg-[var(--background)]"
             >
               <div className="text-center">
                 <motion.div 
@@ -347,7 +347,7 @@ export default function MetaversePage() {
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   className="w-32 h-32 border-4 border-t-cyan-500 border-r-purple-500 border-b-pink-500 border-l-transparent rounded-full mx-auto mb-8"
                 />
-                <h2 className="text-3xl font-light text-white tracking-[0.5em]">INITIALIZING OMNIVERSE</h2>
+                <h2 className="text-3xl font-light text-[var(--text-primary)] tracking-[0.5em]">INITIALIZING OMNIVERSE</h2>
               </div>
             </motion.div>
           )}

@@ -3,7 +3,6 @@
 // Atendimento em tempo real. Cada conversa é uma oportunidade de encantamento.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   ChatBubbleLeftRightIcon,
   UserGroupIcon,
@@ -106,22 +105,19 @@ export default function LiveChatPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Live Chat Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-green-400 font-light">Conectando ao chat...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-green-400 font-light">Conectando ao chat...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Live Chat Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -145,7 +141,7 @@ export default function LiveChatPage() {
             </div>
             <div className="grid grid-cols-3 gap-8 text-center">
               <div>
-                <p className="text-6xl font-black text-white">{metrics?.atendentesOnline || 0}</p>
+                <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.atendentesOnline || 0}</p>
                 <p className="text-gray-400">Atendentes Online</p>
               </div>
               <div>
@@ -164,25 +160,25 @@ export default function LiveChatPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <ChatBubbleLeftRightIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.chats.length || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.chats.length || 0}</p>
             <p className="text-gray-400">Total Hoje</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-2xl p-6 border border-blue-500/30">
             <ClockIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.tempoMedioEspera || 0}min</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.tempoMedioEspera || 0}min</p>
             <p className="text-gray-400">Tempo Espera</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <BoltIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">30s</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">30s</p>
             <p className="text-gray-400">Resposta Média</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
             <HeartIcon className="w-12 h-12 text-pink-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.satisfacaoMedia || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.satisfacaoMedia || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Satisfação</p>
           </motion.div>
         </div>
@@ -211,7 +207,7 @@ export default function LiveChatPage() {
                       ? 'border-green-500/50 shadow-lg shadow-green-500/10'
                       : chat.status === 'na_fila'
                       ? 'border-yellow-500/50'
-                      : 'border-white/10'
+                      : 'border-[var(--border)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -222,7 +218,7 @@ export default function LiveChatPage() {
                         'bg-gray-400'
                       }`} />
                       <div>
-                        <h3 className="text-xl font-bold text-white">{chat.visitante}</h3>
+                        <h3 className="text-xl font-bold text-[var(--text-primary)]">{chat.visitante}</h3>
                         <p className="text-gray-400 text-sm">{chat.pagina_origem}</p>
                       </div>
                     </div>
@@ -230,11 +226,11 @@ export default function LiveChatPage() {
                     <div className="flex items-center gap-6">
                       {chat.atendente && (
                         <div className="text-gray-400">
-                          Atendido por <span className="text-white font-medium">{chat.atendente}</span>
+                          Atendido por <span className="text-[var(--text-primary)] font-medium">{chat.atendente}</span>
                         </div>
                       )}
                       <div className="text-right">
-                        <p className="text-white font-medium">{chat.mensagens} mensagens</p>
+                        <p className="text-[var(--text-primary)] font-medium">{chat.mensagens} mensagens</p>
                         <p className="text-gray-500 text-sm">
                           {chat.inicio ? format(new Date(chat.inicio), "HH:mm", { locale: ptBR }) : '-'}
                           {chat.duracao > 0 && ` • ${chat.duracao}min`}
@@ -280,6 +276,5 @@ export default function LiveChatPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

@@ -3,7 +3,6 @@
 // Cada artigo é uma obra-prima. O conhecimento conquista impérios.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   DocumentTextIcon,
   EyeIcon,
@@ -103,8 +102,8 @@ export default function BlogPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Blog Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
+      
+        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -112,7 +111,7 @@ export default function BlogPage() {
           />
           <p className="absolute text-4xl text-amber-400 font-light">Carregando artigos...</p>
         </div>
-      </LayoutSupremo>
+      
     );
   }
 
@@ -121,8 +120,8 @@ export default function BlogPage() {
   ) || [];
 
   return (
-    <LayoutSupremo title="Blog Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    
+      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -141,25 +140,25 @@ export default function BlogPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-amber-900/60 to-orange-900/60 rounded-2xl p-6 border border-amber-500/30">
             <BookOpenIcon className="w-12 h-12 text-amber-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalPosts || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalPosts || 0}</p>
             <p className="text-gray-400">Total de Posts</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-2xl p-6 border border-blue-500/30">
             <EyeIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-gray-400">Visualizações</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
             <HeartIcon className="w-12 h-12 text-pink-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalCurtidas || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalCurtidas || 0).toLocaleString()}</p>
             <p className="text-gray-400">Curtidas</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-indigo-900/60 rounded-2xl p-6 border border-purple-500/30">
             <ClockIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.mediaTempoLeitura || 0).toFixed(0)} min</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.mediaTempoLeitura || 0).toFixed(0)} min</p>
             <p className="text-gray-400">Tempo Médio</p>
           </motion.div>
         </div>
@@ -197,7 +196,7 @@ export default function BlogPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ y: -10 }}
-                  className="bg-gradient-to-br from-white/5 to-white/10 rounded-3xl overflow-hidden border border-white/10 hover:border-amber-500/50 transition-all"
+                  className="bg-gradient-to-br from-white/5 to-white/10 rounded-3xl overflow-hidden border border-[var(--border)] hover:border-amber-500/50 transition-all"
                 >
                   {/* IMAGEM DE CAPA */}
                   <div className="h-48 bg-gradient-to-br from-amber-600/30 to-orange-600/30 flex items-center justify-center">
@@ -220,7 +219,7 @@ export default function BlogPage() {
                     </div>
 
                     {/* TÍTULO E RESUMO */}
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{post.titulo}</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 line-clamp-2">{post.titulo}</h3>
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">{post.resumo}</p>
 
                     {/* AUTOR E DATA */}
@@ -230,7 +229,7 @@ export default function BlogPage() {
                     </div>
 
                     {/* MÉTRICAS */}
-                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1 text-gray-400">
                           <EyeIcon className="w-5 h-5" />
@@ -273,6 +272,6 @@ export default function BlogPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

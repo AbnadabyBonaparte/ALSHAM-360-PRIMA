@@ -3,7 +3,6 @@
 // Cada centavo investido retorna como tsunami de conversões.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   CurrencyDollarIcon,
   ChartBarIcon,
@@ -109,22 +108,19 @@ export default function AdsManagerPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Ads Manager Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-green-400 font-light">Calculando ROI...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-green-400 font-light">Calculando ROI...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Ads Manager Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -146,7 +142,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-red-900/60 to-orange-900/60 rounded-3xl p-8 border border-red-500/30 backdrop-blur-xl"
           >
             <BanknotesIcon className="w-16 h-16 text-red-400 mb-4" />
-            <p className="text-4xl font-black text-white">R$ {(metrics?.gastoTotal || 0).toLocaleString('pt-BR')}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.gastoTotal || 0).toLocaleString('pt-BR')}</p>
             <p className="text-xl text-gray-400">Investido Total</p>
           </motion.div>
 
@@ -155,7 +151,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
           >
             <CurrencyDollarIcon className="w-16 h-16 text-green-400 mb-4" />
-            <p className="text-4xl font-black text-white">R$ {(metrics?.receitaGerada || 0).toLocaleString('pt-BR')}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.receitaGerada || 0).toLocaleString('pt-BR')}</p>
             <p className="text-xl text-gray-400">Receita Gerada</p>
           </motion.div>
 
@@ -164,7 +160,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-amber-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl"
           >
             <ArrowTrendingUpIcon className="w-16 h-16 text-yellow-400 mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.roasGeral || 0).toFixed(2)}x</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.roasGeral || 0).toFixed(2)}x</p>
             <p className="text-xl text-gray-400">ROAS Geral</p>
           </motion.div>
 
@@ -173,7 +169,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
           >
             <ChartBarIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-5xl font-black text-white">{metrics?.adsAtivos || 0}/{metrics?.totalAds || 0}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.adsAtivos || 0}/{metrics?.totalAds || 0}</p>
             <p className="text-xl text-gray-400">Ads Ativos</p>
           </motion.div>
         </div>
@@ -215,7 +211,7 @@ export default function AdsManagerPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
+                  <tr className="border-b border-[var(--border)]">
                     <th className="text-left py-4 px-6 text-gray-400">Anúncio</th>
                     <th className="text-right py-4 px-6 text-gray-400">Plataforma</th>
                     <th className="text-right py-4 px-6 text-gray-400">Gasto</th>
@@ -277,6 +273,5 @@ export default function AdsManagerPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

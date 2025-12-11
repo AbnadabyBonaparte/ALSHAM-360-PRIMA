@@ -3,7 +3,6 @@
 // Aqui não entra nem Deus sem permissão.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Seguranca.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { 
   ShieldCheckIcon,
   LockClosedIcon,
@@ -98,22 +97,19 @@ export default function SegurancaPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Segurança Suprema">
-        <div className="flex items-center justify-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="w-48 h-48 border-12 border-t-transparent border-red-600 rounded-full"
-          />
-          <p className="absolute text-6xl text-red-600 font-black">GUARDIAN SENTINEL ATIVANDO</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          className="w-48 h-48 border-12 border-t-transparent border-red-600 rounded-full"
+        />
+        <p className="absolute text-6xl text-red-600 font-black">GUARDIAN SENTINEL ATIVANDO</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Segurança Suprema">
-      <div className="min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">
         {/* HEADER APOCALÍPTICO */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -187,7 +183,7 @@ export default function SegurancaPage() {
                   className="bg-gradient-to-br from-red-900/40 to-black/80 rounded-3xl p-8 border-2 border-red-600/50 hover:border-red-500 shadow-2xl shadow-red-600/30"
                 >
                   <CheckBadgeIcon className="w-20 h-20 text-red-500 mx-auto mb-6" />
-                  <p className="text-3xl font-bold text-center text-white">{defense}</p>
+                  <p className="text-3xl font-bold text-center text-[var(--text-primary)]">{defense}</p>
                 </motion.div>
               ))}
             </div>
@@ -212,7 +208,6 @@ export default function SegurancaPage() {
           </motion.div>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }
 
@@ -227,8 +222,8 @@ function SupremeSecurityCard({ icon, title, value, color, status }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-8xl font-black text-white text-center">{value}</p>
-      <p className="text-4xl text-white/80 text-center mt-6">{title}</p>
+      <p className="text-8xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-4xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
       {status === 'critical' && <ExclamationTriangleIcon className="w-20 h-20 text-red-500 mx-auto mt-8 animate-pulse" />}
     </motion.div>
   );

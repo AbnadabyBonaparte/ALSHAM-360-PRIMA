@@ -44,7 +44,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
         className={`relative cursor-pointer rounded-3xl overflow-hidden border-4 transition-all ${selected ? 'border-purple-500 ring-8 ring-purple-500/30 z-50' : 'border-transparent hover:border-white/20'}`}
       >
         {selected && (
-          <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-black px-6 py-2 rounded-full uppercase tracking-widest shadow-2xl">
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-purple-600 to-pink-600 text-[var(--text-primary)] text-xs font-black px-6 py-2 rounded-full uppercase tracking-widest shadow-2xl">
             {block.type.toUpperCase()}
           </div>
         )}
@@ -53,8 +53,8 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {/* HERO */}
           {block.type === 'hero' && (
             <div className={`py-40 px-12 text-center ${block.content.bg}`}>
-              <h1 className="text-7xl md:text-9xl font-black text-white mb-10">{block.content.headline}</h1>
-              <p className="text-3xl text-white/80 mb-16 max-w-5xl mx-auto">{block.content.subheadline}</p>
+              <h1 className="text-7xl md:text-9xl font-black text-[var(--text-primary)] mb-10">{block.content.headline}</h1>
+              <p className="text-3xl text-[var(--text-primary)]/80 mb-16 max-w-5xl mx-auto">{block.content.subheadline}</p>
               <button className="px-20 py-10 bg-white text-black text-4xl font-black rounded-full hover:scale-110 transition-transform shadow-2xl">
                 {block.content.cta}
               </button>
@@ -63,14 +63,14 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
 
           {/* FEATURES */}
           {block.type === 'features' && (
-            <div className="py-40 px-12 bg-black/60">
-              <h2 className="text-7xl font-black text-center text-white mb-32">{block.content.title}</h2>
+            <div className="py-40 px-12 bg-[var(--background)]/60">
+              <h2 className="text-7xl font-black text-center text-[var(--text-primary)] mb-32">{block.content.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-20 max-w-7xl mx-auto">
                 {block.content.items.map((f, i) => (
                   <div key={i} className="text-center">
                     <div className="w-40 h-40 mx-auto mb-12 bg-gradient-to-br from-purple-600/40 to-pink-600/40 rounded-3xl border-4 border-purple-500/40" />
                     <h3 className="text-4xl font-black text-purple-400 mb-6">{f.title}</h3>
-                    <p className="text-2xl text-white/80">{f.desc}</p>
+                    <p className="text-2xl text-[var(--text-primary)]/80">{f.desc}</p>
                   </div>
                 ))}
               </div>
@@ -80,8 +80,8 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {/* CTA */}
           {block.type === 'cta' && (
             <div className={`py-48 px-12 text-center ${block.content.bg}`}>
-              <h2 className="text-8xl font-black text-white mb-20">{block.content.title}</h2>
-              <button className="px-32 py-16 bg-black text-white text-6xl font-black rounded-3xl border-8 border-white/30 hover:scale-110 transition-transform shadow-2xl">
+              <h2 className="text-8xl font-black text-[var(--text-primary)] mb-20">{block.content.title}</h2>
+              <button className="px-32 py-16 bg-[var(--background)] text-[var(--text-primary)] text-6xl font-black rounded-3xl border-8 border-white/30 hover:scale-110 transition-transform shadow-2xl">
                 {block.content.button}
               </button>
             </div>
@@ -89,22 +89,22 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
 
           {/* TESTIMONIALS */}
           {block.type === 'testimonials' && (
-            <div className="py-48 px-12 bg-black/80 text-center">
-              <p className="text-6xl italic text-white/90 mb-20 max-w-6xl mx-auto leading-tight">"{block.content.quote}"</p>
+            <div className="py-48 px-12 bg-[var(--background)]/80 text-center">
+              <p className="text-6xl italic text-[var(--text-primary)]/90 mb-20 max-w-6xl mx-auto leading-tight">"{block.content.quote}"</p>
               <p className="text-4xl font-black text-purple-400">{block.content.author}</p>
-              <p className="text-3xl text-white/60">{block.content.company}</p>
+              <p className="text-3xl text-[var(--text-primary)]/60">{block.content.company}</p>
             </div>
           )}
 
           {/* PRICING — BLINDADO */}
           {block.type === 'pricing' && (
             <div className="py-48 px-12 bg-gradient-to-b from-black to-purple-950/50 text-center">
-              <p className="text-5xl text-white/60 uppercase tracking-widest mb-12">PLANO</p>
-              <h2 className="text-8xl font-black text-white mb-8">{block.content.plan}</h2>
+              <p className="text-5xl text-[var(--text-primary)]/60 uppercase tracking-widest mb-12">PLANO</p>
+              <h2 className="text-8xl font-black text-[var(--text-primary)] mb-8">{block.content.plan}</h2>
               <p className="text-10xl font-black text-emerald-400 mb-8">{block.content.price}</p>
-              <p className="text-5xl text-white/60 mb-20">{block.content.period}</p>
-              <ul className="space-y-6 text-3xl text-white/80 mb-20">
-                {block.content.features?.map(f => <li key={f}>✓ {f}</li>) ?? <li className="text-white/40">Benefícios em breve</li>}
+              <p className="text-5xl text-[var(--text-primary)]/60 mb-20">{block.content.period}</p>
+              <ul className="space-y-6 text-3xl text-[var(--text-primary)]/80 mb-20">
+                {block.content.features?.map(f => <li key={f}>✓ {f}</li>) ?? <li className="text-[var(--text-primary)]/40">Benefícios em breve</li>}
               </ul>
               <button className="px-32 py-16 bg-gradient-to-r from-emerald-500 to-teal-500 text-black text-6xl font-black rounded-3xl shadow-2xl hover:scale-105 transition-transform">
                 ATIVAR DOMÍNIO
@@ -185,7 +185,7 @@ export default function VortexArchitect() {
             <button
               key={type}
               onClick={() => setBlocks([...blocks, { id: Date.now().toString(), type, content: DEFAULTS[type] }])}
-              className="w-full mb-12 p-12 rounded-3xl bg-white/5 hover:bg-purple-600/40 border border-white/10 hover:border-purple-500 transition-all text-left group"
+              className="w-full mb-12 p-12 rounded-3xl bg-white/5 hover:bg-purple-600/40 border border-[var(--border)] hover:border-purple-500 transition-all text-left group"
             >
               <div className="flex items-center gap-8">
                 <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600">
@@ -205,16 +205,16 @@ export default function VortexArchitect() {
 
         {/* CANVAS + HEADER */}
         <div className="flex-1 flex flex-col">
-          <div className="h-24 border-b border-white/5 bg-black/80 flex items-center justify-between px-16">
+          <div className="h-24 border-b border-white/5 bg-[var(--background)]/80 flex items-center justify-between px-16">
             <input value={pageName} onChange={e => setPageName(e.target.value)} className="text-7xl font-black bg-transparent border-none outline-none" />
             <div className="flex items-center gap-8">
               <button onClick={() => save()} className="px-12 py-6 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl flex items-center gap-4 text-2xl font-bold">
                 <Save className="h-8 w-8" /> SALVAR
               </button>
               <div className="flex gap-4 bg-white/5 rounded-2xl p-2">
-                <button onClick={() => setDevice('desktop')} className={`${device === 'desktop' ? 'bg-white text-black' : 'text-white/40'} p-4 rounded-xl`}><Monitor className="w-8 h-8" /></button>
-                <button onClick={() => setDevice('tablet')} className={`${device === 'tablet' ? 'bg-white text-black' : 'text-white/40'} p-4 rounded-xl`}><Tablet className="w-8 h-8" /></button>
-                <button onClick={() => setDevice('mobile')} className={`${device === 'mobile' ? 'bg-white text-black' : 'text-white/40'} p-4 rounded-xl`}><Smartphone className="w-8 h-8" /></button>
+                <button onClick={() => setDevice('desktop')} className={`${device === 'desktop' ? 'bg-white text-black' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Monitor className="w-8 h-8" /></button>
+                <button onClick={() => setDevice('tablet')} className={`${device === 'tablet' ? 'bg-white text-black' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Tablet className="w-8 h-8" /></button>
+                <button onClick={() => setDevice('mobile')} className={`${device === 'mobile' ? 'bg-white text-black' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Smartphone className="w-8 h-8" /></button>
               </div>
               <button onClick={publish} className="px-20 py-8 bg-gradient-to-r from-emerald-500 to-teal-500 text-black text-5xl font-black rounded-3xl shadow-2xl hover:scale-105 transition-transform">
                 PUBLICAR PORTAL
@@ -225,7 +225,7 @@ export default function VortexArchitect() {
           <div className="flex-1 overflow-auto p-20 bg-gradient-to-br from-black via-purple-950/10 to-black">
             <Reorder.Group axis="y" values={blocks} onReorder={setBlocks} className="max-w-7xl mx-auto">
               {blocks.length === 0 ? (
-                <div className="h-screen flex flex-col items-center justify-center text-white/20">
+                <div className="h-screen flex flex-col items-center justify-center text-[var(--text-primary)]/20">
                   <Plus className="w-32 h-32 mb-12" />
                   <p className="text-6xl font-black">O VÓRTICE ESTÁ VAZIO</p>
                   <p className="text-3xl mt-8">Adicione blocos para começar</p>
@@ -242,18 +242,18 @@ export default function VortexArchitect() {
         {/* INSPECTOR */}
         <AnimatePresence>
           {selectedId && selected && (
-            <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }} className="w-96 border-l border-white/5 bg-black/90 p-12">
+            <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }} className="w-96 border-l border-white/5 bg-[var(--background)]/90 p-12">
               <h3 className="text-5xl font-black mb-12">EDITAR {selected.type.toUpperCase()}</h3>
               {Object.entries(selected.content).map(([key, value]) => (
                 <div key={key} className="mb-10">
-                  <label className="text-white/60 text-lg uppercase tracking-widest">{key}</label>
+                  <label className="text-[var(--text-primary)]/60 text-lg uppercase tracking-widest">{key}</label>
                   <textarea
                     value={value as string}
                     onChange={e => {
                       const newContent = { ...selected.content, [key]: e.target.value };
                       setBlocks(blocks.map(b => b.id === selectedId ? { ...b, content: newContent } : b));
                     }}
-                    className="w-full mt-4 px-8 py-6 bg-white/5 border border-white/10 rounded-2xl text-2xl text-white focus:border-purple-500/50 outline-none min-h-[120px]"
+                    className="w-full mt-4 px-8 py-6 bg-white/5 border border-[var(--border)] rounded-2xl text-2xl text-[var(--text-primary)] focus:border-purple-500/50 outline-none min-h-[120px]"
                     rows={key === 'headline' ? 4 : 3}
                   />
                 </div>
@@ -281,7 +281,7 @@ export default function VortexArchitect() {
               onChange={e => setAiPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generateWithAI()}
               placeholder="Fale com o Vortex: 'criar landing black friday com desconto agressivo'"
-              className="w-full px-24 py-16 text-5xl font-light bg-black/80 backdrop-blur-3xl border-8 border-purple-500/70 rounded-3xl outline-none text-white placeholder-white/30 shadow-2xl"
+              className="w-full px-24 py-16 text-5xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-8 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder-white/30 shadow-2xl"
             />
             <button onClick={generateWithAI} className="absolute right-16 top-1/2 -translate-y-1/2 p-12 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 shadow-2xl hover:scale-110 transition-transform">
               <Wand2 className="h-24 w-24 text-black" />
@@ -296,11 +296,11 @@ export default function VortexArchitect() {
               <div className="flex items-center gap-6">
                 <Globe className="h-20 w-20 text-emerald-400" />
                 <div>
-                  <h3 className="text-4xl font-black text-white">PORTAL ABERTO</h3>
+                  <h3 className="text-4xl font-black text-[var(--text-primary)]">PORTAL ABERTO</h3>
                   <p className="text-emerald-300 text-xl mt-2 break-all">{publishedUrl}</p>
                 </div>
                 <button onClick={() => setPublishedUrl(null)} className="ml-auto">
-                  <X className="h-10 w-10 text-white/50 hover:text-white" />
+                  <X className="h-10 w-10 text-[var(--text-primary)]/50 hover:text-[var(--text-primary)]" />
                 </button>
               </div>
             </motion.div>

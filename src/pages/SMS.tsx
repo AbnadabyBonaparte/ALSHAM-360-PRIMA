@@ -3,7 +3,6 @@
 // Cada SMS é uma notificação urgente. Mensagem direta, ação imediata.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   ChatBubbleBottomCenterTextIcon,
   PaperAirplaneIcon,
@@ -96,22 +95,19 @@ export default function SMSPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="SMS Marketing Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-violet-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-violet-400 font-light">Carregando SMS...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-violet-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-violet-400 font-light">Carregando SMS...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="SMS Marketing Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -130,25 +126,25 @@ export default function SMSPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 rounded-2xl p-6 border border-violet-500/30">
             <PaperAirplaneIcon className="w-12 h-12 text-violet-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
             <p className="text-gray-400">SMS Enviados</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.taxaEntrega || 0).toFixed(1)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaEntrega || 0).toFixed(1)}%</p>
             <p className="text-gray-400">Taxa Entrega</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
             <ChartBarIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
             <p className="text-gray-400">Taxa Cliques</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">R$ {(metrics?.custoTotal || 0).toFixed(2)}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.custoTotal || 0).toFixed(2)}</p>
             <p className="text-gray-400">Custo Total</p>
           </motion.div>
         </div>
@@ -172,12 +168,12 @@ export default function SMSPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-violet-500/50 transition-all"
+                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-violet-500/50 transition-all"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-2xl font-bold text-white">{camp.nome}</h3>
+                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{camp.nome}</h3>
                         <span className={`px-3 py-1 rounded-full text-sm capitalize ${
                           camp.status === 'concluida' ? 'bg-green-500/20 text-green-400' :
                           camp.status === 'enviando' ? 'bg-blue-500/20 text-blue-400' :
@@ -198,7 +194,7 @@ export default function SMSPage() {
                   </div>
 
                   {/* MENSAGEM */}
-                  <div className="bg-black/30 rounded-xl p-4 mb-6 border border-white/5">
+                  <div className="bg-[var(--background)]/30 rounded-xl p-4 mb-6 border border-white/5">
                     <p className="text-gray-300 italic">"{camp.mensagem}"</p>
                   </div>
 
@@ -239,6 +235,5 @@ export default function SMSPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

@@ -3,7 +3,6 @@
 // Cada produto é uma obra-prima de valor. O catálogo que vende sozinho.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   CubeIcon,
   CurrencyDollarIcon,
@@ -102,16 +101,14 @@ export default function ProductsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Produtos Supremos">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-orange-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-orange-400 font-light">Carregando catálogo...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-orange-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-orange-400 font-light">Carregando catálogo...</p>
+      </div>
     );
   }
 
@@ -121,8 +118,7 @@ export default function ProductsPage() {
     : metrics?.produtos.filter(p => p.categoria === categoria) || [];
 
   return (
-    <LayoutSupremo title="Produtos Supremos">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -141,25 +137,25 @@ export default function ProductsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-orange-900/60 to-amber-900/60 rounded-2xl p-6 border border-orange-500/30">
             <CubeIcon className="w-12 h-12 text-orange-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalProdutos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalProdutos || 0}</p>
             <p className="text-gray-400">Total Produtos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ArchiveBoxIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-white">R$ {((metrics?.valorEstoque || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorEstoque || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Valor Estoque</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <ChartBarIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.margemMedia || 0).toFixed(0)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.margemMedia || 0).toFixed(0)}%</p>
             <p className="text-gray-400">Margem Média</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <ShoppingBagIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalVendidos || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVendidos || 0).toLocaleString()}</p>
             <p className="text-gray-400">Unidades Vendidas</p>
           </motion.div>
         </div>
@@ -200,14 +196,14 @@ export default function ProductsPage() {
                   className={`rounded-3xl overflow-hidden border backdrop-blur-xl ${
                     produto.status === 'esgotado'
                       ? 'bg-gradient-to-br from-gray-900/60 to-gray-800/60 border-gray-500/30 opacity-70'
-                      : 'bg-gradient-to-br from-white/5 to-white/10 border-white/10 hover:border-orange-500/50'
+                      : 'bg-gradient-to-br from-white/5 to-white/10 border-[var(--border)] hover:border-orange-500/50'
                   }`}
                 >
                   {/* IMAGEM */}
                   <div className="h-40 bg-gradient-to-br from-orange-600/30 to-amber-600/30 flex items-center justify-center relative">
                     <CubeIcon className="w-20 h-20 text-orange-400/50" />
                     {produto.status === 'esgotado' && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[var(--background)]/60 flex items-center justify-center">
                         <span className="text-red-400 font-bold text-xl">ESGOTADO</span>
                       </div>
                     )}
@@ -228,7 +224,7 @@ export default function ProductsPage() {
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{produto.nome}</h3>
+                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1 line-clamp-1">{produto.nome}</h3>
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">{produto.descricao}</p>
 
                     <div className="flex items-center justify-between">
@@ -237,12 +233,12 @@ export default function ProductsPage() {
                         <p className="text-gray-500 text-xs">Custo: R$ {produto.preco_custo.toLocaleString('pt-BR')}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-white">{produto.estoque}</p>
+                        <p className="text-lg font-bold text-[var(--text-primary)]">{produto.estoque}</p>
                         <p className="text-gray-500 text-xs">em estoque</p>
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-sm">
+                    <div className="mt-4 pt-4 border-t border-[var(--border)] flex items-center justify-between text-sm">
                       <span className="text-gray-400">{produto.vendidos} vendidos</span>
                     </div>
                   </div>
@@ -268,6 +264,5 @@ export default function ProductsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

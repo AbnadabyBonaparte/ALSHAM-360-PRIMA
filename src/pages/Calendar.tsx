@@ -2,7 +2,6 @@
 // ALSHAM 360° PRIMA v10 SUPREMO — Calendário Alienígena 1000/1000
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Calendar.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { CalendarIcon, ClockIcon, VideoCameraIcon, UserGroupIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -65,7 +64,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <LayoutSupremo title="Calendário Alienígena">
+    
       <div className="p-8 max-w-7xl mx-auto">
         {/* Header Supremo */}
         <div className="flex items-center justify-between mb-12">
@@ -104,8 +103,8 @@ export default function CalendarPage() {
         </div>
 
         {/* Grid do Calendário */}
-        <div className="bg-black/40 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden">
-          <div className="grid grid-cols-7 text-center border-b border-white/10">
+        <div className="bg-[var(--background)]/40 backdrop-blur-2xl rounded-3xl border border-[var(--border)] overflow-hidden">
+          <div className="grid grid-cols-7 text-center border-b border-[var(--border)]">
             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
               <div key={day} className="py-6 text-xl font-bold text-gray-300">
                 {day}
@@ -134,7 +133,7 @@ export default function CalendarPage() {
                     {dayEvents.slice(0, 4).map(event => (
                       <div
                         key={event.id}
-                        className={`text-xs px-3 py-2 rounded-lg text-white font-medium bg-gradient-to-r ${eventTypeColor(event.type)} truncate`}
+                        className={`text-xs px-3 py-2 rounded-lg text-[var(--text-primary)] font-medium bg-gradient-to-r ${eventTypeColor(event.type)} truncate`}
                       >
                         {event.type === 'demo' && 'Demo '}
                         {event.type === 'call' && 'Call '}
@@ -163,6 +162,6 @@ export default function CalendarPage() {
           </p>
         </div>
       </div>
-    </LayoutSupremo>
+    
   );
 }

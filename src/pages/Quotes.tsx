@@ -3,7 +3,6 @@
 // Onde o dinheiro ganha forma. Onde o cliente diz SIM.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Quotes.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { 
   DocumentTextIcon,
   CurrencyDollarIcon,
@@ -87,8 +86,7 @@ export default function QuotesPage() {
   };
 
   return (
-    <LayoutSupremo title="Cotações Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -128,10 +126,10 @@ export default function QuotesPage() {
                 </div>
 
                 <div className={`bg-gradient-to-br ${config.color} rounded-3xl p-1`}>
-                  <div className="bg-black rounded-3xl p-10 h-full">
+                  <div className="bg-[var(--background)] rounded-3xl p-10 h-full">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <p className="text-4xl font-black text-white">{quote.number}</p>
+                        <p className="text-4xl font-black text-[var(--text-primary)]">{quote.number}</p>
                         <p className="text-2xl text-gray-300 mt-2">{quote.client_name}</p>
                         <p className="text-xl text-gray-400">{quote.company}</p>
                       </div>
@@ -198,6 +196,5 @@ export default function QuotesPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

@@ -3,7 +3,6 @@
 // O manifesto. A palavra final. A verdade absoluta.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Publicacao.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { motion } from 'framer-motion';
 import { SparklesIcon, RocketLaunchIcon, StarIcon, GlobeAltIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
@@ -11,8 +10,7 @@ import { ptBR } from 'date-fns/locale';
 
 export default function PublicacaoPage() {
   return (
-    <LayoutSupremo title="Publicação Oficial — ALSHAM 360° PRIMA v10 SUPREMO">
-      <div className="min-h-screen bg-black text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden relative">
         {/* Fundo com estrelas pulsantes */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20">
           <div className="absolute inset-0">
@@ -80,7 +78,7 @@ export default function PublicacaoPage() {
             <div className="relative">
               <div className="w-96 h-96 bg-gradient-to-br from-yellow-600/20 to-orange-600/20 rounded-full blur-3xl absolute inset-0 animate-pulse"></div>
               <div className="relative z-10 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-full p-1">
-                <div className="bg-black rounded-full p-16 text-center">
+                <div className="bg-[var(--background)] rounded-full p-16 text-center">
                   <StarIcon className="w-32 h-32 text-yellow-400 mx-auto mb-8" />
                   <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                     HARMONIZED RELEASE
@@ -161,6 +159,5 @@ export default function PublicacaoPage() {
           </motion.div>
         </div>
       </div>
-    </LayoutSupremo>
   );
 }

@@ -48,21 +48,21 @@ const KpiCard = ({ title, value, subtitle, trend, prefix = "" }: any) => (
     animate={{ opacity: 1, scale: 1 }}
     whileHover={{ y: -10, scale: 1.02 }}
     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    className="p-10 rounded-[2.5rem] bg-[#0a0a0a] border border-white/10 relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
+    className="p-10 rounded-[2.5rem] bg-[#0a0a0a] border border-[var(--border)] relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
     role="region"
     aria-label={`${title}: ${value}`}
   >
     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     
     <div className="relative z-10">
-      <p className="text-xs font-black uppercase tracking-[0.25em] text-white/40 mb-6">{title}</p>
-      <h3 className="text-6xl font-serif text-white tracking-tighter mb-2">
-        <span className="text-3xl text-white/30 align-top mr-2">{prefix}</span>
+      <p className="text-xs font-black uppercase tracking-[0.25em] text-[var(--text-primary)]/40 mb-6">{title}</p>
+      <h3 className="text-6xl font-serif text-[var(--text-primary)] tracking-tighter mb-2">
+        <span className="text-3xl text-[var(--text-primary)]/30 align-top mr-2">{prefix}</span>
         {value}
       </h3>
       
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
-        <p className="text-sm text-white/50 font-medium italic">"{subtitle}"</p>
+        <p className="text-sm text-[var(--text-primary)]/50 font-medium italic">"{subtitle}"</p>
         {trend !== undefined && (
           <span className={`flex items-center gap-2 text-lg font-black ${trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
             {trend >= 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
@@ -81,7 +81,7 @@ const SentimentOrb = ({ score }: { score: number }) => {
       <motion.div 
         animate={{ rotate: 360 }}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 rounded-full border-t-4 border-r-4 border-white/10"
+        className="absolute inset-0 rounded-full border-t-4 border-r-4 border-[var(--border)]"
       />
       <motion.div 
         animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
@@ -90,8 +90,8 @@ const SentimentOrb = ({ score }: { score: number }) => {
         style={{ backgroundColor: color }}
       />
       <div className="relative z-10 text-center">
-        <span className="text-6xl font-black text-white drop-shadow-2xl">{score}</span>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60 mt-2">Power Index</p>
+        <span className="text-6xl font-black text-[var(--text-primary)] drop-shadow-2xl">{score}</span>
+        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-primary)]/60 mt-2">Power Index</p>
       </div>
     </div>
   );
@@ -209,18 +209,18 @@ export default function ExecutiveDashboard() {
   if (loading) {
     return (
       <div className="h-screen bg-[var(--background)] flex items-center justify-center">
-          <div className="text-center">
-            <motion.div
-              animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              <Briefcase className="w-32 h-32 text-emerald-500/20" />
-            </motion.div>
-            <p className="mt-12 text-2xl font-black text-white/30 tracking-[0.5em] animate-pulse">
-              ACESSANDO NÍVEL EXECUTIVO...
-            </p>
-          </div>
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <Briefcase className="w-32 h-32 text-emerald-500/20" />
+          </motion.div>
+          <p className="mt-12 text-2xl font-black text-[var(--text-primary)]/30 tracking-[0.5em] animate-pulse">
+            ACESSANDO NÍVEL EXECUTIVO...
+          </p>
         </div>
+      </div>
     );
   }
 
@@ -235,7 +235,7 @@ export default function ExecutiveDashboard() {
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="text-8xl md:text-[9rem] leading-none font-black text-white tracking-tighter"
+              className="text-8xl md:text-[9rem] leading-none font-black text-[var(--text-primary)] tracking-tighter"
             >
               THE BOARDROOM
             </motion.h1>
@@ -245,10 +245,10 @@ export default function ExecutiveDashboard() {
               transition={{ delay: 0.3 }}
               className="mt-8 flex items-center gap-6"
             >
-              <span className="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-white/40 text-sm font-bold uppercase tracking-widest">
+              <span className="px-6 py-2 rounded-full border border-[var(--border)] bg-white/5 text-[var(--text-primary)]/40 text-sm font-bold uppercase tracking-widest">
                 Q4 2025 • Era da Expansão
               </span>
-              <p className="text-3xl text-white/60 font-light italic">
+              <p className="text-3xl text-[var(--text-primary)]/60 font-light italic">
                 "Onde legados são forjados em dados."
               </p>
             </motion.div>
@@ -273,7 +273,7 @@ export default function ExecutiveDashboard() {
             
             <button 
               onClick={handleEasterEgg}
-              className="p-10 bg-[#111] border-2 border-white/10 rounded-3xl hover:border-emerald-500/50 hover:text-emerald-500 text-white/30 transition-all group"
+              className="p-10 bg-[#111] border-2 border-[var(--border)] rounded-3xl hover:border-emerald-500/50 hover:text-emerald-500 text-[var(--text-primary)]/30 transition-all group"
               aria-label="Cadeira do Imperador"
             >
               <Crown className="w-10 h-10 group-hover:rotate-12 transition-transform" />
@@ -315,9 +315,9 @@ export default function ExecutiveDashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
           
           {/* Main Chart */}
-          <div className="xl:col-span-2 bg-gradient-to-br from-[#0f0f0f] to-black border border-white/10 rounded-[3rem] p-16 shadow-2xl">
+          <div className="xl:col-span-2 bg-gradient-to-br from-[#0f0f0f] to-black border border-[var(--border)] rounded-[3rem] p-16 shadow-2xl">
             <div className="flex justify-between items-center mb-12">
-              <h3 className="text-4xl font-black text-white">TRAJETÓRIA DO IMPÉRIO</h3>
+              <h3 className="text-4xl font-black text-[var(--text-primary)]">TRAJETÓRIA DO IMPÉRIO</h3>
               <div className="flex gap-6">
                 <span className="flex items-center gap-3 text-sm font-bold text-emerald-400 uppercase tracking-widest"><div className="w-3 h-3 rounded-full bg-emerald-500"/> Receita</span>
                 <span className="flex items-center gap-3 text-sm font-bold text-purple-400 uppercase tracking-widest"><div className="w-3 h-3 rounded-full bg-purple-500"/> Lucro</span>
@@ -353,24 +353,24 @@ export default function ExecutiveDashboard() {
 
           {/* Pillars & Sentiment */}
           <div className="space-y-12">
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-[3rem] p-12 text-center relative overflow-hidden">
+            <div className="bg-[#0a0a0a] border border-[var(--border)] rounded-[3rem] p-12 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-500 via-purple-500 to-emerald-500" />
-              <h3 className="text-sm font-black text-white/40 uppercase tracking-[0.3em] mb-10">Confiança do Mercado</h3>
+              <h3 className="text-sm font-black text-[var(--text-primary)]/40 uppercase tracking-[0.3em] mb-10">Confiança do Mercado</h3>
               <SentimentOrb score={metrics.marketSentiment} />
             </div>
 
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-[3rem] p-12">
-              <h3 className="text-xl font-black text-white mb-10">PILASTRES ESTRATÉGICOS</h3>
+            <div className="bg-[#0a0a0a] border border-[var(--border)] rounded-[3rem] p-12">
+              <h3 className="text-xl font-black text-[var(--text-primary)] mb-10">PILASTRES ESTRATÉGICOS</h3>
               <div className="space-y-8">
                 {departments.map(dept => (
                   <div key={dept.name} className="flex items-center justify-between group">
                     <div className="flex items-center gap-6">
                       <div className={`w-4 h-4 rounded-full ${dept.status === 'optimal' ? 'bg-emerald-500 shadow-[0_0_15px_#10b981]' : dept.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`} />
-                      <span className="text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors">{dept.name}</span>
+                      <span className="text-2xl font-bold text-[var(--text-primary)] group-hover:text-emerald-400 transition-colors">{dept.name}</span>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-white/30 uppercase tracking-widest mb-1">{dept.metric}</p>
-                      <p className="text-xl font-mono text-white font-bold">{dept.value}</p>
+                      <p className="text-xs text-[var(--text-primary)]/30 uppercase tracking-widest mb-1">{dept.metric}</p>
+                      <p className="text-xl font-mono text-[var(--text-primary)] font-bold">{dept.value}</p>
                     </div>
                   </div>
                 ))}
@@ -380,7 +380,7 @@ export default function ExecutiveDashboard() {
         </div>
 
         {/* FOOTER */}
-        <div className="flex flex-col md:flex-row justify-between items-center text-white/20 pt-20 border-t-2 border-white/5">
+        <div className="flex flex-col md:flex-row justify-between items-center text-[var(--text-primary)]/20 pt-20 border-t-2 border-white/5">
           <div className="flex items-center gap-12">
             <span className="font-bold tracking-widest">ALSHAM OS v10.0.1</span>
             <span className="flex items-center gap-3 text-emerald-900/60 font-bold">
