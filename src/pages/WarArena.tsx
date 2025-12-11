@@ -92,7 +92,7 @@ const BossHUD: React.FC<{ current: number; max: number; shakeControls: Animation
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             key={percent}
-            className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-l from-red-500 via-orange-500 to-yellow-500 drop-shadow-2xl"
+            className="text-2xl md:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-red-500 via-orange-500 to-yellow-500 drop-shadow-2xl"
           >
             {percent.toFixed(1)}%
           </motion.span>
@@ -141,7 +141,7 @@ const LegionCard = ({ legion, rank }: { legion: Legion, rank: number }) => {
       `}
     >
       {/* Rank Badge */}
-      <div className={`absolute top-0 right-0 p-6 font-black text-9xl opacity-10 pointer-events-none ${isLeader ? 'text-yellow-500' : 'text-[var(--text-primary)]'}`}>
+      <div className={`absolute top-0 right-0 p-6 font-black text-4xl md:text-5xl lg:text-6xl opacity-10 pointer-events-none ${isLeader ? 'text-yellow-500' : 'text-[var(--text-primary)]'}`}>
         #{rank}
       </div>
 

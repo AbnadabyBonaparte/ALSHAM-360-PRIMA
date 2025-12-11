@@ -95,7 +95,7 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
             CONFIGURAÇÕES SUPREMAS
           </h1>
           <p className="text-6xl text-gray-300 mt-12 font-light">
@@ -118,7 +118,7 @@ export default function SettingsPage() {
           >
             <div className="bg-[var(--background)] rounded-3xl p-16 text-center">
               <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto mb-12" />
-              <h2 className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                 PLANO SUPREMO
               </h2>
               <p className="text-5xl text-gray-300 mt-8">
@@ -143,7 +143,7 @@ export default function SettingsPage() {
 
         {/* RECURSOS ATIVOS */}
         <div className="max-w-7xl mx-auto mb-20">
-          <h2 className="text-7xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
             RECURSOS DO IMPÉRIO
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -170,7 +170,7 @@ export default function SettingsPage() {
             className="bg-gradient-to-r from-red-900/40 via-black to-purple-900/40 rounded-3xl p-16 border-4 border-red-600/50 shadow-2xl shadow-red-600/30 text-center"
           >
             <ShieldCheckIcon className="w-40 h-40 text-red-600 mx-auto mb-12" />
-            <p className="text-7xl font-black text-red-500">
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-red-500">
               Segurança: {settings?.securityScore}%
             </p>
             <p className="text-4xl text-gray-300 mt-8">
@@ -189,10 +189,10 @@ export default function SettingsPage() {
           className="text-center py-40"
         >
           <RocketLaunchIcon className="w-64 h-64 text-cyan-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600">
             TUDO SOB SEU CONTROLE
           </p>
-          <p className="text-7xl text-gray-300 mt-16 font-light">
+          <p className="text-xl md:text-2xl lg:text-3xl text-gray-300 mt-16 font-light">
             Usuários, dinheiro, segurança, IA, futuro.
           </p>
           <p className="text-6xl text-cyan-400 mt-24">

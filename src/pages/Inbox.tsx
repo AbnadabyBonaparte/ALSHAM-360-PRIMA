@@ -113,7 +113,7 @@ export default function InboxPage() {
               <div className="flex items-center gap-8">
                 <InboxIcon className="w-20 h-20 text-primary animate-pulse" />
                 <div>
-                  <h1 className="text-7xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
+                  <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
                     Inbox Suprema
                   </h1>
                   <p className="text-3xl text-gray-300 mt-4">

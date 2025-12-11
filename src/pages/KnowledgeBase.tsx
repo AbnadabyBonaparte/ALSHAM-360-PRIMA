@@ -126,7 +126,7 @@ export default function KnowledgeBasePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-7xl font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
             BASE DE CONHECIMENTO
           </h1>
           <p className="text-3xl text-gray-400 mt-6">

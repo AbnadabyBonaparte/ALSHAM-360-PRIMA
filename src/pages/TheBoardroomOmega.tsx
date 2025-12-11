@@ -153,7 +153,7 @@ export default function TheBoardroomOmega() {
             className="bg-[var(--background)]/40 backdrop-blur-3xl border-8 border-[var(--border)] rounded-4xl p-24 mb-32"
             whileHover={{ borderColor: '#10b981' }}
           >
-            <h2 className="text-7xl font-black text-[var(--text-primary)] mb-20 text-center">TRAJETÓRIA DO IMPÉRIO</h2>
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] mb-20 text-center">TRAJETÓRIA DO IMPÉRIO</h2>
             <ResponsiveContainer width="100%" height={700}>
               <AreaChart data={metrics.revenueTrend}>
                 <defs>
@@ -199,7 +199,7 @@ export default function TheBoardroomOmega() {
                 >
                   <div className="flex justify-between items-center">
                     <h3 className="text-5xl font-black text-[var(--text-primary)]">{d.name}</h3>
-                    <span className="text-8xl font-black">{d.value}</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black">{d.value}</span>
                   </div>
                   <p className="text-2xl text-[var(--text-primary)]/60 mt-4">{d.metric}</p>
                 </motion.div>

@@ -131,7 +131,7 @@ export default function CompliancePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-8xl font-black bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
             COMPLIANCE SUPREMO
           </h1>
           <p className="text-3xl text-gray-400 mt-6">
@@ -155,7 +155,7 @@ export default function CompliancePage() {
               (metrics?.taxaConformidade || 0) >= 70 ? 'text-yellow-400' :
               'text-red-400'
             }`} />
-            <p className="text-7xl font-black text-[var(--text-primary)]">{(metrics?.taxaConformidade || 0).toFixed(0)}%</p>
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">{(metrics?.taxaConformidade || 0).toFixed(0)}%</p>
             <p className="text-2xl text-gray-400 mt-2">Taxa de Conformidade</p>
           </motion.div>
         </div>

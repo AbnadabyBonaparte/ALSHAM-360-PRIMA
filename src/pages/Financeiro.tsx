@@ -202,7 +202,7 @@ export default function Financeiro() {
             <p className="text-sm font-black uppercase tracking-widest text-[var(--text-primary)]/40 mb-4 flex items-center gap-3">
               <Wallet className="w-6 h-6" /> SALDO GLOBAL EM CAIXA
             </p>
-            <h1 className="text-9xl font-black text-[var(--text-primary)] leading-none">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] leading-none">
               R$ {(metrics.simulatedIncome * 10).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
             </h1>
             <p className="text-emerald-400 text-3xl font-black mt-6 flex items-center gap-4">

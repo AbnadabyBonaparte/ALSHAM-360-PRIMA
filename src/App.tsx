@@ -48,6 +48,7 @@ import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
 import DashboardSupremo from "./pages/Dashboard";
+import { SidebarDesktop } from "./components/SidebarSupremo";
 import Analytics from "./pages/Analytics";
 import Automacoes from "./pages/Automacoes";
 import Financeiro from "./pages/Financeiro";
@@ -2092,86 +2093,11 @@ function App() {
           )}
         </AnimatePresence>
 
-        <aside className="hidden min-h-screen lg:flex lg:w-72 xl:w-80 flex-col border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-xl">
-          <div 
-            onClick={() => navigateToPage('dashboard')}
-            className="sticky top-0 flex items-center gap-3 bg-[var(--surface-strong)]/90 px-6 py-6 backdrop-blur cursor-pointer hover:bg-[var(--surface)]/95 transition-colors group"
-            role="button"
-            tabIndex={0}
-            onKeyPress={(e) => e.key === 'Enter' && navigateToPage('dashboard')}
-            aria-label="Voltar ao Dashboard"
-          >
-            <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold group-hover:scale-105 transition-transform">
-              A∞
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)] group-hover:text-[var(--accent-sky)] transition-colors">ALSHAM</p>
-              <p className="text-lg font-medium group-hover:text-[var(--accent-emerald)] transition-colors">360° PRIMA</p>
-            </div>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-4 pb-6">
-            <div className="space-y-5">
-              {sidebarGroups.map((group) => (
-                <div key={group.id} className="space-y-3">
-                  <button
-                    className="flex w-full items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] transition hover:border-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                    aria-label={`Abrir categoria ${group.label}`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="grid h-8 w-8 place-content-center rounded-full bg-[var(--surface)] text-[var(--accent-emerald)]">
-                        {group.icon}
-                      </span>
-                      {group.label}
-                    </span>
-                    <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
-                  </button>
-                  <ul className="ml-4 space-y-2 border-l border-[var(--border)] pl-4 text-sm">
-                    {group.links.map((link) => {
-                      const isActive = activePage === link.id;
-
-                      return (
-                        <li key={link.id} className="flex items-center gap-2">
-                          <span
-                            className={`h-[1px] w-2 transition ${
-                              isActive
-                                ? "bg-[var(--accent-emerald)]"
-                                : "bg-[var(--accent-emerald)]/60"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => navigateToPage(link.id)}
-                            aria-current={isActive ? "page" : undefined}
-                            className={`flex-1 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                              isActive
-                                ? "text-[var(--accent-emerald)]"
-                                : "text-[var(--text-secondary)] hover:text-[var(--accent-emerald)]"
-                            }`}
-                          >
-                            {link.label}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </nav>
-
-          <div className="border-t border-[var(--border)] px-6 py-6">
-            <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-              <div className="grid h-10 w-10 place-content-center rounded-full bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Copilot 360°</p>
-                <p className="text-xs text-[var(--text-secondary)]">Integração profunda com IA generativa e preditiva.</p>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <SidebarDesktop
+          activePage={activePage}
+          onNavigate={navigateToPage}
+          isCollapsed={false}
+        />
 
         <div className="flex flex-col">
           <header

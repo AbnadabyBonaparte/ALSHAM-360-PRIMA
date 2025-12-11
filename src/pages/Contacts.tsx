@@ -51,7 +51,7 @@ export default function ContactsPage() {
           <div className="flex items-center gap-8">
             <UserGroupIcon className="w-20 h-20 text-primary animate-pulse" />
             <div>
-              <h1 className="text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
                 Contatos Alienígena
               </h1>
               <p className="text-3xl text-gray-300 mt-6">

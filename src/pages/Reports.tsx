@@ -123,7 +123,7 @@ export default function ReportsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-emerald-600 bg-clip-text text-transparent">
             RELATÓRIOS SUPREMO
           </h1>
           <p className="text-6xl text-gray-300 mt-12 font-light">
@@ -181,10 +181,10 @@ export default function ReportsPage() {
           className="text-center py-40"
         >
           <LightBulbIcon className="w-64 h-64 text-purple-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
             SEUS NÚMEROS NÃO MENTEM
           </p>
-          <p className="text-8xl font-light text-gray-300 mt-16">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-light text-gray-300 mt-16">
             E a IA já sabe o que você vai faturar nos próximos 90 dias.
           </p>
           <p className="text-6xl text-emerald-400 mt-20">
@@ -209,7 +209,7 @@ function SupremeReportCard({ icon, title, value, growth, color }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
       <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
       <p className="text-2xl text-[var(--text-primary)]/60 text-center mt-4">{growth}</p>
     </motion.div>

@@ -94,7 +94,7 @@ export default function TasksPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
             TAREFAS SUPREMAS
           </h1>
           <p className="text-6xl text-gray-300 mt-12 font-light">
@@ -172,10 +172,10 @@ export default function TasksPage() {
           className="text-center py-40 mt-32"
         >
           <TrophyIcon className="w-64 h-64 text-yellow-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
             CADA TAREFA CONCLUÍDA
           </p>
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
             É UM PASSO PARA O DOMÍNIO
           </p>
           <p className="text-6xl text-gray-400 mt-24">
@@ -242,7 +242,7 @@ function SupremeTaskCard({ icon, title, value, color }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
       <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
     </motion.div>
   );

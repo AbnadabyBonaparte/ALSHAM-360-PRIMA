@@ -119,7 +119,7 @@ export default function SegurancaPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-black to-purple-900/20 blur-3xl"></div>
           <div className="relative z-10">
             <ShieldCheckIcon className="w-48 h-48 text-red-600 mx-auto mb-12 animate-pulse" />
-            <h1 className="text-9xl font-black bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
               SEGURANÇA SUPREMA
             </h1>
             <p className="text-6xl text-gray-300 mt-12 font-light">
@@ -170,7 +170,7 @@ export default function SegurancaPage() {
             whileInView={{ opacity: 1, y: 0 }}
             className="mb-20"
           >
-            <h2 className="text-7xl font-black text-center mb-16 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-center mb-16 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
               DEFESAS ATIVAS
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -196,10 +196,10 @@ export default function SegurancaPage() {
             className="text-center py-40"
           >
             <CpuChipIcon className="w-64 h-64 text-red-600 mx-auto mb-16 animate-pulse" />
-            <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600">
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600">
               NINGUÉM PASSA
             </p>
-            <p className="text-7xl text-gray-300 mt-16 font-light">
+            <p className="text-xl md:text-2xl lg:text-3xl text-gray-300 mt-16 font-light">
               Guardian Sentinel está vigilante.
             </p>
             <p className="text-5xl text-red-500 mt-12">
@@ -222,7 +222,7 @@ function SupremeSecurityCard({ icon, title, value, color, status }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-8xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] text-center">{value}</p>
       <p className="text-4xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
       {status === 'critical' && <ExclamationTriangleIcon className="w-20 h-20 text-red-500 mx-auto mt-8 animate-pulse" />}
     </motion.div>

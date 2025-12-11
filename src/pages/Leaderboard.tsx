@@ -78,7 +78,7 @@ export default function LeaderboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
             HALL DA GLÓRIA
           </h1>
           <p className="text-5xl text-gray-300 mt-8 font-light">
@@ -133,7 +133,7 @@ export default function LeaderboardPage() {
 
                   {/* Medalha */}
                   <div className="text-center mb-8">
-                    <div className={`text-9xl font-black mb-6 ${
+                    <div className={`text-4xl md:text-5xl lg:text-6xl font-black mb-6 ${
                       i === 0 ? 'text-yellow-400' :
                       i === 1 ? 'text-gray-300' :
                       'text-orange-400'
@@ -225,7 +225,7 @@ export default function LeaderboardPage() {
           className="text-center py-40 mt-32"
         >
           <FireIcon className="w-48 h-48 text-orange-500 mx-auto mb-12 animate-pulse" />
-          <p className="text-8xl font-light text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-pink-600">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-pink-600">
             O FOGO NUNCA APAGA
           </p>
           <p className="text-4xl text-gray-400 mt-16">

@@ -127,7 +127,7 @@ export default function SocialMediaPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-8xl font-black bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
             SOCIAL MEDIA SUPREMO
           </h1>
           <p className="text-3xl text-gray-400 mt-6">

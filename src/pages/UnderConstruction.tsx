@@ -83,7 +83,7 @@ export default function UnderConstruction({
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-8xl md:text-9xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent mb-12"
+          className="text-2xl md:text-3xl lg:text-4xl md:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent mb-12"
         >
           {pageName.toUpperCase()}
         </motion.h1>
@@ -92,7 +92,7 @@ export default function UnderConstruction({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="text-5xl md:text-7xl font-light text-gray-300 mb-20"
+          className="text-5xl md:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 mb-20"
         >
           ESTÁ CHEGANDO
         </motion.p>
@@ -107,19 +107,19 @@ export default function UnderConstruction({
           <p className="text-4xl text-gray-400 mb-8">Lançamento estimado em</p>
           <div className="grid grid-cols-4 gap-8">
             <div>
-              <p className="text-8xl font-black text-purple-400">{countdown.days}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-purple-400">{countdown.days}</p>
               <p className="text-2xl text-gray-400">dias</p>
             </div>
             <div>
-              <p className="text-8xl font-black text-pink-400">{countdown.hours.toString().padStart(2, '0')}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-pink-400">{countdown.hours.toString().padStart(2, '0')}</p>
               <p className="text-2xl text-gray-400">horas</p>
             </div>
             <div>
-              <p className="text-8xl font-black text-cyan-400">{countdown.minutes.toString().padStart(2, '0')}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-cyan-400">{countdown.minutes.toString().padStart(2, '0')}</p>
               <p className="text-2xl text-gray-400">min</p>
             </div>
             <div>
-              <p className="text-8xl font-black text-yellow-400">{countdown.seconds.toString().padStart(2, '0')}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-yellow-400">{countdown.seconds.toString().padStart(2, '0')}</p>
               <p className="text-2xl text-gray-400">seg</p>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function UnderConstruction({
             <br />
             Ela está sendo forjada no fogo da perfeição absoluta.
             <br />
-            <span className="text-7xl font-black text-yellow-400">
+            <span className="text-xl md:text-2xl lg:text-3xl font-black text-yellow-400">
               Quando chegar, o mercado inteiro vai sentir.
             </span>
           </p>

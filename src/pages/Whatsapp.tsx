@@ -77,7 +77,7 @@ export default function WhatsappPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 bg-clip-text text-transparent">
             WHATSAPP BUSINESS
           </h1>
           <p className="text-6xl text-gray-300 mt-12 font-light">
@@ -132,7 +132,7 @@ export default function WhatsappPage() {
         >
           <div className="bg-gradient-to-br from-green-900/50 via-emerald-900/50 to-teal-900/50 rounded-3xl p-16 border-4 border-green-500/50 shadow-2xl shadow-green-500/30 text-center">
             <CpuChipIcon className="w-48 h-48 text-green-400 mx-auto mb-12 animate-pulse" />
-            <h2 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 mb-8">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 mb-8">
               CHATBOT IA ATIVO 24/7
             </h2>
             <p className="text-5xl text-gray-300">
@@ -165,10 +165,10 @@ export default function WhatsappPage() {
           className="text-center py-40"
         >
           <GlobeAltIcon className="w-64 h-64 text-green-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600">
             O CLIENTE NÃO ESPERA
           </p>
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-cyan-500 to-blue-600 mt-8">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-cyan-500 to-blue-600 mt-8">
             ELE É CONQUISTADO
           </p>
           <p className="text-6xl text-gray-400 mt-24">
@@ -190,7 +190,7 @@ function SupremeWhatsAppCard({ icon, title, value, color }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
       <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
     </motion.div>
   );

@@ -126,7 +126,7 @@ export default function GamificacaoPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-orange-400 via-red-500 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-orange-400 via-red-500 to-pink-600 bg-clip-text text-transparent">
             GAMIFICAÇÃO SUPREMA
           </h1>
           <p className="text-4xl text-gray-300 mt-8 font-light">
@@ -226,7 +226,7 @@ export default function GamificacaoPage() {
           className="text-center py-32 mt-32"
         >
           <SparklesIcon className="w-40 h-40 text-purple-400 mx-auto mb-12 animate-pulse" />
-          <p className="text-7xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl lg:text-3xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
             "Você não está jogando.
             <br />
             Você está dominando."

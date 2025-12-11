@@ -124,7 +124,7 @@ export default function PipelineQuantico() {
         <div className="p-8 border-b border-[var(--border)] bg-gradient-to-b from-[var(--background)]/80 to-transparent backdrop-blur-3xl">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-7xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 DOMÍNIO REAL
               </h1>
               <div className="flex gap-12 mt-6">

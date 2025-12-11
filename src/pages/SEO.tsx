@@ -119,7 +119,7 @@ export default function SEOPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-8xl font-black bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
             SEO SUPREMO
           </h1>
           <p className="text-3xl text-gray-400 mt-6">
@@ -133,7 +133,7 @@ export default function SEOPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl text-center"
           >
-            <div className="text-8xl mb-4">🥇</div>
+            <div className="text-2xl md:text-3xl lg:text-4xl mb-4">🥇</div>
             <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.palavrasTop3 || 0}</p>
             <p className="text-xl text-gray-400">Palavras no Top 3</p>
           </motion.div>
@@ -142,7 +142,7 @@ export default function SEOPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-3xl p-8 border border-blue-500/30 backdrop-blur-xl text-center"
           >
-            <div className="text-8xl mb-4">🏆</div>
+            <div className="text-2xl md:text-3xl lg:text-4xl mb-4">🏆</div>
             <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.palavrasTop10 || 0}</p>
             <p className="text-xl text-gray-400">Palavras no Top 10</p>
           </motion.div>

@@ -235,7 +235,7 @@ export default function ExecutiveDashboard() {
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="text-8xl md:text-[9rem] leading-none font-black text-[var(--text-primary)] tracking-tighter"
+              className="text-2xl md:text-3xl lg:text-4xl md:text-[9rem] leading-none font-black text-[var(--text-primary)] tracking-tighter"
             >
               THE BOARDROOM
             </motion.h1>

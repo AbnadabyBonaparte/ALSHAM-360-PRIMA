@@ -93,7 +93,7 @@ export default function QuotesPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-emerald-400 via-cyan-500 to-yellow-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-cyan-500 to-yellow-600 bg-clip-text text-transparent">
             COTAÇÕES SUPREMAS
           </h1>
           <p className="text-6xl text-gray-300 mt-12 font-light">
@@ -185,10 +185,10 @@ export default function QuotesPage() {
           className="text-center py-40 mt-32"
         >
           <CurrencyDollarIcon className="w-64 h-64 text-emerald-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+          <p className="text-text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
             O DINHEIRO FALA
           </p>
-          <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
             E A COTAÇÃO RESPONDE
           </p>
           <p className="text-5xl text-gray-400 mt-24">

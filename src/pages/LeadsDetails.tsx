@@ -118,7 +118,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                 </button>
                 <div className="flex items-center gap-8">
                   <div className="relative">
-                    <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-3xl flex items-center justify-center text-8xl font-black text-[var(--text-primary)] shadow-2xl">
+                    <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-3xl flex items-center justify-center text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] shadow-2xl">
                       {lead.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </div>
                     {isHot && (
@@ -128,7 +128,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                     )}
                   </div>
                   <div>
-                    <h1 className="text-8xl font-black bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                       {lead.name}
                     </h1>
                     <p className="text-4xl text-gray-300 mt-4">
@@ -189,15 +189,15 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
               <div className="space-y-6">
                 <div>
                   <p className="text-2xl text-gray-400">Probabilidade de conversão</p>
-                  <p className="text-7xl font-black text-emerald-400">{lead.probability}%</p>
+                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-emerald-400">{lead.probability}%</p>
                 </div>
                 <div>
                   <p className="text-2xl text-gray-400">Risco de churn</p>
-                  <p className={`text-7xl font-black ${lead.risk >= 60 ? 'text-red-400' : 'text-emerald-400'}`}>{lead.risk}%</p>
+                  <p className={`text-xl md:text-2xl lg:text-3xl font-black ${lead.risk >= 60 ? 'text-red-400' : 'text-emerald-400'}`}>{lead.risk}%</p>
                 </div>
                 <div>
                   <p className="text-2xl text-gray-400">Health Score</p>
-                  <p className="text-7xl font-black text-cyan-400">{lead.health}/100</p>
+                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-cyan-400">{lead.health}/100</p>
                 </div>
               </div>
             </motion.div>
