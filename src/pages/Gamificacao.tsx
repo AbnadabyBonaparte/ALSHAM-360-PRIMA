@@ -72,15 +72,21 @@ export default function GamificacaoPage() {
           weeklyProgress: profile.progresso_semanal || [0,0,0,0,0,0,0]
         });
 
-        setLeaderboard(allPlayers?.map((p: any, i: number) => ({
-          rank: i + 1,
-          name: p.name,
-          level: p.nivel,
-          points: p.pontos,
-          streak: p.streak,
-          badges: p.badges,
-          trend: Math.random() > 0.5 ? 'up' : Math.random() > 0.5 ? 'down' : 'same'
-        })) || []);
+        setLeaderboard(allPlayers?.map((p: any, i: number) => {
+          const next = allPlayers?.[i + 1];
+          const trend = next
+            ? (p.pontos >= next.pontos ? 'up' : 'down')
+            : 'same';
+          return {
+            rank: i + 1,
+            name: p.name,
+            level: p.nivel,
+            points: p.pontos,
+            streak: p.streak,
+            badges: p.badges,
+            trend
+          };
+        }) || []);
       }
 
       setLoading(false);
