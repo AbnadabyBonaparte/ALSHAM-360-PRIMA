@@ -3,7 +3,6 @@
 // Cada email é uma carta de amor que converte. A caixa de entrada é nossa.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   EnvelopeIcon,
   EnvelopeOpenIcon,
@@ -101,22 +100,19 @@ export default function EmailMarketingPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Email Marketing Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-blue-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-blue-400 font-light">Preparando disparos...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-blue-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-blue-400 font-light">Preparando disparos...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Email Marketing Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -138,7 +134,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-3xl p-8 border border-blue-500/30 backdrop-blur-xl"
           >
             <PaperAirplaneIcon className="w-16 h-16 text-blue-400 mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
             <p className="text-xl text-gray-400">Emails Enviados</p>
           </motion.div>
 
@@ -147,7 +143,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
           >
             <EnvelopeOpenIcon className="w-16 h-16 text-green-400 mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.taxaAbertura || 0).toFixed(1)}%</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaAbertura || 0).toFixed(1)}%</p>
             <p className="text-xl text-gray-400">Taxa de Abertura</p>
           </motion.div>
 
@@ -156,7 +152,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
           >
             <CursorArrowRaysIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
             <p className="text-xl text-gray-400">Taxa de Cliques</p>
           </motion.div>
 
@@ -165,7 +161,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl"
           >
             <ChartBarIcon className="w-16 h-16 text-yellow-400 mb-4" />
-            <p className="text-5xl font-black text-white">{metrics?.totalListas || 0}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.totalListas || 0}</p>
             <p className="text-xl text-gray-400">Listas Ativas</p>
           </motion.div>
 
@@ -174,7 +170,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-cyan-900/60 to-teal-900/60 rounded-3xl p-8 border border-cyan-500/30 backdrop-blur-xl"
           >
             <UserGroupIcon className="w-16 h-16 text-cyan-400 mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.totalContatos || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalContatos || 0).toLocaleString()}</p>
             <p className="text-xl text-gray-400">Total Contatos</p>
           </motion.div>
         </div>
@@ -199,7 +195,7 @@ export default function EmailMarketingPage() {
                   initial={{ x: -100, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-blue-500/50 transition-all"
+                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-blue-500/50 transition-all"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
@@ -213,7 +209,7 @@ export default function EmailMarketingPage() {
                         }`} />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-white">{camp.assunto}</h3>
+                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{camp.assunto}</h3>
                         <p className="text-gray-400">{camp.data_envio || 'Não agendado'} • {camp.status}</p>
                       </div>
                     </div>
@@ -262,6 +258,5 @@ export default function EmailMarketingPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

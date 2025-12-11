@@ -3,7 +3,6 @@
 // Cada campanha é uma bomba nuclear de conversão. O mercado tremeu.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   RocketLaunchIcon,
   ChartBarIcon,
@@ -101,16 +100,14 @@ export default function CampaignsPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Campanhas Supremas">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-purple-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-purple-400 font-light">Carregando artilharia...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-purple-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-purple-400 font-light">Carregando artilharia...</p>
+      </div>
     );
   }
 
@@ -124,8 +121,7 @@ export default function CampaignsPage() {
   };
 
   return (
-    <LayoutSupremo title="Campanhas Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -147,7 +143,7 @@ export default function CampaignsPage() {
             className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
           >
             <RocketLaunchIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-5xl font-black text-white">{metrics?.total || 0}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.total || 0}</p>
             <p className="text-xl text-gray-400">Total Campanhas</p>
           </motion.div>
 
@@ -156,7 +152,7 @@ export default function CampaignsPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
           >
             <PlayCircleIcon className="w-16 h-16 text-green-400 mb-4" />
-            <p className="text-5xl font-black text-white">{metrics?.ativas || 0}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.ativas || 0}</p>
             <p className="text-xl text-gray-400">Ativas Agora</p>
           </motion.div>
 
@@ -165,7 +161,7 @@ export default function CampaignsPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl"
           >
             <CurrencyDollarIcon className="w-16 h-16 text-yellow-400 mb-4" />
-            <p className="text-4xl font-black text-white">R$ {(metrics?.orcamentoTotal || 0).toLocaleString('pt-BR')}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.orcamentoTotal || 0).toLocaleString('pt-BR')}</p>
             <p className="text-xl text-gray-400">Orçamento Total</p>
           </motion.div>
 
@@ -174,7 +170,7 @@ export default function CampaignsPage() {
             className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-3xl p-8 border border-cyan-500/30 backdrop-blur-xl"
           >
             <UserGroupIcon className="w-16 h-16 text-cyan-400 mb-4" />
-            <p className="text-5xl font-black text-white">{metrics?.leadsTotal || 0}</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.leadsTotal || 0}</p>
             <p className="text-xl text-gray-400">Leads Gerados</p>
           </motion.div>
 
@@ -183,7 +179,7 @@ export default function CampaignsPage() {
             className="bg-gradient-to-br from-emerald-900/60 to-teal-900/60 rounded-3xl p-8 border border-emerald-500/30 backdrop-blur-xl"
           >
             <ChartBarIcon className="w-16 h-16 text-emerald-400 mb-4" />
-            <p className="text-5xl font-black text-white">{(metrics?.roiMedio || 0).toFixed(1)}x</p>
+            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.roiMedio || 0).toFixed(1)}x</p>
             <p className="text-xl text-gray-400">ROI Médio</p>
           </motion.div>
         </div>
@@ -208,13 +204,13 @@ export default function CampaignsPage() {
                   initial={{ x: -100, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-purple-500/50 transition-all"
+                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-purple-500/50 transition-all"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       {statusIcon(camp.status)}
                       <div>
-                        <h3 className="text-2xl font-bold text-white">{camp.nome}</h3>
+                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{camp.nome}</h3>
                         <p className="text-gray-400">{camp.tipo} • {camp.inicio} até {camp.fim || 'em andamento'}</p>
                       </div>
                     </div>
@@ -276,6 +272,5 @@ export default function CampaignsPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }

@@ -3,7 +3,6 @@
 // Cada LP é uma armadilha de conversão perfeita. O visitante entra, cliente sai.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   RocketLaunchIcon,
   EyeIcon,
@@ -97,22 +96,19 @@ export default function LandingPagesPage() {
 
   if (loading) {
     return (
-      <LayoutSupremo title="Landing Pages Supremas">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-cyan-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-cyan-400 font-light">Carregando LPs...</p>
-        </div>
-      </LayoutSupremo>
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-cyan-500 rounded-full"
+        />
+        <p className="absolute text-4xl text-cyan-400 font-light">Carregando LPs...</p>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Landing Pages Supremas">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -131,31 +127,31 @@ export default function LandingPagesPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
             <GlobeAltIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.totalLPs || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalLPs || 0}</p>
             <p className="text-gray-400">Total LPs</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <RocketLaunchIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-white">{metrics?.ativas || 0}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativas || 0}</p>
             <p className="text-gray-400">Ativas</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
             <EyeIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-gray-400">Visualizações</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <UserPlusIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
             <p className="text-gray-400">Conversões</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <ArrowTrendingUpIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-white">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
+            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
             <p className="text-gray-400">Taxa Média</p>
           </motion.div>
         </div>
@@ -179,7 +175,7 @@ export default function LandingPagesPage() {
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-cyan-500/50 transition-all"
+                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-cyan-500/50 transition-all"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
@@ -188,7 +184,7 @@ export default function LandingPagesPage() {
                         lp.status === 'pausada' ? 'bg-yellow-400' : 'bg-gray-400'
                       }`} />
                       <div>
-                        <h3 className="text-2xl font-bold text-white">{lp.nome}</h3>
+                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{lp.nome}</h3>
                         <p className="text-cyan-400 text-sm">{lp.url}</p>
                         {lp.campanha && <p className="text-gray-500 text-sm">Campanha: {lp.campanha}</p>}
                       </div>
@@ -247,6 +243,5 @@ export default function LandingPagesPage() {
           </p>
         </motion.div>
       </div>
-    </LayoutSupremo>
   );
 }
