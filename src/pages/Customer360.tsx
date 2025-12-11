@@ -15,8 +15,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const GlassPanel = ({ children, className = "" }: any) => (
-  <div className={`relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] backdrop-blur-2xl ${className}`}>
-    <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-strong)]/30 to-transparent" />
+  <div className={`relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--background)]/40 backdrop-blur-2xl ${className}`}>
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
     <div className="relative z-10">{children}</div>
   </div>
 );
@@ -41,7 +41,7 @@ const ResonanceOrb = ({ score }: { score: number }) => {
         style={{ borderColor: color, background: `radial-gradient(circle at 30% 30%, ${color}20, black)` }}
       >
         <span className="text-6xl font-black text-[var(--text-primary)]">{score}</span>
-        <p className="text-xs uppercase tracking-widest text-[var(--text-secondary)] mt-2">Health Score</p>
+        <p className="text-xs uppercase tracking-widest text-[var(--text-primary)]/60 mt-2">Health Score</p>
       </motion.div>
     </div>
   );
@@ -141,7 +141,11 @@ export default function Customer360Real() {
     </div>
   );
 
+<<<<<<< HEAD
   if (!lead) return <div className="text-center py-32 text-4xl text-[var(--text-tertiary)]">Lead não encontrado</div>;
+=======
+  if (!lead) return <div className="text-center py-32 text-4xl text-[var(--text-primary)]/30">Lead não encontrado</div>;
+>>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
@@ -153,6 +157,7 @@ export default function Customer360Real() {
               {lead.name}
             </h1>
           </motion.div>
+<<<<<<< HEAD
           <p className="text-5xl text-[var(--text-secondary)] mt-8">{lead.company_name || lead.company}</p>
           <div className="flex justify-center gap-20 mt-16">
             <div className="text-center">
@@ -162,6 +167,17 @@ export default function Customer360Real() {
             <div className="text-center">
               <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
               <p className="text-3xl text-[var(--text-secondary)]">LTV Previsto (IA)</p>
+=======
+          <p className="text-5xl text-[var(--text-primary)]/70 mt-8">{lead.company_name || lead.company}</p>
+          <div className="flex justify-center gap-20 mt-16">
+            <div className="text-center">
+              <p className="text-8xl font-black text-emerald-400">{lead.pipeline}</p>
+              <p className="text-3xl text-[var(--text-primary)]/60">Pipeline Atual</p>
+            </div>
+            <div className="text-center">
+              <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
+              <p className="text-3xl text-[var(--text-primary)]/60">LTV Previsto (IA)</p>
+>>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
             </div>
           </div>
         </motion.div>
@@ -181,7 +197,7 @@ export default function Customer360Real() {
                 <Sparkles className="h-10 w-10 text-purple-400" />
                 <h3 className="text-3xl font-black text-purple-300">Next Best Action (Real)</h3>
               </div>
-              <p className="text-2xl text-white leading-relaxed mb-8">"{lead.nextAction}"</p>
+              <p className="text-2xl text-[var(--text-primary)] leading-relaxed mb-8">"{lead.nextAction}"</p>
               <button className="w-full py-6 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-2xl font-black shadow-2xl">
                 EXECUTAR AGORA
               </button>
@@ -204,10 +220,17 @@ export default function Customer360Real() {
                     <div className="shrink-0 w-16 h-16 rounded-full bg-[var(--surface)] flex items-center justify-center border border-[var(--border)]">
                       {item.icon}
                     </div>
+<<<<<<< HEAD
                     <div className="flex-1 bg-[var(--surface)] rounded-2xl p-6 border border-[var(--border)]">
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="text-xl font-bold text-[var(--text-primary)]">{item.title}</h4>
                         <span className="text-sm text-[var(--text-tertiary)]">
+=======
+                    <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-[var(--border)]">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="text-xl font-bold text-[var(--text-primary)]">{item.title}</h4>
+                        <span className="text-sm text-[var(--text-primary)]/40">
+>>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
                           {formatDistanceToNow(item.date, { addSuffix: true, locale: ptBR })}
                         </span>
                       </div>
@@ -230,5 +253,9 @@ export default function Customer360Real() {
         </motion.div>
 
       </div>
+<<<<<<< HEAD
+=======
+    </div>
+>>>>>>> 7da7c2a (ðŸ”§ SIDEBAR-FIX: Remove LayoutSupremo de pÃ¡ginas CRM (lote 1))
   );
 }

@@ -3,7 +3,6 @@
 // A página que prevê, decide e converte sozinha.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Leads.tsx
 
-import LayoutSupremo from '@/components/LayoutSupremo';
 import {
   SparklesIcon,
   ArrowTrendingUpIcon,
@@ -100,8 +99,7 @@ export default function LeadsPage() {
   };
 
   return (
-    <LayoutSupremo title="Leads Intelligence Suprema">
-      <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -182,9 +180,9 @@ export default function LeadsPage() {
                 {lead.score >= 90 && <SparklesIcon className="w-10 h-10 inline ml-3 animate-pulse" />}
               </div>
 
-              <div className="bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl p-10 border-2 border-white/10 hover:border-primary/70 transition-all hover:shadow-2xl hover:shadow-primary/30">
+              <div className="bg-gradient-to-br from-gray-900/90 via-black/95 to-gray-900/90 backdrop-blur-2xl rounded-3xl p-10 border-2 border-[var(--border)] hover:border-primary/70 transition-all hover:shadow-2xl hover:shadow-primary/30">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center text-5xl font-bold text-white shadow-2xl">
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center text-5xl font-bold text-[var(--text-primary)] shadow-2xl">
                     {lead.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                   </div>
                   <div className="text-right">
@@ -195,7 +193,7 @@ export default function LeadsPage() {
                   </div>
                 </div>
 
-                <h3 className="text-3xl font-bold text-white mb-3">{lead.name}</h3>
+                <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-3">{lead.name}</h3>
                 <p className="text-xl text-gray-300 mb-2">{lead.company}</p>
                 <p className="text-cyan-400 mb-6">{lead.email}</p>
 
@@ -240,7 +238,6 @@ export default function LeadsPage() {
             — Citizen Supremo X.1 já sabe quem vai fechar.
           </p>
         </motion.div>
-      </div>
-    </LayoutSupremo>
+    </div>
   );
 }
