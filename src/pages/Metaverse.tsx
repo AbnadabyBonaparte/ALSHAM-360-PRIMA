@@ -33,24 +33,25 @@ interface SpatialNode {
   status: 'active' | 'warning' | 'critical';
 }
 
-// --- MOCK DATA GENERATOR (Simulando dados complexos do schema) ---
-// Em produção, isso viria de um join entre `metaverse_spaces` e `analytics_summary`
-const generateNodes = (count: number): SpatialNode[] => {
-  const types = ['showroom', 'hq', 'event', 'store'] as const;
-  return Array.from({ length: count }).map((_, i) => {
-    const angle = (i / count) * Math.PI * 2;
-    const radius = 15 + Math.random() * 10;
+const buildNodes = (events: any[]): SpatialNode[] => {
+  const types: SpatialNode['type'][] = ['showroom', 'hq', 'event', 'store'];
+  const source = events.length ? events : Array.from({ length: 8 }).map((_, i) => ({ id: `placeholder-${i}` }));
+
+  return source.map((event, i) => {
+    const angle = (i / source.length) * Math.PI * 2;
+    const radius = 18 + (i % 4);
+    const posY = ((i % 3) - 1) * 2;
     return {
-      id: `node-${i}`,
-      name: `Nexus ${types[Math.floor(Math.random() * types.length)]} ${i}`,
-      type: types[Math.floor(Math.random() * types.length)],
-      position: [Math.cos(angle) * radius, (Math.random() - 0.5) * 5, Math.sin(angle) * radius],
+      id: event.id?.toString() || `node-${i}`,
+      name: event.name || event.title || event.event || `Node ${i + 1}`,
+      type: types[i % types.length],
+      position: [Math.cos(angle) * radius, posY, Math.sin(angle) * radius],
       metrics: {
-        visitors: Math.floor(Math.random() * 5000),
-        revenue: Math.floor(Math.random() * 100000),
-        sentiment: Math.random(),
+        visitors: event.visitors || event.count || 0,
+        revenue: event.value || event.revenue || 0,
+        sentiment: typeof event.sentiment === 'number' ? event.sentiment : 0.5,
       },
-      status: Math.random() > 0.9 ? 'warning' : 'active',
+      status: (event.status as SpatialNode['status']) || 'active',
     };
   });
 };
@@ -315,11 +316,19 @@ export default function MetaversePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate initial data fetch
-    setTimeout(() => {
-      setNodes(generateNodes(12));
-      setLoading(false);
-    }, 1500);
+    async function loadNodes() {
+      try {
+        const { data, error } = await supabase.from('analytics_events').select('*').limit(12);
+        if (error) throw error;
+        setNodes(buildNodes(data || []));
+      } catch (err) {
+        console.error('Erro ao carregar dados do metaverso', err);
+        setNodes(buildNodes([]));
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadNodes();
   }, []);
 
   return (

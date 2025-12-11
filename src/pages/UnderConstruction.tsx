@@ -51,13 +51,13 @@ export default function UnderConstruction({
               scale: [0, 1.5, 0]
             }}
             transition={{
-              duration: 3 + Math.random() * 3,
+              duration: 3 + (i % 3),
               repeat: Infinity,
-              delay: Math.random() * 3
+              delay: (i % 5) * 0.4
             }}
             style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
+              top: `${(i * 17) % 100}%`,
+              left: `${(i * 23) % 100}%`,
             }}
           />
         ))}

@@ -127,27 +127,45 @@ export default function ExecutiveDashboard() {
       const ebitda = income - expense;
       const ebitdaMargin = income > 0 ? (ebitda / income) * 100 : 0;
       
-      // Mock Trend for Chart
-      const revenueTrend = Array.from({length: 12}, (_, i) => ({
-        month: `M${i+1}`,
-        revenue: Math.random() * 100000 + 50000 + (i * 10000),
-        profit: Math.random() * 40000 + 10000 + (i * 5000)
-      }));
+      // Trend real por mês (ordenado)
+      const monthlyMap = new Map<string, { income: number; expense: number }>();
+      finance?.forEach((f) => {
+        const key = new Date(f.date).toISOString().slice(0, 7);
+        const current = monthlyMap.get(key) || { income: 0, expense: 0 };
+        if (f.type === 'income') current.income += f.amount;
+        if (f.type === 'expense') current.expense += f.amount;
+        monthlyMap.set(key, current);
+      });
 
-      // Unit Economics Mock (se não tiver dados suficientes)
-      const ltvCacRatio = 4.2; 
-      const runwayMonths = expense > 0 ? (income * 10) / expense : 24;
+      const revenueTrend = Array.from(monthlyMap.entries())
+        .sort(([a], [b]) => (a > b ? 1 : -1))
+        .slice(-12)
+        .map(([month, totals]) => ({
+          month,
+          revenue: totals.income,
+          profit: totals.income - totals.expense,
+        }));
+
+      // Unit economics a partir dos dados reais
+      const totalOppValue = opps?.reduce((acc, o) => acc + (o.value ?? 0), 0) || 0;
+      const ltvCacRatio = expense > 0 ? (income / expense) : 0;
+      const runwayMonths = expense > 0 ? (income / expense) * 6 : 24;
+
+      const wonDeals = opps?.filter((o) => o.stage?.toLowerCase() === 'ganho' || o.stage?.toLowerCase() === 'ganho ').length || 0;
+      const marketSentiment = opps && opps.length > 0 ? Math.min(100, Math.max(0, (wonDeals / opps.length) * 100)) : 0;
 
       setMetrics({
         revenueYTD: income,
-        revenueGrowth: 14.5,
+        revenueGrowth: revenueTrend.length >= 2
+          ? ((revenueTrend[revenueTrend.length - 1].revenue - revenueTrend[0].revenue) / Math.max(1, revenueTrend[0].revenue)) * 100
+          : 0,
         revenueTrend,
         ebitda,
         ebitdaMargin,
         ltvCacRatio,
         runwayMonths,
         headcount: users?.length || 1,
-        marketSentiment: 88
+        marketSentiment,
       });
 
       setDepartments([

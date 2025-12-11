@@ -26,13 +26,13 @@ export default function PublicacaoPage() {
                   scale: [0, 1.5, 0]
                 }}
                 transition={{
-                  duration: 4 + Math.random() * 4,
+                  duration: 4 + (i % 4),
                   repeat: Infinity,
-                  delay: Math.random() * 5
+                  delay: (i % 5) * 0.5
                 }}
                 style={{
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
+                  top: `${(i * 13) % 100}%`,
+                  left: `${(i * 29) % 100}%`,
                 }}
               />
             ))}
