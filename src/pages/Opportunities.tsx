@@ -97,7 +97,7 @@ export default function OpportunitiesPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600 bg-clip-text text-transparent">
             OPORTUNIDADES
           </h1>
           <p className="text-5xl text-gray-300 mt-8 font-light">
@@ -206,7 +206,7 @@ export default function OpportunitiesPage() {
           className="text-center py-40 mt-32"
         >
           <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto mb-12 animate-pulse" />
-          <p className="text-8xl font-light text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
             O DINHEIRO ESTÁ NO PIPELINE
           </p>
           <p className="text-5xl text-gray-400 mt-16">
@@ -228,7 +228,7 @@ function SupremeDealCard({ icon, title, value, color }: any) {
           {React.cloneElement(icon, { className: "w-20 h-20 text-[var(--text-primary)]" })}
         </div>
       </div>
-      <p className="text-7xl font-black text-[var(--text-primary)] text-center">{value}</p>
+      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
       <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
     </motion.div>
   );

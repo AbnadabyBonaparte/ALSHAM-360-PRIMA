@@ -108,11 +108,11 @@ export default function EternalVault() {
           </motion.h1>
           <div className="flex justify-center gap-32 mt-20">
             <div>
-              <p className="text-9xl font-black text-amber-400">{totalValue.toFixed(2)} ETH</p>
+              <p className="text-4xl md:text-5xl lg:text-6xl font-black text-amber-400">{totalValue.toFixed(2)} ETH</p>
               <p className="text-4xl text-amber-300">Valor Total do Cofre</p>
             </div>
             <div>
-              <p className="text-9xl font-black text-purple-400">{nfts.length}</p>
+              <p className="text-4xl md:text-5xl lg:text-6xl font-black text-purple-400">{nfts.length}</p>
               <p className="text-4xl text-purple-300">Artefatos Imortais</p>
             </div>
           </div>
@@ -228,11 +228,11 @@ export default function EternalVault() {
 
                   <div className="p-20 space-y-12">
                     <div>
-                      <h2 className="text-7xl font-black text-[var(--text-primary)] mb-4">{selected.name}</h2>
+                      <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] mb-4">{selected.name}</h2>
                       <p className="text-4xl text-[var(--text-primary)]/70">{selected.collection}</p>
                     </div>
 
-                    <div className="text-8xl font-black text-amber-400">
+                    <div className="text-2xl md:text-3xl lg:text-4xl font-black text-amber-400">
                       {selected.price_eth} ETH
                     </div>
 
@@ -261,7 +261,7 @@ export default function EternalVault() {
 
         {/* MENSAGEM FINAL */}
         <motion.div className="fixed inset-x-0 bottom-20 text-center">
-          <p className="text-8xl font-black bg-gradient-to-r from-amber-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-amber-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
             ESTES ARTEFATOS SÃO ETERNOS
           </p>
           <p className="text-5xl text-[var(--text-primary)]/60 mt-8">E pertencem apenas a você.</p>

@@ -116,7 +116,7 @@ export default function HomePage() {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-9xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent"
             >
               BEM-VINDO AO FUTURO
             </motion.h1>
@@ -165,7 +165,7 @@ export default function HomePage() {
           className="text-center py-40"
         >
           <SparklesIcon className="w-40 h-40 text-purple-400 mx-auto mb-12 animate-pulse" />
-          <p className="text-7xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 max-w-6xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl lg:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 max-w-6xl mx-auto leading-relaxed">
             "Você não está apenas gerenciando um negócio.
             <br />
             Você está construindo um império com consciência artificial."

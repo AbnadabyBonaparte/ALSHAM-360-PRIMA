@@ -200,7 +200,7 @@ export default function AutomationForgeInfinity() {
               <input
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="text-8xl font-black bg-transparent border-none outline-none text-[var(--text-primary)]"
+                className="text-2xl md:text-3xl lg:text-4xl font-black bg-transparent border-none outline-none text-[var(--text-primary)]"
               />
               <p className="text-4xl text-emerald-400 mt-4">{executions} execuções eternas</p>
             </div>
@@ -278,7 +278,7 @@ className="w-full px-20 py-12 text-4xl font-light bg-[var(--background)]/80 back
           <motion.p
             animate={{ scale: [1, 1.08, 1] }}
             transition={{ duration: 8, repeat: Infinity }}
-            className="text-9xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+            className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
           >
             O DESTINO ESTÁ SENDO FORJADO
           </motion.p>

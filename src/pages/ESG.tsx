@@ -125,7 +125,7 @@ export default function ESGPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-8xl font-black bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
             ESG SUPREMO
           </h1>
           <p className="text-3xl text-gray-400 mt-6">
@@ -141,7 +141,7 @@ export default function ESGPage() {
             className="bg-gradient-to-br from-green-900/40 via-blue-900/40 to-purple-900/40 rounded-3xl p-12 border-4 border-green-500/50 text-center"
           >
             <p className="text-2xl text-gray-400 mb-4">Score ESG Total</p>
-            <p className="text-9xl font-black text-[var(--text-primary)]">{(metrics?.score.total || 0).toFixed(0)}</p>
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)]">{(metrics?.score.total || 0).toFixed(0)}</p>
             <p className="text-xl text-gray-400 mt-4">Top #{metrics?.ranking} no setor</p>
           </motion.div>
         </div>

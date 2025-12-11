@@ -109,7 +109,7 @@ export default function SustainabilityPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-7xl font-black bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 bg-clip-text text-transparent">
             SUSTENTABILIDADE SUPREMA
           </h1>
           <p className="text-3xl text-gray-400 mt-6">
@@ -195,7 +195,7 @@ export default function SustainabilityPage() {
         <div className="max-w-xl mx-auto mb-16">
           <div className="bg-gradient-to-br from-emerald-900/40 to-green-900/40 rounded-3xl p-8 border border-emerald-500/30 text-center">
             <p className="text-2xl text-gray-400 mb-4">Metas de Sustentabilidade</p>
-            <p className="text-7xl font-black text-[var(--text-primary)]">
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">
               {metrics?.metasAtingidas}/{metrics?.totalMetas}
             </p>
             <p className="text-emerald-400 text-xl mt-2">

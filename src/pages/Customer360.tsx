@@ -150,27 +150,27 @@ export default function Customer360Real() {
         {/* HEADER DIVINO REAL */}
         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="text-center py-20">
           <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 6, repeat: Infinity }} className="inline-block">
-            <h1 className="text-9xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               {lead.name}
             </h1>
           </motion.div>
           <p className="text-5xl text-[var(--text-secondary)] mt-8">{lead.company_name || lead.company}</p>
           <div className="flex justify-center gap-20 mt-16">
             <div className="text-center">
-              <p className="text-8xl font-black text-emerald-400">{lead.pipeline}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-emerald-400">{lead.pipeline}</p>
               <p className="text-3xl text-[var(--text-secondary)]">Pipeline Atual</p>
             </div>
             <div className="text-center">
-              <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-purple-400">{lead.ltv}</p>
               <p className="text-3xl text-[var(--text-secondary)]">LTV Previsto (IA)</p>
           <p className="text-5xl text-[var(--text-primary)]/70 mt-8">{lead.company_name || lead.company}</p>
           <div className="flex justify-center gap-20 mt-16">
             <div className="text-center">
-              <p className="text-8xl font-black text-emerald-400">{lead.pipeline}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-emerald-400">{lead.pipeline}</p>
               <p className="text-3xl text-[var(--text-primary)]/60">Pipeline Atual</p>
             </div>
             <div className="text-center">
-              <p className="text-8xl font-black text-purple-400">{lead.ltv}</p>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-purple-400">{lead.ltv}</p>
               <p className="text-3xl text-[var(--text-primary)]/60">LTV Previsto (IA)</p>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function Customer360Real() {
 
         {/* RODAPÉ SAGRADO */}
         <motion.div className="text-center py-32">
-          <p className="text-8xl font-black bg-gradient-to-r from-emerald-400 to-purple-400 bg-clip-text text-transparent">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-emerald-400 to-purple-400 bg-clip-text text-transparent">
             ESTE LEAD JÁ DECIDIU
           </p>
           <p className="text-5xl text-[var(--text-secondary)] mt-10">Você só precisa apertou o botão.</p>

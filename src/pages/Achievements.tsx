@@ -165,7 +165,7 @@ const LevelDashboard = ({ rank }: { rank: UserRank }) => {
 
       <div className="flex flex-col">
         <h2 className="text-sm font-bold text-[var(--color-primary-from)] uppercase tracking-widest mb-1">Current Rank</h2>
-        <h1 className="text-6xl md:text-7xl font-black text-white tracking-tighter drop-shadow-lg">
+        <h1 className="text-6xl md:text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tighter drop-shadow-lg">
           {rank.rank_name}
         </h1>
         <div className="flex items-center gap-6 mt-6 text-sm">
@@ -229,7 +229,7 @@ const AchievementsPage = () => {
           className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12"
         >
           <div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-xl md:text-2xl lg:text-3xl font-black tracking-tighter bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] bg-clip-text text-transparent">
               Hall of Glory
             </h1>
             <p className="text-xl text-[var(--text-secondary)] mt-3">

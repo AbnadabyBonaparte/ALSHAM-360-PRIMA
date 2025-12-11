@@ -53,7 +53,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {/* HERO */}
           {block.type === 'hero' && (
             <div className={`py-40 px-12 text-center ${block.content.bg}`}>
-              <h1 className="text-7xl md:text-9xl font-black text-[var(--text-primary)] mb-10">{block.content.headline}</h1>
+              <h1 className="text-xl md:text-2xl lg:text-3xl md:text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] mb-10">{block.content.headline}</h1>
               <p className="text-3xl text-[var(--text-primary)]/80 mb-16 max-w-5xl mx-auto">{block.content.subheadline}</p>
               <button className="px-20 py-10 bg-white text-black text-4xl font-black rounded-full hover:scale-110 transition-transform shadow-2xl">
                 {block.content.cta}
@@ -64,7 +64,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {/* FEATURES */}
           {block.type === 'features' && (
             <div className="py-40 px-12 bg-[var(--background)]/60">
-              <h2 className="text-7xl font-black text-center text-[var(--text-primary)] mb-32">{block.content.title}</h2>
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-center text-[var(--text-primary)] mb-32">{block.content.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-20 max-w-7xl mx-auto">
                 {block.content.items.map((f, i) => (
                   <div key={i} className="text-center">
@@ -80,7 +80,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {/* CTA */}
           {block.type === 'cta' && (
             <div className={`py-48 px-12 text-center ${block.content.bg}`}>
-              <h2 className="text-8xl font-black text-[var(--text-primary)] mb-20">{block.content.title}</h2>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-20">{block.content.title}</h2>
               <button className="px-32 py-16 bg-[var(--background)] text-[var(--text-primary)] text-6xl font-black rounded-3xl border-8 border-white/30 hover:scale-110 transition-transform shadow-2xl">
                 {block.content.button}
               </button>
@@ -100,7 +100,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {block.type === 'pricing' && (
             <div className="py-48 px-12 bg-gradient-to-b from-black to-purple-950/50 text-center">
               <p className="text-5xl text-[var(--text-primary)]/60 uppercase tracking-widest mb-12">PLANO</p>
-              <h2 className="text-8xl font-black text-[var(--text-primary)] mb-8">{block.content.plan}</h2>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-8">{block.content.plan}</h2>
               <p className="text-10xl font-black text-emerald-400 mb-8">{block.content.price}</p>
               <p className="text-5xl text-[var(--text-primary)]/60 mb-20">{block.content.period}</p>
               <ul className="space-y-6 text-3xl text-[var(--text-primary)]/80 mb-20">
@@ -206,7 +206,7 @@ export default function VortexArchitect() {
         {/* CANVAS + HEADER */}
         <div className="flex-1 flex flex-col">
           <div className="h-24 border-b border-white/5 bg-[var(--background)]/80 flex items-center justify-between px-16">
-            <input value={pageName} onChange={e => setPageName(e.target.value)} className="text-7xl font-black bg-transparent border-none outline-none" />
+            <input value={pageName} onChange={e => setPageName(e.target.value)} className="text-xl md:text-2xl lg:text-3xl font-black bg-transparent border-none outline-none" />
             <div className="flex items-center gap-8">
               <button onClick={() => save()} className="px-12 py-6 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl flex items-center gap-4 text-2xl font-bold">
                 <Save className="h-8 w-8" /> SALVAR

@@ -106,7 +106,7 @@ export default function LeadsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-9xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">
             LEADS INTELLIGENCE
           </h1>
           <p className="text-5xl text-gray-300 mt-8 font-light">
@@ -231,7 +231,7 @@ export default function LeadsPage() {
           className="text-center py-40 mt-32"
         >
           <LightBulbIcon className="w-48 h-48 text-purple-500 mx-auto mb-12 animate-pulse" />
-          <p className="text-8xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600">
             94% dos leads quentes convertem em menos de 7 dias
           </p>
           <p className="text-4xl text-gray-400 mt-16">

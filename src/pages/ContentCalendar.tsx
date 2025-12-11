@@ -144,7 +144,7 @@ export default function ContentCalendarPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-7xl font-black bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             CALENDÁRIO DE CONTEÚDO
           </h1>
           <p className="text-3xl text-gray-400 mt-6">

@@ -112,7 +112,7 @@ export default function VirtualOfficePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-7xl font-black bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
             ESCRITÓRIO VIRTUAL
           </h1>
           <p className="text-3xl text-gray-400 mt-6">
@@ -131,7 +131,7 @@ export default function VirtualOfficePage() {
               <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse" />
               <span className="text-2xl text-green-400 font-bold">ONLINE AGORA</span>
             </div>
-            <p className="text-7xl font-black text-[var(--text-primary)]">{metrics?.usuariosOnline}</p>
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">{metrics?.usuariosOnline}</p>
             <p className="text-gray-400">colaboradores ativos</p>
           </motion.div>
         </div>

@@ -45,7 +45,7 @@ export default function PublicacaoPage() {
             transition={{ duration: 2, type: "spring", stiffness: 50 }}
             className="text-center"
           >
-            <h1 className="text-8xl md:text-9xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent mb-16">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl md:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent mb-16">
               PUBLICAÇÃO OFICIAL
             </h1>
             
@@ -53,7 +53,7 @@ export default function PublicacaoPage() {
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
-              className="text-6xl md:text-8xl font-black bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent"
+              className="text-6xl md:text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent"
             >
               ALSHAM 360° PRIMA
             </motion.div>
@@ -62,7 +62,7 @@ export default function PublicacaoPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}
-              className="text-5xl md:text-7xl font-bold text-yellow-400 mt-8"
+              className="text-5xl md:text-xl md:text-2xl lg:text-3xl font-bold text-yellow-400 mt-8"
             >
               v10.0 SUPREMO
             </motion.div>
@@ -83,7 +83,7 @@ export default function PublicacaoPage() {
                   <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                     HARMONIZED RELEASE
                   </p>
-                  <p className="text-7xl font-black text-yellow-400 mt-6">R25</p>
+                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-yellow-400 mt-6">R25</p>
                 </div>
               </div>
             </div>
@@ -150,10 +150,10 @@ export default function PublicacaoPage() {
             transition={{ delay: 5 }}
             className="text-center py-32"
           >
-            <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
               O FUTURO
             </p>
-            <p className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
               COMEÇOU
             </p>
           </motion.div>
