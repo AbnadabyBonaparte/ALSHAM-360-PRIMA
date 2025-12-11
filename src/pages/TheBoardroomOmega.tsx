@@ -18,7 +18,6 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import LayoutSupremo from '@/components/LayoutSupremo';
 import { useExecutiveMetrics, BOARDROOM_RULES } from '@/hooks/useExecutiveMetrics';
 import KpiCard from '@/components/boardroom/KpiCard';
 import SentimentOrb from '@/components/boardroom/SentimentOrb';
@@ -100,10 +99,7 @@ export default function TheBoardroomOmega() {
         {hiddenMode && <HiddenMatrixRain />}
       </div>
 
-      <LayoutSupremo title="THE BOARDROOM Ω">
-
-        {/* HEADER CERIMONIAL */}
-        <div className="relative z-10 min-h-screen p-20 flex flex-col">
+      <div className="relative z-10 min-h-screen bg-[var(--background)] p-20 flex flex-col">
           <motion.div
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
@@ -235,7 +231,6 @@ export default function TheBoardroomOmega() {
             <p className="text-emerald-400 text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
           </div>
         </div>
-      </LayoutSupremo>
     </>
   );
 }
