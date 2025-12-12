@@ -1,10 +1,6 @@
-/* ========================================================================== */
-/* ALSHAM 360° PRIMA - GLOBAL STYLES                                          */
-/* ========================================================================== */
-/* Design System Supremo                                                      */
-/* ========================================================================== */
+@import "./styles/theme-tokens.css";
+@import "./styles/themes.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
