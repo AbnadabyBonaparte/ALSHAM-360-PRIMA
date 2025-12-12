@@ -2,21 +2,23 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+const rootDir = path.resolve(__dirname, 'src')
+
 export default defineConfig({
   plugins: [react()],
-  root: './src',
-  publicDir: '../public',
+  root: rootDir,
+  publicDir: path.resolve(__dirname, 'public'),
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@/lib': path.resolve(__dirname, './src/lib'),
-      '@/components': path.resolve(__dirname, './src/components'),
-      '@/pages': path.resolve(__dirname, './src/pages'),
-      '@/assets': path.resolve(__dirname, './src/assets'),
+      '@': rootDir,
+      '@/lib': path.resolve(rootDir, 'lib'),
+      '@/components': path.resolve(rootDir, 'components'),
+      '@/pages': path.resolve(rootDir, 'pages'),
+      '@/assets': path.resolve(rootDir, 'assets'),
     }
   },
   build: {
-    outDir: '../dist',
+    outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
     sourcemap: false,
     minify: 'esbuild',
@@ -24,6 +26,7 @@ export default defineConfig({
     cssCodeSplit: true,
     reportCompressedSize: false,
     rollupOptions: {
+      input: path.resolve(rootDir, 'index.html'),
       output: {
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.')

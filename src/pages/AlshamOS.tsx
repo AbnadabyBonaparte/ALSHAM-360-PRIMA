@@ -1,6 +1,7 @@
 // src/pages/AlshamOS.tsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BrainCircuit } from 'lucide-react';
 import RealmSelector from '@/components/RealmSelector';
 import GenesisVault from './realms/GenesisVault';
 import NexusField from './realms/NexusField';
