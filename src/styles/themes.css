@@ -1,96 +1,98 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* 🎨 ALSHAM 360° PRIMA - SISTEMA DE TEMAS DINÂMICOS */
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@layer base {
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  /* 🎨 ALSHAM 360° PRIMA - SISTEMA DE TEMAS DINÂMICOS */
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* ============================================ */
-/* 📐 VARIÁVEIS GLOBAIS DE FONTE */
-/* ============================================ */
-:root {
-  /* Tamanhos de fonte responsivos com clamp */
-  --font-xs: clamp(0.75rem, 2vw, 0.875rem);
-  --font-sm: clamp(0.875rem, 2.5vw, 1rem);
-  --font-base: clamp(0.875rem, 2vw, 1rem);
-  --font-md: clamp(1rem, 3vw, 1.125rem);
-  --font-lg: clamp(1.125rem, 3.5vw, 1.5rem);
-  --font-xl: clamp(1.25rem, 4vw, 1.875rem);
-  --font-2xl: clamp(1.5rem, 5vw, 2.25rem);
-  --font-3xl: clamp(1.875rem, 6vw, 3rem);
-  --font-4xl: clamp(2.25rem, 7vw, 3.75rem);
-  
-  /* Headings específicos */
-  --font-heading-h1: clamp(1.5rem, 5vw, 2.25rem);
-  --font-heading-h2: clamp(1.25rem, 4vw, 1.875rem);
-  --font-heading-h3: clamp(1.125rem, 3.5vw, 1.5rem);
-  --font-heading-h4: clamp(1rem, 3vw, 1.25rem);
-  --font-heading-h5: clamp(0.875rem, 2.5vw, 1.125rem);
-  --font-heading-h6: clamp(0.875rem, 2vw, 1rem);
-  
-  /* Line heights */
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
-  --line-height-loose: 2;
-  
-  /* Font weights */
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
+  /* ============================================ */
+  /* 📐 VARIÁVEIS GLOBAIS DE FONTE */
+  /* ============================================ */
+  :root {
+    /* Tamanhos de fonte responsivos com clamp */
+    --font-xs: clamp(0.75rem, 2vw, 0.875rem);
+    --font-sm: clamp(0.875rem, 2.5vw, 1rem);
+    --font-base: clamp(0.875rem, 2vw, 1rem);
+    --font-md: clamp(1rem, 3vw, 1.125rem);
+    --font-lg: clamp(1.125rem, 3.5vw, 1.5rem);
+    --font-xl: clamp(1.25rem, 4vw, 1.875rem);
+    --font-2xl: clamp(1.5rem, 5vw, 2.25rem);
+    --font-3xl: clamp(1.875rem, 6vw, 3rem);
+    --font-4xl: clamp(2.25rem, 7vw, 3.75rem);
+
+    /* Headings específicos */
+    --font-heading-h1: clamp(1.5rem, 5vw, 2.25rem);
+    --font-heading-h2: clamp(1.25rem, 4vw, 1.875rem);
+    --font-heading-h3: clamp(1.125rem, 3.5vw, 1.5rem);
+    --font-heading-h4: clamp(1rem, 3vw, 1.25rem);
+    --font-heading-h5: clamp(0.875rem, 2.5vw, 1.125rem);
+    --font-heading-h6: clamp(0.875rem, 2vw, 1rem);
+
+    /* Line heights */
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+    --line-height-loose: 2;
+
+    /* Font weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+  }
+
+  /* Aplicação global de fontes */
+  body {
+    font-size: var(--font-base);
+    line-height: var(--line-height-normal);
+    font-weight: var(--font-weight-normal);
+  }
+
+  h1 {
+    font-size: var(--font-heading-h1);
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-bold);
+  }
+
+  h2 {
+    font-size: var(--font-heading-h2);
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-bold);
+  }
+
+  h3 {
+    font-size: var(--font-heading-h3);
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  h4 {
+    font-size: var(--font-heading-h4);
+    line-height: var(--line-height-normal);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  h5 {
+    font-size: var(--font-heading-h5);
+    line-height: var(--line-height-normal);
+    font-weight: var(--font-weight-medium);
+  }
+
+  h6 {
+    font-size: var(--font-heading-h6);
+    line-height: var(--line-height-normal);
+    font-weight: var(--font-weight-medium);
+  }
+
+  p {
+    font-size: var(--font-base);
+    line-height: var(--line-height-relaxed);
+  }
+
+  /* ============================================ */
+  /* 🌑 GLASS DARK (Tema Padrão) */
+  /* ============================================ */
 }
-
-/* Aplicação global de fontes */
-body {
-  font-size: var(--font-base);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-normal);
-}
-
-h1 {
-  font-size: var(--font-heading-h1);
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
-}
-
-h2 {
-  font-size: var(--font-heading-h2);
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
-}
-
-h3 {
-  font-size: var(--font-heading-h3);
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-semibold);
-}
-
-h4 {
-  font-size: var(--font-heading-h4);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-semibold);
-}
-
-h5 {
-  font-size: var(--font-heading-h5);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-medium);
-}
-
-h6 {
-  font-size: var(--font-heading-h6);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-medium);
-}
-
-p {
-  font-size: var(--font-base);
-  line-height: var(--line-height-relaxed);
-}
-
-/* ============================================ */
-/* 🌑 GLASS DARK (Tema Padrão) */
-/* ============================================ */
 [data-theme="glass-dark"] {
   /* Cores primárias */
   --color-primary-from: #10b981;
