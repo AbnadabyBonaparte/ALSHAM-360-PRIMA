@@ -69,8 +69,6 @@ import Gamificacao from "./pages/Gamificacao";
 import Publicacao from "./pages/Publicacao";
 import Seguranca from "./pages/Seguranca";
 import { useUrlSync } from "./hooks/useUrlSync";
-import './styles/responsive.css';
-import './styles/responsive-fix.css';
 
 ChartJS.register(
   CategoryScale,

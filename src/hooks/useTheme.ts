@@ -5,6 +5,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { injectThemeVariables } from '../lib/theme-variables';
 import {
   themes,
   themeList,
@@ -92,6 +93,9 @@ function applyThemeToDocument(themeKey: ThemeKey): void {
   if (metaThemeColor) {
     metaThemeColor.setAttribute('content', theme.colors.background);
   }
+
+  // INJETAR VARIÁVEIS CSS
+  injectThemeVariables(theme);
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
