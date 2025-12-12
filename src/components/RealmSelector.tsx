@@ -19,7 +19,7 @@ const REALMS = [
 
 type Realm = typeof REALMS[number]['id'];
 
-export default function RealmSelector({ current, onChange }: { current: Realm; onChange: (r Realm) => {
+export default function RealmSelector({ current, onChange }: { current: Realm; onChange: (r: Realm) => void }) {
   return (
     <div className="fixed top-1/2 -translate-y-1/2 left-12 z-50 flex flex-col gap-8">
       {REALMS.map((realm) => {
