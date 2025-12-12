@@ -2,7 +2,7 @@
 // Gera páginas alienígenas com dados 100% reais do Supabase, sem repetir layout.
 // Citizen Supremo X.1 diz: cada nova página deve ser um portal vivo.
 import LayoutSupremo from "./LayoutSupremo";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -13,11 +13,6 @@ import {
   ShieldCheckIcon,
   RocketLaunchIcon,
 } from "@heroicons/react/24/outline";
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 export interface SupremeConfig {
   id: string;
@@ -339,4 +334,5 @@ function MetricCard({
     </div>
   );
 }
+
 
