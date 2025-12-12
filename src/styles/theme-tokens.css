@@ -1,31 +1,31 @@
-:root{
-  --theme-dur: 320ms;
-  --theme-ease: cubic-bezier(0.22, 1, 0.36, 1);
-}
+@layer base {
+  :root{
+    --theme-dur: 320ms;
+    --theme-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-/* transições suaves nos elementos base */
-html, body, #root{
-  transition:
-    background-color var(--theme-dur) var(--theme-ease),
-    color var(--theme-dur) var(--theme-ease),
-    border-color var(--theme-dur) var(--theme-ease),
-    box-shadow var(--theme-dur) var(--theme-ease),
-    filter var(--theme-dur) var(--theme-ease);
-}
+  html, body, #root{
+    transition:
+      background-color var(--theme-dur) var(--theme-ease),
+      color var(--theme-dur) var(--theme-ease),
+      border-color var(--theme-dur) var(--theme-ease),
+      box-shadow var(--theme-dur) var(--theme-ease),
+      filter var(--theme-dur) var(--theme-ease);
+  }
 
-html.theme-switching #root{
-  animation: theme-warp var(--theme-dur) var(--theme-ease) both;
-}
+  html.theme-switching #root{
+    animation: theme-warp var(--theme-dur) var(--theme-ease) both;
+  }
 
-@keyframes theme-warp{
-  0%   { filter: blur(0px) saturate(100%); }
-  30%  { filter: blur(20px) saturate(200%); }
-  60%  { filter: blur(10px) saturate(150%); }
-  100% { filter: blur(0px) saturate(100%); }
-}
+  @keyframes theme-warp{
+    0%   { filter: blur(0px) saturate(100%); }
+    30%  { filter: blur(20px) saturate(200%); }
+    60%  { filter: blur(10px) saturate(150%); }
+    100% { filter: blur(0px) saturate(100%); }
+  }
 
-/* acessibilidade: respeita reduce motion */
-@media (prefers-reduced-motion: reduce){
-  html.theme-switching #root{ animation: none; }
-  html, body, #root{ transition: none; }
+  @media (prefers-reduced-motion: reduce){
+    html.theme-switching #root{ animation: none; }
+    html, body, #root{ transition: none; }
+  }
 }
