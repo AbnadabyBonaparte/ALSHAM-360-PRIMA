@@ -2152,83 +2152,95 @@ const { currentTheme: theme, setTheme } = useTheme();
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
-                  <Globe2 className="h-4 w-4 text-[var(--accent-emerald)]" />
-                  <button
-                    onClick={() => setCurrency("BRL")}
-                    aria-label="Selecionar moeda Real Brasileiro"
-                    aria-pressed={currency === "BRL"}
-                    className={`${
-                      currency === "BRL"
-                        ? "text-[var(--accent-emerald)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    BRL
-                  </button>
-                  <button
-                    onClick={() => setCurrency("USD")}
-                    aria-label="Selecionar moeda Dólar Americano"
-                    aria-pressed={currency === "USD"}
-                    className={`${
-                      currency === "USD"
-                        ? "text-[var(--accent-sky)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    USD
-                  </button>
-                  <button
-                    onClick={() => setCurrency("EUR")}
-                    aria-label="Selecionar moeda Euro"
-                    aria-pressed={currency === "EUR"}
-                    className={`${
-                      currency === "EUR"
-                        ? "text-[var(--accent-fuchsia)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    EUR
-                  </button>
-                  <span className="mx-1 h-4 w-[1px] bg-[var(--surface-strong)]" />
-                  <button
-                    onClick={() => setTimeframe("7d")}
-                    aria-label="Selecionar período de 7 dias"
-                    aria-pressed={timeframe === "7d"}
-                    className={`${
-                      timeframe === "7d"
-                        ? "text-[var(--accent-emerald)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    7D
-                  </button>
-                  <button
-                    onClick={() => setTimeframe("30d")}
-                    aria-label="Selecionar período de 30 dias"
-                    aria-pressed={timeframe === "30d"}
-                    className={`${
-                      timeframe === "30d"
-                        ? "text-[var(--accent-sky)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    30D
-                  </button>
-                  <button
-                    onClick={() => setTimeframe("90d")}
-                    aria-label="Selecionar período de 90 dias"
-                    aria-pressed={timeframe === "90d"}
-                    className={`${
-                      timeframe === "90d"
-                        ? "text-[var(--accent-fuchsia)]"
-                        : "text-[var(--text-secondary)]"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-                  >
-                    90D
-                  </button>
-                </div>
+             <div className="flex flex-wrap items-center gap-3">
+  {/* Moeda + Timeframe (mantido exatamente como estava) */}
+  <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+    <Globe2 className="h-4 w-4 text-[var(--accent-emerald)]" />
+    <button
+      onClick={() => setCurrency("BRL")}
+      aria-label="Selecionar moeda Real Brasileiro"
+      aria-pressed={currency === "BRL"}
+      className={`${
+        currency === "BRL"
+          ? "text-[var(--accent-emerald)]"
+          : "text-[var(--text-secondary)]"
+      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+    >
+      BRL
+    </button>
+    <button
+      onClick={() => setCurrency("USD")}
+      aria-label="Selecionar moeda Dólar Americano"
+      aria-pressed={currency === "USD"}
+      className={`${
+        currency === "USD"
+          ? "text-[var(--accent-sky)]"
+          : "text-[var(--text-secondary)]"
+      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+    >
+      USD
+    </button>
+    <button
+      onClick={() => setCurrency("EUR")}
+      aria-label="Selecionar moeda Euro"
+      aria-pressed={currency === "EUR"}
+      className={`${
+        currency === "EUR"
+          ? "text-[var(--accent-fuchsia)]"
+          : "text-[var(--text-secondary)]"
+      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+    >
+      EUR
+    </button>
+    <span className="mx-1 h-4 w-[1px] bg-[var(--surface-strong)]" />
+    <button
+      onClick={() => setTimeframe("7d")}
+      aria-label="Selecionar período de 7 dias"
+      aria-pressed={timeframe === "7d"}
+      className={`${
+        timeframe === "7d"
+          ? "text-[var(--accent-emerald)]"
+          : "text-[var(--text-secondary)]"
+      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+    >
+      7D
+    </button>
+    <button
+      onClick={() => setTimeframe("30d")}
+      aria-label="Selecionar período de 30 dias"
+      aria-pressed={timeframe === "30d"}
+      className={`${
+        timeframe === "30d"
+          ? "text-[var(--accent-sky)]"
+          : "text-[var(--text-secondary)]"
+      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+    >
+      30D
+    </button>
+    <button
+      onClick={() => setTimeframe("90d")}
+      aria-label="Selecionar período de 90 dias"
+      aria-pressed={timeframe === "90d"}
+      className={`${
+        timeframe === "90d"
+          ? "text-[var(--accent-fuchsia)]"
+          : "text-[var(--text-secondary)]"
+      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+    >
+      90D
+    </button>
+  </div>
+
+  {/* Botão novo que abre o ThemeSwitcher grande */}
+  <button
+    onClick={() => setShowThemeSwitcher(true)}
+    className="inline-flex items-center gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text-secondary)] transition hover:border-[var(--accent-fuchsia)]/60 hover:text-[var(--accent-fuchsia)] hover:bg-[var(--surface-strong)]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-fuchsia)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+  >
+    <Palette className="h-5 w-5 text-[var(--accent-sky)]" />
+    <span>Temas Supremos</span>
+    <Sparkles className="h-4 w-4 text-[var(--accent-fuchsia)]/80" />
+  </button>
+</div>
 
                 <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--text-secondary)]">
                   <Palette className="h-4 w-4 text-[var(--accent-sky)]" />
