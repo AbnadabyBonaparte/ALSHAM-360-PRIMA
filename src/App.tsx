@@ -2659,14 +2659,13 @@ function LoadingSkeletonLayout({ theme }: { theme: ThemeKey }) {
               </div>
             </section>
           </main>
-        </div>
+             </div>
+    </div>
       </div>
-        </div>
   </motion.div>
 </motion.div>
       )}
     </AnimatePresence>
   </div>
 </div>
-
 export default App;
