@@ -1,10 +1,14 @@
+/* src/styles/theme-tokens.css */
+/* ALSHAM 360° PRIMA — Theme System (Transitions & A11y Only) */
+
 @layer base {
   :root{
     --theme-dur: 320ms;
     --theme-ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  html, body, #root{
+  /* Transições base (mínimas) — evita efeitos colaterais em html */
+  body, #root{
     transition:
       background-color var(--theme-dur) var(--theme-ease),
       color var(--theme-dur) var(--theme-ease),
@@ -13,6 +17,7 @@
       filter var(--theme-dur) var(--theme-ease);
   }
 
+  /* Warp durante troca de tema (efeito controlado) */
   html.theme-switching #root{
     animation: theme-warp var(--theme-dur) var(--theme-ease) both;
   }
@@ -24,8 +29,9 @@
     100% { filter: blur(0px) saturate(100%); }
   }
 
+  /* Acessibilidade */
   @media (prefers-reduced-motion: reduce){
     html.theme-switching #root{ animation: none; }
-    html, body, #root{ transition: none; }
+    body, #root{ transition: none; }
   }
 }
