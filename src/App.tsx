@@ -1940,7 +1940,7 @@ const { currentTheme: theme, setTheme } = useTheme();
   registerRoute("leads", async () => ({ default: () => <Leads /> }));
 
   return (
-   <div
+  <div
   data-theme={theme}
   className="min-h-screen text-[var(--text-primary)] transition-colors"
   style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
@@ -2038,7 +2038,7 @@ const { currentTheme: theme, setTheme } = useTheme();
               <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
                 <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
                 <div className="space-y-3 text-sm">
-                  {/* ... (moeda, timeframe, temas pequenos — se quiser manter aqui no mobile) */}
+                  {/* Aqui você pode manter moeda e timeframe se quiser no mobile, ou remover */}
                 </div>
               </div>
             </div>
@@ -2047,24 +2047,20 @@ const { currentTheme: theme, setTheme } = useTheme();
       )}
     </AnimatePresence>
 
-    {/* Sidebar Desktop */}
     <SidebarDesktop
       activePage={activePage}
       onNavigate={navigateToPage}
       isCollapsed={false}
     />
 
-    {/* Main Content */}
     <div className="flex flex-col">
-      {/* Header */}
       <header
         className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        {/* ... seu header atual ... */}
+        {/* ... seu header completo ... */}
       </header>
 
-      {/* Main */}
       <main
         className="flex-1 overflow-y-auto bg-[var(--background)]"
         style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
@@ -2080,7 +2076,7 @@ const { currentTheme: theme, setTheme } = useTheme();
       </main>
     </div>
 
-    {/* MODAL DO THEME SWITCHER GRANDE — COLE AQUI! */}
+    {/* MODAL DO THEME SWITCHER GRANDE */}
     <AnimatePresence>
       {showThemeSwitcher && (
         <motion.div
@@ -2122,117 +2118,6 @@ const { currentTheme: theme, setTheme } = useTheme();
     </AnimatePresence>
   </div>
 </div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Moeda</p>
-                        <div className="mt-2 flex gap-2">
-                          {currencyOptions.map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => setCurrency(option.value)}
-                              aria-label={`Selecionar moeda ${option.label}`}
-                              aria-pressed={currency === option.value}
-                              className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                currency === option.value
-                                  ? "border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
-                                  : "border-[var(--border)] bg-[var(--surface-strong)]/60 text-[var(--text-secondary)]"
-                              }`}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Timeframe</p>
-                        <div className="mt-2 flex gap-2">
-                          {timeframeOptions.map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => setTimeframe(option.value)}
-                              aria-label={`Selecionar período ${option.label}`}
-                              aria-pressed={timeframe === option.value}
-                              className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                timeframe === option.value
-                                  ? "border-[var(--accent-sky)]/40 bg-[var(--accent-sky)]/15 text-[var(--accent-sky)]"
-                                  : "border-[var(--border)] bg-[var(--surface-strong)]/60 text-[var(--text-secondary)]"
-                              }`}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Tema</p>
-                        <div className="mt-2 grid grid-cols-2 gap-2">
-                          {themeOptions.map((option) => (
-                            <button
-                              key={option.key}
-                              type="button"
-                              onClick={() => setTheme(option.key)}
-                              aria-label={`Mudar para tema ${option.label}`}
-                              aria-current={theme === option.key ? "true" : "false"}
-                              className={`min-h-[48px] rounded-xl border px-3 py-2 text-left text-xs uppercase tracking-[0.2em] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                theme === option.key
-                                  ? "border-[var(--accent-fuchsia)]/40 bg-[var(--accent-fuchsia)]/10 text-[var(--accent-fuchsia)]"
-                                  : "border-[var(--border)] bg-[var(--surface-strong)]/55 text-[var(--text-secondary)]"
-                              }`}
-                            >
-                              <span className="flex items-center gap-2">
-                                <span
-                                  className="h-4 w-4 rounded-full"
-                                  style={{ background: themeSwatches[option.key], boxShadow: "0 0 10px rgba(135, 148, 164, 0.28)" }}
-                                />
-                                {option.label}
-                              </span>
-                              <span className="mt-1 block text-[10px] capitalize text-[var(--text-secondary)]/80">{option.description}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <SidebarDesktop
-          activePage={activePage}
-          onNavigate={navigateToPage}
-          isCollapsed={false}
-        />
-
-        <div className="flex flex-col">
-          <header
-            className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
-            style={{ paddingTop: "env(safe-area-inset-top)" }}
-          >
-            <div className="flex flex-wrap items-center gap-4 px-6 py-4 sm:py-5">
-              <button
-                type="button"
-                className="grid h-10 w-10 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                onClick={() => setMobileNavOpen((prev) => !prev)}
-                aria-expanded={isMobileNavOpen}
-                aria-controls="mobile-command-center"
-                aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
-              >
-                {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-secondary)]" />
-                <input
-                  className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] py-3 pl-12 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-[var(--accent-emerald)] focus:outline-none focus:ring-0"
-                  placeholder="Pesquisar qualquer interação, deal, automação ou insight"
-                />
-                <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-2 py-1 text-[0.6875rem] sm:text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)]">
-                  <Command className="h-3.5 w-3.5" /> K
-                </span>
-              </div>
-
              <div className="flex flex-wrap items-center gap-3">
   {/* Moeda + Timeframe (mantido exatamente como estava) */}
   <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
