@@ -14,19 +14,10 @@ import {
   type Theme,
 } from '../lib/themes'
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🔧 CONSTANTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 const STORAGE_KEY = 'alsham-theme'
-
-// Alinhado ao “warp” de troca de tema
 const TRANSITION_DURATION = 320
 const TRANSITION_CLASS = 'theme-switching'
 
-/**
- * Detecta o tema salvo no localStorage ou retorna o padrão.
- */
 function detectSavedTheme(): ThemeKey {
   if (typeof window === 'undefined') return defaultTheme
 
@@ -41,8 +32,7 @@ function detectSavedTheme(): ThemeKey {
 }
 
 /**
- * SSOT: aplica somente “estado” no DOM (data-theme + color-scheme + meta),
- * e delega 100% das CSS variables ao adapter público injectThemeVariables(theme).
+ * SSOT: DOM state aqui; CSS variables exclusivamente via theme-variables.ts
  */
 function applyThemeToDOM(themeKey: ThemeKey): void {
   if (typeof document === 'undefined') return
@@ -50,28 +40,21 @@ function applyThemeToDOM(themeKey: ThemeKey): void {
   const theme = getTheme(themeKey)
   const root = document.documentElement
 
-  // 1) Fonte da verdade: atributo + color-scheme
   root.setAttribute('data-theme', themeKey)
   root.style.colorScheme = theme.isDark ? 'dark' : 'light'
 
-  // 2) Meta theme-color (mobile)
   const metaThemeColor = document.querySelector('meta[name="theme-color"]')
   if (metaThemeColor) metaThemeColor.setAttribute('content', theme.colors.background)
 
-  // 3) CSS Variables (Contrato Público)
   injectThemeVariables(theme)
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎯 HOOK INTERFACE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface UseThemeReturn {
   currentTheme: ThemeKey
   theme: Theme
 
   themes: typeof themes
-  themeList: typeof themeList
+  themeList: Theme[]
 
   isDark: boolean
   isTransitioning: boolean
@@ -84,28 +67,21 @@ interface UseThemeReturn {
   getThemeSwatch: (themeKey?: ThemeKey) => string
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🚀 MAIN HOOK
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 export function useTheme(): UseThemeReturn {
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>(defaultTheme)
   const [isTransitioning, setIsTransitioning] = useState(false)
 
-  // Cancela transição se o usuário trocar tema rápido
   const transitionTimerRef = useRef<number | null>(null)
 
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
   const isDark = useMemo(() => isThemeDark(currentTheme), [currentTheme])
 
-  // Initial theme detection
   useEffect(() => {
     const savedTheme = detectSavedTheme()
     setCurrentTheme(savedTheme)
     applyThemeToDOM(savedTheme)
   }, [])
 
-  // Apply theme changes
   useEffect(() => {
     applyThemeToDOM(currentTheme)
   }, [currentTheme])
@@ -115,26 +91,20 @@ export function useTheme(): UseThemeReturn {
       if (!themes[newTheme] || newTheme === currentTheme) return
       if (typeof document === 'undefined') return
 
-      // Persist
       try {
         localStorage.setItem(STORAGE_KEY, newTheme)
       } catch {
         // ignore
       }
 
-      // Start transition
       setIsTransitioning(true)
 
       const root = document.documentElement
       root.classList.add(TRANSITION_CLASS)
 
-      // Atualiza tema (dispara applyThemeToDOM pelo effect)
       setCurrentTheme(newTheme)
 
-      // Clear timers
-      if (transitionTimerRef.current) {
-        window.clearTimeout(transitionTimerRef.current)
-      }
+      if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current)
 
       transitionTimerRef.current = window.setTimeout(() => {
         root.classList.remove(TRANSITION_CLASS)
@@ -146,7 +116,6 @@ export function useTheme(): UseThemeReturn {
   )
 
   const toggleDarkMode = useCallback(() => {
-    // Mantém seu comportamento atual (tema “âncora” dark/light).
     const darkThemes: ThemeKey[] = ['cyber-vivid', 'neon-energy', 'midnight-aurora', 'glass-dark']
     const lightThemes: ThemeKey[] = ['platinum-glass', 'desert-quartz']
     setTheme(isDark ? lightThemes[0] : darkThemes[0])
@@ -169,7 +138,6 @@ export function useTheme(): UseThemeReturn {
     [currentTheme]
   )
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current)
