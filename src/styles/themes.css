@@ -1,13 +1,82 @@
-@layer base {
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  /* 🎨 ALSHAM 360° PRIMA - SISTEMA DE TEMAS DINÂMICOS */
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* src/styles/themes.css */
+/* ALSHAM 360° PRIMA — Theme System (CSS Consumer) */
+/* SSOT: themes.ts + runtime injection via useTheme.ts + theme-variables.ts */
 
-  /* ============================================ */
-  /* 📐 VARIÁVEIS GLOBAIS DE FONTE */
-  /* ============================================ */
+/* =========================================================
+   BASE LAYER
+   ========================================================= */
+@layer base {
+  /* ---------------------------------------------------------
+     0) FALLBACK MÍNIMO + NUCLEAR SYSTEM
+     --------------------------------------------------------- */
   :root {
-    /* Tamanhos de fonte responsivos com clamp */
+    /* ===== TOKENS PRINCIPAIS (runtime sobrescreve) ===== */
+    
+    /* Background & Text */
+    --bg: #0b1220;
+    --bg-gradient: linear-gradient(135deg, #0b1220, #1a1f35);
+    --text: rgba(255, 255, 255, 0.96);
+    --text-2: rgba(255, 255, 255, 0.72);
+    --text-muted: rgba(255, 255, 255, 0.56);
+    
+    /* Surfaces */
+    --surface: rgba(255, 255, 255, 0.06);
+    --surface-strong: rgba(255, 255, 255, 0.10);
+    --surface-elev: rgba(255, 255, 255, 0.08);
+    --surface-glass: rgba(255, 255, 255, 0.04);
+    
+    /* Borders */
+    --border: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --border-focus: rgba(255, 255, 255, 0.25);
+    
+    /* Accents (Sistema Unificado - KΛI-01 Approved) */
+    --accent-primary: #10b981;
+    --accent-secondary: #3b82f6;
+    --accent-tertiary: #a855f7;
+    --accent-warm: #f59e0b;
+    --accent-alert: #ef4444;
+    --accent-success: #22c55e;
+    --accent-warning: #f59e0b;
+    --accent-error: #ef4444;
+    --accent-info: #0ea5e9;
+    
+    /* Gradients (Sistema Unificado) */
+    --gradient-primary: linear-gradient(135deg, var(--accent-primary), #14b8a6);
+    --gradient-secondary: linear-gradient(135deg, var(--accent-secondary), #06b6d4);
+    --gradient-tertiary: linear-gradient(135deg, var(--accent-tertiary), #ec4899);
+    --gradient-success: linear-gradient(135deg, var(--accent-success), #10b981);
+    --gradient-warning: linear-gradient(135deg, var(--accent-warning), #f97316);
+    --gradient-error: linear-gradient(135deg, var(--accent-error), #f43f5e);
+    --gradient-info: linear-gradient(135deg, var(--accent-info), #3b82f6);
+    
+    /* Hover States */
+    --accent-primary-hover: #059669;
+    --accent-secondary-hover: #2563eb;
+    --accent-tertiary-hover: #9333ea;
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(16, 185, 129, 0.3);
+    --glow-secondary: 0 0 15px rgba(59, 130, 246, 0.25);
+    --glow-tertiary: 0 0 15px rgba(168, 85, 247, 0.3);
+    
+    /* ===== COMPATIBILIDADE (será removido gradualmente) ===== */
+    --color-primary-from: var(--accent-primary);
+    --color-primary-to: #14b8a6;
+    --color-primary-hover-from: var(--accent-primary-hover);
+    --color-primary-hover-to: #0d9488;
+    
+    --color-secondary-from: var(--accent-secondary);
+    --color-secondary-to: #06b6d4;
+    --color-secondary-hover-from: var(--accent-secondary-hover);
+    --color-secondary-hover-to: #0891b2;
+    
+    --color-accent-from: var(--accent-tertiary);
+    --color-accent-to: #ec4899;
+    --color-accent-hover-from: var(--accent-tertiary-hover);
+    --color-accent-hover-to: #db2777;
+    
+    /* ===== TIPOGRAFIA (Design System - não é tema) ===== */
     --font-xs: clamp(0.75rem, 2vw, 0.875rem);
     --font-sm: clamp(0.875rem, 2.5vw, 1rem);
     --font-base: clamp(0.875rem, 2vw, 1rem);
@@ -17,419 +86,659 @@
     --font-2xl: clamp(1.5rem, 5vw, 2.25rem);
     --font-3xl: clamp(1.875rem, 6vw, 3rem);
     --font-4xl: clamp(2.25rem, 7vw, 3.75rem);
-
-    /* Headings específicos */
+    
     --font-heading-h1: clamp(1.5rem, 5vw, 2.25rem);
     --font-heading-h2: clamp(1.25rem, 4vw, 1.875rem);
     --font-heading-h3: clamp(1.125rem, 3.5vw, 1.5rem);
     --font-heading-h4: clamp(1rem, 3vw, 1.25rem);
     --font-heading-h5: clamp(0.875rem, 2.5vw, 1.125rem);
     --font-heading-h6: clamp(0.875rem, 2vw, 1rem);
-
-    /* Line heights */
+    
     --line-height-tight: 1.25;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
     --line-height-loose: 2;
-
-    /* Font weights */
+    
     --font-weight-light: 300;
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
     --font-weight-extrabold: 800;
+    
+    /* ===== SISTEMA NUCLEAR (KΛI-01 ADENDO 3) ===== */
+    --nuclear-fallback-active: 0; /* 0 = normal, 1 = emergência */
+  }
+  
+  /* ---------------------------------------------------------
+     NUCLEAR FALLBACK SYSTEM (KΛI-01 ADENDO 3)
+     --------------------------------------------------------- */
+  .nuclear-fallback {
+    --bg: #000000 !important;
+    --text: #ffffff !important;
+    --accent-primary: #00ff00 !important;
+    --accent-alert: #ff0000 !important;
+    --nuclear-fallback-active: 1 !important;
+    
+    /* Desativa todas as animações */
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    
+    /* High contrast mode */
+    border-width: 2px !important;
+    outline: 2px solid #00ff00 !important;
+  }
+  
+  /* Detecta nuclear fallback ativo */
+  :root:has(.nuclear-fallback) {
+    color-scheme: dark light;
   }
 
-  /* Aplicação global de fontes */
+  /* ---------------------------------------------------------
+     1) TRAVAMENTO GLOBAL ANTI-FLASH
+     --------------------------------------------------------- */
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background: var(--bg);
+    background-image: var(--bg-gradient);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    
+    /* Otimização GPU */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Força repaint limpo durante troca de tema */
+  html.theme-switching * {
+    transition: background-color 0.2s ease, 
+                color 0.2s ease, 
+                border-color 0.2s ease !important;
+  }
+
+  /* ---------------------------------------------------------
+     2) TIPOGRAFIA BASE COM PERFORMANCE
+     --------------------------------------------------------- */
   body {
     font-size: var(--font-base);
     line-height: var(--line-height-normal);
     font-weight: var(--font-weight-normal);
+    font-feature-settings: "kern" 1, "liga" 1;
   }
 
-  h1 {
-    font-size: var(--font-heading-h1);
-    line-height: var(--line-height-tight);
+  /* Sistema de headings fluido */
+  h1 { 
+    font-size: var(--font-heading-h1); 
+    line-height: var(--line-height-tight); 
     font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
   }
-
-  h2 {
-    font-size: var(--font-heading-h2);
-    line-height: var(--line-height-tight);
+  
+  h2 { 
+    font-size: var(--font-heading-h2); 
+    line-height: var(--line-height-tight); 
     font-weight: var(--font-weight-bold);
+    letter-spacing: -0.015em;
   }
-
-  h3 {
-    font-size: var(--font-heading-h3);
-    line-height: var(--line-height-tight);
+  
+  h3 { 
+    font-size: var(--font-heading-h3); 
+    line-height: var(--line-height-tight); 
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: -0.01em;
+  }
+  
+  h4 { 
+    font-size: var(--font-heading-h4); 
+    line-height: var(--line-height-normal); 
     font-weight: var(--font-weight-semibold);
   }
-
-  h4 {
-    font-size: var(--font-heading-h4);
-    line-height: var(--line-height-normal);
-    font-weight: var(--font-weight-semibold);
-  }
-
-  h5 {
-    font-size: var(--font-heading-h5);
-    line-height: var(--line-height-normal);
+  
+  h5 { 
+    font-size: var(--font-heading-h5); 
+    line-height: var(--line-height-normal); 
     font-weight: var(--font-weight-medium);
   }
-
-  h6 {
-    font-size: var(--font-heading-h6);
-    line-height: var(--line-height-normal);
+  
+  h6 { 
+    font-size: var(--font-heading-h6); 
+    line-height: var(--line-height-normal); 
     font-weight: var(--font-weight-medium);
   }
-
-  p {
-    font-size: var(--font-base);
-    line-height: var(--line-height-relaxed);
+  
+  p, li, span, div:not([class*="btn"]) {
+    font-size: var(--font-base); 
+    line-height: var(--line-height-relaxed); 
+    color: var(--text-2);
+    max-width: 65ch;
   }
 
-  /* ============================================ */
-  /* 🌑 GLASS DARK (Tema Padrão) */
-  /* ============================================ */
-}
-[data-theme="glass-dark"] {
-  /* Cores primárias */
-  --color-primary-from: #10b981;
-  --color-primary-to: #14b8a6;
-  --color-primary-hover-from: #059669;
-  --color-primary-hover-to: #0d9488;
+  /* ---------------------------------------------------------
+     3) POLIMENTO GLOBAL AVANÇADO
+     --------------------------------------------------------- */
+  ::selection {
+    background: color-mix(in srgb, var(--accent-primary) 40%, transparent);
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  }
   
-  /* Cores secundárias */
-  --color-secondary-from: #3b82f6;
-  --color-secondary-to: #06b6d4;
-  --color-secondary-hover-from: #2563eb;
-  --color-secondary-hover-to: #0891b2;
-  
-  /* Cores de acento */
-  --color-accent-from: #a855f7;
-  --color-accent-to: #ec4899;
-  --color-accent-hover-from: #9333ea;
-  --color-accent-hover-to: #db2777;
-  
-  /* Status - Success */
-  --color-success-from: #22c55e;
-  --color-success-to: #10b981;
-  --color-success-hover-from: #16a34a;
-  --color-success-hover-to: #059669;
-  
-  /* Status - Warning */
-  --color-warning-from: #f59e0b;
-  --color-warning-to: #f97316;
-  --color-warning-hover-from: #d97706;
-  --color-warning-hover-to: #ea580c;
-  
-  /* Status - Error */
-  --color-error-from: #ef4444;
-  --color-error-to: #ec4899;
-  --color-error-hover-from: #dc2626;
-  --color-error-hover-to: #db2777;
-  
-  /* Status - Info */
-  --color-info-from: #3b82f6;
-  --color-info-to: #6366f1;
-  --color-info-hover-from: #2563eb;
-  --color-info-hover-to: #4f46e5;
-}
+  ::-moz-selection {
+    background: color-mix(in srgb, var(--accent-primary) 40%, transparent);
+    color: white;
+  }
 
-/* ============================================ */
-/* 🪙 PLATINUM GLASS */
-/* ============================================ */
-[data-theme="platinum-glass"] {
-  --color-primary-from: #94a3b8;
-  --color-primary-to: #cbd5e1;
-  --color-primary-hover-from: #64748b;
-  --color-primary-hover-to: #94a3b8;
+  a {
+    color: var(--accent-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    position: relative;
+  }
   
-  --color-secondary-from: #9ca3af;
-  --color-secondary-to: #d1d5db;
-  --color-secondary-hover-from: #6b7280;
-  --color-secondary-hover-to: #9ca3af;
+  a:hover {
+    color: var(--accent-tertiary);
+    opacity: 0.9;
+  }
   
-  --color-accent-from: #71717a;
-  --color-accent-to: #a1a1aa;
-  --color-accent-hover-from: #52525b;
-  --color-accent-hover-to: #71717a;
+  a:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* ---------------------------------------------------------
+     4) ELEMENTOS BÁSICOS OTIMIZADOS
+     --------------------------------------------------------- */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
   
-  --color-success-from: #22c55e;
-  --color-success-to: #10b981;
-  --color-success-hover-from: #16a34a;
-  --color-success-hover-to: #059669;
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-color: var(--border-focus);
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
   
-  --color-warning-from: #f59e0b;
-  --color-warning-to: #f97316;
-  --color-warning-hover-from: #d97706;
-  --color-warning-hover-to: #ea580c;
+  /* Scrollbar temática */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
   
-  --color-error-from: #ef4444;
-  --color-error-to: #f43f5e;
-  --color-error-hover-from: #dc2626;
-  --color-error-hover-to: #e11d48;
+  ::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 5px;
+  }
   
-  --color-info-from: #0ea5e9;
-  --color-info-to: #3b82f6;
-  --color-info-hover-from: #0284c7;
-  --color-info-hover-to: #2563eb;
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 5px;
+    transition: background 0.2s ease;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+  }
 }
 
-/* ============================================ */
-/* 🌌 MIDNIGHT AURORA */
-/* ============================================ */
-[data-theme="midnight-aurora"] {
-  --color-primary-from: #8b5cf6;
-  --color-primary-to: #a855f7;
-  --color-primary-hover-from: #7c3aed;
-  --color-primary-hover-to: #9333ea;
+/* =========================================================
+   COMPONENTS LAYER
+   ========================================================= */
+@layer components {
+  /* ---------------------------------------------------------
+     BOTÕES GRADIENTE (Sistema Unificado)
+     --------------------------------------------------------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-sm);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    isolation: isolate;
+  }
   
-  --color-secondary-from: #6366f1;
-  --color-secondary-to: #3b82f6;
-  --color-secondary-hover-from: #4f46e5;
-  --color-secondary-hover-to: #2563eb;
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    border-radius: inherit;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
   
-  --color-accent-from: #d946ef;
-  --color-accent-to: #ec4899;
-  --color-accent-hover-from: #c026d3;
-  --color-accent-hover-to: #db2777;
+  .btn:hover::before {
+    opacity: 1;
+  }
   
-  --color-success-from: #22c55e;
-  --color-success-to: #10b981;
-  --color-success-hover-from: #16a34a;
-  --color-success-hover-to: #059669;
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Botão Primário */
+  .btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--glow-primary);
+  }
   
-  --color-warning-from: #f59e0b;
-  --color-warning-to: #f97316;
-  --color-warning-hover-from: #d97706;
-  --color-warning-hover-to: #ea580c;
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-primary-hover), #0d9488);
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+  }
+
+  /* Botão Secundário */
+  .btn-secondary {
+    background: var(--gradient-secondary);
+    color: white;
+    box-shadow: var(--glow-secondary);
+  }
   
-  --color-error-from: #ef4444;
-  --color-error-to: #f43f5e;
-  --color-error-hover-from: #dc2626;
-  --color-error-hover-to: #e11d48;
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, var(--accent-secondary-hover), #0891b2);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+  }
+
+  /* Botão Terciário */
+  .btn-accent {
+    background: var(--gradient-tertiary);
+    color: white;
+    box-shadow: var(--glow-tertiary);
+  }
   
-  --color-info-from: #3b82f6;
-  --color-info-to: #6366f1;
-  --color-info-hover-from: #2563eb;
-  --color-info-hover-to: #4f46e5;
+  .btn-accent:hover {
+    background: linear-gradient(135deg, var(--accent-tertiary-hover), #db2777);
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+  }
+
+  /* Estados Especiais */
+  .btn-success {
+    background: var(--gradient-success);
+    color: white;
+  }
   
-  /* Ajuste de fonte mais vibrante (opcional) */
-  --font-heading-h1: clamp(1.625rem, 5.5vw, 2.5rem);
+  .btn-warning {
+    background: var(--gradient-warning);
+    color: white;
+  }
+  
+  .btn-error {
+    background: var(--gradient-error);
+    color: white;
+  }
+  
+  .btn-info {
+    background: var(--gradient-info);
+    color: white;
+  }
+
+  /* Botão Ghost */
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  
+  .btn-ghost:hover {
+    background: var(--surface);
+    border-color: var(--border-strong);
+  }
+
+  /* ---------------------------------------------------------
+     SUPERFÍCIES GLASSMORPHISM (KΛI-01 Enhanced)
+     --------------------------------------------------------- */
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .surface:hover {
+    background: var(--surface-strong);
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+
+  .surface-strong {
+    background: var(--surface-strong);
+    border: 1px solid var(--border-strong);
+    backdrop-filter: blur(16px) saturate(200%);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .surface-elev {
+    background: var(--surface-elev);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px) saturate(220%);
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  }
+
+  .surface-glass {
+    background: var(--surface-glass);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px);
+    border-radius: 1rem;
+  }
+
+  /* ---------------------------------------------------------
+     BADGES & INDICATORS
+     --------------------------------------------------------- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: var(--font-xs);
+    font-weight: var(--font-weight-medium);
+    border: 1px solid transparent;
+  }
+  
+  .badge-primary {
+    background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    color: var(--accent-primary);
+    border-color: color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  }
+  
+  .badge-secondary {
+    background: color-mix(in srgb, var(--accent-secondary) 15%, transparent);
+    color: var(--accent-secondary);
+    border-color: color-mix(in srgb, var(--accent-secondary) 30%, transparent);
+  }
+  
+  .badge-accent {
+    background: color-mix(in srgb, var(--accent-tertiary) 15%, transparent);
+    color: var(--accent-tertiary);
+    border-color: color-mix(in srgb, var(--accent-tertiary) 30%, transparent);
+  }
+
+  /* ---------------------------------------------------------
+     CARDS TEMÁTICOS
+     --------------------------------------------------------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-glow {
+    position: relative;
+  }
+  
+  .card-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-primary);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .card-glow:hover::after {
+    opacity: 1;
+  }
 }
 
-/* ============================================ */
-/* 🏜️ DESERT QUARTZ */
-/* ============================================ */
-[data-theme="desert-quartz"] {
-  --color-primary-from: #f59e0b;
-  --color-primary-to: #f97316;
-  --color-primary-hover-from: #d97706;
-  --color-primary-hover-to: #ea580c;
+/* =========================================================
+   UTILITIES LAYER (KΛI-01 Optimized)
+   ========================================================= */
+@layer utilities {
+  /* ===== TYPOGRAPHY ===== */
+  .text-xs { font-size: var(--font-xs); }
+  .text-sm { font-size: var(--font-sm); }
+  .text-base { font-size: var(--font-base); }
+  .text-md { font-size: var(--font-md); }
+  .text-lg { font-size: var(--font-lg); }
+  .text-xl { font-size: var(--font-xl); }
+  .text-2xl { font-size: var(--font-2xl); }
+  .text-3xl { font-size: var(--font-3xl); }
+  .text-4xl { font-size: var(--font-4xl); }
+
+  .font-light { font-weight: var(--font-weight-light); }
+  .font-normal { font-weight: var(--font-weight-normal); }
+  .font-medium { font-weight: var(--font-weight-medium); }
+  .font-semibold { font-weight: var(--font-weight-semibold); }
+  .font-bold { font-weight: var(--font-weight-bold); }
+  .font-extrabold { font-weight: var(--font-weight-extrabold); }
+
+  .leading-tight { line-height: var(--line-height-tight); }
+  .leading-normal { line-height: var(--line-height-normal); }
+  .leading-relaxed { line-height: var(--line-height-relaxed); }
+  .leading-loose { line-height: var(--line-height-loose); }
+
+  /* ===== COLORS ===== */
+  .text-primary { color: var(--text); }
+  .text-secondary { color: var(--text-2); }
+  .text-muted { color: var(--text-muted); }
+  .text-accent { color: var(--accent-primary); }
   
-  --color-secondary-from: #eab308;
-  --color-secondary-to: #f59e0b;
-  --color-secondary-hover-from: #ca8a04;
-  --color-secondary-hover-to: #d97706;
+  .bg-primary { background: var(--bg); }
+  .bg-surface { background: var(--surface); }
+  .bg-surface-strong { background: var(--surface-strong); }
+  .bg-surface-elev { background: var(--surface-elev); }
   
-  --color-accent-from: #f97316;
-  --color-accent-to: #ef4444;
-  --color-accent-hover-from: #ea580c;
-  --color-accent-hover-to: #dc2626;
+  .border-default { border-color: var(--border); }
+  .border-strong { border-color: var(--border-strong); }
+  .border-focus { border-color: var(--border-focus); }
+
+  /* ===== ACCENTS ===== */
+  .text-accent-primary { color: var(--accent-primary); }
+  .text-accent-secondary { color: var(--accent-secondary); }
+  .text-accent-tertiary { color: var(--accent-tertiary); }
+  .text-accent-warm { color: var(--accent-warm); }
+  .text-accent-alert { color: var(--accent-alert); }
+  .text-accent-success { color: var(--accent-success); }
+  .text-accent-warning { color: var(--accent-warning); }
+  .text-accent-error { color: var(--accent-error); }
+  .text-accent-info { color: var(--accent-info); }
+
+  .bg-accent-primary { background: var(--accent-primary); }
+  .bg-accent-secondary { background: var(--accent-secondary); }
+  .bg-accent-tertiary { background: var(--accent-tertiary); }
+
+  .border-accent-primary { border-color: var(--accent-primary); }
+  .border-accent-secondary { border-color: var(--accent-secondary); }
+  .border-accent-tertiary { border-color: var(--accent-tertiary); }
+
+  /* ===== GRADIENTS ===== */
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-secondary { background: var(--gradient-secondary); }
+  .gradient-tertiary { background: var(--gradient-tertiary); }
+  .gradient-success { background: var(--gradient-success); }
+  .gradient-warning { background: var(--gradient-warning); }
+  .gradient-error { background: var(--gradient-error); }
+  .gradient-info { background: var(--gradient-info); }
+
+  /* ===== GLOW EFFECTS ===== */
+  .glow-primary { box-shadow: var(--glow-primary); }
+  .glow-secondary { box-shadow: var(--glow-secondary); }
+  .glow-tertiary { box-shadow: var(--glow-tertiary); }
   
-  --color-success-from: #22c55e;
-  --color-success-to: #10b981;
-  --color-success-hover-from: #16a34a;
-  --color-success-hover-to: #059669;
+  .glow-sm { box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
+  .glow-md { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
+  .glow-lg { box-shadow: 0 0 30px rgba(255, 255, 255, 0.2); }
+
+  /* ===== LAYOUT & SPACING ===== */
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
   
-  --color-warning-from: #eab308;
-  --color-warning-to: #f59e0b;
-  --color-warning-hover-from: #ca8a04;
-  --color-warning-hover-to: #d97706;
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  /* ===== ANIMATION UTILITIES ===== */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
   
-  --color-error-from: #ef4444;
-  --color-error-to: #f43f5e;
-  --color-error-hover-from: #dc2626;
-  --color-error-hover-to: #e11d48;
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
   
-  --color-info-from: #3b82f6;
-  --color-info-to: #06b6d4;
-  --color-info-hover-from: #2563eb;
-  --color-info-hover-to: #0891b2;
-  
-  /* Fonte com serifa suave (opcional - descomente se tiver fonte específica) */
-  /* --font-family-heading: 'Georgia', serif; */
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+  }
 }
 
-/* ============================================ */
-/* ⚡ NEON ENERGY */
-/* ============================================ */
-[data-theme="neon-energy"] {
-  --color-primary-from: #06b6d4;
-  --color-primary-to: #3b82f6;
-  --color-primary-hover-from: #0891b2;
-  --color-primary-hover-to: #2563eb;
-  
-  --color-secondary-from: #3b82f6;
-  --color-secondary-to: #6366f1;
-  --color-secondary-hover-from: #2563eb;
-  --color-secondary-hover-to: #4f46e5;
-  
-  --color-accent-from: #ec4899;
-  --color-accent-to: #f43f5e;
-  --color-accent-hover-from: #db2777;
-  --color-accent-hover-to: #e11d48;
-  
-  --color-success-from: #22c55e;
-  --color-success-to: #10b981;
-  --color-success-hover-from: #16a34a;
-  --color-success-hover-to: #059669;
-  
-  --color-warning-from: #f59e0b;
-  --color-warning-to: #f97316;
-  --color-warning-hover-from: #d97706;
-  --color-warning-hover-to: #ea580c;
-  
-  --color-error-from: #ef4444;
-  --color-error-to: #ec4899;
-  --color-error-hover-from: #dc2626;
-  --color-error-hover-to: #db2777;
-  
-  --color-info-from: #06b6d4;
-  --color-info-to: #3b82f6;
-  --color-info-hover-from: #0891b2;
-  --color-info-hover-to: #2563eb;
-  
-  /* Fonte mais técnica/futurista (opcional) */
-  --font-weight-bold: 800;
+/* =========================================================
+   ANIMAÇÕES GLOBAIS
+   ========================================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-/* ============================================ */
-/* 🔮 CYBER VIVID */
-/* ============================================ */
-[data-theme="cyber-vivid"] {
-  --color-primary-from: #d946ef;
-  --color-primary-to: #a855f7;
-  --color-primary-hover-from: #c026d3;
-  --color-primary-hover-to: #9333ea;
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* =========================================================
+   RESPONSIVE UTILITIES (Mobile First)
+   ========================================================= */
+@media (max-width: 640px) {
+  :root {
+    --font-heading-h1: clamp(1.25rem, 4vw, 1.875rem);
+    --font-heading-h2: clamp(1.125rem, 3.5vw, 1.5rem);
+    --font-heading-h3: clamp(1rem, 3vw, 1.25rem);
+  }
   
-  --color-secondary-from: #a855f7;
-  --color-secondary-to: #8b5cf6;
-  --color-secondary-hover-from: #9333ea;
-  --color-secondary-hover-to: #7c3aed;
+  .card {
+    padding: 1rem;
+  }
   
-  --color-accent-from: #ec4899;
-  --color-accent-to: #f43f5e;
-  --color-accent-hover-from: #db2777;
-  --color-accent-hover-to: #e11d48;
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* =========================================================
+   HIGH CONTRAST MODE (Acessibilidade)
+   ========================================================= */
+@media (prefers-contrast: high) {
+  :root {
+    --border: rgba(255, 255, 255, 0.4);
+    --border-strong: rgba(255, 255, 255, 0.6);
+  }
   
-  --color-success-from: #22c55e;
-  --color-success-to: #10b981;
-  --color-success-hover-from: #16a34a;
-  --color-success-hover-to: #059669;
+  .btn {
+    border-width: 2px;
+  }
   
-  --color-warning-from: #f59e0b;
-  --color-warning-to: #f97316;
-  --color-warning-hover-from: #d97706;
-  --color-warning-hover-to: #ea580c;
+  a {
+    text-decoration: underline;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION (Respeita preferências)
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
   
-  --color-error-from: #ef4444;
-  --color-error-to: #f43f5e;
-  --color-error-hover-from: #dc2626;
-  --color-error-hover-to: #e11d48;
+  .btn:active {
+    transform: none;
+  }
   
-  --color-info-from: #3b82f6;
-  --color-info-to: #6366f1;
-  --color-info-hover-from: #2563eb;
-  --color-info-hover-to: #4f46e5;
+  .surface:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   DEBUG MODE (Apenas desenvolvimento)
+   ========================================================= */
+.theme-debug * {
+  outline: 1px solid rgba(255, 0, 0, 0.1) !important;
+}
+
+.theme-debug .btn {
+  outline: 2px solid rgba(0, 255, 0, 0.3) !important;
+}
+
+/* =========================================================
+   KΛI-01 FOOTER
+   ========================================================= */
+/* 
+  ✅ ARQUITETURA SSOT COMPLETA
+  ✅ SISTEMA UNIFICADO DE TOKENS  
+  ✅ NUCLEAR FALLBACK SYSTEM
+  ✅ PERFORMANCE GPU OTIMIZADA
+  ✅ ACESSIBILIDADE INTEGRADA
+  ✅ RESPONSIVE BY DEFAULT
   
-  /* Fonte mais agressiva */
-  --font-weight-bold: 900;
-  --font-heading-h1: clamp(1.75rem, 6vw, 2.75rem);
-}
-
-/* ============================================ */
-/* 🎨 HELPER CLASSES */
-/* ============================================ */
-
-/* Gradientes */
-.btn-primary {
-  background: linear-gradient(135deg, var(--color-primary-from), var(--color-primary-to));
-  transition: background 0.3s ease;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-hover-from), var(--color-primary-hover-to));
-}
-
-.btn-secondary {
-  background: linear-gradient(135deg, var(--color-secondary-from), var(--color-secondary-to));
-  transition: background 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background: linear-gradient(135deg, var(--color-secondary-hover-from), var(--color-secondary-hover-to));
-}
-
-.btn-success {
-  background: linear-gradient(135deg, var(--color-success-from), var(--color-success-to));
-  transition: background 0.3s ease;
-}
-
-.btn-success:hover {
-  background: linear-gradient(135deg, var(--color-success-hover-from), var(--color-success-hover-to));
-}
-
-.btn-warning {
-  background: linear-gradient(135deg, var(--color-warning-from), var(--color-warning-to));
-  transition: background 0.3s ease;
-}
-
-.btn-warning:hover {
-  background: linear-gradient(135deg, var(--color-warning-hover-from), var(--color-warning-hover-to));
-}
-
-.btn-error {
-  background: linear-gradient(135deg, var(--color-error-from), var(--color-error-to));
-  transition: background 0.3s ease;
-}
-
-.btn-error:hover {
-  background: linear-gradient(135deg, var(--color-error-hover-from), var(--color-error-hover-to));
-}
-
-.btn-info {
-  background: linear-gradient(135deg, var(--color-info-from), var(--color-info-to));
-  transition: background 0.3s ease;
-}
-
-.btn-info:hover {
-  background: linear-gradient(135deg, var(--color-info-hover-from), var(--color-info-hover-to));
-}
-
-/* Classes de texto responsivo */
-.text-xs { font-size: var(--font-xs); }
-.text-sm { font-size: var(--font-sm); }
-.text-base { font-size: var(--font-base); }
-.text-md { font-size: var(--font-md); }
-.text-lg { font-size: var(--font-lg); }
-.text-xl { font-size: var(--font-xl); }
-.text-2xl { font-size: var(--font-2xl); }
-.text-3xl { font-size: var(--font-3xl); }
-.text-4xl { font-size: var(--font-4xl); }
-
-/* Font weights */
-.font-light { font-weight: var(--font-weight-light); }
-.font-normal { font-weight: var(--font-weight-normal); }
-.font-medium { font-weight: var(--font-weight-medium); }
-.font-semibold { font-weight: var(--font-weight-semibold); }
-.font-bold { font-weight: var(--font-weight-bold); }
-.font-extrabold { font-weight: var(--font-weight-extrabold); }
-
-/* Line heights */
-.leading-tight { line-height: var(--line-height-tight); }
-.leading-normal { line-height: var(--line-height-normal); }
-.leading-relaxed { line-height: var(--line-height-relaxed); }
-.leading-loose { line-height: var(--line-height-loose); }
+  VERSÃO: 2.0.0-KΛI-01
+  STATUS: PRODUCTION READY
+  NEXT: IA GENERATIVA DE TEMAS
+*/
