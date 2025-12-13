@@ -1,6 +1,7 @@
-@import "./styles/theme-tokens.css";
-@import "./styles/themes.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Theme system MUST come after Tailwind layers */
+@import "./styles/theme-tokens.css";
+@import "./styles/themes.css";
