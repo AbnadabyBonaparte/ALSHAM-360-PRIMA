@@ -961,7 +961,8 @@ function App() {
     setCurrency,
     setTimeframe,
 
-  } = useDashboardStore();\n  const { currentTheme: theme, setTheme } = useTheme();
+  } = useDashboardStore();
+const { currentTheme: theme, setTheme } = useTheme();
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [activePage, setActivePage] = useState(() => {
