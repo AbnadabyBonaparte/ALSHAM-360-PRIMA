@@ -1940,109 +1940,188 @@ const { currentTheme: theme, setTheme } = useTheme();
   registerRoute("leads", async () => ({ default: () => <Leads /> }));
 
   return (
-    <div
-      data-theme={theme}
-      className="min-h-screen text-[var(--text-primary)] transition-colors"
-      style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
+   <div
+  data-theme={theme}
+  className="min-h-screen text-[var(--text-primary)] transition-colors"
+  style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
+>
+  <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
+    <button
+      className="fixed right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-xl shadow-[color-mix(in_srgb,var(--accent-emerald)_25%,transparent)] backdrop-blur md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+      style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
+      onClick={() => setMobileNavOpen((prev) => !prev)}
+      aria-expanded={isMobileNavOpen}
+      aria-controls="mobile-command-center"
+      aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
     >
-      <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
-        <button
-          className="fixed right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-xl shadow-[color-mix(in_srgb,var(--accent-emerald)_25%,transparent)] backdrop-blur md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-          style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
-          onClick={() => setMobileNavOpen((prev) => !prev)}
-          aria-expanded={isMobileNavOpen}
-          aria-controls="mobile-command-center"
-          aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
+      {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+    </button>
+
+    <AnimatePresence>
+      {isMobileNavOpen && (
+        <motion.div
+          className="fixed inset-0 z-40 bg-[color-mix(in_srgb,var(--background)_75%,transparent)] backdrop-blur-xl md:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={closeMobileNav}
         >
-          {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-
-        <AnimatePresence>
-          {isMobileNavOpen && (
-            <motion.div
-              className="fixed inset-0 z-40 bg-[color-mix(in_srgb,var(--background)_75%,transparent)] backdrop-blur-xl md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeMobileNav}
-            >
-              <motion.div
-                id="mobile-command-center"
-                className="absolute left-0 top-0 flex h-full w-[min(88vw,360px)] flex-col border-r border-[var(--border-strong)] bg-[var(--surface)]/92 shadow-2xl"
-                style={{
-                  paddingTop: "calc(env(safe-area-inset-top) + 1.25rem)",
-                  paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)",
-                }}
-                initial={{ x: "-100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={{ type: "spring", stiffness: 260, damping: 32 }}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className="flex items-center justify-between px-6 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
-                      A∞
-                    </div>
-                    <div>
-                      <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
-                      <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={closeMobileNav}
-                    className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                    aria-label="Fechar menu"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+          <motion.div
+            id="mobile-command-center"
+            className="absolute left-0 top-0 flex h-full w-[min(88vw,360px)] flex-col border-r border-[var(--border-strong)] bg-[var(--surface)]/92 shadow-2xl"
+            style={{
+              paddingTop: "calc(env(safe-area-inset-top) + 1.25rem)",
+              paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)",
+            }}
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", stiffness: 260, damping: 32 }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
+                  A∞
                 </div>
-
-                <div className="h-[1px] w-full bg-[var(--border)]/60" />
-
-                <div className="flex-1 overflow-y-auto px-6">
-                  <div className="space-y-4 pt-4">
-                    {sidebarGroups.map((group) => (
-                      <div key={`mobile-${group.id}`} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-4">
-                        <div className="flex items-center gap-3">
-                          <span className="grid h-9 w-9 place-content-center rounded-xl bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
-                            {group.icon}
-                          </span>
-                          <p className="text-sm font-semibold text-[var(--text-primary)]">{group.label}</p>
-                        </div>
-                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                          {group.links.map((link) => {
-                            const isActive = activePage === link.id;
-
-                            return (
-                              <button
-                                key={link.id}
-                                type="button"
-                                onClick={() => {
-                                  navigateToPage(link.id);
-                                  closeMobileNav();
-                                }}
-                                aria-current={isActive ? "page" : undefined}
-                                className={`rounded-full border px-3 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                                  isActive
-                                    ? "border-[var(--accent-emerald)]/60 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
-                                    : "border-[var(--border)]/70 text-[var(--text-secondary)] hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
-                                }`}
-                              >
-                                {link.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+                <div>
+                  <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
+                  <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={closeMobileNav}
+                className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                aria-label="Fechar menu"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="h-[1px] w-full bg-[var(--border)]/60" />
+            <div className="flex-1 overflow-y-auto px-6">
+              <div className="space-y-4 pt-4">
+                {sidebarGroups.map((group) => (
+                  <div key={`mobile-${group.id}`} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-4">
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-9 w-9 place-content-center rounded-xl bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
+                        {group.icon}
+                      </span>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">{group.label}</p>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                      {group.links.map((link) => {
+                        const isActive = activePage === link.id;
+                        return (
+                          <button
+                            key={link.id}
+                            type="button"
+                            onClick={() => {
+                              navigateToPage(link.id);
+                              closeMobileNav();
+                            }}
+                            aria-current={isActive ? "page" : undefined}
+                            className={`rounded-full border px-3 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                              isActive
+                                ? "border-[var(--accent-emerald)]/60 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
+                                : "border-[var(--border)]/70 text-[var(--text-secondary)] hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
+                            }`}
+                          >
+                            {link.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+                ))}
+              </div>
+              <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
+                <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
+                <div className="space-y-3 text-sm">
+                  {/* ... (moeda, timeframe, temas pequenos — se quiser manter aqui no mobile) */}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
-                  <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
-                    <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
-                    <div className="space-y-3 text-sm">
-                      <div>
+    {/* Sidebar Desktop */}
+    <SidebarDesktop
+      activePage={activePage}
+      onNavigate={navigateToPage}
+      isCollapsed={false}
+    />
+
+    {/* Main Content */}
+    <div className="flex flex-col">
+      {/* Header */}
+      <header
+        className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        {/* ... seu header atual ... */}
+      </header>
+
+      {/* Main */}
+      <main
+        className="flex-1 overflow-y-auto bg-[var(--background)]"
+        style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
+      >
+        {pageState.error ? (
+          <div className="flex min-h-[40vh] flex-col items-center justify-center gap-2 text-center">
+            <AlertCircle className="h-12 w-12 text-[var(--accent-alert)]" />
+            <p className="text-sm text-[var(--text-secondary)]">Falha ao renderizar a página selecionada.</p>
+          </div>
+        ) : (
+          pageState.content
+        )}
+      </main>
+    </div>
+
+    {/* MODAL DO THEME SWITCHER GRANDE — COLE AQUI! */}
+    <AnimatePresence>
+      {showThemeSwitcher && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xl p-4"
+          onClick={() => setShowThemeSwitcher(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            className="w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-3xl border border-[var(--border-strong)] bg-[var(--surface)]/95 backdrop-blur-2xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)]/50 bg-[var(--surface)]/90 backdrop-blur-xl p-6 sm:p-8">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
+                  Escolha seu Universo
+                </h2>
+                <p className="mt-2 text-[var(--text-secondary)]">
+                  6 dimensões visuais criadas para sua obsessão por resultados
+                </p>
+              </div>
+              <button
+                onClick={() => setShowThemeSwitcher(false)}
+                className="grid h-12 w-12 place-content-center rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6 sm:p-10">
+              <ThemeSwitcher />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+</div>
                         <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Moeda</p>
                         <div className="mt-2 flex gap-2">
                           {currencyOptions.map((option) => (
