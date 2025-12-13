@@ -1,10 +1,7 @@
-/* ========================================================================== */
-/* ALSHAM 360° PRIMA - GLOBAL STYLES                                          */
-/* ========================================================================== */
-/* Design System Supremo                                                      */
-/* ========================================================================== */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Theme system MUST come after Tailwind layers */
+@import "./styles/theme-tokens.css";
+@import "./styles/themes.css";

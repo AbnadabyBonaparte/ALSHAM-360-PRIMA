@@ -1,78 +1,104 @@
 // src/lib/theme-variables.ts
-import { Theme } from './themes';
+import type { Theme } from './themes'
 
 export function injectThemeVariables(theme: Theme): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') return
 
-  const root = document.documentElement;
-  
-  // Mapear cores do tema para variáveis CSS
-  const variables = {
-    // Background
+  const root = document.documentElement
+
+  const variables: Record<string, string> = {
+    // ✅ Contrato novo (fonte preferida)
+    '--bg': theme.colors.background,
+    '--bg-g1': theme.colors.backgroundGradient1,
+    '--bg-g2': theme.colors.backgroundGradient2,
+
+    '--surface': theme.colors.surface,
+    '--surface-strong': theme.colors.surfaceStrong,
+    '--surface-elev': theme.colors.surfaceElevated,
+    '--glass-hi': theme.colors.glassHighlight,
+
+    '--border': theme.colors.border,
+    '--border-strong': theme.colors.borderStrong,
+
+    '--text': theme.colors.textPrimary,
+    '--text-2': theme.colors.textSecondary,
+
+    '--accent-1': theme.colors.accentPrimary,
+    '--accent-2': theme.colors.accentSecondary,
+    '--accent-3': theme.colors.accentTertiary,
+    '--accent-warm': theme.colors.accentWarm,
+    '--accent-alert': theme.colors.accentAlert,
+
+    '--grad-primary': theme.colors.gradientPrimary,
+    '--grad-secondary': theme.colors.gradientSecondary,
+    '--grad-accent': theme.colors.gradientAccent,
+    '--grad-wash': theme.colors.gradientWash,
+    '--grad-veiled': theme.colors.gradientVeiled,
+
+    '--glow-1': theme.colors.glowPrimary,
+    '--glow-2': theme.colors.glowSecondary,
+    '--glow-3': theme.colors.glowAccent,
+
+    // ✅ Aliases legacy (compatibilidade)
     '--background': theme.colors.background,
     '--background-gradient-1': theme.colors.backgroundGradient1,
     '--background-gradient-2': theme.colors.backgroundGradient2,
-    
-    // Surfaces
-    '--surface': theme.colors.surface,
-    '--surface-strong': theme.colors.surfaceStrong,
+
     '--surface-elevated': theme.colors.surfaceElevated,
     '--glass-highlight': theme.colors.glassHighlight,
-    
-    // Borders
-    '--border': theme.colors.border,
-    '--border-strong': theme.colors.borderStrong,
-    
-    // Text
+
     '--text-primary': theme.colors.textPrimary,
     '--text-secondary': theme.colors.textSecondary,
-    
-    // Accents (mapeando para nomes usados no CSS)
-    '--color-primary-from': theme.colors.accentPrimary,
-    '--color-primary-to': theme.colors.accentSecondary, // para gradients
-    '--accent-emerald': theme.colors.accentPrimary,
-    '--accent-sky': theme.colors.accentSecondary,
-    '--accent-fuchsia': theme.colors.accentTertiary,
-    '--accent-amber': theme.colors.accentWarm,
-    '--accent-alert': theme.colors.accentAlert,
-    
-    // Gradients
+
     '--gradient-primary': theme.colors.gradientPrimary,
     '--gradient-secondary': theme.colors.gradientSecondary,
     '--gradient-accent': theme.colors.gradientAccent,
     '--gradient-wash': theme.colors.gradientWash,
     '--gradient-veiled': theme.colors.gradientVeiled,
-    
-    // Glows
+
     '--glow-primary': theme.colors.glowPrimary,
     '--glow-secondary': theme.colors.glowSecondary,
     '--glow-accent': theme.colors.glowAccent,
-  };
 
-  // Aplicar todas as variáveis
-  Object.entries(variables).forEach(([key, value]) => {
-    root.style.setProperty(key, value);
-  });
+    // ✅ Legacy gradients para Tailwind/classes existentes
+    '--color-primary-from': theme.colors.accentPrimary,
+    '--color-primary-to': theme.colors.accentSecondary,
+
+    '--color-secondary-from': theme.colors.accentSecondary,
+    '--color-secondary-to': theme.colors.accentTertiary,
+
+    '--color-accent-from': theme.colors.accentTertiary,
+    '--color-accent-to': theme.colors.accentPrimary,
+  }
+
+  for (const [k, v] of Object.entries(variables)) {
+    root.style.setProperty(k, v)
+  }
 }
 
-// Função para remover tema
 export function removeThemeVariables(): void {
-  if (typeof document === 'undefined') return;
-  
-  const root = document.documentElement;
-  const allVariables = [
-    '--background', '--background-gradient-1', '--background-gradient-2',
-    '--surface', '--surface-strong', '--surface-elevated', '--glass-highlight',
-    '--border', '--border-strong',
-    '--text-primary', '--text-secondary',
-    '--color-primary-from', '--color-primary-to',
-    '--accent-emerald', '--accent-sky', '--accent-fuchsia', '--accent-amber', '--accent-alert',
-    '--gradient-primary', '--gradient-secondary', '--gradient-accent',
-    '--gradient-wash', '--gradient-veiled',
-    '--glow-primary', '--glow-secondary', '--glow-accent',
-  ];
+  if (typeof document === 'undefined') return
+  const root = document.documentElement
 
-  allVariables.forEach(variable => {
-    root.style.removeProperty(variable);
-  });
+  const vars = [
+    '--bg','--bg-g1','--bg-g2',
+    '--surface','--surface-strong','--surface-elev','--glass-hi',
+    '--border','--border-strong',
+    '--text','--text-2',
+    '--accent-1','--accent-2','--accent-3','--accent-warm','--accent-alert',
+    '--grad-primary','--grad-secondary','--grad-accent','--grad-wash','--grad-veiled',
+    '--glow-1','--glow-2','--glow-3',
+
+    '--background','--background-gradient-1','--background-gradient-2',
+    '--surface-elevated','--glass-highlight',
+    '--text-primary','--text-secondary',
+    '--gradient-primary','--gradient-secondary','--gradient-accent','--gradient-wash','--gradient-veiled',
+    '--glow-primary','--glow-secondary','--glow-accent',
+
+    '--color-primary-from','--color-primary-to',
+    '--color-secondary-from','--color-secondary-to',
+    '--color-accent-from','--color-accent-to',
+  ]
+
+  vars.forEach((v) => root.style.removeProperty(v))
 }

@@ -1,0 +1,37 @@
+/* src/styles/theme-tokens.css */
+/* ALSHAM 360° PRIMA — Theme System (Transitions & A11y Only) */
+
+@layer base {
+  :root{
+    --theme-dur: 320ms;
+    --theme-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Transições base (mínimas) — evita efeitos colaterais em html */
+  body, #root{
+    transition:
+      background-color var(--theme-dur) var(--theme-ease),
+      color var(--theme-dur) var(--theme-ease),
+      border-color var(--theme-dur) var(--theme-ease),
+      box-shadow var(--theme-dur) var(--theme-ease),
+      filter var(--theme-dur) var(--theme-ease);
+  }
+
+  /* Warp durante troca de tema (efeito controlado) */
+  html.theme-switching #root{
+    animation: theme-warp var(--theme-dur) var(--theme-ease) both;
+  }
+
+  @keyframes theme-warp{
+    0%   { filter: blur(0px) saturate(100%); }
+    30%  { filter: blur(20px) saturate(200%); }
+    60%  { filter: blur(10px) saturate(150%); }
+    100% { filter: blur(0px) saturate(100%); }
+  }
+
+  /* Acessibilidade */
+  @media (prefers-reduced-motion: reduce){
+    html.theme-switching #root{ animation: none; }
+    body, #root{ transition: none; }
+  }
+}
