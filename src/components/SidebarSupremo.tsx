@@ -3,8 +3,6 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 DOMINAÇÃO VISUAL TOTAL - Sidebar por Categoria com Responsividade Alienígena
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-import { useTheme } from '@/hooks/useTheme';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -38,41 +36,39 @@ import {
   Menu,
   Search,
 } from 'lucide-react';
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 📊 ESTRUTURA DA SIDEBAR - IMPORTADA DE CONFIG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 import {
   SIDEBAR_STRUCTURE,
   type SidebarCategory,
   type SidebarLink,
 } from '@/config/sidebarStructure';
-
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎨 HOOK OFICIAL DE TEMA (SSOT)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useTheme } from '@/hooks/useTheme'; // ← Nova importação
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 PROPS DO COMPONENTE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 interface SidebarSupremoProps {
   activePage: string;
   onNavigate: (pageId: string) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🖥️ SIDEBAR DESKTOP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: SidebarSupremoProps) {
+  const { isTransitioning } = useTheme(); // ← Pegamos o estado de transição do tema oficial
+
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
   const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
   const [isHovered, setIsHovered] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
   const filteredStructure = useMemo(() => {
     if (!searchTerm.trim()) return SIDEBAR_STRUCTURE;
-
     const term = searchTerm.toLowerCase();
     return SIDEBAR_STRUCTURE.map((category) => ({
       ...category,
@@ -83,7 +79,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       ),
     })).filter((category) => category.links.length > 0);
   }, [searchTerm]);
-
   const toggleCategory = useCallback((categoryId: string) => {
     console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
     setExpandedCategories((prev) => {
@@ -94,7 +89,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       return newState;
     });
   }, []);
-
   const toggleLink = useCallback((linkId: string) => {
     console.log(`[Sidebar] Toggling link: ${linkId}`); // Debug log
     setExpandedLinks((prev) => {
@@ -105,7 +99,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       return newState;
     });
   }, []);
-
   // Auto-expand categoria da página ativa
   useEffect(() => {
     const activeCategory = SIDEBAR_STRUCTURE.find((cat) =>
@@ -115,9 +108,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       setExpandedCategories((prev) => [...prev, activeCategory.id]);
     }
   }, [activePage]);
-
   const showLabels = !isCollapsed || isHovered;
-
   // Função recursiva para renderizar links (suporta hierarquia)
   const renderLink = useCallback(
     (link: SidebarLink, category: SidebarCategory, depth: number = 0, index: number = 0) => {
@@ -125,7 +116,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       const hasChildren = link.children && link.children.length > 0;
       const isLinkExpanded = expandedLinks.includes(link.id);
       const paddingLeft = depth * 12; // 12px por nível de profundidade
-
       return (
         <motion.li
           key={link.id}
@@ -161,7 +151,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
               </span>
             )}
             <span className="text-sm font-medium flex-1">{link.label}</span>
-
             {/* Badge de status */}
             {link.status === 'placeholder' && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-amber)]/20 text-[var(--accent-amber)] font-medium">
@@ -173,7 +162,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                 {link.badge}
               </span>
             )}
-
             {/* Indicador de children */}
             {hasChildren && (
               <motion.span
@@ -183,7 +171,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                 <ChevronDown className="h-3 w-3" />
               </motion.span>
             )}
-
             {/* Indicador ativo */}
             {isActive && !hasChildren && (
               <motion.span
@@ -197,7 +184,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
               />
             )}
           </motion.button>
-
           {/* Renderizar children recursivamente */}
           {hasChildren && isLinkExpanded && (
             <AnimatePresence>
@@ -219,12 +205,11 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
     },
     [activePage, expandedLinks, toggleLink, onNavigate]
   );
-
   return (
     <aside
       className={`hidden lg:flex flex-col min-h-screen border-r border-[var(--border)] bg-[var(--surface-strong)]/80 backdrop-blur-2xl transition-all duration-500 ease-out ${
         isCollapsed && !isHovered ? 'w-16 lg:w-20' : 'w-64 md:w-72 lg:w-80 xl:w-[22rem]'
-      }`}
+      } ${isTransitioning ? 'theme-switching' : ''}`} // ← Classe de transição oficial
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -257,7 +242,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
           )}
         </AnimatePresence>
       </motion.div>
-
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
         <div className="px-3 py-2">
@@ -284,7 +268,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
           {filteredStructure.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveLink = category.links.some((link) => link.id === activePage);
-
             return (
               <div key={category.id} className="space-y-1">
                 {/* Category Header */}
@@ -332,7 +315,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                     )}
                   </AnimatePresence>
                 </motion.button>
-
                 {/* Category Links */}
                 {showLabels && (
                   <AnimatePresence>
@@ -354,7 +336,6 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
           })}
         </div>
       </nav>
-
       {/* Footer - Copilot Card */}
       <AnimatePresence>
         {showLabels && (
@@ -387,20 +368,18 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
     </aside>
   );
 }
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 📱 SIDEBAR MOBILE (DRAWER)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 interface SidebarMobileProps extends SidebarSupremoProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: SidebarMobileProps) {
+  const { isTransitioning } = useTheme(); // ← Também no mobile, para transição suave
+
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
   const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
-
   const toggleCategory = useCallback((categoryId: string) => {
     console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
     setExpandedCategories((prev) => {
@@ -411,7 +390,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
       return newState;
     });
   }, []);
-
   const toggleLink = useCallback((linkId: string) => {
     console.log(`[Sidebar] Toggling link: ${linkId}`); // Debug log
     setExpandedLinks((prev) => {
@@ -422,7 +400,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
       return newState;
     });
   }, []);
-
   // Prevent body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
@@ -434,12 +411,10 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
       document.body.style.overflow = '';
     };
   }, [isOpen]);
-
   const handleNavigate = (pageId: string) => {
     onNavigate(pageId);
     onClose();
   };
-
   // Função recursiva para renderizar links no mobile
   const renderLinkMobile = useCallback(
     (link: SidebarLink, category: SidebarCategory, depth: number = 0) => {
@@ -447,7 +422,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
       const hasChildren = link.children && link.children.length > 0;
       const isLinkExpanded = expandedLinks.includes(link.id);
       const paddingLeft = depth * 16;
-
       return (
         <div key={link.id}>
           <motion.button
@@ -472,7 +446,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
               </span>
             )}
             <span className="font-medium flex-1">{link.label}</span>
-
             {/* Badge de status */}
             {link.status === 'placeholder' && (
               <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-amber)]/20 text-[var(--accent-amber)] font-medium">
@@ -484,7 +457,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 {link.badge}
               </span>
             )}
-
             {/* Indicador de children */}
             {hasChildren && (
               <motion.span
@@ -494,13 +466,11 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 <ChevronDown className="h-3 w-3" />
               </motion.span>
             )}
-
             {/* Indicador ativo */}
             {isActive && !hasChildren && (
               <span className="h-2 w-2 rounded-full bg-[var(--color-primary-from)] shadow-[0_0_10px_var(--color-primary-from)]" />
             )}
           </motion.button>
-
           {/* Children */}
           {hasChildren && isLinkExpanded && (
             <AnimatePresence>
@@ -522,7 +492,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
     },
     [activePage, expandedLinks, toggleLink, handleNavigate]
   );
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -535,10 +504,9 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
-
           {/* Drawer */}
           <motion.div
-            className="fixed left-0 top-0 z-50 flex h-full w-[85vw] sm:w-[75vw] md:w-[60vw] max-w-[min(400px,90vw)] flex-col bg-[var(--surface)]/98 backdrop-blur-2xl shadow-2xl lg:hidden"
+            className={`fixed left-0 top-0 z-50 flex h-full w-[85vw] sm:w-[75vw] md:w-[60vw] max-w-[min(400px,90vw)] flex-col bg-[var(--surface)]/98 backdrop-blur-2xl shadow-2xl lg:hidden ${isTransitioning ? 'theme-switching' : ''}`}
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
@@ -568,14 +536,12 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 <X className="h-5 w-5" />
               </motion.button>
             </div>
-
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto px-4 py-4">
               <div className="space-y-3">
                 {SIDEBAR_STRUCTURE.map((category) => {
                   const isExpanded = expandedCategories.includes(category.id);
                   const hasActiveLink = category.links.some((link) => link.id === activePage);
-
                   return (
                     <div
                       key={category.id}
@@ -609,7 +575,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                           <ChevronDown className="h-5 w-5 text-[var(--text-secondary)]" />
                         </motion.span>
                       </button>
-
                       {/* Links */}
                       <AnimatePresence>
                         {isExpanded && (
@@ -631,7 +596,6 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 })}
               </div>
             </nav>
-
             {/* Footer */}
             <div className="border-t border-[var(--border)]/50 p-4">
               <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-primary-from)]/30 bg-gradient-to-r from-[var(--color-primary-from)]/10 to-[var(--accent-fuchsia)]/10 p-4">
@@ -650,16 +614,13 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
     </AnimatePresence>
   );
 }
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎯 MOBILE NAV BUTTON (FAB)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 interface MobileNavButtonProps {
   isOpen: boolean;
   onClick: () => void;
 }
-
 export function MobileNavButton({ isOpen, onClick }: MobileNavButtonProps) {
   return (
     <motion.button
@@ -697,11 +658,9 @@ export function MobileNavButton({ isOpen, onClick }: MobileNavButtonProps) {
     </motion.button>
   );
 }
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🚀 EXPORT DEFAULT - Componente Completo
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 export default function SidebarSupremo(props: SidebarSupremoProps) {
   return <SidebarDesktop {...props} />;
 }
