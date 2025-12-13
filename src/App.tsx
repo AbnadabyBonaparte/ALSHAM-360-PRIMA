@@ -969,6 +969,7 @@ const { currentTheme: theme, setTheme } = useTheme();
     const path = window.location.pathname.replace(/^\/+/, "");
     return resolveRouteOrDefault(path || "dashboard-principal");
   });
+  const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
   useUrlSync(activePage, setActivePage);
   const navigateToPage = useCallback((pageId: string) => {
     setActivePage((current) => {
