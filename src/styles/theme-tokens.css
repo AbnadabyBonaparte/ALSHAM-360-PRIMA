@@ -1,0 +1,13 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 🎨 ALSHAM 360° PRIMA - THEME TOKENS BASE */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Base tokens - fallback mínimo para JS off / runtime failure */
+:root {
+  /* Accent token fallbacks - map to canonical accent vars */
+  --accent-emerald: var(--accent-1);
+  --accent-sky: var(--accent-2);
+  --accent-fuchsia: var(--accent-3);
+  --accent-amber: var(--accent-warm);
+  --accent-alert: var(--accent-alert);
+}
