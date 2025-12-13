@@ -1,42 +1,16 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚜️ ALSHAM 360° PRIMA - SIDEBAR SUPREMO
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎨 DOMINAÇÃO VISUAL TOTAL - Sidebar por Categoria com Responsividade Alienígena
+// ⚜️ ALSHAM 360° PRIMA - SIDEBAR SUPREMO (SSOT Compliant)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useState, useCallback, useEffect, useMemo } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
-  LayoutDashboard,
-  Users,
-  UserCircle,
-  Target,
-  GitBranch,
-  FileText,
-  FileSignature,
-  Receipt,
-  Wallet,
-  Inbox,
-  MessageCircle,
-  Mail,
-  MessageSquare,
-  BarChart3,
-  PieChart,
-  Brain,
-  CheckSquare,
-  Calendar,
-  Zap,
-  Trophy,
-  Settings,
-  Shield,
-  Globe,
   ChevronDown,
-  ChevronRight,
-  Sparkles,
   X,
   Menu,
   Search,
-} from 'lucide-react';
+  Sparkles,
+} from 'lucide-react'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 📊 ESTRUTURA DA SIDEBAR - IMPORTADA DE CONFIG
@@ -46,33 +20,37 @@ import {
   SIDEBAR_STRUCTURE,
   type SidebarCategory,
   type SidebarLink,
-} from '@/config/sidebarStructure';
+} from '@/config/sidebarStructure'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 PROPS DO COMPONENTE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface SidebarSupremoProps {
-  activePage: string;
-  onNavigate: (pageId: string) => void;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
+  activePage: string
+  onNavigate: (pageId: string) => void
+  isCollapsed?: boolean
+  onToggleCollapse?: () => void
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🖥️ SIDEBAR DESKTOP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: SidebarSupremoProps) {
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
-  const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
-  const [isHovered, setIsHovered] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+export function SidebarDesktop({
+  activePage,
+  onNavigate,
+  isCollapsed = false,
+}: SidebarSupremoProps) {
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core'])
+  const [expandedLinks, setExpandedLinks] = useState<string[]>([])
+  const [isHovered, setIsHovered] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const filteredStructure = useMemo(() => {
-    if (!searchTerm.trim()) return SIDEBAR_STRUCTURE;
+    if (!searchTerm.trim()) return SIDEBAR_STRUCTURE
 
-    const term = searchTerm.toLowerCase();
+    const term = searchTerm.toLowerCase()
     return SIDEBAR_STRUCTURE.map((category) => ({
       ...category,
       links: category.links.filter(
@@ -80,50 +58,40 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
           link.label.toLowerCase().includes(term) ||
           link.id.toLowerCase().includes(term)
       ),
-    })).filter((category) => category.links.length > 0);
-  }, [searchTerm]);
+    })).filter((category) => category.links.length > 0)
+  }, [searchTerm])
 
   const toggleCategory = useCallback((categoryId: string) => {
-    console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
-    setExpandedCategories((prev) => {
-      const newState = prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId];
-      console.log(`[Sidebar] Expanded categories:`, newState); // Debug log
-      return newState;
-    });
-  }, []);
+    setExpandedCategories((prev) =>
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
+    )
+  }, [])
 
   const toggleLink = useCallback((linkId: string) => {
-    console.log(`[Sidebar] Toggling link: ${linkId}`); // Debug log
-    setExpandedLinks((prev) => {
-      const newState = prev.includes(linkId)
-        ? prev.filter((id) => id !== linkId)
-        : [...prev, linkId];
-      console.log(`[Sidebar] Expanded links:`, newState); // Debug log
-      return newState;
-    });
-  }, []);
+    setExpandedLinks((prev) =>
+      prev.includes(linkId) ? prev.filter((id) => id !== linkId) : [...prev, linkId]
+    )
+  }, [])
 
   // Auto-expand categoria da página ativa
   useEffect(() => {
     const activeCategory = SIDEBAR_STRUCTURE.find((cat) =>
       cat.links.some((link) => link.id === activePage)
-    );
+    )
     if (activeCategory && !expandedCategories.includes(activeCategory.id)) {
-      setExpandedCategories((prev) => [...prev, activeCategory.id]);
+      setExpandedCategories((prev) => [...prev, activeCategory.id])
     }
-  }, [activePage]);
+  }, [activePage, expandedCategories])
 
-  const showLabels = !isCollapsed || isHovered;
+  const showLabels = !isCollapsed || isHovered
 
   // Função recursiva para renderizar links (suporta hierarquia)
   const renderLink = useCallback(
     (link: SidebarLink, category: SidebarCategory, depth: number = 0, index: number = 0) => {
-      const isActive = activePage === link.id;
-      const hasChildren = link.children && link.children.length > 0;
-      const isLinkExpanded = expandedLinks.includes(link.id);
-      const paddingLeft = depth * 12; // 12px por nível de profundidade
+      const isActive = activePage === link.id
+      const hasChildren = !!(link.children && link.children.length > 0)
+      const isLinkExpanded = expandedLinks.includes(link.id)
+      const paddingLeft = depth * 12 // 12px por nível
 
       return (
         <motion.li
@@ -134,11 +102,8 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
         >
           <motion.button
             onClick={() => {
-              if (hasChildren) {
-                toggleLink(link.id);
-              } else {
-                onNavigate(link.id);
-              }
+              if (hasChildren) toggleLink(link.id)
+              else onNavigate(link.id)
             }}
             className={`group/link flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
               isActive
@@ -155,25 +120,31 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
             whileTap={{ scale: 0.98 }}
           >
             {link.icon && (
-              <span className={`transition-all duration-200 ${isActive ? 'scale-110' : 'group-hover/link:scale-110'}`}>
+              <span
+                className={`transition-all duration-200 ${
+                  isActive ? 'scale-110' : 'group-hover/link:scale-110'
+                }`}
+              >
                 {link.icon}
               </span>
             )}
+
             <span className="text-sm font-medium flex-1">{link.label}</span>
 
-            {/* Badge de status */}
+            {/* Badge de status (SSOT vars) */}
             {link.status === 'placeholder' && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-amber)]/20 text-[var(--accent-amber)] font-medium">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-warm)]/20 text-[var(--accent-warm)] font-medium">
                 Dev
               </span>
             )}
+
             {link.badge && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-fuchsia)]/20 text-[var(--accent-fuchsia)] font-medium">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-3)]/20 text-[var(--accent-3)] font-medium">
                 {link.badge}
               </span>
             )}
 
-            {/* Indicador de children */}
+            {/* Indicador children */}
             {hasChildren && (
               <motion.span
                 animate={{ rotate: isLinkExpanded ? 180 : 0 }}
@@ -190,14 +161,12 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                 layoutId={`activeIndicator-${category.id}`}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                style={{
-                  boxShadow: `0 0 10px ${category.accentColor}`,
-                }}
+                style={{ boxShadow: `0 0 10px ${category.accentColor}` }}
               />
             )}
           </motion.button>
 
-          {/* Renderizar children recursivamente */}
+          {/* Children */}
           {hasChildren && isLinkExpanded && (
             <AnimatePresence>
               <motion.ul
@@ -214,10 +183,10 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
             </AnimatePresence>
           )}
         </motion.li>
-      );
+      )
     },
     [activePage, expandedLinks, toggleLink, onNavigate]
-  );
+  )
 
   return (
     <aside
@@ -235,11 +204,12 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
         whileTap={{ scale: 0.99 }}
       >
         <div className="relative">
-          <div className="grid h-11 w-11 place-content-center rounded-2xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-white font-bold text-lg shadow-lg group-hover:shadow-[var(--color-primary-from)]/30 transition-shadow duration-300">
+          <div className="grid h-11 w-11 place-content-center rounded-2xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-2)] to-[var(--accent-3)] text-white font-bold text-lg shadow-lg group-hover:shadow-[var(--color-primary-from)]/30 transition-shadow duration-300">
             A∞
           </div>
-          <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-[var(--accent-emerald)] border-2 border-[var(--surface-strong)] animate-pulse" />
+          <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-[var(--accent-1)] border-2 border-[var(--surface-strong)] animate-pulse" />
         </div>
+
         <AnimatePresence mode="wait">
           {showLabels && (
             <motion.div
@@ -279,10 +249,11 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
             )}
           </div>
         </div>
+
         <div className="space-y-2">
           {filteredStructure.map((category) => {
-            const isExpanded = expandedCategories.includes(category.id);
-            const hasActiveLink = category.links.some((link) => link.id === activePage);
+            const isExpanded = expandedCategories.includes(category.id)
+            const hasActiveLink = category.links.some((link) => link.id === activePage)
 
             return (
               <div key={category.id} className="space-y-1">
@@ -305,11 +276,14 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                         : 'bg-[var(--surface)] text-[var(--text-2)] group-hover:text-[var(--color-primary-from)] group-hover:bg-[var(--color-primary-from)]/10'
                     }`}
                     style={{
-                      boxShadow: hasActiveLink ? `0 0 20px color-mix(in srgb, ${category.accentColor} 30%, transparent)` : 'none',
+                      boxShadow: hasActiveLink
+                        ? `0 0 20px color-mix(in srgb, ${category.accentColor} 30%, transparent)`
+                        : 'none',
                     }}
                   >
                     {category.icon}
                   </span>
+
                   <AnimatePresence mode="wait">
                     {showLabels && (
                       <motion.div
@@ -349,7 +323,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                   </AnimatePresence>
                 )}
               </div>
-            );
+            )
           })}
         </div>
       </nav>
@@ -364,7 +338,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
             className="border-t border-[var(--border)]/50 p-4"
           >
             <motion.div
-              className="flex items-center gap-3 rounded-2xl border border-[var(--color-primary-from)]/30 bg-gradient-to-br from-[var(--color-primary-from)]/10 to-[var(--accent-fuchsia)]/10 p-4 backdrop-blur-sm"
+              className="flex items-center gap-3 rounded-2xl border border-[var(--color-primary-from)]/30 bg-gradient-to-br from-[var(--color-primary-from)]/10 to-[var(--accent-3)]/10 p-4 backdrop-blur-sm"
               whileHover={{ scale: 1.02, y: -2 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
@@ -372,7 +346,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                 <Sparkles className="h-5 w-5 animate-pulse" />
               </div>
               <div>
-                <p className="text-sm font-bold bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--accent-fuchsia)] bg-clip-text text-transparent">
+                <p className="text-sm font-bold bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--accent-3)] bg-clip-text text-transparent">
                   Copilot 360°
                 </p>
                 <p className="text-[11px] text-[var(--text-2)]">
@@ -384,7 +358,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
         )}
       </AnimatePresence>
     </aside>
-  );
+  )
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -392,70 +366,58 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface SidebarMobileProps extends SidebarSupremoProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
-export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: SidebarMobileProps) {
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core']);
-  const [expandedLinks, setExpandedLinks] = useState<string[]>([]);
+export function SidebarMobile({
+  activePage,
+  onNavigate,
+  isOpen,
+  onClose,
+}: SidebarMobileProps) {
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['crm-core'])
+  const [expandedLinks, setExpandedLinks] = useState<string[]>([])
 
   const toggleCategory = useCallback((categoryId: string) => {
-    console.log(`[Sidebar] Toggling category: ${categoryId}`); // Debug log
-    setExpandedCategories((prev) => {
-      const newState = prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId];
-      console.log(`[Sidebar] Expanded categories:`, newState); // Debug log
-      return newState;
-    });
-  }, []);
+    setExpandedCategories((prev) =>
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
+    )
+  }, [])
 
   const toggleLink = useCallback((linkId: string) => {
-    console.log(`[Sidebar] Toggling link: ${linkId}`); // Debug log
-    setExpandedLinks((prev) => {
-      const newState = prev.includes(linkId)
-        ? prev.filter((id) => id !== linkId)
-        : [...prev, linkId];
-      console.log(`[Sidebar] Expanded links:`, newState); // Debug log
-      return newState;
-    });
-  }, []);
+    setExpandedLinks((prev) =>
+      prev.includes(linkId) ? prev.filter((id) => id !== linkId) : [...prev, linkId]
+    )
+  }, [])
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (typeof document === 'undefined') return
+    document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
   const handleNavigate = (pageId: string) => {
-    onNavigate(pageId);
-    onClose();
-  };
+    onNavigate(pageId)
+    onClose()
+  }
 
-  // Função recursiva para renderizar links no mobile
   const renderLinkMobile = useCallback(
     (link: SidebarLink, category: SidebarCategory, depth: number = 0) => {
-      const isActive = activePage === link.id;
-      const hasChildren = link.children && link.children.length > 0;
-      const isLinkExpanded = expandedLinks.includes(link.id);
-      const paddingLeft = depth * 16;
+      const isActive = activePage === link.id
+      const hasChildren = !!(link.children && link.children.length > 0)
+      const isLinkExpanded = expandedLinks.includes(link.id)
+      const paddingLeft = depth * 16
 
       return (
         <div key={link.id}>
           <motion.button
             onClick={() => {
-              if (hasChildren) {
-                toggleLink(link.id);
-              } else {
-                handleNavigate(link.id);
-              }
+              if (hasChildren) toggleLink(link.id)
+              else handleNavigate(link.id)
             }}
             className={`flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left transition-all ${
               isActive
@@ -470,21 +432,21 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 {link.icon}
               </span>
             )}
+
             <span className="font-medium flex-1">{link.label}</span>
 
-            {/* Badge de status */}
             {link.status === 'placeholder' && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-amber)]/20 text-[var(--accent-amber)] font-medium">
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-warm)]/20 text-[var(--accent-warm)] font-medium">
                 Dev
               </span>
             )}
+
             {link.badge && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-fuchsia)]/20 text-[var(--accent-fuchsia)] font-medium">
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-3)]/20 text-[var(--accent-3)] font-medium">
                 {link.badge}
               </span>
             )}
 
-            {/* Indicador de children */}
             {hasChildren && (
               <motion.span
                 animate={{ rotate: isLinkExpanded ? 180 : 0 }}
@@ -494,13 +456,11 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
               </motion.span>
             )}
 
-            {/* Indicador ativo */}
             {isActive && !hasChildren && (
               <span className="h-2 w-2 rounded-full bg-[var(--color-primary-from)] shadow-[0_0_10px_var(--color-primary-from)]" />
             )}
           </motion.button>
 
-          {/* Children */}
           {hasChildren && isLinkExpanded && (
             <AnimatePresence>
               <motion.div
@@ -510,17 +470,15 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 transition={{ duration: 0.2 }}
                 className="space-y-1 overflow-hidden"
               >
-                {link.children!.map((childLink) =>
-                  renderLinkMobile(childLink, category, depth + 1)
-                )}
+                {link.children!.map((childLink) => renderLinkMobile(childLink, category, depth + 1))}
               </motion.div>
             </AnimatePresence>
           )}
         </div>
-      );
+      )
     },
     [activePage, expandedLinks, toggleLink, handleNavigate]
-  );
+  )
 
   return (
     <AnimatePresence>
@@ -550,7 +508,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[var(--border)]/50 px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-content-center rounded-xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-white font-bold shadow-lg">
+                <div className="grid h-10 w-10 place-content-center rounded-xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-2)] to-[var(--accent-3)] text-white font-bold shadow-lg">
                   A∞
                 </div>
                 <div>
@@ -558,6 +516,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                   <p className="text-xs sm:text-sm font-bold text-[var(--text)]">360° PRIMA</p>
                 </div>
               </div>
+
               <motion.button
                 onClick={onClose}
                 className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
@@ -572,8 +531,8 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
             <nav className="flex-1 overflow-y-auto px-4 py-4">
               <div className="space-y-3">
                 {SIDEBAR_STRUCTURE.map((category) => {
-                  const isExpanded = expandedCategories.includes(category.id);
-                  const hasActiveLink = category.links.some((link) => link.id === activePage);
+                  const isExpanded = expandedCategories.includes(category.id)
+                  const hasActiveLink = category.links.some((link) => link.id === activePage)
 
                   return (
                     <div
@@ -601,6 +560,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                             {category.label}
                           </span>
                         </div>
+
                         <motion.span
                           animate={{ rotate: isExpanded ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
@@ -626,14 +586,14 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                         )}
                       </AnimatePresence>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </nav>
 
             {/* Footer */}
             <div className="border-t border-[var(--border)]/50 p-4">
-              <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-primary-from)]/30 bg-gradient-to-r from-[var(--color-primary-from)]/10 to-[var(--accent-fuchsia)]/10 p-4">
+              <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-primary-from)]/30 bg-gradient-to-r from-[var(--color-primary-from)]/10 to-[var(--accent-3)]/10 p-4">
                 <div className="grid h-10 w-10 place-content-center rounded-xl bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)]">
                   <Sparkles className="h-5 w-5" />
                 </div>
@@ -647,7 +607,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
         </>
       )}
     </AnimatePresence>
-  );
+  )
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -655,8 +615,8 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface MobileNavButtonProps {
-  isOpen: boolean;
-  onClick: () => void;
+  isOpen: boolean
+  onClick: () => void
 }
 
 export function MobileNavButton({ isOpen, onClick }: MobileNavButtonProps) {
@@ -666,7 +626,8 @@ export function MobileNavButton({ isOpen, onClick }: MobileNavButtonProps) {
       className="fixed right-3 sm:right-4 z-40 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl border border-[var(--color-primary-from)]/30 bg-[var(--surface)]/95 text-[var(--color-primary-from)] shadow-xl backdrop-blur-xl lg:hidden"
       style={{
         bottom: 'clamp(0.75rem, calc(env(safe-area-inset-bottom) + 1rem), 2rem)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px color-mix(in srgb, var(--color-primary-from) 30%, transparent)',
+        boxShadow:
+          '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px color-mix(in srgb, var(--color-primary-from) 30%, transparent)',
       }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
@@ -694,13 +655,13 @@ export function MobileNavButton({ isOpen, onClick }: MobileNavButtonProps) {
         )}
       </AnimatePresence>
     </motion.button>
-  );
+  )
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🚀 EXPORT DEFAULT - Componente Completo
+// 🚀 EXPORT DEFAULT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function SidebarSupremo(props: SidebarSupremoProps) {
-  return <SidebarDesktop {...props} />;
+  return <SidebarDesktop {...props} />
 }
