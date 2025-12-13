@@ -55,6 +55,7 @@ import Pipeline from "./pages/Pipeline";
 import OmnichannelInbox from "./pages/OmnichannelInbox";
 import NFTGallery from "./pages/NFTGallery";
 import WarArena from "./pages/WarArena";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import LandingPageBuilder from "./pages/LandingPageBuilder";
 import ExecutiveDashboard from "./pages/ExecutiveDashboard";
 import Metaverse from "./pages/Metaverse";
