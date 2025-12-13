@@ -1,184 +1,695 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* 🎨 ALSHAM 360° PRIMA - SISTEMA DE TEMAS DINÂMICOS */
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* src/styles/themes.css */
+/* ALSHAM 360° PRIMA — Theme System (CSS Consumer) */
+/* SSOT: themes.ts + runtime injection via useTheme.ts + theme-variables.ts */
 
-/* ============================================ */
-/* 📐 VARIÁVEIS GLOBAIS DE FONTE */
-/* ============================================ */
-:root {
-  /* Tamanhos de fonte responsivos com clamp */
-  --font-xs: clamp(0.75rem, 2vw, 0.875rem);
-  --font-sm: clamp(0.875rem, 2.5vw, 1rem);
-  --font-base: clamp(0.875rem, 2vw, 1rem);
-  --font-md: clamp(1rem, 3vw, 1.125rem);
-  --font-lg: clamp(1.125rem, 3.5vw, 1.5rem);
-  --font-xl: clamp(1.25rem, 4vw, 1.875rem);
-  --font-2xl: clamp(1.5rem, 5vw, 2.25rem);
-  --font-3xl: clamp(1.875rem, 6vw, 3rem);
-  --font-4xl: clamp(2.25rem, 7vw, 3.75rem);
-  
-  /* Headings específicos */
-  --font-heading-h1: clamp(1.5rem, 5vw, 2.25rem);
-  --font-heading-h2: clamp(1.25rem, 4vw, 1.875rem);
-  --font-heading-h3: clamp(1.125rem, 3.5vw, 1.5rem);
-  --font-heading-h4: clamp(1rem, 3vw, 1.25rem);
-  --font-heading-h5: clamp(0.875rem, 2.5vw, 1.125rem);
-  --font-heading-h6: clamp(0.875rem, 2vw, 1rem);
-  
-  /* Line heights */
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
-  --line-height-loose: 2;
-  
-  /* Font weights */
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
+/* =========================================================
+   BASE LAYER
+   ========================================================= */
+@layer base {
+  /* ---------------------------------------------------------
+     0) FALLBACK MÍNIMO (JS OFF / Runtime Failure)
+     + Aliases para consumir contrato do runtime (theme-variables.ts)
+     --------------------------------------------------------- */
+  :root {
+    /* ===== Core (mínimo legível sem runtime) ===== */
+    --bg: #0b1220;
+    --bg-g1: #0b1220;
+    --bg-g2: #1a1f35;
 
-  /* Accent token fallbacks - compatibility with Tailwind */
-  --accent-emerald: var(--accent-1);
-  --accent-sky: var(--accent-2);
-  --accent-fuchsia: var(--accent-3);
-  --accent-amber: var(--accent-warm);
-  --accent-alert: var(--accent-alert);
+    /* Composto (consumer) */
+    --bg-gradient: linear-gradient(135deg, var(--bg-g1, #0b1220), var(--bg-g2, #1a1f35));
+
+    --text: rgba(255, 255, 255, 0.96);
+    --text-2: rgba(255, 255, 255, 0.72);
+    /* não existe no runtime -> mantém fallback + derivação segura quando possível */
+    --text-muted: color-mix(in srgb, var(--text-2, rgba(255,255,255,0.72)) 75%, transparent);
+
+    /* ===== Surfaces ===== */
+    --surface: rgba(255, 255, 255, 0.06);
+    --surface-strong: rgba(255, 255, 255, 0.10);
+    --surface-elev: rgba(255, 255, 255, 0.08);
+
+    /* contrato runtime: --glass-hi (novo) + --glass-highlight (legacy) */
+    --glass-hi: rgba(255, 255, 255, 0.08);
+    --surface-glass: rgba(255, 255, 255, 0.04);
+
+    /* ===== Borders ===== */
+    --border: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.16);
+
+    /* ===== Accents (contrato runtime: --accent-1/2/3 + warm/alert) ===== */
+    --accent-1: #10b981;
+    --accent-2: #3b82f6;
+    --accent-3: #a855f7;
+    --accent-warm: #f59e0b;
+    --accent-alert: #ef4444;
+
+    /* ===== Gradients (contrato runtime: --grad-*) ===== */
+    --grad-primary: linear-gradient(135deg, #10b981, #14b8a6);
+    --grad-secondary: linear-gradient(135deg, #3b82f6, #06b6d4);
+    --grad-accent: linear-gradient(135deg, #a855f7, #ec4899);
+    --grad-wash: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    --grad-veiled: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06), transparent 70%);
+
+    /* ===== Glow (contrato runtime: --glow-1/2/3 e legacy --glow-*) ===== */
+    --glow-1: 0 0 20px rgba(16, 185, 129, 0.30);
+    --glow-2: 0 0 15px rgba(59, 130, 246, 0.25);
+    --glow-3: 0 0 15px rgba(168, 85, 247, 0.30);
+
+    /* ---------------------------------------------------------
+       ALIASES (Compatibilidade: nomes usados no CSS/app atual)
+       - Estes aliases NÃO definem tema, apenas mapeiam consumo
+       --------------------------------------------------------- */
+
+    /* Background legacy (caso algum trecho use) */
+    --background: var(--bg, #0b1220);
+    --background-gradient-1: var(--bg-g1, #0b1220);
+    --background-gradient-2: var(--bg-g2, #1a1f35);
+
+    /* Text legacy */
+    --text-primary: var(--text, rgba(255,255,255,0.96));
+    --text-secondary: var(--text-2, rgba(255,255,255,0.72));
+
+    /* Surfaces legacy */
+    --surface-elevated: var(--surface-elev, rgba(255,255,255,0.08));
+    --glass-highlight: var(--glass-hi, rgba(255,255,255,0.08));
+
+    /* Accents legacy (o app usa --accent-primary/secondary/tertiary) */
+    --accent-primary: var(--accent-1, #10b981);
+    --accent-secondary: var(--accent-2, #3b82f6);
+    --accent-tertiary: var(--accent-3, #a855f7);
+
+    /* Border focus (consumo) */
+    --border-focus: var(--accent-primary, #10b981);
+
+    /* Gradients legacy (o CSS atual usa --gradient-primary/secondary/tertiary) */
+    --gradient-primary: var(--grad-primary, linear-gradient(135deg, #10b981, #14b8a6));
+    --gradient-secondary: var(--grad-secondary, linear-gradient(135deg, #3b82f6, #06b6d4));
+    --gradient-accent: var(--grad-accent, linear-gradient(135deg, #a855f7, #ec4899));
+    --gradient-wash: var(--grad-wash, linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)));
+    --gradient-veiled: var(--grad-veiled, radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06), transparent 70%));
+    --gradient-tertiary: var(--gradient-accent);
+
+    /* Glows legacy */
+    --glow-primary: var(--glow-1, 0 0 20px rgba(16,185,129,0.30));
+    --glow-secondary: var(--glow-2, 0 0 15px rgba(59,130,246,0.25));
+    --glow-accent: var(--glow-3, 0 0 15px rgba(168,85,247,0.30));
+    --glow-tertiary: var(--glow-accent);
+
+    /* Hover accents (não existem no runtime hoje -> fallback seguro) */
+    --accent-primary-hover: #059669;
+    --accent-secondary-hover: #2563eb;
+    --accent-tertiary-hover: #9333ea;
+
+    /* Aliases legacy para botões gradientes (canônico menciona estes) */
+    --color-primary-from: var(--accent-primary);
+    --color-primary-to: #14b8a6;
+    --color-secondary-from: var(--accent-secondary);
+    --color-secondary-to: #06b6d4;
+    --color-accent-from: var(--accent-tertiary);
+    --color-accent-to: #ec4899;
+
+    --color-primary-hover-to: #0d9488;
+    --color-secondary-hover-to: #0891b2;
+    --color-accent-hover-to: #db2777;
+
+    /* ===== Design System (não é tema) ===== */
+    --font-xs: clamp(0.75rem, 2vw, 0.875rem);
+    --font-sm: clamp(0.875rem, 2.5vw, 1rem);
+    --font-base: clamp(0.875rem, 2vw, 1rem);
+    --font-md: clamp(1rem, 3vw, 1.125rem);
+    --font-lg: clamp(1.125rem, 3.5vw, 1.5rem);
+    --font-xl: clamp(1.25rem, 4vw, 1.875rem);
+    --font-2xl: clamp(1.5rem, 5vw, 2.25rem);
+    --font-3xl: clamp(1.875rem, 6vw, 3rem);
+    --font-4xl: clamp(2.25rem, 7vw, 3.75rem);
+
+    --font-heading-h1: clamp(1.5rem, 5vw, 2.25rem);
+    --font-heading-h2: clamp(1.25rem, 4vw, 1.875rem);
+    --font-heading-h3: clamp(1.125rem, 3.5vw, 1.5rem);
+    --font-heading-h4: clamp(1rem, 3vw, 1.25rem);
+    --font-heading-h5: clamp(0.875rem, 2.5vw, 1.125rem);
+    --font-heading-h6: clamp(0.875rem, 2vw, 1rem);
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+    --line-height-loose: 2;
+
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* ===== Nuclear (flag) ===== */
+    --nuclear-fallback-active: 0;
+
+    /* Force dark as fallback baseline */
+    color-scheme: dark;
+  }
+
+  /* ---------------------------------------------------------
+     NUCLEAR FALLBACK (Targeted)
+     --------------------------------------------------------- */
+  html.nuclear-fallback {
+    --bg: #000000 !important;
+    --bg-g1: #000000 !important;
+    --bg-g2: #000000 !important;
+    --bg-gradient: none !important;
+
+    --text: #ffffff !important;
+    --text-2: #ffffff !important;
+    --text-muted: #ffffff !important;
+
+    --surface: #000000 !important;
+    --surface-strong: #000000 !important;
+    --surface-elev: #000000 !important;
+    --surface-glass: #000000 !important;
+    --glass-hi: #000000 !important;
+
+    --accent-1: #00ff00 !important;
+    --accent-2: #00ff00 !important;
+    --accent-3: #00ff00 !important;
+    --accent-alert: #ff0000 !important;
+
+    --accent-primary: #00ff00 !important;
+    --accent-secondary: #00ff00 !important;
+    --accent-tertiary: #00ff00 !important;
+
+    --border: #00ff00 !important;
+    --border-strong: #00ff00 !important;
+    --border-focus: #00ff00 !important;
+
+    --nuclear-fallback-active: 1 !important;
+
+    /* Desativa efeitos pesados sem afetar layout */
+    filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+
+    color-scheme: dark light !important;
+  }
+
+  html.nuclear-fallback a,
+  html.nuclear-fallback button,
+  html.nuclear-fallback input,
+  html.nuclear-fallback textarea,
+  html.nuclear-fallback select,
+  html.nuclear-fallback [role="button"],
+  html.nuclear-fallback [tabindex]:not([tabindex="-1"]) {
+    outline: 2px solid #00ff00 !important;
+    outline-offset: 2px !important;
+  }
+
+  /* ---------------------------------------------------------
+     1) BASE GLOBAL (anti-flash)
+     --------------------------------------------------------- */
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background: var(--bg, #0b1220);
+    background-image: var(--bg-gradient, linear-gradient(135deg, #0b1220, #1a1f35));
+    color: var(--text, rgba(255,255,255,0.96));
+    margin: 0;
+    padding: 0;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Transição “segura” durante troca de tema */
+  html.theme-switching * {
+    transition:
+      background-color 0.20s ease,
+      color 0.20s ease,
+      border-color 0.20s ease,
+      box-shadow 0.20s ease !important;
+  }
+
+  /* ---------------------------------------------------------
+     2) TIPOGRAFIA BASE
+     --------------------------------------------------------- */
+  body {
+    font-size: var(--font-base);
+    line-height: var(--line-height-normal);
+    font-weight: var(--font-weight-normal);
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1 { font-size: var(--font-heading-h1); line-height: var(--line-height-tight); font-weight: var(--font-weight-bold); letter-spacing: -0.02em; }
+  h2 { font-size: var(--font-heading-h2); line-height: var(--line-height-tight); font-weight: var(--font-weight-bold); letter-spacing: -0.015em; }
+  h3 { font-size: var(--font-heading-h3); line-height: var(--line-height-tight); font-weight: var(--font-weight-semibold); letter-spacing: -0.01em; }
+  h4 { font-size: var(--font-heading-h4); line-height: var(--line-height-normal); font-weight: var(--font-weight-semibold); }
+  h5 { font-size: var(--font-heading-h5); line-height: var(--line-height-normal); font-weight: var(--font-weight-medium); }
+  h6 { font-size: var(--font-heading-h6); line-height: var(--line-height-normal); font-weight: var(--font-weight-medium); }
+
+  .prose p,
+  .prose li,
+  .prose span,
+  .content-area p,
+  .content-area li,
+  .content-area span,
+  p, li, span {
+    font-size: var(--font-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--text-2, rgba(255,255,255,0.72));
+  }
+
+  .prose p,
+  .prose li,
+  .content-area p,
+  .content-area li {
+    max-width: 65ch;
+  }
+
+  /* ---------------------------------------------------------
+     3) POLIMENTO GLOBAL
+     --------------------------------------------------------- */
+  ::selection {
+    background: color-mix(in srgb, var(--accent-primary, var(--accent-1, #10b981)) 40%, transparent);
+    color: #ffffff;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  }
+
+  ::-moz-selection {
+    background: color-mix(in srgb, var(--accent-primary, var(--accent-1, #10b981)) 40%, transparent);
+    color: #ffffff;
+  }
+
+  a {
+    color: var(--accent-secondary, var(--accent-2, #3b82f6));
+    text-decoration: none;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    position: relative;
+  }
+
+  a:hover {
+    color: var(--accent-tertiary, var(--accent-3, #a855f7));
+    opacity: 0.9;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent-primary, var(--accent-1, #10b981));
+    outline-offset: 2px;
+  }
+
+  /* ---------------------------------------------------------
+     4) ELEMENTOS BÁSICOS
+     --------------------------------------------------------- */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--border-focus, var(--accent-primary, var(--accent-1, #10b981)));
+    outline-offset: 2px;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border, rgba(255,255,255,0.10));
+    margin: 2rem 0;
+  }
+
+  /* Scrollbar (WebKit) */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--surface, rgba(255,255,255,0.06)); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb { background: var(--border, rgba(255,255,255,0.10)); border-radius: 5px; transition: background 0.2s ease; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-strong, rgba(255,255,255,0.16)); }
 }
 
-/* Aplicação global de fontes */
-body {
-  font-size: var(--font-base);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-normal);
+/* =========================================================
+   COMPONENTS LAYER (Consumer-only)
+   ========================================================= */
+@layer components {
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-sm);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    isolation: isolate;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    border-radius: inherit;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .btn:hover::before { opacity: 1; }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--gradient-primary, var(--grad-primary, linear-gradient(135deg, #10b981, #14b8a6)));
+    color: #ffffff;
+    box-shadow: var(--glow-primary, var(--glow-1, 0 0 20px rgba(16, 185, 129, 0.30)));
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(
+      135deg,
+      var(--accent-primary-hover, #059669),
+      var(--color-primary-hover-to, #0d9488)
+    );
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.40);
+  }
+
+  .btn-secondary {
+    background: var(--gradient-secondary, var(--grad-secondary, linear-gradient(135deg, #3b82f6, #06b6d4)));
+    color: #ffffff;
+    box-shadow: var(--glow-secondary, var(--glow-2, 0 0 15px rgba(59, 130, 246, 0.25)));
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(
+      135deg,
+      var(--accent-secondary-hover, #2563eb),
+      var(--color-secondary-hover-to, #0891b2)
+    );
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.40);
+  }
+
+  .btn-accent {
+    background: var(--gradient-tertiary, var(--gradient-accent, var(--grad-accent, linear-gradient(135deg, #a855f7, #ec4899))));
+    color: #ffffff;
+    box-shadow: var(--glow-tertiary, var(--glow-accent, var(--glow-3, 0 0 15px rgba(168, 85, 247, 0.30))));
+  }
+
+  .btn-accent:hover {
+    background: linear-gradient(
+      135deg,
+      var(--accent-tertiary-hover, #9333ea),
+      var(--color-accent-hover-to, #db2777)
+    );
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.40);
+  }
+
+  /* Mantém compatibilidade: estes não existem no runtime hoje, então ficam fallback-only */
+  .btn-success { background: var(--gradient-success, linear-gradient(135deg, #22c55e, #10b981)); color: #ffffff; }
+  .btn-warning { background: var(--gradient-warning, linear-gradient(135deg, #f59e0b, #f97316)); color: #ffffff; }
+  .btn-error   { background: var(--gradient-error,   linear-gradient(135deg, #ef4444, #f43f5e)); color: #ffffff; }
+  .btn-info    { background: var(--gradient-info,    linear-gradient(135deg, #0ea5e9, #3b82f6)); color: #ffffff; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border, rgba(255,255,255,0.10));
+    color: var(--text, rgba(255,255,255,0.96));
+  }
+
+  .btn-ghost:hover {
+    background: var(--surface, rgba(255,255,255,0.06));
+    border-color: var(--border-strong, rgba(255,255,255,0.16));
+  }
+
+  /* Surfaces */
+  .surface {
+    background: var(--surface, rgba(255,255,255,0.06));
+    border: 1px solid var(--border, rgba(255,255,255,0.10));
+    backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .surface:hover {
+    background: var(--surface-strong, rgba(255,255,255,0.10));
+    border-color: var(--border-strong, rgba(255,255,255,0.16));
+    transform: translateY(-2px);
+  }
+
+  .surface-strong {
+    background: var(--surface-strong, rgba(255,255,255,0.10));
+    border: 1px solid var(--border-strong, rgba(255,255,255,0.16));
+    backdrop-filter: blur(16px) saturate(200%);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .surface-elev {
+    background: var(--surface-elev, var(--surface-elevated, rgba(255, 255, 255, 0.08)));
+    border: 1px solid var(--border, rgba(255,255,255,0.10));
+    backdrop-filter: blur(20px) saturate(220%);
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  }
+
+  .surface-glass {
+    background: var(--surface-glass, rgba(255, 255, 255, 0.04));
+    border: 1px solid color-mix(in srgb, var(--border, rgba(255,255,255,0.10)) 70%, transparent);
+    backdrop-filter: blur(24px);
+    border-radius: 1rem;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: var(--font-xs);
+    font-weight: var(--font-weight-medium);
+    border: 1px solid transparent;
+  }
+
+  .badge-primary {
+    background: color-mix(in srgb, var(--accent-primary, var(--accent-1, #10b981)) 15%, transparent);
+    color: var(--accent-primary, var(--accent-1, #10b981));
+    border-color: color-mix(in srgb, var(--accent-primary, var(--accent-1, #10b981)) 30%, transparent);
+  }
+
+  .badge-secondary {
+    background: color-mix(in srgb, var(--accent-secondary, var(--accent-2, #3b82f6)) 15%, transparent);
+    color: var(--accent-secondary, var(--accent-2, #3b82f6));
+    border-color: color-mix(in srgb, var(--accent-secondary, var(--accent-2, #3b82f6)) 30%, transparent);
+  }
+
+  .badge-accent {
+    background: color-mix(in srgb, var(--accent-tertiary, var(--accent-3, #a855f7)) 15%, transparent);
+    color: var(--accent-tertiary, var(--accent-3, #a855f7));
+    border-color: color-mix(in srgb, var(--accent-tertiary, var(--accent-3, #a855f7)) 30%, transparent);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface, rgba(255,255,255,0.06));
+    border: 1px solid var(--border, rgba(255,255,255,0.10));
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card:hover {
+    border-color: var(--border-strong, rgba(255,255,255,0.16));
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-glow { position: relative; }
+
+  .card-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-primary, var(--grad-primary, linear-gradient(135deg, #10b981, #14b8a6)));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .card-glow:hover::after { opacity: 1; }
 }
 
-h1 {
-  font-size: var(--font-heading-h1);
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
+/* =========================================================
+   UTILITIES LAYER
+   ========================================================= */
+@layer utilities {
+  /* Typography */
+  .text-xs { font-size: var(--font-xs); }
+  .text-sm { font-size: var(--font-sm); }
+  .text-base { font-size: var(--font-base); }
+  .text-md { font-size: var(--font-md); }
+  .text-lg { font-size: var(--font-lg); }
+  .text-xl { font-size: var(--font-xl); }
+  .text-2xl { font-size: var(--font-2xl); }
+  .text-3xl { font-size: var(--font-3xl); }
+  .text-4xl { font-size: var(--font-4xl); }
+
+  .font-light { font-weight: var(--font-weight-light); }
+  .font-normal { font-weight: var(--font-weight-normal); }
+  .font-medium { font-weight: var(--font-weight-medium); }
+  .font-semibold { font-weight: var(--font-weight-semibold); }
+  .font-bold { font-weight: var(--font-weight-bold); }
+  .font-extrabold { font-weight: var(--font-weight-extrabold); }
+
+  .leading-tight { line-height: var(--line-height-tight); }
+  .leading-normal { line-height: var(--line-height-normal); }
+  .leading-relaxed { line-height: var(--line-height-relaxed); }
+  .leading-loose { line-height: var(--line-height-loose); }
+
+  /* Colors */
+  .text-primary { color: var(--text, rgba(255,255,255,0.96)); }
+  .text-secondary { color: var(--text-2, rgba(255,255,255,0.72)); }
+  .text-muted { color: var(--text-muted, rgba(255,255,255,0.56)); }
+
+  .bg-primary { background: var(--bg, #0b1220); }
+  .bg-surface { background: var(--surface, rgba(255,255,255,0.06)); }
+  .bg-surface-strong { background: var(--surface-strong, rgba(255,255,255,0.10)); }
+  .bg-surface-elev { background: var(--surface-elev, rgba(255,255,255,0.08)); }
+
+  /* Accents */
+  .text-accent-primary { color: var(--accent-primary, var(--accent-1, #10b981)); }
+  .text-accent-secondary { color: var(--accent-secondary, var(--accent-2, #3b82f6)); }
+  .text-accent-tertiary { color: var(--accent-tertiary, var(--accent-3, #a855f7)); }
+  .text-accent-warm { color: var(--accent-warm, #f59e0b); }
+  .text-accent-alert { color: var(--accent-alert, #ef4444); }
+
+  .bg-accent-primary { background: var(--accent-primary, var(--accent-1, #10b981)); }
+  .bg-accent-secondary { background: var(--accent-secondary, var(--accent-2, #3b82f6)); }
+  .bg-accent-tertiary { background: var(--accent-tertiary, var(--accent-3, #a855f7)); }
+
+  .border-accent-primary { border-color: var(--accent-primary, var(--accent-1, #10b981)); }
+  .border-accent-secondary { border-color: var(--accent-secondary, var(--accent-2, #3b82f6)); }
+  .border-accent-tertiary { border-color: var(--accent-tertiary, var(--accent-3, #a855f7)); }
+
+  .border-default { border-color: var(--border, rgba(255,255,255,0.10)); }
+  .border-strong { border-color: var(--border-strong, rgba(255,255,255,0.16)); }
+
+  /* Gradients & Glow */
+  .gradient-primary { background: var(--gradient-primary, var(--grad-primary)); }
+  .gradient-secondary { background: var(--gradient-secondary, var(--grad-secondary)); }
+  .gradient-tertiary { background: var(--gradient-tertiary, var(--grad-accent)); }
+
+  /* Mantidos por compatibilidade */
+  .gradient-success { background: var(--gradient-success, linear-gradient(135deg, #22c55e, #10b981)); }
+  .gradient-warning { background: var(--gradient-warning, linear-gradient(135deg, #f59e0b, #f97316)); }
+  .gradient-error { background: var(--gradient-error, linear-gradient(135deg, #ef4444, #f43f5e)); }
+  .gradient-info { background: var(--gradient-info, linear-gradient(135deg, #0ea5e9, #3b82f6)); }
+
+  .glow-primary { box-shadow: var(--glow-primary, var(--glow-1)); }
+  .glow-secondary { box-shadow: var(--glow-secondary, var(--glow-2)); }
+  .glow-tertiary { box-shadow: var(--glow-tertiary, var(--glow-3)); }
+
+  .glow-sm { box-shadow: 0 0 10px rgba(255, 255, 255, 0.10); }
+  .glow-md { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
+  .glow-lg { box-shadow: 0 0 30px rgba(255, 255, 255, 0.20); }
+
+  /* Glass */
+  .glass {
+    background: var(--surface-glass, rgba(255, 255, 255, 0.04));
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border, rgba(255,255,255,0.10));
+  }
+
+  .glass-strong {
+    background: var(--surface-strong, rgba(255, 255, 255, 0.10));
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-strong, rgba(255,255,255,0.16));
+  }
+
+  /* Prose */
+  .prose { max-width: 65ch; }
 }
 
-h2 {
-  font-size: var(--font-heading-h2);
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-bold);
+/* =========================================================
+   ANIMAÇÕES GLOBAIS
+   ========================================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-h3 {
-  font-size: var(--font-heading-h3);
-  line-height: var(--line-height-tight);
-  font-weight: var(--font-weight-semibold);
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 640px) {
+  :root {
+    --font-heading-h1: clamp(1.25rem, 4vw, 1.875rem);
+    --font-heading-h2: clamp(1.125rem, 3.5vw, 1.5rem);
+    --font-heading-h3: clamp(1rem, 3vw, 1.25rem);
+  }
+
+  .card { padding: 1rem; }
+  .btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
 }
 
-h4 {
-  font-size: var(--font-heading-h4);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-semibold);
+/* =========================================================
+   ACESSIBILIDADE
+   ========================================================= */
+@media (prefers-contrast: high) {
+  :root {
+    --border: rgba(255, 255, 255, 0.50);
+    --border-strong: rgba(255, 255, 255, 0.80);
+  }
+
+  .btn { border-width: 2px; }
+  a { text-decoration: underline; }
 }
 
-h5 {
-  font-size: var(--font-heading-h5);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-medium);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .btn:active,
+  .surface:hover,
+  .card:hover { transform: none !important; }
 }
 
-h6 {
-  font-size: var(--font-heading-h6);
-  line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-medium);
-}
+/* =========================================================
+   DEBUG (Development only)
+   ========================================================= */
+.theme-debug * { outline: 1px solid rgba(255, 0, 0, 0.1) !important; }
+.theme-debug .btn { outline: 2px solid rgba(0, 255, 0, 0.3) !important; }
 
-p {
-  font-size: var(--font-base);
-  line-height: var(--line-height-relaxed);
-}
+/*
+  ✅ SSOT Compliant (Consumer-only)
+  ✅ Tokens consumidos alinham com injectThemeVariables(theme)
+  ✅ Fallback mínimo legível (JS off/runtime failure)
+  ✅ Nuclear fallback targeted
+  ✅ Acessibilidade (contrast + reduced motion)
 
-/* ============================================ */
-/* 🎨 HELPER CLASSES - Theme Agnostic */
-/* ============================================ */
-
-/* ============================================ */
-/* 🎨 HELPER CLASSES */
-/* ============================================ */
-
-/* Gradientes */
-.btn-primary {
-  background: linear-gradient(135deg, var(--color-primary-from), var(--color-primary-to));
-  transition: background 0.3s ease;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-hover-from), var(--color-primary-hover-to));
-}
-
-.btn-secondary {
-  background: linear-gradient(135deg, var(--color-secondary-from), var(--color-secondary-to));
-  transition: background 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background: linear-gradient(135deg, var(--color-secondary-hover-from), var(--color-secondary-hover-to));
-}
-
-.btn-success {
-  background: linear-gradient(135deg, var(--color-success-from), var(--color-success-to));
-  transition: background 0.3s ease;
-}
-
-.btn-success:hover {
-  background: linear-gradient(135deg, var(--color-success-hover-from), var(--color-success-hover-to));
-}
-
-.btn-warning {
-  background: linear-gradient(135deg, var(--color-warning-from), var(--color-warning-to));
-  transition: background 0.3s ease;
-}
-
-.btn-warning:hover {
-  background: linear-gradient(135deg, var(--color-warning-hover-from), var(--color-warning-hover-to));
-}
-
-.btn-error {
-  background: linear-gradient(135deg, var(--color-error-from), var(--color-error-to));
-  transition: background 0.3s ease;
-}
-
-.btn-error:hover {
-  background: linear-gradient(135deg, var(--color-error-hover-from), var(--color-error-hover-to));
-}
-
-.btn-info {
-  background: linear-gradient(135deg, var(--color-info-from), var(--color-info-to));
-  transition: background 0.3s ease;
-}
-
-.btn-info:hover {
-  background: linear-gradient(135deg, var(--color-info-hover-from), var(--color-info-hover-to));
-}
-
-/* Classes de texto responsivo */
-.text-xs { font-size: var(--font-xs); }
-.text-sm { font-size: var(--font-sm); }
-.text-base { font-size: var(--font-base); }
-.text-md { font-size: var(--font-md); }
-.text-lg { font-size: var(--font-lg); }
-.text-xl { font-size: var(--font-xl); }
-.text-2xl { font-size: var(--font-2xl); }
-.text-3xl { font-size: var(--font-3xl); }
-.text-4xl { font-size: var(--font-4xl); }
-
-/* Font weights */
-.font-light { font-weight: var(--font-weight-light); }
-.font-normal { font-weight: var(--font-weight-normal); }
-.font-medium { font-weight: var(--font-weight-medium); }
-.font-semibold { font-weight: var(--font-weight-semibold); }
-.font-bold { font-weight: var(--font-weight-bold); }
-.font-extrabold { font-weight: var(--font-weight-extrabold); }
-
-/* Line heights */
-.leading-tight { line-height: var(--line-height-tight); }
-.leading-normal { line-height: var(--line-height-normal); }
-.leading-relaxed { line-height: var(--line-height-relaxed); }
-.leading-loose { line-height: var(--line-height-loose); }
+  VERSÃO: 2.2.0-SSOT-CONSUMER-ALIGNED
+*/
