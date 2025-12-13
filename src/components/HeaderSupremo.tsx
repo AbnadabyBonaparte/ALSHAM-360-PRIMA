@@ -87,11 +87,11 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
           className="h-5 w-5 rounded-full border border-white/20 shadow-md"
           style={{ background: currentThemeData.swatch }}
         />
-        <span className="hidden text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)] sm:block">
+        <span className="hidden text-xs font-semibold uppercase tracking-wider text-[var(--text)] sm:block">
           {currentThemeData.emoji}
         </span>
         <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="h-3 w-3 text-[var(--text-secondary)]" />
+          <ChevronDown className="h-3 w-3 text-[var(--text-2)]" />
         </motion.span>
       </motion.button>
 
@@ -111,7 +111,7 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
               <p className="text-[0.625rem] sm:text-xs font-bold uppercase tracking-[0.3em] text-[var(--color-primary-from)]">
                 Temas Neon
               </p>
-              <p className="text-[0.625rem] sm:text-xs text-[var(--text-secondary)]">
+              <p className="text-[0.625rem] sm:text-xs text-[var(--text-2)]">
                 Escolha sua vibe cósmica
               </p>
             </div>
@@ -170,13 +170,13 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
                         <span className="text-base">{theme.emoji}</span>
                         <span
                           className={`text-sm font-bold ${
-                            isSelected ? 'text-[var(--color-primary-from)]' : 'text-[var(--text-primary)]'
+                            isSelected ? 'text-[var(--color-primary-from)]' : 'text-[var(--text)]'
                           }`}
                         >
                           {theme.name}
                         </span>
                       </div>
-                      <p className="mt-0.5 text-[0.625rem] sm:text-xs text-[var(--text-secondary)]">
+                      <p className="mt-0.5 text-[0.625rem] sm:text-xs text-[var(--text-2)]">
                         {theme.description}
                       </p>
                     </div>
@@ -198,7 +198,7 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
             {/* Footer */}
             <div className="mt-3 flex items-center gap-2 rounded-xl bg-[var(--surface-strong)]/50 px-3 py-2">
               <Sparkles className="h-3 w-3 text-[var(--color-primary-from)]" />
-              <span className="text-[0.625rem] sm:text-xs text-[var(--text-secondary)]">
+              <span className="text-[0.625rem] sm:text-xs text-[var(--text-2)]">
                 Tema atual: <strong className="text-[var(--color-primary-from)]">{currentThemeData.name}</strong>
               </span>
             </div>
@@ -245,8 +245,8 @@ function ControlGroup({ currency, onCurrencyChange, timeframe, onTimeframeChange
             onClick={() => onCurrencyChange(c.value)}
             className={`rounded-lg px-2 py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-wider transition-all ${
               currency === c.value
-                ? 'text-[var(--text-primary)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                ? 'text-[var(--text)]'
+                : 'text-[var(--text-2)] hover:text-[var(--text)]'
             }`}
             style={{
               color: currency === c.value ? c.color : undefined,
@@ -270,8 +270,8 @@ function ControlGroup({ currency, onCurrencyChange, timeframe, onTimeframeChange
             onClick={() => onTimeframeChange(t.value)}
             className={`rounded-lg px-2 py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-wider transition-all ${
               timeframe === t.value
-                ? 'text-[var(--text-primary)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                ? 'text-[var(--text)]'
+                : 'text-[var(--text-2)] hover:text-[var(--text)]'
             }`}
             style={{
               color: timeframe === t.value ? t.color : undefined,
@@ -297,7 +297,7 @@ function NotificationButton() {
 
   return (
     <motion.button
-      className="relative grid h-9 w-9 sm:h-11 sm:w-11 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-secondary)] transition-colors hover:text-[var(--color-primary-from)] hover:border-[var(--color-primary-from)]/30"
+      className="relative grid h-9 w-9 sm:h-11 sm:w-11 place-content-center rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-2)] transition-colors hover:text-[var(--color-primary-from)] hover:border-[var(--color-primary-from)]/30"
       whileHover={{
         scale: 1.05,
         boxShadow: '0 0 20px color-mix(in srgb, var(--color-primary-from) 20%, transparent)',
@@ -347,10 +347,10 @@ function UserProfile({ name, role, initials }: UserProfileProps) {
         <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-[var(--accent-emerald)] ring-2 ring-[var(--surface)]" />
       </div>
       <div className="hidden text-left lg:block">
-        <p className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">{name}</p>
+        <p className="text-xs sm:text-sm font-semibold text-[var(--text)]">{name}</p>
         <p className="text-[0.625rem] sm:text-xs font-medium text-[var(--color-primary-from)]">{role}</p>
       </div>
-      <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
+      <ChevronDown className="h-4 w-4 text-[var(--text-2)]" />
     </motion.button>
   );
 }
@@ -371,13 +371,13 @@ function SearchBar() {
     >
       <Search
         className={`absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${
-          isFocused ? 'text-[var(--color-primary-from)]' : 'text-[var(--text-secondary)]'
+          isFocused ? 'text-[var(--color-primary-from)]' : 'text-[var(--text-2)]'
         }`}
       />
       <input
         type="text"
         placeholder="Pesquisar leads, deals, automações, insights..."
-        className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] py-3 pl-12 pr-16 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] transition-all duration-300 focus:border-[var(--color-primary-from)]/50 focus:outline-none focus:ring-0"
+        className="w-full rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] py-3 pl-12 pr-16 text-sm text-[var(--text)] placeholder:text-[var(--text-2)] transition-all duration-300 focus:border-[var(--color-primary-from)]/50 focus:outline-none focus:ring-0"
         style={{
           boxShadow: isFocused
             ? '0 0 20px color-mix(in srgb, var(--color-primary-from) 15%, transparent), inset 0 0 20px color-mix(in srgb, var(--color-primary-from) 5%, transparent)'
@@ -392,8 +392,8 @@ function SearchBar() {
           borderColor: isFocused ? 'var(--color-primary-from)' : 'var(--border-strong)',
         }}
       >
-        <Command className="h-3 w-3 text-[var(--text-secondary)]" />
-        <span className="text-[0.625rem] sm:text-xs font-bold tracking-wider text-[var(--text-secondary)]">K</span>
+        <Command className="h-3 w-3 text-[var(--text-2)]" />
+        <span className="text-[0.625rem] sm:text-xs font-bold tracking-wider text-[var(--text-2)]">K</span>
       </motion.span>
     </motion.div>
   );
@@ -425,7 +425,7 @@ export default function HeaderSupremo({
         {/* Mobile Menu Toggle */}
         <motion.button
           onClick={onMobileMenuToggle}
-          className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--color-primary-from)] lg:hidden"
+          className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-2)] hover:text-[var(--color-primary-from)] lg:hidden"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >

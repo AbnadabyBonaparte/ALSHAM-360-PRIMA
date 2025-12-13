@@ -100,7 +100,7 @@ export default function SEOPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -112,7 +112,7 @@ export default function SEOPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -134,7 +134,7 @@ export default function SEOPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl text-center"
           >
             <div className="text-2xl md:text-3xl lg:text-4xl mb-4">🥇</div>
-            <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.palavrasTop3 || 0}</p>
+            <p className="text-6xl font-black text-[var(--text)]">{metrics?.palavrasTop3 || 0}</p>
             <p className="text-xl text-gray-400">Palavras no Top 3</p>
           </motion.div>
 
@@ -143,7 +143,7 @@ export default function SEOPage() {
             className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-3xl p-8 border border-blue-500/30 backdrop-blur-xl text-center"
           >
             <div className="text-2xl md:text-3xl lg:text-4xl mb-4">🏆</div>
-            <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.palavrasTop10 || 0}</p>
+            <p className="text-6xl font-black text-[var(--text)]">{metrics?.palavrasTop10 || 0}</p>
             <p className="text-xl text-gray-400">Palavras no Top 10</p>
           </motion.div>
 
@@ -152,7 +152,7 @@ export default function SEOPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl text-center"
           >
             <ArrowTrendingUpIcon className="w-20 h-20 text-green-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.trafegoOrganico || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.trafegoOrganico || 0).toLocaleString()}</p>
             <p className="text-xl text-gray-400">Tráfego Orgânico/mês</p>
           </motion.div>
         </div>
@@ -161,17 +161,17 @@ export default function SEOPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-5xl mx-auto">
           <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 rounded-2xl p-8 border border-purple-500/20 text-center">
             <BoltIcon className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.dominioAuthority || 0}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.dominioAuthority || 0}</p>
             <p className="text-gray-400">Domain Authority</p>
           </div>
           <div className="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 rounded-2xl p-8 border border-cyan-500/20 text-center">
             <LinkIcon className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.backlinks || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.backlinks || 0).toLocaleString()}</p>
             <p className="text-gray-400">Backlinks</p>
           </div>
           <div className="bg-gradient-to-br from-teal-900/40 to-emerald-900/40 rounded-2xl p-8 border border-teal-500/20 text-center">
             <DocumentTextIcon className="w-16 h-16 text-teal-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.paginasIndexadas || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.paginasIndexadas || 0).toLocaleString()}</p>
             <p className="text-gray-400">Páginas Indexadas</p>
           </div>
         </div>
@@ -205,19 +205,19 @@ export default function SEOPage() {
                     <div className="flex items-center gap-6">
                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl ${
                         kw.posicao <= 3 ? 'bg-yellow-500 text-black' :
-                        kw.posicao <= 10 ? 'bg-blue-500 text-[var(--text-primary)]' :
-                        'bg-gray-700 text-[var(--text-primary)]'
+                        kw.posicao <= 10 ? 'bg-blue-500 text-[var(--text)]' :
+                        'bg-gray-700 text-[var(--text)]'
                       }`}>
                         #{kw.posicao}
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{kw.palavra}</h3>
+                        <h3 className="text-2xl font-bold text-[var(--text)]">{kw.palavra}</h3>
                         <p className="text-gray-400 text-sm">{kw.url}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-8 text-right">
                       <div>
-                        <p className="text-xl font-bold text-[var(--text-primary)]">{kw.volume.toLocaleString()}</p>
+                        <p className="text-xl font-bold text-[var(--text)]">{kw.volume.toLocaleString()}</p>
                         <p className="text-gray-500 text-sm">Volume</p>
                       </div>
                       <div>

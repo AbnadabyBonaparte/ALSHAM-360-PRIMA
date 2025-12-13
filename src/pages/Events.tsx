@@ -101,7 +101,7 @@ export default function EventsPage() {
   if (loading) {
     return (
       
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -123,7 +123,7 @@ export default function EventsPage() {
 
   return (
     
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -142,25 +142,25 @@ export default function EventsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 rounded-2xl p-6 border border-violet-500/30">
             <CalendarDaysIcon className="w-12 h-12 text-violet-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalEventos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalEventos || 0}</p>
             <p className="text-gray-400">Total Eventos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-2xl p-6 border border-blue-500/30">
             <ClockIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.proximos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.proximos || 0}</p>
             <p className="text-gray-400">Próximos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
             <UserGroupIcon className="w-12 h-12 text-pink-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
             <p className="text-gray-400">Total Inscritos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <TicketIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-4xl font-black text-[var(--text)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-gray-400">Receita Total</p>
           </motion.div>
         </div>
@@ -210,7 +210,7 @@ export default function EventsPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{evento.nome}</h3>
+                    <h3 className="text-2xl font-bold text-[var(--text)] mb-2">{evento.nome}</h3>
                     <p className="text-gray-400 text-sm line-clamp-2">{evento.descricao}</p>
                   </div>
 
@@ -230,7 +230,7 @@ export default function EventsPage() {
 
                     <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
                       <div>
-                        <p className="text-2xl font-bold text-[var(--text-primary)]">{evento.inscritos}/{evento.capacidade}</p>
+                        <p className="text-2xl font-bold text-[var(--text)]">{evento.inscritos}/{evento.capacidade}</p>
                         <p className="text-gray-500 text-sm">Inscritos</p>
                       </div>
                       <div className="text-right">

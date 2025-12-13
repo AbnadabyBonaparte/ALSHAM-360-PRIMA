@@ -132,7 +132,7 @@ function EmptyStateEpico({
 
       {/* Message */}
       <motion.p
-        className="mb-6 max-w-md text-[var(--text-secondary)]"
+        className="mb-6 max-w-md text-[var(--text-2)]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -142,7 +142,7 @@ function EmptyStateEpico({
 
       {/* Motivational Quote */}
       <motion.blockquote
-        className="mb-8 max-w-lg rounded-2xl border border-[var(--color-primary-from)]/20 bg-[var(--color-primary-from)]/5 px-6 py-4 italic text-[var(--text-secondary)]"
+        className="mb-8 max-w-lg rounded-2xl border border-[var(--color-primary-from)]/20 bg-[var(--color-primary-from)]/5 px-6 py-4 italic text-[var(--text-2)]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -197,11 +197,11 @@ function ErrorState({
       >
         <AlertCircle className="h-10 w-10 text-[var(--accent-alert)]" />
       </motion.div>
-      <p className="text-lg text-[var(--text-secondary)]">{message}</p>
+      <p className="text-lg text-[var(--text-2)]">{message}</p>
       {onRetry && (
         <motion.button
           onClick={onRetry}
-          className="rounded-xl bg-[var(--surface)] px-6 py-2 text-sm font-medium text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--color-primary-from)]"
+          className="rounded-xl bg-[var(--surface)] px-6 py-2 text-sm font-medium text-[var(--text)] border border-[var(--border)] hover:border-[var(--color-primary-from)]"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -299,9 +299,9 @@ export default function LayoutSupremo({
   return (
     <div
       data-theme={theme}
-      className="min-h-screen text-[var(--text-primary)] transition-colors duration-300"
+      className="min-h-screen text-[var(--text)] transition-colors duration-300"
       style={{
-        background: 'var(--background)',
+        background: 'var(--bg)',
         backgroundAttachment: 'fixed'
       }}
     >

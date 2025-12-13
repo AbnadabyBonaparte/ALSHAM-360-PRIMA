@@ -14,9 +14,9 @@ export default function SentimentOrb({ score, size = 'small', era }: Props) {
     <div className="relative flex items-center justify-center">
       <div className={`absolute ${dimension} rounded-full bg-gradient-to-br ${color} blur-3xl opacity-40`} />
       <div className={`relative ${dimension} rounded-full bg-[var(--surface)] border border-[var(--border)] flex flex-col items-center justify-center gap-2`}>
-        <span className="text-5xl font-black text-[var(--text-primary)]">{score}</span>
-        <span className="text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">Sentimento</span>
-        {era && <span className="text-sm font-bold text-[var(--text-primary)]/80">{era}</span>}
+        <span className="text-5xl font-black text-[var(--text)]">{score}</span>
+        <span className="text-xs uppercase tracking-[0.3em] text-[var(--text-2)]">Sentimento</span>
+        {era && <span className="text-sm font-bold text-[var(--text)]/80">{era}</span>}
       </div>
     </div>
   );

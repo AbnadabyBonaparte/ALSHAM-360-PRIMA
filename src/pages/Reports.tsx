@@ -104,7 +104,7 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -116,7 +116,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -209,9 +209,9 @@ function SupremeReportCard({ icon, title, value, growth, color }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
-      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
-      <p className="text-2xl text-[var(--text-primary)]/60 text-center mt-4">{growth}</p>
+      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text)] text-center">{value}</p>
+      <p className="text-3xl text-[var(--text)]/80 text-center mt-6">{title}</p>
+      <p className="text-2xl text-[var(--text)]/60 text-center mt-4">{growth}</p>
     </motion.div>
   );
 }
@@ -219,7 +219,7 @@ function SupremeReportCard({ icon, title, value, growth, color }: any) {
 function MiniCard({ title, value, color }: any) {
   return (
     <div className={`bg-gradient-to-br from-${color}-900/50 to-${color}-900/30 rounded-3xl p-8 border border-${color}-500/30`}>
-      <p className="text-5xl font-black text-[var(--text-primary)]">{value}</p>
+      <p className="text-5xl font-black text-[var(--text)]">{value}</p>
       <p className="text-2xl text-gray-300 mt-4">{title}</p>
     </div>
   );

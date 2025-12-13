@@ -87,7 +87,7 @@ export default function HomePage() {
   if (loading) {
     return (
       
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -103,7 +103,7 @@ export default function HomePage() {
 
   return (
     
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-hidden">
         {/* HERO SUPREMO */}
         <motion.div 
           initial={{ opacity: 0 }}
@@ -135,7 +135,7 @@ export default function HomePage() {
               className="mt-20 inline-block"
             >
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-1 rounded-3xl">
-                <div className="bg-[var(--background)] rounded-3xl px-16 py-8">
+                <div className="bg-[var(--bg)] rounded-3xl px-16 py-8">
                   <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
                     Citizen Supremo X.1 está online
                   </p>
@@ -187,9 +187,9 @@ function SupremeMetric({ icon, title, value, color }: any) {
     >
       <div className="absolute inset-0 bg-white/5"></div>
       <div className="relative z-10">
-        <div className className="w-20 h-20 text-[var(--text-primary)]/90 mb-6" />
-        <p className="text-6xl font-black text-[var(--text-primary)]">{value}</p>
-        <p className="text-2xl text-[var(--text-primary)]/80 mt-4">{title}</p>
+        <div className className="w-20 h-20 text-[var(--text)]/90 mb-6" />
+        <p className="text-6xl font-black text-[var(--text)]">{value}</p>
+        <p className="text-2xl text-[var(--text)]/80 mt-4">{title}</p>
       </div>
     </motion.div>
   );

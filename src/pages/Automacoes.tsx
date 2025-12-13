@@ -89,7 +89,7 @@ export default function AutomacoesPage() {
               >
                 <div className="flex items-start justify-between mb-8">
                   <div>
-                    <h2 className="text-3xl font-bold text-[var(--text-primary)]">{auto.name}</h2>
+                    <h2 className="text-3xl font-bold text-[var(--text)]">{auto.name}</h2>
                     <p className="text-gray-400 mt-2">Trigger: {auto.trigger}</p>
                   </div>
                   <div className="flex items-center gap-4">

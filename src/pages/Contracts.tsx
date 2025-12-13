@@ -96,7 +96,7 @@ export default function ContractsPage() {
   if (loading) {
     return (
       
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -119,7 +119,7 @@ export default function ContractsPage() {
 
   return (
     
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -138,25 +138,25 @@ export default function ContractsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-indigo-900/60 to-blue-900/60 rounded-2xl p-6 border border-indigo-500/30">
             <DocumentDuplicateIcon className="w-12 h-12 text-indigo-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalContratos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalContratos || 0}</p>
             <p className="text-gray-400">Total Contratos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <ShieldCheckIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.ativos || 0}</p>
             <p className="text-gray-400">Ativos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorRecorrente || 0) / 1000).toFixed(0)}k/mês</p>
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorRecorrente || 0) / 1000).toFixed(0)}k/mês</p>
             <p className="text-gray-400">Recorrente</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorTotal || 0) / 1000000).toFixed(1)}M</p>
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorTotal || 0) / 1000000).toFixed(1)}M</p>
             <p className="text-gray-400">Valor Total</p>
           </motion.div>
         </div>
@@ -197,14 +197,14 @@ export default function ContractsPage() {
                           <DocumentDuplicateIcon className="w-8 h-8 text-indigo-400" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-[var(--text-primary)]">{contrato.titulo}</h3>
+                          <h3 className="text-xl font-bold text-[var(--text)]">{contrato.titulo}</h3>
                           <p className="text-gray-400">{contrato.cliente} • {contrato.tipo}</p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-8">
                         <div className="text-right">
-                          <p className="text-xl font-bold text-[var(--text-primary)]">R$ {contrato.valor_mensal.toLocaleString('pt-BR')}</p>
+                          <p className="text-xl font-bold text-[var(--text)]">R$ {contrato.valor_mensal.toLocaleString('pt-BR')}</p>
                           <p className="text-gray-500 text-sm">/mês</p>
                         </div>
 

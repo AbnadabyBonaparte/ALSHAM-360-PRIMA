@@ -143,7 +143,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
             className={`group/link flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
               isActive
                 ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)] shadow-md'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]/60'
+                : 'text-[var(--text-2)] hover:text-[var(--text)] hover:bg-[var(--surface)]/60'
             }`}
             style={{
               paddingLeft: `${12 + paddingLeft}px`,
@@ -249,7 +249,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
               transition={{ duration: 0.2 }}
             >
               <p className="text-[0.625rem] sm:text-xs uppercase tracking-[0.4em] text-[var(--color-primary-from)] font-semibold">ALSHAM</p>
-              <p className="text-sm sm:text-base font-bold bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)] bg-clip-text text-transparent">
+              <p className="text-sm sm:text-base font-bold bg-gradient-to-r from-[var(--text)] to-[var(--text-2)] bg-clip-text text-transparent">
                 360° PRIMA
               </p>
             </motion.div>
@@ -261,20 +261,20 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
       <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
         <div className="px-3 py-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar página..."
-              className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--surface)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[var(--color-primary-from)] transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[var(--surface)] border border-[var(--border)] rounded-xl text-[var(--text)] placeholder-[var(--text-2)] focus:outline-none focus:border-[var(--color-primary-from)] transition-colors"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-[var(--surface-strong)] rounded"
               >
-                <X className="h-3 w-3 text-[var(--text-secondary)]" />
+                <X className="h-3 w-3 text-[var(--text-2)]" />
               </button>
             )}
           </div>
@@ -302,7 +302,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                     className={`grid h-9 w-9 place-content-center rounded-xl transition-all duration-300 ${
                       hasActiveLink
                         ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)] shadow-lg'
-                        : 'bg-[var(--surface)] text-[var(--text-secondary)] group-hover:text-[var(--color-primary-from)] group-hover:bg-[var(--color-primary-from)]/10'
+                        : 'bg-[var(--surface)] text-[var(--text-2)] group-hover:text-[var(--color-primary-from)] group-hover:bg-[var(--color-primary-from)]/10'
                     }`}
                     style={{
                       boxShadow: hasActiveLink ? `0 0 20px color-mix(in srgb, ${category.accentColor} 30%, transparent)` : 'none',
@@ -318,14 +318,14 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        <span className={`text-sm font-semibold ${hasActiveLink ? 'text-[var(--color-primary-from)]' : 'text-[var(--text-primary)]'}`}>
+                        <span className={`text-sm font-semibold ${hasActiveLink ? 'text-[var(--color-primary-from)]' : 'text-[var(--text)]'}`}>
                           {category.label}
                         </span>
                         <motion.span
                           animate={{ rotate: isExpanded ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <ChevronDown className="h-4 w-4 text-[var(--text-secondary)]" />
+                          <ChevronDown className="h-4 w-4 text-[var(--text-2)]" />
                         </motion.span>
                       </motion.div>
                     )}
@@ -375,7 +375,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
                 <p className="text-sm font-bold bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--accent-fuchsia)] bg-clip-text text-transparent">
                   Copilot 360°
                 </p>
-                <p className="text-[11px] text-[var(--text-secondary)]">
+                <p className="text-[11px] text-[var(--text-2)]">
                   IA Generativa Integrada
                 </p>
               </div>
@@ -460,7 +460,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
             className={`flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left transition-all ${
               isActive
                 ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)]'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--surface)]/80 hover:text-[var(--text-primary)]'
+                : 'text-[var(--text-2)] hover:bg-[var(--surface)]/80 hover:text-[var(--text)]'
             }`}
             style={{ paddingLeft: `${16 + paddingLeft}px` }}
             whileTap={{ scale: 0.98 }}
@@ -555,12 +555,12 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 </div>
                 <div>
                   <p className="text-[0.625rem] sm:text-xs uppercase tracking-[0.35em] text-[var(--color-primary-from)] font-semibold">ALSHAM</p>
-                  <p className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">360° PRIMA</p>
+                  <p className="text-xs sm:text-sm font-bold text-[var(--text)]">360° PRIMA</p>
                 </div>
               </div>
               <motion.button
                 onClick={onClose}
-                className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -592,12 +592,12 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                             className={`grid h-9 w-9 place-content-center rounded-xl ${
                               hasActiveLink
                                 ? 'bg-[var(--color-primary-from)]/20 text-[var(--color-primary-from)]'
-                                : 'bg-[var(--surface)] text-[var(--text-secondary)]'
+                                : 'bg-[var(--surface)] text-[var(--text-2)]'
                             }`}
                           >
                             {category.icon}
                           </span>
-                          <span className={`font-semibold ${hasActiveLink ? 'text-[var(--color-primary-from)]' : 'text-[var(--text-primary)]'}`}>
+                          <span className={`font-semibold ${hasActiveLink ? 'text-[var(--color-primary-from)]' : 'text-[var(--text)]'}`}>
                             {category.label}
                           </span>
                         </div>
@@ -605,7 +605,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                           animate={{ rotate: isExpanded ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <ChevronDown className="h-5 w-5 text-[var(--text-secondary)]" />
+                          <ChevronDown className="h-5 w-5 text-[var(--text-2)]" />
                         </motion.span>
                       </button>
 
@@ -639,7 +639,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
                 </div>
                 <div>
                   <p className="text-sm font-bold text-[var(--color-primary-from)]">Copilot 360°</p>
-                  <p className="text-xs text-[var(--text-secondary)]">IA Generativa</p>
+                  <p className="text-xs text-[var(--text-2)]">IA Generativa</p>
                 </div>
               </div>
             </div>

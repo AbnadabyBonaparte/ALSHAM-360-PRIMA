@@ -57,8 +57,8 @@ const DealCard = ({ deal }: { deal: Deal }) => {
         <div className="relative z-10">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <p className="text-xs text-[var(--text-primary)]/50 uppercase">{deal.company}</p>
-              <h3 className="font-black text-[var(--text-primary)] text-lg">{deal.name}</h3>
+              <p className="text-xs text-[var(--text)]/50 uppercase">{deal.company}</p>
+              <h3 className="font-black text-[var(--text)] text-lg">{deal.name}</h3>
             </div>
             {deal.health === 'divine' && <Trophy className="h-8 w-8 text-yellow-400" />}
             {deal.health === 'hot' && <Flame className="h-8 w-8 text-orange-500 animate-pulse" />}
@@ -69,8 +69,8 @@ const DealCard = ({ deal }: { deal: Deal }) => {
           </p>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[var(--text-primary)]/60">{deal.probability}% chance</span>
-            <span className="text-[var(--text-primary)]/40">{daysOld}d</span>
+            <span className="text-[var(--text)]/60">{deal.probability}% chance</span>
+            <span className="text-[var(--text)]/40">{daysOld}d</span>
           </div>
 
           {deal.ai_insight && (
@@ -118,20 +118,20 @@ export default function PipelineQuantico() {
   const weighted = deals.reduce((a, d) => a + d.value * d.probability / 100, 0);
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--background)]">
+    <div className="h-screen flex flex-col bg-[var(--bg)]">
 
         {/* HEADER DIVINO + REAL */}
-        <div className="p-8 border-b border-[var(--border)] bg-gradient-to-b from-[var(--background)]/80 to-transparent backdrop-blur-3xl">
+        <div className="p-8 border-b border-[var(--border)] bg-gradient-to-b from-[var(--bg)]/80 to-transparent backdrop-blur-3xl">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 DOMÍNIO REAL
               </h1>
               <div className="flex gap-12 mt-6">
-                <div><p className="text-5xl font-black text-emerald-400">R$ {total.toLocaleString('pt-BR')}</p><p className="text-[var(--text-secondary)]">Total</p></div>
-                <div><p className="text-5xl font-black text-purple-400">R$ {weighted.toLocaleString('pt-BR')}</p><p className="text-[var(--text-secondary)]">Previsão IA</p></div>
-                <div><p className="text-5xl font-black text-emerald-400">R$ {total.toLocaleString('pt-BR')}</p><p className="text-[var(--text-primary)]/60">Total</p></div>
-                <div><p className="text-5xl font-black-purple-400">R$ {weighted.toLocaleString('pt-BR')}</p><p className="text-[var(--text-primary)]/60">Previsão IA</p></div>
+                <div><p className="text-5xl font-black text-emerald-400">R$ {total.toLocaleString('pt-BR')}</p><p className="text-[var(--text-2)]">Total</p></div>
+                <div><p className="text-5xl font-black text-purple-400">R$ {weighted.toLocaleString('pt-BR')}</p><p className="text-[var(--text-2)]">Previsão IA</p></div>
+                <div><p className="text-5xl font-black text-emerald-400">R$ {total.toLocaleString('pt-BR')}</p><p className="text-[var(--text)]/60">Total</p></div>
+                <div><p className="text-5xl font-black-purple-400">R$ {weighted.toLocaleString('pt-BR')}</p><p className="text-[var(--text)]/60">Previsão IA</p></div>
               </div>
             </div>
             <input
@@ -139,7 +139,7 @@ export default function PipelineQuantico() {
               placeholder="Buscar deals..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="bg-[var(--surface-strong)] border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none text-[var(--text-primary)]"
+              className="bg-[var(--surface-strong)] border border-[var(--border)] rounded-2xl px-6 py-4 text-lg w-96 focus:border-purple-500/50 outline-none text-[var(--text)]"
             />
           </div>
         </div>
@@ -154,9 +154,9 @@ export default function PipelineQuantico() {
               return (
                 <div key={key} className="w-96">
                   <motion.div className={`p-6 rounded-3xl bg-gradient-to-br ${config.aura} opacity-20 blur-2xl absolute -inset-4`} animate={{ opacity: [0.1, 0.3, 0.1] }} transition={{ duration: 6, repeat: Infinity }} />
-                  <div className="relative bg-[var(--background)]/60 backdrop-blur-3xl rounded-3xl border border-[var(--border)] p-6">
-                    <h2 className="text-4xl font-black text-[var(--text-primary)] mb-8 text-center">{config.label}</h2>
-                    <p className="text-5xl font-black text-center text-[var(--text-primary)] mb-8">R$ {stageTotal.toLocaleString('pt-BR')}</p>
+                  <div className="relative bg-[var(--bg)]/60 backdrop-blur-3xl rounded-3xl border border-[var(--border)] p-6">
+                    <h2 className="text-4xl font-black text-[var(--text)] mb-8 text-center">{config.label}</h2>
+                    <p className="text-5xl font-black text-center text-[var(--text)] mb-8">R$ {stageTotal.toLocaleString('pt-BR')}</p>
 
                     <Reorder.Group axis="y" values={stageDeals} onReorder={newOrder => {
                       // Atualiza estágio no Supabase (optimistic UI)

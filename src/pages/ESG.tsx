@@ -98,7 +98,7 @@ export default function ESGPage() {
   if (loading) {
     return (
       
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -118,7 +118,7 @@ export default function ESGPage() {
 
   return (
     
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -141,7 +141,7 @@ export default function ESGPage() {
             className="bg-gradient-to-br from-green-900/40 via-blue-900/40 to-purple-900/40 rounded-3xl p-12 border-4 border-green-500/50 text-center"
           >
             <p className="text-2xl text-gray-400 mb-4">Score ESG Total</p>
-            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)]">{(metrics?.score.total || 0).toFixed(0)}</p>
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text)]">{(metrics?.score.total || 0).toFixed(0)}</p>
             <p className="text-xl text-gray-400 mt-4">Top #{metrics?.ranking} no setor</p>
           </motion.div>
         </div>
@@ -154,7 +154,7 @@ export default function ESGPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30"
           >
             <GlobeAmericasIcon className="w-16 h-16 text-green-400 mb-4" />
-            <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.score.environmental || 0}</p>
+            <p className="text-6xl font-black text-[var(--text)]">{metrics?.score.environmental || 0}</p>
             <p className="text-xl text-gray-400 mt-2">Environmental</p>
             <div className="mt-6 h-3 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -171,7 +171,7 @@ export default function ESGPage() {
             className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-3xl p-8 border border-blue-500/30"
           >
             <UserGroupIcon className="w-16 h-16 text-blue-400 mb-4" />
-            <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.score.social || 0}</p>
+            <p className="text-6xl font-black text-[var(--text)]">{metrics?.score.social || 0}</p>
             <p className="text-xl text-gray-400 mt-2">Social</p>
             <div className="mt-6 h-3 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -188,7 +188,7 @@ export default function ESGPage() {
             className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30"
           >
             <BuildingOfficeIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-6xl font-black text-[var(--text-primary)]">{metrics?.score.governance || 0}</p>
+            <p className="text-6xl font-black text-[var(--text)]">{metrics?.score.governance || 0}</p>
             <p className="text-xl text-gray-400 mt-2">Governance</p>
             <div className="mt-6 h-3 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -236,7 +236,7 @@ export default function ESGPage() {
                       </span>
                     </div>
 
-                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">{ini.titulo}</h3>
+                    <h3 className="text-xl font-bold text-[var(--text)] mb-2">{ini.titulo}</h3>
                     <p className="text-gray-400 text-sm mb-4">{ini.meta}</p>
 
                     <div>

@@ -45,13 +45,13 @@ export default function AIInsightsPanel({
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-[var(--text-primary)]" />
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">Insights IA</h2>
+          <Brain className="w-5 h-5 text-[var(--text)]" />
+          <h2 className="text-base font-semibold text-[var(--text)]">Insights IA</h2>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[var(--text-secondary)] hidden sm:inline">Análise em tempo real</span>
+          <span className="text-xs text-[var(--text-2)] hidden sm:inline">Análise em tempo real</span>
           <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-            <ArrowRight className="w-4 h-4 text-[var(--text-secondary)]" />
+            <ArrowRight className="w-4 h-4 text-[var(--text-2)]" />
           </motion.div>
         </div>
       </div>
@@ -69,9 +69,9 @@ export default function AIInsightsPanel({
               <div className="p-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
                 <div className="flex items-center justify-between mb-1">
                   <Zap className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-medium text-[var(--text-secondary)]">Conversão</span>
+                  <span className="text-xs font-medium text-[var(--text-2)]">Conversão</span>
                 </div>
-                <div className="text-xl font-bold text-[var(--text-primary)]">{conversionProb}%</div>
+                <div className="text-xl font-bold text-[var(--text)]">{conversionProb}%</div>
                 {conversionProb > 70 && (
                   <div className="flex items-center gap-1 mt-1">
                     <ThumbsUp className="w-3 h-3 text-emerald-400" />
@@ -83,9 +83,9 @@ export default function AIInsightsPanel({
               <div className="p-2 rounded-lg border border-sky-500/20 bg-sky-500/5">
                 <div className="flex items-center justify-between mb-1">
                   <Award className="w-4 h-4 text-sky-400" />
-                  <span className="text-xs font-medium text-[var(--text-secondary)]">Saúde</span>
+                  <span className="text-xs font-medium text-[var(--text-2)]">Saúde</span>
                 </div>
-                <div className="text-xl font-bold text-[var(--text-primary)]">{healthScore}%</div>
+                <div className="text-xl font-bold text-[var(--text)]">{healthScore}%</div>
                 {healthScore > 80 && (
                   <div className="flex items-center gap-1 mt-1">
                     <Award className="w-3 h-3 text-emerald-400" />
@@ -97,9 +97,9 @@ export default function AIInsightsPanel({
               <div className="p-2 rounded-lg border border-orange-500/20 bg-orange-500/5">
                 <div className="flex items-center justify-between mb-1">
                   <AlertTriangle className="w-4 h-4 text-orange-400" />
-                  <span className="text-xs font-medium text-[var(--text-secondary)]">Risco</span>
+                  <span className="text-xs font-medium text-[var(--text-2)]">Risco</span>
                 </div>
-                <div className="text-xl font-bold text-[var(--text-primary)]">{riskScore}%</div>
+                <div className="text-xl font-bold text-[var(--text)]">{riskScore}%</div>
                 {riskScore > 60 && (
                   <div className="flex items-center gap-1 mt-1">
                     <AlertTriangle className="w-3 h-3 text-red-400" />
@@ -116,10 +116,10 @@ export default function AIInsightsPanel({
                     {nextAction.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Próxima Melhor Ação</h3>
-                    <p className="text-xs text-[var(--text-secondary)] mt-1">{nextAction.reason}</p>
+                    <h3 className="text-sm font-semibold text-[var(--text)]">Próxima Melhor Ação</h3>
+                    <p className="text-xs text-[var(--text-2)] mt-1">{nextAction.reason}</p>
                     {nextAction.script && (
-                      <div className="mt-2 p-2 bg-[var(--surface-strong)] rounded text-xs text-[var(--text-secondary)]">
+                      <div className="mt-2 p-2 bg-[var(--surface-strong)] rounded text-xs text-[var(--text-2)]">
                         {nextAction.script}
                       </div>
                     )}
@@ -130,7 +130,7 @@ export default function AIInsightsPanel({
 
             <div className="border-t border-[var(--border)] p-2 bg-[var(--surface)]">
               {insights.length === 0 ? (
-                <p className="text-center text-[var(--text-secondary)] text-sm py-4">Nenhum insight disponível no momento</p>
+                <p className="text-center text-[var(--text-2)] text-sm py-4">Nenhum insight disponível no momento</p>
               ) : (
                 <div className="space-y-2">
                   {insights.map((insight, index) => (
@@ -144,8 +144,8 @@ export default function AIInsightsPanel({
                       <div className="flex items-start gap-2">
                         <div className="mt-0.5">{getInsightIcon(insight.type)}</div>
                         <div className="flex-1">
-                          <h4 className="text-sm font-semibold text-[var(--text-primary)]">{insight.title}</h4>
-                          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{insight.message}</p>
+                          <h4 className="text-sm font-semibold text-[var(--text)]">{insight.title}</h4>
+                          <p className="text-xs text-[var(--text-2)] mt-0.5">{insight.message}</p>
                           {insight.action && (
                             <button className="mt-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
                               {insight.action}

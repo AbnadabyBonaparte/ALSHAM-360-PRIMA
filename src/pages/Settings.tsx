@@ -76,7 +76,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -88,7 +88,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER BILIONÁRIO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -116,7 +116,7 @@ export default function SettingsPage() {
             animate={{ scale: 1, opacity: 1 }}
             className="bg-gradient-to-br from-yellow-600/40 via-orange-600/40 to-red-600/40 rounded-3xl p-1 shadow-2xl shadow-yellow-500/50"
           >
-            <div className="bg-[var(--background)] rounded-3xl p-16 text-center">
+            <div className="bg-[var(--bg)] rounded-3xl p-16 text-center">
               <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto mb-12" />
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                 PLANO SUPREMO
@@ -156,7 +156,7 @@ export default function SettingsPage() {
                 className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-10 border border-purple-500/30 hover:border-purple-500 transition-all"
               >
                 <SparklesIcon className="w-20 h-20 text-purple-400 mx-auto mb-6" />
-                <p className="text-3xl font-bold text-center text-[var(--text-primary)]">{feature}</p>
+                <p className="text-3xl font-bold text-center text-[var(--text)]">{feature}</p>
               </motion.div>
             ))}
           </div>

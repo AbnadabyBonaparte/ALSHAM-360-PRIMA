@@ -86,7 +86,7 @@ export default function VirtualOfficePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -105,7 +105,7 @@ export default function VirtualOfficePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -131,7 +131,7 @@ export default function VirtualOfficePage() {
               <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse" />
               <span className="text-2xl text-green-400 font-bold">ONLINE AGORA</span>
             </div>
-            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">{metrics?.usuariosOnline}</p>
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text)]">{metrics?.usuariosOnline}</p>
             <p className="text-gray-400">colaboradores ativos</p>
           </motion.div>
         </div>
@@ -140,25 +140,25 @@ export default function VirtualOfficePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
             <BuildingOffice2Icon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.salasCriadas}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.salasCriadas}</p>
             <p className="text-gray-400">Salas Virtuais</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <VideoCameraIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.reunioesHoje}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.reunioesHoje}</p>
             <p className="text-gray-400">Reuniões Hoje</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <ClockIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.horasTrabalhadas}h</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.horasTrabalhadas}h</p>
             <p className="text-gray-400">Horas Hoje</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
             <UserGroupIcon className="w-12 h-12 text-pink-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.usuariosOnline}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.usuariosOnline}</p>
             <p className="text-gray-400">Team Online</p>
           </motion.div>
         </div>
@@ -203,17 +203,17 @@ export default function VirtualOfficePage() {
                       )}
                     </div>
 
-                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-1">{sala.nome}</h3>
+                    <h3 className="text-xl font-bold text-[var(--text)] mb-1">{sala.nome}</h3>
                     <p className={`text-sm ${config.color}`}>{config.label}</p>
 
                     <div className="mt-6 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <UserGroupIcon className="w-5 h-5 text-gray-400" />
-                        <span className="text-[var(--text-primary)] font-medium">{sala.participantes}/{sala.capacidade}</span>
+                        <span className="text-[var(--text)] font-medium">{sala.participantes}/{sala.capacidade}</span>
                       </div>
                       <button className={`px-4 py-2 rounded-xl font-medium transition-all ${
                         sala.participantes > 0
-                          ? 'bg-violet-500 text-[var(--text-primary)] hover:bg-violet-600'
+                          ? 'bg-violet-500 text-[var(--text)] hover:bg-violet-600'
                           : 'bg-white/10 text-gray-400 hover:bg-white/20'
                       }`}>
                         {sala.participantes > 0 ? 'Entrar' : 'Abrir'}

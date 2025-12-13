@@ -100,7 +100,7 @@ export default function EmailMarketingPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -112,7 +112,7 @@ export default function EmailMarketingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -134,7 +134,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-3xl p-8 border border-blue-500/30 backdrop-blur-xl"
           >
             <PaperAirplaneIcon className="w-16 h-16 text-blue-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
             <p className="text-xl text-gray-400">Emails Enviados</p>
           </motion.div>
 
@@ -143,7 +143,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
           >
             <EnvelopeOpenIcon className="w-16 h-16 text-green-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaAbertura || 0).toFixed(1)}%</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.taxaAbertura || 0).toFixed(1)}%</p>
             <p className="text-xl text-gray-400">Taxa de Abertura</p>
           </motion.div>
 
@@ -152,7 +152,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
           >
             <CursorArrowRaysIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
             <p className="text-xl text-gray-400">Taxa de Cliques</p>
           </motion.div>
 
@@ -161,7 +161,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl"
           >
             <ChartBarIcon className="w-16 h-16 text-yellow-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.totalListas || 0}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.totalListas || 0}</p>
             <p className="text-xl text-gray-400">Listas Ativas</p>
           </motion.div>
 
@@ -170,7 +170,7 @@ export default function EmailMarketingPage() {
             className="bg-gradient-to-br from-cyan-900/60 to-teal-900/60 rounded-3xl p-8 border border-cyan-500/30 backdrop-blur-xl"
           >
             <UserGroupIcon className="w-16 h-16 text-cyan-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalContatos || 0).toLocaleString()}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalContatos || 0).toLocaleString()}</p>
             <p className="text-xl text-gray-400">Total Contatos</p>
           </motion.div>
         </div>
@@ -209,7 +209,7 @@ export default function EmailMarketingPage() {
                         }`} />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{camp.assunto}</h3>
+                        <h3 className="text-2xl font-bold text-[var(--text)]">{camp.assunto}</h3>
                         <p className="text-gray-400">{camp.data_envio || 'Não agendado'} • {camp.status}</p>
                       </div>
                     </div>

@@ -94,7 +94,7 @@ export default function PartnersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -121,7 +121,7 @@ export default function PartnersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -140,25 +140,25 @@ export default function PartnersPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
             <BuildingOffice2Icon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalParceiros || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalParceiros || 0}</p>
             <p className="text-gray-400">Total Parceiros</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
             <StarIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.ativos || 0}</p>
             <p className="text-gray-400">Ativos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
             <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.receitaTotal || 0) / 1000000).toFixed(1)}M</p>
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.receitaTotal || 0) / 1000000).toFixed(1)}M</p>
             <p className="text-gray-400">Receita Gerada</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
             <ChartBarIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.dealsConjuntos || 0}</p>
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.dealsConjuntos || 0}</p>
             <p className="text-gray-400">Deals Conjuntos</p>
           </motion.div>
         </div>
@@ -199,7 +199,7 @@ export default function PartnersPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{parceiro.nome}</h3>
+                    <h3 className="text-2xl font-bold text-[var(--text)] mb-1">{parceiro.nome}</h3>
                     <div className="flex items-center gap-2 text-gray-400 text-sm mb-6">
                       <GlobeAltIcon className="w-4 h-4" />
                       <span>{parceiro.pais}</span>
@@ -217,7 +217,7 @@ export default function PartnersPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Deals Conjuntos</span>
-                        <span className="text-[var(--text-primary)] font-bold">{parceiro.deals_conjuntos}</span>
+                        <span className="text-[var(--text)] font-bold">{parceiro.deals_conjuntos}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Satisfação</span>

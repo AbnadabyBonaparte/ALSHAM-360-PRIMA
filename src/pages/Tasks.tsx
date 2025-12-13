@@ -87,7 +87,7 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -193,7 +193,7 @@ function TaskColumn({ title, tasks, color }: any) {
       animate={{ opacity: 1, x: 0 }}
       className={`bg-gradient-to-br ${color} rounded-3xl p-10 border-4 border-white/20 backdrop-blur-xl`}
     >
-      <h2 className="text-5xl font-black text-[var(--text-primary)] mb-8 text-center">{title}</h2>
+      <h2 className="text-5xl font-black text-[var(--text)] mb-8 text-center">{title}</h2>
       <div className="space-y-6">
         {tasks.map((task: any) => (
           <motion.div
@@ -202,7 +202,7 @@ function TaskColumn({ title, tasks, color }: any) {
             className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-[var(--text-primary)]">{task.title}</h3>
+              <h3 className="text-2xl font-bold text-[var(--text)]">{task.title}</h3>
               <div className={`px-6 py-3 rounded-full font-black text-xl bg-gradient-to-r ${getPriorityColor(task.priority)}`}>
                 {task.priority.toUpperCase()}
               </div>
@@ -242,8 +242,8 @@ function SupremeTaskCard({ icon, title, value, color }: any) {
           {icon}
         </div>
       </div>
-      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
-      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
+      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text)] text-center">{value}</p>
+      <p className="text-3xl text-[var(--text)]/80 text-center mt-6">{title}</p>
     </motion.div>
   );
 }

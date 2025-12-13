@@ -71,7 +71,7 @@ export default function LeaderboardPage() {
   const mortals = champions.slice(3);
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -145,14 +145,14 @@ export default function LeaderboardPage() {
                   {/* Avatar + Nome */}
                   <div className="text-center">
                     <div className="relative inline-block">
-                      <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-6xl font-bold text-[var(--text-primary)] shadow-2xl mx-auto">
+                      <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-6xl font-bold text-[var(--text)] shadow-2xl mx-auto">
                         {hero.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                       </div>
-                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-[var(--background)]/80 rounded-full border-2 border-white/20 text-[var(--text-primary)] font-bold">
+                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-[var(--bg)]/80 rounded-full border-2 border-white/20 text-[var(--text)] font-bold">
                         Nível {hero.level}
                       </div>
                     </div>
-                    <h2 className="text-5xl font-bold text-[var(--text-primary)] mt-12">{hero.name}</h2>
+                    <h2 className="text-5xl font-bold text-[var(--text)] mt-12">{hero.name}</h2>
                     <p className="text-2xl text-gray-300 mt-4">{hero.title}</p>
                     <p className="text-xl text-gray-400">{hero.department}</p>
                   </div>
@@ -204,7 +204,7 @@ export default function LeaderboardPage() {
                       #{player.rank}
                     </div>
                     <div>
-                      <h3 className="text-3xl font-bold text-[var(--text-primary)]">{player.name}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--text)]">{player.name}</h3>
                       <p className="text-xl text-gray-400">{player.title} • {player.department}</p>
                     </div>
                   </div>

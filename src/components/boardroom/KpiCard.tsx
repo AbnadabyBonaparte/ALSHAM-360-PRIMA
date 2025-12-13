@@ -29,13 +29,13 @@ export default function KpiCard({
         glow ? 'shadow-[0_0_40px_rgba(16,185,129,0.35)]' : ''
       }`}
     >
-      <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-primary)]/60 mb-3">{title}</p>
-      <div className="text-5xl font-black text-[var(--text-primary)] tracking-tight">
+      <p className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text)]/60 mb-3">{title}</p>
+      <div className="text-5xl font-black text-[var(--text)] tracking-tight">
         {prefix}
         {value}
         {suffix}
       </div>
-      {subtitle && <p className="text-[var(--text-secondary)] mt-2">{subtitle}</p>}
+      {subtitle && <p className="text-[var(--text-2)] mt-2">{subtitle}</p>}
       {trend !== undefined && (
         <div className={`mt-4 inline-flex items-center gap-2 ${trendColor}`}>
           {trendIcon}

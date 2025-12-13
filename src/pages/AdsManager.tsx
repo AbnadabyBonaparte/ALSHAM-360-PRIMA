@@ -108,7 +108,7 @@ export default function AdsManagerPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -120,7 +120,7 @@ export default function AdsManagerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -142,7 +142,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-red-900/60 to-orange-900/60 rounded-3xl p-8 border border-red-500/30 backdrop-blur-xl"
           >
             <BanknotesIcon className="w-16 h-16 text-red-400 mb-4" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.gastoTotal || 0).toLocaleString('pt-BR')}</p>
+            <p className="text-4xl font-black text-[var(--text)]">R$ {(metrics?.gastoTotal || 0).toLocaleString('pt-BR')}</p>
             <p className="text-xl text-gray-400">Investido Total</p>
           </motion.div>
 
@@ -151,7 +151,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
           >
             <CurrencyDollarIcon className="w-16 h-16 text-green-400 mb-4" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.receitaGerada || 0).toLocaleString('pt-BR')}</p>
+            <p className="text-4xl font-black text-[var(--text)]">R$ {(metrics?.receitaGerada || 0).toLocaleString('pt-BR')}</p>
             <p className="text-xl text-gray-400">Receita Gerada</p>
           </motion.div>
 
@@ -160,7 +160,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-amber-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl"
           >
             <ArrowTrendingUpIcon className="w-16 h-16 text-yellow-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.roasGeral || 0).toFixed(2)}x</p>
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.roasGeral || 0).toFixed(2)}x</p>
             <p className="text-xl text-gray-400">ROAS Geral</p>
           </motion.div>
 
@@ -169,7 +169,7 @@ export default function AdsManagerPage() {
             className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
           >
             <ChartBarIcon className="w-16 h-16 text-purple-400 mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.adsAtivos || 0}/{metrics?.totalAds || 0}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.adsAtivos || 0}/{metrics?.totalAds || 0}</p>
             <p className="text-xl text-gray-400">Ads Ativos</p>
           </motion.div>
         </div>

@@ -85,10 +85,10 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
               >
                 <div className="bg-[var(--surface-strong)] rounded-t-lg p-4 border-b border-[var(--border)]">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-[var(--text-primary)]">{stage.name}</h3>
-                    <span className="text-xs text-[var(--text-secondary)]">{stage.leads.length}</span>
+                    <h3 className="font-semibold text-[var(--text)]">{stage.name}</h3>
+                    <span className="text-xs text-[var(--text-2)]">{stage.leads.length}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+                  <div className="flex items-center gap-1 text-xs text-[var(--text-2)]">
                     <DollarSign className="w-3 h-3" />
                     <span>{getTotalValue(stage.leads).toLocaleString()}</span>
                   </div>
@@ -99,7 +99,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                   className="p-1 hover:bg-white/5 rounded transition-colors"
                   title={`Adicionar lead em ${stage.name}`}
                 >
-                  <Plus className="w-4 h-4 text-[var(--text-secondary)]" />
+                  <Plus className="w-4 h-4 text-[var(--text-2)]" />
                 </button>
 
                 <div className="space-y-2 p-2">
@@ -122,7 +122,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
 
                 {stage.leads.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-[var(--text-secondary)] mb-2">Nenhum lead nesta etapa</p>
+                    <p className="text-[var(--text-2)] mb-2">Nenhum lead nesta etapa</p>
                     <button
                       onClick={() => handleAddLead(stage.id)}
                       className="w-full px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm hover:bg-emerald-500/20 transition-colors inline-flex items-center justify-center gap-2"

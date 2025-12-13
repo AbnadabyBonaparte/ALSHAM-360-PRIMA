@@ -90,7 +90,7 @@ export default function SustainabilityPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -102,7 +102,7 @@ export default function SustainabilityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -126,7 +126,7 @@ export default function SustainabilityPage() {
           >
             <div className="w-64 h-64 rounded-full bg-gradient-to-br from-blue-500 via-green-500 to-emerald-500 opacity-30 blur-3xl absolute inset-0" />
             <div className="w-64 h-64 rounded-full bg-gradient-to-br from-blue-600 via-green-600 to-emerald-600 flex items-center justify-center relative">
-              <GlobeAmericasIcon className="w-32 h-32 text-[var(--text-primary)]" />
+              <GlobeAmericasIcon className="w-32 h-32 text-[var(--text)]" />
             </div>
           </motion.div>
         </div>
@@ -138,7 +138,7 @@ export default function SustainabilityPage() {
             className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 text-center"
           >
             <SunIcon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.energiaRenovavel}%</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.energiaRenovavel}%</p>
             <p className="text-gray-400 mt-2">Energia Renovável</p>
             <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -154,7 +154,7 @@ export default function SustainabilityPage() {
             className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 text-center"
           >
             <ArrowPathIcon className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.reducaoResiduos}%</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.reducaoResiduos}%</p>
             <p className="text-gray-400 mt-2">Redução Resíduos</p>
             <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -170,7 +170,7 @@ export default function SustainabilityPage() {
             className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-3xl p-8 border border-blue-500/30 text-center"
           >
             <BeakerIcon className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.aguaReciclada}%</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.aguaReciclada}%</p>
             <p className="text-gray-400 mt-2">Água Reciclada</p>
             <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -186,7 +186,7 @@ export default function SustainabilityPage() {
             className="bg-gradient-to-br from-teal-900/60 to-cyan-900/60 rounded-3xl p-8 border border-teal-500/30 text-center"
           >
             <CloudIcon className="w-16 h-16 text-teal-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.emissoesSalvas}</p>
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.emissoesSalvas}</p>
             <p className="text-gray-400 mt-2">Ton CO₂ Evitadas</p>
           </motion.div>
         </div>
@@ -195,7 +195,7 @@ export default function SustainabilityPage() {
         <div className="max-w-xl mx-auto mb-16">
           <div className="bg-gradient-to-br from-emerald-900/40 to-green-900/40 rounded-3xl p-8 border border-emerald-500/30 text-center">
             <p className="text-2xl text-gray-400 mb-4">Metas de Sustentabilidade</p>
-            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text)]">
               {metrics?.metasAtingidas}/{metrics?.totalMetas}
             </p>
             <p className="text-emerald-400 text-xl mt-2">
@@ -238,7 +238,7 @@ export default function SustainabilityPage() {
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">{projeto.nome}</h3>
+                  <h3 className="text-xl font-bold text-[var(--text)] mb-2">{projeto.nome}</h3>
                   <p className="text-gray-400 text-sm mb-4">Impacto: {projeto.impacto}</p>
 
                   <div className="pt-4 border-t border-[var(--border)]">

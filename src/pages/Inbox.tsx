@@ -105,7 +105,7 @@ export default function InboxPage() {
 
   return (
     
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
         {/* HEADER SUPREMO */}
         <div className="border-b border-[var(--border)] bg-gradient-to-r from-purple-900/20 via-black to-cyan-900/20 backdrop-blur-xl">
           <div className="p-8 max-w-7xl mx-auto">
@@ -133,25 +133,25 @@ export default function InboxPage() {
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'all' ? 'bg-primary text-[var(--text-primary)]' : 'bg-white/10'}`}
+                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'all' ? 'bg-primary text-[var(--text)]' : 'bg-white/10'}`}
               >
                 Todas
               </button>
               <button
                 onClick={() => setFilter('unread')}
-                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'unread' ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-[var(--text-primary)]' : 'bg-white/10'}`}
+                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'unread' ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-[var(--text)]' : 'bg-white/10'}`}
               >
                 Não lidas ({unreadCount})
               </button>
               <button
                 onClick={() => setFilter('high')}
-                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'high' ? 'bg-gradient-to-r from-red-600 to-orange-600 text-[var(--text-primary)]' : 'bg-white/10'}`}
+                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'high' ? 'bg-gradient-to-r from-red-600 to-orange-600 text-[var(--text)]' : 'bg-white/10'}`}
               >
                 Urgentes ({highPriorityCount})
               </button>
               <button
                 onClick={() => setFilter('whatsapp')}
-                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'whatsapp' ? 'bg-green-500 text-[var(--text-primary)]' : 'bg-white/10'}`}
+                className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all ${filter === 'whatsapp' ? 'bg-green-500 text-[var(--text)]' : 'bg-white/10'}`}
               >
                 WhatsApp
               </button>
@@ -206,24 +206,24 @@ export default function InboxPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-6">
                       <div className="relative">
-                        <div className="w-20 h-20 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center text-4xl font-bold text-[var(--text-primary)]">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center text-4xl font-bold text-[var(--text)]">
                           {msg.from.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                         </div>
                         {msg.channel === 'whatsapp' && (
                           <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                            <ChatBubbleLeftRightIcon className="w-6 h-6 text-[var(--text-primary)]" />
+                            <ChatBubbleLeftRightIcon className="w-6 h-6 text-[var(--text)]" />
                           </div>
                         )}
                         {!msg.read && (
                           <div className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-                            <ExclamationTriangleIcon className="w-5 h-5 text-[var(--text-primary)]" />
+                            <ExclamationTriangleIcon className="w-5 h-5 text-[var(--text)]" />
                           </div>
                         )}
                       </div>
 
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-3">
-                          <h3 className="text-3xl font-bold text-[var(--text-primary)]">{msg.from}</h3>
+                          <h3 className="text-3xl font-bold text-[var(--text)]">{msg.from}</h3>
                           {msg.channel !== 'email' && (
                             <span className="px-4 py-2 bg-white/10 rounded-full text-sm font-medium">
                               {msg.channel.toUpperCase()}
@@ -250,7 +250,7 @@ export default function InboxPage() {
                     </div>
 
                     <button className="p-4 bg-white/10 hover:bg-primary/30 rounded-2xl transition-all group">
-                      <PaperAirplaneIcon className="w-8 h-8 text-[var(--text-primary)] group-hover:text-[var(--text-primary)]" />
+                      <PaperAirplaneIcon className="w-8 h-8 text-[var(--text)] group-hover:text-[var(--text)]" />
                     </button>
                   </div>
                 </motion.div>
