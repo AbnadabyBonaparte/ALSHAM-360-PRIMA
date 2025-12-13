@@ -1940,47 +1940,119 @@ const { currentTheme: theme, setTheme } = useTheme();
   registerRoute("leads", async () => ({ default: () => <Leads /> }));
 
   return (
-  <div
-  data-theme={theme}
-  className="min-h-screen text-[var(--text-primary)] transition-colors"
-  style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
->
-  <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
-    <button
-      className="fixed right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-xl shadow-[color-mix(in_srgb,var(--accent-emerald)_25%,transparent)] backdrop-blur md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-      style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
-      onClick={() => setMobileNavOpen((prev) => !prev)}
-      aria-expanded={isMobileNavOpen}
-      aria-controls="mobile-command-center"
-      aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
+    <div
+      data-theme={theme}
+      className="min-h-screen text-[var(--text-primary)] transition-colors"
+      style={{ background: "var(--background)", backgroundAttachment: "fixed" }}
     >
-      {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-    </button>
-
-    <AnimatePresence>
-      {isMobileNavOpen && (
-        <motion.div
-          className="fixed inset-0 z-40 bg-[color-mix(in_srgb,var(--background)_75%,transparent)] backdrop-blur-xl md:hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeMobileNav}
+      <div className="min-h-screen lg:grid lg:grid-cols-[320px_1fr]">
+        <button
+          className="fixed right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-xl shadow-[color-mix(in_srgb,var(--accent-emerald)_25%,transparent)] backdrop-blur md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
+          onClick={() => setMobileNavOpen((prev) => !prev)}
+          aria-expanded={isMobileNavOpen}
+          aria-controls="mobile-command-center"
+          aria-label={isMobileNavOpen ? "Fechar navegação" : "Abrir navegação"}
         >
-          <motion.div
-            id="mobile-command-center"
-            className="absolute left-0 top-0 flex h-full w-[min(88vw,360px)] flex-col border-r border-[var(--border-strong)] bg-[var(--surface)]/92 shadow-2xl"
-            style={{
-              paddingTop: "calc(env(safe-area-inset-top) + 1.25rem)",
-              paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)",
-            }}
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 260, damping: 32 }}
-            onClick={(event) => event.stopPropagation()}
+          {isMobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+
+        <AnimatePresence>
+          {isMobileNavOpen && (
+            <motion.div
+              className="fixed inset-0 z-40 bg-[color-mix(in_srgb,var(--background)_75%,transparent)] backdrop-blur-xl md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMobileNav}
+            >
+              <motion.div
+                id="mobile-command-center"
+                className="absolute left-0 top-0 flex h-full w-[min(88vw,360px)] flex-col border-r border-[var(--border-strong)] bg-[var(--surface)]/92 shadow-2xl"
+                style={{
+                  paddingTop: "calc(env(safe-area-inset-top) + 1.25rem)",
+                  paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)",
+                }}
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", stiffness: 260, damping: 32 }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="flex items-center justify-between px-6 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
+                      A∞
+                    </div>
+                    <div>
+                      <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.38em] text-[var(--accent-emerald)]">ALSHAM</p>
+                      <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeMobileNav}
+                    className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                    aria-label="Fechar menu"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="h-[1px] w-full bg-[var(--border)]/60" />
+                <div className="flex-1 overflow-y-auto px-6">
+                  <div className="space-y-4 pt-4">
+                    {sidebarGroups.map((group) => (
+                      <div
+                        key={`mobile-${group.id}`}
+                        className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-4"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="grid h-9 w-9 place-content-center rounded-xl bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
+                            {group.icon}
+                          </span>
+                          <p className="text-sm font-semibold text-[var(--text-primary)]">{group.label}</p>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                          {group.links.map((link) => {
+                            const isActive = activePage === link.id;
+                            return (
+                              <button
+                                key={link.id}
+                                type="button"
+                                onClick={() => {
+                                  navigateToPage(link.id);
+                                  closeMobileNav();
+                                }}
+                                aria-current={isActive ? "page" : undefined}
+                                className={`rounded-full border px-3 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
+                                  isActive
+                                    ? "border-[var(--accent-emerald)]/60 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
+                                    : "border-[var(--border)]/70 text-[var(--text-secondary)] hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
+                                }`}
+                              >
+                                {link.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <SidebarDesktop activePage={activePage} onNavigate={navigateToPage} isCollapsed={false} />
+
+        <div className="flex flex-col">
+          <header
+            className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
+            style={{ paddingTop: "env(safe-area-inset-top)" }}
           >
-            <div className="flex items-center justify-between px-6 pb-4">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-4 px-6 py-4 sm:py-5">
+              <div className="flex items-center gap-3 lg:hidden">
                 <div className="grid h-10 w-10 place-content-center rounded-2xl bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-slate-950 font-semibold">
                   A∞
                 </div>
@@ -1989,224 +2061,109 @@ const { currentTheme: theme, setTheme } = useTheme();
                   <p className="text-base font-medium text-[var(--text-primary)]">360° PRIMA</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={closeMobileNav}
-                className="grid h-10 w-10 place-content-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                aria-label="Fechar menu"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="h-[1px] w-full bg-[var(--border)]/60" />
-            <div className="flex-1 overflow-y-auto px-6">
-              <div className="space-y-4 pt-4">
-                {sidebarGroups.map((group) => (
-                  <div key={`mobile-${group.id}`} className="rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-4">
-                    <div className="flex items-center gap-3">
-                      <span className="grid h-9 w-9 place-content-center rounded-xl bg-[var(--surface-strong)]/70 text-[var(--accent-emerald)]">
-                        {group.icon}
-                      </span>
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">{group.label}</p>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                      {group.links.map((link) => {
-                        const isActive = activePage === link.id;
-                        return (
-                          <button
-                            key={link.id}
-                            type="button"
-                            onClick={() => {
-                              navigateToPage(link.id);
-                              closeMobileNav();
-                            }}
-                            aria-current={isActive ? "page" : undefined}
-                            className={`rounded-full border px-3 py-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
-                              isActive
-                                ? "border-[var(--accent-emerald)]/60 bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)]"
-                                : "border-[var(--border)]/70 text-[var(--text-secondary)] hover:border-[var(--accent-emerald)]/60 hover:text-[var(--accent-emerald)]"
-                            }`}
-                          >
-                            {link.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+
+              <div className="flex flex-1 items-center gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm shadow-sm">
+                <Search className="h-5 w-5 text-[var(--text-secondary)]" />
+                <input
+                  type="text"
+                  placeholder="Buscar campanhas, leads, squads..."
+                  className="flex-1 bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] px-3 py-1 text-[0.8125rem] text-[var(--text-secondary)] transition hover:border-[var(--accent-emerald)]/50 hover:text-[var(--accent-emerald)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                >
+                  <Command className="h-4 w-4" />
+                  <span className="text-[0.75rem] font-semibold tracking-[0.1em]">⌘K</span>
+                </button>
               </div>
-              <div className="mt-6 space-y-5 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/85 p-4">
-                <p className="text-[0.6875rem] sm:text-xs uppercase tracking-[0.34em] text-[var(--accent-sky)]">Controles rápidos</p>
-                <div className="space-y-3 text-sm">
-                  {/* Aqui você pode manter moeda e timeframe se quiser no mobile, ou remover */}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                  <Globe2 className="h-4 w-4 text-[var(--accent-emerald)]" />
+                  <button
+                    onClick={() => setCurrency("BRL")}
+                    aria-label="Selecionar moeda Real Brasileiro"
+                    aria-pressed={currency === "BRL"}
+                    className={`${
+                      currency === "BRL"
+                        ? "text-[var(--accent-emerald)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    BRL
+                  </button>
+                  <button
+                    onClick={() => setCurrency("USD")}
+                    aria-label="Selecionar moeda Dólar Americano"
+                    aria-pressed={currency === "USD"}
+                    className={`${
+                      currency === "USD"
+                        ? "text-[var(--accent-sky)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    USD
+                  </button>
+                  <button
+                    onClick={() => setCurrency("EUR")}
+                    aria-label="Selecionar moeda Euro"
+                    aria-pressed={currency === "EUR"}
+                    className={`${
+                      currency === "EUR"
+                        ? "text-[var(--accent-fuchsia)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    EUR
+                  </button>
+                  <span className="mx-1 h-4 w-[1px] bg-[var(--surface-strong)]" />
+                  <button
+                    onClick={() => setTimeframe("7d")}
+                    aria-label="Selecionar período de 7 dias"
+                    aria-pressed={timeframe === "7d"}
+                    className={`${
+                      timeframe === "7d"
+                        ? "text-[var(--accent-emerald)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    7D
+                  </button>
+                  <button
+                    onClick={() => setTimeframe("30d")}
+                    aria-label="Selecionar período de 30 dias"
+                    aria-pressed={timeframe === "30d"}
+                    className={`${
+                      timeframe === "30d"
+                        ? "text-[var(--accent-sky)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    30D
+                  </button>
+                  <button
+                    onClick={() => setTimeframe("90d")}
+                    aria-label="Selecionar período de 90 dias"
+                    aria-pressed={timeframe === "90d"}
+                    className={`${
+                      timeframe === "90d"
+                        ? "text-[var(--accent-fuchsia)]"
+                        : "text-[var(--text-secondary)]"
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
+                  >
+                    90D
+                  </button>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
 
-    <SidebarDesktop
-      activePage={activePage}
-      onNavigate={navigateToPage}
-      isCollapsed={false}
-    />
-
-    <div className="flex flex-col">
-      <header
-        className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-strong)]/70 backdrop-blur-xl"
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
-      >
-        {/* ... seu header completo ... */}
-      </header>
-
-      <main
-        className="flex-1 overflow-y-auto bg-[var(--background)]"
-        style={{ backgroundImage: "var(--gradient-veiled)", backgroundAttachment: "fixed" }}
-      >
-        {pageState.error ? (
-          <div className="flex min-h-[40vh] flex-col items-center justify-center gap-2 text-center">
-            <AlertCircle className="h-12 w-12 text-[var(--accent-alert)]" />
-            <p className="text-sm text-[var(--text-secondary)]">Falha ao renderizar a página selecionada.</p>
-          </div>
-        ) : (
-          pageState.content
-        )}
-      </main>
-    </div>
-
-    {/* MODAL DO THEME SWITCHER GRANDE */}
-    <AnimatePresence>
-      {showThemeSwitcher && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xl p-4"
-          onClick={() => setShowThemeSwitcher(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-3xl border border-[var(--border-strong)] bg-[var(--surface)]/95 backdrop-blur-2xl shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)]/50 bg-[var(--surface)]/90 backdrop-blur-xl p-6 sm:p-8">
-              <div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
-                  Escolha seu Universo
-                </h2>
-                <p className="mt-2 text-[var(--text-secondary)]">
-                  6 dimensões visuais criadas para sua obsessão por resultados
-                </p>
-              </div>
-              <button
-                onClick={() => setShowThemeSwitcher(false)}
-                className="grid h-12 w-12 place-content-center rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="p-6 sm:p-10">
-              <ThemeSwitcher />
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
-</div>
-             <div className="flex flex-wrap items-center gap-3">
-  {/* Moeda + Timeframe (mantido exatamente como estava) */}
-  <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs uppercase tracking-[0.3em] text-[var(--text-secondary)]">
-    <Globe2 className="h-4 w-4 text-[var(--accent-emerald)]" />
-    <button
-      onClick={() => setCurrency("BRL")}
-      aria-label="Selecionar moeda Real Brasileiro"
-      aria-pressed={currency === "BRL"}
-      className={`${
-        currency === "BRL"
-          ? "text-[var(--accent-emerald)]"
-          : "text-[var(--text-secondary)]"
-      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-    >
-      BRL
-    </button>
-    <button
-      onClick={() => setCurrency("USD")}
-      aria-label="Selecionar moeda Dólar Americano"
-      aria-pressed={currency === "USD"}
-      className={`${
-        currency === "USD"
-          ? "text-[var(--accent-sky)]"
-          : "text-[var(--text-secondary)]"
-      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-    >
-      USD
-    </button>
-    <button
-      onClick={() => setCurrency("EUR")}
-      aria-label="Selecionar moeda Euro"
-      aria-pressed={currency === "EUR"}
-      className={`${
-        currency === "EUR"
-          ? "text-[var(--accent-fuchsia)]"
-          : "text-[var(--text-secondary)]"
-      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-    >
-      EUR
-    </button>
-    <span className="mx-1 h-4 w-[1px] bg-[var(--surface-strong)]" />
-    <button
-      onClick={() => setTimeframe("7d")}
-      aria-label="Selecionar período de 7 dias"
-      aria-pressed={timeframe === "7d"}
-      className={`${
-        timeframe === "7d"
-          ? "text-[var(--accent-emerald)]"
-          : "text-[var(--text-secondary)]"
-      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-    >
-      7D
-    </button>
-    <button
-      onClick={() => setTimeframe("30d")}
-      aria-label="Selecionar período de 30 dias"
-      aria-pressed={timeframe === "30d"}
-      className={`${
-        timeframe === "30d"
-          ? "text-[var(--accent-sky)]"
-          : "text-[var(--text-secondary)]"
-      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-    >
-      30D
-    </button>
-    <button
-      onClick={() => setTimeframe("90d")}
-      aria-label="Selecionar período de 90 dias"
-      aria-pressed={timeframe === "90d"}
-      className={`${
-        timeframe === "90d"
-          ? "text-[var(--accent-fuchsia)]"
-          : "text-[var(--text-secondary)]"
-      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]`}
-    >
-      90D
-    </button>
-  </div>
-
-  {/* Botão novo que abre o ThemeSwitcher grande */}
-  <button
-    onClick={() => setShowThemeSwitcher(true)}
-    className="inline-flex items-center gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text-secondary)] transition hover:border-[var(--accent-fuchsia)]/60 hover:text-[var(--accent-fuchsia)] hover:bg-[var(--surface-strong)]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-fuchsia)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-  >
-    <Palette className="h-5 w-5 text-[var(--accent-sky)]" />
-    <span>Temas Supremos</span>
-    <Sparkles className="h-4 w-4 text-[var(--accent-fuchsia)]/80" />
-  </button>
-</div>
+                <button
+                  onClick={() => setShowThemeSwitcher(true)}
+                  className="inline-flex items-center gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--text-secondary)] transition hover:border-[var(--accent-fuchsia)]/60 hover:text-[var(--accent-fuchsia)] hover:bg-[var(--surface-strong)]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-fuchsia)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                >
+                  <Palette className="h-5 w-5 text-[var(--accent-sky)]" />
+                  <span>Temas Supremos</span>
+                  <Sparkles className="h-4 w-4 text-[var(--accent-fuchsia)]/80" />
+                </button>
 
                 <div className="flex items-center gap-2 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--text-secondary)]">
                   <Palette className="h-4 w-4 text-[var(--accent-sky)]" />
@@ -2272,9 +2229,46 @@ const { currentTheme: theme, setTheme } = useTheme();
           </main>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showThemeSwitcher && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xl p-4"
+            onClick={() => setShowThemeSwitcher(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-3xl border border-[var(--border-strong)] bg-[var(--surface)]/95 backdrop-blur-2xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)]/50 bg-[var(--surface)]/90 backdrop-blur-xl p-6 sm:p-8">
+                <div>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">Escolha seu Universo</h2>
+                  <p className="mt-2 text-[var(--text-secondary)]">
+                    6 dimensões visuais criadas para sua obsessão por resultados
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowThemeSwitcher(false)}
+                  className="grid h-12 w-12 place-content-center rounded-2xl border border-[var(--border)] bg-[var(--surface-strong)] text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="p-6 sm:p-10">
+                <ThemeSwitcher />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
-}
 
 function CampaignSpotlight({
   campaigns,
