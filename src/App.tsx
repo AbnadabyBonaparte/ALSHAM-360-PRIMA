@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";\nimport { useTheme } from "@/hooks/useTheme";
 import { create } from "zustand";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -537,7 +537,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
   campaigns: [],
   currency: "BRL",
   timeframe: "30d",
-  theme: "glass-dark",
+
   organizationUnavailable: false,
   fetchData: async () => {
     try {
@@ -764,7 +764,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
 
   setCurrency: (currency) => set({ currency }),
   setTimeframe: (timeframe) => set({ timeframe }),
-  setTheme: (theme) => set({ theme }),
+
 }));
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -785,13 +785,13 @@ type DashboardState = {
   engagement: EngagementData;
   currency: "USD" | "EUR" | "BRL";
   timeframe: "7d" | "30d" | "90d";
-  theme: ThemeKey;
+
   campaigns: Campaign[];
   organizationUnavailable: boolean;
   fetchData: () => Promise<void>;
   setCurrency: (currency: "USD" | "EUR" | "BRL") => void;
   setTimeframe: (timeframe: "7d" | "30d" | "90d") => void;
-  setTheme: (theme: ThemeKey) => void;
+
 };
 
 type ThemeKey =
@@ -954,13 +954,13 @@ function App() {
     campaigns,
     currency,
     timeframe,
-    theme,
+
     organizationUnavailable,
     fetchData,
     setCurrency,
     setTimeframe,
-    setTheme,
-  } = useDashboardStore();
+
+  } = useDashboardStore();\n  const { currentTheme: theme, setTheme } = useTheme();
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [activePage, setActivePage] = useState(() => {
