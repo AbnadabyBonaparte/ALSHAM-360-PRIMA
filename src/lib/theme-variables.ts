@@ -60,11 +60,15 @@ export function injectThemeVariables(theme: Theme): void {
     '--glow-secondary': theme.colors.glowSecondary,
     '--glow-accent': theme.colors.glowAccent,
 
-    // ✅ Mantém o CSS atual de botões funcionando (SEM sobrescrever por accent)
-    // Deixe o themes.css definir --color-primary-from/to por tema,
-    // ou então mapeie para "primário real" caso queira padronizar via JS:
+    // ✅ Legacy gradients para Tailwind/classes existentes
     '--color-primary-from': theme.colors.accentPrimary,
     '--color-primary-to': theme.colors.accentSecondary,
+
+    '--color-secondary-from': theme.colors.accentSecondary,
+    '--color-secondary-to': theme.colors.accentTertiary,
+
+    '--color-accent-from': theme.colors.accentTertiary,
+    '--color-accent-to': theme.colors.accentPrimary,
   }
 
   for (const [k, v] of Object.entries(variables)) {
@@ -84,12 +88,16 @@ export function removeThemeVariables(): void {
     '--accent-1','--accent-2','--accent-3','--accent-warm','--accent-alert',
     '--grad-primary','--grad-secondary','--grad-accent','--grad-wash','--grad-veiled',
     '--glow-1','--glow-2','--glow-3',
+
     '--background','--background-gradient-1','--background-gradient-2',
     '--surface-elevated','--glass-highlight',
     '--text-primary','--text-secondary',
     '--gradient-primary','--gradient-secondary','--gradient-accent','--gradient-wash','--gradient-veiled',
     '--glow-primary','--glow-secondary','--glow-accent',
+
     '--color-primary-from','--color-primary-to',
+    '--color-secondary-from','--color-secondary-to',
+    '--color-accent-from','--color-accent-to',
   ]
 
   vars.forEach((v) => root.style.removeProperty(v))
