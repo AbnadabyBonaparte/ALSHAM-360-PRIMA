@@ -4,6 +4,7 @@
 // 🎨 DOMINAÇÃO VISUAL TOTAL - Sidebar por Categoria com Responsividade Alienígena
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+import { useTheme } from '@/hooks/useTheme';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
