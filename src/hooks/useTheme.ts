@@ -1,11 +1,9 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚜️ ALSHAM 360° PRIMA - HOOK DE TEMAS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎨 DOMINAÇÃO VISUAL TOTAL - Sistema de Temas Neon Insanos
+// ⚜️ ALSHAM 360° PRIMA - HOOK DE TEMAS (SSOT Compliant)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { injectThemeVariables } from '../lib/theme-variables';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { injectThemeVariables } from '../lib/theme-variables'
 import {
   themes,
   themeList,
@@ -14,88 +12,76 @@ import {
   isThemeDark,
   type ThemeKey,
   type Theme,
-} from '../lib/themes';
+} from '../lib/themes'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🔧 CONSTANTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const STORAGE_KEY = 'alsham-theme';
-const TRANSITION_DURATION = 300;
+const STORAGE_KEY = 'alsham-theme'
+
+// Alinhado ao “warp” de troca de tema
+const TRANSITION_DURATION = 320
+const TRANSITION_CLASS = 'theme-switching'
+
+/**
+ * Detecta o tema salvo no localStorage ou retorna o padrão.
+ */
+function detectSavedTheme(): ThemeKey {
+  if (typeof window === 'undefined') return defaultTheme
+
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved && themes[saved as ThemeKey]) return saved as ThemeKey
+  } catch {
+    // ignore
+  }
+
+  return defaultTheme
+}
+
+/**
+ * SSOT: aplica somente “estado” no DOM (data-theme + color-scheme + meta),
+ * e delega 100% das CSS variables ao adapter público injectThemeVariables(theme).
+ */
+function applyThemeToDOM(themeKey: ThemeKey): void {
+  if (typeof document === 'undefined') return
+
+  const theme = getTheme(themeKey)
+  const root = document.documentElement
+
+  // 1) Fonte da verdade: atributo + color-scheme
+  root.setAttribute('data-theme', themeKey)
+  root.style.colorScheme = theme.isDark ? 'dark' : 'light'
+
+  // 2) Meta theme-color (mobile)
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+  if (metaThemeColor) metaThemeColor.setAttribute('content', theme.colors.background)
+
+  // 3) CSS Variables (Contrato Público)
+  injectThemeVariables(theme)
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎯 HOOK INTERFACE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface UseThemeReturn {
-  // Current theme
-  currentTheme: ThemeKey;
-  theme: Theme;
+  currentTheme: ThemeKey
+  theme: Theme
 
-  // Theme lists
-  themes: typeof themes;
-  themeList: Theme[];
+  themes: typeof themes
+  themeList: typeof themeList
 
-  // State
-  isDark: boolean;
-  isTransitioning: boolean;
+  isDark: boolean
+  isTransitioning: boolean
 
-  // Actions
-  setTheme: (theme: ThemeKey) => void;
-  toggleDarkMode: () => void;
-  cycleTheme: () => void;
+  setTheme: (theme: ThemeKey) => void
+  toggleDarkMode: () => void
+  cycleTheme: () => void
 
-  // Utilities
-  getThemeColors: (themeKey?: ThemeKey) => Theme['colors'];
-  getThemeSwatch: (themeKey?: ThemeKey) => string;
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎨 HELPER FUNCTIONS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-/**
- * Detecta o tema salvo no localStorage ou retorna o padrão
- */
-function detectSavedTheme(): ThemeKey {
-  if (typeof window === 'undefined') return defaultTheme;
-
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && themes[saved as ThemeKey]) {
-      return saved as ThemeKey;
-    }
-  } catch {
-    // localStorage not available
-  }
-
-  return defaultTheme;
-}
-
-/**
- * Aplica o tema ao documento
- */
-function applyThemeToDocument(themeKey: ThemeKey): void {
-  if (typeof document === 'undefined') return;
-
-  // Set data-theme attribute
-  document.documentElement.dataset.theme = themeKey;
-
-  // Update body class for backwards compatibility
-  Object.keys(themes).forEach((key) => {
-    document.body.classList.remove(key);
-  });
-  document.body.classList.add(themeKey);
-
-  // Update meta theme-color for mobile browsers
-  const theme = getTheme(themeKey);
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-  if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', theme.colors.background);
-  }
-
-  // INJETAR VARIÁVEIS CSS
-  injectThemeVariables(theme);
+  getThemeColors: (themeKey?: ThemeKey) => Theme['colors']
+  getThemeSwatch: (themeKey?: ThemeKey) => string
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -103,78 +89,92 @@ function applyThemeToDocument(themeKey: ThemeKey): void {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function useTheme(): UseThemeReturn {
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(defaultTheme);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(defaultTheme)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
-  // Memoized theme object
-  const theme = useMemo(() => getTheme(currentTheme), [currentTheme]);
-  const isDark = useMemo(() => isThemeDark(currentTheme), [currentTheme]);
+  // Cancela transição se o usuário trocar tema rápido
+  const transitionTimerRef = useRef<number | null>(null)
+
+  const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
+  const isDark = useMemo(() => isThemeDark(currentTheme), [currentTheme])
 
   // Initial theme detection
   useEffect(() => {
-    const savedTheme = detectSavedTheme();
-    setCurrentTheme(savedTheme);
-    applyThemeToDocument(savedTheme);
-  }, []);
+    const savedTheme = detectSavedTheme()
+    setCurrentTheme(savedTheme)
+    applyThemeToDOM(savedTheme)
+  }, [])
 
   // Apply theme changes
   useEffect(() => {
-    applyThemeToDocument(currentTheme);
-  }, [currentTheme]);
+    applyThemeToDOM(currentTheme)
+  }, [currentTheme])
 
-  // Set theme with transition
-  const setTheme = useCallback((newTheme: ThemeKey) => {
-    if (!themes[newTheme] || newTheme === currentTheme) return;
+  const setTheme = useCallback(
+    (newTheme: ThemeKey) => {
+      if (!themes[newTheme] || newTheme === currentTheme) return
+      if (typeof document === 'undefined') return
 
-    setIsTransitioning(true);
+      // Persist
+      try {
+        localStorage.setItem(STORAGE_KEY, newTheme)
+      } catch {
+        // ignore
+      }
 
-    // Save to localStorage
-    try {
-      localStorage.setItem(STORAGE_KEY, newTheme);
-    } catch {
-      // localStorage not available
-    }
+      // Start transition
+      setIsTransitioning(true)
 
-    // Apply theme
-    setCurrentTheme(newTheme);
+      const root = document.documentElement
+      root.classList.add(TRANSITION_CLASS)
 
-    // End transition
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, TRANSITION_DURATION);
-  }, [currentTheme]);
+      // Atualiza tema (dispara applyThemeToDOM pelo effect)
+      setCurrentTheme(newTheme)
 
-  // Toggle between dark and light themes
+      // Clear timers
+      if (transitionTimerRef.current) {
+        window.clearTimeout(transitionTimerRef.current)
+      }
+
+      transitionTimerRef.current = window.setTimeout(() => {
+        root.classList.remove(TRANSITION_CLASS)
+        setIsTransitioning(false)
+        transitionTimerRef.current = null
+      }, TRANSITION_DURATION)
+    },
+    [currentTheme]
+  )
+
   const toggleDarkMode = useCallback(() => {
-    const darkThemes: ThemeKey[] = ['cyber-vivid', 'neon-energy', 'midnight-aurora', 'glass-dark'];
-    const lightThemes: ThemeKey[] = ['platinum-glass', 'desert-quartz'];
+    // Mantém seu comportamento atual (tema “âncora” dark/light).
+    const darkThemes: ThemeKey[] = ['cyber-vivid', 'neon-energy', 'midnight-aurora', 'glass-dark']
+    const lightThemes: ThemeKey[] = ['platinum-glass', 'desert-quartz']
+    setTheme(isDark ? lightThemes[0] : darkThemes[0])
+  }, [isDark, setTheme])
 
-    if (isDark) {
-      // Switch to first light theme
-      setTheme(lightThemes[0]);
-    } else {
-      // Switch to first dark theme
-      setTheme(darkThemes[0]);
-    }
-  }, [isDark, setTheme]);
-
-  // Cycle through all themes
   const cycleTheme = useCallback(() => {
-    const themeKeys = Object.keys(themes) as ThemeKey[];
-    const currentIndex = themeKeys.indexOf(currentTheme);
-    const nextIndex = (currentIndex + 1) % themeKeys.length;
-    setTheme(themeKeys[nextIndex]);
-  }, [currentTheme, setTheme]);
+    const themeKeys = Object.keys(themes) as ThemeKey[]
+    const currentIndex = themeKeys.indexOf(currentTheme)
+    const nextIndex = (currentIndex + 1) % themeKeys.length
+    setTheme(themeKeys[nextIndex])
+  }, [currentTheme, setTheme])
 
-  // Get colors for a specific theme (defaults to current)
-  const getThemeColors = useCallback((themeKey?: ThemeKey) => {
-    return getTheme(themeKey || currentTheme).colors;
-  }, [currentTheme]);
+  const getThemeColors = useCallback(
+    (themeKey?: ThemeKey) => getTheme(themeKey || currentTheme).colors,
+    [currentTheme]
+  )
 
-  // Get swatch for a specific theme (defaults to current)
-  const getThemeSwatch = useCallback((themeKey?: ThemeKey) => {
-    return getTheme(themeKey || currentTheme).swatch;
-  }, [currentTheme]);
+  const getThemeSwatch = useCallback(
+    (themeKey?: ThemeKey) => getTheme(themeKey || currentTheme).swatch,
+    [currentTheme]
+  )
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current)
+    }
+  }, [])
 
   return {
     currentTheme,
@@ -188,13 +188,9 @@ export function useTheme(): UseThemeReturn {
     cycleTheme,
     getThemeColors,
     getThemeSwatch,
-  };
+  }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📦 EXPORTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-export type { ThemeKey, Theme };
-export { themes, themeList, defaultTheme, getTheme, isThemeDark };
-export default useTheme;
+export type { ThemeKey, Theme }
+export { themes, themeList, defaultTheme, getTheme, isThemeDark }
+export default useTheme
