@@ -9,6 +9,7 @@ import {
   TrendingUp, TrendingDown, Target, Rocket, Zap, Brain, Clock,
   ArrowRight, Activity, Sparkles, Lock, Command,
   Mic
+  Users
 } from "lucide-react";
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
