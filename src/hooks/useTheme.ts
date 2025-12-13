@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚜️ ALSHAM 360° PRIMA - HOOK DE TEMAS (10/10)
+// ⚜️ ALSHAM 360° PRIMA - HOOK DE TEMAS (SSOT Compliant)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
@@ -20,7 +20,7 @@ import {
 
 const STORAGE_KEY = 'alsham-theme'
 
-// 10/10: alinhado com o “warp” de troca de tema
+// Alinhado ao “warp” de troca de tema
 const TRANSITION_DURATION = 320
 const TRANSITION_CLASS = 'theme-switching'
 
@@ -41,8 +41,8 @@ function detectSavedTheme(): ThemeKey {
 }
 
 /**
- * 10/10: contrato único de CSS Variables no :root (HTML)
- * Mantém compatibilidade chamando injectThemeVariables(theme) ao final.
+ * SSOT: aplica somente “estado” no DOM (data-theme + color-scheme + meta),
+ * e delega 100% das CSS variables ao adapter público injectThemeVariables(theme).
  */
 function applyThemeToDOM(themeKey: ThemeKey): void {
   if (typeof document === 'undefined') return
@@ -58,45 +58,7 @@ function applyThemeToDOM(themeKey: ThemeKey): void {
   const metaThemeColor = document.querySelector('meta[name="theme-color"]')
   if (metaThemeColor) metaThemeColor.setAttribute('content', theme.colors.background)
 
-  // 3) CSS Variables (contrato estável)
-  const vars: Record<string, string> = {
-    '--bg': theme.colors.background,
-    '--bg-g1': theme.colors.backgroundGradient1,
-    '--bg-g2': theme.colors.backgroundGradient2,
-
-    '--surface': theme.colors.surface,
-    '--surface-strong': theme.colors.surfaceStrong,
-    '--surface-elev': theme.colors.surfaceElevated,
-    '--glass-hi': theme.colors.glassHighlight,
-
-    '--border': theme.colors.border,
-    '--border-strong': theme.colors.borderStrong,
-
-    '--text': theme.colors.textPrimary,
-    '--text-2': theme.colors.textSecondary,
-
-    '--accent-1': theme.colors.accentPrimary,
-    '--accent-2': theme.colors.accentSecondary,
-    '--accent-3': theme.colors.accentTertiary,
-    '--accent-warm': theme.colors.accentWarm,
-    '--accent-alert': theme.colors.accentAlert,
-
-    '--grad-primary': theme.colors.gradientPrimary,
-    '--grad-secondary': theme.colors.gradientSecondary,
-    '--grad-accent': theme.colors.gradientAccent,
-    '--grad-wash': theme.colors.gradientWash,
-    '--grad-veiled': theme.colors.gradientVeiled,
-
-    '--glow-1': theme.colors.glowPrimary,
-    '--glow-2': theme.colors.glowSecondary,
-    '--glow-3': theme.colors.glowAccent,
-  }
-
-  for (const [k, v] of Object.entries(vars)) {
-    root.style.setProperty(k, v)
-  }
-
-  // 4) Compatibilidade: mantém seu pipeline atual (caso algum CSS dependa)
+  // 3) CSS Variables (Contrato Público)
   injectThemeVariables(theme)
 }
 
@@ -109,7 +71,7 @@ interface UseThemeReturn {
   theme: Theme
 
   themes: typeof themes
-  themeList: Theme[]
+  themeList: typeof themeList
 
   isDark: boolean
   isTransitioning: boolean
@@ -130,7 +92,7 @@ export function useTheme(): UseThemeReturn {
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>(defaultTheme)
   const [isTransitioning, setIsTransitioning] = useState(false)
 
-  // 10/10: cancela transição se o usuário trocar tema rápido
+  // Cancela transição se o usuário trocar tema rápido
   const transitionTimerRef = useRef<number | null>(null)
 
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
@@ -163,11 +125,10 @@ export function useTheme(): UseThemeReturn {
       // Start transition
       setIsTransitioning(true)
 
-      // 10/10: warp class no <html>
       const root = document.documentElement
       root.classList.add(TRANSITION_CLASS)
 
-      // Atualiza tema (isso dispara applyThemeToDOM pelo effect)
+      // Atualiza tema (dispara applyThemeToDOM pelo effect)
       setCurrentTheme(newTheme)
 
       // Clear timers
@@ -185,6 +146,7 @@ export function useTheme(): UseThemeReturn {
   )
 
   const toggleDarkMode = useCallback(() => {
+    // Mantém seu comportamento atual (tema “âncora” dark/light).
     const darkThemes: ThemeKey[] = ['cyber-vivid', 'neon-energy', 'midnight-aurora', 'glass-dark']
     const lightThemes: ThemeKey[] = ['platinum-glass', 'desert-quartz']
     setTheme(isDark ? lightThemes[0] : darkThemes[0])
