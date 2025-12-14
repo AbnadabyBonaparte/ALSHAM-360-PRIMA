@@ -2663,6 +2663,6 @@ function LoadingSkeletonLayout({ theme }: { theme: ThemeKey }) {
       </div>
     </div>
   );
-}
+}}
 
 export default App;
