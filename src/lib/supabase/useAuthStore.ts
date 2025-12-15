@@ -1,3 +1,4 @@
+// src/lib/supabase/useAuthStore.ts
 import { create } from 'zustand'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from './client'
@@ -126,34 +127,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   clearError: () => set({ error: null }),
 
   init: async () => {
-    // 🔒 de-dup: se já há init em execução, aguarde a mesma promise
     if (initInFlight) return initInFlight
 
+    const setDerived = () => {
+      const s = get()
+      set({
+        isAuthenticated: !!s.user,
+        needsOrgSelection:
+          !!s.user &&
+          !s.currentOrgId &&
+          s.organizations.length !== 1 &&
+          !s.loadingOrgs,
+      })
+    }
+
     const run = async () => {
-      const state = get()
-
-      // “rehydrate” seguro:
-      // se já inicializado e não está carregando orgs e tem user,
-      // mas ainda não tem org resolvida (0 ou >1), não precisa re-init pesado
-      // (o estado já representa o gate corretamente).
-      if (state.initialized && !state.loadingOrgs) {
-        set({
-          loading: false,
-          loadingAuth: false,
-          isAuthenticated: !!state.user,
-          needsOrgSelection: !!state.user && !state.currentOrgId && state.organizations.length !== 1,
-        })
-        return
-      }
-
-      const setDerived = () => {
-        const s = get()
-        set({
-          isAuthenticated: !!s.user,
-          needsOrgSelection: !!s.user && !s.currentOrgId && s.organizations.length !== 1 && !s.loadingOrgs,
-        })
-      }
-
       set({ loading: true, loadingAuth: true, error: null })
 
       const { data, error } = await supabase.auth.getSession()
@@ -210,8 +198,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             error: null,
           })
 
-          // ⚠️ Regra UX: listener NÃO carrega orgs.
-          // Apenas limpa estado quando logout.
           if (!newUser) {
             set({
               organizations: [],
@@ -247,7 +233,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const s = get()
       set({
         isAuthenticated: !!s.user,
-        needsOrgSelection: !!s.user && !s.currentOrgId && s.organizations.length !== 1 && !s.loadingOrgs,
+        needsOrgSelection:
+          !!s.user &&
+          !s.currentOrgId &&
+          s.organizations.length !== 1 &&
+          !s.loadingOrgs,
       })
     }
 
@@ -274,12 +264,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // - 1 org: auto-seleciona
       // - >1: força selector (não auto-seleciona, ignora storage)
       let resolvedOrgId: string | null = null
-
-      if (organizations.length === 1) {
-        resolvedOrgId = organizations[0].id
-      } else {
-        resolvedOrgId = null
-      }
+      if (organizations.length === 1) resolvedOrgId = organizations[0].id
 
       const currentOrg = resolvedOrgId
         ? organizations.find((o) => o.id === resolvedOrgId) ?? null
@@ -295,7 +280,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         loadingOrgs: false,
       })
 
-      // storage apenas se houver org definida (auto-select ou switch)
       writeOrgToStorage(resolvedOrgId)
       setDerived()
     } catch (e: any) {
