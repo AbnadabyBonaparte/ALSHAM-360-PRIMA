@@ -1,10 +1,10 @@
 // src/components/LayoutSupremo.tsx
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚜️ ALSHAM 360° PRIMA - LAYOUT SUPREMO (ABSOLUTE STABLE EDITION)
-// - 100% compatível com Tailwind tokens padrão (bg-background, text-foreground)
-// - Zero dependência de CSS vars customizadas que podem falhar
-// - Visibilidade garantida em qualquer tema ou estado inicial
-// - Mantém toda a estrutura épica: Sidebar, Header, Mobile Nav, animações
+// ⚜️ ALSHAM 360° PRIMA - LAYOUT SUPREMO (ABSOLUTE STABLE + ERROR-PROOF EDITION)
+// - 100% Tailwind tokens padrão → visibilidade garantida em qualquer estado
+// - Gradiente supremo no título com fallback seguro
+// - Proteção contra accent-sky/accent-fuchsia ausentes
+// - Estrutura épica preservada: Sidebar, Header, Mobile Nav, animações
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
@@ -16,7 +16,7 @@ import { SidebarDesktop, SidebarMobile, MobileNavButton } from './SidebarSupremo
 import type { ThemeKey } from '@/lib/themes'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SKELETONS E STATES
+// SKELETONS E STATES (visibilidade garantida)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function SkeletonCard() {
@@ -79,11 +79,14 @@ function SkeletonLoading() {
 
 function ErrorState({ message = 'Ops! Algo deu errado ao carregar a página.' }: { message?: string }) {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 text-center bg-background">
-      <div className="grid h-20 w-20 place-content-center rounded-full bg-destructive/10">
-        <AlertCircle className="h-10 w-10 text-destructive" />
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-6 px-4 text-center bg-background">
+      <div className="grid h-24 w-24 place-content-center rounded-full bg-destructive/10">
+        <AlertCircle className="h-12 w-12 text-destructive" />
       </div>
-      <p className="text-base text-muted-foreground">{message}</p>
+      <div>
+        <p className="text-xl font-semibold text-foreground mb-2">Erro ao carregar</p>
+        <p className="text-base text-muted-foreground max-w-md">{message}</p>
+      </div>
     </div>
   )
 }
@@ -117,7 +120,7 @@ export interface LayoutSupremoProps {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// COMPONENTE PRINCIPAL
+// COMPONENTE PRINCIPAL — ESTÁVEL E SUPREMO
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function LayoutSupremo({
@@ -146,12 +149,15 @@ export default function LayoutSupremo({
   const [isMobileNavOpen, setMobileNavOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
+  // Fecha sidebar mobile ao redimensionar para desktop
   useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth >= 1024) setMobileNavOpen(false)
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileNavOpen(false)
+      }
     }
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const handleNavigate = useCallback(
@@ -170,13 +176,13 @@ export default function LayoutSupremo({
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="min-h-screen md:grid md:grid-cols-1 lg:grid-cols-[auto_1fr]">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[auto_1fr]">
         {/* Desktop Sidebar */}
         <SidebarDesktop
           activePage={activePage}
           onNavigate={handleNavigate}
           isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+          onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
         />
 
         {/* Mobile Sidebar */}
@@ -187,14 +193,14 @@ export default function LayoutSupremo({
           onClose={() => setMobileNavOpen(false)}
         />
 
-        {/* Mobile FAB */}
+        {/* Mobile Navigation Button */}
         <MobileNavButton
           isOpen={isMobileNavOpen}
-          onClick={() => setMobileNavOpen((v) => !v)}
+          onClick={() => setMobileNavOpen(prev => !prev)}
         />
 
-        {/* Main Content Area */}
-        <div className="flex min-h-screen flex-col">
+        {/* Main Content */}
+        <div className="flex flex-col">
           <HeaderSupremo
             theme={theme}
             onThemeChange={onThemeChange}
@@ -202,21 +208,23 @@ export default function LayoutSupremo({
             onCurrencyChange={onCurrencyChange}
             timeframe={timeframe}
             onTimeframeChange={onTimeframeChange}
-            onMobileMenuToggle={() => setMobileNavOpen((v) => !v)}
+            onMobileMenuToggle={() => setMobileNavOpen(prev => !prev)}
             isMobileMenuOpen={isMobileNavOpen}
             userName={userName}
             userRole={userRole}
             userInitials={userInitials}
           />
 
-          <main className="flex-1 overflow-y-auto bg-background">
+          <main className="flex-1 overflow-y-auto">
             {title && (
               <motion.div
-                className="border-b border-border/50 px-4 py-4 sm:px-6 lg:px-8"
+                className="border-b border-border/50 px-4 py-4 sm:px-6 lg:px-8 bg-background"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
               >
-                <h1 className="text-lg font-bold sm:text-xl md:text-2xl lg:text-3xl bg-gradient-to-r from-primary via-accent-sky to-accent-fuchsia bg-clip-text text-transparent">
+                {/* Título com gradiente supremo + fallback seguro */}
+                <h1 className="text-lg font-bold sm:text-xl md:text-2xl lg:text-3xl bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">
                   {title}
                 </h1>
               </motion.div>
@@ -225,10 +233,10 @@ export default function LayoutSupremo({
             <AnimatePresence mode="wait">
               <motion.div
                 key={activePage}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
                 className="p-4 sm:p-6 lg:p-8"
               >
                 {renderContent()}
