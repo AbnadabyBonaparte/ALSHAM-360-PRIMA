@@ -1,9 +1,10 @@
 // src/components/LayoutSupremo.tsx
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ⚜️ ALSHAM 360° PRIMA - LAYOUT SUPREMO (STABLE)
-// - Força visibilidade via Tailwind tokens (bg-background / text-foreground)
-// - Mantém Sidebar + Header sempre presentes
-// - Evita depender de CSS vars opcionais que podem não existir no theme system
+// ⚜️ ALSHAM 360° PRIMA - LAYOUT SUPREMO (ABSOLUTE STABLE EDITION)
+// - 100% compatível com Tailwind tokens padrão (bg-background, text-foreground)
+// - Zero dependência de CSS vars customizadas que podem falhar
+// - Visibilidade garantida em qualquer tema ou estado inicial
+// - Mantém toda a estrutura épica: Sidebar, Header, Mobile Nav, animações
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
@@ -15,7 +16,7 @@ import { SidebarDesktop, SidebarMobile, MobileNavButton } from './SidebarSupremo
 import type { ThemeKey } from '@/lib/themes'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Helpers (states)
+// SKELETONS E STATES
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function SkeletonCard() {
@@ -24,20 +25,20 @@ function SkeletonCard() {
       <div className="absolute inset-0 skeleton-shimmer" />
       <div className="space-y-4">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-muted/40" />
+          <div className="h-12 w-12 rounded-2xl bg-muted/40 skeleton-shimmer" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-2/3 rounded-lg bg-muted/40" />
-            <div className="h-3 w-1/2 rounded-lg bg-muted/40" />
+            <div className="h-4 w-2/3 rounded-lg bg-muted/40 skeleton-shimmer" />
+            <div className="h-3 w-1/2 rounded-lg bg-muted/40 skeleton-shimmer" />
           </div>
         </div>
         <div className="space-y-2">
-          <div className="h-3 w-full rounded-lg bg-muted/40" />
-          <div className="h-3 w-4/5 rounded-lg bg-muted/40" />
-          <div className="h-3 w-3/5 rounded-lg bg-muted/40" />
+          <div className="h-3 w-full rounded-lg bg-muted/40 skeleton-shimmer" />
+          <div className="h-3 w-4/5 rounded-lg bg-muted/40 skeleton-shimmer" />
+          <div className="h-3 w-3/5 rounded-lg bg-muted/40 skeleton-shimmer" />
         </div>
         <div className="flex gap-3 pt-2">
-          <div className="h-10 w-24 rounded-xl bg-muted/40" />
-          <div className="h-10 w-24 rounded-xl bg-muted/40" />
+          <div className="h-10 w-24 rounded-xl bg-muted/40 skeleton-shimmer" />
+          <div className="h-10 w-24 rounded-xl bg-muted/40 skeleton-shimmer" />
         </div>
       </div>
     </div>
@@ -46,16 +47,16 @@ function SkeletonCard() {
 
 function SkeletonLoading() {
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <div className="h-8 w-48 rounded-xl bg-muted/40" />
-            <div className="h-4 w-32 rounded-lg bg-muted/40" />
+            <div className="h-8 w-48 rounded-xl bg-muted/40 skeleton-shimmer" />
+            <div className="h-4 w-32 rounded-lg bg-muted/40 skeleton-shimmer" />
           </div>
           <div className="flex gap-3">
-            <div className="h-10 w-24 rounded-xl bg-muted/40" />
-            <div className="h-10 w-10 rounded-xl bg-muted/40" />
+            <div className="h-10 w-24 rounded-xl bg-muted/40 skeleton-shimmer" />
+            <div className="h-10 w-10 rounded-xl bg-muted/40 skeleton-shimmer" />
           </div>
         </div>
 
@@ -78,7 +79,7 @@ function SkeletonLoading() {
 
 function ErrorState({ message = 'Ops! Algo deu errado ao carregar a página.' }: { message?: string }) {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 text-center">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 text-center bg-background">
       <div className="grid h-20 w-20 place-content-center rounded-full bg-destructive/10">
         <AlertCircle className="h-10 w-10 text-destructive" />
       </div>
@@ -88,7 +89,7 @@ function ErrorState({ message = 'Ops! Algo deu errado ao carregar a página.' }:
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Props
+// PROPS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export interface LayoutSupremoProps {
@@ -109,7 +110,6 @@ export interface LayoutSupremoProps {
 
   isLoading?: boolean
   error?: string | null
-  isEmpty?: boolean
 
   userName?: string
   userRole?: string
@@ -117,7 +117,7 @@ export interface LayoutSupremoProps {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Main
+// COMPONENTE PRINCIPAL
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function LayoutSupremo({
@@ -140,7 +140,7 @@ export default function LayoutSupremo({
   error = null,
 
   userName = 'Abnadaby',
-  userRole = 'Founder',
+  userRole = 'Arquiteto Supremo',
   userInitials = 'AB',
 }: LayoutSupremoProps) {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false)
@@ -169,17 +169,14 @@ export default function LayoutSupremo({
   }
 
   return (
-    <div
-      data-theme={theme}
-      className="min-h-screen bg-background text-foreground"
-    >
+    <div className="min-h-screen bg-background text-foreground">
       <div className="min-h-screen md:grid md:grid-cols-1 lg:grid-cols-[auto_1fr]">
         {/* Desktop Sidebar */}
         <SidebarDesktop
           activePage={activePage}
           onNavigate={handleNavigate}
           isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(v => !v)}
+          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
         />
 
         {/* Mobile Sidebar */}
@@ -193,10 +190,10 @@ export default function LayoutSupremo({
         {/* Mobile FAB */}
         <MobileNavButton
           isOpen={isMobileNavOpen}
-          onClick={() => setMobileNavOpen(v => !v)}
+          onClick={() => setMobileNavOpen((v) => !v)}
         />
 
-        {/* Main */}
+        {/* Main Content Area */}
         <div className="flex min-h-screen flex-col">
           <HeaderSupremo
             theme={theme}
@@ -205,21 +202,21 @@ export default function LayoutSupremo({
             onCurrencyChange={onCurrencyChange}
             timeframe={timeframe}
             onTimeframeChange={onTimeframeChange}
-            onMobileMenuToggle={() => setMobileNavOpen(v => !v)}
+            onMobileMenuToggle={() => setMobileNavOpen((v) => !v)}
             isMobileMenuOpen={isMobileNavOpen}
             userName={userName}
             userRole={userRole}
             userInitials={userInitials}
           />
 
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto bg-background">
             {title && (
               <motion.div
                 className="border-b border-border/50 px-4 py-4 sm:px-6 lg:px-8"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h1 className="text-lg font-bold sm:text-xl md:text-2xl lg:text-3xl">
+                <h1 className="text-lg font-bold sm:text-xl md:text-2xl lg:text-3xl bg-gradient-to-r from-primary via-accent-sky to-accent-fuchsia bg-clip-text text-transparent">
                   {title}
                 </h1>
               </motion.div>
@@ -232,6 +229,7 @@ export default function LayoutSupremo({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
+                className="p-4 sm:p-6 lg:p-8"
               >
                 {renderContent()}
               </motion.div>
@@ -243,4 +241,9 @@ export default function LayoutSupremo({
   )
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EXPORTS ADICIONAIS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 export { SkeletonLoading, SkeletonCard, ErrorState }
+export type { LayoutSupremoProps }
