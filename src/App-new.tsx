@@ -13,11 +13,11 @@ import { Gamification } from './pages/Gamification'
 import { Settings } from './pages/Settings'
 
 // Auth Pages
-import { Login } from './pages/Auth/Login'
-import { SignUp } from './pages/Auth/SignUp'
-import { ForgotPassword } from './pages/Auth/ForgotPassword'
-import { ResetPassword } from './pages/Auth/ResetPassword'
-import { OrganizationSelector } from './pages/Auth/OrganizationSelector'
+import Login from './pages/auth/Login.tsx'
+import SignUp from './pages/auth/SignUp.tsx'
+import ForgotPassword from './pages/auth/ForgotPassword.tsx'
+import ResetPassword from './pages/auth/ResetPassword.tsx'
+import OrganizationSelector from './pages/auth/OrganizationSelector.tsx'
 
 // Placeholder for development
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
