@@ -85,38 +85,36 @@ const SUPABASE_CONFIG = Object.freeze({
 // ---------------------------------------------------------------------------
 // SUPABASE CLIENT
 function ensureSupabaseClient() {
-  if (typeof window !== 'undefined') {
-    if (!window.__VITE_SUPABASE_URL__) {
-      window.__VITE_SUPABASE_URL__ = SUPABASE_URL;
-    }
-    if (!window.__VITE_SUPABASE_ANON_KEY__) {
-      window.__VITE_SUPABASE_ANON_KEY__ = SUPABASE_ANON_KEY;
-    }
+  // ✅ reaproveita instância global se já existir
+  if (typeof globalThis !== 'undefined' && globalThis[GLOBAL_CLIENT_KEY]) {
+    supabase = globalThis[GLOBAL_CLIENT_KEY];
+    return supabase;
   }
+
+  if (typeof window !== 'undefined') {
+    if (!window.__VITE_SUPABASE_URL__) window.__VITE_SUPABASE_URL__ = SUPABASE_URL;
+    if (!window.__VITE_SUPABASE_ANON_KEY__) window.__VITE_SUPABASE_ANON_KEY__ = SUPABASE_ANON_KEY;
+  }
+
   if (!supabase) {
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined
-      }
+        storageKey: 'alsham-360-prima-auth', // ✅ IGUAL ao client.ts
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      },
     });
+
     if (typeof globalThis !== 'undefined') {
       globalThis[GLOBAL_CLIENT_KEY] = supabase;
     }
-    if (typeof window !== 'undefined') {
-      window.AlshamSupabase = window.AlshamSupabase || {};
-      if (!window.AlshamSupabase.supabase) {
-        window.AlshamSupabase.supabase = supabase;
-      }
-      if (!window.AlshamSupabase.auth) {
-        window.AlshamSupabase.auth = supabase.auth;
-      }
-    }
   }
+
   return supabase;
 }
+
 
 ensureSupabaseClient();
 
