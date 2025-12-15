@@ -45,12 +45,23 @@ function derivedAliases(id: string): string[] {
   return Array.from(variations);
 }
 
+/**
+ * Registra um alias e também variações derivadas do alias.
+ * Isso evita "travamento" quando a UI manda ids em formatos diferentes (hífen vs underscore).
+ */
 function registerAlias(canonicalId: string, alias: string) {
   const normalisedAlias = normaliseIdentifier(alias);
-  if (!normalisedAlias) {
-    return;
-  }
+  if (!normalisedAlias) return;
+
+  // alias direto
   aliasRegistry.set(normalisedAlias, canonicalId);
+
+  // variações (ex: leads-lista, leads_lista, leadslita)
+  for (const v of derivedAliases(normalisedAlias)) {
+    if (v && v !== canonicalId) {
+      aliasRegistry.set(v, canonicalId);
+    }
+  }
 }
 
 function clearAliasesFor(canonicalId: string) {
@@ -95,11 +106,10 @@ export function registerRoute(id: string, loader: RouteLoader, options?: RouteOp
 
   aliasCandidates.forEach((alias) => {
     const normalisedAlias = normaliseIdentifier(alias);
-    if (!normalisedAlias || normalisedAlias === canonicalId) {
-      return;
-    }
+    if (!normalisedAlias || normalisedAlias === canonicalId) return;
+
     entry.aliases.add(normalisedAlias);
-    aliasRegistry.set(normalisedAlias, canonicalId);
+    registerAlias(canonicalId, normalisedAlias);
   });
 
   if (!entry.placeholder) {
@@ -109,10 +119,10 @@ export function registerRoute(id: string, loader: RouteLoader, options?: RouteOp
       if (baseRoute?.placeholder) {
         unregisterRoute(baseSegment);
         entry.aliases.add(baseSegment);
-        aliasRegistry.set(baseSegment, canonicalId);
+        registerAlias(canonicalId, baseSegment);
       } else if (!aliasRegistry.has(baseSegment)) {
         entry.aliases.add(baseSegment);
-        aliasRegistry.set(baseSegment, canonicalId);
+        registerAlias(canonicalId, baseSegment);
       }
     }
   }
@@ -122,9 +132,7 @@ export function registerRoute(id: string, loader: RouteLoader, options?: RouteOp
 
 export function unregisterRoute(id: string) {
   const canonicalId = normaliseIdentifier(id);
-  if (!canonicalId) {
-    return;
-  }
+  if (!canonicalId) return;
 
   routeRegistry.delete(canonicalId);
   lazyCache.delete(canonicalId);
@@ -144,6 +152,12 @@ export function listRegisteredRoutes(): string[] {
   return Array.from(routeRegistry.keys());
 }
 
+/**
+ * Resolve rota tentando:
+ * 1) match direto
+ * 2) alias direto
+ * 3) variações do candidate (hífen/underscore/compact)
+ */
 export function resolveRouteId(candidate: string | null | undefined): string | null {
   const normalised = normaliseIdentifier(candidate);
   if (!normalised) {
@@ -154,14 +168,25 @@ export function resolveRouteId(candidate: string | null | undefined): string | n
     return normalised;
   }
 
-  return aliasRegistry.get(normalised) ?? null;
+  const directAlias = aliasRegistry.get(normalised);
+  if (directAlias) {
+    return directAlias;
+  }
+
+  // Variações para evitar "travamento" em ids emitidos pelo Sidebar
+  const variations = derivedAliases(normalised);
+  for (const v of variations) {
+    if (routeRegistry.has(v)) return v;
+    const aliased = aliasRegistry.get(v);
+    if (aliased) return aliased;
+  }
+
+  return null;
 }
 
 export function resolveRouteOrDefault(candidate: string | null | undefined): string {
   const resolved = resolveRouteId(candidate);
-  if (resolved) {
-    return resolved;
-  }
+  if (resolved) return resolved;
 
   if (candidate) {
     console.warn(
@@ -178,14 +203,10 @@ export function getDefaultRouteId() {
 
 export async function prefetchRoute(id: string) {
   const canonical = resolveRouteId(id);
-  if (!canonical) {
-    return;
-  }
+  if (!canonical) return;
 
   const entry = routeRegistry.get(canonical);
-  if (!entry) {
-    return;
-  }
+  if (!entry) return;
 
   try {
     ensureLazyComponent(canonical);
@@ -219,14 +240,10 @@ export function renderPage(activePage: string | null | undefined): ReactNode {
 
 function ensureLazyComponent(id: string) {
   let cached = lazyCache.get(id);
-  if (cached) {
-    return cached;
-  }
+  if (cached) return cached;
 
   const entry = routeRegistry.get(id);
-  if (!entry) {
-    return null;
-  }
+  if (!entry) return null;
 
   const LazyComponent = lazy(entry.loader);
   lazyCache.set(id, LazyComponent);
@@ -237,9 +254,7 @@ function getFallbackLabel(identifier: string | null | undefined): string {
   const canonical = resolveRouteId(identifier);
   if (canonical) {
     const entry = routeRegistry.get(canonical);
-    if (entry?.label) {
-      return entry.label;
-    }
+    if (entry?.label) return entry.label;
   }
 
   const normalised = normaliseIdentifier(identifier);
