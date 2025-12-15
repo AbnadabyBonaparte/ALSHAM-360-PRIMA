@@ -1114,7 +1114,7 @@ export function getAllRoutes(): string[] {
       // group: não é rota (apenas organiza)
       if (!isGroup) routes.push(link.id);
 
-      if (isGroup) extractRoutes(link.children!);
+      if (isGroup) extractRoutes(link.children ?? []);
     }
   };
   for (const category of SIDEBAR_STRUCTURE) {
