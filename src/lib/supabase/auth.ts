@@ -37,6 +37,7 @@ export async function signOut() {
 
 export async function resetPassword(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    // ✅ rota correta do seu App.tsx
     redirectTo: `${window.location.origin}/auth/reset-password`,
   })
 
