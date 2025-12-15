@@ -1,10 +1,12 @@
+// src/lib/supabase/auth.ts
 import { supabase } from './client'
 import type { User, Session } from '@supabase/supabase-js'
 
 /**
  * Wrapper único de autenticação.
- * NÃO cria client novo.
- * NÃO reexporta createClient.
+ * ✅ NÃO cria client novo.
+ * ✅ NÃO reexporta createClient.
+ * ✅ Redirect de reset alinhado com sua rota /auth/reset-password.
  */
 
 export async function signIn(email: string, password: string) {
@@ -17,7 +19,11 @@ export async function signIn(email: string, password: string) {
   return data
 }
 
-export async function signUp(email: string, password: string, metadata?: Record<string, any>) {
+export async function signUp(
+  email: string,
+  password: string,
+  metadata?: Record<string, any>
+) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -36,9 +42,12 @@ export async function signOut() {
 }
 
 export async function resetPassword(email: string) {
+  const origin =
+    typeof window !== 'undefined' ? window.location.origin : ''
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     // ✅ rota correta do seu App.tsx
-    redirectTo: `${window.location.origin}/auth/reset-password`,
+    redirectTo: `${origin}/auth/reset-password`,
   })
 
   if (error) throw error
@@ -53,11 +62,13 @@ export async function updatePassword(newPassword: string) {
 }
 
 export async function getSession(): Promise<Session | null> {
-  const { data } = await supabase.auth.getSession()
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
   return data.session
 }
 
 export async function getUser(): Promise<User | null> {
-  const { data } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getUser()
+  if (error) throw error
   return data.user
 }
