@@ -1,7 +1,10 @@
-// FORCED REBUILD TRIGGER - AUTH FLOW ACTIVE - 2025-12-15 09:15
-// src/App.tsx — FINAL ESTÁVEL (RECOVERY FIRST + SINGLETON SUPABASE + PROTECTED OUTLET)
+// src/App.tsx
+// ALSHAM 360° PRIMA — ROOT ROUTER (FINAL STABLE)
+// Auth orchestration lives HERE. Layout lives elsewhere.
+
 import React, { useEffect, useMemo } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
@@ -11,14 +14,18 @@ import { Login } from '@/pages/auth/Login'
 import { SignUp } from '@/pages/auth/SignUp'
 import { ForgotPassword } from '@/pages/auth/ForgotPassword'
 import ResetPassword from '@/pages/auth/ResetPassword'
+import { OrganizationSelector } from '@/pages/auth/OrganizationSelector'
 
 // App pages
 import DashboardSupremo from '@/pages/Dashboard'
 
-// ✅ Precondition route
+// Precondition
 import PreconditionGate from '@/pages/precondition/PreconditionGate'
 
-// Detecta fluxo de recovery do Supabase (normalmente vem no hash)
+/**
+ * Detecta fluxo de recovery do Supabase
+ * (hash ou search param)
+ */
 function isRecoveryFlow(): boolean {
   if (typeof window === 'undefined') return false
   const h = window.location.hash || ''
@@ -27,11 +34,14 @@ function isRecoveryFlow(): boolean {
 }
 
 function AppContent() {
-  const user = useAuthStore((s) => s.user)
-  const loading = useAuthStore((s) => s.loading)
-  const init = useAuthStore((s) => s.init)
+  const {
+    user,
+    loading,
+    init,
+    currentOrg,
+  } = useAuthStore()
 
-  // “gruda” o estado do recovery no primeiro load (evita piscar/redirect errado)
+  // trava o estado de recovery no primeiro render
   const recovery = useMemo(() => isRecoveryFlow(), [])
 
   useEffect(() => {
@@ -48,32 +58,62 @@ function AppContent() {
 
   return (
     <Routes>
-      {/* ✅ Sempre disponível */}
+      {/* =========================================================
+          🔓 ROTAS SEMPRE LIVRES
+         ========================================================= */}
       <Route path="/precondition/:code" element={<PreconditionGate />} />
-
-      {/* ✅ Reset password sempre acessível (mesmo logado) */}
       <Route path="/auth/reset-password" element={<ResetPassword />} />
 
-      {/* ✅ Se o link for recovery, força entrar no reset antes de qualquer redirect */}
-      {recovery && <Route path="*" element={<Navigate to="/auth/reset-password" replace />} />}
+      {/* Força reset se for recovery */}
+      {recovery && (
+        <Route path="*" element={<Navigate to="/auth/reset-password" replace />} />
+      )}
 
-      {/* 🌐 Rotas públicas */}
-      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/signup" element={!user ? <SignUp /> : <Navigate to="/dashboard" replace />} />
+      {/* =========================================================
+          🌐 ROTAS PÚBLICAS (NÃO LOGADO)
+         ========================================================= */}
+      <Route
+        path="/login"
+        element={!user ? <Login /> : <Navigate to="/dashboard" replace />}
+      />
+      <Route
+        path="/signup"
+        element={!user ? <SignUp /> : <Navigate to="/dashboard" replace />}
+      />
       <Route
         path="/forgot-password"
         element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" replace />}
       />
 
-      {/* 🔒 Rotas protegidas (aninhadas com Outlet) */}
+      {/* =========================================================
+          🔒 ROTAS PROTEGIDAS (LOGIN OK)
+         ========================================================= */}
       <Route element={<ProtectedLayout />}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardSupremo />} />
-        {/* coloque suas outras páginas aqui */}
+        {/* usuário logado, mas SEM organização */}
+        {!currentOrg && (
+          <Route
+            path="*"
+            element={<OrganizationSelector />}
+          />
+        )}
+
+        {/* usuário logado + org selecionada */}
+        {currentOrg && (
+          <>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<DashboardSupremo />} />
+            {/* outras páginas internas entram aqui */}
+          </>
+        )}
       </Route>
 
-      {/* fallback */}
-      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
+      {/* =========================================================
+          🧭 FALLBACK FINAL
+         ========================================================= */}
+      <Route
+        path="*"
+        element={<Navigate to={user ? '/dashboard' : '/login'} replace />}
+      />
     </Routes>
   )
 }
