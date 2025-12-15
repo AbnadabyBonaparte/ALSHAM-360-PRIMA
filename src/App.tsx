@@ -1,3 +1,4 @@
+// FORCED REBUILD TRIGGER - AUTH FLOW ACTIVE - 2025-12-15 09:15
 // src/App.tsx - VERSÃO FINAL ABSOLUTA COM AUTH REAL
 import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
