@@ -12,11 +12,17 @@ export const OrganizationSelector: React.FC = () => {
   const user = useAuthStore((s) => s.user)
   const organizations = useAuthStore((s) => s.organizations)
   const loadingOrgs = useAuthStore((s) => s.loadingOrgs)
+  const currentOrgId = useAuthStore((s) => s.currentOrgId)
+
   const error = useAuthStore((s) => s.error)
   const clearError = useAuthStore((s) => s.clearError)
   const switchOrganization = useAuthStore((s) => s.switchOrganization)
 
+  // 1) Sem auth => login
   if (!user) return <Navigate to="/login" replace />
+
+  // 2) Se já tem org selecionada (auto-select ou switch), sai do selector
+  if (currentOrgId) return <Navigate to="/dashboard" replace />
 
   const safeOrgs: Organization[] = Array.isArray(organizations) ? organizations : []
 
@@ -42,6 +48,7 @@ export const OrganizationSelector: React.FC = () => {
     )
   }
 
+  // 0 orgs: estado cravado (sem criar nada aqui)
   if (!safeOrgs.length) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
