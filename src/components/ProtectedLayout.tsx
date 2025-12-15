@@ -17,7 +17,7 @@ export function ProtectedLayout() {
   const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
 
   /**
-   * activePage canônico baseado no Router:
+   * activePage canônico:
    * - /dashboard => dashboard
    * - /app/:pageId => canonicalizeRouteId(pageId)
    * - /select-organization => select-organization
@@ -35,30 +35,23 @@ export function ProtectedLayout() {
   }, [location.pathname, params])
 
   /**
-   * Navegação real alinhada ao Router canônico:
+   * Navegação canônica alinhada ao App.tsx:
    * - dashboard => /dashboard
    * - select-organization => /select-organization
-   * - demais => /app/<pageId>
+   * - demais => /app/<canonicalId>
    */
   const onNavigate = useCallback(
     (pageId: string) => {
-      const normalized = normalizePageId(pageId)
-      const canonical = canonicalizeRouteId(normalized)
-      if (!canonical) return
+      const raw = normalizePageId(pageId)
+      const id = canonicalizeRouteId(raw)
+      if (!id) return
 
-      if (canonical === 'dashboard') {
-        navigate('/dashboard', { replace: false })
-        return
-      }
+      if (id === 'dashboard') return navigate('/dashboard', { replace: false })
+      if (id === 'select-organization') return navigate('/select-organization', { replace: false })
 
-      if (canonical === 'select-organization') {
-        navigate('/select-organization', { replace: false })
-        return
-      }
-
-      navigate(`/app/${canonical}`, { replace: false })
+      return navigate(`/app/${id}`, { replace: false })
     },
-    [navigate]
+    [navigate],
   )
 
   // Loading gate
