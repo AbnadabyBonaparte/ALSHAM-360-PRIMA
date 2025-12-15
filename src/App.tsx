@@ -965,7 +965,6 @@ function App() {
 
   } = useDashboardStore();
   const { currentTheme: theme, setTheme } = useTheme();
-const { currentTheme: theme, setTheme } = useTheme();
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [activePage, setActivePage] = useState(() => {
