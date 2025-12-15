@@ -10,8 +10,11 @@ export function ProtectedLayout() {
 
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
-  const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
+  const loadingOrgs = useAuthStore((s) => s.loadingOrgs)
+  const organizations = useAuthStore((s) => s.organizations)
+  const currentOrgId = useAuthStore((s) => s.currentOrgId)
 
+  // 1) Loader global
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -20,12 +23,30 @@ export function ProtectedLayout() {
     )
   }
 
+  // 2) Sem sessão => login
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  // ✅ Gate de org: evita loop se já estiver no selector
-  if (needsOrgSelection && location.pathname !== '/select-organization') {
+  // 3) Enquanto orgs ainda estão carregando, não decide rotas
+  if (loadingOrgs) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
+
+  const orgCount = Array.isArray(organizations) ? organizations.length : 0
+  const hasOrgSelected = !!currentOrgId
+
+  // 4) Gate canônico:
+  // - Se 0 orgs => vai para selector (que mostra estado "sem org")
+  // - Se >1 orgs e não selecionou => selector
+  // - Evita loop se já estiver no selector
+  const mustSelectOrg = !hasOrgSelected && (orgCount === 0 || orgCount > 1)
+
+  if (mustSelectOrg && location.pathname !== '/select-organization') {
     return <Navigate to="/select-organization" replace />
   }
 
