@@ -1,44 +1,40 @@
 /**
- * 🛡 ALSHAM 360° PRIMA — Service Worker v2.0 (CORRIGIDO)
- * 
- * 🔧 CORREÇÕES APLICADAS:
- * - NUNCA cachear rotas de autenticação
- * - NUNCA cachear requests do Supabase
- * - Network-First para HTML (sempre buscar versão mais recente)
- * - Cache-First apenas para assets estáticos (CSS, JS, imagens)
+ * 🛡 ALSHAM 360° PRIMA — Service Worker v2.1 (ANTI-STale-Bundle)
+ *
+ * - Não cacheia auth / Supabase / API
+ * - Navigation (HTML): network-first com cache: 'no-store'
+ * - Scripts (JS): network-only com cache: 'no-store' (evita bundle velho)
+ * - Assets estáticos (img/css/font): cache-first com update em background
  */
 
-const CACHE_NAME = 'alsham-cache-v2.0-fixed';
-const STATIC_CACHE_NAME = 'alsham-static-v2.0';
+const CACHE_NAME = 'alsham-cache-v2.1';
+const STATIC_CACHE_NAME = 'alsham-static-v2.1';
 
-// Assets estáticos que PODEM ser cacheados
 const STATIC_ASSETS = [
-  '/css/tailwind.min.css',
-  '/css/tokens.css',
-  '/css/style.css',
+  '/index.html',          // ✅ garante fallback real
   '/favicon.ico',
-  '/manifest.json'
+  '/manifest.json',
 ];
 
-// 🔧 FIX: URLs que NUNCA devem ser cacheadas
+// Rotas/domínios que NUNCA devem ser cacheados pelo SW
 const NEVER_CACHE = [
   '/login',
-  '/dashboard',
+  '/signup',
+  '/forgot-password',
   '/auth',
+  '/dashboard',
+  '/precondition',
+  '/api/',
   'supabase.co',
   'supabase.com',
-  '/api/',
-  '.js' // JavaScript sempre buscar da rede
 ];
 
-// Verificar se URL deve ser ignorada
 function shouldNeverCache(url) {
-  return NEVER_CACHE.some(pattern => url.includes(pattern));
+  return NEVER_CACHE.some((pattern) => url.includes(pattern));
 }
 
 self.addEventListener('install', (event) => {
-  console.log('🔧 [SW] Instalando Service Worker corrigido...');
-  
+  console.log('🔧 [SW] Instalando Service Worker v2.1...');
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME)
       .then((cache) => cache.addAll(STATIC_ASSETS))
@@ -48,18 +44,16 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('🔧 [SW] Ativando e limpando caches antigos...');
-  
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME && key !== STATIC_CACHE_NAME)
-          .map((key) => {
-            console.log('🗑️ [SW] Deletando cache antigo:', key);
-            return caches.delete(key);
-          })
+    caches.keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME && key !== STATIC_CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim())
   );
 });
 
@@ -67,62 +61,53 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = request.url;
 
-  // 🔧 FIX: Ignorar métodos não-GET
-  if (request.method !== 'GET') {
+  if (request.method !== 'GET') return;
+
+  // ✅ 1) Nunca cachear auth/supabase/api — e força rede SEM cache HTTP
+  if (shouldNeverCache(url)) {
+    event.respondWith(fetch(new Request(request, { cache: 'no-store' })));
     return;
   }
 
-  // 🔧 FIX: NUNCA cachear rotas de autenticação ou Supabase
-  if (shouldNeverCache(url)) {
-    console.log('🚫 [SW] Ignorando cache para:', url);
-    return; // Deixa o navegador buscar normalmente
+  // ✅ 2) Scripts (JS) = network-only NO-STORE (mata bundle velho)
+  if (request.destination === 'script') {
+    event.respondWith(fetch(new Request(request, { cache: 'no-store' })));
+    return;
   }
 
-  // 🔧 FIX: HTML sempre usa Network-First (busca da rede primeiro)
-  if (request.headers.get('accept')?.includes('text/html')) {
+  // ✅ 3) HTML (navegação) = network-first NO-STORE
+  const accept = request.headers.get('accept') || '';
+  if (accept.includes('text/html')) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Opcional: cachear HTML apenas se necessário
-          // Mas SEMPRE serve da rede primeiro
-          return response;
-        })
-        .catch(() => {
-          // Fallback offline
-          return caches.match('/index.html');
-        })
+      fetch(new Request(request, { cache: 'no-store' }))
+        .catch(() => caches.match('/index.html'))
     );
     return;
   }
 
-  // 🔧 FIX: CSS/Imagens usam Cache-First (pode vir do cache)
+  // ✅ 4) Assets = cache-first + update em background
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Atualizar cache em background
-        fetch(request).then((response) => {
-          if (response && response.status === 200) {
-            caches.open(STATIC_CACHE_NAME).then((cache) => {
-              cache.put(request, response);
-            });
-          }
-        }).catch(() => {});
-        
-        return cachedResponse;
+    caches.match(request).then((cached) => {
+      if (cached) {
+        fetch(request)
+          .then((resp) => {
+            if (resp && resp.status === 200) {
+              caches.open(STATIC_CACHE_NAME).then((cache) => cache.put(request, resp));
+            }
+          })
+          .catch(() => {});
+        return cached;
       }
 
-      // Não está no cache, buscar da rede
-      return fetch(request).then((response) => {
-        if (response && response.status === 200 && response.type === 'basic') {
-          const responseClone = response.clone();
-          caches.open(STATIC_CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
+      return fetch(request).then((resp) => {
+        if (resp && resp.status === 200 && resp.type === 'basic') {
+          const clone = resp.clone();
+          caches.open(STATIC_CACHE_NAME).then((cache) => cache.put(request, clone));
         }
-        return response;
+        return resp;
       });
     })
   );
 });
 
-console.log('✅ [SW] Service Worker corrigido carregado');
+console.log('✅ [SW] Service Worker v2.1 carregado');
