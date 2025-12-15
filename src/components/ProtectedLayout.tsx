@@ -11,6 +11,26 @@ function normalizePageId(value: string | undefined | null) {
   return v.replace(/^\//, '')
 }
 
+/**
+ * Aliases canônicos para evitar que IDs “de label” virem rotas inválidas
+ * e caiam em UnderConstruction indevidamente.
+ *
+ * Ex.: Sidebar logo chamando onNavigate('dashboard-principal') deve ir para /dashboard.
+ */
+const CANONICAL_ALIASES: Record<string, string> = {
+  'dashboard-principal': 'dashboard',
+  'dashboard_principal': 'dashboard',
+  'dashboardprincipal': 'dashboard',
+  home: 'dashboard',
+  inicio: 'dashboard',
+  main: 'dashboard',
+}
+
+function canonicalizePageId(id: string) {
+  const key = normalizePageId(id)
+  return CANONICAL_ALIASES[key] ?? key
+}
+
 export function ProtectedLayout() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -21,29 +41,35 @@ export function ProtectedLayout() {
   const loadingOrgs = useAuthStore((s) => s.loadingOrgs)
   const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
 
-  // ✅ activePage canônico baseado no seu App.tsx:
-  // - /dashboard => dashboard
-  // - /app/:pageId => pageId
-  // - /select-organization => select-organization
+  /**
+   * activePage canônico baseado no seu App.tsx:
+   * - /dashboard => dashboard
+   * - /app/:pageId => pageId
+   * - /select-organization => select-organization
+   */
   const activePage = useMemo(() => {
     const paramPage = (params as any)?.pageId as string | undefined
-    if (paramPage) return normalizePageId(paramPage)
+    if (paramPage) return canonicalizePageId(paramPage)
 
     const path = location.pathname || ''
     if (path === '/dashboard') return 'dashboard'
     if (path === '/select-organization') return 'select-organization'
 
-    // fallback: tenta derivar do último segmento (sem quebrar o app)
+    // fallback: tenta derivar do último segmento
     const last = path.split('/').filter(Boolean).pop()
-    return normalizePageId(last ?? 'dashboard')
+    return canonicalizePageId(last ?? 'dashboard')
   }, [location.pathname, params])
 
-  // ✅ Navegação real alinhada ao Router canônico:
-  // - dashboard => /dashboard
-  // - demais => /app/<pageId>
+  /**
+   * Navegação real alinhada ao Router canônico:
+   * - dashboard => /dashboard
+   * - select-organization => /select-organization
+   * - demais => /app/<pageId>
+   */
   const onNavigate = useCallback(
     (pageId: string) => {
-      const id = normalizePageId(pageId)
+      const raw = normalizePageId(pageId)
+      const id = canonicalizePageId(raw)
       if (!id) return
 
       if (id === 'dashboard') {
@@ -51,7 +77,6 @@ export function ProtectedLayout() {
         return
       }
 
-      // Evita rotas proibidas/estruturais
       if (id === 'select-organization') {
         navigate('/select-organization', { replace: false })
         return
@@ -62,7 +87,7 @@ export function ProtectedLayout() {
     [navigate]
   )
 
-  // ✅ Loading gate
+  // Loading gate
   if (loading || loadingOrgs) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -71,12 +96,12 @@ export function ProtectedLayout() {
     )
   }
 
-  // ✅ Auth gate
+  // Auth gate
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  // ✅ Org gate (evita loop se já estiver no selector)
+  // Org gate (evita loop se já estiver no selector)
   if (needsOrgSelection && location.pathname !== '/select-organization') {
     return <Navigate to="/select-organization" replace />
   }
