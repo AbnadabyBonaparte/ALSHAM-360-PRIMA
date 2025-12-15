@@ -1,20 +1,26 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { resetPassword } from '@/lib/supabase/auth'
 
 export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
 
-    // TODO: Implement forgot password
-    setTimeout(() => {
+    try {
+      await resetPassword(email)
       setSent(true)
+    } catch (err: any) {
+      setError(err?.message || 'Falha ao enviar instruções. Tente novamente.')
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -35,7 +41,11 @@ export const ForgotPassword: React.FC = () => {
               <p className="text-green-600 text-sm">
                 Email enviado! Verifique sua caixa de entrada.
               </p>
+              <p className="text-green-700/70 text-xs mt-2">
+                Abra o link do email para definir uma nova senha.
+              </p>
             </div>
+
             <Link
               to="/login"
               className="text-alsham-primary hover:text-alsham-primary-hover font-medium"
@@ -45,8 +55,17 @@ export const ForgotPassword: React.FC = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-alsham-text-primary mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-alsham-text-primary mb-2"
+              >
                 Email
               </label>
               <input
@@ -57,6 +76,7 @@ export const ForgotPassword: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
                 placeholder="seu@email.com"
+                autoComplete="email"
               />
             </div>
 
