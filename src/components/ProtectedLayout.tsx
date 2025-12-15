@@ -21,40 +21,48 @@ export function ProtectedLayout() {
   const loadingOrgs = useAuthStore((s) => s.loadingOrgs)
   const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
 
-  // ✅ Deriva o "activePage" da URL.
-  // - Se sua App está em /dashboard -> activePage="dashboard"
-  // - Se estiver em /leads -> activePage="leads"
-  // - Se estiver em /p/:pageId -> usa params.pageId
+  // ✅ activePage canônico baseado no seu App.tsx:
+  // - /dashboard => dashboard
+  // - /app/:pageId => pageId
+  // - /select-organization => select-organization
   const activePage = useMemo(() => {
-    const byParam = normalizePageId((params as any)?.pageId)
-    if ((params as any)?.pageId) return byParam
+    const paramPage = (params as any)?.pageId as string | undefined
+    if (paramPage) return normalizePageId(paramPage)
 
-    const path = normalizePageId(location.pathname)
-    // path pode virar "dashboard", "select-organization", etc.
-    // Para páginas internas, usamos o próprio path.
-    return path || 'dashboard'
+    const path = location.pathname || ''
+    if (path === '/dashboard') return 'dashboard'
+    if (path === '/select-organization') return 'select-organization'
+
+    // fallback: tenta derivar do último segmento (sem quebrar o app)
+    const last = path.split('/').filter(Boolean).pop()
+    return normalizePageId(last ?? 'dashboard')
   }, [location.pathname, params])
 
-  // ✅ Navegação real (Sidebar deixa de ser no-op)
+  // ✅ Navegação real alinhada ao Router canônico:
+  // - dashboard => /dashboard
+  // - demais => /app/<pageId>
   const onNavigate = useCallback(
     (pageId: string) => {
       const id = normalizePageId(pageId)
-
-      // Proteções simples
       if (!id) return
 
-      // Convenção canônica recomendada:
-      // 1) dashboard fica em /dashboard
-      // 2) demais páginas podem ficar em /<pageId> (ou /p/<pageId> se você preferir)
-      //
-      // Aqui adotamos /<pageId> para ser o mais simples e direto.
-      // Se você já usa /p/:pageId no App.tsx, troque para: navigate(`/p/${id}`)
-      navigate(`/${id}`, { replace: false })
+      if (id === 'dashboard') {
+        navigate('/dashboard', { replace: false })
+        return
+      }
+
+      // Evita rotas proibidas/estruturais
+      if (id === 'select-organization') {
+        navigate('/select-organization', { replace: false })
+        return
+      }
+
+      navigate(`/app/${id}`, { replace: false })
     },
     [navigate]
   )
 
-  // ✅ Loading gate global
+  // ✅ Loading gate
   if (loading || loadingOrgs) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -74,10 +82,7 @@ export function ProtectedLayout() {
   }
 
   return (
-    <LayoutSupremo
-      activePage={activePage}
-      onNavigate={onNavigate}
-    >
+    <LayoutSupremo activePage={activePage} onNavigate={onNavigate}>
       <Outlet />
     </LayoutSupremo>
   )
