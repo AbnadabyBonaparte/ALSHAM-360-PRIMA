@@ -4,184 +4,7 @@ import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-rou
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import LayoutSupremo from '@/components/LayoutSupremo'
-
-function normalizePageId(value: string | undefined | null) {
-  const v = (value ?? '').trim()
-  if (!v) return 'dashboard'
-  return v.replace(/^\//, '')
-}
-
-/**
- * Aliases canônicos para evitar que IDs “de label” virem rotas inválidas
- * e caiam em UnderConstruction indevidamente.
- *
- * SSOT de conversão: Sidebar IDs -> pagesListSupremo IDs (registry)
- *
- * Ex.: Sidebar chamando onNavigate('dashboard-principal') deve ir para /dashboard.
- */
-const CANONICAL_ALIASES: Record<string, string> = {
-  // ──────────────────────────────────────────────────────────────
-  // Dashboard
-  // ──────────────────────────────────────────────────────────────
-  'dashboard-principal': 'dashboard',
-  'dashboard_principal': 'dashboard',
-  dashboardprincipal: 'dashboard',
-  home: 'dashboard',
-  inicio: 'dashboard',
-  main: 'dashboard',
-
-  // ──────────────────────────────────────────────────────────────
-  // CRM Core
-  // ──────────────────────────────────────────────────────────────
-  'leads-lista': 'leads',
-  'leads_lista': 'leads',
-  leadslita: 'leads',
-
-  'leads-detalhes': 'lead-details',
-  'leads_detalhes': 'lead-details',
-  leaddetails: 'lead-details',
-
-  'leads-importacao': 'imports',
-  'leads_importacao': 'imports',
-
-  'contatos-lista': 'contacts',
-  'contatos_lista': 'contacts',
-
-  'contatos-detalhes': 'contact-details',
-  'contatos_detalhes': 'contact-details',
-
-  'contas-empresas-lista': 'accounts',
-  'contas_empresas_lista': 'accounts',
-  contas: 'accounts',
-
-  'contas-detalhes': 'account-details',
-  'contas_detalhes': 'account-details',
-
-  'oportunidades-lista': 'opportunities',
-  'oportunidades_lista': 'opportunities',
-
-  'oportunidades-kanban': 'opportunities',
-  'oportunidades_kanban': 'opportunities',
-
-  'pipeline-vendas': 'pipeline',
-  'pipeline_vendas': 'pipeline',
-
-  financeiro: 'billing', // sidebar usa "financeiro" (pt), registry tem "billing"
-  'atividades-tarefas': 'tasks',
-  'atividades_tarefas': 'tasks',
-
-  calendario: 'calendar',
-
-  cotacoes: 'quotes',
-  'propostas-comerciais': 'proposals',
-  'propostas_comerciais': 'proposals',
-
-  // ──────────────────────────────────────────────────────────────
-  // Marketing
-  // ──────────────────────────────────────────────────────────────
-  'campanhas-lista': 'campaigns',
-  'campanhas_lista': 'campaigns',
-
-  'email-marketing-dashboard': 'email-marketing',
-  'email_marketing_dashboard': 'email-marketing',
-
-  'landing-pages-lista': 'landing-pages',
-  'landing_pages_lista': 'landing-pages',
-
-  'formularios-lista': 'forms',
-  'formularios_lista': 'forms',
-
-  'redes-sociais-dashboard': 'social',
-  'redes_sociais_dashboard': 'social',
-
-  'automacao-de-marketing': 'journeys',
-  'automacao_de_marketing': 'journeys',
-
-  // ──────────────────────────────────────────────────────────────
-  // Suporte
-  // ──────────────────────────────────────────────────────────────
-  'tickets-lista': 'tickets',
-  'tickets_lista': 'tickets',
-
-  'tickets-detalhes': 'ticket-details',
-  'tickets_detalhes': 'ticket-details',
-
-  'base-de-conhecimento': 'knowledge-base',
-  'base_de_conhecimento': 'knowledge-base',
-
-  'portal-do-cliente': 'customer-portal',
-  'portal_do_cliente': 'customer-portal',
-
-  'slas-e-metricas': 'slas',
-  'slas_e_metricas': 'slas',
-
-  incident: 'incident',
-
-  // ──────────────────────────────────────────────────────────────
-  // Analytics
-  // ──────────────────────────────────────────────────────────────
-  'executive-dashboard': 'executive',
-  'executive_dashboard': 'executive',
-
-  'analytics-dashboard': 'analytics',
-  'analytics_dashboard': 'analytics',
-
-  'relatorios-personalizados': 'reports',
-  'relatorios_personalizados': 'reports',
-
-  'forecasting-de-vendas': 'forecasting',
-  'forecasting_de_vendas': 'forecasting',
-
-  'cohort-analysis': 'cohorts',
-  cohortanalysis: 'cohorts',
-
-  'a-b-testing': 'ab-testing',
-  'a_b_testing': 'ab-testing',
-  abtesting: 'ab-testing',
-
-  // ──────────────────────────────────────────────────────────────
-  // Automação & IA
-  // ──────────────────────────────────────────────────────────────
-  'workflows-lista': 'workflows',
-  'workflows_lista': 'workflows',
-
-  'automation-builder': 'automations',
-  automationbuilder: 'automations',
-
-  'ai-insights': 'labs-insights',
-  aiinsights: 'labs-insights',
-
-  // ──────────────────────────────────────────────────────────────
-  // Omnichannel
-  // ──────────────────────────────────────────────────────────────
-  'omnichannel-inbox': 'inbox',
-  omnichannelinbox: 'inbox',
-
-  'whatsapp-business': 'whatsapp',
-  whatsappbusiness: 'whatsapp',
-
-  // ──────────────────────────────────────────────────────────────
-  // Admin / Settings
-  // ──────────────────────────────────────────────────────────────
-  'cobranca-e-planos': 'billing',
-  'cobranca_e_planos': 'billing',
-
-  'branding-personalizado': 'themes',
-  'branding_personalizado': 'themes',
-
-  'logs-de-auditoria': 'audit-log',
-  'logs_de_auditoria': 'audit-log',
-
-  // ──────────────────────────────────────────────────────────────
-  // Extras (já batem com pagesListSupremo, mas mantemos para robustez)
-  // ──────────────────────────────────────────────────────────────
-  metaverse: 'metaverse',
-}
-
-function canonicalizePageId(id: string) {
-  const key = normalizePageId(id).toLowerCase()
-  return CANONICAL_ALIASES[key] ?? key
-}
+import { canonicalizeRouteId, normalizePageId } from '@/routes'
 
 export function ProtectedLayout() {
   const location = useLocation()
@@ -194,22 +17,21 @@ export function ProtectedLayout() {
   const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
 
   /**
-   * activePage canônico baseado no seu App.tsx:
+   * activePage canônico baseado no Router:
    * - /dashboard => dashboard
-   * - /app/:pageId => pageId
+   * - /app/:pageId => canonicalizeRouteId(pageId)
    * - /select-organization => select-organization
    */
   const activePage = useMemo(() => {
     const paramPage = (params as any)?.pageId as string | undefined
-    if (paramPage) return canonicalizePageId(paramPage)
+    if (paramPage) return canonicalizeRouteId(paramPage)
 
     const path = location.pathname || ''
     if (path === '/dashboard') return 'dashboard'
     if (path === '/select-organization') return 'select-organization'
 
-    // fallback: tenta derivar do último segmento
     const last = path.split('/').filter(Boolean).pop()
-    return canonicalizePageId(last ?? 'dashboard')
+    return canonicalizeRouteId(last ?? 'dashboard')
   }, [location.pathname, params])
 
   /**
@@ -220,21 +42,21 @@ export function ProtectedLayout() {
    */
   const onNavigate = useCallback(
     (pageId: string) => {
-      const raw = normalizePageId(pageId)
-      const id = canonicalizePageId(raw)
-      if (!id) return
+      const normalized = normalizePageId(pageId)
+      const canonical = canonicalizeRouteId(normalized)
+      if (!canonical) return
 
-      if (id === 'dashboard') {
+      if (canonical === 'dashboard') {
         navigate('/dashboard', { replace: false })
         return
       }
 
-      if (id === 'select-organization') {
+      if (canonical === 'select-organization') {
         navigate('/select-organization', { replace: false })
         return
       }
 
-      navigate(`/app/${id}`, { replace: false })
+      navigate(`/app/${canonical}`, { replace: false })
     },
     [navigate]
   )
