@@ -20,31 +20,26 @@ export type UserOrganization = {
 }
 
 interface AuthState {
-  // auth
   user: User | null
   session: Session | null
 
-  // org
   organizations: Organization[]
   currentOrgId: string | null
   currentOrg: Organization | null
   roleInOrg: OrgRole | null
 
-  // status
   loading: boolean
   loadingAuth: boolean
   loadingOrgs: boolean
   initialized: boolean
   error: string | null
 
-  // derived (estável)
   isAuthenticated: boolean
   needsOrgSelection: boolean
 
-  // actions
   init: () => Promise<void>
   fetchOrganizations: () => Promise<void>
-  refreshOrganizations: () => Promise<void> // alias
+  refreshOrganizations: () => Promise<void>
   switchOrganization: (orgId: string) => Promise<void>
   clearError: () => void
   signOut: () => Promise<void>
@@ -52,6 +47,7 @@ interface AuthState {
 
 // 🔒 listener único
 let authUnsub: (() => void) | null = null
+let initInFlight: Promise<void> | null = null
 
 const ORG_STORAGE_KEY = 'ALSHAM_CURRENT_ORG_ID'
 
@@ -80,7 +76,6 @@ async function fetchOrganizationsForUser(userId: string): Promise<{
   orgs: Organization[]
   roleByOrgId: Record<string, OrgRole>
 }> {
-  // JOIN: user_organizations -> organizations(*)
   const { data, error } = await supabase
     .from('user_organizations')
     .select('org_id, role, organizations:organizations(*)')
@@ -98,7 +93,6 @@ async function fetchOrganizationsForUser(userId: string): Promise<{
     })
     .filter(Boolean) as Organization[]
 
-  // dedupe por id
   const seen = new Set<string>()
   const deduped: Organization[] = []
   for (const o of orgs) {
@@ -112,135 +106,148 @@ async function fetchOrganizationsForUser(userId: string): Promise<{
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-  // auth
   user: null,
   session: null,
 
-  // org
   organizations: [],
   currentOrgId: null,
   currentOrg: null,
   roleInOrg: null,
 
-  // status
   loading: true,
   loadingAuth: true,
   loadingOrgs: false,
   initialized: false,
   error: null,
 
-  // derived (será recalculado via setDerived)
   isAuthenticated: false,
   needsOrgSelection: false,
 
   clearError: () => set({ error: null }),
 
   init: async () => {
-    if (get().initialized) return
+    // 🔒 de-dup: se já há init em execução, aguarde a mesma promise
+    if (initInFlight) return initInFlight
 
-    // helper para manter derived consistente
-    const setDerived = () => {
-      const user = get().user
-      const orgs = get().organizations
-      const currentOrgId = get().currentOrgId
+    const run = async () => {
+      const state = get()
 
-      set({
-        isAuthenticated: !!user,
-        needsOrgSelection: !!user && orgs.length > 0 && !currentOrgId,
-      })
-    }
-
-    set({ loading: true, loadingAuth: true, error: null })
-
-    // 1) sessão inicial
-    const { data, error } = await supabase.auth.getSession()
-    if (error) {
-      set({
-        session: null,
-        user: null,
-        organizations: [],
-        currentOrgId: null,
-        currentOrg: null,
-        roleInOrg: null,
-        loading: false,
-        loadingAuth: false,
-        loadingOrgs: false,
-        initialized: true,
-        error: error.message,
-      })
-      setDerived()
-      return
-    }
-
-    const session = data.session
-    const user = session?.user ?? null
-
-    set({
-      session,
-      user,
-      loadingAuth: false,
-      initialized: true,
-    })
-
-    // 2) carrega orgs se logado
-    if (user) {
-      await get().fetchOrganizations()
-    } else {
-      set({
-        organizations: [],
-        currentOrgId: null,
-        currentOrg: null,
-        roleInOrg: null,
-      })
-      writeOrgToStorage(null)
-    }
-
-    // 3) listener único
-    if (!authUnsub) {
-      const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-        const newUser = newSession?.user ?? null
-
+      // “rehydrate” seguro:
+      // se já inicializado e não está carregando orgs e tem user,
+      // mas ainda não tem org resolvida (0 ou >1), não precisa re-init pesado
+      // (o estado já representa o gate corretamente).
+      if (state.initialized && !state.loadingOrgs) {
         set({
-          session: newSession,
-          user: newUser,
+          loading: false,
           loadingAuth: false,
-          error: null,
+          isAuthenticated: !!state.user,
+          needsOrgSelection: !!state.user && !state.currentOrgId && state.organizations.length !== 1,
+        })
+        return
+      }
+
+      const setDerived = () => {
+        const s = get()
+        set({
+          isAuthenticated: !!s.user,
+          needsOrgSelection: !!s.user && !s.currentOrgId && s.organizations.length !== 1 && !s.loadingOrgs,
+        })
+      }
+
+      set({ loading: true, loadingAuth: true, error: null })
+
+      const { data, error } = await supabase.auth.getSession()
+      if (error) {
+        set({
+          session: null,
+          user: null,
+          organizations: [],
+          currentOrgId: null,
+          currentOrg: null,
+          roleInOrg: null,
+          loading: false,
+          loadingAuth: false,
+          loadingOrgs: false,
+          initialized: true,
+          error: error.message,
+        })
+        setDerived()
+        return
+      }
+
+      const session = data.session
+      const user = session?.user ?? null
+
+      set({
+        session,
+        user,
+        loadingAuth: false,
+        initialized: true,
+      })
+
+      // ✅ ÚNICA fonte de carregamento de orgs
+      if (user) {
+        await get().fetchOrganizations()
+      } else {
+        set({
+          organizations: [],
+          currentOrgId: null,
+          currentOrg: null,
+          roleInOrg: null,
+        })
+        writeOrgToStorage(null)
+      }
+
+      // 🔒 listener único (SEM fetchOrganizations aqui)
+      if (!authUnsub) {
+        const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+          const newUser = newSession?.user ?? null
+
+          set({
+            session: newSession,
+            user: newUser,
+            loadingAuth: false,
+            error: null,
+          })
+
+          // ⚠️ Regra UX: listener NÃO carrega orgs.
+          // Apenas limpa estado quando logout.
+          if (!newUser) {
+            set({
+              organizations: [],
+              currentOrgId: null,
+              currentOrg: null,
+              roleInOrg: null,
+              loadingOrgs: false,
+            })
+            writeOrgToStorage(null)
+          }
+
+          setDerived()
         })
 
-        if (newUser) {
-          await get().fetchOrganizations()
-        } else {
-          set({
-            organizations: [],
-            currentOrgId: null,
-            currentOrg: null,
-            roleInOrg: null,
-          })
-          writeOrgToStorage(null)
-        }
+        authUnsub = () => sub.subscription.unsubscribe()
+      }
 
-        setDerived()
-      })
-
-      authUnsub = () => sub.subscription.unsubscribe()
+      set({ loading: false })
+      setDerived()
     }
 
-    set({ loading: false })
-    setDerived()
+    initInFlight = run().finally(() => {
+      initInFlight = null
+    })
+
+    return initInFlight
   },
 
-  // ✅ nome CANÔNICO usado pelo OrganizationSelector
   fetchOrganizations: async () => {
     const user = get().user
 
-    // helper derived
     const setDerived = () => {
-      const u = get().user
-      const orgs = get().organizations
-      const currentOrgId = get().currentOrgId
+      const s = get()
       set({
-        isAuthenticated: !!u,
-        needsOrgSelection: !!u && orgs.length > 0 && !currentOrgId,
+        isAuthenticated: !!s.user,
+        needsOrgSelection: !!s.user && !s.currentOrgId && s.organizations.length !== 1 && !s.loadingOrgs,
       })
     }
 
@@ -258,15 +265,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     set({ loadingOrgs: true, error: null })
-
     try {
       const { orgs, roleByOrgId } = await fetchOrganizationsForUser(user.id)
       const organizations = safeArray<Organization>(orgs)
 
-      const storedOrgId = readOrgFromStorage()
-      const resolvedOrgId =
-        (storedOrgId && organizations.some((o) => o.id === storedOrgId) ? storedOrgId : null) ??
-        (organizations[0]?.id ?? null)
+      // ✅ UX CRAVADA:
+      // - 0 orgs: nenhuma selecionada
+      // - 1 org: auto-seleciona
+      // - >1: força selector (não auto-seleciona, ignora storage)
+      let resolvedOrgId: string | null = null
+
+      if (organizations.length === 1) {
+        resolvedOrgId = organizations[0].id
+      } else {
+        resolvedOrgId = null
+      }
 
       const currentOrg = resolvedOrgId
         ? organizations.find((o) => o.id === resolvedOrgId) ?? null
@@ -282,6 +295,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         loadingOrgs: false,
       })
 
+      // storage apenas se houver org definida (auto-select ou switch)
       writeOrgToStorage(resolvedOrgId)
       setDerived()
     } catch (e: any) {
@@ -298,7 +312,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // alias para compatibilidade com código antigo
   refreshOrganizations: async () => {
     await get().fetchOrganizations()
   },
@@ -314,9 +327,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         currentOrg: null,
       })
       writeOrgToStorage(null)
-      set({
-        needsOrgSelection: true,
-      })
+      set({ needsOrgSelection: true })
       return
     }
 
@@ -346,6 +357,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       loadingOrgs: false,
       isAuthenticated: false,
       needsOrgSelection: false,
+      initialized: true,
     })
 
     writeOrgToStorage(null)
