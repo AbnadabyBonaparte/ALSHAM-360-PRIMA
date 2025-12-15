@@ -34,7 +34,9 @@ function AppContent() {
   const init = useAuthStore((s) => s.init)
   const loading = useAuthStore((s) => s.loading)
   const user = useAuthStore((s) => s.user)
-  const currentOrg = useAuthStore((s) => (s as any).currentOrg ?? null)
+
+  // ✅ CORREÇÃO P0: usar estado tipado real do store (sem any cast)
+  const currentOrg = useAuthStore((s) => s.currentOrg)
 
   const recovery = useMemo(() => isRecoveryFlow(), [])
 
@@ -72,17 +74,13 @@ function AppContent() {
         {/* Org gate CANÔNICO */}
         <Route
           path="/select-organization"
-          element={
-            currentOrg ? <Navigate to="/dashboard" replace /> : <OrganizationSelector />
-          }
+          element={currentOrg ? <Navigate to="/dashboard" replace /> : <OrganizationSelector />}
         />
 
         {/* Internal pages */}
         <Route
           path="/dashboard"
-          element={
-            !currentOrg ? <Navigate to="/select-organization" replace /> : <DashboardSupremo />
-          }
+          element={!currentOrg ? <Navigate to="/select-organization" replace /> : <DashboardSupremo />}
         />
 
         <Route
