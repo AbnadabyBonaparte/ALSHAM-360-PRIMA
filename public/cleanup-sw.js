@@ -1,65 +1,114 @@
 /* ============================================================
- 🛡️ ALSHAM 360° PRIMA — Service Worker Cleanup v1.0
- Remove registros antigos do SW manual para evitar conflitos
- Data: 2025-10-15
+ 🛡️ ALSHAM 360° PRIMA — Service Worker Cleanup v2.0 (SAFE)
+ Objetivo:
+ - Remover caches antigos que mantêm bundles velhos (tela preta)
+ - Desregistrar APENAS SWs legados problemáticos (sem matar o SW atual)
+ Data: 2025-12-15
  Autor: @AbnadabyBonaparte
 ============================================================ */
 
-(function() {
+(function () {
   'use strict';
 
-  console.log('🧹 [ALSHAM] Iniciando limpeza de Service Workers...');
+  console.log('🧹 [ALSHAM] Iniciando limpeza de Service Workers e caches...');
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-      let cleanedCount = 0;
-      
-      registrations.forEach(function(registration) {
-        const scriptURL = registration.active ? registration.active.scriptURL : '';
-        
-        // Remove apenas o SW manual antigo (/sw.js)
-        if (scriptURL.includes('/sw.js') && !scriptURL.includes('workbox')) {
-          console.log('🗑️ [ALSHAM] Removendo SW manual antigo:', scriptURL);
-          registration.unregister().then(function(success) {
-            if (success) {
-              console.log('✅ [ALSHAM] SW manual removido com sucesso!');
-              cleanedCount++;
-              
-              // Limpa caches antigos
-              caches.keys().then(function(cacheNames) {
-                return Promise.all(
-                  cacheNames.map(function(cacheName) {
-                    if (cacheName.includes('alsham360-v11.0')) {
-                      console.log('🗑️ [ALSHAM] Removendo cache antigo:', cacheName);
-                      return caches.delete(cacheName);
-                    }
-                  })
-                );
-              }).then(function() {
-                console.log('✅ [ALSHAM] Caches antigos limpos!');
-              });
-            }
-          });
-        } else {
-          console.log('✅ [ALSHAM] SW Workbox mantido:', scriptURL);
-        }
-      });
-
-      setTimeout(function() {
-        if (cleanedCount === 0) {
-          console.log('✅ [ALSHAM] Nenhum SW antigo encontrado. Sistema limpo!');
-        } else {
-          console.log('🎉 [ALSHAM] Cleanup concluído! ' + cleanedCount + ' SW(s) removido(s).');
-          console.log('🔄 [ALSHAM] Recarregando página em 2 segundos...');
-          setTimeout(function() {
-            window.location.reload();
-          }, 2000);
-        }
-      }, 1000);
-    }).catch(function(error) {
-      console.error('❌ [ALSHAM] Erro ao limpar SWs:', error);
-    });
-  } else {
+  if (!('serviceWorker' in navigator)) {
     console.warn('⚠️ [ALSHAM] Service Workers não suportados neste navegador.');
+    return;
   }
+
+  // Caches que queremos limpar (padrões)
+  function isOldCacheName(name) {
+    // legado que você já tinha
+    if (name.includes('alsham360-v11.0')) return true;
+
+    // novos padrões (SW v2.x)
+    if (name.startsWith('alsham-cache-')) return true;
+    if (name.startsWith('alsham-static-')) return true;
+
+    // se existir algum cache anterior que você usou
+    if (name.includes('alsham-cache-v')) return true;
+    if (name.includes('alsham-static-v')) return true;
+
+    return false;
+  }
+
+  // Decide se devemos desregistrar um SW (não matar o atual)
+  function shouldUnregisterSW(scriptURL) {
+    if (!scriptURL) return false;
+
+    // Mantém workbox sempre
+    if (scriptURL.includes('workbox')) return false;
+
+    // Apenas SW manual (sw.js), mas com critérios de legado
+    // Se você atualizar o SW e mudar versão/cache name, ele vai ficar OK.
+    // Aqui removemos quando:
+    // - for sw.js de origem antiga (sem query version)
+    // - ou for sw.js com cache name v11 / histórico
+    const isManualSW = scriptURL.includes('/sw.js');
+
+    // Critérios de "antigo"
+    const looksLegacy =
+      scriptURL.includes('alsham360') ||
+      scriptURL.includes('v11') ||
+      (!scriptURL.includes('?v=') && !scriptURL.includes('v2.1') && !scriptURL.includes('v2.0'));
+
+    return isManualSW && looksLegacy;
+  }
+
+  async function run() {
+    let removedSW = 0;
+    let removedCaches = 0;
+
+    try {
+      // 1) Limpa caches antigos
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(async (name) => {
+          if (isOldCacheName(name)) {
+            console.log('🗑️ [ALSHAM] Removendo cache:', name);
+            const ok = await caches.delete(name);
+            if (ok) removedCaches++;
+          }
+        })
+      );
+
+      // 2) Desregistra apenas SWs legados problemáticos
+      const registrations = await navigator.serviceWorker.getRegistrations();
+
+      await Promise.all(
+        registrations.map(async (registration) => {
+          const active = registration.active;
+          const waiting = registration.waiting;
+          const installing = registration.installing;
+
+          const scriptURL =
+            (active && active.scriptURL) ||
+            (waiting && waiting.scriptURL) ||
+            (installing && installing.scriptURL) ||
+            '';
+
+          if (shouldUnregisterSW(scriptURL)) {
+            console.log('🗑️ [ALSHAM] Desregistrando SW legado:', scriptURL);
+            const ok = await registration.unregister();
+            if (ok) removedSW++;
+          } else {
+            console.log('✅ [ALSHAM] SW mantido:', scriptURL || '(sem scriptURL detectável)');
+          }
+        })
+      );
+
+      console.log('✅ [ALSHAM] Limpeza concluída.');
+      console.log(`📦 [ALSHAM] Caches removidos: ${removedCaches}`);
+      console.log(`🛠️ [ALSHAM] SWs desregistrados: ${removedSW}`);
+
+      // 3) Recarrega para puxar bundle novo
+      console.log('🔄 [ALSHAM] Recarregando página em 1 segundo...');
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err) {
+      console.error('❌ [ALSHAM] Erro durante limpeza:', err);
+    }
+  }
+
+  run();
 })();
