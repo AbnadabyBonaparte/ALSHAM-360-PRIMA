@@ -1065,14 +1065,16 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
 export function findCategoryById(id: string): SidebarCategory | undefined {
   return SIDEBAR_STRUCTURE.find((cat) => cat.id === id);
 }
+
 /**
- * Encontra um link em qualquer categoria pelo ID
+ * Encontra qualquer item da sidebar (incluindo groups) pelo ID
+ * Útil para navegação hierárquica, expansão de menus, tooltips, etc.
  */
-export function findLinkById(linkId: string): { category: SidebarCategory; link: SidebarLink } | undefined {
+export function findItemById(itemId: string): { category: SidebarCategory; item: SidebarLink } | undefined {
   for (const category of SIDEBAR_STRUCTURE) {
     const findInLinks = (links: SidebarLink[]): SidebarLink | undefined => {
       for (const link of links) {
-        if (link.id === linkId) return link;
+        if (link.id === itemId) return link;
         if (link.children) {
           const found = findInLinks(link.children);
           if (found) return found;
@@ -1080,13 +1082,26 @@ export function findLinkById(linkId: string): { category: SidebarCategory; link:
       }
       return undefined;
     };
-    const link = findInLinks(category.links);
-    if (link) {
-      return { category, link };
+    const item = findInLinks(category.links);
+    if (item) {
+      return { category, item };
     }
   }
   return undefined;
 }
+
+/**
+ * Encontra apenas uma ROTA válida (folha – sem children) pelo ID
+ * Usar este em qualquer lógica de routing, active state, validação de página
+ */
+export function findRouteById(routeId: string): { category: SidebarCategory; route: SidebarLink } | undefined {
+  const result = findItemById(routeId);
+  if (result && !result.item.children?.length) {
+    return { category: result.category, route: result.item };
+  }
+  return undefined;
+}
+
 /**
  * Obtém todas as rotas reais (apenas folhas – itens sem children)
  */
@@ -1107,20 +1122,22 @@ export function getAllRoutes(): string[] {
   }
   return [...new Set(routes)]; // Remove possíveis duplicatas (não deve haver)
 }
+
 /**
  * Conta total de links (rotas reais)
  */
 export function getTotalLinksCount(): number {
   return getAllRoutes().length;
 }
+
 /**
  * Obtém estatísticas da sidebar (apenas sobre rotas reais)
  */
 export function getSidebarStats() {
   const allRoutes = getAllRoutes();
   const implemented = allRoutes.filter((id) => {
-    const result = findLinkById(id);
-    return result?.link.status === 'implemented';
+    const result = findRouteById(id);
+    return result?.route.status === 'implemented';
   });
   return {
     totalCategories: SIDEBAR_STRUCTURE.length,
