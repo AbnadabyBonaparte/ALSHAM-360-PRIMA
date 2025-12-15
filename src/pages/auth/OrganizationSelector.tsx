@@ -6,25 +6,32 @@ import {
   Building2,
   Users,
   Crown,
-  CheckCircle,
-  Loader2,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react'
 import type { Organization } from '../../lib/supabase/types'
 
 export const OrganizationSelector: React.FC = () => {
-  const { organizations, switchOrganization, currentOrg, error, clearError, isAuthenticated } = useAuthStore()
+  const { 
+    organizations, 
+    switchOrganization, 
+    currentOrg, 
+    error, 
+    clearError, 
+    isAuthenticated 
+  } = useAuthStore()
+  
   const navigate = useNavigate()
 
-  // Redirect if not authenticated
+  // Redirect se não estiver autenticado
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login')
     }
   }, [isAuthenticated, navigate])
 
-  // Redirect if organization is already selected
+  // Redirect automático se organização já estiver selecionada
   useEffect(() => {
     if (currentOrg) {
       navigate('/dashboard')
@@ -36,6 +43,7 @@ export const OrganizationSelector: React.FC = () => {
     await switchOrganization(org.id)
   }
 
+  // Estado de carregamento inicial
   if (!organizations.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
@@ -45,8 +53,12 @@ export const OrganizationSelector: React.FC = () => {
           className="text-center"
         >
           <Loader2 className="w-12 h-12 animate-spin text-blue-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Carregando organizações...</h2>
-          <p className="text-slate-400">Aguarde enquanto buscamos suas organizações.</p>
+          <h2 className="text-xl font-semibold text-white mb-2">
+            Carregando organizações...
+          </h2>
+          <p className="text-slate-400">
+            Aguarde enquanto buscamos suas organizações.
+          </p>
         </motion.div>
       </div>
     )
@@ -54,10 +66,10 @@ export const OrganizationSelector: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+      {/* Background Grid Pattern — agora via CSS class segura */}
+      <div className="absolute inset-0 bg-subtle-grid opacity-40" />
 
-      {/* Floating Orbs */}
+      {/* Floating Orbs Animados */}
       <motion.div
         className="absolute top-20 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"
         animate={{
@@ -90,7 +102,7 @@ export const OrganizationSelector: React.FC = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-2xl"
         >
-          {/* Header */}
+          {/* Header Supremo */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -104,7 +116,6 @@ export const OrganizationSelector: React.FC = () => {
             >
               <Building2 className="w-10 h-10 text-white" />
             </motion.div>
-
             <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-2">
               Selecionar Organização
             </h1>
@@ -113,7 +124,7 @@ export const OrganizationSelector: React.FC = () => {
             </p>
           </motion.div>
 
-          {/* Error Message */}
+          {/* Mensagem de Erro */}
           <AnimatePresence>
             {error && (
               <motion.div
@@ -130,7 +141,7 @@ export const OrganizationSelector: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Organizations Grid */}
+          {/* Grid de Organizações */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -151,7 +162,6 @@ export const OrganizationSelector: React.FC = () => {
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Organization Avatar */}
                   <div className="flex items-start space-x-4 mb-4">
                     <div className="flex-shrink-0">
                       {org.logo_url ? (
@@ -168,7 +178,6 @@ export const OrganizationSelector: React.FC = () => {
                         </div>
                       )}
                     </div>
-
                     <div className="flex-1 min-w-0">
                       <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">
                         {org.name}
@@ -176,8 +185,6 @@ export const OrganizationSelector: React.FC = () => {
                       <p className="text-slate-400 text-sm mb-2">
                         {org.domain || 'Sem domínio configurado'}
                       </p>
-
-                      {/* Organization Stats (placeholder for now) */}
                       <div className="flex items-center space-x-4 text-xs text-slate-500">
                         <div className="flex items-center space-x-1">
                           <Users className="w-3 h-3" />
@@ -190,14 +197,10 @@ export const OrganizationSelector: React.FC = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* CTA */}
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400 text-sm">Acessar organização</span>
                     <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform" />
                   </div>
-
-                  {/* Hover Effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </motion.button>
               </motion.div>
