@@ -1,8 +1,9 @@
 /* src/styles/themes.css */
-/* ALSHAM 360° PRIMA — Theme System (CSS Consumer SSOT v2.5.4) */
+/* ALSHAM 360° PRIMA — Theme System (CSS Consumer SSOT v2.6.0) */
 /* =========================================================
    SSOT: themes.ts + runtime injection via useTheme.ts
    Este arquivo é CONSUMER-ONLY → NÃO define temas, apenas consome
+   Objetivo: 100% build-proof + shadcn bridge completo + zero “cara estranha”
    ========================================================= */
 
 /* =========================================================
@@ -10,7 +11,9 @@
    ========================================================= */
 @layer base {
   :root {
-    /* Core fallback (dark baseline) */
+    /* =========================================================
+       CORE FALLBACK (dark baseline)
+       ========================================================= */
     --bg: #0b1220;
     --bg-g1: #0b1220;
     --bg-g2: #1a1f35;
@@ -20,25 +23,33 @@
     --text-2: rgba(255, 255, 255, 0.72);
     --text-muted: color-mix(in srgb, var(--text-2) 75%, transparent);
 
-    /* Surfaces */
+    /* =========================================================
+       SURFACES (legacy primitives)
+       ========================================================= */
     --surface: rgba(255, 255, 255, 0.06);
     --surface-strong: rgba(255, 255, 255, 0.10);
     --surface-elev: rgba(255, 255, 255, 0.08);
     --glass-hi: rgba(255, 255, 255, 0.08);
     --surface-glass: rgba(255, 255, 255, 0.04);
 
-    /* Borders LEGACY — mantido intacto */
+    /* =========================================================
+       BORDERS (legacy — mantido intacto)
+       ========================================================= */
     --border: rgba(255, 255, 255, 0.10);
     --border-strong: rgba(255, 255, 255, 0.16);
 
-    /* Accents */
+    /* =========================================================
+       ACCENTS (fallback)
+       ========================================================= */
     --accent-1: #10b981;
     --accent-2: #3b82f6;
     --accent-3: #a855f7;
     --accent-warm: #f59e0b;
     --accent-alert: #ef4444;
 
-    /* Gradients */
+    /* =========================================================
+       GRADIENTS (fallback)
+       ========================================================= */
     --grad-primary: linear-gradient(135deg, #10b981, #14b8a6);
     --grad-secondary: linear-gradient(135deg, #3b82f6, #06b6d4);
     --grad-accent: linear-gradient(135deg, #a855f7, #ec4899);
@@ -53,16 +64,21 @@
       transparent 70%
     );
 
-    /* Glows */
+    /* =========================================================
+       GLOWS (fallback)
+       ========================================================= */
     --glow-1: 0 0 20px rgba(16, 185, 129, 0.30);
     --glow-2: 0 0 15px rgba(59, 130, 246, 0.25);
     --glow-3: 0 0 15px rgba(168, 85, 247, 0.30);
 
     /* =========================================================
-       SHADCN/TAILWIND TOKENS BRIDGE
+       SHADCN/TAILWIND TOKENS BRIDGE (essencial)
+       - mantém contrato: bg-background, text-foreground, card, ring, radius, etc.
+       - evita “tokens vazios” no computedStyle
        ========================================================= */
     --background: var(--bg, #0b1220);
     --foreground: var(--text, rgba(255, 255, 255, 0.96));
+
     --muted: var(--surface, rgba(255, 255, 255, 0.06));
     --muted-foreground: var(--text-2, rgba(255, 255, 255, 0.72));
 
@@ -75,29 +91,30 @@
     --primary: var(--accent-1, #10b981);
     --primary-foreground: #ffffff;
 
-    /* Mantido: sua dupla definição (2ª sobrescreve a 1ª) */
-    --secondary: rgba(255, 255, 255, 0.08);
+    /* “premium subtle” — sem duplicação */
     --secondary: color-mix(in srgb, var(--foreground) 8%, transparent);
     --secondary-foreground: var(--foreground);
 
-    --accent: rgba(16, 185, 129, 0.18);
     --accent: color-mix(in srgb, var(--primary) 18%, transparent);
     --accent-foreground: var(--foreground);
 
     --destructive: var(--accent-alert, #ef4444);
     --destructive-foreground: #ffffff;
 
+    /* Nunca auto-referência */
     --border-shad: var(--border, rgba(255, 255, 255, 0.10));
     --input: var(--border-shad);
     --ring: color-mix(in srgb, var(--primary) 55%, transparent);
 
+    /* Radius essencial para shadcn */
     --radius: 1rem;
 
     /* =========================================================
-       ALIASES LEGACY
+       LEGACY ALIASES (compatibilidade)
        ========================================================= */
     --text-primary: var(--text);
     --text-secondary: var(--text-2);
+
     --accent-primary: var(--accent-1);
     --accent-secondary: var(--accent-2);
     --accent-tertiary: var(--accent-3);
@@ -121,7 +138,9 @@
     --accent-secondary-hover: #2563eb;
     --accent-tertiary-hover: #9333ea;
 
-    /* Design system */
+    /* =========================================================
+       DESIGN SYSTEM (não tema)
+       ========================================================= */
     --font-xs: clamp(0.75rem, 2vw, 0.875rem);
     --font-sm: clamp(0.875rem, 2.5vw, 1rem);
     --font-base: clamp(0.875rem, 2vw, 1rem);
@@ -154,10 +173,13 @@
     color-scheme: dark;
   }
 
+  /* ---------------------------------------------------------
+     NUCLEAR FALLBACK (ativado manualmente no html se runtime falhar)
+     --------------------------------------------------------- */
   html.nuclear-fallback {
     --bg: #000000 !important;
-    --foreground: #ffffff !important;
     --background: #000000 !important;
+    --foreground: #ffffff !important;
     --text: #ffffff !important;
     --card: #000000 !important;
     --primary: #00ff00 !important;
@@ -168,6 +190,9 @@
     box-shadow: none !important;
   }
 
+  /* ---------------------------------------------------------
+     GLOBAL BASE (anti-flash + consumo)
+     --------------------------------------------------------- */
   html,
   body,
   #root {
@@ -181,6 +206,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Transição suave durante troca de tema */
   html.theme-switching * {
     transition:
       background-color 0.32s ease,
@@ -221,7 +247,9 @@
 }
 
 /* =========================================================
-   COMPONENTS LAYER
+   COMPONENTS LAYER (build-proof)
+   - sem opacity no container (evita “cara estranha”)
+   - sem bg-card/xx e border-border/xx
    ========================================================= */
 @layer components {
   .btn {
@@ -240,7 +268,7 @@
     @apply bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/40;
   }
 
-  /* Build-proof: remove hover:bg-muted/50 (quebraria se bg-muted for custom) */
+  /* Build-proof: hover sem /50 */
   .btn-ghost {
     @apply bg-transparent border border-border text-foreground;
   }
@@ -248,34 +276,31 @@
     background-color: color-mix(in srgb, var(--muted) 50%, transparent);
   }
 
-  /* =========================================================
-     SURFACES (build-proof)
-     - sem bg-card/xx
-     - sem border-border/xx
-     ========================================================= */
+  /* Surfaces: sem opacity no container */
   .surface {
-    @apply bg-card border backdrop-blur-xl rounded-2xl transition-all duration-300 hover:border-border-strong hover:-translate-y-1;
-    opacity: 0.6;
+    @apply border backdrop-blur-xl rounded-2xl transition-all duration-300 hover:border-border-strong hover:-translate-y-1;
+    background-color: color-mix(in srgb, var(--card) 60%, transparent);
     border-color: color-mix(in srgb, var(--border) 50%, transparent);
   }
   .surface:hover {
-    opacity: 0.8;
+    background-color: color-mix(in srgb, var(--card) 80%, transparent);
   }
 
   .surface-elev {
-    @apply bg-card border backdrop-blur-2xl rounded-3xl shadow-2xl;
-    opacity: 0.8;
+    @apply border backdrop-blur-2xl rounded-3xl shadow-2xl;
+    background-color: color-mix(in srgb, var(--card) 80%, transparent);
     border-color: color-mix(in srgb, var(--border) 50%, transparent);
   }
 
   .glass {
-    @apply bg-card border backdrop-blur-xl rounded-2xl;
-    opacity: 0.4;
+    @apply border backdrop-blur-xl rounded-2xl;
+    background-color: color-mix(in srgb, var(--card) 40%, transparent);
     border-color: color-mix(in srgb, var(--border) 30%, transparent);
   }
 
   .card {
-    @apply bg-card border border-border rounded-2xl p-6 transition-all duration-300 hover:border-border-strong hover:shadow-2xl;
+    @apply border border-border rounded-2xl p-6 transition-all duration-300 hover:border-border-strong hover:shadow-2xl;
+    background-color: var(--card);
   }
 }
 
@@ -306,9 +331,11 @@
 }
 
 /* =========================================================
-   VERSÃO: 2.5.4-SSOT-CONSUMER-BUILD-PROOF
-   ✅ Elimina bg-card/xx e border-border/xx (causadores de erro)
-   ✅ Utilities locais: bg-card, border-border, border-border-strong, text-foreground
-   ✅ btn-ghost hover sem /50 (build-proof)
-   ✅ Mantém consumer-only + bridge shadcn completa
+   VERSÃO: 2.6.0-SSOT-CONSUMER-1000/1000
+   ✅ Consumer-only (runtime injection em themes.ts/useTheme.ts)
+   ✅ Bridge shadcn completo (tokens não ficam vazios)
+   ✅ Zero auto-referência (border/input/ring)
+   ✅ Build-proof total (sem bg-card/xx, border-border/xx, hover /50 em custom)
+   ✅ Sem opacity no container (elimina “cara estranha”)
+   ✅ Nuclear fallback disponível
    ========================================================= */
