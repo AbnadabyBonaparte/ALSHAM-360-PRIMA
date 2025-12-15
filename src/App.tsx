@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { useTheme } from '@/hooks/useTheme'
 
 // Auth pages
 import { Login } from '@/pages/auth/Login'
@@ -31,11 +32,12 @@ function isRecoveryFlow(): boolean {
 }
 
 function AppContent() {
+  // ✅ garante runtime do tema sempre ativo (inclusive no selector)
+  useTheme()
+
   const init = useAuthStore((s) => s.init)
   const loading = useAuthStore((s) => s.loading)
   const user = useAuthStore((s) => s.user)
-
-  // ✅ CORREÇÃO P0: usar estado tipado real do store (sem any cast)
   const currentOrg = useAuthStore((s) => s.currentOrg)
 
   const recovery = useMemo(() => isRecoveryFlow(), [])
