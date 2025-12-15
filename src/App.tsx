@@ -71,6 +71,7 @@ import Gamificacao from "./pages/Gamificacao";
 import Publicacao from "./pages/Publicacao";
 import Seguranca from "./pages/Seguranca";
 import { useUrlSync } from "./hooks/useUrlSync";
+import { useTheme } from "./hooks/useTheme";
 
 ChartJS.register(
   CategoryScale,
@@ -479,7 +480,7 @@ registerRoute("recursos-e-templates", async () => ({ default: () => <Placeholder
 registerRoute("comunidade", async () => ({ default: () => <PlaceholderPage title="Comunidade" /> }));
 registerRoute("historias-de-sucesso", async () => ({ default: () => <PlaceholderPage title="Histórias de Sucesso" /> }));
 
-const themeOptions: { key: string; label: string; description: string }[] = [
+const themeOptions: { key: ThemeKey; label: string; description: string }[] = [
   { key: "glass-dark", label: "Glass Dark", description: "Night ops" },
   { key: "platinum-glass", label: "Platinum Glass", description: "Boardroom" },
   { key: "midnight-aurora", label: "Midnight Aurora", description: "Innovation" },
@@ -963,6 +964,7 @@ function App() {
     setTimeframe,
 
   } = useDashboardStore();
+  const { currentTheme: theme, setTheme } = useTheme();
 const { currentTheme: theme, setTheme } = useTheme();
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
@@ -1077,14 +1079,7 @@ const { currentTheme: theme, setTheme } = useTheme();
   }, []); // ⚠️ IMPORTANTE: array vazio - executar só uma vez
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 3️⃣ THEME MANAGEMENT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 4️⃣ CAMPAIGN CAROUSEL MANAGEMENT
+  // 3️⃣ CAMPAIGN CAROUSEL MANAGEMENT
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
     if (!campaigns.length) return;

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Supabase ALSHAM 360° PRIMA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>🧪 Teste de Conexão Supabase - ALSHAM 360° PRIMA</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        async function log(message) {
+            console.log(message);
+            output.innerHTML += '<p>' + message + '</p>';
+        }
+
+        async function testSupabase() {
+            try {
+                log('🧪 Iniciando teste de conexão com Supabase...');
+
+                // Credenciais do projeto
+                const SUPABASE_URL = 'https://rgvnbtuqtxvfxhrdnkjg.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI';
+
+                log('URL: ' + SUPABASE_URL);
+                log('Key presente: ' + !!SUPABASE_ANON_KEY);
+
+                // Criar cliente
+                const { createClient } = supabase;
+                const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                log('✅ Cliente Supabase criado com sucesso!');
+
+                // Testar tabelas - todas as possíveis do catálogo
+                const tables = [
+                    'organizations',
+                    'user_profiles',
+                    'user_organizations',
+                    'leads_crm',
+                    'sales_opportunities',
+                    'campaigns',
+                    'contacts',
+                    'accounts',
+                    'audit_log',
+                    'gamification_points',
+                    'gamification_badges',
+                    'user_badges',
+                    'team_leaderboards',
+                    'notifications',
+                    'ai_predictions',
+                    'ia_logs',
+                    'sentiment_analysis_logs',
+                    'automation_rules',
+                    'automation_executions',
+                    'logs_automacao',
+                    'email_templates',
+                    'lead_labels',
+                    'lead_label_links',
+                    'lead_sources',
+                    'billing',
+                    'invoices',
+                    'financial_logs',
+                    'payment_events',
+                    'help_center',
+                    'community_changelog',
+                    'ai_docs',
+                    'team_goals',
+                    'team_commissions',
+                    'team_territories'
+                ];
+
+                log('\n📋 Testando acesso às tabelas...');
+
+                const existingTables = [];
+                const nonExistingTables = [];
+
+                for (const table of tables) {
+                    try {
+                        const { data, error } = await supabaseClient
+                            .from(table)
+                            .select('*')
+                            .limit(1);
+
+                        if (error) {
+                            log(`❌ ${table}: ${error.message}`);
+                            nonExistingTables.push(table);
+                        } else {
+                            log(`✅ ${table}: OK (${data ? data.length : 0} registros encontrados)`);
+                            existingTables.push(table);
+                        }
+                    } catch (err) {
+                        log(`❌ ${table}: Erro - ${err.message}`);
+                        nonExistingTables.push(table);
+                    }
+                }
+
+                log('\n🎯 RESUMO:');
+                log(`✅ Tabelas encontradas: ${existingTables.length}`);
+                log(`❌ Tabelas não encontradas: ${nonExistingTables.length}`);
+
+                if (existingTables.length > 0) {
+                    log('\n📊 Tabelas existentes:');
+                    existingTables.forEach(table => log(`  - ${table}`));
+                }
+
+                // Testar informações do projeto
+                try {
+                    log('\n📊 Testando informações do projeto...');
+                    const { data: authUser, error: authError } = await supabaseClient.auth.getUser();
+
+                    if (authError) {
+                        log('ℹ️ Usuário não autenticado (esperado para teste anônimo)');
+                    } else {
+                        log('👤 Usuário autenticado: ' + (authUser?.user?.email || 'N/A'));
+                    }
+                } catch (err) {
+                    log('⚠️ Erro ao verificar autenticação: ' + err.message);
+                }
+
+                log('\n🎉 Teste concluído!');
+
+            } catch (err) {
+                log('❌ Erro geral: ' + err.message);
+                console.error(err);
+            }
+        }
+
+        // Executar teste quando a página carregar
+        testSupabase();
+    </script>
+</body>
+</html>

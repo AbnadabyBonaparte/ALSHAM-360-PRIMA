@@ -16,10 +16,10 @@ restartPolicyType = "ON_FAILURE"
 NODE_ENV = "production"
 PORT = "3000"
 
-# Variáveis críticas do Supabase
-SUPABASE_URL = "https://SEU-PROJETO.supabase.co"
-SUPABASE_ANON_KEY = "coloque_sua_chave_anon_producao_aqui"
-SUPABASE_SERVICE_ROLE = "coloque_sua_chave_service_role_producao_aqui"
+# Variáveis críticas do Supabase - ALSHAM 360° PRIMA
+SUPABASE_URL = "https://rgvnbtuqtxvfxhrdnkjg.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndm5idHVxdHh2ZnhocmRua2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTIzNjIsImV4cCI6MjA3MDQ4ODM2Mn0.CxKiXMiYLz2b-yux0JI-A37zu4Q_nxQUnRf_MzKw-VI"
+SUPABASE_SERVICE_ROLE = "sbp_6958fd759296f069a8c2dc1499a64484b52d5503"
 
 # Variáveis para o frontend (Vite)
 VITE_SUPABASE_URL = "${SUPABASE_URL}"
