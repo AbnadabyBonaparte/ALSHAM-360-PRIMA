@@ -10,7 +10,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { Login } from '@/pages/auth/Login'
 import { SignUp } from '@/pages/auth/SignUp'
 import { ForgotPassword } from '@/pages/auth/ForgotPassword'
-import { ResetPassword } from '@/pages/auth/ResetPassword'
+import ResetPassword from '@/pages/auth/ResetPassword'
 
 // App pages
 import DashboardSupremo from '@/pages/Dashboard'
