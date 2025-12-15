@@ -3,17 +3,19 @@ import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
-import { OrganizationSelector } from '@/pages/auth/OrganizationSelector' // ou '@/components/auth/OrganizationSelector' se for o premium
+import { OrganizationSelector } from '@/pages/auth/OrganizationSelector' // versão épica corrigida
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 
-// Auth Pages
+// Páginas de Auth (já existem e são premium)
 import { Login } from './pages/auth/Login'
 import { SignUp } from './pages/auth/SignUp'
 import { ForgotPassword } from './pages/auth/ForgotPassword'
 import { ResetPassword } from './pages/auth/ResetPassword'
 
-// Pages principais (importe as reais)
-import { Dashboard } from './pages/Dashboard'
+// Sua obra-prima — o Dashboard Supremo
+import DashboardSupremo from './pages/Dashboard' // ajuste o nome exato se for diferente (ex: Dashboard.tsx)
+
+// Outras páginas principais (adicione conforme existirem)
 import { Leads } from './pages/Leads'
 import { Opportunities } from './pages/Opportunities'
 import { Campaigns } from './pages/Campaigns'
@@ -23,12 +25,21 @@ import { Gamification } from './pages/Gamification'
 import { Settings } from './pages/Settings'
 
 function AppContent() {
-  const { user, currentOrg, organizations, loading, needsOrgSelection, initialize } = useAuthStore()
+  const {
+    user,
+    currentOrg,
+    organizations,
+    loading,
+    needsOrgSelection,
+    initialize
+  } = useAuthStore()
 
+  // Inicializa a sessão e listener do Supabase
   useEffect(() => {
-    initialize() // Inicializa sessão + listener
+    initialize()
   }, [initialize])
 
+  // Estado de loading premium
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
@@ -37,7 +48,7 @@ function AppContent() {
     )
   }
 
-  // Não logado → rotas públicas
+  // Não autenticado → rotas públicas
   if (!user) {
     return (
       <Routes>
@@ -50,25 +61,25 @@ function AppContent() {
     )
   }
 
-  // Logado, mas precisa selecionar org
+  // Autenticado mas precisa selecionar organização
   if (needsOrgSelection || (organizations.length > 0 && !currentOrg)) {
     return <OrganizationSelector />
   }
 
-  // Tudo pronto → app protegido
+  // Tudo pronto → app protegido com layout supremo
   return (
     <ProtectedLayout>
       <Routes>
         <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="leads" element={<Leads />} />
-        <Route path="opportunities" element={<Opportunities />} />
-        <Route path="campaigns" element={<Campaigns />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="automations" element={<Automations />} />
-        <Route path="gamification" element={<Gamification />} />
-        <Route path="settings" element={<Settings />} />
-        {/* Adicione outras rotas aqui */}
+        <Route path="/dashboard" element={<DashboardSupremo />} />
+        <Route path="/leads" element={<Leads />} />
+        <Route path="/opportunities" element={<Opportunities />} />
+        <Route path="/campaigns" element={<Campaigns />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/automations" element={<Automations />} />
+        <Route path="/gamification" element={<Gamification />} />
+        <Route path="/settings" element={<Settings />} />
+        {/* Adicione mais rotas conforme necessário */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </ProtectedLayout>
