@@ -1,7 +1,10 @@
+/* src/index.css */
+/* ALSHAM 360° PRIMA — Global Styles */
+/* Ordem correta: imports do Design System → Tailwind layers */
+
 @import "./styles/theme-tokens.css";
 @import "./styles/themes.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
