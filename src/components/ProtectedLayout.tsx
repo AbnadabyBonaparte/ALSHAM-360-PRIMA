@@ -1,5 +1,5 @@
 // src/components/ProtectedLayout.tsx
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
@@ -10,11 +10,7 @@ export function ProtectedLayout() {
 
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
-  const init = useAuthStore((s) => s.init)
-
-  useEffect(() => {
-    init()
-  }, [init])
+  const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
 
   if (loading) {
     return (
@@ -26,6 +22,11 @@ export function ProtectedLayout() {
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  // ✅ Gate de org: evita loop se já estiver no selector
+  if (needsOrgSelection && location.pathname !== '/select-organization') {
+    return <Navigate to="/select-organization" replace />
   }
 
   return (
