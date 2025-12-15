@@ -2,12 +2,14 @@
 // ALSHAM 360° PRIMA — ROOT ROUTER (CANONICAL ORG GATE)
 
 import React, { useEffect, useMemo } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'
 
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
-import { useTheme } from '@/hooks/useTheme'
+
+// Internal page registry renderer
+import { renderPage } from '@/routes'
 
 // Auth pages
 import { Login } from '@/pages/auth/Login'
@@ -31,13 +33,18 @@ function isRecoveryFlow(): boolean {
   return h.includes('type=recovery') || s.includes('type=recovery')
 }
 
-function AppContent() {
-  // ✅ garante runtime do tema sempre ativo (inclusive no selector)
-  useTheme()
+function AppPage() {
+  const params = useParams()
+  const pageId = params.pageId ?? 'dashboard'
+  return <>{renderPage(pageId)}</>
+}
 
+function AppContent() {
   const init = useAuthStore((s) => s.init)
   const loading = useAuthStore((s) => s.loading)
   const user = useAuthStore((s) => s.user)
+
+  const currentOrgId = useAuthStore((s) => s.currentOrgId)
   const currentOrg = useAuthStore((s) => s.currentOrg)
 
   const recovery = useMemo(() => isRecoveryFlow(), [])
@@ -53,6 +60,8 @@ function AppContent() {
       </div>
     )
   }
+
+  const hasOrg = !!(currentOrgId && currentOrg)
 
   return (
     <Routes>
@@ -73,27 +82,30 @@ function AppContent() {
 
       {/* Protected shell */}
       <Route element={<ProtectedLayout />}>
-        {/* Org gate CANÔNICO */}
+        {/* Org gate */}
         <Route
           path="/select-organization"
-          element={currentOrg ? <Navigate to="/dashboard" replace /> : <OrganizationSelector />}
+          element={hasOrg ? <Navigate to="/dashboard" replace /> : <OrganizationSelector />}
         />
 
-        {/* Internal pages */}
+        {/* Canonical dashboard */}
         <Route
           path="/dashboard"
-          element={!currentOrg ? <Navigate to="/select-organization" replace /> : <DashboardSupremo />}
+          element={!hasOrg ? <Navigate to="/select-organization" replace /> : <DashboardSupremo />}
         />
 
+        {/* Dynamic internal pages via registry */}
         <Route
-          path="/"
-          element={<Navigate to={currentOrg ? '/dashboard' : '/select-organization'} replace />}
+          path="/app/:pageId"
+          element={!hasOrg ? <Navigate to="/select-organization" replace /> : <AppPage />}
         />
+
+        <Route path="/" element={<Navigate to={hasOrg ? '/dashboard' : '/select-organization'} replace />} />
 
         {/* Catchall interno: decide por org */}
         <Route
           path="*"
-          element={<Navigate to={currentOrg ? '/dashboard' : '/select-organization'} replace />}
+          element={<Navigate to={hasOrg ? '/dashboard' : '/select-organization'} replace />}
         />
       </Route>
 
