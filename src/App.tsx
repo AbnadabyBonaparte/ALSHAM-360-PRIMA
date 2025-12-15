@@ -1,6 +1,6 @@
 // FORCED REBUILD TRIGGER - AUTH FLOW ACTIVE - 2025-12-15 09:15
-// src/App.tsx - FINAL ESTÁVEL (SINGLETON SUPABASE + AUTH STORE LIMPO)
-import React, { useEffect } from 'react'
+// src/App.tsx — FINAL ESTÁVEL (RECOVERY FIRST + SINGLETON SUPABASE + PROTECTED OUTLET)
+import React, { useEffect, useMemo } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
@@ -15,13 +15,24 @@ import { ResetPassword } from '@/pages/auth/ResetPassword'
 // App pages
 import DashboardSupremo from '@/pages/Dashboard'
 
-// ✅ Precondition route (resolve /precondition/BK_LOGIN sem quebrar o router)
+// ✅ Precondition route
 import PreconditionGate from '@/pages/precondition/PreconditionGate'
 
+// Detecta fluxo de recovery do Supabase (normalmente vem no hash)
+function isRecoveryFlow(): boolean {
+  if (typeof window === 'undefined') return false
+  const h = window.location.hash || ''
+  const s = window.location.search || ''
+  return h.includes('type=recovery') || s.includes('type=recovery')
+}
+
 function AppContent() {
-  const user = useAuthStore(s => s.user)
-  const loading = useAuthStore(s => s.loading)
-  const init = useAuthStore(s => s.init)
+  const user = useAuthStore((s) => s.user)
+  const loading = useAuthStore((s) => s.loading)
+  const init = useAuthStore((s) => s.init)
+
+  // “gruda” o estado do recovery no primeiro load (evita piscar/redirect errado)
+  const recovery = useMemo(() => isRecoveryFlow(), [])
 
   useEffect(() => {
     init()
@@ -40,17 +51,25 @@ function AppContent() {
       {/* ✅ Sempre disponível */}
       <Route path="/precondition/:code" element={<PreconditionGate />} />
 
+      {/* ✅ Reset password sempre acessível (mesmo logado) */}
+      <Route path="/auth/reset-password" element={<ResetPassword />} />
+
+      {/* ✅ Se o link for recovery, força entrar no reset antes de qualquer redirect */}
+      {recovery && <Route path="*" element={<Navigate to="/auth/reset-password" replace />} />}
+
       {/* 🌐 Rotas públicas */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
       <Route path="/signup" element={!user ? <SignUp /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/auth/reset-password" element={<ResetPassword />} />
+      <Route
+        path="/forgot-password"
+        element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" replace />}
+      />
 
       {/* 🔒 Rotas protegidas (aninhadas com Outlet) */}
       <Route element={<ProtectedLayout />}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardSupremo />} />
-        {/* coloque suas outras páginas aqui, como children */}
+        {/* coloque suas outras páginas aqui */}
       </Route>
 
       {/* fallback */}
