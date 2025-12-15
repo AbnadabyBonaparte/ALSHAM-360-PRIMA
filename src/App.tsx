@@ -1,5 +1,5 @@
 // src/App.tsx
-// ALSHAM 360° PRIMA — ROOT ROUTER (FINAL • ORG-AWARE • ANTI-LOOP)
+// ALSHAM 360° PRIMA — ROOT ROUTER (CANONICAL ORG GATE)
 
 import React, { useEffect, useMemo } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
@@ -13,6 +13,8 @@ import { Login } from '@/pages/auth/Login'
 import { SignUp } from '@/pages/auth/SignUp'
 import { ForgotPassword } from '@/pages/auth/ForgotPassword'
 import ResetPassword from '@/pages/auth/ResetPassword'
+
+// Org
 import { OrganizationSelector } from '@/pages/auth/OrganizationSelector'
 
 // App pages
@@ -21,26 +23,19 @@ import DashboardSupremo from '@/pages/Dashboard'
 // Precondition
 import PreconditionGate from '@/pages/precondition/PreconditionGate'
 
-/**
- * Detecta fluxo de recovery do Supabase
- */
 function isRecoveryFlow(): boolean {
   if (typeof window === 'undefined') return false
-  return (
-    window.location.hash.includes('type=recovery') ||
-    window.location.search.includes('type=recovery')
-  )
+  const h = window.location.hash || ''
+  const s = window.location.search || ''
+  return h.includes('type=recovery') || s.includes('type=recovery')
 }
 
 function AppContent() {
-  const {
-    user,
-    loading,
-    init,
-    currentOrg,
-  } = useAuthStore()
+  const init = useAuthStore((s) => s.init)
+  const loading = useAuthStore((s) => s.loading)
+  const user = useAuthStore((s) => s.user)
+  const currentOrg = useAuthStore((s) => (s as any).currentOrg ?? null)
 
-  // trava recovery no primeiro render
   const recovery = useMemo(() => isRecoveryFlow(), [])
 
   useEffect(() => {
@@ -57,73 +52,53 @@ function AppContent() {
 
   return (
     <Routes>
-      {/* =========================================================
-          🔓 SEMPRE LIVRES
-         ========================================================= */}
+      {/* Always free */}
       <Route path="/precondition/:code" element={<PreconditionGate />} />
       <Route path="/auth/reset-password" element={<ResetPassword />} />
 
-      {/* Recovery tem prioridade absoluta */}
-      {recovery && (
-        <Route path="*" element={<Navigate to="/auth/reset-password" replace />} />
-      )}
+      {/* Force reset if recovery */}
+      {recovery && <Route path="*" element={<Navigate to="/auth/reset-password" replace />} />}
 
-      {/* =========================================================
-          🌐 PÚBLICAS (NÃO LOGADO)
-         ========================================================= */}
-      <Route
-        path="/login"
-        element={!user ? <Login /> : <Navigate to="/" replace />}
-      />
-      <Route
-        path="/signup"
-        element={!user ? <SignUp /> : <Navigate to="/" replace />}
-      />
+      {/* Public */}
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/signup" element={!user ? <SignUp /> : <Navigate to="/dashboard" replace />} />
       <Route
         path="/forgot-password"
-        element={!user ? <ForgotPassword /> : <Navigate to="/" replace />}
+        element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" replace />}
       />
 
-      {/* =========================================================
-          🔒 PROTEGIDAS (LOGADO)
-         ========================================================= */}
+      {/* Protected shell */}
       <Route element={<ProtectedLayout />}>
-        {/* Root decide org vs dashboard */}
+        {/* Org gate CANÔNICO */}
         <Route
-          path="/"
+          path="/select-organization"
           element={
-            !currentOrg
-              ? <Navigate to="/select-organization" replace />
-              : <Navigate to="/dashboard" replace />
+            currentOrg ? <Navigate to="/dashboard" replace /> : <OrganizationSelector />
           }
         />
 
-        {/* Seleção de organização */}
-        <Route
-          path="/select-organization"
-          element={<OrganizationSelector />}
-        />
-
-        {/* Dashboard */}
+        {/* Internal pages */}
         <Route
           path="/dashboard"
           element={
-            currentOrg
-              ? <DashboardSupremo />
-              : <Navigate to="/select-organization" replace />
+            !currentOrg ? <Navigate to="/select-organization" replace /> : <DashboardSupremo />
           }
         />
 
-        {/* outras páginas internas entram aqui */}
+        <Route
+          path="/"
+          element={<Navigate to={currentOrg ? '/dashboard' : '/select-organization'} replace />}
+        />
+
+        {/* Catchall interno: decide por org */}
+        <Route
+          path="*"
+          element={<Navigate to={currentOrg ? '/dashboard' : '/select-organization'} replace />}
+        />
       </Route>
 
-      {/* =========================================================
-          🧭 FALLBACK FINAL
-         ========================================================= */}
-      <Route
-        path="*"
-        element={<Navigate to={user ? '/' : '/login'} replace />}
-      />
+      {/* Final fallback */}
+      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
     </Routes>
   )
 }
