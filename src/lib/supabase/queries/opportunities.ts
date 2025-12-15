@@ -1,5 +1,19 @@
 import { supabase } from '../client'
-import type { Opportunity, OpportunityInsert, OpportunityUpdate } from '../types'
+import type { OpportunityInsert, OpportunityUpdate } from '../types'
+
+// Shape estável do retorno do pipeline
+export type PipelineStageAggregate = {
+  count: number
+  total_value: number
+  avg_probability: number
+  opportunities: Array<{
+    stage: string | null
+    value: number | null
+    probability: number | null
+  }>
+}
+
+export type PipelineByStage = Record<string, PipelineStageAggregate>
 
 // Queries para Opportunities (Pipeline de Vendas)
 export const opportunitiesQueries = {
@@ -43,10 +57,7 @@ export const opportunitiesQueries = {
 
     if (filters?.limit) query = query.limit(filters.limit)
     if (filters?.offset) {
-      query = query.range(
-        filters.offset,
-        filters.offset + (filters.limit || 50) - 1
-      )
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1)
     }
 
     const { data, error, count } = await query
@@ -106,10 +117,7 @@ export const opportunitiesQueries = {
   },
 
   async delete(id: string) {
-    const { error } = await supabase
-      .from('opportunities')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('opportunities').delete().eq('id', id)
 
     if (error) {
       console.error('Error deleting opportunity:', error)
@@ -119,8 +127,9 @@ export const opportunitiesQueries = {
     return { error: null }
   },
 
-  // ✅ CORREÇÃO AQUI
-  async getByStage() {
+  // ✅ FIX: remove count(*) + select() duplicado (causava 400)
+  // ✅ Retorno estável: sempre um Record por stage
+  async getByStage(): Promise<{ data: PipelineByStage; error: any }> {
     const { data, error } = await supabase
       .from('opportunities')
       .select('stage, value, probability')
@@ -130,34 +139,36 @@ export const opportunitiesQueries = {
       return { data: {}, error }
     }
 
-    const pipelineData = (data || []).reduce(
-      (acc: Record<string, any>, opp: any) => {
-        if (!acc[opp.stage]) {
-          acc[opp.stage] = {
-            count: 0,
-            total_value: 0,
-            avg_probability: 0,
-            opportunities: []
-          }
+    const pipelineData: PipelineByStage = (data || []).reduce((acc: PipelineByStage, opp: any) => {
+      const stageKey = (opp?.stage ?? '').toString().trim() || 'Sem Stage'
+
+      if (!acc[stageKey]) {
+        acc[stageKey] = {
+          count: 0,
+          total_value: 0,
+          avg_probability: 0,
+          opportunities: [],
         }
+      }
 
-        acc[opp.stage].count += 1
-        acc[opp.stage].total_value += opp.value || 0
-        acc[opp.stage].opportunities.push(opp)
+      acc[stageKey].count += 1
+      acc[stageKey].total_value += opp?.value || 0
+      acc[stageKey].opportunities.push({
+        stage: opp?.stage ?? null,
+        value: opp?.value ?? null,
+        probability: opp?.probability ?? null,
+      })
 
-        return acc
-      },
-      {}
-    )
+      return acc
+    }, {} as PipelineByStage)
 
-    Object.keys(pipelineData).forEach(stage => {
+    Object.keys(pipelineData).forEach((stage) => {
       const stageData = pipelineData[stage]
       const totalProb = stageData.opportunities.reduce(
-        (sum: number, opp: any) => sum + (opp.probability || 0),
+        (sum, opp) => sum + (opp.probability || 0),
         0
       )
-      stageData.avg_probability =
-        stageData.count > 0 ? totalProb / stageData.count : 0
+      stageData.avg_probability = stageData.count > 0 ? totalProb / stageData.count : 0
     })
 
     return { data: pipelineData, error: null }
@@ -179,22 +190,18 @@ export const opportunitiesQueries = {
   },
 
   async getValueByStage() {
-    const { data, error } = await supabase
-      .from('opportunities')
-      .select('stage, value')
+    const { data, error } = await supabase.from('opportunities').select('stage, value')
 
     if (error) {
       console.error('Error fetching opportunity values:', error)
       return { data: {}, error }
     }
 
-    const valuesByStage = (data || []).reduce(
-      (acc: Record<string, number>, opp: any) => {
-        acc[opp.stage] = (acc[opp.stage] || 0) + (opp.value || 0)
-        return acc
-      },
-      {}
-    )
+    const valuesByStage = (data || []).reduce((acc: Record<string, number>, opp: any) => {
+      const stageKey = (opp?.stage ?? '').toString().trim() || 'Sem Stage'
+      acc[stageKey] = (acc[stageKey] || 0) + (opp?.value || 0)
+      return acc
+    }, {})
 
     return { data: valuesByStage, error: null }
   },
@@ -219,23 +226,18 @@ export const opportunitiesQueries = {
   },
 
   async getWeightedRevenue() {
-    const { data, error } = await supabase
-      .from('opportunities')
-      .select('value, probability')
+    const { data, error } = await supabase.from('opportunities').select('value, probability')
 
     if (error) {
       console.error('Error calculating weighted revenue:', error)
       return { data: 0, error }
     }
 
-    const weightedRevenue = (data || []).reduce(
-      (total: number, opp: any) => {
-        const value = opp.value || 0
-        const probability = (opp.probability || 0) / 100
-        return total + value * probability
-      },
-      0
-    )
+    const weightedRevenue = (data || []).reduce((total: number, opp: any) => {
+      const value = opp?.value || 0
+      const probability = (opp?.probability || 0) / 100
+      return total + value * probability
+    }, 0)
 
     return { data: weightedRevenue, error: null }
   },
@@ -254,5 +256,5 @@ export const opportunitiesQueries = {
     }
 
     return { data, error: null }
-  }
+  },
 }
