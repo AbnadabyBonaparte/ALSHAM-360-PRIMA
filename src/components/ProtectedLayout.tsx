@@ -1,49 +1,60 @@
 // src/components/ProtectedLayout.tsx
-import React, { useMemo } from 'react'
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import React, { useCallback, useMemo } from 'react'
+import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import LayoutSupremo from '@/components/LayoutSupremo'
 
-function deriveActivePageFromPath(pathname: string): string {
-  // /dashboard => dashboard
-  if (pathname === '/dashboard' || pathname === '/dashboard/') return 'dashboard'
-
-  // /app/:pageId => pageId
-  if (pathname.startsWith('/app/')) {
-    const id = pathname.replace('/app/', '').split('/')[0]
-    return (id || 'dashboard').trim()
-  }
-
-  // /select-organization etc.
-  return 'dashboard'
+function normalizePageId(value: string | undefined | null) {
+  const v = (value ?? '').trim()
+  if (!v) return 'dashboard'
+  return v.replace(/^\//, '')
 }
 
 export function ProtectedLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const params = useParams()
 
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
   const loadingOrgs = useAuthStore((s) => s.loadingOrgs)
   const needsOrgSelection = useAuthStore((s) => s.needsOrgSelection)
 
-  const activePage = useMemo(() => deriveActivePageFromPath(location.pathname), [location.pathname])
+  // ✅ Deriva o "activePage" da URL.
+  // - Se sua App está em /dashboard -> activePage="dashboard"
+  // - Se estiver em /leads -> activePage="leads"
+  // - Se estiver em /p/:pageId -> usa params.pageId
+  const activePage = useMemo(() => {
+    const byParam = normalizePageId((params as any)?.pageId)
+    if ((params as any)?.pageId) return byParam
 
-  const onNavigate = (pageId: string) => {
-    const id = (pageId ?? '').trim()
-    if (!id) return
+    const path = normalizePageId(location.pathname)
+    // path pode virar "dashboard", "select-organization", etc.
+    // Para páginas internas, usamos o próprio path.
+    return path || 'dashboard'
+  }, [location.pathname, params])
 
-    // Canonical: dashboard em rota própria
-    if (id === 'dashboard') {
-      navigate('/dashboard', { replace: false })
-      return
-    }
+  // ✅ Navegação real (Sidebar deixa de ser no-op)
+  const onNavigate = useCallback(
+    (pageId: string) => {
+      const id = normalizePageId(pageId)
 
-    // Todas as demais páginas via registry: /app/:pageId
-    navigate(`/app/${encodeURIComponent(id)}`, { replace: false })
-  }
+      // Proteções simples
+      if (!id) return
 
+      // Convenção canônica recomendada:
+      // 1) dashboard fica em /dashboard
+      // 2) demais páginas podem ficar em /<pageId> (ou /p/<pageId> se você preferir)
+      //
+      // Aqui adotamos /<pageId> para ser o mais simples e direto.
+      // Se você já usa /p/:pageId no App.tsx, troque para: navigate(`/p/${id}`)
+      navigate(`/${id}`, { replace: false })
+    },
+    [navigate]
+  )
+
+  // ✅ Loading gate global
   if (loading || loadingOrgs) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -52,17 +63,21 @@ export function ProtectedLayout() {
     )
   }
 
+  // ✅ Auth gate
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  // Gate de org (evita loop se já estiver no selector)
+  // ✅ Org gate (evita loop se já estiver no selector)
   if (needsOrgSelection && location.pathname !== '/select-organization') {
     return <Navigate to="/select-organization" replace />
   }
 
   return (
-    <LayoutSupremo activePage={activePage} onNavigate={onNavigate}>
+    <LayoutSupremo
+      activePage={activePage}
+      onNavigate={onNavigate}
+    >
       <Outlet />
     </LayoutSupremo>
   )
