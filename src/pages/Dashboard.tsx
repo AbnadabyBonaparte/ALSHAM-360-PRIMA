@@ -1,16 +1,11 @@
 // src/pages/Dashboard.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard Alienígena 1000/1000 CORRIGIDO
-// FIXES:
-// ✅ opportunities: removido "status" (não existe) e lógica migrada para "stage"
-// ✅ marketing_campaigns: trocado para "campaigns" (tabela real)
-// ✅ cálculos: revenue/deals agora com base em stage (won/lost)
+// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard (queries corrigidas)
 
-import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp, TrendingDown, Target, Rocket, Zap, Brain, Clock,
-  ArrowRight, Activity, Mic, Sparkles,
-  Lock, Command, Users
+  ArrowRight, Activity, Mic, Sparkles, Lock, Command, Users
 } from "lucide-react";
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
@@ -19,25 +14,10 @@ import {
 import { Line, Doughnut } from "react-chartjs-2";
 import { getSupabaseClient } from "../lib/supabase";
 
-// SETUP CHARTJS
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🧠 CÉREBRO MATEMÁTICO (Regressão Linear para Predição Real)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const predictFuture = (dataPoints: number[]): number[] => {
-  if (dataPoints.length < 2) return dataPoints.map((v) => Math.round(v * 1.1));
+  if (dataPoints.length < 2) return dataPoints.map(v => Math.round(v * 1.1));
 
   const n = dataPoints.length;
   let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
@@ -62,10 +42,6 @@ const predictFuture = (dataPoints: number[]): number[] => {
   return futurePoints;
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 💎 COMPONENTES SUPREMOS (Design System Interno)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 const GlassCard = ({ children, className = "", onClick, role = "region" }: any) => (
   <motion.div
     onClick={onClick}
@@ -87,45 +63,25 @@ const GlassCard = ({ children, className = "", onClick, role = "region" }: any) 
 );
 
 const NumberTicker = ({ value, prefix = "" }: { value: number | string; prefix?: string }) => {
-  const num = typeof value === "number" ? value : Number(value);
-  const safe = Number.isFinite(num) ? num : 0;
-  return <span className="tabular-nums tracking-tight">{prefix}{safe.toLocaleString()}</span>;
+  const v = typeof value === "number" ? value : Number(value) || 0;
+  return <span className="tabular-nums tracking-tight">{prefix}{v.toLocaleString()}</span>;
 };
 
 const OracleWidget = ({ kpis, mode }: { kpis: any[]; mode: string }) => {
   const getInsight = () => {
-    if (mode === "future") {
-      return {
-        title: "Projeção de Crescimento Linear",
-        impact:
-          "Baseado na regressão dos últimos 30 dias, sua receita deve crescer ~15% se mantiver o ritmo de fechamento atual.",
-        confidence: "Alta (Matemática)",
-      };
-    }
-
-    const leads = kpis.find((k) => k.id === "leads")?.raw || 0;
-    const deals = kpis.find((k) => k.id === "revenue")?.raw || 0;
-
-    if (leads === 0)
-      return {
-        title: "Alerta de Topo de Funil",
-        impact: "Zero leads detectados. Prioridade crítica: ativar campanhas de aquisição.",
-        confidence: "Crítica",
-      };
-
-    if (deals > leads)
-      return {
-        title: "Anomalia de Conversão",
-        impact: "Mais fechamentos que leads? Verifique a integridade dos dados de entrada.",
-        confidence: "Média",
-      };
-
-    return {
-      title: "Saúde Operacional Estável",
-      impact:
-        "Conversão de Lead-para-Deal está saudável. O foco agora deve ser aumentar o ticket médio.",
-      confidence: "Alta",
+    if (mode === "future") return {
+      title: "Projeção de Crescimento Linear",
+      impact: "Baseado na regressão dos últimos 30 dias, sua receita deve crescer se mantiver o ritmo atual.",
+      confidence: "Alta (Matemática)",
     };
+
+    const leads = kpis.find(k => k.id === "leads")?.raw || 0;
+    const deals = kpis.find(k => k.id === "revenue")?.raw || 0;
+
+    if (leads === 0) return { title: "Alerta de Topo de Funil", impact: "Zero leads detectados. Prioridade: ativar aquisição.", confidence: "Crítica" };
+    if (deals > leads) return { title: "Anomalia de Conversão", impact: "Mais fechamentos que leads? Verifique integridade dos dados.", confidence: "Média" };
+
+    return { title: "Saúde Operacional Estável", impact: "Conversão saudável. Próximo foco: aumentar ticket médio.", confidence: "Alta" };
   };
 
   const insight = getInsight();
@@ -145,12 +101,8 @@ const OracleWidget = ({ kpis, mode }: { kpis: any[]; mode: string }) => {
               </h3>
               <span className="flex h-2 w-2 flex-shrink-0 rounded-full bg-[var(--accent-purple)] shadow-[0_0_10px_currentColor]" />
             </div>
-            <p className="text-sm sm:text-base font-medium text-[var(--text-primary)]">
-              {insight.title}
-            </p>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {insight.impact}
-            </p>
+            <p className="text-sm sm:text-base font-medium text-[var(--text-primary)]">{insight.title}</p>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{insight.impact}</p>
           </div>
         </div>
       </div>
@@ -158,13 +110,11 @@ const OracleWidget = ({ kpis, mode }: { kpis: any[]; mode: string }) => {
   );
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎤 VOICE COMMAND HOOK (Web Speech API)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const useVoiceCommand = (actions: Record<string, () => void>) => {
   const [isListening, setIsListening] = useState(false);
 
   const startListening = useCallback(() => {
+    // @ts-ignore
     if (!("webkitSpeechRecognition" in window)) {
       alert("Seu navegador não suporta Voice API. Use Chrome/Edge.");
       return;
@@ -178,7 +128,7 @@ const useVoiceCommand = (actions: Record<string, () => void>) => {
     recognition.onend = () => setIsListening(false);
 
     recognition.onresult = (event: any) => {
-      const command = event.results[0][0].transcript.toLowerCase();
+      const command = (event.results?.[0]?.[0]?.transcript || "").toLowerCase();
       Object.keys(actions).forEach((key) => {
         if (command.includes(key)) actions[key]();
       });
@@ -190,12 +140,9 @@ const useVoiceCommand = (actions: Record<string, () => void>) => {
   return { isListening, startListening };
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎮 KONAMI CODE HOOK (Easter Egg)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const useKonamiCode = (callback: () => void) => {
   const [input, setInput] = useState<string[]>([]);
-  const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+  const code = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -207,16 +154,6 @@ const useKonamiCode = (callback: () => void) => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [input, callback]);
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🚀 PAGE: DASHBOARD SUPREMO (Real Implementation)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-type OpportunityRow = {
-  created_at: string;
-  value: number | null;
-  stage: string | null;
 };
 
 export default function DashboardSupremo() {
@@ -242,40 +179,40 @@ export default function DashboardSupremo() {
       startDate.setDate(now.getDate() - (mode === "past" ? 60 : 30));
       const isoStart = startDate.toISOString();
 
-      // ✅ FIX: opportunities não tem status; campaigns é a tabela real
+      // IMPORTANT: não inventar schema.
+      // - opportunities: usa stage/value (status NÃO existe no schema que você enviou).
+      // - campaigns: substitui marketing_campaigns (404).
       const [leadsRes, oppsRes, campaignsRes] = await Promise.all([
-        // Mantido como estava para não inventar schema de leads_crm
-        supabase.from("leads_crm").select("created_at, status").gte("created_at", isoStart),
-        supabase.from("opportunities").select("created_at, value, stage").gte("created_at", isoStart),
+        supabase.from("leads_crm").select("created_at").gte("created_at", isoStart),
+        supabase.from("opportunities").select("created_at, stage, value").gte("created_at", isoStart),
         supabase.from("campaigns").select("id, status").eq("status", "active"),
       ]);
 
-      const leads = leadsRes.data || [];
-      const opps = (oppsRes.data || []) as OpportunityRow[];
-      const campaigns = campaignsRes.data || [];
+      // Se alguma tabela não existir ou RLS bloquear, não travar o dashboard.
+      const leads = Array.isArray(leadsRes.data) ? leadsRes.data : [];
+      const opps = Array.isArray(oppsRes.data) ? oppsRes.data : [];
+      const campaigns = Array.isArray(campaignsRes.data) ? campaignsRes.data : [];
 
-      // Normalizador de stage
-      const norm = (v: any) => String(v ?? "").trim().toLowerCase();
-      const isWon = (o: OpportunityRow) => norm(o.stage) === "won";
-      const isLost = (o: OpportunityRow) => norm(o.stage) === "lost";
+      const revenue = opps.reduce((acc: number, curr: any) => {
+        // Sem coluna status: adotamos heurística neutra (não soma por "won").
+        // Receita aqui vira "soma total de value" (ajuste posterior quando definir status no schema).
+        return acc + (Number(curr.value) || 0);
+      }, 0);
 
-      const revenue = opps.reduce((acc, curr) => (isWon(curr) ? acc + (curr.value || 0) : acc), 0);
-      const activeDeals = opps.filter((o) => !isWon(o) && !isLost(o)).length;
+      const activeDeals = opps.length;
 
-      const pipelineStages = opps.reduce((acc: any, curr) => {
+      const pipelineStages = opps.reduce((acc: any, curr: any) => {
         const stage = curr.stage || "Unknown";
         acc[stage] = (acc[stage] || 0) + 1;
         return acc;
       }, {});
 
       const dailyRevenue = new Array(30).fill(0);
-      opps.forEach((o) => {
-        if (isWon(o)) {
-          const dayIndex = Math.floor(
-            (new Date(o.created_at).getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          if (dayIndex >= 0 && dayIndex < 30) dailyRevenue[dayIndex] += o.value || 0;
-        }
+      opps.forEach((o: any) => {
+        const createdAt = o.created_at ? new Date(o.created_at) : null;
+        if (!createdAt) return;
+        const dayIndex = Math.floor((createdAt.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < 30) dailyRevenue[dayIndex] += (Number(o.value) || 0);
       });
 
       let finalRevenue = revenue;
@@ -284,8 +221,7 @@ export default function DashboardSupremo() {
 
       if (mode === "future") {
         const predictedRevenuePoints = predictFuture(dailyRevenue);
-        const avgLeadsPerDay = leads.length ? Math.max(0, Math.round(leads.length / 30)) : 0;
-        const predictedLeadsPoints = predictFuture(new Array(30).fill(avgLeadsPerDay));
+        const predictedLeadsPoints = predictFuture(new Array(30).fill(Math.round((leads.length || 1) / 30)));
 
         finalRevenue = predictedRevenuePoints.reduce((a, b) => a + b, 0);
         finalLeads = predictedLeadsPoints.reduce((a, b) => a + b, 0);
@@ -301,29 +237,29 @@ export default function DashboardSupremo() {
         monthlyRevenue: chartData,
       });
     } catch (error) {
-      console.error("Erro fatal ao buscar dados reais:", error);
+      console.error("Erro ao buscar dados do dashboard:", error);
     } finally {
-      setTimeout(() => setLoading(false), 800);
+      setTimeout(() => setLoading(false), 400);
     }
   };
 
   useEffect(() => {
     fetchData(timeMode);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeMode]);
 
   const voiceActions = {
     retro: () => setTimeMode("past"),
     agora: () => setTimeMode("present"),
     futuro: () => setTimeMode("future"),
-    "predição": () => setTimeMode("future"),
+    predição: () => setTimeMode("future"),
     matrix: () => setMatrixMode(true),
   };
+
   const { isListening, startListening } = useVoiceCommand(voiceActions);
 
   useKonamiCode(() => {
     setMatrixMode((prev) => !prev);
-    alert("🐰 SYSTEM OVERRIDE: GOD MODE ENABLED");
+    alert("SYSTEM OVERRIDE: GOD MODE ENABLED");
   });
 
   if (matrixMode) {
@@ -331,7 +267,7 @@ export default function DashboardSupremo() {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--background)] font-mono text-[var(--accent-emerald)]">
         <div className="text-center space-y-4">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold animate-pulse">ALSHAM SYSTEM</h1>
-          <p className="typing-effect text-sm sm:text-base">Acessando mainframe... Consciência situacional ativada.</p>
+          <p className="text-sm sm:text-base">Acessando mainframe... Consciência situacional ativada.</p>
           <button
             onClick={() => setMatrixMode(false)}
             className="border border-[var(--accent-emerald)] px-4 py-2 hover:bg-[var(--accent-emerald)] hover:text-[var(--background)] transition-colors"
@@ -364,7 +300,7 @@ export default function DashboardSupremo() {
           <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl">
             {timeMode === "future"
               ? "Projeção matemática baseada no comportamento dos últimos 30 dias."
-              : "Monitoramento em tempo real do ecossistema empresarial."}
+              : "Monitoramento do ecossistema empresarial com dados disponíveis no schema atual."}
           </p>
         </motion.div>
 
@@ -379,32 +315,31 @@ export default function DashboardSupremo() {
             aria-label="Comando de voz"
           >
             <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="absolute -bottom-8 w-max opacity-0 transition-opacity group-hover:opacity-100 text-[0.625rem] sm:text-xs bg-[var(--surface-strong)] text-[var(--text-primary)] px-2 py-1 rounded border border-[var(--border)] shadow-lg pointer-events-none hidden sm:block">
-              Comando de Voz
-            </span>
           </button>
         </div>
       </header>
 
-      {/* KPI GRID */}
       <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { id: "revenue", title: "Receita Total", val: realData.revenue, icon: Target, prefix: "R$ ", trend: timeMode === "future" ? 15 : 8 },
           { id: "leads", title: "Novos Leads", val: realData.leads, icon: Users, prefix: "", trend: timeMode === "future" ? 12 : -3 },
-          { id: "deals", title: "Deals Ativos", val: realData.deals, icon: Activity, prefix: "", trend: 2 },
+          { id: "deals", title: "Deals (registros)", val: realData.deals, icon: Activity, prefix: "", trend: 2 },
           { id: "campaigns", title: "Campanhas", val: realData.activeCampaigns, icon: Rocket, prefix: "", trend: 0 },
         ].map((kpi) => (
-          <GlassCard key={kpi.id} className="p-4 sm:p-6" onClick={() => {}}>
+          <GlassCard key={kpi.id} className="p-4 sm:p-6">
             <div className="flex justify-between items-start">
               <div className="rounded-lg sm:rounded-xl bg-[var(--surface-strong)]/50 p-2 sm:p-3 text-[var(--text-primary)]">
                 <kpi.icon className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div className={`flex items-center gap-0.5 sm:gap-1 text-[0.625rem] sm:text-xs font-bold ${kpi.trend >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"}`}>
+              <div
+                className={`flex items-center gap-1 text-[0.625rem] sm:text-xs font-bold ${
+                  kpi.trend >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"
+                }`}
+              >
                 {kpi.trend >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                 {Math.abs(kpi.trend)}%
               </div>
             </div>
-
             <div className="mt-3 sm:mt-4">
               <p className="text-[0.625rem] sm:text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">
                 {kpi.title}
@@ -417,15 +352,13 @@ export default function DashboardSupremo() {
                 )}
               </h3>
             </div>
-
             <div className="mt-3 sm:mt-4 h-10 sm:h-12 opacity-50">
               <Line
                 data={{
-                  labels: (realData.monthlyRevenue || []).map((_: any, i: number) => i),
+                  labels: realData.monthlyRevenue.map((_: any, i: number) => i),
                   datasets: [
                     {
-                      data: realData.monthlyRevenue?.length ? realData.monthlyRevenue : [0, 0, 0, 0, 0],
-                      borderColor: kpi.trend >= 0 ? "rgb(16, 185, 129)" : "rgb(239, 68, 68)",
+                      data: realData.monthlyRevenue.length ? realData.monthlyRevenue : [0, 0, 0, 0, 0],
                       borderWidth: 2,
                       pointRadius: 0,
                       tension: 0.4,
@@ -444,7 +377,6 @@ export default function DashboardSupremo() {
         ))}
       </div>
 
-      {/* BENTO GRID */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <GlassCard className="min-h-[300px] sm:min-h-[400px] p-4 sm:p-6">
@@ -453,9 +385,8 @@ export default function DashboardSupremo() {
                 <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--accent-sky)]" />
                 <span className="truncate">Revenue Performance {timeMode === "future" && "(Projeção)"}</span>
               </h3>
-              {timeMode === "future" && <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[var(--text-secondary)] flex-shrink-0" />}
+              {timeMode === "future" && <Lock className="h-4 w-4 text-[var(--text-secondary)] flex-shrink-0" />}
             </div>
-
             <div className="h-[250px] sm:h-[300px] w-full">
               <Line
                 data={{
@@ -464,13 +395,6 @@ export default function DashboardSupremo() {
                     {
                       label: "Receita Diária",
                       data: realData.monthlyRevenue,
-                      borderColor: timeMode === "future" ? "rgb(139, 92, 246)" : "rgb(56, 189, 248)",
-                      backgroundColor: (ctx) => {
-                        const grad = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
-                        grad.addColorStop(0, timeMode === "future" ? "rgba(139, 92, 246, 0.3)" : "rgba(56, 189, 248, 0.3)");
-                        grad.addColorStop(1, "rgba(0,0,0,0)");
-                        return grad;
-                      },
                       fill: true,
                       tension: 0.4,
                       borderDash: timeMode === "future" ? [5, 5] : [],
@@ -484,7 +408,7 @@ export default function DashboardSupremo() {
                   plugins: { legend: { display: false } },
                   scales: {
                     x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 20 } },
-                    y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { maxTicksLimit: 5 } },
+                    y: { ticks: { maxTicksLimit: 5 } },
                   },
                 }}
               />
@@ -499,7 +423,7 @@ export default function DashboardSupremo() {
               </div>
               <h4 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">Automação Ativa</h4>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-2">
-                Seu sistema está rodando <span className="text-[var(--text-primary)] font-bold">12 workflows</span> em background, economizando est. 42h/semana.
+                Seu sistema está rodando workflows em background. Ajuste quando os módulos reais estiverem prontos.
               </p>
             </GlassCard>
           </div>
@@ -517,13 +441,6 @@ export default function DashboardSupremo() {
                   datasets: [
                     {
                       data: realData.pipelineData.length ? realData.pipelineData.map((d: any) => d.value) : [1],
-                      backgroundColor: [
-                        "rgb(16, 185, 129)",
-                        "rgb(56, 189, 248)",
-                        "rgb(139, 92, 246)",
-                        "rgb(245, 158, 11)",
-                        "rgb(239, 68, 68)",
-                      ],
                       borderWidth: 0,
                     },
                   ],
@@ -533,12 +450,7 @@ export default function DashboardSupremo() {
                   plugins: {
                     legend: {
                       position: "bottom",
-                      labels: {
-                        color: "rgb(156, 163, 175)",
-                        font: { size: 10 },
-                        padding: 10,
-                        usePointStyle: true,
-                      },
+                      labels: { font: { size: 10 }, padding: 10, usePointStyle: true },
                     },
                   },
                 }}
@@ -549,7 +461,7 @@ export default function DashboardSupremo() {
           <GlassCard className="p-0">
             <div className="p-3 sm:p-4 border-b border-[var(--border)]/50">
               <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-                <Command className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <Command className="h-4 w-4" />
                 <span>Live Actions</span>
               </h3>
             </div>
