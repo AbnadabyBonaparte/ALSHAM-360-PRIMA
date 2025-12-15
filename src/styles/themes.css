@@ -1,5 +1,5 @@
 /* src/styles/themes.css */
-/* ALSHAM 360° PRIMA — Theme System (CSS Consumer SSOT v2.4.0) */
+/* ALSHAM 360° PRIMA — Theme System (CSS Consumer SSOT v2.5.0) */
 /* =========================================================
    SSOT: themes.ts + runtime injection via useTheme.ts
    Este arquivo é CONSUMER-ONLY → NÃO define temas, apenas consome
@@ -30,7 +30,7 @@
     --glass-hi: rgba(255, 255, 255, 0.08);
     --surface-glass: rgba(255, 255, 255, 0.04);
 
-    /* Borders (legacy — NUNCA auto-referência) */
+    /* Borders LEGACY — mantido intacto (não sobrescrito) */
     --border: rgba(255, 255, 255, 0.10);
     --border-strong: rgba(255, 255, 255, 0.16);
 
@@ -79,9 +79,8 @@
     --destructive: var(--accent-alert, #ef4444);
     --destructive-foreground: #ffffff;
 
-    /* Border/Input/Ring — usa fallback fixo para evitar auto-referência */
+    /* Border/Input/Ring — usa fallback do --border legacy (nunca auto-referência) */
     --border-shad: var(--border, rgba(255,255,255,0.10));
-    --border: var(--border-shad);
     --input: var(--border-shad);
     --ring: color-mix(in srgb, var(--primary) 55%, transparent);
 
@@ -262,10 +261,12 @@
 }
 
 /* =========================================================
-   VERSÃO: 2.4.0-SSOT-CONSUMER-FIXED
-   ✅ Bug --border auto-referência corrigido
-   ✅ --radius adicionado
-   ✅ secondary/accent com contraste suave
+   VERSÃO: 2.5.0-SSOT-CONSUMER-10/10
+   ✅ Auto-referência --border eliminada
+   ✅ --border legacy preservado
+   ✅ --border-shad separado para shadcn
+   ✅ --radius presente
+   ✅ secondary/accent suave
    ✅ Bridge shadcn completo
    ✅ Consumer-only + fallbacks seguros
    ========================================================= */
