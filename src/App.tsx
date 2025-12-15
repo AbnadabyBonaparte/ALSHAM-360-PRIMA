@@ -47,10 +47,9 @@ import { Bar, Doughnut, Line } from "react-chartjs-2";
 import campaignOrion from "./assets/campaign-orion.png";
 import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
 
-// Páginas principais que existem e funcionam (mantidas)
+// Páginas reais e existentes (com named exports)
 import { DashboardSupremo } from "./pages/Dashboard";
 import { Leads } from "./pages/Leads";
-import { Pipeline } from "./pages/Pipeline";
 import { Analytics } from "./pages/Analytics";
 import { Automations } from "./pages/Automations";
 import { Gamification } from "./pages/Gamification";
@@ -60,11 +59,12 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { SidebarDesktop } from "./components/SidebarSupremo";
 import { useUrlSync } from "./hooks/useUrlSync";
 
-// Páginas que ainda não existem ou não têm export correto (comentadas temporariamente)
+// Páginas que ainda não existem ou não têm export correto (comentadas para build passar)
 // import { LeadsDetails } from "./pages/LeadsDetails";
+// import { Pipeline } from "./pages/Pipeline";
+// import { OmnichannelInbox } from "./pages/OmnichannelInbox";
 // import { Customer360 } from "./pages/Customer360";
 // import { AutomationBuilder } from "./pages/AutomationBuilder";
-// import { OmnichannelInbox } from "./pages/OmnichannelInbox";
 // import { NFTGallery } from "./pages/NFTGallery";
 // import { WarArena } from "./pages/WarArena";
 // import { LandingPageBuilder } from "./pages/LandingPageBuilder";
