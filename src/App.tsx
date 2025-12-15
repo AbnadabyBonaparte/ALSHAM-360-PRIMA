@@ -37,33 +37,24 @@ function AppContent() {
 
   return (
     <Routes>
-      {/* ✅ Sempre disponível (evita “No routes matched /precondition/BK_LOGIN”) */}
+      {/* ✅ Sempre disponível */}
       <Route path="/precondition/:code" element={<PreconditionGate />} />
 
-      {!user ? (
-        <>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/reset-password" element={<ResetPassword />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </>
-      ) : (
-        <>
-          <Route
-            path="/*"
-            element={
-              <ProtectedLayout>
-                <Routes>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<DashboardSupremo />} />
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </ProtectedLayout>
-            }
-          />
-        </>
-      )}
+      {/* 🌐 Rotas públicas */}
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/signup" element={!user ? <SignUp /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/auth/reset-password" element={<ResetPassword />} />
+
+      {/* 🔒 Rotas protegidas (aninhadas com Outlet) */}
+      <Route element={<ProtectedLayout />}>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<DashboardSupremo />} />
+        {/* coloque suas outras páginas aqui, como children */}
+      </Route>
+
+      {/* fallback */}
+      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
     </Routes>
   )
 }
