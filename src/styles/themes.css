@@ -1,5 +1,5 @@
 /* src/styles/themes.css */
-/* ALSHAM 360° PRIMA — Theme System (CSS Consumer SSOT v2.5.0) */
+/* ALSHAM 360° PRIMA — Theme System (CSS Consumer SSOT v2.5.1) */
 /* =========================================================
    SSOT: themes.ts + runtime injection via useTheme.ts
    Este arquivo é CONSUMER-ONLY → NÃO define temas, apenas consome
@@ -70,9 +70,12 @@
     --primary: var(--accent-1, #10b981);
     --primary-foreground: #ffffff;
 
+    /* Secondary e Accent com fallback seguro para browsers antigos */
+    --secondary: rgba(255,255,255,0.08); /* fallback */
     --secondary: color-mix(in srgb, var(--foreground) 8%, transparent);
     --secondary-foreground: var(--foreground);
 
+    --accent: rgba(16,185,129,0.18); /* fallback verde suave baseado em primary default */
     --accent: color-mix(in srgb, var(--primary) 18%, transparent);
     --accent-foreground: var(--foreground);
 
@@ -261,12 +264,12 @@
 }
 
 /* =========================================================
-   VERSÃO: 2.5.0-SSOT-CONSUMER-10/10
-   ✅ Auto-referência --border eliminada
+   VERSÃO: 2.5.1-SSOT-CONSUMER-10/10-FALLBACK
+   ✅ Auto-referência eliminada
    ✅ --border legacy preservado
-   ✅ --border-shad separado para shadcn
+   ✅ --border-shad separado
    ✅ --radius presente
-   ✅ secondary/accent suave
+   ✅ secondary/accent com fallback color-mix
    ✅ Bridge shadcn completo
    ✅ Consumer-only + fallbacks seguros
    ========================================================= */
