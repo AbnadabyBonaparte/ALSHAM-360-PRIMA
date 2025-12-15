@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuthStore } from '../../lib/supabase/useAuthStore'
 import { useNavigate } from 'react-router-dom'
 import {
   Building2,
@@ -8,123 +7,99 @@ import {
   Crown,
   AlertCircle,
   ArrowRight,
-  Loader2
+  Loader2,
 } from 'lucide-react'
+
+import { useAuthStore } from '../../lib/supabase/useAuthStore'
 import type { Organization } from '../../lib/supabase/types'
 
 export const OrganizationSelector: React.FC = () => {
-  const { 
-    organizations, 
-    switchOrganization, 
-    currentOrg, 
-    error, 
-    clearError, 
-    isAuthenticated 
-  } = useAuthStore()
-  
   const navigate = useNavigate()
 
-  // Redirect se não estiver autenticado
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login')
-    }
-  }, [isAuthenticated, navigate])
+  const user = useAuthStore((s) => s.user)
+  const organizations = useAuthStore((s) => (s as any).organizations ?? [])
+  const orgLoading = useAuthStore((s) => (s as any).orgLoading ?? false)
+  const error = useAuthStore((s) => (s as any).error ?? null)
+  const clearError = useAuthStore((s) => (s as any).clearError?.())
+  const switchOrganization = useAuthStore((s) => (s as any).switchOrganization)
+  const fetchOrganizations = useAuthStore((s) => (s as any).fetchOrganizations)
 
-  // Redirect automático se organização já estiver selecionada
+  // Se não tiver user, manda pro login (apenas uma vez, estável)
   useEffect(() => {
-    if (currentOrg) {
-      navigate('/dashboard')
+    if (!user) navigate('/login', { replace: true })
+  }, [user, navigate])
+
+  // Carrega orgs (se existir a action no store)
+  useEffect(() => {
+    if (user && typeof fetchOrganizations === 'function') {
+      fetchOrganizations()
     }
-  }, [currentOrg, navigate])
+  }, [user, fetchOrganizations])
+
+  const safeOrgs: Organization[] = Array.isArray(organizations) ? organizations : []
 
   const handleOrgSelect = async (org: Organization) => {
-    clearError()
-    await switchOrganization(org.id)
+    try {
+      if (typeof clearError === 'function') clearError()
+      if (typeof switchOrganization !== 'function') {
+        throw new Error('switchOrganization não existe no store.')
+      }
+      await switchOrganization(org.id)
+      navigate('/dashboard', { replace: true })
+    } catch (e: any) {
+      // erro já pode ser setado pelo store; aqui só evita crash
+      console.error(e)
+    }
   }
 
-  // Estado de carregamento inicial
-  if (!organizations.length) {
+  // Loading state real
+  if (orgLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Carregando organizações...
-          </h2>
-          <p className="text-slate-400">
-            Aguarde enquanto buscamos suas organizações.
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Carregando organizações...</h2>
+          <p className="text-slate-400">Aguarde enquanto buscamos suas organizações.</p>
         </motion.div>
       </div>
     )
   }
 
+  // Lista vazia (não é “loading”)
+  if (!safeOrgs.length) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center max-w-lg">
+          <h2 className="text-xl font-semibold text-white mb-2">Nenhuma organização encontrada</h2>
+          <p className="text-slate-400 mb-6">
+            Seu usuário autenticou, mas não retornou organizações. Verifique a consulta no store
+            (fetchOrganizations) ou o vínculo do usuário na tabela de memberships.
+          </p>
+          <button
+            onClick={() => typeof fetchOrganizations === 'function' && fetchOrganizations()}
+            className="rounded-xl bg-white/10 px-4 py-2 text-white hover:bg-white/15"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Background Grid Pattern — agora via CSS class segura */}
+    <div className="relative overflow-hidden">
       <div className="absolute inset-0 bg-subtle-grid opacity-40" />
 
-      {/* Floating Orbs Animados */}
-      <motion.div
-        className="absolute top-20 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div
-        className="absolute bottom-20 right-1/4 w-80 h-80 bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-full blur-3xl"
-        animate={{
-          x: [0, -40, 0],
-          y: [0, 40, 0],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-
-      <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-2xl"
-        >
-          {/* Header Supremo */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center mb-8"
-          >
-            <motion.div
-              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl mb-6 shadow-lg shadow-blue-500/25"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+      <div className="relative z-10 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl mb-6 shadow-lg shadow-blue-500/25">
               <Building2 className="w-10 h-10 text-white" />
-            </motion.div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-2">
-              Selecionar Organização
-            </h1>
-            <p className="text-slate-400 text-lg">
-              Escolha qual organização você deseja acessar
-            </p>
-          </motion.div>
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2">Selecionar Organização</h1>
+            <p className="text-slate-400 text-lg">Escolha qual organização você deseja acessar</p>
+          </div>
 
-          {/* Mensagem de Erro */}
           <AnimatePresence>
             {error && (
               <motion.div
@@ -141,19 +116,13 @@ export const OrganizationSelector: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Grid de Organizações */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            {organizations.map((org: Organization, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {safeOrgs.map((org: Organization, index) => (
               <motion.div
                 key={org.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+                transition={{ duration: 0.4, delay: 0.05 * index }}
                 className="group relative"
               >
                 <motion.button
@@ -173,7 +142,7 @@ export const OrganizationSelector: React.FC = () => {
                       ) : (
                         <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
                           <span className="text-white font-bold text-xl">
-                            {org.name.charAt(0).toUpperCase()}
+                            {org.name?.charAt(0)?.toUpperCase?.() ?? 'O'}
                           </span>
                         </div>
                       )}
@@ -188,7 +157,7 @@ export const OrganizationSelector: React.FC = () => {
                       <div className="flex items-center space-x-4 text-xs text-slate-500">
                         <div className="flex items-center space-x-1">
                           <Users className="w-3 h-3" />
-                          <span>12 membros</span>
+                          <span>—</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Crown className="w-3 h-3" />
@@ -197,34 +166,16 @@ export const OrganizationSelector: React.FC = () => {
                       </div>
                     </div>
                   </div>
+
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400 text-sm">Acessar organização</span>
                     <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </motion.button>
               </motion.div>
             ))}
-          </motion.div>
-
-          {/* Footer */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="text-center mt-12"
-          >
-            <p className="text-slate-500 text-sm mb-4">
-              Não consegue acessar sua organização?
-            </p>
-            <button
-              onClick={() => navigate('/support')}
-              className="text-blue-400 hover:text-blue-300 text-sm underline transition-colors"
-            >
-              Entre em contato com o suporte
-            </button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   )
