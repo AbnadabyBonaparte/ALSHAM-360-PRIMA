@@ -1,6 +1,5 @@
 // src/App.tsx
-// ALSHAM 360° PRIMA — ROOT ROUTER (FINAL STABLE)
-// Auth orchestration lives HERE. Layout lives elsewhere.
+// ALSHAM 360° PRIMA — ROOT ROUTER (FINAL • ORG-AWARE • ANTI-LOOP)
 
 import React, { useEffect, useMemo } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
@@ -24,13 +23,13 @@ import PreconditionGate from '@/pages/precondition/PreconditionGate'
 
 /**
  * Detecta fluxo de recovery do Supabase
- * (hash ou search param)
  */
 function isRecoveryFlow(): boolean {
   if (typeof window === 'undefined') return false
-  const h = window.location.hash || ''
-  const s = window.location.search || ''
-  return h.includes('type=recovery') || s.includes('type=recovery')
+  return (
+    window.location.hash.includes('type=recovery') ||
+    window.location.search.includes('type=recovery')
+  )
 }
 
 function AppContent() {
@@ -41,7 +40,7 @@ function AppContent() {
     currentOrg,
   } = useAuthStore()
 
-  // trava o estado de recovery no primeiro render
+  // trava recovery no primeiro render
   const recovery = useMemo(() => isRecoveryFlow(), [])
 
   useEffect(() => {
@@ -59,52 +58,63 @@ function AppContent() {
   return (
     <Routes>
       {/* =========================================================
-          🔓 ROTAS SEMPRE LIVRES
+          🔓 SEMPRE LIVRES
          ========================================================= */}
       <Route path="/precondition/:code" element={<PreconditionGate />} />
       <Route path="/auth/reset-password" element={<ResetPassword />} />
 
-      {/* Força reset se for recovery */}
+      {/* Recovery tem prioridade absoluta */}
       {recovery && (
         <Route path="*" element={<Navigate to="/auth/reset-password" replace />} />
       )}
 
       {/* =========================================================
-          🌐 ROTAS PÚBLICAS (NÃO LOGADO)
+          🌐 PÚBLICAS (NÃO LOGADO)
          ========================================================= */}
       <Route
         path="/login"
-        element={!user ? <Login /> : <Navigate to="/dashboard" replace />}
+        element={!user ? <Login /> : <Navigate to="/" replace />}
       />
       <Route
         path="/signup"
-        element={!user ? <SignUp /> : <Navigate to="/dashboard" replace />}
+        element={!user ? <SignUp /> : <Navigate to="/" replace />}
       />
       <Route
         path="/forgot-password"
-        element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" replace />}
+        element={!user ? <ForgotPassword /> : <Navigate to="/" replace />}
       />
 
       {/* =========================================================
-          🔒 ROTAS PROTEGIDAS (LOGIN OK)
+          🔒 PROTEGIDAS (LOGADO)
          ========================================================= */}
       <Route element={<ProtectedLayout />}>
-        {/* usuário logado, mas SEM organização */}
-        {!currentOrg && (
-          <Route
-            path="*"
-            element={<OrganizationSelector />}
-          />
-        )}
+        {/* Root decide org vs dashboard */}
+        <Route
+          path="/"
+          element={
+            !currentOrg
+              ? <Navigate to="/select-organization" replace />
+              : <Navigate to="/dashboard" replace />
+          }
+        />
 
-        {/* usuário logado + org selecionada */}
-        {currentOrg && (
-          <>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardSupremo />} />
-            {/* outras páginas internas entram aqui */}
-          </>
-        )}
+        {/* Seleção de organização */}
+        <Route
+          path="/select-organization"
+          element={<OrganizationSelector />}
+        />
+
+        {/* Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            currentOrg
+              ? <DashboardSupremo />
+              : <Navigate to="/select-organization" replace />
+          }
+        />
+
+        {/* outras páginas internas entram aqui */}
       </Route>
 
       {/* =========================================================
@@ -112,7 +122,7 @@ function AppContent() {
          ========================================================= */}
       <Route
         path="*"
-        element={<Navigate to={user ? '/dashboard' : '/login'} replace />}
+        element={<Navigate to={user ? '/' : '/login'} replace />}
       />
     </Routes>
   )
