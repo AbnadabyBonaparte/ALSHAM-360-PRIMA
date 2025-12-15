@@ -1,24 +1,35 @@
+// src/components/ProtectedLayout.tsx
 import React, { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import LayoutSupremo from '@/components/LayoutSupremo'
+import { OrganizationSelector } from '@/pages/auth/OrganizationSelector'
 
 /**
- * ProtectedLayout
- * - Não inicializa auth duas vezes (App.tsx já chama init, mas mantemos idempotente)
- * - Não usa campos antigos do store
- * - Não re-declara componentes com nomes duplicados
+ * ProtectedLayout (CANÔNICO)
+ * - Gate de autenticação
+ * - Gate de seleção de organização (se aplicável)
+ * - Envolve TODAS as rotas internas com LayoutSupremo (Sidebar + Header + Shell)
  */
 export function ProtectedLayout() {
+  const location = useLocation()
+
   const user = useAuthStore(s => s.user)
   const loading = useAuthStore(s => s.loading)
   const init = useAuthStore(s => s.init)
 
-  const location = useLocation()
+  // Se seu store tiver estes campos, ele usa; se não tiver, não quebra.
+  const needsOrgSelection = useAuthStore(s => (s as any).needsOrgSelection)
+  const clearError = useAuthStore(s => (s as any).clearError)
 
   useEffect(() => {
-    init()
+    init?.()
   }, [init])
+
+  useEffect(() => {
+    clearError?.()
+  }, [location.pathname, clearError])
 
   if (loading) {
     return (
@@ -32,5 +43,15 @@ export function ProtectedLayout() {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  return <Outlet />
+  // Se o sistema usa orgs e o store sinaliza que precisa selecionar, renderiza o selector.
+  if (needsOrgSelection) {
+    return <OrganizationSelector />
+  }
+
+  // ✅ Aqui volta o chrome inteiro do app (sidebar + header)
+  return (
+    <LayoutSupremo>
+      <Outlet />
+    </LayoutSupremo>
+  )
 }
