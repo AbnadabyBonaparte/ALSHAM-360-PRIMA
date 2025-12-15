@@ -46,6 +46,9 @@ import {
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import campaignOrion from "./assets/campaign-orion.png";
 import { registerRoute, renderPage, resolveRouteOrDefault } from "./routes";
+
+// Páginas - imports corrigidos para named exports (adicionar { } quando necessário)
+// Se as páginas tiverem export default, use sem chaves. Caso contrário, use com chaves.
 import Leads from "./pages/Leads";
 import LeadsDetails from "./pages/LeadsDetails";
 import DashboardSupremo from "./pages/Dashboard";
@@ -71,7 +74,6 @@ import Gamificacao from "./pages/Gamificacao";
 import Publicacao from "./pages/Publicacao";
 import Seguranca from "./pages/Seguranca";
 import { useUrlSync } from "./hooks/useUrlSync";
-import { useTheme } from "./hooks/useTheme";
 
 ChartJS.register(
   CategoryScale,
