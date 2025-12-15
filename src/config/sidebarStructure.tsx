@@ -3,7 +3,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 📋 SINGLE SOURCE OF TRUTH - Estrutura completa de navegação
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+import React from 'react';
 import {
   Target,
   Users,
@@ -92,81 +92,60 @@ import {
   Calendar,
   LayoutDashboard,
 } from 'lucide-react';
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 📊 TIPOS E INTERFACES
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 /**
  * Status de implementação de uma página
  */
 export type PageStatus = 'implemented' | 'placeholder' | 'planned';
-
 /**
  * Link individual da sidebar
  */
 export interface SidebarLink {
   /** ID único da rota (deve corresponder ao registrado no App.tsx) */
   id: string;
-
   /** Label exibido na navegação */
   label: string;
-
   /** Ícone do link (opcional) */
   icon?: React.ReactNode;
-
   /** Status de implementação */
   status?: PageStatus;
-
   /** Badge opcional (ex: "Novo", "Beta", número de notificações) */
   badge?: string | number;
-
   /** Descrição curta para tooltips */
   description?: string;
-
   /** Sublinks (para menus hierárquicos) */
   children?: SidebarLink[];
-
   /** Roles/permissões necessárias para acessar */
   roles?: string[];
-
   /** Se true, o link não será exibido */
   hidden?: boolean;
 }
-
 /**
  * Categoria da sidebar
  */
 export interface SidebarCategory {
   /** ID único da categoria */
   id: string;
-
   /** Label da categoria */
   label: string;
-
   /** Ícone da categoria */
   icon: React.ReactNode;
-
   /** Cor de destaque (CSS variable ou hex) */
   accentColor: string;
-
   /** Links da categoria */
   links: SidebarLink[];
-
   /** Se true, a categoria começa colapsada */
   defaultCollapsed?: boolean;
-
   /** Descrição da categoria */
   description?: string;
-
   /** Badge da categoria */
   badge?: string | number;
 }
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🗂️ ESTRUTURA COMPLETA DA SIDEBAR (11 CATEGORIAS)
+// 🗂️ ESTRUTURA COMPLETA DA SIDEBAR (12 CATEGORIAS)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
   // ────────────────────────────────────────────────────────────────────
   // 1. CRM CORE
@@ -179,8 +158,8 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     description: 'Gestão de clientes, leads e oportunidades',
     links: [
       {
-        id: 'dashboard-principal',
-        label: 'Dashboard Principal',
+        id: 'dashboard',
+        label: 'Dashboard',
         icon: <LayoutDashboard className="h-4 w-4" />,
         status: 'implemented',
         description: 'Visão geral do CRM',
@@ -192,10 +171,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         description: 'Visão 360° do cliente',
       },
       {
-        id: 'leads-lista',
+        id: 'leads-group',
         label: 'Leads',
         icon: <Users className="h-4 w-4" />,
-        status: 'implemented',
         description: 'Gestão de leads',
         children: [
           {
@@ -216,10 +194,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'contatos-lista',
+        id: 'contatos-group',
         label: 'Contatos',
         icon: <UserCircle className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'contatos-lista',
@@ -234,10 +211,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'contas-empresas-lista',
+        id: 'contas-empresas-group',
         label: 'Contas/Empresas',
         icon: <Building className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'contas-empresas-lista',
@@ -252,10 +228,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'oportunidades-lista',
+        id: 'oportunidades-group',
         label: 'Oportunidades',
         icon: <Target className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'oportunidades-lista',
@@ -305,7 +280,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 2. MARKETING
   // ────────────────────────────────────────────────────────────────────
@@ -317,10 +291,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     description: 'Campanhas, email marketing e redes sociais',
     links: [
       {
-        id: 'campanhas-lista',
+        id: 'campanhas-group',
         label: 'Campanhas',
         icon: <Rocket className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'campanhas-lista',
@@ -335,10 +308,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'email-marketing-dashboard',
+        id: 'email-marketing-group',
         label: 'Email Marketing',
         icon: <Mail className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'email-marketing-dashboard',
@@ -358,10 +330,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'landing-pages-lista',
+        id: 'landing-pages-group',
         label: 'Landing Pages',
         icon: <Layout className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'landing-pages-lista',
@@ -375,10 +346,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'formularios-lista',
+        id: 'formularios-group',
         label: 'Formulários',
         icon: <FileSpreadsheet className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'formularios-lista',
@@ -393,10 +363,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
-        id: 'redes-sociais-dashboard',
+        id: 'redes-sociais-group',
         label: 'Redes Sociais',
         icon: <Share2 className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'redes-sociais-dashboard',
@@ -418,7 +387,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 3. SUPORTE AO CLIENTE
   // ────────────────────────────────────────────────────────────────────
@@ -430,10 +398,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     description: 'Atendimento, tickets e base de conhecimento',
     links: [
       {
-        id: 'tickets-lista',
+        id: 'tickets-group',
         label: 'Tickets',
         icon: <Headphones className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'tickets-lista',
@@ -485,7 +452,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 4. ANALYTICS & RELATÓRIOS
   // ────────────────────────────────────────────────────────────────────
@@ -563,7 +529,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 5. AUTOMAÇÃO & IA
   // ────────────────────────────────────────────────────────────────────
@@ -575,10 +540,9 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     description: 'Workflows, IA e automações',
     links: [
       {
-        id: 'workflows-lista',
+        id: 'workflows-group',
         label: 'Workflows',
         icon: <Workflow className="h-4 w-4" />,
-        status: 'placeholder',
         children: [
           {
             id: 'workflows-lista',
@@ -628,7 +592,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 6. GAMIFICAÇÃO
   // ────────────────────────────────────────────────────────────────────
@@ -704,7 +667,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 7. OMNICHANNEL
   // ────────────────────────────────────────────────────────────────────
@@ -788,7 +750,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 8. GESTÃO DE EQUIPES
   // ────────────────────────────────────────────────────────────────────
@@ -849,7 +810,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 9. INTEGRAÇÕES
   // ────────────────────────────────────────────────────────────────────
@@ -922,7 +882,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 10. EXPERIÊNCIAS IMERSIVAS
   // ────────────────────────────────────────────────────────────────────
@@ -950,7 +909,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 11. CONFIGURAÇÕES & ADMIN
   // ────────────────────────────────────────────────────────────────────
@@ -1053,7 +1011,6 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
       },
     ],
   },
-
   // ────────────────────────────────────────────────────────────────────
   // 12. COMUNIDADE & SUPORTE
   // ────────────────────────────────────────────────────────────────────
@@ -1099,18 +1056,15 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
     ],
   },
 ];
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🔧 UTILITÁRIOS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 /**
  * Encontra uma categoria pelo ID
  */
 export function findCategoryById(id: string): SidebarCategory | undefined {
   return SIDEBAR_STRUCTURE.find((cat) => cat.id === id);
 }
-
 /**
  * Encontra um link em qualquer categoria pelo ID
  */
@@ -1126,7 +1080,6 @@ export function findLinkById(linkId: string): { category: SidebarCategory; link:
       }
       return undefined;
     };
-
     const link = findInLinks(category.links);
     if (link) {
       return { category, link };
@@ -1134,38 +1087,34 @@ export function findLinkById(linkId: string): { category: SidebarCategory; link:
   }
   return undefined;
 }
-
 /**
- * Obtém todas as rotas flat (sem hierarquia)
+ * Obtém todas as rotas reais (apenas folhas – itens sem children)
  */
 export function getAllRoutes(): string[] {
   const routes: string[] = [];
-
   const extractRoutes = (links: SidebarLink[]) => {
     for (const link of links) {
-      routes.push(link.id);
-      if (link.children) {
-        extractRoutes(link.children);
-      }
+      const isGroup = !!link.children?.length;
+
+      // group: não é rota (apenas organiza)
+      if (!isGroup) routes.push(link.id);
+
+      if (isGroup) extractRoutes(link.children!);
     }
   };
-
   for (const category of SIDEBAR_STRUCTURE) {
     extractRoutes(category.links);
   }
-
-  return [...new Set(routes)]; // Remove duplicatas
+  return [...new Set(routes)]; // Remove possíveis duplicatas (não deve haver)
 }
-
 /**
- * Conta total de links
+ * Conta total de links (rotas reais)
  */
 export function getTotalLinksCount(): number {
   return getAllRoutes().length;
 }
-
 /**
- * Obtém estatísticas da sidebar
+ * Obtém estatísticas da sidebar (apenas sobre rotas reais)
  */
 export function getSidebarStats() {
   const allRoutes = getAllRoutes();
@@ -1173,7 +1122,6 @@ export function getSidebarStats() {
     const result = findLinkById(id);
     return result?.link.status === 'implemented';
   });
-
   return {
     totalCategories: SIDEBAR_STRUCTURE.length,
     totalLinks: allRoutes.length,
