@@ -1,59 +1,36 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
-import {
-  Building2,
-  Users,
-  Crown,
-  AlertCircle,
-  ArrowRight,
-  Loader2,
-} from 'lucide-react'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { Building2, Users, Crown, AlertCircle, ArrowRight, Loader2 } from 'lucide-react'
 
 import { useAuthStore } from '../../lib/supabase/useAuthStore'
-import type { Organization } from '../../lib/supabase/types'
+import type { Organization } from '../../lib/supabase/useAuthStore'
 
 export const OrganizationSelector: React.FC = () => {
   const navigate = useNavigate()
 
   const user = useAuthStore((s) => s.user)
-  const organizations = useAuthStore((s) => (s as any).organizations ?? [])
-  const orgLoading = useAuthStore((s) => (s as any).orgLoading ?? false)
-  const error = useAuthStore((s) => (s as any).error ?? null)
-  const clearError = useAuthStore((s) => (s as any).clearError?.())
-  const switchOrganization = useAuthStore((s) => (s as any).switchOrganization)
-  const fetchOrganizations = useAuthStore((s) => (s as any).fetchOrganizations)
+  const organizations = useAuthStore((s) => s.organizations)
+  const loadingOrgs = useAuthStore((s) => s.loadingOrgs)
+  const error = useAuthStore((s) => s.error)
+  const clearError = useAuthStore((s) => s.clearError)
+  const switchOrganization = useAuthStore((s) => s.switchOrganization)
 
-  // Se não tiver user, manda pro login (apenas uma vez, estável)
-  useEffect(() => {
-    if (!user) navigate('/login', { replace: true })
-  }, [user, navigate])
-
-  // Carrega orgs (se existir a action no store)
-  useEffect(() => {
-    if (user && typeof fetchOrganizations === 'function') {
-      fetchOrganizations()
-    }
-  }, [user, fetchOrganizations])
+  if (!user) return <Navigate to="/login" replace />
 
   const safeOrgs: Organization[] = Array.isArray(organizations) ? organizations : []
 
   const handleOrgSelect = async (org: Organization) => {
     try {
-      if (typeof clearError === 'function') clearError()
-      if (typeof switchOrganization !== 'function') {
-        throw new Error('switchOrganization não existe no store.')
-      }
+      clearError()
       await switchOrganization(org.id)
       navigate('/dashboard', { replace: true })
-    } catch (e: any) {
-      // erro já pode ser setado pelo store; aqui só evita crash
+    } catch (e) {
       console.error(e)
     }
   }
 
-  // Loading state real
-  if (orgLoading) {
+  if (loadingOrgs) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
@@ -65,21 +42,20 @@ export const OrganizationSelector: React.FC = () => {
     )
   }
 
-  // Lista vazia (não é “loading”)
   if (!safeOrgs.length) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-lg">
           <h2 className="text-xl font-semibold text-white mb-2">Nenhuma organização encontrada</h2>
           <p className="text-slate-400 mb-6">
-            Seu usuário autenticou, mas não retornou organizações. Verifique a consulta no store
-            (fetchOrganizations) ou o vínculo do usuário na tabela de memberships.
+            Seu usuário autenticou, mas não retornou organizações. Verifique vínculos em
+            <code className="mx-1">user_organizations</code> e políticas/RLS.
           </p>
           <button
-            onClick={() => typeof fetchOrganizations === 'function' && fetchOrganizations()}
+            onClick={() => window.location.reload()}
             className="rounded-xl bg-white/10 px-4 py-2 text-white hover:bg-white/15"
           >
-            Tentar novamente
+            Recarregar
           </button>
         </div>
       </div>
@@ -117,7 +93,7 @@ export const OrganizationSelector: React.FC = () => {
           </AnimatePresence>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {safeOrgs.map((org: Organization, index) => (
+            {safeOrgs.map((org, index) => (
               <motion.div
                 key={org.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -147,6 +123,7 @@ export const OrganizationSelector: React.FC = () => {
                         </div>
                       )}
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">
                         {org.name}
