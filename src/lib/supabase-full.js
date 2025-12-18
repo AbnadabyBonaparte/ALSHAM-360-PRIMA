@@ -7,7 +7,8 @@
 // 📊 ESTATÍSTICAS: ~570 funções, 141 tabelas, 40+ views, 45 canais real-time, 10 módulos, ~8850 linhas
 // 🧩 ARQUIVO ÚNICO: Consolidação de 10 partes sem remoções
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const supabaseModule = typeof window !== 'undefined' && window?.supabase?.createClient ? window.supabase : await import('@supabase/supabase-js');
+// ✅ FIXED: Changed to static import to prevent Vite warning
+import * as supabaseModule from '@supabase/supabase-js';
 const { createClient } = supabaseModule;
 if (typeof window !== 'undefined') {
   window.ALSHAM = window.ALSHAM || {};

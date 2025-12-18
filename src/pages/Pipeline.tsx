@@ -87,21 +87,45 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 export default function PipelineQuantico() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from('opportunities').select('*');
-      if (data) {
-        const enriched = data.map(d => ({
-          ...d,
-          health: d.value > 1000000 ? 'divine' : d.probability > 90 ? 'hot' : d.probability > 60 ? 'warm' : d.probability < 20 ? 'fallen' : 'cold'
-        }));
-        setDeals(enriched);
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { data, error: queryError } = await supabase.from('opportunities').select('*');
+
+        if (queryError) {
+          console.error('Error loading opportunities:', queryError);
+          setError('Erro ao carregar oportunidades. A tabela pode não existir ainda.');
+          setLoading(false);
+          return;
+        }
+
+        if (data) {
+          const enriched = data.map(d => ({
+            ...d,
+            health: d.value > 1000000 ? 'divine' : d.probability > 90 ? 'hot' : d.probability > 60 ? 'warm' : d.probability < 20 ? 'fallen' : 'cold'
+          }));
+          setDeals(enriched);
+        }
+      } catch (err) {
+        console.error('Error loading pipeline:', err);
+        setError('Erro inesperado ao carregar pipeline');
+      } finally {
+        setLoading(false);
       }
     };
     load();
 
-    supabase.channel('pipeline-live').on('postgres_changes', { event: '*', schema: 'public', table: 'opportunities' }, () => load()).subscribe();
+    const channel = supabase.channel('pipeline-live').on('postgres_changes', { event: '*', schema: 'public', table: 'opportunities' }, () => load()).subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const columns = useMemo(() => {
@@ -116,6 +140,35 @@ export default function PipelineQuantico() {
 
   const total = deals.reduce((a, d) => a + d.value, 0);
   const weighted = deals.reduce((a, d) => a + d.value * d.probability / 100, 0);
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[var(--background)]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500 mx-auto mb-8"></div>
+          <p className="text-2xl text-[var(--text-secondary)]">Carregando pipeline...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[var(--background)]">
+        <div className="text-center max-w-2xl px-8">
+          <div className="text-6xl mb-8">⚠️</div>
+          <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">Pipeline Indisponível</h2>
+          <p className="text-xl text-[var(--text-secondary)] mb-8">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-lg transition-colors"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-[var(--background)]">

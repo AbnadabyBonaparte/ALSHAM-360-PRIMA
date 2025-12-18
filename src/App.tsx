@@ -20,9 +20,6 @@ import ResetPassword from '@/pages/auth/ResetPassword'
 // Org
 import { OrganizationSelector } from '@/pages/auth/OrganizationSelector'
 
-// App pages
-import DashboardSupremo from '@/pages/Dashboard'
-
 // Precondition
 import PreconditionGate from '@/pages/precondition/PreconditionGate'
 
@@ -122,7 +119,7 @@ function AppContent() {
         {/* Canonical dashboard */}
         <Route
           path="/dashboard"
-          element={!hasOrg ? <Navigate to="/select-organization" replace /> : <DashboardSupremo />}
+          element={!hasOrg ? <Navigate to="/select-organization" replace /> : <>{renderPage('dashboard')}</>}
         />
 
         {/* Dynamic internal pages via registry (canonical) */}
