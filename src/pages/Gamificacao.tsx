@@ -43,52 +43,72 @@ export default function GamificacaoPage() {
 
   useEffect(() => {
     async function loadSupremeGamification() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user?.email) {
+          setLoading(false);
+          return;
+        }
 
-      const { data: profile } = await supabase
-        .from('gamificacao_usuarios')
-        .select('*')
-        .eq('email', user.email)
-        .single();
+        const { data: profile, error: profileError } = await supabase
+          .from('gamificacao_usuarios')
+          .select('*')
+          .eq('email', user.email)
+          .single();
 
-      const { data: allPlayers } = await supabase
-        .from('gamificacao_usuarios')
-        .select('name, pontos, streak, nivel, badges')
-        .order('pontos', { ascending: false })
-        .limit(10);
+        // Se a tabela não existe ou há erro, mostra mensagem apropriada
+        if (profileError) {
+          console.warn('Gamificação não configurada:', profileError);
+          setLoading(false);
+          return;
+        }
 
-      if (profile) {
-        const rank = allPlayers?.findIndex(p => p.email === user.email) + 1 || 0;
+        const { data: allPlayers, error: playersError } = await supabase
+          .from('gamificacao_usuarios')
+          .select('name, pontos, streak, nivel, badges, email')
+          .order('pontos', { ascending: false })
+          .limit(10);
 
-        setUser({
-          points: profile.pontos || 0,
-          level: profile.nivel || 1,
-          streak: profile.streak || 0,
-          badges: profile.badges || 0,
-          rank,
-          nextLevelPoints: profile.nivel * 500,
-          weeklyProgress: profile.progresso_semanal || [0,0,0,0,0,0,0]
-        });
+        if (playersError) {
+          console.warn('Erro ao buscar ranking:', playersError);
+          setLoading(false);
+          return;
+        }
 
-        setLeaderboard(allPlayers?.map((p: any, i: number) => {
-          const next = allPlayers?.[i + 1];
-          const trend = next
-            ? (p.pontos >= next.pontos ? 'up' : 'down')
-            : 'same';
-          return {
-            rank: i + 1,
-            name: p.name,
-            level: p.nivel,
-            points: p.pontos,
-            streak: p.streak,
-            badges: p.badges,
-            trend
-          };
-        }) || []);
+        if (profile) {
+          const rank = allPlayers?.findIndex((p: any) => p.email === user.email) + 1 || 0;
+
+          setUser({
+            points: profile.pontos || 0,
+            level: profile.nivel || 1,
+            streak: profile.streak || 0,
+            badges: profile.badges || 0,
+            rank,
+            nextLevelPoints: profile.nivel * 500,
+            weeklyProgress: profile.progresso_semanal || [0,0,0,0,0,0,0]
+          });
+
+          setLeaderboard(allPlayers?.map((p: any, i: number) => {
+            const next = allPlayers?.[i + 1];
+            const trend = next
+              ? (p.pontos >= next.pontos ? 'up' : 'down')
+              : 'same';
+            return {
+              rank: i + 1,
+              name: p.name,
+              level: p.nivel,
+              points: p.pontos,
+              streak: p.streak,
+              badges: p.badges,
+              trend
+            };
+          }) || []);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar gamificação:', err);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
 
     loadSupremeGamification();
