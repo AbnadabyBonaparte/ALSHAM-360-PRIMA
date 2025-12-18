@@ -1,5 +1,27 @@
 import { supabase } from '../client'
-import type { GamificationPoints, GamificationBadge, NotificationInsert } from '../types'
+import type { NotificationInsert } from '../types'
+
+// Interface que corresponde ao schema REAL da tabela gamification_points
+export interface GamificationPoint {
+  id: number // bigint = number em JS
+  user_id: string
+  org_id: string
+  activity_type: string
+  points_awarded: number
+  related_entity_id: string | null
+  reason: string | null
+  created_at: string
+}
+
+// Interface para inserção de pontos
+export interface GamificationPointInsert {
+  user_id: string
+  org_id: string
+  activity_type: string
+  points_awarded: number
+  related_entity_id?: string
+  reason?: string
+}
 
 // Queries para Gamificação
 export const gamificationQueries = {
@@ -13,17 +35,17 @@ export const gamificationQueries = {
 
     if (error) {
       console.error('Error fetching user points:', error)
-      return { data: [], error }
+      return { data: [] as GamificationPoint[], error }
     }
 
-    return { data: data || [], error: null }
+    return { data: (data || []) as GamificationPoint[], error: null }
   },
 
   // Buscar total de pontos do usuário
   async getUserTotalPoints(userId: string) {
     const { data, error } = await supabase
       .from('gamification_points')
-      .select('points')
+      .select('points_awarded')
       .eq('user_id', userId)
 
     if (error) {
@@ -31,20 +53,34 @@ export const gamificationQueries = {
       return { data: 0, error }
     }
 
-    const total = data.reduce((sum: number, point: any) => sum + point.points, 0)
+    const total = (data || []).reduce(
+      (sum: number, point: { points_awarded: number }) => sum + (point.points_awarded || 0),
+      0
+    )
     return { data: total, error: null }
   },
 
   // Adicionar pontos ao usuário
-  async addPoints(userId: string, points: number, reason: string, metadata?: any) {
+  async addPoints(
+    userId: string,
+    orgId: string,
+    pointsAwarded: number,
+    activityType: string,
+    reason?: string,
+    relatedEntityId?: string
+  ) {
+    const insertData: GamificationPointInsert = {
+      user_id: userId,
+      org_id: orgId,
+      points_awarded: pointsAwarded,
+      activity_type: activityType,
+      reason: reason || null,
+      related_entity_id: relatedEntityId || null
+    }
+
     const { data, error } = await supabase
       .from('gamification_points')
-      .insert({
-        user_id: userId,
-        points,
-        reason,
-        metadata
-      })
+      .insert(insertData)
       .select()
       .single()
 
@@ -54,9 +90,9 @@ export const gamificationQueries = {
     }
 
     // Criar notificação para o usuário
-    await this.createPointsNotification(userId, points, reason)
+    await this.createPointsNotification(userId, pointsAwarded, reason || activityType)
 
-    return { data, error: null }
+    return { data: data as GamificationPoint, error: null }
   },
 
   // Buscar badges disponíveis
@@ -122,11 +158,18 @@ export const gamificationQueries = {
   },
 
   // Buscar leaderboard da organização
-  async getOrganizationLeaderboard() {
+  async getOrganizationLeaderboard(orgId?: string) {
     // Primeiro buscar todos os usuários da org atual
-    const { data: users, error: usersError } = await supabase
+    let query = supabase
       .from('user_profiles')
       .select('user_id, full_name, avatar_url')
+
+    // Se orgId foi fornecido, filtrar por org
+    if (orgId) {
+      query = query.eq('org_id', orgId)
+    }
+
+    const { data: users, error: usersError } = await query
 
     if (usersError) {
       console.error('Error fetching users:', usersError)
@@ -135,18 +178,18 @@ export const gamificationQueries = {
 
     // Buscar pontos de cada usuário
     const leaderboard = await Promise.all(
-      users.map(async (user: any) => {
+      (users || []).map(async (user: any) => {
         const { data: totalPoints } = await this.getUserTotalPoints(user.user_id)
         return {
           user_id: user.user_id,
-          full_name: user.full_name,
+          full_name: user.full_name || 'Usuário',
           avatar_url: user.avatar_url,
-          total_points: totalPoints
+          total_points: totalPoints || 0
         }
       })
     )
 
-    // Ordenar por pontos
+    // Ordenar por pontos (maior primeiro)
     leaderboard.sort((a, b) => b.total_points - a.total_points)
 
     return { data: leaderboard, error: null }
@@ -163,14 +206,54 @@ export const gamificationQueries = {
 
     return {
       data: {
-        total_points: totalPoints,
-        badges_count: badges.length,
-        current_rank: userRank,
-        total_users: totalUsers,
+        total_points: totalPoints || 0,
+        badges_count: badges?.length || 0,
+        current_rank: userRank || 0,
+        total_users: totalUsers || 0,
         rank_percentage: totalUsers > 0 ? ((totalUsers - userRank + 1) / totalUsers) * 100 : 0
       },
       error: null
     }
+  },
+
+  // Buscar histórico de pontos por tipo de atividade
+  async getPointsByActivityType(userId: string, activityType?: string) {
+    let query = supabase
+      .from('gamification_points')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (activityType) {
+      query = query.eq('activity_type', activityType)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error('Error fetching points by activity:', error)
+      return { data: [], error }
+    }
+
+    return { data: (data || []) as GamificationPoint[], error: null }
+  },
+
+  // Buscar pontos por período
+  async getPointsByPeriod(userId: string, startDate: string, endDate: string) {
+    const { data, error } = await supabase
+      .from('gamification_points')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('created_at', startDate)
+      .lte('created_at', endDate)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching points by period:', error)
+      return { data: [], error }
+    }
+
+    return { data: (data || []) as GamificationPoint[], error: null }
   },
 
   // Criar notificação de pontos
