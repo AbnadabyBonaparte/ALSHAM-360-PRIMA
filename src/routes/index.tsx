@@ -291,6 +291,12 @@ function bootstrapRealRoutes() {
     label: 'Detalhe do Lead',
     aliases: ['lead-details'],
   })
+
+  // Theme Switcher
+  registerRoute('theme-switcher', () => import('../components/ThemeSwitcher').then(m => ({ default: m.ThemeSwitcher })), {
+    label: 'Temas',
+    aliases: ['temas', 'themes'],
+  })
 }
 
 function bootstrapPlaceholderRoutes() {

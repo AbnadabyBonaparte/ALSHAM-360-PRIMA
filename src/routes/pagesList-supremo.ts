@@ -156,5 +156,8 @@ export const pagesListSupremo: PageDefinition[] = [
   { id: "marketplace", label: "App Marketplace", icon: "ShoppingBagIcon", module: "Futuro" },
   { id: "sandbox", label: "Sandbox/Dev", icon: "CodeBracketSquareIcon", module: "Futuro" },
   { id: "labs-insights", label: "Labs Insights", icon: "ChartBarSquareIcon", module: "Futuro" },
+
+  // Sistema & Personalização
+  { id: "theme-switcher", label: "Temas", icon: "PaintBrushIcon", module: "Sistema" },
 ];
 
