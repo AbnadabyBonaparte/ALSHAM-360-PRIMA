@@ -168,6 +168,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'customer-360',
         label: 'Customer 360',
         icon: <Users className="h-4 w-4" />,
+        status: 'implemented',
         description: 'Visão 360° do cliente',
       },
       {
@@ -248,11 +249,13 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'pipeline-vendas',
         label: 'Pipeline de Vendas',
         icon: <GitBranch className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'financeiro',
         label: 'Financeiro',
         icon: <Wallet className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'atividades-tarefas',
@@ -342,6 +345,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'landing-builder',
             label: 'Builder',
+            status: 'implemented',
           },
         ],
       },
@@ -466,6 +470,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'executive-dashboard',
         label: 'Executive Dashboard',
         icon: <BarChart className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'analytics-dashboard',
@@ -560,6 +565,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'automation-builder',
         label: 'Automation Builder',
         icon: <Zap className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'sequences-de-vendas',
@@ -577,6 +583,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'ai-assistant',
         label: 'AI Assistant',
         icon: <Sparkles className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'playbooks-de-vendas',
@@ -612,6 +619,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'achievements',
         label: 'Achievements',
         icon: <Award className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'badges-e-conquistas',
@@ -635,6 +643,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'nft-gallery',
         label: 'NFT Gallery',
         icon: <Sparkles className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'competitions',
@@ -646,6 +655,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'war-arena',
         label: 'War Arena',
         icon: <Flame className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'rewards-store',
@@ -681,6 +691,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'omnichannel-inbox',
         label: 'Inbox Omnichannel',
         icon: <Inbox className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'email-inbox',
@@ -896,16 +907,19 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'metaverse',
         label: 'Metaverse',
         icon: <Globe2 className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'alsham-os',
         label: 'Alsham OS',
         icon: <Layout className="h-4 w-4" />,
+        status: 'implemented',
       },
       {
         id: 'boardroom-omega',
         label: 'The Boardroom Ω',
         icon: <Briefcase className="h-4 w-4" />,
+        status: 'implemented',
       },
     ],
   },
@@ -1008,6 +1022,13 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         label: 'System Status',
         icon: <Server className="h-4 w-4" />,
         status: 'placeholder',
+      },
+      {
+        id: 'api-status',
+        label: 'API Status',
+        icon: <Server className="h-4 w-4" />,
+        status: 'implemented',
+        description: 'Status e monitoramento de APIs',
       },
     ],
   },

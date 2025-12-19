@@ -297,6 +297,88 @@ function bootstrapRealRoutes() {
     label: 'Temas',
     aliases: ['temas', 'themes'],
   })
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🎯 PÁGINAS IMPLEMENTADAS - Registradas em 2025-12-19
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  // Automação & IA
+  registerRoute('automation-builder', () => import('../pages/AutomationBuilder'), {
+    label: 'Automation Builder',
+    aliases: ['automations'],
+  })
+
+  registerRoute('ai-assistant', () => import('../pages/AIAssistant'), {
+    label: 'AI Assistant',
+    aliases: ['assistant'],
+  })
+
+  // CRM & Vendas
+  registerRoute('pipeline-vendas', () => import('../pages/Pipeline'), {
+    label: 'Pipeline de Vendas',
+    aliases: ['pipeline'],
+  })
+
+  registerRoute('financeiro', () => import('../pages/Financeiro'), {
+    label: 'Financeiro',
+    aliases: ['finance'],
+  })
+
+  // Comunicação
+  registerRoute('omnichannel-inbox', () => import('../pages/OmnichannelInbox'), {
+    label: 'Inbox Omnichannel',
+    aliases: ['inbox'],
+  })
+
+  // Marketing
+  registerRoute('landing-builder', () => import('../pages/LandingPageBuilder'), {
+    label: 'Landing Page Builder',
+    aliases: ['landing-pages-builder'],
+  })
+
+  // Gamificação
+  registerRoute('nft-gallery', () => import('../pages/NFTGallery'), {
+    label: 'NFT Gallery',
+    aliases: ['nfts'],
+  })
+
+  registerRoute('war-arena', () => import('../pages/WarArena'), {
+    label: 'War Arena',
+    aliases: ['arena'],
+  })
+
+  registerRoute('achievements', () => import('../pages/Achievements'), {
+    label: 'Achievements',
+    aliases: ['conquistas'],
+  })
+
+  // Analytics & Relatórios
+  registerRoute('executive-dashboard', () => import('../pages/ExecutiveDashboard'), {
+    label: 'Executive Dashboard',
+    aliases: ['executive'],
+  })
+
+  // Experiências Imersivas
+  registerRoute('metaverse', () => import('../pages/Metaverse'), {
+    label: 'Metaverse',
+    aliases: ['metaverso'],
+  })
+
+  registerRoute('alsham-os', () => import('../pages/AlshamOS'), {
+    label: 'Alsham OS',
+    aliases: ['os'],
+  })
+
+  registerRoute('boardroom-omega', () => import('../pages/TheBoardroomOmega'), {
+    label: 'The Boardroom Ω',
+    aliases: ['boardroom'],
+  })
+
+  // Sistema & Admin
+  registerRoute('api-status', () => import('../pages/APIStatus'), {
+    label: 'API Status',
+    aliases: ['status'],
+  })
 }
 
 function bootstrapPlaceholderRoutes() {
