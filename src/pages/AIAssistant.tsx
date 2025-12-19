@@ -65,13 +65,24 @@ export default function AIAssistant() {
   const navigate = useNavigate()
 
   // Auth/org canônico via store (não inventa hooks)
-  const user = useAuthStore(s => s.user)
-  const currentOrgId = useAuthStore(s => (s as any).currentOrgId ?? (s as any).orgId ?? null)
-  const loading = useAuthStore(s => (s as any).loading ?? false)
-  const loadingOrgs = useAuthStore(s => (s as any).loadingOrgs ?? false)
+  const { user, currentOrgId, loading, loadingAuth, loadingOrgs, isAuthenticated, init } =
+    useAuthStore(
+      useCallback(
+        state => ({
+          user: state.user,
+          currentOrgId: state.currentOrgId,
+          loading: state.loading,
+          loadingAuth: state.loadingAuth,
+          loadingOrgs: state.loadingOrgs,
+          isAuthenticated: state.isAuthenticated,
+          init: state.init,
+        }),
+        [],
+      ),
+    )
 
-  const orgId = currentOrgId as string | null
-  const userId = (user as any)?.id ?? null
+  const orgId = currentOrgId ?? null
+  const userId = user?.id ?? null
 
   const [messages, setMessages] = useState<Message[]>([WELCOME])
   const [input, setInput] = useState('')
@@ -85,6 +96,15 @@ export default function AIAssistant() {
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const canSend = useMemo(() => Boolean(input.trim()) && !isLoading, [input, isLoading])
+
+  useEffect(() => {
+    init().catch(() => toast.error('Não foi possível inicializar o contexto de autenticação.'))
+  }, [init])
+
+  useEffect(() => {
+    if (loadingAuth) return
+    if (!isAuthenticated) navigate('/precondition/BK_LOGIN', { replace: true })
+  }, [isAuthenticated, loadingAuth, navigate])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
