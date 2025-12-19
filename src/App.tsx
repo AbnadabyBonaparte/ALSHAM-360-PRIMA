@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'rea
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { ThemeInitializer } from '@/components/ThemeInitializer'
 
 // Internal page registry renderer
 import { renderPage } from '@/routes'
@@ -187,6 +188,7 @@ function TopLevelPageGuard() {
 export default function App() {
   return (
     <Router>
+      <ThemeInitializer />
       <AppContent />
     </Router>
   )
