@@ -1,38 +1,90 @@
 // src/lib/ritualReport.ts
-// TODO: Instalar dependências: npm i jspdf html2canvas
-// import jsPDF from 'jspdf';
-// import html2canvas from 'html2canvas';
+// RITUAL REPORT SUPREMO — FORJADO NO FOGO ETERNO
+// Gera PDF imperial com captura da tela atual + voz cerimonial
+// Dependências obrigatórias: npm i jspdf html2canvas @types/jspdf
+
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export async function generateRitualReport() {
-  const utterance = new SpeechSynthesisUtterance("Iniciando o Rito do Relatório Trimestral...");
-  utterance.lang = 'pt-BR';
-  window.speechSynthesis.speak(utterance);
+  // Voz cerimonial — início do rito
+  const speak = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 0.9;
+    utterance.pitch = 1.1;
+    utterance.volume = 1;
+    window.speechSynthesis.cancel(); // limpa fila
+    window.speechSynthesis.speak(utterance);
+  };
 
-  // Nota: jsPDF e html2canvas precisam ser instalados como dependências
-  // Para agora, apenas mostramos um alerta
-  alert("Função de geração de relatório em desenvolvimento. Instale: npm i jspdf html2canvas");
+  speak("Iniciando o Rito do Relatório Trimestral... O Império será julgado.");
 
-  // TODO: Descomentar quando jsPDF e html2canvas estiverem instalados
-  /*
-  const doc = new jsPDF('landscape', 'px', 'a4');
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(0, 255, 150);
+  try {
+    // Captura toda a tela atual (inclui header, sidebar, tudo)
+    const canvas = await html2canvas(document.body, {
+      scale: 2, // alta resolução
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+      scrollX: 0,
+      scrollY: -window.scrollY
+    });
 
-  doc.setFontSize(60);
-  doc.text("RELATÓRIO RITUAL", 100, 100);
-  doc.setFontSize(30);
-  const currentEra = new Date().getFullYear();
-  doc.text(`ERA ATUAL: ${currentEra}`, 100, 180);
+    const imgData = canvas.toDataURL('image/png');
 
-  // Captura tela + insere no PDF
-  const canvas = await html2canvas(document.body);
-  const img = canvas.toDataURL('image/png');
-  doc.addImage(img, 'PNG', 20, 220, 1200, 675);
+    // Cria PDF em landscape A4
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: 'a4'
+    });
 
-  doc.save(`ALSHAM_RITUAL_${new Date().toISOString().split('T')[0]}.pdf`);
-  */
+    // Estilo imperial
+    pdf.setFont('helvetica');
+    pdf.setTextColor(0, 255, 150); // verde cyber
+    pdf.setFontSize(80);
+    pdf.text('RELATÓRIO RITUAL', 100, 120, { align: 'center' });
 
-  const utteranceFinal = new SpeechSynthesisUtterance("O Relatório Ritual foi forjado. O Império foi julgado. E aprovado.");
-  utteranceFinal.lang = 'pt-BR';
-  window.speechSynthesis.speak(utteranceFinal);
+    pdf.setFontSize(40);
+    pdf.setTextColor(100, 255, 200);
+    const currentEra = new Date().getFullYear();
+    pdf.text(`ERA DO IMPÉRIO: ${currentEra}`, 100, 200, { align: 'center' });
+
+    pdf.setTextColor(200, 255, 240);
+    pdf.setFontSize(30);
+    pdf.text('Forjado pelo Citizen Supremo X.1', 100, 260, { align: 'center' });
+
+    // Adiciona captura da tela
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = pdfWidth - 80;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 40, 300, imgWidth, imgHeight);
+
+    // Salva com nome épico
+    const fileName = `ALSHAM_RITUAL_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
+
+    // Voz final — aprovação divina
+    speak("O Relatório Ritual foi forjado. O Império foi julgado... e aprovado com glória absoluta.");
+
+    toast.success('RELATÓRIO RITUAL FORJADO E BAIXADO', {
+      icon: '👑',
+      duration: 8000,
+      style: {
+        background: 'linear-gradient(to right, #10b981, #8b5cf6)',
+        color: 'white',
+        fontSize: '20px'
+      }
+    });
+  } catch (error) {
+    console.error('Falha no Rito do Relatório:', error);
+    speak("O rito falhou. Uma anomalia cósmica interrompeu o julgamento.");
+    toast.error('Falha ao forjar o relatório ritual');
+  }
 }
