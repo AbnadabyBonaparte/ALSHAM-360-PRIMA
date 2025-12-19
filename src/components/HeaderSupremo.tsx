@@ -19,14 +19,13 @@ import {
   Check,
 } from 'lucide-react';
 import { themeList, type ThemeKey } from '../lib/themes';
+import { useTheme } from '@/hooks/useTheme';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎨 PROPS DO COMPONENTE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface HeaderSupremoProps {
-  theme: ThemeKey;
-  onThemeChange: (theme: ThemeKey) => void;
   currency: 'BRL' | 'USD' | 'EUR';
   onCurrencyChange: (currency: 'BRL' | 'USD' | 'EUR') => void;
   timeframe: '7d' | '30d' | '90d';
@@ -42,12 +41,8 @@ interface HeaderSupremoProps {
 // 🎨 THEME SELECTOR COMPONENT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-interface ThemeSelectorProps {
-  currentTheme: ThemeKey;
-  onThemeChange: (theme: ThemeKey) => void;
-}
-
-function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
+function ThemeSelector() {
+  const { currentTheme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredTheme, setHoveredTheme] = useState<ThemeKey | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -125,7 +120,7 @@ function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProps) {
                   <motion.button
                     key={theme.key}
                     onClick={() => {
-                      onThemeChange(theme.key);
+                      setTheme(theme.key);
                       setIsOpen(false);
                     }}
                     onMouseEnter={() => setHoveredTheme(theme.key)}
@@ -404,8 +399,6 @@ function SearchBar() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function HeaderSupremo({
-  theme,
-  onThemeChange,
   currency,
   onCurrencyChange,
   timeframe,
@@ -466,7 +459,7 @@ export default function HeaderSupremo({
           />
 
           {/* Theme Selector */}
-          <ThemeSelector currentTheme={theme} onThemeChange={onThemeChange} />
+          <ThemeSelector />
 
           {/* Notifications */}
           <NotificationButton />

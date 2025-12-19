@@ -13,7 +13,6 @@ import { AlertCircle } from 'lucide-react'
 
 import HeaderSupremo from './HeaderSupremo'
 import { SidebarDesktop, SidebarMobile, MobileNavButton } from './SidebarSupremo'
-import type { ThemeKey } from '@/lib/themes'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // SKELETONS E STATES (visibilidade garantida)
@@ -99,9 +98,6 @@ export interface LayoutSupremoProps {
   children: ReactNode
   title?: string
 
-  theme?: ThemeKey
-  onThemeChange?: (theme: ThemeKey) => void
-
   activePage?: string
   onNavigate?: (pageId: string) => void
 
@@ -126,9 +122,6 @@ export interface LayoutSupremoProps {
 export default function LayoutSupremo({
   children,
   title,
-
-  theme = 'cyber-vivid',
-  onThemeChange = () => {},
 
   activePage = 'dashboard',
   onNavigate = () => {},
@@ -202,8 +195,6 @@ export default function LayoutSupremo({
         {/* Main Content */}
         <div className="flex flex-col">
           <HeaderSupremo
-            theme={theme}
-            onThemeChange={onThemeChange}
             currency={currency}
             onCurrencyChange={onCurrencyChange}
             timeframe={timeframe}
