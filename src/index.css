@@ -4,3 +4,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SHADCN/UI INTEGRATION
+
+   Os componentes shadcn/ui usam as variáveis CSS definidas
+   em themes.css através do "SHADCN/TAILWIND TOKENS BRIDGE"
+
+   Não redefinimos as variáveis aqui para evitar conflitos.
+   O bridge em themes.css mapeia automaticamente:
+   - --background → var(--bg)
+   - --foreground → var(--text)
+   - --primary → var(--accent-1)
+   - etc.
+
+   Isso garante que os componentes shadcn/ui usem o sistema
+   de temas dinâmico do ALSHAM 360° PRIMA.
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
