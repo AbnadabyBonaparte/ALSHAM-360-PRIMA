@@ -58,8 +58,8 @@ export const SignUp: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="mb-6 p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/30 rounded-lg">
+            <p className="text-[var(--accent-alert)] text-sm">{error}</p>
           </div>
         )}
 

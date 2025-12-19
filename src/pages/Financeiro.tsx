@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase/client';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTheme } from '@/hooks/useTheme';
 
 interface FinancialRecord {
   id: string;
@@ -69,6 +70,8 @@ const StatCard = ({
 );
 
 export default function Financeiro() {
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
   const [transactions, setTransactions] = useState<FinancialRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [simulationDrop, setSimulationDrop] = useState(0);
@@ -182,7 +185,7 @@ export default function Financeiro() {
               onChange={e => setSimulationDrop(Number(e.target.value))}
               className="w-full h-4 rounded-full appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, var(--accent-1) ${(100 - simulationDrop * 2)}%, #ef4444 ${(100 - simulationDrop * 2)}%)`
+                background: `linear-gradient(to right, var(--accent-1) ${(100 - simulationDrop * 2)}%, var(--accent-alert) ${(100 - simulationDrop * 2)}%)`
               }}
             />
             <p className="text-center text-[var(--text)] mt-4 text-xl">
@@ -215,8 +218,8 @@ export default function Financeiro() {
                       <stop offset="95%" stopColor="var(--accent-1)" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="exp" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.6}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="var(--accent-alert)" stopOpacity={0.6}/>
+                      <stop offset="95%" stopColor="var(--accent-alert)" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="name" stroke="var(--text)" tick={{ fill: 'var(--text)' }} />
@@ -226,7 +229,7 @@ export default function Financeiro() {
                     labelStyle={{ color: 'var(--text)' }}
                   />
                   <Area type="monotone" dataKey="income" stroke="var(--accent-1)" strokeWidth={4} fill="url(#inc)" />
-                  <Area type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={4} fill="url(#exp)" />
+                  <Area type="monotone" dataKey="expense" stroke="var(--accent-alert)" strokeWidth={4} fill="url(#exp)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -234,18 +237,18 @@ export default function Financeiro() {
             <div className="space-y-12">
               <div className="bg-[var(--surface)]/70 backdrop-blur-xl border border-[var(--border)] rounded-3xl p-10">
                 <div className="flex items-center gap-6 mb-8">
-                  <div className="p-5 bg-red-600/30 rounded-2xl">
-                    <AlertTriangle className="w-12 h-12 text-red-400" />
+                  <div className="p-5 bg-[var(--accent-alert)]/30 rounded-2xl">
+                    <AlertTriangle className="w-12 h-12 text-[var(--accent-alert)]" />
                   </div>
                   <div>
-                    <h4 className="text-3xl font-black text-red-400">ANOMALIA CRÍTICA</h4>
+                    <h4 className="text-3xl font-black text-[var(--accent-alert)]">ANOMALIA CRÍTICA</h4>
                     <p className="text-sm text-[var(--text)]/60">Detectada pela IA em tempo real</p>
                   </div>
                 </div>
                 <p className="text-xl text-[var(--text)] leading-relaxed">
-                  Infraestrutura em nuvem subiu <span className="text-red-400 text-5xl font-black">47%</span> em 72h.
+                  Infraestrutura em nuvem subiu <span className="text-[var(--accent-alert)] text-5xl font-black">47%</span> em 72h.
                 </p>
-                <button className="mt-8 w-full py-6 bg-red-600/70 hover:bg-red-600 text-[var(--background)] text-xl font-black rounded-2xl transition-all hover:scale-105">
+                <button className="mt-8 w-full py-6 bg-[var(--accent-alert)]/70 hover:bg-[var(--accent-alert)] text-[var(--background)] text-xl font-black rounded-2xl transition-all hover:scale-105">
                   Iniciar Investigação Automática
                 </button>
               </div>

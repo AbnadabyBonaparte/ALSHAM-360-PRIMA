@@ -107,11 +107,11 @@ export default function InvoicesPage() {
   }
 
   const statusConfig: Record<string, { bg: string; text: string; icon: JSX.Element }> = {
-    rascunho: { bg: 'bg-gray-500/20', text: 'text-gray-400', icon: <DocumentTextIcon className="w-5 h-5" /> },
-    enviada: { bg: 'bg-blue-500/20', text: 'text-blue-400', icon: <ClockIcon className="w-5 h-5" /> },
-    paga: { bg: 'bg-green-500/20', text: 'text-green-400', icon: <CheckCircleIcon className="w-5 h-5" /> },
-    atrasada: { bg: 'bg-red-500/20', text: 'text-red-400', icon: <ExclamationTriangleIcon className="w-5 h-5" /> },
-    cancelada: { bg: 'bg-gray-500/20', text: 'text-gray-400', icon: <ArrowPathIcon className="w-5 h-5" /> }
+    rascunho: { bg: 'bg-[var(--surface)]/20', text: 'text-[var(--text-2)]', icon: <DocumentTextIcon className="w-5 h-5" /> },
+    enviada: { bg: 'bg-[var(--accent-2)]/20', text: 'text-[var(--accent-2)]', icon: <ClockIcon className="w-5 h-5" /> },
+    paga: { bg: 'bg-[var(--accent-1)]/20', text: 'text-[var(--accent-1)]', icon: <CheckCircleIcon className="w-5 h-5" /> },
+    atrasada: { bg: 'bg-[var(--accent-alert)]/20', text: 'text-[var(--accent-alert)]', icon: <ExclamationTriangleIcon className="w-5 h-5" /> },
+    cancelada: { bg: 'bg-[var(--surface)]/20', text: 'text-[var(--text-2)]', icon: <ArrowPathIcon className="w-5 h-5" /> }
   };
 
   return (

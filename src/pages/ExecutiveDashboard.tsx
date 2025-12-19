@@ -13,6 +13,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 // Assumindo que os hooks e componentes auxiliares já existem (ou mantendo a lógica local se preferir)
 // Para garantir que compile, vou incluir a lógica de dados aqui mesmo, seguindo o padrão "monolito seguro".
 import { supabase } from '@/lib/supabase';
+import { useTheme } from '@/hooks/useTheme';
 
 // ===================== TYPES & CONFIG =====================
 const BOARDROOM_RULES = {
@@ -75,15 +76,17 @@ const KpiCard = ({ title, value, subtitle, trend, prefix = "" }: any) => (
 );
 
 const SentimentOrb = ({ score }: { score: number }) => {
-  const color = score > 75 ? '#10b981' : score > 50 ? '#fbbf24' : '#ef4444';
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
+  const color = score > 75 ? themeColors.accentPrimary : score > 50 ? themeColors.accentWarm : themeColors.accentAlert;
   return (
     <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
-      <motion.div 
+      <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
         className="absolute inset-0 rounded-full border-t-4 border-r-4 border-[var(--border)]"
       />
-      <motion.div 
+      <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 4, repeat: Infinity }}
         className="absolute inset-4 rounded-full blur-2xl"
@@ -100,6 +103,8 @@ const SentimentOrb = ({ score }: { score: number }) => {
 // ===================== PAGE =====================
 
 export default function ExecutiveDashboard() {
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
   const [metrics, setMetrics] = useState<ExecutiveMetrics | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
@@ -191,7 +196,7 @@ export default function ExecutiveDashboard() {
         {
           duration: 8000,
           icon: <Crown className="w-8 h-8 text-yellow-400" />,
-          style: { background: '#000', color: '#fff', border: '1px solid #333', padding: '16px' }
+          style: { background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)', padding: '16px' }
         }
       );
     }, 3000);
@@ -271,9 +276,9 @@ export default function ExecutiveDashboard() {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </button>
             
-            <button 
+            <button
               onClick={handleEasterEgg}
-              className="p-10 bg-[#111] border-2 border-[var(--border)] rounded-3xl hover:border-emerald-500/50 hover:text-emerald-500 text-[var(--text-primary)]/30 transition-all group"
+              className="p-10 bg-[var(--surface)] border-2 border-[var(--border)] rounded-3xl hover:border-emerald-500/50 hover:text-emerald-500 text-[var(--text-primary)]/30 transition-all group"
               aria-label="Cadeira do Imperador"
             >
               <Crown className="w-10 h-10 group-hover:rotate-12 transition-transform" />
@@ -315,7 +320,7 @@ export default function ExecutiveDashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
           
           {/* Main Chart */}
-          <div className="xl:col-span-2 bg-gradient-to-br from-[#0f0f0f] to-black border border-[var(--border)] rounded-[3rem] p-16 shadow-2xl">
+          <div className="xl:col-span-2 bg-gradient-to-br from-[var(--surface)] to-[var(--bg)] border border-[var(--border)] rounded-[3rem] p-16 shadow-2xl">
             <div className="flex justify-between items-center mb-12">
               <h3 className="text-4xl font-black text-[var(--text-primary)]">TRAJETÓRIA DO IMPÉRIO</h3>
               <div className="flex gap-6">
@@ -329,23 +334,23 @@ export default function ExecutiveDashboard() {
                 <AreaChart data={metrics.revenueTrend}>
                   <defs>
                     <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor={themeColors.accentPrimary} stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor={themeColors.accentPrimary} stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="prof" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor={themeColors.accentTertiary} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={themeColors.accentTertiary} stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="month" stroke="#333" tick={{ fill: '#666', fontSize: 14, fontWeight: 'bold' }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#333" tick={{ fill: '#666', fontSize: 14, fontWeight: 'bold' }} tickFormatter={v => `R$${v/1000}k`} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="month" stroke={themeColors.border} tick={{ fill: themeColors.textSecondary, fontSize: 14, fontWeight: 'bold' }} axisLine={false} tickLine={false} />
+                  <YAxis stroke={themeColors.border} tick={{ fill: themeColors.textSecondary, fontSize: 14, fontWeight: 'bold' }} tickFormatter={v => `R$${v/1000}k`} axisLine={false} tickLine={false} />
                   <Tooltip
-                    contentStyle={{ background: '#000', border: '2px solid #333', borderRadius: '16px', padding: '20px' }}
-                    labelStyle={{ color: '#888', marginBottom: '10px', textTransform: 'uppercase' }}
+                    contentStyle={{ background: themeColors.surface, border: `2px solid ${themeColors.border}`, borderRadius: '16px', padding: '20px' }}
+                    labelStyle={{ color: themeColors.textSecondary, marginBottom: '10px', textTransform: 'uppercase' }}
                     formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, '']}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={6} fill="url(#rev)" />
-                  <Area type="monotone" dataKey="profit" stroke="#8b5cf6" strokeWidth={6} fill="url(#prof)" />
+                  <Area type="monotone" dataKey="revenue" stroke={themeColors.accentPrimary} strokeWidth={6} fill="url(#rev)" />
+                  <Area type="monotone" dataKey="profit" stroke={themeColors.accentTertiary} strokeWidth={6} fill="url(#prof)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -365,7 +370,7 @@ export default function ExecutiveDashboard() {
                 {departments.map(dept => (
                   <div key={dept.name} className="flex items-center justify-between group">
                     <div className="flex items-center gap-6">
-                      <div className={`w-4 h-4 rounded-full ${dept.status === 'optimal' ? 'bg-emerald-500 shadow-[0_0_15px_#10b981]' : dept.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`} />
+                      <div className={`w-4 h-4 rounded-full ${dept.status === 'optimal' ? 'bg-emerald-500 shadow-[0_0_15px_var(--accent-1)]' : dept.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`} />
                       <span className="text-2xl font-bold text-[var(--text-primary)] group-hover:text-emerald-400 transition-colors">{dept.name}</span>
                     </div>
                     <div className="text-right">
