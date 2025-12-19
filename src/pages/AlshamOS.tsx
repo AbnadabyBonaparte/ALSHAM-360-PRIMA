@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BrainCircuit } from 'lucide-react';
 import RealmSelector from '@/components/RealmSelector';
 import OraculumArkanus from '@/components/OraculumArkanus';
-
 type Realm = 'genesis' | 'nexus' | 'prism' | 'throne';
 
 export default function AlshamOS() {
