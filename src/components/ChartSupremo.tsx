@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useTheme } from "@/hooks/useTheme";
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -22,8 +23,14 @@ export default function ChartSupremo({
   title,
   labels,
   dataValues,
-  color = "rgb(16, 185, 129)", // emerald-500
+  color,
 }: ChartSupremoProps) {
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
+
+  // Use color from props or default to theme accent
+  const chartColor = color || themeColors.accentPrimary;
+
   const data = {
     labels,
     datasets: [
@@ -31,8 +38,8 @@ export default function ChartSupremo({
         label: title,
         data: dataValues,
         fill: false,
-        borderColor: color,
-        backgroundColor: color,
+        borderColor: chartColor,
+        backgroundColor: chartColor,
         tension: 0.3,
         pointRadius: 4,
       },
@@ -43,25 +50,25 @@ export default function ChartSupremo({
     plugins: {
       legend: {
         labels: {
-          color: "#ccc",
+          color: themeColors.textSecondary,
         },
       },
     },
     scales: {
       x: {
-        ticks: { color: "#aaa" },
-        grid: { color: "rgba(255,255,255,0.05)" },
+        ticks: { color: themeColors.textSecondary },
+        grid: { color: themeColors.border },
       },
       y: {
-        ticks: { color: "#aaa" },
-        grid: { color: "rgba(255,255,255,0.05)" },
+        ticks: { color: themeColors.textSecondary },
+        grid: { color: themeColors.border },
       },
     },
   };
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-lg">
-      <h2 className="text-lg font-semibold mb-4">{title}</h2>
+    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 shadow-lg">
+      <h2 className="text-lg font-semibold text-[var(--text)] mb-4">{title}</h2>
       <Line data={data} options={options} />
     </div>
   );

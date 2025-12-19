@@ -1,6 +1,7 @@
 // src/components/leads/LeadScoreGauge.tsx
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
+import { useTheme } from '@/hooks/useTheme';
 
 interface LeadScoreGaugeProps {
   score: number;
@@ -9,12 +10,15 @@ interface LeadScoreGaugeProps {
   className?: string;
 }
 
-export default function LeadScoreGauge({ 
-  score, 
-  size = 'md', 
+export default function LeadScoreGauge({
+  score,
+  size = 'md',
   showLabel = true,
   className = ''
 }: LeadScoreGaugeProps) {
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🔧 FIX: MAPEAR SIZE PARA PIXELS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -34,17 +38,17 @@ export default function LeadScoreGauge({
 
   // Normalizar score entre 0-100
   const normalizedScore = Math.max(0, Math.min(100, score || 0));
-  
+
   // Calcular progresso (0 = topo, sentido horário)
   const progress = (normalizedScore / 100) * circumference;
   const dashOffset = circumference - progress;
 
-  // Cor baseada no score
+  // Cor baseada no score - usa cores do tema
   const getScoreColor = (score: number) => {
-    if (score >= 80) return { from: '#10b981', to: '#14b8a6' }; // Emerald/Teal
-    if (score >= 60) return { from: '#3b82f6', to: '#6366f1' }; // Blue/Indigo
-    if (score >= 40) return { from: '#f59e0b', to: '#f97316' }; // Orange
-    return { from: '#ef4444', to: '#dc2626' }; // Red
+    if (score >= 80) return { from: themeColors.accentPrimary, to: themeColors.accentSecondary }; // Hot
+    if (score >= 60) return { from: themeColors.accentSecondary, to: themeColors.accentTertiary }; // Warm
+    if (score >= 40) return { from: themeColors.accentWarm, to: themeColors.accentTertiary }; // Cool
+    return { from: themeColors.accentAlert, to: themeColors.accentWarm }; // Cold
   };
 
   const colors = getScoreColor(normalizedScore);
@@ -72,9 +76,8 @@ export default function LeadScoreGauge({
             cy={center}
             r={radius}
             fill="none"
-            stroke="currentColor"
+            stroke={themeColors.border}
             strokeWidth={stroke}
-            className="text-neutral-800"
           />
 
           {/* Progress circle with gradient */}
@@ -113,7 +116,7 @@ export default function LeadScoreGauge({
               {Math.round(normalizedScore)}
             </div>
             {showLabel && size !== 'sm' && (
-              <div className="text-xs text-gray-400 mt-1">score</div>
+              <div className="text-xs text-[var(--text-2)] mt-1">score</div>
             )}
           </div>
         </div>
