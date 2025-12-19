@@ -125,6 +125,12 @@ export default function AIAssistant() {
     }
   }, [ttsEnabled])
 
+  // Autofocus suave (enterprise UX)
+  useEffect(() => {
+    const t = window.setTimeout(() => textareaRef.current?.focus(), 140)
+    return () => window.clearTimeout(t)
+  }, [])
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
@@ -489,6 +495,12 @@ export default function AIAssistant() {
     [handleSend]
   )
 
+  // Quick prompts (enterprise)
+  const applyPrompt = useCallback((text: string) => {
+    setInput(text)
+    window.setTimeout(() => textareaRef.current?.focus(), 0)
+  }, [])
+
   const openOrgSelector = () => navigate('/select-organization')
   const goBack = () => navigate(-1)
 
@@ -732,6 +744,32 @@ export default function AIAssistant() {
               )}
 
               <div ref={messagesEndRef} />
+            </div>
+          </div>
+
+          {/* Quick prompts */}
+          <div className="border-t px-4 pb-3 pt-4 md:px-6" style={{ borderColor: 'color-mix(in oklab, var(--foreground, #fff) 10%, transparent)' }}>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Resumir pipeline', text: 'Resuma o pipeline de vendas e indique gargalos.' },
+                { label: 'Priorizar leads', text: 'Priorize os leads com maior probabilidade de conversão e explique o critério.' },
+                { label: 'Próximos passos', text: 'Gere próximos passos operacionais para hoje, com checklist.' },
+                { label: 'Diagnóstico', text: 'Faça um diagnóstico rápido de conversão e sugira 3 melhorias.' },
+              ].map(p => (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => applyPrompt(p.text)}
+                  className="rounded-full border px-3 py-1 text-xs font-semibold transition hover:opacity-90 md:text-sm"
+                  style={{
+                    borderColor: 'color-mix(in oklab, var(--foreground, #fff) 14%, transparent)',
+                    background: 'color-mix(in oklab, var(--surface, var(--background)) 70%, transparent)',
+                    color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)',
+                  }}
+                >
+                  {p.label}
+                </button>
+              ))}
             </div>
           </div>
 
