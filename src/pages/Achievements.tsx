@@ -1,326 +1,234 @@
 // src/pages/Achievements.tsx
-// 100/100 STYLUS S+ — ALSHAM 360° PRIMA EDITION
-// A página de Achievements mais sofisticada do mundo
+// ALSHAM 360° PRIMA — HALL OF GLORY v∞
+// O trono onde lendas são forjadas e imortalizadas
+// 100% tema dinâmico • Proporções divinas • Animações supremas • Poder absoluto
 
-import React, { useState, useEffect, useMemo, useRef, Suspense, lazy } from 'react'
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion'
-import { createSupremePage } from '@/components/SupremePageFactory'
-import { supremeConfigs } from './supremeConfigs'
-import { useTheme } from '@/hooks/useTheme'
-import { useAnalytics } from '@/hooks/useAnalytics'
-import confetti from 'canvas-confetti'
-import useSound from 'use-sound'
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Trophy, Star, Zap, Medal, Crown, Sparkles, Lock, CheckCircle, Flame, Share2, Download, Gift,
-  TrendingUp, Award, Hexagon, ChevronRight, Globe, Users, Target
-} from 'lucide-react'
+  Trophy, Star, Zap, Medal, Crown, Sparkles, Lock, CheckCircle2, Flame,
+  TrendingUp, Award
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 
-// Lazy-load dos componentes pesados
-const NeuralGraph = lazy(() => import('@/components/visualizations/NeuralGraph').then(m => ({ default: m.NeuralGraph || m.default })))
-const ReplayDebugger = lazy(() => import('@/components/dev/ReplayDebugger').then(m => ({ default: m.ReplayDebugger || m.default })))
-
-// --- Types ---
 interface Badge {
-  id: string
-  name: string
-  description: string
-  icon: React.ReactNode
-  rarity: 'common' | 'rare' | 'epic' | 'legendary'
-  unlocked: boolean
-  progress: number // 0-100
-  xp_reward: number
-  unlocked_at?: string
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary' | 'divine';
+  unlocked: boolean;
+  progress: number;
+  xp_reward: number;
+  unlocked_at?: string;
 }
 
 interface UserRank {
-  rank_name: string
-  current_xp: number
-  next_rank_xp: number
-  global_position: number
-  weekly_change: number
+  rank_name: string;
+  current_xp: number;
+  next_rank_xp: number;
+  global_position: number;
+  weekly_change: number;
 }
 
-// --- Mock data (substitua por Supabase real) ---
 const ACHIEVEMENTS: Badge[] = [
-  { id: '1', name: "Bug Hunter", description: "Resolveu 50 bugs críticos sem reabertura.", icon: <Zap className="w-12 h-12" />, rarity: 'legendary', unlocked: true, progress: 100, xp_reward: 5000, unlocked_at: '2025-11-15' },
-  { id: '2', name: "Pipeline Master", description: "Deployou em produção na sexta sem crash.", icon: <Crown className="w-12 h-12" />, rarity: 'epic', unlocked: true, progress: 100, xp_reward: 2500, unlocked_at: '2025-12-01' },
-  { id: '3', name: "Early Bird", description: "Primeiro commit antes das 8h por 5 dias seguidos.", icon: <Star className="w-12 h-12" />, rarity: 'rare', unlocked: true, progress: 100, xp_reward: 500, unlocked_at: '2025-12-05' },
-  { id: '4', name: "Code Poet", description: "Escreveu documentação que alguém realmente leu.", icon: <Medal className="w-12 h-12" />, rarity: 'rare', unlocked: false, progress: 65, xp_reward: 1000 },
-  { id: '5', name: "Sales Shark", description: "Fechou 3 deals acima de $50k em um mês.", icon: <Trophy className="w-12 h-12" />, rarity: 'legendary', unlocked: false, progress: 20, xp_reward: 10000 },
-  { id: '6', name: "AI Whisperer", description: "Conseguiu 100% de acerto em prompts críticos.", icon: <Sparkles className="w-12 h-12" />, rarity: 'epic', unlocked: false, progress: 0, xp_reward: 7500 },
-]
+  { id: '1', name: "Bug Slayer Supremo", description: "Eliminou 100 bugs críticos sem misericórdia.", icon: <Zap className="w-20 h-20" />, rarity: 'legendary', unlocked: true, progress: 100, xp_reward: 10000, unlocked_at: '2025-11-20' },
+  { id: '2', name: "Pipeline Divine", description: "Deploy imperial sem falha por 30 dias consecutivos.", icon: <Crown className="w-20 h-20" />, rarity: 'divine', unlocked: true, progress: 100, xp_reward: 25000, unlocked_at: '2025-12-01' },
+  { id: '3', name: "Early Riser", description: "Primeiro commit antes das 7h por 15 dias.", icon: <Star className="w-20 h-20" />, rarity: 'epic', unlocked: true, progress: 100, xp_reward: 5000, unlocked_at: '2025-12-10' },
+  { id: '4', name: "Code Poet", description: "Documentação lida e elogiada por 10+ devs.", icon: <Medal className="w-20 h-20" />, rarity: 'rare', unlocked: false, progress: 78, xp_reward: 3000 },
+  { id: '5', name: "Sales God", description: "Fechou 5 deals > R$ 500k em um trimestre.", icon: <Trophy className="w-20 h-20" />, rarity: 'divine', unlocked: false, progress: 45, xp_reward: 50000 },
+  { id: '6', name: "AI Sovereign", description: "100% de acerto em prompts complexos com Oraculum.", icon: <Sparkles className="w-20 h-20" />, rarity: 'legendary', unlocked: false, progress: 12, xp_reward: 15000 },
+];
 
-// --- Componente Holográfico 3D Tilt ---
-const HolographicCard = ({ badge, onClick }: { badge: Badge; onClick: () => void }) => {
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const rotateX = useTransform(y, [-100, 100], [12, -12])
-  const rotateY = useTransform(x, [-100, 100], [-12, 12])
-  const spring = { damping: 20, stiffness: 300 }
-  const rotateXSpring = useSpring(rotateX, spring)
-  const rotateYSpring = useSpring(rotateY, spring)
+const RARITY_GLOW = {
+  common: 'shadow-gray-500/30',
+  rare: 'shadow-cyan-500/50',
+  epic: 'shadow-purple-500/60',
+  legendary: 'shadow-amber-500/70',
+  divine: 'shadow-red-600/80 animate-pulse'
+};
 
-  const rarityColors = {
-    common: 'from-slate-600 to-slate-800 border-slate-600',
-    rare: 'from-blue-500 to-cyan-400 border-cyan-400',
-    epic: 'from-purple-600 to-pink-500 border-pink-400',
-    legendary: 'from-amber-400 to-yellow-600 border-yellow-300 shadow-[0_0_40px_rgba(251,191,36,0.5)]',
-  }
-
-  const isLocked = !badge.unlocked
+const HolographicCard = ({ badge }: { badge: Badge }) => {
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
-      style={{ rotateX: rotateXSpring, rotateY: rotateYSpring, transformStyle: "preserve-3d" }}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect()
-        const xPct = (e.clientX - rect.left) / rect.width - 0.5
-        const yPct = (e.clientY - rect.top) / rect.height - 0.5
-        x.set(xPct * 200)
-        y.set(yPct * 200)
-      }}
-      onMouseLeave={() => { x.set(0); y.set(0) }}
-      onClick={!isLocked ? onClick : undefined}
-      className={`relative h-80 w-full rounded-3xl p-[2px] cursor-pointer group perspective-1500 ${isLocked ? 'opacity-70 grayscale' : ''}`}
+      initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
+      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+      whileHover={{ scale: 1.08, y: -20 }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      className="relative cursor-pointer"
     >
-      {/* Borda animada */}
-      <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${rarityColors[badge.rarity]} opacity-20 group-hover:opacity-100 transition-opacity duration-500`} />
+      {/* Glow dinâmico por raridade */}
+      <motion.div
+        animate={{ opacity: hovered ? 1 : 0.6 }}
+        className={`absolute -inset-8 rounded-3xl blur-3xl bg-gradient-to-br ${RARITY_GLOW[badge.rarity]}`}
+      />
 
-      {/* Card interno */}
-      <div className="relative h-full w-full bg-[var(--surface-glass)] backdrop-blur-2xl rounded-3xl p-8 flex flex-col items-center justify-between border border-[var(--border)] overflow-hidden">
-        {/* Shine effect */}
-        {!isLocked && (
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none" />
-        )}
+      <div className={`relative h-96 rounded-3xl bg-[var(--surface)]/70 backdrop-blur-2xl border-4 border-[var(--border)] p-10 flex flex-col items-center justify-between overflow-hidden ${!badge.unlocked && 'grayscale opacity-80'}`}>
+        {/* Ícone com animação */}
+        <motion.div
+          animate={{ rotate: hovered ? 360 : 0 }}
+          transition={{ duration: 20, repeat: hovered ? Infinity : 0, ease: "linear" }}
+          className="mt-8"
+        >
+          {badge.unlocked ? badge.icon : <Lock className="w-20 h-20 text-[var(--text)]/50" />}
+        </motion.div>
 
-        {/* Ícone com glow */}
-        <div className="relative mt-4">
-          {!isLocked && <div className={`absolute inset-0 blur-3xl opacity-60 bg-gradient-to-r ${rarityColors[badge.rarity]}`} />}
-          <div className="relative z-10">
-            {isLocked ? <Lock className="w-24 h-24 text-[var(--text-muted)]" /> : badge.icon}
-          </div>
+        <div className="text-center">
+          <h3 className="text-3xl font-black text-[var(--text)] mb-4">{badge.name}</h3>
+          <p className="text-lg text-[var(--text)]/70 px-6">{badge.description}</p>
         </div>
 
-        {/* Conteúdo */}
-        <div className="text-center z-10">
-          <h3 className="font-bold text-2xl mb-2">{badge.name}</h3>
-          <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{badge.description}</p>
-        </div>
-
-        {/* Progresso ou data */}
-        <div className="w-full z-10">
-          {isLocked ? (
-            <div className="w-full bg-black/40 h-3 rounded-full overflow-hidden">
-              <div className="bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] h-full transition-all duration-1000" style={{ width: `${badge.progress}%` }} />
+        {/* Progresso ou XP */}
+        <div className="w-full mt-8">
+          {badge.unlocked ? (
+            <div className="flex items-center justify-center gap-4 text-emerald-400">
+              <CheckCircle2 className="w-10 h-10" />
+              <p className="text-2xl font-black">+{badge.xp_reward} XP</p>
             </div>
           ) : (
-            <div className="flex justify-center items-center gap-2 text-sm font-bold text-[var(--status-ok)]">
-              <CheckCircle className="w-5 h-5" />
-              Unlocked {badge.unlocked_at ? `— ${new Date(badge.unlocked_at).toLocaleDateString()}` : ''}
+            <div className="w-full bg-[var(--background)]/50 rounded-full h-8 overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${badge.progress}%` }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="h-full bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)]"
+              />
+              <p className="text-center text-xl font-black text-[var(--text)] mt-4">{badge.progress}%</p>
             </div>
           )}
+        </div>
+
+        {/* Raridade badge */}
+        <div className="mt-6 px-8 py-4 rounded-full bg-[var(--background)]/50 border border-[var(--border)]">
+          <p className={`text-2xl font-black text-[var(--accent-1)]`}>
+            {badge.rarity.toUpperCase()}
+          </p>
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-// --- Painel de Nível (Circular Progress) ---
-const LevelDashboard = ({ rank }: { rank: UserRank }) => {
-  const progress = (rank.current_xp / rank.next_rank_xp) * 100
-  const [playLevelUp] = useSound('/sounds/level-up.mp3', { volume: 0.4 })
-
-  useEffect(() => {
-    if (progress >= 100) playLevelUp()
-  }, [progress, playLevelUp])
+const LevelOrb = ({ rank }: { rank: UserRank }) => {
+  const progress = (rank.current_xp / rank.next_rank_xp) * 100;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] border border-[var(--border)] p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-      {/* Círculo de XP */}
-      <div className="relative w-44 h-44 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90">
-          <circle cx="88" cy="88" r="82" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-[var(--surface-3)]" />
-          <motion.circle
-            cx="88" cy="88" r="82"
-            stroke="url(#gradient-xp)"
-            strokeWidth="12"
-            fill="transparent"
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: progress / 100 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-          />
-          <defs>
-            <linearGradient id="gradient-xp" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--color-primary-from)" />
-              <stop offset="100%" stopColor="var(--color-primary-to)" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-black text-white">{Math.floor(progress)}%</span>
-          <span className="text-xs text-[var(--text-secondary)] uppercase">to Next Rank</span>
-        </div>
-      </div>
+    <div className="relative w-80 h-80 mx-auto">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 rounded-full border-8 border-[var(--accent-1)]/20"
+      />
 
-      <div className="flex flex-col">
-        <h2 className="text-sm font-bold text-[var(--color-primary-from)] uppercase tracking-widest mb-1">Current Rank</h2>
-        <h1 className="text-6xl md:text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tighter drop-shadow-lg">
-          {rank.rank_name}
-        </h1>
-        <div className="flex items-center gap-6 mt-6 text-sm">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-green-400" />
-            <span className="text-green-400 font-bold">Top {rank.global_position}%</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Flame className="w-6 h-6 text-orange-500" />
-            <span className="text-orange-500 font-bold">14 Days Streak</span>
-          </div>
+      <motion.div
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 4, repeat: Infinity }}
+        className="absolute inset-8 rounded-full bg-gradient-to-br from-[var(--accent-1)]/20 to-[var(--accent-2)]/20 blur-3xl"
+      />
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <h2 className="text-6xl font-black text-[var(--text)] mb-4">{rank.rank_name}</h2>
+        <p className="text-8xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
+          {Math.floor(progress)}%
+        </p>
+        <p className="text-2xl text-[var(--text)]/70 mt-4">para próximo nível</p>
+        <div className="flex items-center gap-8 mt-8">
+          <p className="text-3xl text-emerald-400">Top {rank.global_position}% global</p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-// --- Página Principal ---
-const AchievementsPage = () => {
-  const { theme, setTheme } = useTheme()
-  const { logEvent } = useAnalytics()
-  const [activeTab, setActiveTab] = useState<'badges' | 'leaderboard' | 'rewards'>('badges')
-  const [achievements, setAchievements] = useState<Badge[]>(ACHIEVEMENTS)
+export default function Achievements() {
+  const [achievements] = useState(ACHIEVEMENTS);
+  const [activeTab, setActiveTab] = useState<'badges' | 'leaderboard'>('badges');
 
-  // Simulação de progresso
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setAchievements(prev => prev.map(a => {
-        if (!a.unlocked && a.id === 'first-replay') {
-          return { ...a, progress: Math.min(100, a.progress + 2) }
-        }
-        return a
-      }))
-    }, 3000)
-    return () => clearInterval(timer)
-  }, [])
-
-  // Log de abertura
-  useEffect(() => {
-    logEvent('Achievements_Opened', {
-      theme,
-      unlocked: achievements.filter(a => a.unlocked).length,
-      total: achievements.length
-    })
-  }, [logEvent, achievements, theme])
-
-  const unlockedCount = achievements.filter(a => a.unlocked).length
+  const unlockedCount = achievements.filter(a => a.unlocked).length;
+  const totalXP = achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.xp_reward, 0);
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden font-sans relative" data-theme={theme}>
-      {/* Background dinâmico */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="w-full h-full bg-gradient-to-br from-[var(--color-primary-from)] to-[var(--color-primary-to)] blur-3xl" />
-      </div>
-
-      {/* Header Hero */}
-      <header className="relative z-10 pt-12 pb-16 px-6 md:px-12 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12"
-        >
-          <div>
-            <h1 className="text-5xl md:text-xl md:text-2xl lg:text-3xl font-black tracking-tighter bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] bg-clip-text text-transparent">
-              Hall of Glory
-            </h1>
-            <p className="text-xl text-[var(--text-secondary)] mt-3">
-              Sua jornada de lenda na Synapse
-            </p>
-          </div>
-
-          <div className="flex items-center gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-black">{unlockedCount}</div>
-              <div className="text-sm text-[var(--text-secondary)]">Desbloqueadas</div>
+    <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">
+      {/* TOOLBAR SUPERIOR */}
+      <div className="border-b border-[var(--border)] bg-[var(--surface)]/60 backdrop-blur-md p-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-6xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
+            HALL OF GLORY
+          </h1>
+          <p className="text-3xl text-[var(--text)]/70 mt-4">
+            Sua jornada de lenda no Império ALSHAM
+          </p>
+          <div className="flex gap-16 mt-8">
+            <div>
+              <p className="text-xl text-[var(--text)]/60">Desbloqueadas</p>
+              <p className="text-5xl font-black text-emerald-400">{unlockedCount}/{achievements.length}</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-black">{achievements.length}</div>
-              <div className="text-sm text-[var(--text-secondary)]">Total</div>
+            <div>
+              <p className="text-xl text-[var(--text)]/60">XP Total</p>
+              <p className="text-5xl font-black text-[var(--accent-1)]">{totalXP.toLocaleString()}</p>
             </div>
           </div>
-        </motion.div>
-
-        {/* Level Dashboard */}
-        <LevelDashboard rank={{
-          rank_name: "Cyber Architect",
-          current_xp: 8450,
-          next_rank_xp: 10000,
-          global_position: 4,
-          weekly_change: 12
-        }} />
-      </header>
-
-      {/* Tabs */}
-      <div className="sticky top-0 z-50 bg-[var(--background)]/90 backdrop-blur-xl border-b border-[var(--border)]">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex gap-12">
-          {['badges', 'leaderboard', 'rewards'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as any)}
-              className={`py-6 text-sm font-bold uppercase tracking-widest border-b-2 transition-all ${
-                activeTab === tab
-                  ? 'border-[var(--color-primary-from)] text-[var(--text-primary)]'
-                  : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
         </div>
       </div>
 
-      {/* Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12">
-        <AnimatePresence mode="wait">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 overflow-auto p-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Level Orb Central */}
+          <div className="mb-20">
+            <LevelOrb rank={{
+              rank_name: "Cyber Sovereign",
+              current_xp: 42850,
+              next_rank_xp: 50000,
+              global_position: 3,
+              weekly_change: 18
+            }} />
+          </div>
+
+          {/* Tabs */}
+          <div className="flex justify-center gap-12 mb-16">
+            {['badges', 'leaderboard'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={`px-12 py-6 text-3xl font-black uppercase tracking-widest rounded-2xl transition-all ${activeTab === tab ? 'bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] text-[var(--background)]' : 'bg-[var(--surface)]/50 text-[var(--text)]/70 hover:text-[var(--text)]'}`}
+              >
+                {tab === 'badges' ? 'ACHIEVEMENTS' : 'LEADERBOARD'}
+              </button>
+            ))}
+          </div>
+
+          {/* Badges Grid */}
           {activeTab === 'badges' && (
-            <motion.div
-              key="badges"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {achievements.map(badge => (
-                <HolographicCard key={badge.id} badge={badge} onClick={() => console.log('Detalhes:', badge.name)} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {achievements.map((badge, i) => (
+                <HolographicCard key={badge.id} badge={badge} />
               ))}
-            </motion.div>
+            </div>
           )}
 
+          {/* Leaderboard Placeholder */}
           {activeTab === 'leaderboard' && (
-            <motion.div
-              key="leaderboard"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-[var(--surface-glass)] rounded-3xl border border-[var(--border)] overflow-hidden p-8 text-center"
-            >
-              <h2 className="text-3xl font-bold mb-6">Global Elite League</h2>
-              <div className="max-w-2xl mx-auto font-mono text-left space-y-4">
-                <div className="p-4 bg-black/30 rounded-xl">
-                  1. Sarah Connor [Cyberdyne] – 99,420 XP
+            <div className="bg-[var(--surface)]/70 backdrop-blur-xl rounded-3xl border border-[var(--border)] p-16 text-center">
+              <h2 className="text-5xl font-black text-[var(--text)] mb-12">GLOBAL ELITE LEAGUE</h2>
+              <div className="space-y-8 max-w-2xl mx-auto">
+                <div className="p-8 bg-gradient-to-r from-yellow-600/30 to-amber-600/30 rounded-3xl border border-yellow-500/50">
+                  <p className="text-4xl font-black text-yellow-400">1. Neo Anderson — 142,000 XP</p>
                 </div>
-                <div className="p-4 bg-black/30 rounded-xl">
-                  2. Neo Anderson [Matrix] – 98,000 XP
+                <div className="p-8 bg-gradient-to-r from-gray-600/30 to-gray-500/30 rounded-3xl border border-gray-400/50">
+                  <p className="text-4xl font-black text-gray-300">2. Sarah Connor — 138,500 XP</p>
                 </div>
-                <div className="p-4 bg-[var(--color-primary-from)]/20 rounded-xl border border-[var(--color-primary-from)]">
-                  3. YOU – 8,450 XP
+                <div className="p-8 bg-gradient-to-r from-[var(--accent-1)]/40 to-[var(--accent-2)]/40 rounded-3xl border border-[var(--accent-1)]">
+                  <p className="text-4xl font-black text-[var(--accent-1)]">3. VOCÊ — 42,850 XP</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-      </main>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
-
-export default createSupremePage(supremeConfigs['Achievements'], AchievementsPage)
