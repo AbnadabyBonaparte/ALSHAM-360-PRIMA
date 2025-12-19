@@ -32,9 +32,10 @@ function detectSavedTheme(): ThemeKey {
 
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
+    console.log('🔎 detectSavedTheme:', { saved, exists: saved && themes[saved as ThemeKey] })
     if (saved && themes[saved as ThemeKey]) return saved as ThemeKey
-  } catch {
-    // ignore
+  } catch (error) {
+    console.error('❌ detectSavedTheme error:', error)
   }
 
   return defaultTheme
@@ -101,6 +102,7 @@ export function useTheme(): UseThemeReturn {
   // Initial theme detection
   useEffect(() => {
     const savedTheme = detectSavedTheme()
+    console.log('🔍 Initial theme detection:', { savedTheme, defaultTheme })
     setCurrentTheme(savedTheme)
     applyThemeToDOM(savedTheme)
   }, [])
@@ -112,14 +114,17 @@ export function useTheme(): UseThemeReturn {
 
   const setTheme = useCallback(
     (newTheme: ThemeKey) => {
+      console.log('🎨 setTheme called:', { newTheme, currentTheme, blocked: newTheme === currentTheme })
+
       if (!themes[newTheme] || newTheme === currentTheme) return
       if (typeof document === 'undefined') return
 
       // Persist
       try {
         localStorage.setItem(STORAGE_KEY, newTheme)
-      } catch {
-        // ignore
+        console.log('💾 localStorage.setItem:', newTheme)
+      } catch (error) {
+        console.error('❌ localStorage.setItem failed:', error)
       }
 
       // Start transition
@@ -130,6 +135,7 @@ export function useTheme(): UseThemeReturn {
 
       // Atualiza tema (dispara applyThemeToDOM pelo effect)
       setCurrentTheme(newTheme)
+      console.log('✅ setCurrentTheme called:', newTheme)
 
       // Clear timers
       if (transitionTimerRef.current) {
