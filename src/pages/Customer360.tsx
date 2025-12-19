@@ -13,6 +13,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTheme } from '@/hooks/useTheme';
 
 const GlassPanel = ({ children, className = "" }: any) => (
   <div className={`relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--background)]/40 backdrop-blur-2xl ${className}`}>
@@ -21,9 +22,9 @@ const GlassPanel = ({ children, className = "" }: any) => (
   </div>
 );
 
-const ResonanceOrb = ({ score }: { score: number }) => {
+const ResonanceOrb = ({ score, themeColors }: { score: number; themeColors: any }) => {
   const mood = score > 85 ? 'divine' : score > 70 ? 'hot' : score > 50 ? 'warm' : 'cold';
-  const color = mood === 'divine' ? '#facc15' : mood === 'hot' ? '#f97316' : mood === 'warm' ? '#60a5fa' : '#94a3b8';
+  const color = mood === 'divine' ? themeColors.accentWarm : mood === 'hot' ? themeColors.accentWarm : mood === 'warm' ? themeColors.accentSecondary : themeColors.textSecondary;
 
   return (
     <div className="relative w-48 h-48 grid place-content-center">
@@ -48,6 +49,8 @@ const ResonanceOrb = ({ score }: { score: number }) => {
 };
 
 export default function Customer360Real() {
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
   const { id } = useParams();
   const [lead, setLead] = useState<any>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
@@ -172,7 +175,7 @@ export default function Customer360Real() {
           <div className="lg:col-span-5 space-y-10">
             <GlassPanel className="p-12 text-center">
               <h2 className="text-3xl font-black text-[var(--text-primary)] mb-10">Saúde Neural do Lead</h2>
-              <ResonanceOrb score={lead.score} />
+              <ResonanceOrb score={lead.score} themeColors={themeColors} />
               {lead.health === 'divine' && <p className="mt-8 text-4xl font-black text-yellow-400">DEUS DO PIPELINE</p>}
             </GlassPanel>
 

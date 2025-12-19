@@ -140,7 +140,7 @@ export default function SustainabilityPage() {
             <SunIcon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.energiaRenovavel}%</p>
             <p className="text-gray-400 mt-2">Energia Renovável</p>
-            <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="mt-4 h-2 bg-[var(--surface)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics?.energiaRenovavel}%` }}
@@ -156,7 +156,7 @@ export default function SustainabilityPage() {
             <ArrowPathIcon className="w-16 h-16 text-green-400 mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.reducaoResiduos}%</p>
             <p className="text-gray-400 mt-2">Redução Resíduos</p>
-            <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="mt-4 h-2 bg-[var(--surface)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics?.reducaoResiduos}%` }}
@@ -172,7 +172,7 @@ export default function SustainabilityPage() {
             <BeakerIcon className="w-16 h-16 text-blue-400 mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.aguaReciclada}%</p>
             <p className="text-gray-400 mt-2">Água Reciclada</p>
-            <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="mt-4 h-2 bg-[var(--surface)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics?.aguaReciclada}%` }}
@@ -231,8 +231,8 @@ export default function SustainabilityPage() {
                       {projeto.tipo}
                     </span>
                     <span className={`px-3 py-1 rounded-full text-sm ${
-                      projeto.status === 'concluido' ? 'bg-green-500/20 text-green-400' :
-                      'bg-blue-500/20 text-blue-400'
+                      projeto.status === 'concluido' ? 'bg-[var(--accent-1)]/20 text-[var(--accent-1)]' :
+                      'bg-[var(--accent-2)]/20 text-[var(--accent-2)]'
                     }`}>
                       {projeto.status}
                     </span>

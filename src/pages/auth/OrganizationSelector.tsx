@@ -89,11 +89,11 @@ export const OrganizationSelector: React.FC = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                className="mb-8 p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/20 rounded-xl"
               >
                 <div className="flex items-center space-x-3">
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                  <p className="text-red-300 text-sm">{error}</p>
+                  <AlertCircle className="w-5 h-5 text-[var(--accent-alert)] flex-shrink-0" />
+                  <p className="text-[var(--accent-alert)] text-sm">{error}</p>
                 </div>
               </motion.div>
             )}

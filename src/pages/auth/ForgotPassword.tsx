@@ -37,11 +37,11 @@ export const ForgotPassword: React.FC = () => {
 
         {sent ? (
           <div className="text-center space-y-4">
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-600 text-sm">
+            <div className="p-4 bg-[var(--accent-1)]/10 border border-[var(--accent-1)]/30 rounded-lg">
+              <p className="text-[var(--accent-1)] text-sm">
                 Email enviado! Verifique sua caixa de entrada.
               </p>
-              <p className="text-green-700/70 text-xs mt-2">
+              <p className="text-[var(--accent-1)]/70 text-xs mt-2">
                 Abra o link do email para definir uma nova senha.
               </p>
             </div>
@@ -56,8 +56,8 @@ export const ForgotPassword: React.FC = () => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{error}</p>
+              <div className="p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/30 rounded-lg">
+                <p className="text-[var(--accent-alert)] text-sm">{error}</p>
               </div>
             )}
 

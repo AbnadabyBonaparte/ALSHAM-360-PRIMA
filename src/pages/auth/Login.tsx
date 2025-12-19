@@ -45,16 +45,16 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl p-10 border border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
+      <div className="max-w-md w-full bg-[var(--surface)] rounded-2xl shadow-2xl p-10 border border-[var(--border)]">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-4">ALSHAM 360° PRIMA</h1>
-          <p className="text-gray-400 text-lg">Entre com sua conta admin</p>
+          <p className="text-[var(--text-2)] text-lg">Entre com sua conta admin</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/50 border border-red-800 rounded-lg">
-            <p className="text-red-300 text-center">{error}</p>
+          <div className="mb-6 p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/30 rounded-lg">
+            <p className="text-[var(--accent-alert)] text-center">{error}</p>
           </div>
         )}
 
@@ -64,7 +64,7 @@ export const Login: React.FC = () => {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            className="w-full px-4 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-white placeholder-[var(--text-2)] focus:outline-none focus:border-[var(--accent-2)]"
             placeholder="Email"
             required
           />
@@ -73,21 +73,21 @@ export const Login: React.FC = () => {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            className="w-full px-4 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-white placeholder-[var(--text-2)] focus:outline-none focus:border-[var(--accent-2)]"
             placeholder="Senha"
             required
           />
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition disabled:opacity-70"
+            className="w-full bg-[var(--accent-2)] hover:bg-[var(--accent-2)]/80 text-white font-bold py-3 rounded-lg transition disabled:opacity-70"
           >
             {submitting ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
 
         <div className="mt-8 text-center">
-          <a href="/forgot-password" className="text-gray-400 hover:text-white text-sm underline">
+          <a href="/forgot-password" className="text-[var(--text-2)] hover:text-white text-sm underline">
             Esqueci minha senha
           </a>
         </div>

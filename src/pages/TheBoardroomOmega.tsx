@@ -22,8 +22,11 @@ import { useExecutiveMetrics, BOARDROOM_RULES } from '@/hooks/useExecutiveMetric
 import KpiCard from '@/components/boardroom/KpiCard';
 import SentimentOrb from '@/components/boardroom/SentimentOrb';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function TheBoardroomOmega() {
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
   const { metrics, departments, loading } = useExecutiveMetrics();
   const [era, setEra] = useState<'EXPANSÃO' | 'SILÍCIO VIVO' | 'DOMÍNIO TOTAL' | 'ASCENSÃO'>('EXPANSÃO');
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -149,32 +152,32 @@ export default function TheBoardroomOmega() {
           </div>
 
           {/* GRÁFICO VIVO */}
-          <motion.div 
+          <motion.div
             className="bg-[var(--background)]/40 backdrop-blur-3xl border-8 border-[var(--border)] rounded-4xl p-24 mb-32"
-            whileHover={{ borderColor: '#10b981' }}
+            whileHover={{ borderColor: themeColors.accentPrimary }}
           >
             <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] mb-20 text-center">TRAJETÓRIA DO IMPÉRIO</h2>
             <ResponsiveContainer width="100%" height={700}>
               <AreaChart data={metrics.revenueTrend}>
                 <defs>
                   <linearGradient id="omegaRev">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9}/>
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0}/>
+                    <stop offset="0%" stopColor={themeColors.accentPrimary} stopOpacity={0.9}/>
+                    <stop offset="100%" stopColor={themeColors.accentPrimary} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <Area 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#10b981" 
-                  strokeWidth={12} 
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke={themeColors.accentPrimary}
+                  strokeWidth={12}
                   fill="url(#omegaRev)"
-                  dot={{ fill: '#10b981', r: 8 }}
-                  activeDot={{ r: 16, stroke: '#fff', strokeWidth: 4 }}
+                  dot={{ fill: themeColors.accentPrimary, r: 8 }}
+                  activeDot={{ r: 16, stroke: themeColors.textPrimary, strokeWidth: 4 }}
                 />
-                <XAxis dataKey="month" stroke="#666" />
-                <YAxis stroke="#666" tickFormatter={v => `${v/1000}M`} />
-                <Tooltip 
-                  contentStyle={{ background: 'rgba(0,0,0,0.95)', border: '2px solid #10b981' }}
+                <XAxis dataKey="month" stroke={themeColors.textSecondary} />
+                <YAxis stroke={themeColors.textSecondary} tickFormatter={v => `${v/1000}M`} />
+                <Tooltip
+                  contentStyle={{ background: themeColors.surface, border: `2px solid ${themeColors.accentPrimary}` }}
                   formatter={(v: number) => `R$ ${v.toLocaleString('pt-BR')}`}
                 />
               </AreaChart>

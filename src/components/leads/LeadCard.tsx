@@ -40,15 +40,15 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
 
   const getStatusColor = (status: string) => {
     const colors = {
-      new: 'bg-blue-500',
-      contacted: 'bg-purple-500',
-      qualified: 'bg-emerald-500',
-      proposal: 'bg-orange-500',
-      negotiation: 'bg-cyan-500',
-      won: 'bg-green-500',
-      lost: 'bg-red-500'
+      new: 'bg-[var(--accent-2)]',
+      contacted: 'bg-[var(--accent-3)]',
+      qualified: 'bg-[var(--accent-1)]',
+      proposal: 'bg-[var(--accent-warm)]',
+      negotiation: 'bg-[var(--accent-2)]',
+      won: 'bg-[var(--accent-1)]',
+      lost: 'bg-[var(--accent-alert)]'
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-500';
+    return colors[status as keyof typeof colors] || 'bg-[var(--surface)]';
   };
 
   const getInitials = () => {
@@ -176,7 +176,7 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
       <div className="flex items-center gap-1.5">
         <button
           onClick={handleCall}
-          className="flex-1 px-2 py-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-xs font-semibold hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-2 py-1.5 bg-[var(--accent-2)]/10 border border-[var(--accent-2)]/30 text-[var(--accent-2)] rounded-lg text-xs font-semibold hover:bg-[var(--accent-2)]/20 transition-colors flex items-center justify-center gap-1"
         >
           <Phone className="w-3 h-3" />
           Ligar
@@ -190,7 +190,7 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
         </button>
         <button
           onClick={handleEmail}
-          className="flex-1 px-2 py-1.5 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-lg text-xs font-semibold hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-2 py-1.5 bg-[var(--accent-3)]/10 border border-[var(--accent-3)]/30 text-[var(--accent-3)] rounded-lg text-xs font-semibold hover:bg-[var(--accent-3)]/20 transition-colors flex items-center justify-center gap-1"
         >
           <Mail className="w-3 h-3" />
           Email

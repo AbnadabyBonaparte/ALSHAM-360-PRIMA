@@ -79,13 +79,13 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0b1220] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
         <h1 className="text-xl font-extrabold text-white">Redefinir senha</h1>
         <p className="mt-1 text-sm text-white/70">Defina uma nova senha para sua conta.</p>
 
         {err && (
-          <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+          <div className="mt-4 rounded-xl border border-[var(--accent-alert)]/30 bg-[var(--accent-alert)]/10 p-3 text-sm text-[var(--accent-alert)]">
             <div className="font-semibold">Não foi possível concluir</div>
             <div className="mt-1">{err}</div>
             <div className="mt-3 flex gap-2">
@@ -135,7 +135,7 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={!ready || loading}
-            className="w-full rounded-xl bg-blue-600 px-4 py-3 font-bold text-white hover:bg-blue-700 disabled:opacity-60"
+            className="w-full rounded-xl bg-[var(--accent-2)] px-4 py-3 font-bold text-white hover:bg-[var(--accent-2)]/80 disabled:opacity-60"
           >
             {loading ? 'Salvando...' : 'Salvar nova senha'}
           </button>

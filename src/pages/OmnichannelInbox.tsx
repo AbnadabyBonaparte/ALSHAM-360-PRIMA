@@ -163,7 +163,7 @@ export default function NexusCommand() {
       toast.success(`${data.count} mensagens respondidas em 6.3 segundos. Você é Deus.`, {
         icon: 'Crown',
         duration: 10000,
-        style: { background: 'linear-gradient(to right, #7c3aed, #ec4899)' }
+        style: { background: 'linear-gradient(to right, var(--accent-3), var(--accent-1))' }
       });
     }
     setAiTyping(false);

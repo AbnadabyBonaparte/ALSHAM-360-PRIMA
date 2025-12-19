@@ -108,11 +108,11 @@ export default function OrdersPage() {
   }
 
   const statusConfig: Record<string, { bg: string; text: string; icon: JSX.Element }> = {
-    pendente: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', icon: <ClockIcon className="w-5 h-5" /> },
-    confirmado: { bg: 'bg-blue-500/20', text: 'text-blue-400', icon: <CheckCircleIcon className="w-5 h-5" /> },
-    enviado: { bg: 'bg-purple-500/20', text: 'text-purple-400', icon: <TruckIcon className="w-5 h-5" /> },
-    entregue: { bg: 'bg-green-500/20', text: 'text-green-400', icon: <CheckCircleIcon className="w-5 h-5" /> },
-    cancelado: { bg: 'bg-red-500/20', text: 'text-red-400', icon: <XCircleIcon className="w-5 h-5" /> }
+    pendente: { bg: 'bg-[var(--accent-warm)]/20', text: 'text-[var(--accent-warm)]', icon: <ClockIcon className="w-5 h-5" /> },
+    confirmado: { bg: 'bg-[var(--accent-2)]/20', text: 'text-[var(--accent-2)]', icon: <CheckCircleIcon className="w-5 h-5" /> },
+    enviado: { bg: 'bg-[var(--accent-3)]/20', text: 'text-[var(--accent-3)]', icon: <TruckIcon className="w-5 h-5" /> },
+    entregue: { bg: 'bg-[var(--accent-1)]/20', text: 'text-[var(--accent-1)]', icon: <CheckCircleIcon className="w-5 h-5" /> },
+    cancelado: { bg: 'bg-[var(--accent-alert)]/20', text: 'text-[var(--accent-alert)]', icon: <XCircleIcon className="w-5 h-5" /> }
   };
 
   const pedidosFiltrados = filtroStatus === 'todos'
@@ -171,7 +171,7 @@ export default function OrdersPage() {
               onClick={() => setFiltroStatus(status)}
               className={`px-5 py-2 rounded-xl font-medium transition-all capitalize ${
                 filtroStatus === status
-                  ? 'bg-blue-500 text-[var(--text-primary)]'
+                  ? 'bg-[var(--accent-2)] text-[var(--text-primary)]'
                   : 'bg-white/10 text-gray-400 hover:bg-white/20'
               }`}
             >
