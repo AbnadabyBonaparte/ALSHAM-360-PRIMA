@@ -53,6 +53,10 @@ const COMPATIBILITY_ALIASES: Record<string, string> = {
   // Customer
   'customer-360': 'customer-360',
   customer360: 'customer-360',
+
+  // Marketing
+  ads: 'ads-manager',
+  'ads-manager': 'ads-manager',
 }
 
 /**
@@ -331,6 +335,11 @@ function bootstrapRealRoutes() {
   })
 
   // Marketing
+  registerRoute('ads-manager', () => import('../pages/AdsManager'), {
+    label: 'Ads Manager',
+    aliases: ['ads'],
+  })
+
   registerRoute('landing-builder', () => import('../pages/LandingPageBuilder'), {
     label: 'Landing Page Builder',
     aliases: ['landing-pages-builder'],

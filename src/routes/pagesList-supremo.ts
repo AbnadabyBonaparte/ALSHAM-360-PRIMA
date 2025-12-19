@@ -68,7 +68,7 @@ export const pagesListSupremo: PageDefinition[] = [
   { id: "forms", label: "Formulários", icon: "ClipboardIcon", module: "Marketing" },
   { id: "seo", label: "SEO", icon: "MagnifyingGlassIcon", module: "Marketing" },
   { id: "social", label: "Social Media", icon: "HashtagIcon", module: "Marketing" },
-  { id: "ads", label: "Ads/Media", icon: "RectangleStackIcon", module: "Marketing" },
+  { id: "ads-manager", label: "Ads Manager", icon: "RectangleStackIcon", module: "Marketing" },
   { id: "ab-testing", label: "A/B Testing", icon: "SquaresPlusIcon", module: "Marketing" },
   { id: "content-hub", label: "Content Hub", icon: "NewspaperIcon", module: "Marketing" },
   { id: "webinars", label: "Webinars/Events", icon: "VideoCameraIcon", module: "Marketing" },
