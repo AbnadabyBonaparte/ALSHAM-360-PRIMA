@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { Network, Users, GitBranch, Zap } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Node {
   id: string;
@@ -22,14 +23,16 @@ interface RelationshipNetworkProps {
   centerNodeId?: string;
 }
 
-export default function RelationshipNetwork({ 
-  nodes = [], 
+export default function RelationshipNetwork({
+  nodes = [],
   edges = [],
-  centerNodeId 
+  centerNodeId
 }: RelationshipNetworkProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredNode, setHoveredNode] = useState<Node | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const { getThemeColors } = useTheme();
+  const themeColors = getThemeColors();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -77,7 +80,13 @@ export default function RelationshipNetwork({
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
-        ctx.strokeStyle = `rgba(16, 185, 129, ${edge.strength})`;
+        // Use theme accent color with strength-based opacity
+        const edgeColor = themeColors.accentPrimary;
+        // Convert hex to rgba
+        const r = parseInt(edgeColor.slice(1, 3), 16);
+        const g = parseInt(edgeColor.slice(3, 5), 16);
+        const b = parseInt(edgeColor.slice(5, 7), 16);
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${edge.strength})`;
         ctx.lineWidth = 2 * edge.strength;
         ctx.stroke();
       });
@@ -103,8 +112,12 @@ export default function RelationshipNetwork({
         // Glow effect
         if (isCenterNode || isSelected || isHovered) {
           const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * scale * 2);
-          gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
-          gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+          const glowColor = themeColors.accentPrimary;
+          const r = parseInt(glowColor.slice(1, 3), 16);
+          const g = parseInt(glowColor.slice(3, 5), 16);
+          const b = parseInt(glowColor.slice(5, 7), 16);
+          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.3)`);
+          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
           ctx.fillStyle = gradient;
           ctx.fillRect(x - radius * 2, y - radius * 2, radius * 4, radius * 4);
         }
@@ -112,29 +125,29 @@ export default function RelationshipNetwork({
         // Node background
         ctx.beginPath();
         ctx.arc(x, y, radius * scale, 0, Math.PI * 2);
-        
+
         const nodeGradient = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
         if (isCenterNode) {
-          nodeGradient.addColorStop(0, '#10b981');
-          nodeGradient.addColorStop(1, '#14b8a6');
+          nodeGradient.addColorStop(0, themeColors.accentPrimary);
+          nodeGradient.addColorStop(1, themeColors.accentSecondary);
         } else if (node.type === 'contact') {
-          nodeGradient.addColorStop(0, '#3b82f6');
-          nodeGradient.addColorStop(1, '#8b5cf6');
+          nodeGradient.addColorStop(0, themeColors.accentSecondary);
+          nodeGradient.addColorStop(1, themeColors.accentTertiary);
         } else {
-          nodeGradient.addColorStop(0, '#6366f1');
-          nodeGradient.addColorStop(1, '#8b5cf6');
+          nodeGradient.addColorStop(0, themeColors.accentTertiary);
+          nodeGradient.addColorStop(1, themeColors.accentWarm);
         }
-        
+
         ctx.fillStyle = nodeGradient;
         ctx.fill();
 
         // Border
-        ctx.strokeStyle = isSelected || isHovered ? '#fff' : 'rgba(255,255,255,0.3)';
+        ctx.strokeStyle = isSelected || isHovered ? themeColors.textPrimary : themeColors.border;
         ctx.lineWidth = 2;
         ctx.stroke();
 
         // Label
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = themeColors.textPrimary;
         ctx.font = `${isCenterNode ? 14 : 12}px Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -153,7 +166,7 @@ export default function RelationshipNetwork({
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
     };
-  }, [nodes, edges, centerNodeId, hoveredNode, selectedNode]);
+  }, [nodes, edges, centerNodeId, hoveredNode, selectedNode, themeColors]);
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
