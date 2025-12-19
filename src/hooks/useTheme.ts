@@ -51,6 +51,13 @@ function applyThemeToDOM(themeKey: ThemeKey): void {
   const theme = getTheme(themeKey)
   const root = document.documentElement
 
+  console.log('🎨 applyThemeToDOM chamado:', {
+    themeKey,
+    themeName: theme.name,
+    isDark: theme.isDark,
+    primaryColor: theme.colors.background
+  })
+
   // 1) Fonte da verdade: atributo + color-scheme
   root.setAttribute('data-theme', themeKey)
   root.style.colorScheme = theme.isDark ? 'dark' : 'light'
@@ -61,6 +68,8 @@ function applyThemeToDOM(themeKey: ThemeKey): void {
 
   // 3) CSS Variables (Contrato Público)
   injectThemeVariables(theme)
+
+  console.log('✅ Tema aplicado no DOM:', themeKey)
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -90,7 +99,12 @@ interface UseThemeReturn {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function useTheme(): UseThemeReturn {
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(defaultTheme)
+  // Inicializa direto com o tema detectado (síncrono, sem flash)
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(() => {
+    const detected = detectSavedTheme()
+    console.log('🎨 useState initializer - tema detectado:', detected)
+    return detected
+  })
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   // Cancela transição se o usuário trocar tema rápido
@@ -98,14 +112,6 @@ export function useTheme(): UseThemeReturn {
 
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
   const isDark = useMemo(() => isThemeDark(currentTheme), [currentTheme])
-
-  // Initial theme detection
-  useEffect(() => {
-    const savedTheme = detectSavedTheme()
-    console.log('🔍 Initial theme detection:', { savedTheme, defaultTheme })
-    setCurrentTheme(savedTheme)
-    applyThemeToDOM(savedTheme)
-  }, [])
 
   // Apply theme changes
   useEffect(() => {
