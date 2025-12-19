@@ -147,7 +147,6 @@ export default function AIAssistant() {
         if (error) return // silencioso (fail-soft)
 
         if (Array.isArray(data) && data.length) {
-          // mantém welcome no topo se não houver no histórico
           const merged = [
             WELCOME,
             ...data.map((m: any) => ({
@@ -160,7 +159,6 @@ export default function AIAssistant() {
             })),
           ]
 
-          // remove duplicatas por id
           const seen = new Set<string>()
           const uniq = merged.filter(m => {
             if (seen.has(m.id)) return false
@@ -277,28 +275,25 @@ export default function AIAssistant() {
     }
   }, [])
 
-  // TTS (Text-to-Speech) token-first, sem dependências
-  const speak = useCallback(
-    (text: string) => {
-      if (!text?.trim()) return
-      if (!('speechSynthesis' in window)) return
+  // TTS (Text-to-Speech)
+  const speak = useCallback((text: string) => {
+    if (!text?.trim()) return
+    if (!('speechSynthesis' in window)) return
 
-      try {
-        window.speechSynthesis.cancel()
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.lang = 'pt-BR'
-        utterance.rate = 0.96
-        utterance.pitch = 1
-        utterance.onstart = () => setIsSpeaking(true)
-        utterance.onend = () => setIsSpeaking(false)
-        utterance.onerror = () => setIsSpeaking(false)
-        window.speechSynthesis.speak(utterance)
-      } catch {
-        setIsSpeaking(false)
-      }
-    },
-    []
-  )
+    try {
+      window.speechSynthesis.cancel()
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'pt-BR'
+      utterance.rate = 0.96
+      utterance.pitch = 1
+      utterance.onstart = () => setIsSpeaking(true)
+      utterance.onend = () => setIsSpeaking(false)
+      utterance.onerror = () => setIsSpeaking(false)
+      window.speechSynthesis.speak(utterance)
+    } catch {
+      setIsSpeaking(false)
+    }
+  }, [])
 
   // Persist (fail-soft)
   const tryInsert = useCallback(
@@ -320,17 +315,15 @@ export default function AIAssistant() {
     [supabase, orgId]
   )
 
-  // Streaming opcional: se endpoint existir, ótimo; se não, fallback seguro
+  // Streaming opcional: tenta endpoint; se falhar, fallback seguro
   const callAssistant = useCallback(
     async (prompt: string) => {
-      // Endpoint padrão (ajuste quando sua API estiver pronta)
       const endpoint = '/api/graal-v10'
 
       abortControllerRef.current?.abort()
       const controller = new AbortController()
       abortControllerRef.current = controller
 
-      // Tenta streaming; se falhar, cai para resposta simulada.
       try {
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -359,7 +352,6 @@ export default function AIAssistant() {
       } catch (err: any) {
         if (err?.name === 'AbortError') throw err
 
-        // Fallback simulado (não falha a página)
         const simulated =
           `Entendido, Imperador.\n\n` +
           `Analisando "${prompt}" com os dados do império...\n\n` +
@@ -378,13 +370,11 @@ export default function AIAssistant() {
   const handleSend = useCallback(async () => {
     if (!canSend) return
 
-    // Se ainda está carregando auth/org, evita ações confusas
     if (loading || loadingOrgs) {
       toast('Carregando contexto…', { icon: '⏳' })
       return
     }
 
-    // Não bloqueia a página sem org, mas avisa e opera em modo local
     const localOnly = !orgId
 
     const text = input.trim()
@@ -418,7 +408,6 @@ export default function AIAssistant() {
       setMessages(prev => [...prev, aiMsg])
       if (!localOnly) await tryInsert(aiMsg)
 
-      // TTS é opcional; não bloqueia UX se falhar
       speak(aiText)
     } catch (err: any) {
       if (err?.name !== 'AbortError') toast.error('Erro na comunicação com o Citizen Supremo')
@@ -427,12 +416,16 @@ export default function AIAssistant() {
     }
   }, [canSend, input, loading, loadingOrgs, orgId, userId, tryInsert, callAssistant, speak])
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
-  }
+  // ✅ ÚNICA declaração (corrige o erro do build)
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        handleSend()
+      }
+    },
+    [handleSend]
+  )
 
   const openOrgSelector = () => navigate('/select-organization')
 
@@ -511,7 +504,7 @@ export default function AIAssistant() {
             </div>
 
             <div
-              aria-label="Status online"
+              aria-label="Status"
               className="h-3 w-3 rounded-full"
               style={{
                 background: orgId ? 'var(--accent-2, #22c55e)' : 'var(--accent-1, #a855f7)',
@@ -523,7 +516,6 @@ export default function AIAssistant() {
           </div>
         </div>
 
-        {/* Banner org missing (não bloqueia, só alerta) */}
         {!orgId && !loading && !loadingOrgs && (
           <div className="mx-auto max-w-7xl px-6 pb-6 md:px-8">
             <div
@@ -547,7 +539,8 @@ export default function AIAssistant() {
                 className="rounded-xl border px-4 py-2 text-sm font-semibold transition"
                 style={{
                   borderColor: 'color-mix(in oklab, var(--foreground, #fff) 14%, transparent)',
-                  background: 'linear-gradient(90deg, color-mix(in oklab, var(--accent-1, #a855f7) 18%, transparent), color-mix(in oklab, var(--accent-2, #22c55e) 14%, transparent))',
+                  background:
+                    'linear-gradient(90deg, color-mix(in oklab, var(--accent-1, #a855f7) 18%, transparent), color-mix(in oklab, var(--accent-2, #22c55e) 14%, transparent))',
                 }}
               >
                 Selecionar organização
@@ -639,7 +632,6 @@ export default function AIAssistant() {
             })}
           </AnimatePresence>
 
-          {/* Streaming bubble (durante stream real) */}
           {!!streamingContent && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
               <div
@@ -775,7 +767,7 @@ export default function AIAssistant() {
         </div>
       </motion.div>
 
-      {/* Floating Orb (não navega para lugar errado; você já está nele, mas serve como affordance) */}
+      {/* Floating Orb */}
       <motion.button
         type="button"
         onClick={() => navigate('/app/ai-assistant')}
@@ -792,11 +784,4 @@ export default function AIAssistant() {
       </motion.button>
     </div>
   )
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
-  }
 }
