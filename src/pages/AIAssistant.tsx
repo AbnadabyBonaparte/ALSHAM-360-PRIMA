@@ -1,14 +1,13 @@
 // src/pages/AIAssistant.tsx
 // CITIZEN SUPREMO X.1 — AIAssistant (CANÔNICO • TOKEN-FIRST • ZERO-RISK • MULTI-TENANT READY)
-// 19/12/2025 — Revisado para: (1) não quebrar build, (2) respeitar tokens, (3) suportar org/user,
-// (4) persistência/realtime opcionais (fail-soft), (5) STT/TTS robustos, (6) streaming opcional.
+// Revisão: remove createClient (inexistente no repo) e usa supabase SSOT do projeto.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Mic, Paperclip, BrainCircuit, Loader2, Volume2, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
 
 type Role = 'user' | 'assistant'
@@ -17,7 +16,6 @@ interface Message {
   id: string
   role: Role
   content: string
-  // ISO string para persistência e consistência (não Date)
   timestamp: string
   org_id?: string | null
   user_id?: string | null
@@ -48,11 +46,7 @@ function formatTime(iso: string) {
   }
 }
 
-/**
- * Fail-soft persistence:
- * - Se tabela/rls não existir → UI segue funcionando.
- * - Se org não existir → não tenta persistir.
- */
+// Tabela padrão (fail-soft)
 const TABLE = 'ai_chat_history'
 
 const WELCOME: Message = {
@@ -69,9 +63,8 @@ const WELCOME: Message = {
 
 export default function AIAssistant() {
   const navigate = useNavigate()
-  const supabase = useMemo(() => createClient(), [])
 
-  // Auth/org canônico via store
+  // Auth/org canônico via store (não inventa hooks)
   const user = useAuthStore(s => s.user)
   const currentOrgId = useAuthStore(s => (s as any).currentOrgId ?? (s as any).orgId ?? null)
   const loading = useAuthStore(s => (s as any).loading ?? false)
@@ -101,7 +94,7 @@ export default function AIAssistant() {
     scrollToBottom()
   }, [messages, streamingContent, scrollToBottom])
 
-  // Cleanup: STT/TTS/stream abort
+  // Cleanup STT/TTS/stream
   useEffect(() => {
     return () => {
       try {
@@ -144,10 +137,10 @@ export default function AIAssistant() {
           .limit(200)
 
         if (!isMounted) return
-        if (error) return // silencioso (fail-soft)
+        if (error) return // fail-soft
 
         if (Array.isArray(data) && data.length) {
-          const merged = [
+          const merged: Message[] = [
             WELCOME,
             ...data.map((m: any) => ({
               id: String(m.id ?? uid('h')),
@@ -218,9 +211,9 @@ export default function AIAssistant() {
         // no-op
       }
     }
-  }, [supabase, orgId])
+  }, [orgId])
 
-  // STT (Speech-to-Text) robusto
+  // STT
   const startListening = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SR) {
@@ -265,6 +258,7 @@ export default function AIAssistant() {
     }
   }, [])
 
+  // TTS
   const stopSpeaking = useCallback(() => {
     try {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel()
@@ -275,7 +269,6 @@ export default function AIAssistant() {
     }
   }, [])
 
-  // TTS (Text-to-Speech)
   const speak = useCallback((text: string) => {
     if (!text?.trim()) return
     if (!('speechSynthesis' in window)) return
@@ -295,7 +288,7 @@ export default function AIAssistant() {
     }
   }, [])
 
-  // Persist (fail-soft)
+  // Persist fail-soft
   const tryInsert = useCallback(
     async (msg: Message) => {
       if (!orgId) return
@@ -312,10 +305,10 @@ export default function AIAssistant() {
         // fail-soft
       }
     },
-    [supabase, orgId]
+    [orgId]
   )
 
-  // Streaming opcional: tenta endpoint; se falhar, fallback seguro
+  // Streaming opcional (fallback automático)
   const callAssistant = useCallback(
     async (prompt: string) => {
       const endpoint = '/api/graal-v10'
@@ -352,14 +345,13 @@ export default function AIAssistant() {
       } catch (err: any) {
         if (err?.name === 'AbortError') throw err
 
-        const simulated =
+        return (
           `Entendido, Imperador.\n\n` +
           `Analisando "${prompt}" com os dados do império...\n\n` +
           `Resposta operacional: tudo está sob controle.\n` +
           `Próximo passo sugerido: priorizar leads com health score > 90.\n\n` +
           `O que deseja saber em seguida?`
-
-        return simulated
+        )
       } finally {
         setStreamingContent('')
       }
@@ -376,8 +368,8 @@ export default function AIAssistant() {
     }
 
     const localOnly = !orgId
-
     const text = input.trim()
+
     const userMsg: Message = {
       id: uid('u'),
       role: 'user',
@@ -416,7 +408,6 @@ export default function AIAssistant() {
     }
   }, [canSend, input, loading, loadingOrgs, orgId, userId, tryInsert, callAssistant, speak])
 
-  // ✅ ÚNICA declaração (corrige o erro do build)
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !e.shiftKey) {
