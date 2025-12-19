@@ -9,6 +9,12 @@ export function injectThemeVariables(theme: Theme): void {
 
   const root = document.documentElement;
 
+  console.log('💉 injectThemeVariables iniciando:', {
+    themeName: theme.name,
+    background: theme.colors.background,
+    accentPrimary: theme.colors.accentPrimary
+  });
+
   // Mapeamento completo e alinhado com o consumo no themes.css + Tailwind
   const variables: Record<string, string> = {
     // Background (usado no body/#root via var(--bg))
@@ -80,6 +86,8 @@ export function injectThemeVariables(theme: Theme): void {
   Object.entries(variables).forEach(([key, value]) => {
     root.style.setProperty(key, value);
   });
+
+  console.log('✅ injectThemeVariables completo:', Object.keys(variables).length, 'variáveis injetadas');
 }
 
 // Opcional: cleanup completo (útil para testes ou hot-reload)
