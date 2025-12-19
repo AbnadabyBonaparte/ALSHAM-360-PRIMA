@@ -105,7 +105,7 @@ const SegmentedTabs = ({
   onChange: (v: 'badges' | 'leaderboard') => void
 }) => {
   return (
-    <div className="flex justify-center mb-16">
+    <div className="flex justify-center">
       <div
         className={[
           'relative inline-flex items-center gap-2 p-2 rounded-2xl',
@@ -115,7 +115,6 @@ const SegmentedTabs = ({
         ].join(' ')}
       >
         <div className="absolute -inset-6 rounded-3xl blur-3xl bg-gradient-to-br from-[var(--accent-1)]/10 via-transparent to-[var(--accent-2)]/10 opacity-70 pointer-events-none" />
-
         {(['badges', 'leaderboard'] as const).map((tab) => {
           const active = value === tab
           return (
@@ -131,8 +130,7 @@ const SegmentedTabs = ({
                   ? [
                       'text-[var(--background)]',
                       'bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)]',
-                      // micro-ajuste (2): depth premium no tab ativo
-                      'shadow-[0_8px_24px_rgba(0,0,0,0.25)]',
+                      'shadow-[0_10px_28px_rgba(0,0,0,0.32)]',
                     ].join(' ')
                   : 'text-[var(--text)]/75 hover:text-[var(--text)] bg-transparent',
               ].join(' ')}
@@ -172,16 +170,19 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
       <div
         className={[
           'relative h-96 rounded-3xl',
-          'bg-[var(--surface)]/70 backdrop-blur-2xl',
+          'bg-[var(--surface)]/68 backdrop-blur-2xl',
           'border border-[var(--border)]',
+          'shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]',
           'p-10 flex flex-col items-center justify-between overflow-hidden',
           !badge.unlocked ? 'opacity-90' : '',
         ].join(' ')}
       >
+        {/* highlight interno sutil (material premium) */}
+        <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/5 via-transparent to-transparent opacity-70" />
+
         <motion.div
           animate={{ rotate: hovered ? 1.25 : 0, scale: hovered ? 1.03 : 1 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          // micro-ajuste (3): topo do card menos “vazio”
           className="mt-3"
         >
           <IconMedallion
@@ -221,13 +222,7 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
         </div>
 
         <div className="mt-4 px-6 py-3 rounded-full bg-[var(--background)]/40 border border-[var(--border)]">
-          <p
-            className={[
-              // micro-ajuste (4): label mais “luxo” (menos peso, mais espaçamento)
-              'text-[10px] font-semibold tracking-[0.32em]',
-              'text-[var(--text)]/70',
-            ].join(' ')}
-          >
+          <p className="text-[10px] font-semibold tracking-[0.32em] text-[var(--text)]/70">
             {badge.rarity.toUpperCase()}
           </p>
         </div>
@@ -240,27 +235,88 @@ const LevelOrb = ({ rank }: { rank: UserRank }) => {
   const progress = (rank.current_xp / rank.next_rank_xp) * 100
   const pct = Math.max(0, Math.min(100, Math.floor(progress)))
 
+  const size = 320
+  const stroke = 10
+  const r = (size / 2) - (stroke / 2) - 8
+  const c = 2 * Math.PI * r
+  const dash = (pct / 100) * c
+
   return (
     <div className="relative w-80 h-80 mx-auto">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        // micro-ajuste (1): anel menos “pesado” (conteúdo vence a moldura)
-        className="absolute inset-0 rounded-full border-4 border-[var(--accent-1)]/12"
-      />
+      {/* assinatura visual: progress arc real + ticks */}
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="absolute inset-0 mx-auto"
+      >
+        <defs>
+          <linearGradient id="alsham-orb" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--accent-1)" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="var(--accent-2)" stopOpacity="0.95" />
+          </linearGradient>
+          <filter id="softGlow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-      <motion.div
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 4.5, repeat: Infinity }}
-        className="absolute inset-8 rounded-full bg-gradient-to-br from-[var(--accent-1)]/16 to-[var(--accent-2)]/12 blur-3xl"
-      />
+        {/* track */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="rgba(255,255,255,0.10)"
+          strokeWidth={stroke}
+        />
 
-      <div className="absolute inset-10 rounded-full bg-[var(--surface)]/35 border border-[var(--border)]/60 backdrop-blur-xl" />
+        {/* progress arc */}
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="url(#alsham-orb)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${c - dash}`}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          filter="url(#softGlow)"
+          initial={{ strokeDasharray: `0 ${c}` }}
+          animate={{ strokeDasharray: `${dash} ${c - dash}` }}
+          transition={{ duration: 1.2, ease: 'easeOut' }}
+        />
 
+        {/* ticks discretos */}
+        {Array.from({ length: 36 }).map((_, i) => {
+          const a = (i / 36) * 2 * Math.PI
+          const x1 = size / 2 + Math.cos(a) * (r - 18)
+          const y1 = size / 2 + Math.sin(a) * (r - 18)
+          const x2 = size / 2 + Math.cos(a) * (r - 8)
+          const y2 = size / 2 + Math.sin(a) * (r - 8)
+          return (
+            <line
+              key={i}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth={2}
+              strokeLinecap="round"
+            />
+          )
+        })}
+      </svg>
+
+      {/* plate */}
+      <div className="absolute inset-10 rounded-full bg-[var(--surface)]/40 border border-[var(--border)]/60 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-10">
-        <h2 className="text-5xl font-black text-[var(--text)] leading-none tracking-tight">
-          {rank.rank_name}
-        </h2>
+        <h2 className="text-5xl font-black text-[var(--text)] leading-none tracking-tight">{rank.rank_name}</h2>
 
         <p className="mt-4 text-7xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent leading-none">
           {pct}%
@@ -281,9 +337,7 @@ export default function Achievements() {
   const [activeTab, setActiveTab] = useState<'badges' | 'leaderboard'>('badges')
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length
-  const totalXP = achievements
-    .filter((a) => a.unlocked)
-    .reduce((sum, a) => sum + a.xp_reward, 0)
+  const totalXP = achievements.filter((a) => a.unlocked).reduce((sum, a) => sum + a.xp_reward, 0)
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">
@@ -311,19 +365,27 @@ export default function Achievements() {
 
       <div className="flex-1 overflow-auto p-12">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-16">
-            <LevelOrb
-              rank={{
-                rank_name: 'Cyber Sovereign',
-                current_xp: 42850,
-                next_rank_xp: 50000,
-                global_position: 3,
-                weekly_change: 18,
-              }}
-            />
-          </div>
+          {/* Plinth premium para ancorar orb + tabs */}
+          <div className="mb-14">
+            <div className="relative rounded-3xl border border-[var(--border)] bg-[var(--surface)]/28 backdrop-blur-xl p-10 overflow-hidden">
+              <div className="absolute -inset-10 blur-3xl bg-gradient-to-br from-[var(--accent-1)]/10 via-transparent to-[var(--accent-2)]/10 opacity-80 pointer-events-none" />
+              <div className="absolute inset-0 rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] pointer-events-none" />
 
-          <SegmentedTabs value={activeTab} onChange={setActiveTab} />
+              <LevelOrb
+                rank={{
+                  rank_name: 'Cyber Sovereign',
+                  current_xp: 42850,
+                  next_rank_xp: 50000,
+                  global_position: 3,
+                  weekly_change: 18,
+                }}
+              />
+
+              <div className="mt-10">
+                <SegmentedTabs value={activeTab} onChange={setActiveTab} />
+              </div>
+            </div>
+          </div>
 
           {activeTab === 'badges' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
