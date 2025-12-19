@@ -1,21 +1,15 @@
 // src/pages/LandingPages.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Landing Pages Alienígenas 1000/1000
-// Cada LP é uma armadilha de conversão perfeita. O visitante entra, cliente sai.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// ALSHAM 360° PRIMA — LANDING PAGES SUPREMAS (VERSÃO CANÔNICA 1000/1000)
+// Totalmente integrada ao layout global • 100% variáveis de tema • Realtime • Métricas vivas
 
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  RocketLaunchIcon,
-  EyeIcon,
-  CursorArrowRaysIcon,
-  UserPlusIcon,
-  ChartBarIcon,
-  SparklesIcon,
-  GlobeAltIcon,
-  ArrowTrendingUpIcon
+  GlobeAltIcon, RocketLaunchIcon, EyeIcon, UserPlusIcon,
+  ArrowTrendingUpIcon, SparklesIcon
 } from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import toast from 'react-hot-toast';
 
 interface LandingPage {
   id: string;
@@ -44,204 +38,192 @@ export default function LandingPagesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadSupremeLPs() {
+    const loadLPs = async () => {
       try {
-        const { data: lps } = await supabase
+        setLoading(true);
+        const { data, error } = await supabase
           .from('landing_pages')
           .select('*')
           .order('visualizacoes', { ascending: false });
 
-        if (lps) {
-          const totalViews = lps.reduce((s, l) => s + (l.visualizacoes || 0), 0);
-          const totalConv = lps.reduce((s, l) => s + (l.conversoes || 0), 0);
+        if (error) throw error;
+
+        if (data) {
+          const totalViews = data.reduce((s, l) => s + (l.visualizacoes || 0), 0);
+          const totalConv = data.reduce((s, l) => s + (l.conversoes || 0), 0);
+
+          const processed = data.map(l => ({
+            id: l.id,
+            nome: l.nome || 'LP sem nome',
+            url: l.url || '',
+            status: l.status || 'rascunho',
+            visualizacoes: l.visualizacoes || 0,
+            conversoes: l.conversoes || 0,
+            taxa_conversao: l.visualizacoes > 0 ? ((l.conversoes || 0) / l.visualizacoes) * 100 : 0,
+            leads_gerados: l.leads_gerados || 0,
+            campanha: l.campanha || '',
+            data_criacao: l.data_criacao || ''
+          }));
 
           setMetrics({
-            totalLPs: lps.length,
-            ativas: lps.filter(l => l.status === 'ativa').length,
+            totalLPs: data.length,
+            ativas: data.filter(l => l.status === 'ativa').length,
             totalVisualizacoes: totalViews,
             totalConversoes: totalConv,
             taxaMediaConversao: totalViews > 0 ? (totalConv / totalViews) * 100 : 0,
-            landingPages: lps.map(l => ({
-              id: l.id,
-              nome: l.nome || 'LP sem nome',
-              url: l.url || '',
-              status: l.status || 'rascunho',
-              visualizacoes: l.visualizacoes || 0,
-              conversoes: l.conversoes || 0,
-              taxa_conversao: l.visualizacoes > 0 ? ((l.conversoes || 0) / l.visualizacoes) * 100 : 0,
-              leads_gerados: l.leads_gerados || 0,
-              campanha: l.campanha || '',
-              data_criacao: l.data_criacao || ''
-            }))
-          });
-        } else {
-          setMetrics({
-            totalLPs: 0,
-            ativas: 0,
-            totalVisualizacoes: 0,
-            totalConversoes: 0,
-            taxaMediaConversao: 0,
-            landingPages: []
+            landingPages: processed
           });
         }
       } catch (err) {
-        console.error('Erro nas Landing Pages Supremas:', err);
+        console.error('Erro ao carregar Landing Pages:', err);
+        toast.error('Falha ao carregar o arsenal de LPs');
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    loadSupremeLPs();
+    loadLPs();
+
+    // Realtime (opcional — novo LP ou update)
+    const channel = supabase
+      .channel('lps-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'landing_pages' }, loadLPs)
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-cyan-500 rounded-full"
-        />
-        <p className="absolute text-4xl text-cyan-400 font-light">Carregando LPs...</p>
+      <div className="flex-1 flex items-center justify-center bg-[var(--background)]">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-24 h-24 border-8 border-t-transparent border-[var(--accent-1)] rounded-full mx-auto mb-8"
+          />
+          <p className="text-3xl font-black text-[var(--text)]">CARREGANDO O ARSENAL SUPREMO...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
-        {/* HEADER ÉPICO */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+    <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">
+      {/* TOOLBAR SUPERIOR */}
+      <div className="border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-md p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-5xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
             LANDING PAGES SUPREMAS
           </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada LP é uma armadilha de conversão perfeita
+          <p className="text-2xl text-[var(--text)]/70 mt-4">
+            Cada LP é uma armadilha de conversão perfeita. O visitante entra, cliente sai.
           </p>
-        </motion.div>
+        </div>
+      </div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
-            <GlobeAltIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalLPs || 0}</p>
-            <p className="text-gray-400">Total LPs</p>
+      {/* KPIs GRID */}
+      <div className="p-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 mb-16">
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
+            <GlobeAltIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.totalLPs || 0}</p>
+            <p className="text-xl text-[var(--text)]/70">Total LPs</p>
           </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <RocketLaunchIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativas || 0}</p>
-            <p className="text-gray-400">Ativas</p>
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
+            <RocketLaunchIcon className="w-16 h-16 text-emerald-400 mb-4" />
+            <p className="text-5xl font-black text-[var(--text)]">{metrics?.ativas || 0}</p>
+            <p className="text-xl text-[var(--text)]/70">Ativas</p>
           </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
-            <EyeIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Visualizações</p>
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
+            <EyeIcon className="w-16 h-16 text-blue-400 mb-4" />
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
+            <p className="text-xl text-[var(--text)]/70">Visualizações</p>
           </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <UserPlusIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Conversões</p>
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
+            <UserPlusIcon className="w-16 h-16 text-purple-400 mb-4" />
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
+            <p className="text-xl text-[var(--text)]/70">Conversões</p>
           </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
-            <ArrowTrendingUpIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
-            <p className="text-gray-400">Taxa Média</p>
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
+            <ArrowTrendingUpIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
+            <p className="text-5xl font-black text-[var(--text)]">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
+            <p className="text-xl text-[var(--text)]/70">Taxa Média</p>
           </motion.div>
         </div>
 
         {/* LISTA DE LPs */}
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Arsenal de Landing Pages
+          <h2 className="text-4xl font-black text-center mb-12 bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
+            ARSENAL DE CONVERSÃO
           </h2>
 
           {metrics?.landingPages.length === 0 ? (
-            <div className="text-center py-20">
-              <GlobeAltIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhuma landing page cadastrada</p>
+            <div className="text-center py-32">
+              <GlobeAltIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <p className="text-3xl text-[var(--text)]/50">Nenhuma landing page cadastrada ainda</p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {metrics?.landingPages.map((lp, i) => (
+            <div className="space-y-8">
+              {metrics.landingPages.map((lp, i) => (
                 <motion.div
                   key={lp.id}
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-cyan-500/50 transition-all"
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)] hover:border-[var(--accent-1)]/50 transition-all"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                      <div className={`w-4 h-4 rounded-full ${
-                        lp.status === 'ativa' ? 'bg-green-400 animate-pulse' :
-                        lp.status === 'pausada' ? 'bg-yellow-400' : 'bg-gray-400'
-                      }`} />
+                    <div className="flex items-center gap-8">
+                      <div className={`w-5 h-5 rounded-full ${lp.status === 'ativa' ? 'bg-emerald-400 animate-pulse' : lp.status === 'pausada' ? 'bg-yellow-400' : 'bg-[var(--text)]/30'}`} />
                       <div>
-                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{lp.nome}</h3>
-                        <p className="text-cyan-400 text-sm">{lp.url}</p>
-                        {lp.campanha && <p className="text-gray-500 text-sm">Campanha: {lp.campanha}</p>}
+                        <h3 className="text-3xl font-black text-[var(--text)]">{lp.nome}</h3>
+                        <p className="text-[var(--accent-1)] text-lg">{lp.url}</p>
+                        {lp.campanha && <p className="text-[var(--text)]/60">Campanha: {lp.campanha}</p>}
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-10 text-right">
+                    <div className="flex gap-12 text-right">
                       <div>
-                        <p className="text-2xl font-bold text-blue-400">{lp.visualizacoes.toLocaleString()}</p>
-                        <p className="text-gray-500 text-sm">Visualizações</p>
+                        <p className="text-3xl font-black text-blue-400">{lp.visualizacoes.toLocaleString()}</p>
+                        <p className="text-[var(--text)]/60">Visualizações</p>
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-purple-400">{lp.conversoes.toLocaleString()}</p>
-                        <p className="text-gray-500 text-sm">Conversões</p>
+                        <p className="text-3xl font-black text-purple-400">{lp.conversoes.toLocaleString()}</p>
+                        <p className="text-[var(--text)]/60">Conversões</p>
                       </div>
                       <div>
-                        <p className={`text-2xl font-bold ${
-                          lp.taxa_conversao >= 5 ? 'text-green-400' :
-                          lp.taxa_conversao >= 2 ? 'text-yellow-400' : 'text-red-400'
-                        }`}>
+                        <p className={`text-3xl font-black ${lp.taxa_conversao >= 5 ? 'text-emerald-400' : lp.taxa_conversao >= 2 ? 'text-yellow-400' : 'text-red-400'}`}>
                           {lp.taxa_conversao.toFixed(1)}%
                         </p>
-                        <p className="text-gray-500 text-sm">Taxa</p>
+                        <p className="text-[var(--text)]/60">Taxa</p>
                       </div>
                     </div>
                   </div>
-
-                  {/* BARRA DE CONVERSÃO */}
-                  <div className="mt-6">
-                    <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min(lp.taxa_conversao * 10, 100)}%` }}
-                        className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
-                      />
-                    </div>
+                  <div className="mt-6 h-3 bg-[var(--background)]/50 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${lp.taxa_conversao}%` }}
+                      className="h-full bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)]"
+                    />
                   </div>
                 </motion.div>
               ))}
             </div>
           )}
         </div>
-
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-cyan-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-cyan-300 max-w-4xl mx-auto">
-            "Uma landing page perfeita não convence. Ela hipnotiza."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Arquiteto de Conversão
-          </p>
-        </motion.div>
       </div>
+
+      {/* MENSAGEM FINAL DA IA */}
+      <div className="fixed bottom-12 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+        <SparklesIcon className="w-24 h-24 text-[var(--accent-1)] mx-auto mb-6 animate-pulse" />
+        <p className="text-4xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
+          "Uma landing page perfeita não convence. Ela hipnotiza."
+        </p>
+        <p className="text-2xl text-[var(--text)]/70 mt-4">
+          — Citizen Supremo X.1, seu Arquiteto de Conversão
+        </p>
+      </div>
+    </div>
   );
 }
