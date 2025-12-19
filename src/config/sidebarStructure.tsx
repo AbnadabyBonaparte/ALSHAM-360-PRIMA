@@ -311,6 +311,13 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         ],
       },
       {
+        id: 'ads-manager',
+        label: 'Ads Manager',
+        icon: <BarChart3 className="h-4 w-4" />,
+        status: 'implemented',
+        description: 'Gestão unificada de mídia paga e desempenho',
+      },
+      {
         id: 'email-marketing-group',
         label: 'Email Marketing',
         icon: <Mail className="h-4 w-4" />,
