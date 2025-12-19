@@ -1,6 +1,6 @@
 // src/pages/AIAssistant.tsx
 // CITIZEN SUPREMO X.1 — AIAssistant (CANÔNICO • TOKEN-FIRST • ZERO-RISK • MULTI-TENANT READY)
-// Revisão: remove createClient (inexistente no repo) e usa supabase SSOT do projeto.
+// Revisão final: auth store real + init guard + textarea auto-grow + anti-dup + pulse sem keyframes custom.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -46,7 +46,6 @@ function formatTime(iso: string) {
   }
 }
 
-// Tabela padrão (fail-soft)
 const TABLE = 'ai_chat_history'
 
 const WELCOME: Message = {
@@ -64,22 +63,16 @@ const WELCOME: Message = {
 export default function AIAssistant() {
   const navigate = useNavigate()
 
-  // Auth/org canônico via store (não inventa hooks)
-  const { user, currentOrgId, loading, loadingAuth, loadingOrgs, isAuthenticated, init } =
-    useAuthStore(
-      useCallback(
-        state => ({
-          user: state.user,
-          currentOrgId: state.currentOrgId,
-          loading: state.loading,
-          loadingAuth: state.loadingAuth,
-          loadingOrgs: state.loadingOrgs,
-          isAuthenticated: state.isAuthenticated,
-          init: state.init,
-        }),
-        [],
-      ),
-    )
+  // Selector direto (mais limpo / menos risco de render estranho)
+  const { user, currentOrgId, loading, loadingAuth, loadingOrgs, isAuthenticated, init } = useAuthStore(state => ({
+    user: state.user,
+    currentOrgId: (state as any).currentOrgId ?? null,
+    loading: (state as any).loading ?? false,
+    loadingAuth: (state as any).loadingAuth ?? false,
+    loadingOrgs: (state as any).loadingOrgs ?? false,
+    isAuthenticated: (state as any).isAuthenticated ?? false,
+    init: (state as any).init as () => Promise<void>,
+  }))
 
   const orgId = currentOrgId ?? null
   const userId = user?.id ?? null
@@ -94,13 +87,18 @@ export default function AIAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const canSend = useMemo(() => Boolean(input.trim()) && !isLoading, [input, isLoading])
 
+  // init guard: só inicializa se ainda não temos estado suficiente
   useEffect(() => {
+    if (isAuthenticated && user) return
     init().catch(() => toast.error('Não foi possível inicializar o contexto de autenticação.'))
-  }, [init])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
+  // Gate de auth
   useEffect(() => {
     if (loadingAuth) return
     if (!isAuthenticated) navigate('/precondition/BK_LOGIN', { replace: true })
@@ -113,6 +111,15 @@ export default function AIAssistant() {
   useEffect(() => {
     scrollToBottom()
   }, [messages, streamingContent, scrollToBottom])
+
+  // Auto-grow textarea (máx 6 linhas)
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = '0px'
+    const next = Math.min(el.scrollHeight, 6 * 28) // ~6 linhas, 28px line-height aproximado
+    el.style.height = `${Math.max(next, 28)}px`
+  }, [input])
 
   // Cleanup STT/TTS/stream
   useEffect(() => {
@@ -157,7 +164,7 @@ export default function AIAssistant() {
           .limit(200)
 
         if (!isMounted) return
-        if (error) return // fail-soft
+        if (error) return
 
         if (Array.isArray(data) && data.length) {
           const merged: Message[] = [
@@ -399,7 +406,9 @@ export default function AIAssistant() {
       user_id: userId,
     }
 
-    setMessages(prev => [...prev, userMsg])
+    // anti-dup: nunca adiciona se já existir o id (paranoia boa)
+    setMessages(prev => (prev.some(m => m.id === userMsg.id) ? prev : [...prev, userMsg]))
+
     setInput('')
     setIsLoading(true)
 
@@ -417,7 +426,7 @@ export default function AIAssistant() {
         user_id: null,
       }
 
-      setMessages(prev => [...prev, aiMsg])
+      setMessages(prev => (prev.some(m => m.id === aiMsg.id) ? prev : [...prev, aiMsg]))
       if (!localOnly) await tryInsert(aiMsg)
 
       speak(aiText)
@@ -516,12 +525,10 @@ export default function AIAssistant() {
 
             <div
               aria-label="Status"
-              className="h-3 w-3 rounded-full"
+              className={`h-3 w-3 rounded-full ${orgId ? 'bg-emerald-400' : 'bg-purple-400'} animate-pulse`}
               style={{
-                background: orgId ? 'var(--accent-2, #22c55e)' : 'var(--accent-1, #a855f7)',
                 boxShadow:
                   '0 0 0 6px color-mix(in oklab, var(--foreground, #fff) 10%, transparent), 0 0 28px color-mix(in oklab, var(--foreground, #fff) 18%, transparent)',
-                animation: 'pulse 1.6s ease-in-out infinite',
               }}
             />
           </div>
@@ -740,6 +747,7 @@ export default function AIAssistant() {
               </label>
 
               <textarea
+                ref={textareaRef}
                 id="aiassistant-input"
                 value={input}
                 onChange={e => setInput(e.target.value)}
@@ -750,6 +758,7 @@ export default function AIAssistant() {
                 style={{
                   color: 'var(--foreground, var(--text))',
                   caretColor: 'var(--accent-1, #a855f7)',
+                  lineHeight: '28px',
                 }}
               />
 
