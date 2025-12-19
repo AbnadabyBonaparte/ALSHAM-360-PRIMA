@@ -97,23 +97,75 @@ const ACHIEVEMENTS: Badge[] = [
   },
 ]
 
+/**
+ * Premium segmented control (tabs)
+ * - One container, two options
+ * - Controlled glow via tokens
+ */
+const SegmentedTabs = ({
+  value,
+  onChange,
+}: {
+  value: 'badges' | 'leaderboard'
+  onChange: (v: 'badges' | 'leaderboard') => void
+}) => {
+  return (
+    <div className="flex justify-center mb-16">
+      <div
+        className={[
+          'relative inline-flex items-center gap-2 p-2 rounded-2xl',
+          'bg-[var(--surface)]/55 backdrop-blur-xl',
+          'border border-[var(--border)]',
+          'shadow-[0_0_0_1px_rgba(255,255,255,0.04)]',
+        ].join(' ')}
+      >
+        {/* Subtle aura */}
+        <div className="absolute -inset-6 rounded-3xl blur-3xl bg-gradient-to-br from-[var(--accent-1)]/10 via-transparent to-[var(--accent-2)]/10 opacity-70 pointer-events-none" />
+
+        {(['badges', 'leaderboard'] as const).map((tab) => {
+          const active = value === tab
+          return (
+            <button
+              key={tab}
+              onClick={() => onChange(tab)}
+              className={[
+                'relative px-10 py-4 rounded-xl font-black uppercase',
+                'tracking-[0.18em]',
+                'transition-all duration-200',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-1)]/50',
+                active
+                  ? 'text-[var(--background)] bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] shadow-lg'
+                  : 'text-[var(--text)]/75 hover:text-[var(--text)] bg-transparent',
+              ].join(' ')}
+            >
+              <span className="text-lg">
+                {tab === 'badges' ? 'ACHIEVEMENTS' : 'LEADERBOARD'}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 const HolographicCard = ({ badge }: { badge: Badge }) => {
   const [hovered, setHovered] = useState(false)
-
   const lockedIcon = useMemo(() => Lock, [])
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.94, rotateY: -10 }}
+      initial={{ opacity: 0, scale: 0.96, rotateY: -8 }}
       animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-      whileHover={{ scale: 1.03, y: -10 }}
+      whileHover={{ scale: 1.02, y: -8 }}
       transition={{ type: 'spring', stiffness: 240, damping: 22 }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       className="relative cursor-pointer"
     >
+      {/* Aura controlada por raridade (token) */}
       <motion.div
-        animate={{ opacity: hovered ? 0.95 : 0.55 }}
+        animate={{ opacity: hovered ? 0.9 : 0.55 }}
         className={[
           'absolute -inset-6 rounded-3xl blur-3xl',
           'bg-gradient-to-br',
@@ -127,29 +179,34 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
           'bg-[var(--surface)]/70 backdrop-blur-2xl',
           'border border-[var(--border)]',
           'p-10 flex flex-col items-center justify-between overflow-hidden',
-          !badge.unlocked ? 'opacity-85' : '',
+          !badge.unlocked ? 'opacity-90' : '',
         ].join(' ')}
       >
+        {/* Ícone governado (medallion) - mais presença e disciplina */}
         <motion.div
-          animate={{ rotate: hovered ? 2 : 0, scale: hovered ? 1.02 : 1 }}
+          animate={{ rotate: hovered ? 1.25 : 0, scale: hovered ? 1.03 : 1 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="mt-8"
+          className="mt-6"
         >
           <IconMedallion
             rarity={badge.rarity}
             icon={badge.unlocked ? badge.icon : lockedIcon}
             locked={!badge.unlocked}
-            scale="xl"
+            // Ajuste: medallion um pouco mais presente (você estava em xl; aqui fica melhor para o card)
+            scale="2xl"
             container="glass"
             state={hovered ? 'hover' : 'default'}
           />
         </motion.div>
 
         <div className="text-center">
-          <h3 className="text-3xl font-black text-[var(--text)] mb-3">{badge.name}</h3>
+          <h3 className="text-3xl font-black text-[var(--text)] mb-3 leading-none">
+            {badge.name}
+          </h3>
           <p className="text-lg text-[var(--text)]/70 px-6">{badge.description}</p>
         </div>
 
+        {/* Progresso ou XP */}
         <div className="w-full mt-8">
           {badge.unlocked ? (
             <div className="flex items-center justify-center gap-4 text-emerald-400">
@@ -171,8 +228,9 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
           )}
         </div>
 
-        <div className="mt-4 px-6 py-3 rounded-full bg-[var(--background)]/45 border border-[var(--border)]">
-          <p className="text-sm font-black tracking-[0.22em] text-[var(--text)]/75">
+        {/* Label de raridade: mais “luxo” (menos gritante) */}
+        <div className="mt-4 px-6 py-3 rounded-full bg-[var(--background)]/40 border border-[var(--border)]">
+          <p className="text-xs font-black tracking-[0.28em] text-[var(--text)]/70">
             {badge.rarity.toUpperCase()}
           </p>
         </div>
@@ -183,29 +241,52 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
 
 const LevelOrb = ({ rank }: { rank: UserRank }) => {
   const progress = (rank.current_xp / rank.next_rank_xp) * 100
+  const pct = Math.max(0, Math.min(100, Math.floor(progress)))
 
+  /**
+   * Fix premium do print:
+   * - Evitar colisão do título com o anel
+   * - Melhor hierarquia tipográfica
+   * - Mais respiro e centralização real
+   */
   return (
     <div className="relative w-80 h-80 mx-auto">
+      {/* Outer ring */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        className="absolute inset-0 rounded-full border-8 border-[var(--accent-1)]/20"
+        className="absolute inset-0 rounded-full border-8 border-[var(--accent-1)]/18"
       />
 
+      {/* Soft inner aura */}
       <motion.div
-        animate={{ scale: [1, 1.06, 1] }}
-        transition={{ duration: 4, repeat: Infinity }}
-        className="absolute inset-8 rounded-full bg-gradient-to-br from-[var(--accent-1)]/18 to-[var(--accent-2)]/14 blur-3xl"
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ duration: 4.5, repeat: Infinity }}
+        className="absolute inset-8 rounded-full bg-gradient-to-br from-[var(--accent-1)]/16 to-[var(--accent-2)]/12 blur-3xl"
       />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <h2 className="text-6xl font-black text-[var(--text)] mb-4">{rank.rank_name}</h2>
-        <p className="text-8xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
-          {Math.floor(progress)}%
+      {/* Inner plate to increase contrast */}
+      <div className="absolute inset-10 rounded-full bg-[var(--surface)]/35 border border-[var(--border)]/60 backdrop-blur-xl" />
+
+      {/* Content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-10">
+        {/* Title: smaller + tighter + controlled wrapping */}
+        <h2 className="text-5xl font-black text-[var(--text)] leading-none tracking-tight">
+          {rank.rank_name}
+        </h2>
+
+        {/* Percentage: keep dominant */}
+        <p className="mt-4 text-7xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent leading-none">
+          {pct}%
         </p>
-        <p className="text-2xl text-[var(--text)]/70 mt-4">para próximo nível</p>
-        <div className="flex items-center gap-8 mt-8">
-          <p className="text-3xl text-emerald-400">Top {rank.global_position}% global</p>
+
+        <p className="mt-3 text-xl text-[var(--text)]/70">para próximo nível</p>
+
+        {/* Footer stat: smaller and spaced */}
+        <div className="mt-6">
+          <p className="text-xl font-semibold text-emerald-400">
+            Top {rank.global_position}% global
+          </p>
         </div>
       </div>
     </div>
@@ -250,7 +331,7 @@ export default function Achievements() {
       <div className="flex-1 overflow-auto p-12">
         <div className="max-w-7xl mx-auto">
           {/* Level Orb Central */}
-          <div className="mb-20">
+          <div className="mb-16">
             <LevelOrb
               rank={{
                 rank_name: 'Cyber Sovereign',
@@ -262,23 +343,8 @@ export default function Achievements() {
             />
           </div>
 
-          {/* Tabs */}
-          <div className="flex justify-center gap-12 mb-16">
-            {(['badges', 'leaderboard'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={[
-                  'px-12 py-6 text-3xl font-black uppercase tracking-widest rounded-2xl transition-all',
-                  activeTab === tab
-                    ? 'bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] text-[var(--background)]'
-                    : 'bg-[var(--surface)]/50 text-[var(--text)]/70 hover:text-[var(--text)]',
-                ].join(' ')}
-              >
-                {tab === 'badges' ? 'ACHIEVEMENTS' : 'LEADERBOARD'}
-              </button>
-            ))}
-          </div>
+          {/* Tabs (Segmented Control premium) */}
+          <SegmentedTabs value={activeTab} onChange={setActiveTab} />
 
           {/* Badges Grid */}
           {activeTab === 'badges' && (
