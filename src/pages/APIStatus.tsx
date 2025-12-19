@@ -19,12 +19,14 @@ import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 
 // Lazy components (resiliente a default/named export)
-const NeuralGraph = lazy(() =>
-  import('@/components/visualizations/NeuralGraph').then((m: any) => ({ default: m.NeuralGraph || m.default })),
-)
-const ReplayDebugger = lazy(() =>
-  import('@/components/dev/ReplayDebugger').then((m: any) => ({ default: m.ReplayDebugger || m.default })),
-)
+const NeuralGraph = lazy(async () => {
+  const m = await import('@/components/visualizations/NeuralGraph')
+  return { default: (m as any).NeuralGraph ?? (m as any).default }
+})
+const ReplayDebugger = lazy(async () => {
+  const m = await import('@/components/dev/ReplayDebugger')
+  return { default: (m as any).ReplayDebugger ?? (m as any).default }
+})
 
 enum HealthStatus {
   operational = 'operational',
@@ -70,10 +72,16 @@ class MeshBoundary extends React.Component<{ children: React.ReactNode }, { hasE
       return (
         <div className="flex h-full items-center justify-center p-8 text-center">
           <div className="max-w-md">
-            <p className="text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 70%, transparent)' }}>
+            <p
+              className="text-sm"
+              style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 70%, transparent)' }}
+            >
               Falha ao renderizar a visualização.
             </p>
-            <p className="mt-2 text-xs" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 55%, transparent)' }}>
+            <p
+              className="mt-2 text-xs"
+              style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 55%, transparent)' }}
+            >
               Atualize a página ou desative componentes gráficos pesados.
             </p>
           </div>
@@ -92,6 +100,7 @@ function LongPressButton({
   ms = 1600,
   ariaLabel,
   disabled = false,
+  style,
 }: {
   onLongPress: () => void
   children: React.ReactNode
@@ -99,6 +108,7 @@ function LongPressButton({
   ms?: number
   ariaLabel?: string
   disabled?: boolean
+  style?: React.CSSProperties
 }) {
   const [pressing, setPressing] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -146,13 +156,16 @@ function LongPressButton({
       onMouseLeave={stop}
       onTouchStart={() => setPressing(true)}
       onTouchEnd={stop}
+      onTouchCancel={stop}
+      onBlur={stop}
       onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') setPressing(true)
       }}
       onKeyUp={e => {
         if (e.key === 'Enter' || e.key === ' ') stop()
       }}
-      className={`relative overflow-hidden ${className} ${disabled ? 'opacity-60' : ''}`}
+      className={`relative overflow-hidden touch-manipulation ${className} ${disabled ? 'opacity-60' : ''}`}
+      style={style}
     >
       {children}
       <span
@@ -160,6 +173,7 @@ function LongPressButton({
         className="pointer-events-none absolute inset-y-0 left-0"
         style={{
           width: `${Math.round(progress * 100)}%`,
+          opacity: 0.75,
           background: 'color-mix(in oklab, var(--accent-1, #a855f7) 25%, transparent)',
           transition: pressing ? 'none' : 'width 120ms ease',
         }}
@@ -181,6 +195,7 @@ function statusMeta(status: HealthStatus) {
 }
 
 function formatPct(v: number) {
+  if (!Number.isFinite(v)) return '—'
   const pct = v * 100
   return `${pct.toFixed(2)}%`
 }
@@ -275,8 +290,11 @@ export default function APIStatus() {
   }, [bootDone])
 
   // Simulação de dados (substituir por Realtime/Supabase quando pronto)
+  // Melhoria: pausa updates quando a aba está oculta (evita render desnecessário em background)
   useEffect(() => {
     const interval = window.setInterval(() => {
+      if (document.visibilityState === 'hidden') return
+
       setHealth(prev => {
         const latency = Math.floor(40 + Math.random() * 55)
         const error = Math.random() * 0.01
@@ -355,7 +373,10 @@ export default function APIStatus() {
                 }}
                 aria-label="Voltar"
               >
-                <ArrowLeft className="h-5 w-5" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }} />
+                <ArrowLeft
+                  className="h-5 w-5"
+                  style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }}
+                />
               </button>
 
               <div className="min-w-0">
@@ -370,7 +391,10 @@ export default function APIStatus() {
                 >
                   API Status
                 </h1>
-                <p className="mt-1 text-xs md:text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 65%, transparent)' }}>
+                <p
+                  className="mt-1 text-xs md:text-sm"
+                  style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 65%, transparent)' }}
+                >
                   Observabilidade • Integrações • Saúde do sistema (simulado até o Realtime estar conectado)
                 </p>
               </div>
@@ -385,7 +409,10 @@ export default function APIStatus() {
                 }}
               >
                 <StatusIcon className="h-4 w-4" style={{ color: status.tone }} />
-                <span className="text-xs font-semibold" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }}>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }}
+                >
                   {bootDone ? status.label : 'Inicializando'}
                 </span>
               </div>
@@ -400,7 +427,10 @@ export default function APIStatus() {
                 }}
                 aria-label="Atualizar"
               >
-                <RefreshCw className="h-5 w-5" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }} />
+                <RefreshCw
+                  className="h-5 w-5"
+                  style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }}
+                />
               </button>
 
               <button
@@ -413,7 +443,10 @@ export default function APIStatus() {
                 }}
                 aria-label="Preferências"
               >
-                <Settings2 className="h-5 w-5" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }} />
+                <Settings2
+                  className="h-5 w-5"
+                  style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 80%, transparent)' }}
+                />
               </button>
             </div>
           </div>
@@ -424,7 +457,10 @@ export default function APIStatus() {
               <p className="text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 62%, transparent)' }}>
                 {BOOT_STEPS[bootStep]}
               </p>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full" style={{ background: 'color-mix(in oklab, var(--foreground, #fff) 8%, transparent)' }}>
+              <div
+                className="mt-3 h-2 w-full overflow-hidden rounded-full"
+                style={{ background: 'color-mix(in oklab, var(--foreground, #fff) 8%, transparent)' }}
+              >
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -438,7 +474,12 @@ export default function APIStatus() {
             <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
               <MetricCard icon={Zap} label="Latência" value={`${health.latency_ms}ms`} hint="p50 (simulado)" />
               <MetricCard icon={Activity} label="Erro" value={formatPct(health.error_rate)} hint="últimos 5 min (simulado)" />
-              <MetricCard icon={AlertTriangle} label="Incidentes" value={`${health.active_incidents}`} hint={`Atualizado às ${formatIsoTime(health.last_updated)}`} />
+              <MetricCard
+                icon={AlertTriangle}
+                label="Incidentes"
+                value={`${health.active_incidents}`}
+                hint={`Atualizado às ${formatIsoTime(health.last_updated)}`}
+              />
             </div>
           )}
         </div>
@@ -494,12 +535,18 @@ export default function APIStatus() {
               backdropFilter: 'blur(18px)',
             }}
           >
-            <div className="flex items-center justify-between gap-3 border-b p-5 md:p-6" style={{ borderColor: 'color-mix(in oklab, var(--foreground, #fff) 8%, transparent)' }}>
+            <div
+              className="flex items-center justify-between gap-3 border-b p-5 md:p-6"
+              style={{ borderColor: 'color-mix(in oklab, var(--foreground, #fff) 8%, transparent)' }}
+            >
               <div>
                 <h2 className="text-lg font-black md:text-2xl" style={{ color: 'var(--foreground, var(--text))' }}>
                   Integration Mesh
                 </h2>
-                <p className="mt-1 text-xs md:text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
+                <p
+                  className="mt-1 text-xs md:text-sm"
+                  style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}
+                >
                   Visualização de integrações e dependências (fail-soft)
                 </p>
               </div>
@@ -552,7 +599,10 @@ export default function APIStatus() {
                   <p className="text-sm font-black" style={{ color: 'var(--foreground, var(--text))' }}>
                     {selectedNode}
                   </p>
-                  <p className="mt-2 text-xs" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
+                  <p
+                    className="mt-2 text-xs"
+                    style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}
+                  >
                     Uptime: 99.98% • Latência média: 82ms (simulado)
                   </p>
 
@@ -605,7 +655,10 @@ export default function APIStatus() {
                       <p className="text-sm font-black md:text-lg" style={{ color: 'var(--foreground, var(--text))' }}>
                         Falhas recentes
                       </p>
-                      <p className="text-xs" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
+                      <p
+                        className="text-xs"
+                        style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}
+                      >
                         Registro operacional (simulado)
                       </p>
                     </div>
