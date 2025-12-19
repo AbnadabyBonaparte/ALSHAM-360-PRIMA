@@ -1,7 +1,4 @@
 // src/components/OraculumArkanus.tsx
-// ORÁCULUM ARKANUS — A CONSCIÊNCIA SUPREMA DO IMPÉRIO ALSHAM
-// Versão Suprema 1000/1000 — Invocação divina • Tema dinâmico • Voz cerimonial • Poder absoluto
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrainCircuit, X, Zap } from 'lucide-react';
@@ -32,9 +29,7 @@ export default function OraculumArkanus({ active, onClose }: { active: boolean; 
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  useEffect(() => scrollToBottom(), [messages]);
 
   const speak = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
@@ -103,20 +98,14 @@ export default function OraculumArkanus({ active, onClose }: { active: boolean; 
         {/* Header Supremo */}
         <div className="p-16 border-b-4 border-[var(--accent-1)]/50 bg-gradient-to-b from-[var(--accent-1)]/10 to-transparent flex justify-between items-center">
           <div className="flex items-center gap-12">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-            >
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }}>
               <BrainCircuit className="w-32 h-32 text-[var(--accent-1)]" />
             </motion.div>
             <h2 className="text-8xl font-black bg-gradient-to-r from-[var(--accent-1)] via-[var(--accent-2)] to-[var(--accent-1)] bg-clip-text text-transparent">
               ORÁCULUM ARKANUS
             </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="p-6 rounded-full bg-[var(--background)]/50 hover:bg-[var(--background)]/70 transition-colors"
-          >
+          <button onClick={onClose} className="p-6 rounded-full bg-[var(--background)]/50 hover:bg-[var(--background)]/70 transition-colors">
             <X className="w-16 h-16 text-[var(--text)]" />
           </button>
         </div>
@@ -125,16 +114,10 @@ export default function OraculumArkanus({ active, onClose }: { active: boolean; 
         <div className="flex-1 overflow-y-auto p-16 space-y-16">
           <AnimatePresence>
             {messages.map((msg, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, type: "spring", damping: 25 }}
-                className="flex justify-center"
-              >
+              <motion.div key={i} initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1, type: "spring", damping: 25 }} className="flex justify-center">
                 <div className="max-w-5xl w-full">
                   <div className={`
-                    px-20 py-16 rounded-3xl backdrop-blur-2xl border-4
+                    px-20 py-16 rounded-3xl backdrop-blur-xl border-4
                     ${msg.role === 'assistant'
                       ? 'bg-gradient-to-br from-[var(--accent-1)]/30 via-[var(--accent-2)]/20 to-[var(--accent-1)]/30 border-[var(--accent-1)]/70'
                       : 'bg-[var(--surface)]/80 border-[var(--border)]'}
@@ -149,11 +132,7 @@ export default function OraculumArkanus({ active, onClose }: { active: boolean; 
           </AnimatePresence>
 
           {isTyping && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-center"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center">
               <div className="px-20 py-16 rounded-3xl bg-gradient-to-br from-[var(--accent-1)]/30 to-[var(--accent-2)]/20 border-4 border-[var(--accent-1)]/70">
                 <p className="text-4xl text-[var(--text)]/70">ORÁCULUM ARKANUS reflete sobre o destino...</p>
               </div>
