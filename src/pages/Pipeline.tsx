@@ -1,14 +1,15 @@
 // src/pages/Pipeline.tsx
-// ALSHAM 360° PRIMA — PIPELINE QUÂNTICO: DOMÍNIO REAL (VERSÃO CANÔNICA 1000/1000)
-// Totalmente integrado ao layout global (HeaderSupremo + SidebarSupremo + Tema Dinâmico)
-// Sem header duplicado • Sem layout full-screen próprio • 100% variáveis de tema
-// Drag & drop real-time • Multi-org seguro • Loading/error states robustos • Performance otimizada
+// ALSHAM 360° PRIMA — PIPELINE QUÂNTICO (migrado para shadcn/ui)
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import { supabase } from '@/lib/supabase/client'; // ajuste se necessário
+import { supabase } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { Search, Trophy, Flame } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 type Stage = 'Qualificação' | 'Proposta' | 'Negociação' | 'Fechamento' | 'Ganho' | 'Perdido';
 
@@ -41,49 +42,47 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 
   return (
     <Reorder.Item value={deal} whileDrag={{ scale: 1.05, zIndex: 50 }}>
-      <motion.div
-        layout
+      <Card
         className={`
-          relative p-5 rounded-2xl backdrop-blur-xl border cursor-grab active:cursor-grabbing overflow-hidden
-          ${deal.health === 'divine' ? 'bg-gradient-to-br from-[var(--accent-1)]/40 via-[var(--accent-2)]/30 to-[var(--accent-1)]/40 border-[var(--accent-1)] shadow-2xl shadow-[var(--accent-1)]/40' :
-            deal.stage === 'Ganho' ? 'bg-gradient-to-br from-emerald-600/30 to-teal-700/30 border-emerald-500/50' :
+          relative cursor-grab active:cursor-grabbing overflow-hidden
+          ${deal.health === 'divine' ? 'bg-gradient-to-br from-[var(--accent-sky)]/40 via-[var(--accent-purple)]/30 to-[var(--accent-sky)]/40 border-[var(--accent-sky)] shadow-2xl shadow-[var(--accent-sky)]/40' :
+            deal.stage === 'Ganho' ? 'bg-gradient-to-br from-[var(--accent-emerald)]/30 to-[var(--accent-sky)]/30 border-[var(--accent-emerald)]/50' :
             'bg-[var(--surface)]/70 border-[var(--border)]'}
           ${isStale ? 'opacity-70 grayscale' : ''}
         `}
-        whileHover={{ scale: 1.03, borderColor: 'var(--accent-1)' }}
       >
         {deal.health === 'divine' && (
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 bg-gradient-to-r from-[var(--accent-1)]/20 to-transparent blur-xl"
+            className="absolute inset-0 bg-gradient-to-r from-[var(--accent-sky)]/20 to-transparent blur-xl"
           />
         )}
-        <div className="relative z-10">
+        <CardContent className="relative z-10 p-5">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <p className="text-xs text-[var(--text)]/60 uppercase tracking-wider">{deal.company}</p>
-              <h3 className="font-black text-[var(--text)] text-lg mt-1">{deal.name}</h3>
+              <p className="text-xs text-[var(--text-primary)]/60 uppercase tracking-wider">{deal.company}</p>
+              <h3 className="font-black text-[var(--text-primary)] text-lg mt-1">{deal.name}</h3>
             </div>
             <div className="flex items-center gap-2">
-              {deal.health === 'divine' && <Trophy className="h-6 w-6 text-[var(--accent-1)]" />}
-              {deal.health === 'hot' && <Flame className="h-6 w-6 text-orange-500 animate-pulse" />}
+              {deal.health === 'divine' && <Trophy className="h-6 w-6 text-[var(--accent-sky)]" />}
+              {deal.health === 'hot' && <Flame className="h-6 w-6 text-[var(--accent-warning)] animate-pulse" />}
             </div>
           </div>
-          <p className="text-3xl font-black text-[var(--accent-1)] my-3">
+          <p className="text-3xl font-black text-[var(--accent-sky)] my-3">
             R$ {deal.value.toLocaleString('pt-BR')}
           </p>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[var(--text)]/70">{deal.probability}% chance</span>
-            <span className="text-[var(--text)]/50">{daysOld}d</span>
+            <span className="text-[var(--text-primary)]/70">{deal.probability}% chance</span>
+            <span className="text-[var(--text-primary)]/50">{daysOld}d</span>
           </div>
           {deal.ai_insight && (
-            <div className="mt-4 p-3 bg-[var(--accent-1)]/20 rounded-xl border border-[var(--accent-1)]/30">
-              <p className="text-[var(--accent-1)] text-sm font-medium">{deal.ai_insight}</p>
+            <div className="mt-4 p-3 bg-[var(--accent-sky)]/20 rounded-xl border border-[var(--accent-sky)]/30">
+              <p className="text-[var(--accent-sky)] text-sm font-medium">{deal.ai_insight}</p>
             </div>
           )}
-        </div>
-      </motion.div>
+        </CardContent>
+      </Card>
     </Reorder.Item>
   );
 };
@@ -166,8 +165,8 @@ export default function PipelineQuantico() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-[var(--accent-1)] mx-auto mb-6"></div>
-          <p className="text-2xl text-[var(--text)]/70">Despertando o Pipeline Quântico...</p>
+          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-[var(--accent-sky)] mx-auto mb-6"></div>
+          <p className="text-2xl text-[var(--text-primary)]/70">Despertando o Pipeline Quântico...</p>
         </div>
       </div>
     );
@@ -178,14 +177,14 @@ export default function PipelineQuantico() {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-lg">
           <p className="text-6xl mb-6">⚠️</p>
-          <h2 className="text-3xl font-black text-[var(--text)] mb-4">Pipeline Indisponível</h2>
-          <p className="text-xl text-[var(--text)]/70 mb-8">{error}</p>
-          <button
+          <h2 className="text-3xl font-black text-[var(--text-primary)] mb-4">Pipeline Indisponível</h2>
+          <p className="text-xl text-[var(--text-primary)]/70 mb-8">{error}</p>
+          <Button
             onClick={() => window.location.reload()}
-            className="px-8 py-4 bg-[var(--accent-1)]/70 hover:bg-[var(--accent-1)] text-[var(--background)] rounded-2xl font-bold text-lg transition-all"
+            className="px-8 py-4 bg-[var(--accent-sky)]/70 hover:bg-[var(--accent-sky)] text-[var(--background)] rounded-2xl font-bold text-lg"
           >
             Tentar Novamente
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -193,32 +192,32 @@ export default function PipelineQuantico() {
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">
-      {/* TOOLBAR SUPERIOR - Integrada ao layout global */}
+      {/* TOOLBAR SUPERIOR */}
       <div className="border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-md p-6">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-purple)] bg-clip-text text-transparent">
               DOMÍNIO REAL — PIPELINE QUÂNTICO
             </h1>
             <div className="flex gap-12 mt-6">
               <div>
-                <p className="text-sm text-[var(--text)]/60">Total em Pipeline</p>
-                <p className="text-4xl font-black text-[var(--text)]">R$ {totalValue.toLocaleString('pt-BR')}</p>
+                <p className="text-sm text-[var(--text-primary)]/60">Total em Pipeline</p>
+                <p className="text-4xl font-black text-[var(--text-primary)]">R$ {totalValue.toLocaleString('pt-BR')}</p>
               </div>
               <div>
-                <p className="text-sm text-[var(--text)]/60">Previsão Ponderada (IA)</p>
-                <p className="text-4xl font-black text-[var(--accent-1)]">R$ {weightedValue.toLocaleString('pt-BR')}</p>
+                <p className="text-sm text-[var(--text-primary)]/60">Previsão Ponderada (IA)</p>
+                <p className="text-4xl font-black text-[var(--accent-sky)]">R$ {weightedValue.toLocaleString('pt-BR')}</p>
               </div>
             </div>
           </div>
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[var(--text)]/50" />
-            <input
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-[var(--text-primary)]/50" />
+            <Input
               type="text"
               placeholder="Buscar deals por nome ou empresa..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-14 pr-6 py-4 bg-[var(--surface)]/70 border border-[var(--border)] rounded-2xl text-lg w-96 focus:border-[var(--accent-1)] outline-none text-[var(--text)]"
+              className="pl-14 pr-6 py-4 bg-[var(--surface)]/70 border-[var(--border)] rounded-2xl text-lg w-96 text-[var(--text-primary)]"
             />
           </div>
         </div>
@@ -233,34 +232,36 @@ export default function PipelineQuantico() {
 
             return (
               <div key={key} className="flex-1 min-w-80">
-                <div className="bg-[var(--surface)]/40 backdrop-blur-md rounded-3xl border border-[var(--border)] p-6 h-full flex flex-col">
-                  <h2 className="text-3xl font-black text-center text-[var(--text)] mb-4">{config.label}</h2>
-                  <p className="text-2xl font-bold text-center text-[var(--accent-1)] mb-8">
-                    R$ {stageTotal.toLocaleString('pt-BR')}
-                  </p>
-                  <Reorder.Group
-                    axis="y"
-                    values={stageDeals}
-                    onReorder={async (newOrder) => {
-                      // Atualiza estágio no Supabase (optimistic UI)
-                      const updates = newOrder.map((deal, index) =>
-                        supabase.from('opportunities').update({ stage: key }).eq('id', deal.id)
-                      );
-                      await Promise.all(updates);
-                      toast.success(`Deal movido para ${config.label}`, { duration: 2000 });
-                    }}
-                    className="flex-1 space-y-4 overflow-y-auto"
-                  >
-                    <AnimatePresence>
-                      {stageDeals.map(deal => (
-                        <DealCard key={deal.id} deal={deal} />
-                      ))}
-                    </AnimatePresence>
-                    {stageDeals.length === 0 && (
-                      <p className="text-center text-[var(--text)]/40 py-12 text-xl">Vazio neste estágio</p>
-                    )}
-                  </Reorder.Group>
-                </div>
+                <Card className="bg-[var(--surface)]/40 backdrop-blur-md border-[var(--border)] rounded-3xl h-full">
+                  <CardContent className="p-6 flex flex-col h-full">
+                    <h2 className="text-3xl font-black text-center text-[var(--text-primary)] mb-4">{config.label}</h2>
+                    <p className="text-2xl font-bold text-center text-[var(--accent-sky)] mb-8">
+                      R$ {stageTotal.toLocaleString('pt-BR')}
+                    </p>
+                    <Reorder.Group
+                      axis="y"
+                      values={stageDeals}
+                      onReorder={async (newOrder) => {
+                        // Atualiza estágio no Supabase (optimistic UI)
+                        const updates = newOrder.map((deal, index) =>
+                          supabase.from('opportunities').update({ stage: key }).eq('id', deal.id)
+                        );
+                        await Promise.all(updates);
+                        toast.success(`Deal movido para ${config.label}`, { duration: 2000 });
+                      }}
+                      className="flex-1 space-y-4 overflow-y-auto"
+                    >
+                      <AnimatePresence>
+                        {stageDeals.map(deal => (
+                          <DealCard key={deal.id} deal={deal} />
+                        ))}
+                      </AnimatePresence>
+                      {stageDeals.length === 0 && (
+                        <p className="text-center text-[var(--text-primary)]/40 py-12 text-xl">Vazio neste estágio</p>
+                      )}
+                    </Reorder.Group>
+                  </CardContent>
+                </Card>
               </div>
             );
           })}
@@ -269,7 +270,7 @@ export default function PipelineQuantico() {
 
       {/* MENSAGEM ÉPICA FIXA */}
       <div className="fixed bottom-10 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-        <p className="text-5xl font-black bg-gradient-to-r from-[var(--accent-1)] via-[var(--accent-2)] to-[var(--accent-1)] bg-clip-text text-transparent">
+        <p className="text-5xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-purple)] to-[var(--accent-sky)] bg-clip-text text-transparent">
           O DINHEIRO JÁ ESCOLHEU VOCÊ
         </p>
       </div>
