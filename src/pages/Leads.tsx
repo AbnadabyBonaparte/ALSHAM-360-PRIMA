@@ -1,8 +1,31 @@
+// src/pages/Leads.tsx
+// ALSHAM 360° PRIMA — Leads (migrado para shadcn/ui)
+
 import React, { useEffect, useState } from 'react'
 import { leadsQueries } from '../lib/supabase/queries/leads'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import type { Lead } from '../lib/supabase/types'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export const Leads: React.FC = () => {
   const { currentOrg } = useAuthStore()
@@ -47,23 +70,33 @@ export const Leads: React.FC = () => {
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): { bg: string; text: string } => {
     switch (status) {
-      case 'novo': return 'bg-green-100 text-green-800'
-      case 'qualificado': return 'bg-blue-100 text-blue-800'
-      case 'contato': return 'bg-yellow-100 text-yellow-800'
-      case 'proposta': return 'bg-purple-100 text-purple-800'
-      case 'fechado': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'novo':
+        return { bg: 'bg-[var(--accent-emerald)]/10', text: 'text-[var(--accent-emerald)]' }
+      case 'qualificado':
+        return { bg: 'bg-[var(--accent-sky)]/10', text: 'text-[var(--accent-sky)]' }
+      case 'contato':
+        return { bg: 'bg-[var(--accent-warning)]/10', text: 'text-[var(--accent-warning)]' }
+      case 'proposta':
+        return { bg: 'bg-[var(--accent-purple)]/10', text: 'text-[var(--accent-purple)]' }
+      case 'fechado':
+        return { bg: 'bg-[var(--surface-strong)]', text: 'text-[var(--text-secondary)]' }
+      default:
+        return { bg: 'bg-[var(--surface-strong)]', text: 'text-[var(--text-secondary)]' }
     }
   }
 
-  const getTemperatureColor = (temperature: string) => {
+  const getTemperatureVariant = (temperature: string): { bg: string; text: string } => {
     switch (temperature) {
-      case 'quente': return 'bg-red-100 text-red-800'
-      case 'morno': return 'bg-yellow-100 text-yellow-800'
-      case 'frio': return 'bg-blue-100 text-blue-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'quente':
+        return { bg: 'bg-[var(--accent-alert)]/10', text: 'text-[var(--accent-alert)]' }
+      case 'morno':
+        return { bg: 'bg-[var(--accent-warning)]/10', text: 'text-[var(--accent-warning)]' }
+      case 'frio':
+        return { bg: 'bg-[var(--accent-sky)]/10', text: 'text-[var(--accent-sky)]' }
+      default:
+        return { bg: 'bg-[var(--surface-strong)]', text: 'text-[var(--text-secondary)]' }
     }
   }
 
@@ -76,134 +109,139 @@ export const Leads: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-alsham-bg-default">
+    <div className="min-h-screen bg-[var(--background)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-alsham-text-primary">Leads</h1>
-          <p className="text-alsham-text-secondary mt-2">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Leads</h1>
+          <p className="text-[var(--text-secondary)] mt-2">
             Gerencie seus leads e prospects
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Buscar por nome, email ou empresa..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
-              />
+        <Card className="mb-6 border-[var(--border)]/40 bg-[var(--surface)]/70 backdrop-blur-xl">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder="Buscar por nome, email ou empresa..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
+                />
+              </div>
+              <div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-[200px] bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)]">
+                    <SelectValue placeholder="Todos os status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[var(--surface)] border-[var(--border)]">
+                    <SelectItem value=" " className="text-[var(--text-primary)]">Todos os status</SelectItem>
+                    <SelectItem value="novo" className="text-[var(--text-primary)]">Novo</SelectItem>
+                    <SelectItem value="qualificado" className="text-[var(--text-primary)]">Qualificado</SelectItem>
+                    <SelectItem value="contato" className="text-[var(--text-primary)]">Contato</SelectItem>
+                    <SelectItem value="proposta" className="text-[var(--text-primary)]">Proposta</SelectItem>
+                    <SelectItem value="fechado" className="text-[var(--text-primary)]">Fechado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
-              >
-                <option value="">Todos os status</option>
-                <option value="novo">Novo</option>
-                <option value="qualificado">Qualificado</option>
-                <option value="contato">Contato</option>
-                <option value="proposta">Proposta</option>
-                <option value="fechado">Fechado</option>
-              </select>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Leads Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <Card className="border-[var(--border)]/40 bg-[var(--surface)]/70 backdrop-blur-xl overflow-hidden">
           {leads.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Lead
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Empresa
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Temperatura
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Score
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Criado em
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {leads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {lead.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {lead.email}
-                          </div>
-                          {lead.phone && (
-                            <div className="text-sm text-gray-500">
-                              {lead.phone}
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-[var(--border)]/50 hover:bg-transparent">
+                    <TableHead className="text-[var(--text-secondary)]">Lead</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Empresa</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Status</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Temperatura</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Score</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Criado em</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leads.map((lead) => {
+                    const statusVariant = getStatusVariant(lead.status)
+                    const temperatureVariant = getTemperatureVariant(lead.temperature)
+
+                    return (
+                      <TableRow
+                        key={lead.id}
+                        className="border-[var(--border)]/50 hover:bg-[var(--surface-strong)]/50 transition-colors"
+                      >
+                        <TableCell>
+                          <div>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">
+                              {lead.name}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {lead.company || '-'}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {lead.position || '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(lead.status)}`}>
-                          {lead.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTemperatureColor(lead.temperature)}`}>
-                          {lead.temperature}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {lead.score}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(lead.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            <div className="text-sm text-[var(--text-secondary)]">
+                              {lead.email}
+                            </div>
+                            {lead.phone && (
+                              <div className="text-sm text-[var(--text-secondary)]">
+                                {lead.phone}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-[var(--text-primary)]">
+                            {lead.company || '-'}
+                          </div>
+                          <div className="text-sm text-[var(--text-secondary)]">
+                            {lead.position || '-'}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={`${statusVariant.bg} ${statusVariant.text} border-0 font-semibold`}
+                          >
+                            {lead.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={`${temperatureVariant.bg} ${temperatureVariant.text} border-0 font-semibold`}
+                          >
+                            {lead.temperature}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-[var(--text-primary)]">
+                          {lead.score}
+                        </TableCell>
+                        <TableCell className="text-sm text-[var(--text-secondary)]">
+                          {formatDate(lead.created_at)}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-alsham-text-secondary">
+            <CardContent className="py-12 text-center">
+              <p className="text-[var(--text-secondary)]">
                 {error || 'Nenhum lead encontrado'}
               </p>
               {error && (
-                <button
+                <Button
                   onClick={loadLeads}
-                  className="mt-4 px-4 py-2 bg-alsham-primary text-white rounded-lg hover:bg-alsham-primary-hover"
+                  className="mt-4 bg-[var(--accent-sky)] text-white hover:bg-[var(--accent-sky)]/90"
                 >
                   Tentar novamente
-                </button>
+                </Button>
               )}
-            </div>
+            </CardContent>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   )
