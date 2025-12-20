@@ -1,5 +1,5 @@
 // src/pages/Dashboard.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard (queries corrigidas)
+// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard (migrado para shadcn/ui)
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +13,10 @@ import {
 } from "chart.js";
 import { Line, Doughnut } from "react-chartjs-2";
 import { getSupabaseClient } from "../lib/supabase";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -50,15 +54,17 @@ const GlassCard = ({ children, className = "", onClick, role = "region" }: any) 
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-50px" }}
     whileHover={onClick ? { y: -4, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.3)" } : {}}
-    className={`relative overflow-hidden rounded-[24px] border border-[var(--border)]/40 bg-[var(--surface)]/70 backdrop-blur-xl transition-all ${onClick ? "cursor-pointer active:scale-[0.98]" : ""} ${className}`}
+    className={onClick ? "cursor-pointer active:scale-[0.98]" : ""}
   >
-    <div
-      className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-      }}
-    />
-    <div className="relative z-10 h-full">{children}</div>
+    <Card className={`relative overflow-hidden rounded-[24px] border-[var(--border)]/40 bg-[var(--surface)]/70 backdrop-blur-xl transition-all ${className}`}>
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      <div className="relative z-10 h-full">{children}</div>
+    </Card>
   </motion.div>
 );
 
@@ -89,23 +95,25 @@ const OracleWidget = ({ kpis, mode }: { kpis: any[]; mode: string }) => {
   return (
     <div className="relative overflow-hidden rounded-[16px] sm:rounded-[24px] bg-[var(--surface)]/50 border border-[var(--accent-purple)]/20 p-[1px]">
       <div className="absolute inset-0 bg-[var(--accent-purple)]/10 blur-xl animate-pulse" />
-      <div className="relative h-full rounded-[15px] sm:rounded-[23px] bg-[var(--surface)]/90 p-4 sm:p-5 backdrop-blur-xl">
-        <div className="flex items-start gap-3 sm:gap-4">
-          <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 place-content-center rounded-full bg-[var(--accent-purple)]/20 text-[var(--accent-purple)] shadow-lg">
-            <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
-          <div className="flex-1 space-y-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest text-[var(--accent-purple)]">
-                Oracle Insight • {insight.confidence}
-              </h3>
-              <span className="flex h-2 w-2 flex-shrink-0 rounded-full bg-[var(--accent-purple)] shadow-[0_0_10px_currentColor]" />
+      <Card className="relative h-full rounded-[15px] sm:rounded-[23px] bg-[var(--surface)]/90 backdrop-blur-xl border-0">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 place-content-center rounded-full bg-[var(--accent-purple)]/20 text-[var(--accent-purple)] shadow-lg">
+              <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <p className="text-sm sm:text-base font-medium text-[var(--text-primary)]">{insight.title}</p>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{insight.impact}</p>
+            <div className="flex-1 space-y-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest text-[var(--accent-purple)]">
+                  Oracle Insight • {insight.confidence}
+                </h3>
+                <span className="flex h-2 w-2 flex-shrink-0 rounded-full bg-[var(--accent-purple)] shadow-[0_0_10px_currentColor]" />
+              </div>
+              <p className="text-sm sm:text-base font-medium text-[var(--text-primary)]">{insight.title}</p>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{insight.impact}</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
@@ -268,12 +276,13 @@ export default function DashboardSupremo() {
         <div className="text-center space-y-4">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold animate-pulse">ALSHAM SYSTEM</h1>
           <p className="text-sm sm:text-base">Acessando mainframe... Consciência situacional ativada.</p>
-          <button
+          <Button
             onClick={() => setMatrixMode(false)}
-            className="border border-[var(--accent-emerald)] px-4 py-2 hover:bg-[var(--accent-emerald)] hover:text-[var(--background)] transition-colors"
+            variant="outline"
+            className="border-[var(--accent-emerald)] text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)] hover:text-[var(--background)]"
           >
             DESATIVAR
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -287,15 +296,16 @@ export default function DashboardSupremo() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
               The Oracle Deck
             </h1>
-            <span
-              className={`rounded-full border px-2 sm:px-3 py-0.5 sm:py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest ${
+            <Badge
+              variant="outline"
+              className={`rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest ${
                 timeMode === "future"
                   ? "border-[var(--accent-purple)]/30 bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]"
                   : "border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]"
               }`}
             >
               {timeMode === "future" ? "PREDICTIVE AI" : "LIVE DATA"}
-            </span>
+            </Badge>
           </div>
           <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl">
             {timeMode === "future"
@@ -305,9 +315,11 @@ export default function DashboardSupremo() {
         </motion.div>
 
         <div className="flex items-center gap-3 sm:gap-4">
-          <button
+          <Button
             onClick={startListening}
-            className={`group relative flex h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-full border transition-all ${
+            variant="ghost"
+            size="icon"
+            className={`group relative h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-full border transition-all ${
               isListening
                 ? "border-[var(--accent-alert)] bg-[var(--accent-alert)]/10 text-[var(--accent-alert)] animate-pulse"
                 : "border-[var(--border)] hover:border-[var(--accent-sky)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -315,7 +327,7 @@ export default function DashboardSupremo() {
             aria-label="Comando de voz"
           >
             <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -346,7 +358,7 @@ export default function DashboardSupremo() {
               </p>
               <h3 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
                 {loading ? (
-                  <span className="animate-pulse bg-[var(--surface-strong)] text-transparent rounded inline-block w-24">00000</span>
+                  <Skeleton className="h-8 w-24 bg-[var(--surface-strong)]" />
                 ) : (
                   <NumberTicker value={kpi.val} prefix={kpi.prefix} />
                 )}
@@ -467,14 +479,15 @@ export default function DashboardSupremo() {
             </div>
             <div className="p-1 sm:p-2">
               {["Criar Campanha", "Importar Leads", "Relatório PDF", "Chat com Time"].map((action, i) => (
-                <button
+                <Button
                   key={i}
-                  className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg hover:bg-[var(--surface-strong)] text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-between group"
+                  variant="ghost"
+                  className="w-full justify-between px-3 sm:px-4 py-2.5 sm:py-3 h-auto rounded-lg text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-strong)] group"
                   aria-label={action}
                 >
                   <span className="truncate">{action}</span>
                   <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
-                </button>
+                </Button>
               ))}
             </div>
           </GlassCard>
