@@ -1,7 +1,5 @@
 // src/pages/Reports.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Relatórios Alienígena 1000/1000
-// Onde os números falam. Onde a verdade aparece. Onde você reina.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Reports.tsx
+// ALSHAM 360° PRIMA — Relatórios (migrado para shadcn/ui)
 
 import {
   DocumentChartBarIcon,
@@ -23,6 +21,7 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface SupremeReport {
   totalRevenue: number;
@@ -108,9 +107,9 @@ export default function ReportsPage() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-12 border-t-transparent border-cyan-500 rounded-full"
+          className="w-40 h-40 border-12 border-t-transparent border-[var(--accent-sky)] rounded-full"
         />
-        <p className="absolute text-5xl text-cyan-400 font-light">Citizen Supremo X.1 calculando seu império...</p>
+        <p className="absolute text-5xl text-[var(--accent-sky)] font-light">Sistema ALSHAM calculando seu império...</p>
       </div>
     );
   }
@@ -123,13 +122,13 @@ export default function ReportsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-purple)] to-[var(--accent-emerald)] bg-clip-text text-transparent">
             RELATÓRIOS SUPREMO
           </h1>
-          <p className="text-6xl text-gray-300 mt-12 font-light">
+          <p className="text-6xl text-[var(--text-secondary)] mt-12 font-light">
             R$ {report?.totalRevenue.toLocaleString('pt-BR')} em receita • {report?.conversionRate}% conversão
           </p>
-          <p className="text-5xl text-emerald-400 mt-6">
+          <p className="text-5xl text-[var(--accent-emerald)] mt-6">
             Previsão 30 dias: R$ {report?.forecastNext30.toLocaleString('pt-BR')}
           </p>
         </motion.div>
@@ -141,37 +140,57 @@ export default function ReportsPage() {
             title="Receita Total"
             value={`R$ ${report?.totalRevenue.toLocaleString('pt-BR')}`}
             growth="+127%"
-            color="from-emerald-500 to-teal-600"
+            colorClass="from-[var(--accent-emerald)] to-[var(--accent-sky)]"
           />
           <SupremeReportCard
             icon={<ArrowTrendingUpIcon />}
             title="MRR Projetado"
             value={`R$ ${report?.monthlyRecurring.toLocaleString('pt-BR')}`}
             growth="+89%"
-            color="from-purple-500 to-pink-600"
+            colorClass="from-[var(--accent-purple)] to-[var(--accent-pink)]"
           />
           <SupremeReportCard
             icon={<UsersIcon />}
             title="Leads Este Mês"
             value={report?.newLeads.toString()}
             growth="+64%"
-            color="from-cyan-500 to-blue-600"
+            colorClass="from-[var(--accent-sky)] to-[var(--accent-purple)]"
           />
           <SupremeReportCard
             icon={<TrophyIcon />}
             title="Top Performer"
             value={report?.topPerformer}
             growth={`${report?.topPerformerPoints.toLocaleString()} pts`}
-            color="from-yellow-500 to-orange-600"
+            colorClass="from-[var(--accent-warning)] to-[var(--accent-alert)]"
           />
         </div>
 
         {/* GRID DE MÉTRICAS SECUNDÁRIAS */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-20">
-          <MiniCard title="Taxa de Conversão" value={`${report?.conversionRate}%`} color="emerald" />
-          <MiniCard title="Tamanho Médio do Deal" value={`R$ ${report?.avgDealSize.toLocaleString('pt-BR')}`} color="cyan" />
-          <MiniCard title="Win Rate" value={`${report?.winRate}%`} color="purple" />
-          <MiniCard title="Pipeline Atual" value={`R$ ${report?.pipelineValue.toLocaleString('pt-BR')}`} color="orange" />
+          <MiniCard
+            title="Taxa de Conversão"
+            value={`${report?.conversionRate}%`}
+            colorClass="from-[var(--accent-emerald)]/50 to-[var(--accent-emerald)]/30"
+            borderClass="border-[var(--accent-emerald)]/30"
+          />
+          <MiniCard
+            title="Tamanho Médio do Deal"
+            value={`R$ ${report?.avgDealSize.toLocaleString('pt-BR')}`}
+            colorClass="from-[var(--accent-sky)]/50 to-[var(--accent-sky)]/30"
+            borderClass="border-[var(--accent-sky)]/30"
+          />
+          <MiniCard
+            title="Win Rate"
+            value={`${report?.winRate}%`}
+            colorClass="from-[var(--accent-purple)]/50 to-[var(--accent-purple)]/30"
+            borderClass="border-[var(--accent-purple)]/30"
+          />
+          <MiniCard
+            title="Pipeline Atual"
+            value={`R$ ${report?.pipelineValue.toLocaleString('pt-BR')}`}
+            colorClass="from-[var(--accent-warning)]/50 to-[var(--accent-warning)]/30"
+            borderClass="border-[var(--accent-warning)]/30"
+          />
         </div>
 
         {/* MENSAGEM FINAL DA IA */}
@@ -180,47 +199,48 @@ export default function ReportsPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40"
         >
-          <LightBulbIcon className="w-64 h-64 text-purple-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+          <LightBulbIcon className="w-64 h-64 text-[var(--accent-purple)] mx-auto mb-16 animate-pulse" />
+          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]">
             SEUS NÚMEROS NÃO MENTEM
           </p>
-          <p className="text-2xl md:text-3xl lg:text-4xl font-light text-gray-300 mt-16">
+          <p className="text-2xl md:text-3xl lg:text-4xl font-light text-[var(--text-secondary)] mt-16">
             E a IA já sabe o que você vai faturar nos próximos 90 dias.
           </p>
-          <p className="text-6xl text-emerald-400 mt-20">
+          <p className="text-6xl text-[var(--accent-emerald)] mt-20">
             Precisão atual: {report?.aiPredictionsAccuracy}%
           </p>
-          <p className="text-5xl text-gray-400 mt-16">
-            — Citizen Supremo X.1
+          <p className="text-5xl text-[var(--text-secondary)] mt-16">
+            — Sistema ALSHAM
           </p>
         </motion.div>
       </div>
   );
 }
 
-function SupremeReportCard({ icon, title, value, growth, color }: any) {
+function SupremeReportCard({ icon, title, value, growth, colorClass }: any) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl`}
-    >
-      <div className="flex items-center justify-center mb-8">
-        <div className="p-8 bg-white/10 rounded-3xl">
-          {icon}
+    <Card className={`bg-gradient-to-br ${colorClass} border-[var(--border)] backdrop-blur-xl shadow-2xl rounded-3xl hover:scale-105 transition-all`}>
+      <CardContent className="p-12">
+        <div className="flex items-center justify-center mb-8">
+          <div className="p-8 bg-[var(--text-primary)]/10 rounded-3xl">
+            {icon}
+          </div>
         </div>
-      </div>
-      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
-      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
-      <p className="text-2xl text-[var(--text-primary)]/60 text-center mt-4">{growth}</p>
-    </motion.div>
+        <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
+        <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
+        <p className="text-2xl text-[var(--text-primary)]/60 text-center mt-4">{growth}</p>
+      </CardContent>
+    </Card>
   );
 }
 
-function MiniCard({ title, value, color }: any) {
+function MiniCard({ title, value, colorClass, borderClass }: any) {
   return (
-    <div className={`bg-gradient-to-br from-${color}-900/50 to-${color}-900/30 rounded-3xl p-8 border border-${color}-500/30`}>
-      <p className="text-5xl font-black text-[var(--text-primary)]">{value}</p>
-      <p className="text-2xl text-gray-300 mt-4">{title}</p>
-    </div>
+    <Card className={`bg-gradient-to-br ${colorClass} rounded-3xl border ${borderClass}`}>
+      <CardContent className="p-8">
+        <p className="text-5xl font-black text-[var(--text-primary)]">{value}</p>
+        <p className="text-2xl text-[var(--text-secondary)] mt-4">{title}</p>
+      </CardContent>
+    </Card>
   );
 }

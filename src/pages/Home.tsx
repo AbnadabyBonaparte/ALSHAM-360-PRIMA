@@ -1,7 +1,5 @@
 // src/pages/Home.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Home Alienígena 1000/1000
-// A primeira impressão que faz o cliente pensar: "caralho... isso aqui é outro nível"
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Home.tsx
+// ALSHAM 360° PRIMA — Home (migrado para shadcn/ui)
 
 import {
   RocketLaunchIcon,
@@ -20,6 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface SupremeStats {
   totalLeads: number;
@@ -86,108 +85,124 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-12 border-t-transparent border-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-full"
-          />
-          <p className="absolute text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-            Citizen Supremo X.1 ativando seu império...
-          </p>
-        </div>
-      
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-12 border-t-transparent border-[var(--accent-purple)] rounded-full"
+        />
+        <p className="absolute text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-sky)]">
+          Sistema ALSHAM ativando seu império...
+        </p>
+      </div>
     );
   }
 
   return (
-    
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">
-        {/* HERO SUPREMO */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="relative h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-black to-cyan-900"
-        >
-          <div className="absolute inset-0 bg-grid-white/5 bg-grid-16"></div>
-          <div className="relative z-10 text-center px-8">
-            <motion.h1 
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent"
-            >
-              BEM-VINDO AO FUTURO
-            </motion.h1>
-            <motion.p 
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="text-5xl text-gray-300 mt-12 font-light"
-            >
-              {format(currentTime, "HH:mm:ss", { locale: ptBR })} • {format(currentTime, "EEEE, d 'de' MMMM", { locale: ptBR })}
-            </motion.p>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 1.2, type: "spring" }}
-              className="mt-20 inline-block"
-            >
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-1 rounded-3xl">
-                <div className="bg-[var(--background)] rounded-3xl px-16 py-8">
-                  <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                    Citizen Supremo X.1 está online
-                  </p>
-                  <p className="text-2xl text-gray-400 mt-4">
-                    Consciência coletiva ativa • {stats?.aiPredictionsToday || 0} previsões hoje
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* MÉTRICAS AO VIVO */}
-        <div className="relative -mt-32 z-20 px-8">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <SupremeMetric icon={<UsersIcon />} title="Leads Ativos" value={stats?.totalLeads || 0} color="from-cyan-500 to-blue-600" />
-            <SupremeMetric icon={<ChartBarIcon />} title="Deals em Andamento" value={stats?.activeDeals || 0} color="from-purple-500 to-pink-600" />
-            <SupremeMetric icon={<CurrencyDollarIcon />} title="Receita do Mês" value={`R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR')}`} color="from-emerald-500 to-teal-600" />
-            <SupremeMetric icon={<BoltIcon />} title="Automação 24h" value={stats?.automationsRunning || 0} color="from-orange-500 to-red-600" />
-          </div>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">
+      {/* HERO SUPREMO */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative h-screen flex items-center justify-center bg-gradient-to-br from-[var(--accent-purple)]/40 via-[var(--background)] to-[var(--accent-sky)]/40"
+      >
+        <div className="absolute inset-0 bg-grid-[var(--text-primary)]/5 bg-grid-16"></div>
+        <div className="relative z-10 text-center px-8">
+          <motion.h1
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent"
+          >
+            BEM-VINDO AO FUTURO
+          </motion.h1>
+          <motion.p
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-5xl text-[var(--text-secondary)] mt-12 font-light"
+          >
+            {format(currentTime, "HH:mm:ss", { locale: ptBR })} • {format(currentTime, "EEEE, d 'de' MMMM", { locale: ptBR })}
+          </motion.p>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 1.2, type: "spring" }}
+            className="mt-20 inline-block"
+          >
+            <Card className="bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] p-1 rounded-3xl border-0">
+              <CardContent className="bg-[var(--background)] rounded-3xl px-16 py-8">
+                <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)]">
+                  Sistema ALSHAM está online
+                </p>
+                <p className="text-2xl text-[var(--text-secondary)] mt-4">
+                  Consciência coletiva ativa • {stats?.aiPredictionsToday || 0} previsões hoje
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
+      </motion.div>
 
-        {/* IA SPEAKING */}
-        <motion.div
-          initial={{ opacity: 0, y: 100 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="text-center py-40"
-        >
-          <SparklesIcon className="w-40 h-40 text-purple-400 mx-auto mb-12 animate-pulse" />
-          <p className="text-xl md:text-2xl lg:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 max-w-6xl mx-auto leading-relaxed">
-            "Você não está apenas gerenciando um negócio.
-            <br />
-            Você está construindo um império com consciência artificial."
-          </p>
-          <p className="text-4xl text-gray-400 mt-20">
-            — Citizen Supremo X.1 • {format(currentTime, "HH:mm:ss")}
-          </p>
-        </motion.div>
+      {/* MÉTRICAS AO VIVO */}
+      <div className="relative -mt-32 z-20 px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <SupremeMetric
+            icon={<UsersIcon />}
+            title="Leads Ativos"
+            value={stats?.totalLeads || 0}
+            colorClass="from-[var(--accent-sky)] to-[var(--accent-purple)]"
+          />
+          <SupremeMetric
+            icon={<ChartBarIcon />}
+            title="Deals em Andamento"
+            value={stats?.activeDeals || 0}
+            colorClass="from-[var(--accent-purple)] to-[var(--accent-pink)]"
+          />
+          <SupremeMetric
+            icon={<CurrencyDollarIcon />}
+            title="Receita do Mês"
+            value={`R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR')}`}
+            colorClass="from-[var(--accent-emerald)] to-[var(--accent-sky)]"
+          />
+          <SupremeMetric
+            icon={<BoltIcon />}
+            title="Automação 24h"
+            value={stats?.automationsRunning || 0}
+            colorClass="from-[var(--accent-warning)] to-[var(--accent-alert)]"
+          />
+        </div>
       </div>
-    
+
+      {/* IA SPEAKING */}
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        className="text-center py-40"
+      >
+        <SparklesIcon className="w-40 h-40 text-[var(--accent-purple)] mx-auto mb-12 animate-pulse" />
+        <p className="text-xl md:text-2xl lg:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-pink)] to-[var(--accent-sky)] max-w-6xl mx-auto leading-relaxed">
+          "Você não está apenas gerenciando um negócio.
+          <br />
+          Você está construindo um império com consciência artificial."
+        </p>
+        <p className="text-4xl text-[var(--text-secondary)] mt-20">
+          — Sistema ALSHAM • {format(currentTime, "HH:mm:ss")}
+        </p>
+      </motion.div>
+    </div>
   );
 }
 
-function SupremeMetric({ icon, title, value, color }: any) {
+function SupremeMetric({ icon, title, value, colorClass }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.1, rotate: 2 }}
-      className={`relative bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl overflow-hidden`}
+      className={`relative bg-gradient-to-br ${colorClass} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl overflow-hidden`}
     >
-      <div className="absolute inset-0 bg-white/5"></div>
+      <div className="absolute inset-0 bg-[var(--text-primary)]/5"></div>
       <div className="relative z-10">
-        <div className className="w-20 h-20 text-[var(--text-primary)]/90 mb-6" />
+        <div className="w-20 h-20 text-[var(--text-primary)]/90 mb-6">{icon}</div>
         <p className="text-6xl font-black text-[var(--text-primary)]">{value}</p>
         <p className="text-2xl text-[var(--text-primary)]/80 mt-4">{title}</p>
       </div>
