@@ -1,19 +1,19 @@
 // src/pages/ExecutiveDashboard.tsx
-// THE BOARDROOM — ALSHAM STYLUS EDITION v4.0
+// THE BOARDROOM — ALSHAM STYLUS EDITION (migrado para shadcn/ui)
 // 100/100: Concept • Visual • Technical • Brand • Business
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FileText, Share2, ShieldCheck, Globe, Briefcase, 
-  Crown, Download, Target, TrendingUp, Zap
+import { motion } from 'framer-motion';
+import {
+  FileText, Globe, Briefcase,
+  Crown, Target, TrendingUp, TrendingDown, ShieldCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-// Assumindo que os hooks e componentes auxiliares já existem (ou mantendo a lógica local se preferir)
-// Para garantir que compile, vou incluir a lógica de dados aqui mesmo, seguindo o padrão "monolito seguro".
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/hooks/useTheme';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 // ===================== TYPES & CONFIG =====================
 const BOARDROOM_RULES = {
@@ -44,28 +44,28 @@ interface Department {
 // ===================== COMPONENTS =====================
 
 const KpiCard = ({ title, value, subtitle, trend, prefix = "" }: any) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     whileHover={{ y: -10, scale: 1.02 }}
     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    className="p-10 rounded-[2.5rem] bg-[var(--surface)] border border-[var(--border)] relative overflow-hidden group hover:border-emerald-500/30 transition-colors"
+    className="p-10 rounded-[2.5rem] bg-[var(--surface)] border border-[var(--border)] relative overflow-hidden group hover:border-[var(--accent-emerald)]/30 transition-colors"
     role="region"
     aria-label={`${title}: ${value}`}
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-    
+    <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
     <div className="relative z-10">
       <p className="text-xs font-black uppercase tracking-[0.25em] text-[var(--text-primary)]/40 mb-6">{title}</p>
       <h3 className="text-6xl font-serif text-[var(--text-primary)] tracking-tighter mb-2">
         <span className="text-3xl text-[var(--text-primary)]/30 align-top mr-2">{prefix}</span>
         {value}
       </h3>
-      
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border)]/5">
         <p className="text-sm text-[var(--text-primary)]/50 font-medium italic">"{subtitle}"</p>
         {trend !== undefined && (
-          <span className={`flex items-center gap-2 text-lg font-black ${trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <span className={`flex items-center gap-2 text-lg font-black ${trend >= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-alert)]'}`}>
             {trend >= 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
             {Math.abs(trend)}%
           </span>
@@ -116,8 +116,8 @@ export default function ExecutiveDashboard() {
     async function loadEmpireData() {
       // Fetch Real Data via Promise.all
       const [
-        { data: finance }, 
-        { data: opps }, 
+        { data: finance },
+        { data: opps },
         { data: users }
       ] = await Promise.all([
         supabase.from('financial_records').select('amount, type, date').order('date', { ascending: true }),
@@ -130,7 +130,7 @@ export default function ExecutiveDashboard() {
       const expense = finance?.filter(f => f.type === 'expense').reduce((a, b) => a + b.amount, 0) || 0;
       const ebitda = income - expense;
       const ebitdaMargin = income > 0 ? (ebitda / income) * 100 : 0;
-      
+
       // Trend real por mês (ordenado)
       const monthlyMap = new Map<string, { income: number; expense: number }>();
       finance?.forEach((f) => {
@@ -195,8 +195,8 @@ export default function ExecutiveDashboard() {
         </div>,
         {
           duration: 8000,
-          icon: <Crown className="w-8 h-8 text-yellow-400" />,
-          style: { background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)', padding: '16px' }
+          icon: <Crown className="w-8 h-8 text-[var(--accent-warning)]" />,
+          style: { background: 'var(--surface)', color: 'var(--text-primary)', border: '1px solid var(--border)', padding: '16px' }
         }
       );
     }, 3000);
@@ -204,9 +204,9 @@ export default function ExecutiveDashboard() {
 
   const handleEasterEgg = () => {
     setEasterEggActive(true);
-    toast("🏛️ O IMPERADOR ESTÁ OBSERVANDO.", { 
-      icon: '👁️', 
-      style: { background: 'black', color: 'gold', border: '1px solid gold' } 
+    toast("🏛️ O IMPERADOR ESTÁ OBSERVANDO.", {
+      icon: '👁️',
+      style: { background: 'var(--background)', color: 'var(--accent-warning)', border: '1px solid var(--accent-warning)' }
     });
     setTimeout(() => setEasterEggActive(false), 5000);
   };
@@ -219,7 +219,7 @@ export default function ExecutiveDashboard() {
             animate={{ rotate: 360, scale: [1, 1.2, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <Briefcase className="w-32 h-32 text-emerald-500/20" />
+            <Briefcase className="w-32 h-32 text-[var(--accent-emerald)]/20" />
           </motion.div>
           <p className="mt-12 text-2xl font-black text-[var(--text-primary)]/30 tracking-[0.5em] animate-pulse">
             ACESSANDO NÍVEL EXECUTIVO...
@@ -235,16 +235,16 @@ export default function ExecutiveDashboard() {
     <div className={`min-h-screen bg-[var(--background)] p-12 lg:p-20 space-y-24 transition-colors duration-1000 ${easterEggActive ? 'hue-rotate-90' : ''}`}>
 
         {/* HERO: NARRATIVA IMPERIAL */}
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-16 border-b-4 border-white/5 pb-20">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-16 border-b-4 border-[var(--border)]/5 pb-20">
           <div>
-            <motion.h1 
+            <motion.h1
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="text-2xl md:text-3xl lg:text-4xl md:text-[9rem] leading-none font-black text-[var(--text-primary)] tracking-tighter"
             >
               THE BOARDROOM
             </motion.h1>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -260,29 +260,30 @@ export default function ExecutiveDashboard() {
           </div>
 
           <div className="flex gap-8">
-            <button
+            <Button
               onClick={handleGenerateReport}
               disabled={generatingReport}
-              className="group relative px-16 py-10 bg-white text-black font-black text-2xl uppercase tracking-widest rounded-3xl overflow-hidden hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+              className="group relative px-16 py-10 bg-[var(--text-primary)] text-[var(--background)] font-black text-2xl uppercase tracking-widest rounded-3xl overflow-hidden hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)]"
             >
               <span className="flex items-center gap-6 z-10 relative">
                 {generatingReport ? (
-                  <div className="w-8 h-8 border-4 border-black/20 border-t-black rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-4 border-[var(--background)]/20 border-t-[var(--background)] rounded-full animate-spin" />
                 ) : (
-                  <FileText className="w-8 h-8" /> 
+                  <FileText className="w-8 h-8" />
                 )}
                 {generatingReport ? "FORJANDO..." : "BOARD REPORT"}
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            </button>
-            
-            <button
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--accent-emerald)]/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </Button>
+
+            <Button
               onClick={handleEasterEgg}
-              className="p-10 bg-[var(--surface)] border-2 border-[var(--border)] rounded-3xl hover:border-emerald-500/50 hover:text-emerald-500 text-[var(--text-primary)]/30 transition-all group"
+              variant="ghost"
+              className="p-10 bg-[var(--surface)] border-2 border-[var(--border)] rounded-3xl hover:border-[var(--accent-emerald)]/50 hover:text-[var(--accent-emerald)] text-[var(--text-primary)]/30 transition-all group"
               aria-label="Cadeira do Imperador"
             >
               <Crown className="w-10 h-10 group-hover:rotate-12 transition-transform" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -318,82 +319,88 @@ export default function ExecutiveDashboard() {
 
         {/* DEEP DIVE: TRAJETÓRIA & ESTRUTURA */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
-          
+
           {/* Main Chart */}
-          <div className="xl:col-span-2 bg-gradient-to-br from-[var(--surface)] to-[var(--bg)] border border-[var(--border)] rounded-[3rem] p-16 shadow-2xl">
-            <div className="flex justify-between items-center mb-12">
-              <h3 className="text-4xl font-black text-[var(--text-primary)]">TRAJETÓRIA DO IMPÉRIO</h3>
-              <div className="flex gap-6">
-                <span className="flex items-center gap-3 text-sm font-bold text-emerald-400 uppercase tracking-widest"><div className="w-3 h-3 rounded-full bg-emerald-500"/> Receita</span>
-                <span className="flex items-center gap-3 text-sm font-bold text-purple-400 uppercase tracking-widest"><div className="w-3 h-3 rounded-full bg-purple-500"/> Lucro</span>
+          <Card className="xl:col-span-2 bg-gradient-to-br from-[var(--surface)] to-[var(--background)] border border-[var(--border)] rounded-[3rem] shadow-2xl">
+            <CardContent className="p-16">
+              <div className="flex justify-between items-center mb-12">
+                <h3 className="text-4xl font-black text-[var(--text-primary)]">TRAJETÓRIA DO IMPÉRIO</h3>
+                <div className="flex gap-6">
+                  <span className="flex items-center gap-3 text-sm font-bold text-[var(--accent-emerald)] uppercase tracking-widest"><div className="w-3 h-3 rounded-full bg-[var(--accent-emerald)]"/> Receita</span>
+                  <span className="flex items-center gap-3 text-sm font-bold text-[var(--accent-purple)] uppercase tracking-widest"><div className="w-3 h-3 rounded-full bg-[var(--accent-purple)]"/> Lucro</span>
+                </div>
               </div>
-            </div>
-            
-            <div className="h-[500px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={metrics.revenueTrend}>
-                  <defs>
-                    <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={themeColors.accentPrimary} stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor={themeColors.accentPrimary} stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="prof" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={themeColors.accentTertiary} stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor={themeColors.accentTertiary} stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="month" stroke={themeColors.border} tick={{ fill: themeColors.textSecondary, fontSize: 14, fontWeight: 'bold' }} axisLine={false} tickLine={false} />
-                  <YAxis stroke={themeColors.border} tick={{ fill: themeColors.textSecondary, fontSize: 14, fontWeight: 'bold' }} tickFormatter={v => `R$${v/1000}k`} axisLine={false} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{ background: themeColors.surface, border: `2px solid ${themeColors.border}`, borderRadius: '16px', padding: '20px' }}
-                    labelStyle={{ color: themeColors.textSecondary, marginBottom: '10px', textTransform: 'uppercase' }}
-                    formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, '']}
-                  />
-                  <Area type="monotone" dataKey="revenue" stroke={themeColors.accentPrimary} strokeWidth={6} fill="url(#rev)" />
-                  <Area type="monotone" dataKey="profit" stroke={themeColors.accentTertiary} strokeWidth={6} fill="url(#prof)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+
+              <div className="h-[500px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={metrics.revenueTrend}>
+                    <defs>
+                      <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={themeColors.accentPrimary} stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor={themeColors.accentPrimary} stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="prof" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={themeColors.accentTertiary} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={themeColors.accentTertiary} stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="month" stroke={themeColors.border} tick={{ fill: themeColors.textSecondary, fontSize: 14, fontWeight: 'bold' }} axisLine={false} tickLine={false} />
+                    <YAxis stroke={themeColors.border} tick={{ fill: themeColors.textSecondary, fontSize: 14, fontWeight: 'bold' }} tickFormatter={v => `R$${v/1000}k`} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{ background: themeColors.surface, border: `2px solid ${themeColors.border}`, borderRadius: '16px', padding: '20px' }}
+                      labelStyle={{ color: themeColors.textSecondary, marginBottom: '10px', textTransform: 'uppercase' }}
+                      formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, '']}
+                    />
+                    <Area type="monotone" dataKey="revenue" stroke={themeColors.accentPrimary} strokeWidth={6} fill="url(#rev)" />
+                    <Area type="monotone" dataKey="profit" stroke={themeColors.accentTertiary} strokeWidth={6} fill="url(#prof)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Pillars & Sentiment */}
           <div className="space-y-12">
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[3rem] p-12 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-500 via-purple-500 to-emerald-500" />
-              <h3 className="text-sm font-black text-[var(--text-primary)]/40 uppercase tracking-[0.3em] mb-10">Confiança do Mercado</h3>
-              <SentimentOrb score={metrics.marketSentiment} />
-            </div>
+            <Card className="bg-[var(--surface)] border border-[var(--border)] rounded-[3rem] text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-purple)] to-[var(--accent-emerald)]" />
+              <CardContent className="p-12">
+                <h3 className="text-sm font-black text-[var(--text-primary)]/40 uppercase tracking-[0.3em] mb-10">Confiança do Mercado</h3>
+                <SentimentOrb score={metrics.marketSentiment} />
+              </CardContent>
+            </Card>
 
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[3rem] p-12">
-              <h3 className="text-xl font-black text-[var(--text-primary)] mb-10">PILASTRES ESTRATÉGICOS</h3>
-              <div className="space-y-8">
-                {departments.map(dept => (
-                  <div key={dept.name} className="flex items-center justify-between group">
-                    <div className="flex items-center gap-6">
-                      <div className={`w-4 h-4 rounded-full ${dept.status === 'optimal' ? 'bg-emerald-500 shadow-[0_0_15px_var(--accent-1)]' : dept.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`} />
-                      <span className="text-2xl font-bold text-[var(--text-primary)] group-hover:text-emerald-400 transition-colors">{dept.name}</span>
+            <Card className="bg-[var(--surface)] border border-[var(--border)] rounded-[3rem]">
+              <CardContent className="p-12">
+                <h3 className="text-xl font-black text-[var(--text-primary)] mb-10">PILASTRES ESTRATÉGICOS</h3>
+                <div className="space-y-8">
+                  {departments.map(dept => (
+                    <div key={dept.name} className="flex items-center justify-between group">
+                      <div className="flex items-center gap-6">
+                        <div className={`w-4 h-4 rounded-full ${dept.status === 'optimal' ? 'bg-[var(--accent-emerald)] shadow-[0_0_15px_var(--accent-emerald)]' : dept.status === 'warning' ? 'bg-[var(--accent-warning)]' : 'bg-[var(--accent-alert)] animate-pulse'}`} />
+                        <span className="text-2xl font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-emerald)] transition-colors">{dept.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-[var(--text-primary)]/30 uppercase tracking-widest mb-1">{dept.metric}</p>
+                        <p className="text-xl font-mono text-[var(--text-primary)] font-bold">{dept.value}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-[var(--text-primary)]/30 uppercase tracking-widest mb-1">{dept.metric}</p>
-                      <p className="text-xl font-mono text-[var(--text-primary)] font-bold">{dept.value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
         {/* FOOTER */}
-        <div className="flex flex-col md:flex-row justify-between items-center text-[var(--text-primary)]/20 pt-20 border-t-2 border-white/5">
+        <div className="flex flex-col md:flex-row justify-between items-center text-[var(--text-primary)]/20 pt-20 border-t-2 border-[var(--border)]/5">
           <div className="flex items-center gap-12">
             <span className="font-bold tracking-widest">ALSHAM OS v10.0.1</span>
-            <span className="flex items-center gap-3 text-emerald-900/60 font-bold">
+            <span className="flex items-center gap-3 text-[var(--accent-emerald)]/60 font-bold">
               <Globe className="w-5 h-5" /> SISTEMA ONLINE
             </span>
           </div>
           <div className="flex items-center gap-4 mt-6 md:mt-0">
-            <ShieldCheck className="w-6 h-6 text-emerald-900/60" />
+            <ShieldCheck className="w-6 h-6 text-[var(--accent-emerald)]/60" />
             <span className="font-black tracking-widest uppercase text-xs">Segurança Quântica Ativa</span>
           </div>
         </div>

@@ -1,6 +1,11 @@
+// src/pages/Settings.tsx
+// ALSHAM 360° PRIMA — Settings (migrado para shadcn/ui)
+
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 export const Settings: React.FC = () => {
   const { currentOrg, user, signOut } = useAuthStore()
@@ -13,54 +18,59 @@ export const Settings: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-alsham-bg-default">
+    <div className="min-h-screen bg-[var(--background)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-alsham-text-primary">Configurações</h1>
-          <p className="text-alsham-text-secondary mt-2">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Configurações</h1>
+          <p className="text-[var(--text-secondary)] mt-2">
             Gerencie suas preferências e conta
           </p>
         </div>
 
         <div className="space-y-6">
           {/* Account Info */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-alsham-text-primary mb-4">
-              Informações da Conta
-            </h2>
-            <div className="space-y-3">
+          <Card className="bg-[var(--surface)] border-[var(--border)]">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-[var(--text-primary)]">
+                Informações da Conta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-alsham-text-secondary">
+                <label className="block text-sm font-medium text-[var(--text-secondary)]">
                   Email
                 </label>
-                <p className="text-alsham-text-primary">{user?.email}</p>
+                <p className="text-[var(--text-primary)]">{user?.email}</p>
               </div>
               {currentOrg && (
                 <div>
-                  <label className="block text-sm font-medium text-alsham-text-secondary">
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]">
                     Organização Atual
                   </label>
-                  <p className="text-alsham-text-primary">{currentOrg.name}</p>
+                  <p className="text-[var(--text-primary)]">{currentOrg.name}</p>
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Actions */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-alsham-text-primary mb-4">
-              Ações da Conta
-            </h2>
-            <div className="space-y-3">
-              <button
+          <Card className="bg-[var(--surface)] border-[var(--border)]">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-[var(--text-primary)]">
+                Ações da Conta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
                 onClick={handleSignOut}
                 disabled={loading}
-                className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                variant="destructive"
+                className="w-full sm:w-auto bg-[var(--accent-alert)] hover:bg-[var(--accent-alert)]/90"
               >
                 {loading ? <LoadingSpinner size="sm" /> : 'Sair da conta'}
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

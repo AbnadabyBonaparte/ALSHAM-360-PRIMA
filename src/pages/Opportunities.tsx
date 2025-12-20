@@ -1,8 +1,22 @@
+// src/pages/Opportunities.tsx
+// ALSHAM 360° PRIMA — Opportunities (migrado para shadcn/ui)
+
 import React, { useEffect, useState } from 'react'
 import { opportunitiesQueries } from '../lib/supabase/queries/opportunities'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import type { Opportunity } from '../lib/supabase/types'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 export const Opportunities: React.FC = () => {
   const { currentOrg } = useAuthStore()
@@ -48,15 +62,22 @@ export const Opportunities: React.FC = () => {
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
-  const getStageColor = (stage: string) => {
+  const getStageVariant = (stage: string): { bg: string; text: string } => {
     switch (stage) {
-      case 'prospecção': return 'bg-gray-100 text-gray-800'
-      case 'qualificação': return 'bg-blue-100 text-blue-800'
-      case 'proposta': return 'bg-yellow-100 text-yellow-800'
-      case 'negociação': return 'bg-purple-100 text-purple-800'
-      case 'fechada': return 'bg-green-100 text-green-800'
-      case 'perdida': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'prospecção':
+        return { bg: 'bg-[var(--surface-strong)]', text: 'text-[var(--text-secondary)]' }
+      case 'qualificação':
+        return { bg: 'bg-[var(--accent-sky)]/10', text: 'text-[var(--accent-sky)]' }
+      case 'proposta':
+        return { bg: 'bg-[var(--accent-warning)]/10', text: 'text-[var(--accent-warning)]' }
+      case 'negociação':
+        return { bg: 'bg-[var(--accent-purple)]/10', text: 'text-[var(--accent-purple)]' }
+      case 'fechada':
+        return { bg: 'bg-[var(--accent-emerald)]/10', text: 'text-[var(--accent-emerald)]' }
+      case 'perdida':
+        return { bg: 'bg-[var(--accent-alert)]/10', text: 'text-[var(--accent-alert)]' }
+      default:
+        return { bg: 'bg-[var(--surface-strong)]', text: 'text-[var(--text-secondary)]' }
     }
   }
 
@@ -69,91 +90,91 @@ export const Opportunities: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-alsham-bg-default">
+    <div className="min-h-screen bg-[var(--background)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-alsham-text-primary">Oportunidades</h1>
-          <p className="text-alsham-text-secondary mt-2">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">Oportunidades</h1>
+          <p className="text-[var(--text-secondary)] mt-2">
             Gerencie seu pipeline de vendas
           </p>
         </div>
 
         {/* Opportunities List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <Card className="border-[var(--border)]/40 bg-[var(--surface)]/70 backdrop-blur-xl overflow-hidden">
           {opportunities.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Oportunidade
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Valor
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stage
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Probabilidade
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fechamento
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {opportunities.map((opp) => (
-                    <tr key={opp.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {opp.title}
-                          </div>
-                          {opp.lead && (
-                            <div className="text-sm text-gray-500">
-                              {opp.lead.name} - {opp.lead.company}
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-[var(--border)]/50 hover:bg-transparent">
+                    <TableHead className="text-[var(--text-secondary)]">Oportunidade</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Valor</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Stage</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Probabilidade</TableHead>
+                    <TableHead className="text-[var(--text-secondary)]">Fechamento</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {opportunities.map((opp) => {
+                    const stageVariant = getStageVariant(opp.stage)
+
+                    return (
+                      <TableRow
+                        key={opp.id}
+                        className="border-[var(--border)]/50 hover:bg-[var(--surface-strong)]/50 transition-colors"
+                      >
+                        <TableCell>
+                          <div>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">
+                              {opp.title}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatCurrency(opp.value)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStageColor(opp.stage)}`}>
-                          {opp.stage}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {opp.probability}%
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {opp.expected_close_date ? formatDate(opp.expected_close_date) : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            {opp.lead && (
+                              <div className="text-sm text-[var(--text-secondary)]">
+                                {opp.lead.name} - {opp.lead.company}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm font-medium text-[var(--text-primary)]">
+                            {formatCurrency(opp.value)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={`${stageVariant.bg} ${stageVariant.text} border-0 font-semibold`}
+                          >
+                            {opp.stage}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-[var(--text-primary)]">
+                          {opp.probability}%
+                        </TableCell>
+                        <TableCell className="text-sm text-[var(--text-secondary)]">
+                          {opp.expected_close_date ? formatDate(opp.expected_close_date) : '-'}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-alsham-text-secondary">
+            <CardContent className="py-12 text-center">
+              <p className="text-[var(--text-secondary)]">
                 {error || 'Nenhuma oportunidade encontrada'}
               </p>
               {error && (
-                <button
+                <Button
                   onClick={loadOpportunities}
-                  className="mt-4 px-4 py-2 bg-alsham-primary text-white rounded-lg hover:bg-alsham-primary-hover"
+                  className="mt-4 bg-[var(--accent-sky)] hover:bg-[var(--accent-sky)]/90 text-[var(--text-primary)]"
                 >
                   Tentar novamente
-                </button>
+                </Button>
               )}
-            </div>
+            </CardContent>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   )
