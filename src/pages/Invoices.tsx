@@ -1,7 +1,6 @@
 // src/pages/Invoices.tsx
 // ALSHAM 360° PRIMA v10 SUPREMO — Faturas Alienígenas 1000/1000
-// Cada fatura é dinheiro no bolso. Cobrança automatizada, caixa cheio.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// 100% CSS Variables + shadcn/ui
 
 import {
   DocumentTextIcon,
@@ -14,10 +13,13 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Invoice {
   id: string;
@@ -99,157 +101,165 @@ export default function InvoicesPage() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-green-500 rounded-full"
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-emerald)] rounded-full"
         />
-        <p className="absolute text-4xl text-green-400 font-light">Contando dinheiro...</p>
+        <p className="absolute text-4xl text-[var(--accent-emerald)] font-light">Contando dinheiro...</p>
       </div>
     );
   }
 
-  const statusConfig: Record<string, { bg: string; text: string; icon: JSX.Element }> = {
-    rascunho: { bg: 'bg-[var(--surface)]/20', text: 'text-[var(--text-2)]', icon: <DocumentTextIcon className="w-5 h-5" /> },
-    enviada: { bg: 'bg-[var(--accent-2)]/20', text: 'text-[var(--accent-2)]', icon: <ClockIcon className="w-5 h-5" /> },
-    paga: { bg: 'bg-[var(--accent-1)]/20', text: 'text-[var(--accent-1)]', icon: <CheckCircleIcon className="w-5 h-5" /> },
-    atrasada: { bg: 'bg-[var(--accent-alert)]/20', text: 'text-[var(--accent-alert)]', icon: <ExclamationTriangleIcon className="w-5 h-5" /> },
-    cancelada: { bg: 'bg-[var(--surface)]/20', text: 'text-[var(--text-2)]', icon: <ArrowPathIcon className="w-5 h-5" /> }
+  const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
+    rascunho: { variant: 'secondary', icon: <DocumentTextIcon className="w-4 h-4" /> },
+    enviada: { variant: 'outline', icon: <ClockIcon className="w-4 h-4" /> },
+    paga: { variant: 'default', icon: <CheckCircleIcon className="w-4 h-4" /> },
+    atrasada: { variant: 'destructive', icon: <ExclamationTriangleIcon className="w-4 h-4" /> },
+    cancelada: { variant: 'secondary', icon: <ArrowPathIcon className="w-4 h-4" /> }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
-        {/* HEADER ÉPICO */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
-            FATURAS SUPREMAS
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada fatura é dinheiro garantido no seu bolso
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text)] p-8">
+      {/* HEADER ÉPICO */}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-16"
+      >
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-emerald)] to-[var(--accent-sky)] bg-clip-text text-transparent">
+          FATURAS SUPREMAS
+        </h1>
+        <p className="text-3xl text-[var(--text-secondary)] mt-6">
+          Cada fatura é dinheiro garantido no seu bolso
+        </p>
+      </motion.div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-2xl p-6 border border-gray-500/30">
-            <DocumentTextIcon className="w-12 h-12 text-gray-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalFaturas || 0}</p>
-            <p className="text-gray-400">Total Faturas</p>
-          </motion.div>
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
+        <Card className="bg-[var(--surface)]/60 border-[var(--border)]">
+          <CardContent className="p-6">
+            <DocumentTextIcon className="w-12 h-12 text-[var(--text-secondary)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalFaturas || 0}</p>
+            <p className="text-[var(--text-secondary)]">Total Faturas</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
-            <BanknotesIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorEmitido || 0) / 1000).toFixed(0)}k</p>
-            <p className="text-gray-400">Emitido</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
+          <CardContent className="p-6">
+            <BanknotesIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorEmitido || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-[var(--text-secondary)]">Emitido</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorRecebido || 0) / 1000).toFixed(0)}k</p>
-            <p className="text-gray-400">Recebido</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
+          <CardContent className="p-6">
+            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorRecebido || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-[var(--text-secondary)]">Recebido</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
-            <ClockIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorPendente || 0) / 1000).toFixed(0)}k</p>
-            <p className="text-gray-400">Pendente</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
+          <CardContent className="p-6">
+            <ClockIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorPendente || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-[var(--text-secondary)]">Pendente</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-red-900/60 to-pink-900/60 rounded-2xl p-6 border border-red-500/30">
-            <ExclamationTriangleIcon className="w-12 h-12 text-red-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.atrasadas || 0}</p>
-            <p className="text-gray-400">Atrasadas</p>
-          </motion.div>
-        </div>
-
-        {/* LISTA DE FATURAS */}
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-            Registro de Faturas
-          </h2>
-
-          {metrics?.faturas.length === 0 ? (
-            <div className="text-center py-20">
-              <DocumentTextIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhuma fatura cadastrada</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[var(--border)]">
-                    <th className="text-left py-4 px-6 text-gray-400">Fatura</th>
-                    <th className="text-left py-4 px-6 text-gray-400">Cliente</th>
-                    <th className="text-right py-4 px-6 text-gray-400">Valor</th>
-                    <th className="text-center py-4 px-6 text-gray-400">Emissão</th>
-                    <th className="text-center py-4 px-6 text-gray-400">Vencimento</th>
-                    <th className="text-center py-4 px-6 text-gray-400">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics?.faturas.map((fatura, i) => {
-                    const config = statusConfig[fatura.status];
-                    const diasAtraso = fatura.status === 'atrasada' && fatura.data_vencimento
-                      ? differenceInDays(new Date(), new Date(fatura.data_vencimento))
-                      : 0;
-
-                    return (
-                      <motion.tr
-                        key={fatura.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.03 }}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                      >
-                        <td className="py-4 px-6">
-                          <span className="font-mono font-bold text-[var(--text-primary)]">{fatura.numero}</span>
-                        </td>
-                        <td className="py-4 px-6 text-gray-300">{fatura.cliente}</td>
-                        <td className="py-4 px-6 text-right">
-                          <span className="text-xl font-bold text-green-400">
-                            R$ {fatura.valor.toLocaleString('pt-BR')}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-center text-gray-400">
-                          {fatura.data_emissao ? format(new Date(fatura.data_emissao), 'dd/MM/yy') : '-'}
-                        </td>
-                        <td className="py-4 px-6 text-center text-gray-400">
-                          {fatura.data_vencimento ? format(new Date(fatura.data_vencimento), 'dd/MM/yy') : '-'}
-                          {diasAtraso > 0 && (
-                            <span className="block text-red-400 text-xs">{diasAtraso} dias atraso</span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${config.bg} ${config.text} text-sm capitalize`}>
-                            {config.icon}
-                            {fatura.status}
-                          </span>
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-green-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-green-300 max-w-4xl mx-auto">
-            "Fatura enviada é dinheiro a caminho. Fatura paga é império crescendo."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Tesoureiro Alienígena
-          </p>
-        </motion.div>
+        <Card className="bg-[var(--accent-alert)]/10 border-[var(--accent-alert)]/30">
+          <CardContent className="p-6">
+            <ExclamationTriangleIcon className="w-12 h-12 text-[var(--accent-alert)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.atrasadas || 0}</p>
+            <p className="text-[var(--text-secondary)]">Atrasadas</p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* LISTA DE FATURAS */}
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] bg-clip-text text-transparent">
+          Registro de Faturas
+        </h2>
+
+        {metrics?.faturas.length === 0 ? (
+          <div className="text-center py-20">
+            <DocumentTextIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <p className="text-3xl text-[var(--text-secondary)]">Nenhuma fatura cadastrada</p>
+          </div>
+        ) : (
+          <Card className="bg-[var(--surface)]/60 border-[var(--border)]">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-[var(--border)]">
+                  <TableHead className="text-[var(--text-secondary)]">Fatura</TableHead>
+                  <TableHead className="text-[var(--text-secondary)]">Cliente</TableHead>
+                  <TableHead className="text-right text-[var(--text-secondary)]">Valor</TableHead>
+                  <TableHead className="text-center text-[var(--text-secondary)]">Emissão</TableHead>
+                  <TableHead className="text-center text-[var(--text-secondary)]">Vencimento</TableHead>
+                  <TableHead className="text-center text-[var(--text-secondary)]">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {metrics?.faturas.map((fatura, i) => {
+                  const config = statusConfig[fatura.status];
+                  const diasAtraso = fatura.status === 'atrasada' && fatura.data_vencimento
+                    ? differenceInDays(new Date(), new Date(fatura.data_vencimento))
+                    : 0;
+
+                  return (
+                    <motion.tr
+                      key={fatura.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                      className="border-[var(--border)] hover:bg-[var(--surface-strong)]/50 transition-colors"
+                    >
+                      <TableCell className="font-mono font-bold text-[var(--text)]">{fatura.numero}</TableCell>
+                      <TableCell className="text-[var(--text-secondary)]">{fatura.cliente}</TableCell>
+                      <TableCell className="text-right">
+                        <span className="text-xl font-bold text-[var(--accent-emerald)]">
+                          R$ {fatura.valor.toLocaleString('pt-BR')}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center text-[var(--text-secondary)]">
+                        {fatura.data_emissao ? format(new Date(fatura.data_emissao), 'dd/MM/yy') : '-'}
+                      </TableCell>
+                      <TableCell className="text-center text-[var(--text-secondary)]">
+                        {fatura.data_vencimento ? format(new Date(fatura.data_vencimento), 'dd/MM/yy') : '-'}
+                        {diasAtraso > 0 && (
+                          <span className="block text-[var(--accent-alert)] text-xs">{diasAtraso} dias atraso</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant={config.variant} className="gap-2 capitalize">
+                          {config.icon}
+                          {fatura.status}
+                        </Badge>
+                      </TableCell>
+                    </motion.tr>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Card>
+        )}
+      </div>
+
+      {/* MENSAGEM FINAL DA IA */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="text-center py-24 mt-16"
+      >
+        <SparklesIcon className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
+        <p className="text-5xl font-light text-[var(--accent-emerald)] max-w-4xl mx-auto">
+          "Fatura enviada é dinheiro a caminho. Fatura paga é império crescendo."
+        </p>
+        <p className="text-3xl text-[var(--text-secondary)] mt-8">
+          — Citizen Supremo X.1, seu Tesoureiro Alienígena
+        </p>
+      </motion.div>
+    </div>
   );
 }

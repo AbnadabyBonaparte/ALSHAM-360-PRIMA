@@ -1,23 +1,21 @@
 // src/pages/Contracts.tsx
 // ALSHAM 360° PRIMA v10 SUPREMO — Contratos Alienígenas 1000/1000
-// Cada contrato é uma fortaleza jurídica. Blindagem total, lucro garantido.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// 100% CSS Variables + shadcn/ui
 
 import {
   DocumentDuplicateIcon,
   ShieldCheckIcon,
   CurrencyDollarIcon,
   CalendarDaysIcon,
-  PencilSquareIcon,
   SparklesIcon,
   CheckBadgeIcon,
-  ClockIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface Contract {
   id: string;
@@ -95,164 +93,171 @@ export default function ContractsPage() {
 
   if (loading) {
     return (
-      
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-indigo-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-indigo-400 font-light">Analisando contratos...</p>
-        </div>
-      
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
+        />
+        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Analisando contratos...</p>
+      </div>
     );
   }
 
-  const statusConfig: Record<string, { bg: string; text: string }> = {
-    rascunho: { bg: 'bg-gray-500/20', text: 'text-gray-400' },
-    em_revisao: { bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
-    assinado: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-    ativo: { bg: 'bg-green-500/20', text: 'text-green-400' },
-    expirado: { bg: 'bg-orange-500/20', text: 'text-orange-400' },
-    cancelado: { bg: 'bg-red-500/20', text: 'text-red-400' }
+  const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    rascunho: { variant: 'secondary' },
+    em_revisao: { variant: 'outline' },
+    assinado: { variant: 'default' },
+    ativo: { variant: 'default' },
+    expirado: { variant: 'outline' },
+    cancelado: { variant: 'destructive' }
   };
 
   return (
-    
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
-        {/* HEADER ÉPICO */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-indigo-400 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-            CONTRATOS SUPREMOS
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada contrato é uma fortaleza jurídica blindada
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text)] p-8">
+      {/* HEADER ÉPICO */}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-16"
+      >
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-sky)] to-[var(--accent-emerald)] bg-clip-text text-transparent">
+          CONTRATOS SUPREMOS
+        </h1>
+        <p className="text-3xl text-[var(--text-secondary)] mt-6">
+          Cada contrato é uma fortaleza jurídica blindada
+        </p>
+      </motion.div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-indigo-900/60 to-blue-900/60 rounded-2xl p-6 border border-indigo-500/30">
-            <DocumentDuplicateIcon className="w-12 h-12 text-indigo-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalContratos || 0}</p>
-            <p className="text-gray-400">Total Contratos</p>
-          </motion.div>
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
+        <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
+          <CardContent className="p-6">
+            <DocumentDuplicateIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalContratos || 0}</p>
+            <p className="text-[var(--text-secondary)]">Total Contratos</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <ShieldCheckIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativos || 0}</p>
-            <p className="text-gray-400">Ativos</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
+          <CardContent className="p-6">
+            <ShieldCheckIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.ativos || 0}</p>
+            <p className="text-[var(--text-secondary)]">Ativos</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <CurrencyDollarIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorRecorrente || 0) / 1000).toFixed(0)}k/mês</p>
-            <p className="text-gray-400">Recorrente</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30">
+          <CardContent className="p-6">
+            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorRecorrente || 0) / 1000).toFixed(0)}k/mês</p>
+            <p className="text-[var(--text-secondary)]">Recorrente</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
-            <CurrencyDollarIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorTotal || 0) / 1000000).toFixed(1)}M</p>
-            <p className="text-gray-400">Valor Total</p>
-          </motion.div>
-        </div>
+        <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
+          <CardContent className="p-6">
+            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorTotal || 0) / 1000000).toFixed(1)}M</p>
+            <p className="text-[var(--text-secondary)]">Valor Total</p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* LISTA DE CONTRATOS */}
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-400 to-cyan-500 bg-clip-text text-transparent">
-            Gestão de Contratos
-          </h2>
+      {/* LISTA DE CONTRATOS */}
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-emerald)] bg-clip-text text-transparent">
+          Gestão de Contratos
+        </h2>
 
-          {metrics?.contratos.length === 0 ? (
-            <div className="text-center py-20">
-              <DocumentDuplicateIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhum contrato cadastrado</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {metrics?.contratos.map((contrato, i) => {
-                const config = statusConfig[contrato.status];
-                const diasRestantes = contrato.data_fim
-                  ? differenceInDays(new Date(contrato.data_fim), new Date())
-                  : 0;
+        {metrics?.contratos.length === 0 ? (
+          <div className="text-center py-20">
+            <DocumentDuplicateIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <p className="text-3xl text-[var(--text-secondary)]">Nenhum contrato cadastrado</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {metrics?.contratos.map((contrato, i) => {
+              const config = statusConfig[contrato.status];
+              const diasRestantes = contrato.data_fim
+                ? differenceInDays(new Date(contrato.data_fim), new Date())
+                : 0;
 
-                return (
-                  <motion.div
-                    key={contrato.id}
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-6 border transition-all ${
-                      contrato.status === 'ativo' ? 'border-green-500/30 hover:border-green-500/50' :
-                      'border-[var(--border)] hover:border-indigo-500/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-6">
-                        <div className="p-4 bg-indigo-500/20 rounded-2xl">
-                          <DocumentDuplicateIcon className="w-8 h-8 text-indigo-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-[var(--text-primary)]">{contrato.titulo}</h3>
-                          <p className="text-gray-400">{contrato.cliente} • {contrato.tipo}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-8">
-                        <div className="text-right">
-                          <p className="text-xl font-bold text-[var(--text-primary)]">R$ {contrato.valor_mensal.toLocaleString('pt-BR')}</p>
-                          <p className="text-gray-500 text-sm">/mês</p>
-                        </div>
-
-                        <div className="text-right">
-                          <p className="text-sm text-gray-400">
-                            {contrato.data_inicio ? format(new Date(contrato.data_inicio), 'dd/MM/yy') : '-'} →{' '}
-                            {contrato.data_fim ? format(new Date(contrato.data_fim), 'dd/MM/yy') : '-'}
-                          </p>
-                          {contrato.status === 'ativo' && diasRestantes <= 30 && diasRestantes > 0 && (
-                            <p className="text-orange-400 text-sm font-medium">Expira em {diasRestantes} dias</p>
-                          )}
+              return (
+                <motion.div
+                  key={contrato.id}
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Card className={`bg-[var(--surface)]/60 border transition-all ${
+                    contrato.status === 'ativo' ? 'border-[var(--accent-emerald)]/30 hover:border-[var(--accent-emerald)]/50' :
+                    'border-[var(--border)] hover:border-[var(--accent-sky)]/50'
+                  }`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6">
+                          <div className="p-4 bg-[var(--accent-sky)]/20 rounded-2xl">
+                            <DocumentDuplicateIcon className="w-8 h-8 text-[var(--accent-sky)]" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-[var(--text)]">{contrato.titulo}</h3>
+                            <p className="text-[var(--text-secondary)]">{contrato.cliente} • {contrato.tipo}</p>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          {contrato.renovacao_automatica && (
-                            <div className="p-2 bg-blue-500/20 rounded-lg" title="Renovação automática">
-                              <CheckBadgeIcon className="w-5 h-5 text-blue-400" />
-                            </div>
-                          )}
-                          <div className={`px-4 py-2 rounded-xl ${config.bg} ${config.text} font-medium capitalize`}>
-                            {contrato.status.replace('_', ' ')}
+                        <div className="flex items-center gap-8">
+                          <div className="text-right">
+                            <p className="text-xl font-bold text-[var(--text)]">R$ {contrato.valor_mensal.toLocaleString('pt-BR')}</p>
+                            <p className="text-[var(--text-secondary)] text-sm">/mês</p>
+                          </div>
+
+                          <div className="text-right">
+                            <p className="text-sm text-[var(--text-secondary)]">
+                              {contrato.data_inicio ? format(new Date(contrato.data_inicio), 'dd/MM/yy') : '-'} →{' '}
+                              {contrato.data_fim ? format(new Date(contrato.data_fim), 'dd/MM/yy') : '-'}
+                            </p>
+                            {contrato.status === 'ativo' && diasRestantes <= 30 && diasRestantes > 0 && (
+                              <p className="text-[var(--accent-warning)] text-sm font-medium">Expira em {diasRestantes} dias</p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {contrato.renovacao_automatica && (
+                              <div className="p-2 bg-[var(--accent-sky)]/20 rounded-lg" title="Renovação automática">
+                                <CheckBadgeIcon className="w-5 h-5 text-[var(--accent-sky)]" />
+                              </div>
+                            )}
+                            <Badge variant={config.variant} className="capitalize">
+                              {contrato.status.replace('_', ' ')}
+                            </Badge>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-indigo-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-indigo-300 max-w-4xl mx-auto">
-            "Um contrato bem redigido é a diferença entre lucro e prejuízo."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Conselheiro Jurídico
-          </p>
-        </motion.div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
-    
+
+      {/* MENSAGEM FINAL DA IA */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="text-center py-24 mt-16"
+      >
+        <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+        <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
+          "Um contrato bem redigido é a diferença entre lucro e prejuízo."
+        </p>
+        <p className="text-3xl text-[var(--text-secondary)] mt-8">
+          — Citizen Supremo X.1, seu Conselheiro Jurídico
+        </p>
+      </motion.div>
+    </div>
   );
 }
