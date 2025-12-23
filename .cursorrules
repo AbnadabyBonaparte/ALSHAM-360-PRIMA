@@ -1,0 +1,98 @@
+# ALSHAM 360° PRIMA - Cursor Rules
+
+You are working on ALSHAM 360° PRIMA, an enterprise CRM with 150+ modules, cyberpunk design, and 6 dynamic themes.
+
+## CRITICAL RULES (NEVER VIOLATE)
+
+### 1. ZERO HARDCODED COLORS
+NEVER use:
+- `bg-white`, `bg-black`, `bg-gray-*`
+- `text-white`, `text-gray-*`, `text-emerald-*`, `text-blue-*`
+- `border-gray-*`, `border-blue-*`
+- Hex colors like `#fff`, `#10b981`
+
+ALWAYS use CSS variables:
+- `bg-[var(--surface)]` instead of `bg-white`
+- `bg-[var(--bg)]` instead of `bg-gray-900`
+- `text-[var(--text)]` instead of `text-white`
+- `text-[var(--text-secondary)]` instead of `text-gray-500`
+- `border-[var(--border)]` instead of `border-gray-200`
+
+### 2. USE SHADCN/UI COMPONENTS
+Always import from `@/components/ui/`:
+```tsx
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+```
+
+### 3. REAL DATA ONLY
+- NO mock data, fake data, or placeholders
+- Always use Supabase queries
+- Always filter by `org_id` for multi-tenancy
+
+### 4. PRESERVE FUNCTIONALITY
+- Keep framer-motion animations
+- Keep Supabase realtime subscriptions
+- Keep Recharts/Chart.js integrations
+- Never remove existing features
+
+## COLOR MAPPING
+
+```
+bg-white → bg-[var(--surface)]
+bg-gray-50/100 → bg-[var(--surface-strong)]
+bg-gray-800/900 → bg-[var(--bg)]
+text-white → text-[var(--text)]
+text-gray-500 → text-[var(--text-secondary)]
+text-gray-900 → text-[var(--text-primary)]
+border-gray-* → border-[var(--border)]
+
+# Status colors
+green → bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]
+blue → bg-[var(--accent-sky)]/10 text-[var(--accent-sky)]
+yellow → bg-[var(--accent-warning)]/10 text-[var(--accent-warning)]
+red → bg-[var(--accent-alert)]/10 text-[var(--accent-alert)]
+purple → bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]
+```
+
+## VALIDATION BEFORE COMMIT
+
+```bash
+# Check for hardcoded colors (must return empty)
+grep -rn "bg-gray-\|bg-white\|text-gray-[0-9]" src/pages/
+
+# Check for shadcn/ui imports (must be > 0)
+grep -c "@/components/ui" src/pages/[FILE].tsx
+
+# Build test
+npm run build
+```
+
+## TECH STACK
+
+- React + TypeScript + Vite
+- Tailwind CSS + CSS Variables
+- shadcn/ui components
+- Supabase (PostgreSQL + Realtime)
+- Framer Motion (animations)
+- Recharts (charts)
+- Lucide React (icons)
+
+## FILE STRUCTURE
+
+```
+src/
+├── components/ui/     # shadcn/ui (DON'T MODIFY)
+├── pages/             # All pages (migrate to shadcn/ui)
+├── hooks/useTheme.ts  # Theme hook
+├── lib/supabase/      # Supabase client
+└── styles/themes.css  # CSS variables
+```
+
+## CURRENT PROGRESS
+
+- 27/63 pages migrated to shadcn/ui (43%)
+- See `docs/ROADMAP_TODAS_PAGINAS.md` for full list
