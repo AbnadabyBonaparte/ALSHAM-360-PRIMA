@@ -15,6 +15,8 @@ import {
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface SocialAccount {
   id: string;
@@ -100,23 +102,23 @@ export default function SocialMediaPage() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-pink-500 rounded-full"
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-pink)] rounded-full"
         />
-        <p className="absolute text-4xl text-pink-400 font-light">Conectando às redes...</p>
+        <p className="absolute text-4xl text-[var(--accent-pink)] font-light">Conectando às redes...</p>
       </div>
     );
   }
 
   const platformIcon = (plataforma: string) => {
     const colors: Record<string, string> = {
-      instagram: 'from-pink-500 to-purple-500',
-      facebook: 'from-blue-600 to-blue-400',
-      twitter: 'from-cyan-500 to-blue-500',
-      linkedin: 'from-blue-700 to-blue-500',
-      tiktok: 'from-pink-500 to-cyan-500',
-      youtube: 'from-red-600 to-red-400'
+      instagram: 'from-[var(--accent-pink)] to-[var(--accent-purple)]',
+      facebook: 'from-[var(--accent-sky)] to-[var(--accent-1)]',
+      twitter: 'from-[var(--accent-sky)] to-[var(--accent-1)]',
+      linkedin: 'from-[var(--accent-sky)] to-[var(--accent-1)]',
+      tiktok: 'from-[var(--accent-pink)] to-[var(--accent-sky)]',
+      youtube: 'from-[var(--accent-alert)] to-[var(--accent-warning)]'
     };
-    return colors[plataforma.toLowerCase()] || 'from-gray-500 to-gray-400';
+    return colors[plataforma.toLowerCase()] || 'from-[var(--text-secondary)] to-[var(--text-secondary)]';
   };
 
   return (
@@ -127,10 +129,10 @@ export default function SocialMediaPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-pink)] via-[var(--accent-purple)] to-[var(--accent-1)] bg-clip-text text-transparent">
             SOCIAL MEDIA SUPREMO
           </h1>
-          <p className="text-3xl text-gray-400 mt-6">
+          <p className="text-3xl text-[var(--text-secondary)] mt-6">
             O feed é nosso território. Cada post é uma conquista viral.
           </p>
         </motion.div>
@@ -139,61 +141,61 @@ export default function SocialMediaPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16 max-w-7xl mx-auto">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-pink-900/60 to-purple-900/60 rounded-3xl p-8 border border-pink-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <UserPlusIcon className="w-16 h-16 text-pink-400 mb-4" />
+            <UserPlusIcon className="w-16 h-16 text-[var(--accent-pink)] mb-4" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalSeguidores || 0).toLocaleString()}</p>
-            <p className="text-xl text-gray-400">Seguidores Totais</p>
+            <p className="text-xl text-[var(--text-secondary)]">Seguidores Totais</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-red-900/60 to-pink-900/60 rounded-3xl p-8 border border-red-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <HeartIcon className="w-16 h-16 text-red-400 mb-4" />
+            <HeartIcon className="w-16 h-16 text-[var(--accent-alert)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.engajamentoMedio || 0).toFixed(1)}%</p>
-            <p className="text-xl text-gray-400">Engajamento Médio</p>
+            <p className="text-xl text-[var(--text-secondary)]">Engajamento Médio</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-purple-900/60 to-indigo-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <ChatBubbleLeftIcon className="w-16 h-16 text-purple-400 mb-4" />
+            <ChatBubbleLeftIcon className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.totalPosts || 0}</p>
-            <p className="text-xl text-gray-400">Posts Publicados</p>
+            <p className="text-xl text-[var(--text-secondary)]">Posts Publicados</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-3xl p-8 border border-cyan-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <EyeIcon className="w-16 h-16 text-cyan-400 mb-4" />
+            <EyeIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.alcanceTotal || 0).toLocaleString()}</p>
-            <p className="text-xl text-gray-400">Alcance Total</p>
+            <p className="text-xl text-[var(--text-secondary)]">Alcance Total</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <ShareIcon className="w-16 h-16 text-green-400 mb-4" />
+            <ShareIcon className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">+{(metrics?.crescimentoMensal || 0).toFixed(1)}%</p>
-            <p className="text-xl text-gray-400">Crescimento Mensal</p>
+            <p className="text-xl text-[var(--text-secondary)]">Crescimento Mensal</p>
           </motion.div>
         </div>
 
         {/* CONTAS CONECTADAS */}
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-pink)] to-[var(--accent-purple)] bg-clip-text text-transparent">
             Contas Conectadas
           </h2>
 
           {metrics?.contas.length === 0 ? (
             <div className="text-center py-20">
-              <GlobeAltIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhuma conta conectada</p>
-              <p className="text-xl text-gray-600 mt-4">Conecte suas redes sociais</p>
+              <GlobeAltIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <p className="text-3xl text-[var(--text)]/50">Nenhuma conta conectada</p>
+              <p className="text-xl text-[var(--text)]/40 mt-4">Conecte suas redes sociais</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -204,7 +206,7 @@ export default function SocialMediaPage() {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ scale: 1.05 }}
-                  className={`bg-gradient-to-br ${platformIcon(conta.plataforma)} rounded-3xl p-8 border border-white/20 shadow-2xl`}
+                  className={`bg-gradient-to-br ${platformIcon(conta.plataforma)} rounded-3xl p-8 border border-[var(--border)] shadow-2xl`}
                 >
                   <div className="text-center">
                     <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{conta.plataforma}</h3>
@@ -227,7 +229,7 @@ export default function SocialMediaPage() {
                         </div>
                       </div>
 
-                      <div className={`rounded-xl p-3 ${conta.crescimento >= 0 ? 'bg-green-500/30' : 'bg-red-500/30'}`}>
+                      <div className={`rounded-xl p-3 ${conta.crescimento >= 0 ? 'bg-[var(--accent-emerald)]/20' : 'bg-[var(--accent-alert)]/20'}`}>
                         <p className="text-2xl font-bold text-[var(--text-primary)]">
                           {conta.crescimento >= 0 ? '+' : ''}{conta.crescimento}%
                         </p>
@@ -248,11 +250,11 @@ export default function SocialMediaPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-20"
         >
-          <SparklesIcon className="w-32 h-32 text-pink-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-pink-300 max-w-4xl mx-auto">
+          <SparklesIcon className="w-32 h-32 text-[var(--accent-pink)] mx-auto mb-8 animate-pulse" />
+          <p className="text-5xl font-light text-[var(--accent-pink)] max-w-4xl mx-auto">
             "Viralizar não é sorte. É estratégia alienígena."
           </p>
-          <p className="text-3xl text-gray-500 mt-8">
+          <p className="text-3xl text-[var(--text-secondary)] mt-8">
             — Citizen Supremo X.1, seu Influenciador Digital
           </p>
         </motion.div>

@@ -16,6 +16,8 @@ import {
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface EmailCampaign {
   id: string;
@@ -104,9 +106,9 @@ export default function EmailMarketingPage() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-blue-500 rounded-full"
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
         />
-        <p className="absolute text-4xl text-blue-400 font-light">Preparando disparos...</p>
+        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Preparando disparos...</p>
       </div>
     );
   }
@@ -119,10 +121,10 @@ export default function EmailMarketingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-blue-400 via-cyan-500 to-teal-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-1)] to-[var(--accent-emerald)] bg-clip-text text-transparent">
             EMAIL MARKETING SUPREMO
           </h1>
-          <p className="text-3xl text-gray-400 mt-6">
+          <p className="text-3xl text-[var(--text-secondary)] mt-6">
             Cada email é uma carta de amor que converte
           </p>
         </motion.div>
@@ -131,61 +133,61 @@ export default function EmailMarketingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16 max-w-7xl mx-auto">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-3xl p-8 border border-blue-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <PaperAirplaneIcon className="w-16 h-16 text-blue-400 mb-4" />
+            <PaperAirplaneIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
-            <p className="text-xl text-gray-400">Emails Enviados</p>
+            <p className="text-xl text-[var(--text-secondary)]">Emails Enviados</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <EnvelopeOpenIcon className="w-16 h-16 text-green-400 mb-4" />
+            <EnvelopeOpenIcon className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaAbertura || 0).toFixed(1)}%</p>
-            <p className="text-xl text-gray-400">Taxa de Abertura</p>
+            <p className="text-xl text-[var(--text-secondary)]">Taxa de Abertura</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-3xl p-8 border border-purple-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <CursorArrowRaysIcon className="w-16 h-16 text-purple-400 mb-4" />
+            <CursorArrowRaysIcon className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
-            <p className="text-xl text-gray-400">Taxa de Cliques</p>
+            <p className="text-xl text-[var(--text-secondary)]">Taxa de Cliques</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <ChartBarIcon className="w-16 h-16 text-yellow-400 mb-4" />
+            <ChartBarIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.totalListas || 0}</p>
-            <p className="text-xl text-gray-400">Listas Ativas</p>
+            <p className="text-xl text-[var(--text-secondary)]">Listas Ativas</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-cyan-900/60 to-teal-900/60 rounded-3xl p-8 border border-cyan-500/30 backdrop-blur-xl"
+            className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <UserGroupIcon className="w-16 h-16 text-cyan-400 mb-4" />
+            <UserGroupIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalContatos || 0).toLocaleString()}</p>
-            <p className="text-xl text-gray-400">Total Contatos</p>
+            <p className="text-xl text-[var(--text-secondary)]">Total Contatos</p>
           </motion.div>
         </div>
 
         {/* LISTA DE CAMPANHAS */}
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-1)] bg-clip-text text-transparent">
             Campanhas de Email
           </h2>
 
           {metrics?.campanhas.length === 0 ? (
             <div className="text-center py-20">
-              <EnvelopeIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhuma campanha de email</p>
-              <p className="text-xl text-gray-600 mt-4">Crie sua primeira campanha de email</p>
+              <EnvelopeIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <p className="text-3xl text-[var(--text)]/50">Nenhuma campanha de email</p>
+              <p className="text-xl text-[var(--text)]/40 mt-4">Crie sua primeira campanha de email</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -195,44 +197,44 @@ export default function EmailMarketingPage() {
                   initial={{ x: -100, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-blue-500/50 transition-all"
+                  className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-[var(--accent-sky)]/50 transition-all"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       <div className={`p-4 rounded-2xl ${
-                        camp.status === 'enviado' ? 'bg-green-500/20' :
-                        camp.status === 'agendado' ? 'bg-yellow-500/20' : 'bg-gray-500/20'
+                        camp.status === 'enviado' ? 'bg-[var(--accent-emerald)]/20' :
+                        camp.status === 'agendado' ? 'bg-[var(--accent-warning)]/20' : 'bg-[var(--text)]/10'
                       }`}>
                         <EnvelopeIcon className={`w-10 h-10 ${
-                          camp.status === 'enviado' ? 'text-green-400' :
-                          camp.status === 'agendado' ? 'text-yellow-400' : 'text-gray-400'
+                          camp.status === 'enviado' ? 'text-[var(--accent-emerald)]' :
+                          camp.status === 'agendado' ? 'text-[var(--accent-warning)]' : 'text-[var(--text-secondary)]'
                         }`} />
                       </div>
                       <div>
                         <h3 className="text-2xl font-bold text-[var(--text-primary)]">{camp.assunto}</h3>
-                        <p className="text-gray-400">{camp.data_envio || 'Não agendado'} • {camp.status}</p>
+                        <p className="text-[var(--text-secondary)]">{camp.data_envio || 'Não agendado'} • {camp.status}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-10 text-right">
                       <div>
-                        <p className="text-2xl font-bold text-blue-400">{camp.enviados.toLocaleString()}</p>
-                        <p className="text-gray-500">Enviados</p>
+                        <p className="text-2xl font-bold text-[var(--accent-sky)]">{camp.enviados.toLocaleString()}</p>
+                        <p className="text-[var(--text)]/50">Enviados</p>
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-green-400">
+                        <p className="text-2xl font-bold text-[var(--accent-emerald)]">
                           {camp.enviados > 0 ? ((camp.abertos / camp.enviados) * 100).toFixed(1) : 0}%
                         </p>
-                        <p className="text-gray-500">Abertura</p>
+                        <p className="text-[var(--text)]/50">Abertura</p>
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-purple-400">
+                        <p className="text-2xl font-bold text-[var(--accent-purple)]">
                           {camp.abertos > 0 ? ((camp.cliques / camp.abertos) * 100).toFixed(1) : 0}%
                         </p>
-                        <p className="text-gray-500">CTR</p>
+                        <p className="text-[var(--text)]/50">CTR</p>
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-red-400">{camp.bounces}</p>
-                        <p className="text-gray-500">Bounces</p>
+                        <p className="text-2xl font-bold text-[var(--accent-alert)]">{camp.bounces}</p>
+                        <p className="text-[var(--text)]/50">Bounces</p>
                       </div>
                     </div>
                   </div>
@@ -249,11 +251,11 @@ export default function EmailMarketingPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-20"
         >
-          <SparklesIcon className="w-32 h-32 text-blue-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-blue-300 max-w-4xl mx-auto">
+          <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+          <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
             "A caixa de entrada é sagrada. Cada email aberto é uma porta aberta."
           </p>
-          <p className="text-3xl text-gray-500 mt-8">
+          <p className="text-3xl text-[var(--text-secondary)] mt-8">
             — Citizen Supremo X.1, seu Mestre do Email
           </p>
         </motion.div>

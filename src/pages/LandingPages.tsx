@@ -10,6 +10,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 interface LandingPage {
   id: string;
@@ -131,17 +134,17 @@ export default function LandingPagesPage() {
             <p className="text-xl text-[var(--text)]/70">Total LPs</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <RocketLaunchIcon className="w-16 h-16 text-emerald-400 mb-4" />
+            <RocketLaunchIcon className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{metrics?.ativas || 0}</p>
             <p className="text-xl text-[var(--text)]/70">Ativas</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <EyeIcon className="w-16 h-16 text-blue-400 mb-4" />
+            <EyeIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text)]/70">Visualizações</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <UserPlusIcon className="w-16 h-16 text-purple-400 mb-4" />
+            <UserPlusIcon className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text)]/70">Conversões</p>
           </motion.div>
@@ -176,7 +179,7 @@ export default function LandingPagesPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-8">
-                      <div className={`w-5 h-5 rounded-full ${lp.status === 'ativa' ? 'bg-emerald-400 animate-pulse' : lp.status === 'pausada' ? 'bg-yellow-400' : 'bg-[var(--text)]/30'}`} />
+                      <div className={`w-5 h-5 rounded-full ${lp.status === 'ativa' ? 'bg-[var(--accent-emerald)] animate-pulse' : lp.status === 'pausada' ? 'bg-[var(--accent-warning)]' : 'bg-[var(--text)]/30'}`} />
                       <div>
                         <h3 className="text-3xl font-black text-[var(--text)]">{lp.nome}</h3>
                         <p className="text-[var(--accent-1)] text-lg">{lp.url}</p>
@@ -185,15 +188,15 @@ export default function LandingPagesPage() {
                     </div>
                     <div className="flex gap-12 text-right">
                       <div>
-                        <p className="text-3xl font-black text-blue-400">{lp.visualizacoes.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-[var(--accent-sky)]">{lp.visualizacoes.toLocaleString()}</p>
                         <p className="text-[var(--text)]/60">Visualizações</p>
                       </div>
                       <div>
-                        <p className="text-3xl font-black text-purple-400">{lp.conversoes.toLocaleString()}</p>
+                        <p className="text-3xl font-black text-[var(--accent-purple)]">{lp.conversoes.toLocaleString()}</p>
                         <p className="text-[var(--text)]/60">Conversões</p>
                       </div>
                       <div>
-                        <p className={`text-3xl font-black ${lp.taxa_conversao >= 5 ? 'text-emerald-400' : lp.taxa_conversao >= 2 ? 'text-yellow-400' : 'text-red-400'}`}>
+                        <p className={`text-3xl font-black ${lp.taxa_conversao >= 5 ? 'text-[var(--accent-emerald)]' : lp.taxa_conversao >= 2 ? 'text-[var(--accent-warning)]' : 'text-[var(--accent-alert)]'}`}>
                           {lp.taxa_conversao.toFixed(1)}%
                         </p>
                         <p className="text-[var(--text)]/60">Taxa</p>
