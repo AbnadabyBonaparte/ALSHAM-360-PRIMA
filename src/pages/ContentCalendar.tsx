@@ -2,6 +2,7 @@
 // ALSHAM 360° PRIMA v10 SUPREMO — Calendário de Conteúdo Alienígena 1000/1000
 // Cada dia é uma oportunidade de dominação. O conteúdo nunca para.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
   CalendarDaysIcon,
@@ -15,10 +16,12 @@ import {
   PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface ContentItem {
   id: string;
@@ -58,10 +61,10 @@ export default function ContentCalendarPage() {
         if (conteudos) {
           setMetrics({
             totalConteudos: conteudos.length,
-            publicados: conteudos.filter(c => c.status === 'publicado').length,
-            agendados: conteudos.filter(c => c.status === 'agendado').length,
-            rascunhos: conteudos.filter(c => c.status === 'rascunho').length,
-            conteudos: conteudos.map(c => ({
+            publicados: conteudos.filter((c: any) => c.status === 'publicado').length,
+            agendados: conteudos.filter((c: any) => c.status === 'agendado').length,
+            rascunhos: conteudos.filter((c: any) => c.status === 'rascunho').length,
+            conteudos: conteudos.map((c: any) => ({
               id: c.id,
               titulo: c.titulo || 'Sem título',
               tipo: c.tipo || 'blog',
@@ -91,16 +94,14 @@ export default function ContentCalendarPage() {
 
   if (loading) {
     return (
-      
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-indigo-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-indigo-400 font-light">Carregando calendário...</p>
-        </div>
-      
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full"
+        />
+        <p className="absolute text-4xl text-[var(--accent-purple)] font-light">Carregando calendário...</p>
+      </div>
     );
   }
 
@@ -127,83 +128,93 @@ export default function ContentCalendarPage() {
 
   const typeColor = (tipo: string) => {
     switch (tipo) {
-      case 'video': return 'bg-red-500';
-      case 'social': return 'bg-pink-500';
-      case 'podcast': return 'bg-purple-500';
-      case 'email': return 'bg-blue-500';
-      default: return 'bg-green-500';
+      case 'video': return 'bg-[var(--accent-alert)]';
+      case 'social': return 'bg-[var(--accent-pink)]';
+      case 'podcast': return 'bg-[var(--accent-purple)]';
+      case 'email': return 'bg-[var(--accent-sky)]';
+      default: return 'bg-[var(--accent-emerald)]';
     }
   };
 
   return (
-    
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
-        {/* HEADER ÉPICO */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            CALENDÁRIO DE CONTEÚDO
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada dia é uma oportunidade de dominação
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+      {/* HEADER ÉPICO */}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-16"
+      >
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-1)] to-[var(--accent-pink)] bg-clip-text text-transparent">
+          CALENDÁRIO DE CONTEÚDO
+        </h1>
+        <p className="text-3xl text-[var(--text-secondary)] mt-6">
+          Cada dia é uma oportunidade de dominação
+        </p>
+      </motion.div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-indigo-900/60 to-purple-900/60 rounded-2xl p-6 border border-indigo-500/30">
-            <CalendarDaysIcon className="w-12 h-12 text-indigo-400 mb-3" />
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
+        <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
+          <CardContent className="p-6">
+            <CalendarDaysIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalConteudos || 0}</p>
-            <p className="text-gray-400">Total no Mês</p>
-          </motion.div>
+            <p className="text-[var(--text-secondary)]">Total no Mês</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <CheckCircleIcon className="w-12 h-12 text-green-400 mb-3" />
+        <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
+          <CardContent className="p-6">
+            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.publicados || 0}</p>
-            <p className="text-gray-400">Publicados</p>
-          </motion.div>
+            <p className="text-[var(--text-secondary)]">Publicados</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
-            <ClockIcon className="w-12 h-12 text-yellow-400 mb-3" />
+        <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
+          <CardContent className="p-6">
+            <ClockIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
-            <p className="text-gray-400">Agendados</p>
-          </motion.div>
+            <p className="text-[var(--text-secondary)]">Agendados</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-2xl p-6 border border-gray-500/30">
-            <PencilSquareIcon className="w-12 h-12 text-gray-400 mb-3" />
+        <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
+          <CardContent className="p-6">
+            <PencilSquareIcon className="w-12 h-12 text-[var(--text-secondary)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.rascunhos || 0}</p>
-            <p className="text-gray-400">Rascunhos</p>
-          </motion.div>
-        </div>
+            <p className="text-[var(--text-secondary)]">Rascunhos</p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* NAVEGAÇÃO DO MÊS */}
-        <div className="flex items-center justify-center gap-8 mb-8">
-          <button
-            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-            className="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
-          >
-            ←
-          </button>
-          <h2 className="text-3xl font-bold text-[var(--text-primary)]">
-            {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
-          </h2>
-          <button
-            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-            className="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
-          >
-            →
-          </button>
-        </div>
+      {/* NAVEGAÇÃO DO MÊS */}
+      <div className="flex items-center justify-center gap-8 mb-8">
+        <Button
+          variant="ghost"
+          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+          className="p-3 rounded-xl bg-[var(--surface)]/60 hover:bg-[var(--surface)] text-[var(--text-primary)]"
+        >
+          ←
+        </Button>
+        <h2 className="text-3xl font-bold text-[var(--text-primary)]">
+          {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
+        </h2>
+        <Button
+          variant="ghost"
+          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+          className="p-3 rounded-xl bg-[var(--surface)]/60 hover:bg-[var(--surface)] text-[var(--text-primary)]"
+        >
+          →
+        </Button>
+      </div>
 
-        {/* CALENDÁRIO */}
-        <div className="max-w-6xl mx-auto bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 border border-[var(--border)] backdrop-blur-xl">
+      {/* CALENDÁRIO */}
+      <Card className="max-w-6xl mx-auto bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)]">
+        <CardContent className="p-8">
           {/* DIAS DA SEMANA */}
           <div className="grid grid-cols-7 gap-2 mb-4">
             {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-              <div key={day} className="text-center text-gray-400 font-medium py-2">
+              <div key={day} className="text-center text-[var(--text-secondary)] font-medium py-2">
                 {day}
               </div>
             ))}
@@ -225,12 +236,12 @@ export default function ContentCalendarPage() {
                   key={day.toISOString()}
                   whileHover={{ scale: 1.05 }}
                   className={`aspect-square rounded-xl p-2 border transition-all cursor-pointer ${
-                    isToday ? 'bg-indigo-500/30 border-indigo-500' :
-                    dayContent.length > 0 ? 'bg-white/10 border-white/20' :
-                    'bg-white/5 border-transparent hover:border-[var(--border)]'
+                    isToday ? 'bg-[var(--accent-purple)]/30 border-[var(--accent-purple)]' :
+                    dayContent.length > 0 ? 'bg-[var(--surface)]/60 border-[var(--border)]' :
+                    'bg-[var(--surface)]/30 border-transparent hover:border-[var(--border)]'
                   }`}
                 >
-                  <div className="text-sm font-medium text-gray-300 mb-1">
+                  <div className="text-sm font-medium text-[var(--text-secondary)] mb-1">
                     {format(day, 'd')}
                   </div>
                   <div className="space-y-1">
@@ -244,55 +255,55 @@ export default function ContentCalendarPage() {
                       </div>
                     ))}
                     {dayContent.length > 3 && (
-                      <div className="text-xs text-gray-400">+{dayContent.length - 3} mais</div>
+                      <div className="text-xs text-[var(--text-secondary)]">+{dayContent.length - 3} mais</div>
                     )}
                   </div>
                 </motion.div>
               );
             })}
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* LEGENDA */}
-        <div className="flex justify-center gap-6 mt-8">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded" />
-            <span className="text-gray-400">Blog</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded" />
-            <span className="text-gray-400">Vídeo</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-pink-500 rounded" />
-            <span className="text-gray-400">Social</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-purple-500 rounded" />
-            <span className="text-gray-400">Podcast</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-500 rounded" />
-            <span className="text-gray-400">Email</span>
-          </div>
+      {/* LEGENDA */}
+      <div className="flex justify-center gap-6 mt-8 flex-wrap">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-[var(--accent-emerald)] rounded" />
+          <span className="text-[var(--text-secondary)]">Blog</span>
         </div>
-
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-indigo-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-indigo-300 max-w-4xl mx-auto">
-            "Consistência é o segredo. Cada dia sem conteúdo é um dia que seu concorrente avança."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Editor-Chefe
-          </p>
-        </motion.div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-[var(--accent-alert)] rounded" />
+          <span className="text-[var(--text-secondary)]">Vídeo</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-[var(--accent-pink)] rounded" />
+          <span className="text-[var(--text-secondary)]">Social</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-[var(--accent-purple)] rounded" />
+          <span className="text-[var(--text-secondary)]">Podcast</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-[var(--accent-sky)] rounded" />
+          <span className="text-[var(--text-secondary)]">Email</span>
+        </div>
       </div>
-    
+
+      {/* MENSAGEM FINAL DA IA */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="text-center py-24 mt-16"
+      >
+        <SparklesIcon className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
+        <p className="text-5xl font-light text-[var(--accent-purple)] max-w-4xl mx-auto">
+          "Consistência é o segredo. Cada dia sem conteúdo é um dia que seu concorrente avança."
+        </p>
+        <p className="text-3xl text-[var(--text-secondary)] mt-8">
+          — Citizen Supremo X.1, seu Editor-Chefe
+        </p>
+      </motion.div>
+    </div>
   );
 }
