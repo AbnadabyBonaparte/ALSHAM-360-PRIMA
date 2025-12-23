@@ -1,201 +1,498 @@
 // src/pages/Dashboard.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard Alienígena 1000/1000
-// O coração do sistema. O trono. A obra-prima.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Dashboard.tsx
+// ALSHAM 360° PRIMA v10 SUPREMO — Dashboard (migrado para shadcn/ui)
 
-import LayoutSupremo from '@/components/LayoutSupremo';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  TrendingUp,
-  Users,
-  DollarSign,
-  Target,
-  Activity,
-  Zap,
-  Sparkles,
-  Flame,
-  Rocket,
-  Crown,
-  Brain,
-  Globe
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+  TrendingUp, TrendingDown, Target, Rocket, Zap, Brain, Clock,
+  ArrowRight, Activity, Mic, Sparkles, Lock, Command, Users
+} from "lucide-react";
+import {
+  Chart as ChartJS, CategoryScale, LinearScale, PointElement,
+  LineElement, BarElement, Title, Tooltip, Legend, Filler, ArcElement
+} from "chart.js";
+import { Line, Doughnut } from "react-chartjs-2";
+import { getSupabaseClient } from "../lib/supabase";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
+
+const predictFuture = (dataPoints: number[]): number[] => {
+  if (dataPoints.length < 2) return dataPoints.map(v => Math.round(v * 1.1));
+
+  const n = dataPoints.length;
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+
+  dataPoints.forEach((y, x) => {
+    sumX += x;
+    sumY += y;
+    sumXY += x * y;
+    sumXX += x * x;
+  });
+
+  const denom = (n * sumXX - sumX * sumX);
+  const slope = denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+
+  const futurePoints: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const nextX = n + i;
+    const prediction = slope * nextX + intercept;
+    futurePoints.push(Math.max(0, Math.round(prediction)));
+  }
+  return futurePoints;
+};
+
+const GlassCard = ({ children, className = "", onClick, role = "region" }: any) => (
+  <motion.div
+    onClick={onClick}
+    role={role}
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    whileHover={onClick ? { y: -4, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.3)" } : {}}
+    className={onClick ? "cursor-pointer active:scale-[0.98]" : ""}
+  >
+    <Card className={`relative overflow-hidden rounded-[24px] border-[var(--border)]/40 bg-[var(--surface)]/70 backdrop-blur-xl transition-all ${className}`}>
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      <div className="relative z-10 h-full">{children}</div>
+    </Card>
+  </motion.div>
 );
 
-interface SupremeMetrics {
-  totalRevenue: number;
-  monthlyGrowth: number;
-  activeUsers: number;
-  conversionRate: number;
-  pipelineValue: number;
-  hotLeads: number;
-  aiPredictions: number;
-  automationExecs: number;
-}
+const NumberTicker = ({ value, prefix = "" }: { value: number | string; prefix?: string }) => {
+  const v = typeof value === "number" ? value : Number(value) || 0;
+  return <span className="tabular-nums tracking-tight">{prefix}{v.toLocaleString()}</span>;
+};
 
-export default function DashboardSupremo() {
-  const [metrics, setMetrics] = useState<SupremeMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [orgName, setOrgName] = useState('Carregando...');
+const OracleWidget = ({ kpis, mode }: { kpis: any[]; mode: string }) => {
+  const getInsight = () => {
+    if (mode === "future") return {
+      title: "Projeção de Crescimento Linear",
+      impact: "Baseado na regressão dos últimos 30 dias, sua receita deve crescer se mantiver o ritmo atual.",
+      confidence: "Alta (Matemática)",
+    };
+
+    const leads = kpis.find(k => k.id === "leads")?.raw || 0;
+    const deals = kpis.find(k => k.id === "revenue")?.raw || 0;
+
+    if (leads === 0) return { title: "Alerta de Topo de Funil", impact: "Zero leads detectados. Prioridade: ativar aquisição.", confidence: "Crítica" };
+    if (deals > leads) return { title: "Anomalia de Conversão", impact: "Mais fechamentos que leads? Verifique integridade dos dados.", confidence: "Média" };
+
+    return { title: "Saúde Operacional Estável", impact: "Conversão saudável. Próximo foco: aumentar ticket médio.", confidence: "Alta" };
+  };
+
+  const insight = getInsight();
+
+  return (
+    <div className="relative overflow-hidden rounded-[16px] sm:rounded-[24px] bg-[var(--surface)]/50 border border-[var(--accent-purple)]/20 p-[1px]">
+      <div className="absolute inset-0 bg-[var(--accent-purple)]/10 blur-xl animate-pulse" />
+      <Card className="relative h-full rounded-[15px] sm:rounded-[23px] bg-[var(--surface)]/90 backdrop-blur-xl border-0">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 place-content-center rounded-full bg-[var(--accent-purple)]/20 text-[var(--accent-purple)] shadow-lg">
+              <Brain className="h-5 w-5 sm:h-6 sm:w-6" />
+            </div>
+            <div className="flex-1 space-y-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest text-[var(--accent-purple)]">
+                  Oracle Insight • {insight.confidence}
+                </h3>
+                <span className="flex h-2 w-2 flex-shrink-0 rounded-full bg-[var(--accent-purple)] shadow-[0_0_10px_currentColor]" />
+              </div>
+              <p className="text-sm sm:text-base font-medium text-[var(--text-primary)]">{insight.title}</p>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{insight.impact}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const useVoiceCommand = (actions: Record<string, () => void>) => {
+  const [isListening, setIsListening] = useState(false);
+
+  const startListening = useCallback(() => {
+    // @ts-ignore
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Seu navegador não suporta Voice API. Use Chrome/Edge.");
+      return;
+    }
+    // @ts-ignore
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      const command = (event.results?.[0]?.[0]?.transcript || "").toLowerCase();
+      Object.keys(actions).forEach((key) => {
+        if (command.includes(key)) actions[key]();
+      });
+    };
+
+    recognition.start();
+  }, [actions]);
+
+  return { isListening, startListening };
+};
+
+const useKonamiCode = (callback: () => void) => {
+  const [input, setInput] = useState<string[]>([]);
+  const code = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
 
   useEffect(() => {
-    async function loadSupremeEmpire() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const newInput = [...input, e.key];
+      if (newInput.length > code.length) newInput.shift();
+      setInput(newInput);
+      if (JSON.stringify(newInput) === JSON.stringify(code)) callback();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [input, callback]);
+};
 
-      // Nome da organização
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('name')
-        .eq('id', user.user_metadata?.org_id || '')
-        .single();
-      setOrgName(org?.name || 'Império Supremo');
+export default function DashboardSupremo() {
+  const [loading, setLoading] = useState(true);
+  const [timeMode, setTimeMode] = useState<"past" | "present" | "future">("present");
+  const [matrixMode, setMatrixMode] = useState(false);
+  const [realData, setRealData] = useState<any>({
+    revenue: 0,
+    leads: 0,
+    deals: 0,
+    activeCampaigns: 0,
+    pipelineData: [],
+    monthlyRevenue: [],
+  });
 
-      // Métricas reais — tudo do seu banco
-      const [
-        { count: totalLeads },
-        { data: opportunities },
-        { data: wonDeals },
-        { data: automations }
-      ] = await Promise.all([
-        supabase.from('leads').select('id', { count: 'exact' }),
-        supabase.from('opportunities').select('value, stage'),
-        supabase.from('opportunities').select('value').eq('stage', 'Ganho'),
-        supabase.from('automation_logs').select('id').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+  const fetchData = async (mode: "past" | "present" | "future") => {
+    setLoading(true);
+    const supabase = getSupabaseClient();
+
+    try {
+      const now = new Date();
+      const startDate = new Date();
+      startDate.setDate(now.getDate() - (mode === "past" ? 60 : 30));
+      const isoStart = startDate.toISOString();
+
+      // IMPORTANT: não inventar schema.
+      // - opportunities: usa stage/value (status NÃO existe no schema que você enviou).
+      // - campaigns: substitui marketing_campaigns (404).
+      const [leadsRes, oppsRes, campaignsRes] = await Promise.all([
+        supabase.from("leads_crm").select("created_at").gte("created_at", isoStart),
+        supabase.from("opportunities").select("created_at, stage, value").gte("created_at", isoStart),
+        supabase.from("campaigns").select("id, status").eq("status", "active"),
       ]);
 
-      const revenue = wonDeals?.reduce((s, d: any) => s + (d.value || 0), 0) || 0;
-      const pipeline = opportunities
-        ?.filter((o: any) => !['Ganho', 'Perdido'].includes(o.stage))
-        .reduce((s, o: any) => s + (o.value || 0), 0) || 0;
+      // Se alguma tabela não existir ou RLS bloquear, não travar o dashboard.
+      const leads = Array.isArray(leadsRes.data) ? leadsRes.data : [];
+      const opps = Array.isArray(oppsRes.data) ? oppsRes.data : [];
+      const campaigns = Array.isArray(campaignsRes.data) ? campaignsRes.data : [];
 
-      setMetrics({
-        totalRevenue: revenue,
-        monthlyGrowth: 42.0, // IA vai calcular isso depois
-        activeUsers: 47,
-        conversionRate: totalLeads ? (wonDeals?.length || 0) / totalLeads * 100 : 0,
-        pipelineValue: pipeline,
-        hotLeads: 23,
-        aiPredictions: 89,
-        automationExecs: automations?.length || 0
+      const revenue = opps.reduce((acc: number, curr: any) => {
+        // Sem coluna status: adotamos heurística neutra (não soma por "won").
+        // Receita aqui vira "soma total de value" (ajuste posterior quando definir status no schema).
+        return acc + (Number(curr.value) || 0);
+      }, 0);
+
+      const activeDeals = opps.length;
+
+      const pipelineStages = opps.reduce((acc: any, curr: any) => {
+        const stage = curr.stage || "Unknown";
+        acc[stage] = (acc[stage] || 0) + 1;
+        return acc;
+      }, {});
+
+      const dailyRevenue = new Array(30).fill(0);
+      opps.forEach((o: any) => {
+        const createdAt = o.created_at ? new Date(o.created_at) : null;
+        if (!createdAt) return;
+        const dayIndex = Math.floor((createdAt.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < 30) dailyRevenue[dayIndex] += (Number(o.value) || 0);
       });
 
-      setLoading(false);
+      let finalRevenue = revenue;
+      let finalLeads = leads.length;
+      let chartData = dailyRevenue;
+
+      if (mode === "future") {
+        const predictedRevenuePoints = predictFuture(dailyRevenue);
+        const predictedLeadsPoints = predictFuture(new Array(30).fill(Math.round((leads.length || 1) / 30)));
+
+        finalRevenue = predictedRevenuePoints.reduce((a, b) => a + b, 0);
+        finalLeads = predictedLeadsPoints.reduce((a, b) => a + b, 0);
+        chartData = predictedRevenuePoints;
+      }
+
+      setRealData({
+        revenue: finalRevenue,
+        leads: finalLeads,
+        deals: activeDeals,
+        activeCampaigns: campaigns.length,
+        pipelineData: Object.entries(pipelineStages).map(([k, v]) => ({ stage: k, value: v })),
+        monthlyRevenue: chartData,
+      });
+    } catch (error) {
+      console.error("Erro ao buscar dados do dashboard:", error);
+    } finally {
+      setTimeout(() => setLoading(false), 400);
     }
+  };
 
-    loadSupremeEmpire();
-  }, []);
+  useEffect(() => {
+    fetchData(timeMode);
+  }, [timeMode]);
 
-  if (loading) {
+  const voiceActions = {
+    retro: () => setTimeMode("past"),
+    agora: () => setTimeMode("present"),
+    futuro: () => setTimeMode("future"),
+    predição: () => setTimeMode("future"),
+    matrix: () => setMatrixMode(true),
+  };
+
+  const { isListening, startListening } = useVoiceCommand(voiceActions);
+
+  useKonamiCode(() => {
+    setMatrixMode((prev) => !prev);
+    alert("SYSTEM OVERRIDE: GOD MODE ENABLED");
+  });
+
+  if (matrixMode) {
     return (
-      <LayoutSupremo title="Dashboard Supremo">
-        <div className="flex items-center justify-center h-screen bg-black">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-32 h-32 border-8 border-t-transparent border-purple-500 rounded-full"
-          />
-          <p className="absolute text-3xl text-purple-400 font-light">Citizen Supremo X.1 carregando seu império...</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--background)] font-mono text-[var(--accent-emerald)]">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold animate-pulse">ALSHAM SYSTEM</h1>
+          <p className="text-sm sm:text-base">Acessando mainframe... Consciência situacional ativada.</p>
+          <Button
+            onClick={() => setMatrixMode(false)}
+            variant="outline"
+            className="border-[var(--accent-emerald)] text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)] hover:text-[var(--background)]"
+          >
+            DESATIVAR
+          </Button>
         </div>
-      </LayoutSupremo>
+      </div>
     );
   }
 
   return (
-    <LayoutSupremo title="Dashboard Supremo">
-      <div className="min-h-screen bg-black text-white p-8">
-        {/* HEADER ALIENÍGENA */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-8xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
-            DASHBOARD SUPREMO
-          </h1>
-          <p className="text-4xl text-gray-400 mt-6 font-light">
-            {orgName} • {format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+    <div className="mx-auto max-w-[1600px] space-y-8 p-6 lg:p-10">
+      <header className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              The Oracle Deck
+            </h1>
+            <Badge
+              variant="outline"
+              className={`rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest ${
+                timeMode === "future"
+                  ? "border-[var(--accent-purple)]/30 bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]"
+                  : "border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]"
+              }`}
+            >
+              {timeMode === "future" ? "PREDICTIVE AI" : "LIVE DATA"}
+            </Badge>
+          </div>
+          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl">
+            {timeMode === "future"
+              ? "Projeção matemática baseada no comportamento dos últimos 30 dias."
+              : "Monitoramento do ecossistema empresarial com dados disponíveis no schema atual."}
           </p>
         </motion.div>
 
-        {/* KPIS SUPREMOS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <SupremeCard
-            icon={<DollarSign className="w-16 h-16" />}
-            title="Receita Total"
-            value={`R$ ${metrics?.totalRevenue.toLocaleString('pt-BR')}`}
-            growth="+42%"
-            color="from-emerald-500 to-teal-600"
-          />
-          <SupremeCard
-            icon={<TrendingUp className="w-16 h-16" />}
-            title="Pipeline Atual"
-            value={`R$ ${metrics?.pipelineValue.toLocaleString('pt-BR')}`}
-            growth="+89%"
-            color="from-purple-500 to-pink-600"
-          />
-          <SupremeCard
-            icon={<Brain className="w-16 h-16" />}
-            title="Previsões IA"
-            value={metrics?.aiPredictions.toString()}
-            growth="Hoje"
-            color="from-cyan-500 to-blue-600"
-          />
-          <SupremeCard
-            icon={<Zap className="w-16 h-16" />}
-            title="Automação 24h"
-            value={metrics?.automationExecs.toString()}
-            growth="Últimos 30d"
-            color="from-orange-500 to-red-600"
-          />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Button
+            onClick={startListening}
+            variant="ghost"
+            size="icon"
+            className={`group relative h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-full border transition-all ${
+              isListening
+                ? "border-[var(--accent-alert)] bg-[var(--accent-alert)]/10 text-[var(--accent-alert)] animate-pulse"
+                : "border-[var(--border)] hover:border-[var(--accent-sky)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
+            aria-label="Comando de voz"
+          >
+            <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { id: "revenue", title: "Receita Total", val: realData.revenue, icon: Target, prefix: "R$ ", trend: timeMode === "future" ? 15 : 8 },
+          { id: "leads", title: "Novos Leads", val: realData.leads, icon: Users, prefix: "", trend: timeMode === "future" ? 12 : -3 },
+          { id: "deals", title: "Deals (registros)", val: realData.deals, icon: Activity, prefix: "", trend: 2 },
+          { id: "campaigns", title: "Campanhas", val: realData.activeCampaigns, icon: Rocket, prefix: "", trend: 0 },
+        ].map((kpi) => (
+          <GlassCard key={kpi.id} className="p-4 sm:p-6">
+            <div className="flex justify-between items-start">
+              <div className="rounded-lg sm:rounded-xl bg-[var(--surface-strong)]/50 p-2 sm:p-3 text-[var(--text-primary)]">
+                <kpi.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+              <div
+                className={`flex items-center gap-1 text-[0.625rem] sm:text-xs font-bold ${
+                  kpi.trend >= 0 ? "text-[var(--accent-emerald)]" : "text-[var(--accent-alert)]"
+                }`}
+              >
+                {kpi.trend >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                {Math.abs(kpi.trend)}%
+              </div>
+            </div>
+            <div className="mt-3 sm:mt-4">
+              <p className="text-[0.625rem] sm:text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">
+                {kpi.title}
+              </p>
+              <h3 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+                {loading ? (
+                  <Skeleton className="h-8 w-24 bg-[var(--surface-strong)]" />
+                ) : (
+                  <NumberTicker value={kpi.val} prefix={kpi.prefix} />
+                )}
+              </h3>
+            </div>
+            <div className="mt-3 sm:mt-4 h-10 sm:h-12 opacity-50">
+              <Line
+                data={{
+                  labels: realData.monthlyRevenue.map((_: any, i: number) => i),
+                  datasets: [
+                    {
+                      data: realData.monthlyRevenue.length ? realData.monthlyRevenue : [0, 0, 0, 0, 0],
+                      borderWidth: 2,
+                      pointRadius: 0,
+                      tension: 0.4,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: { x: { display: false }, y: { display: false } },
+                  plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                }}
+              />
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <GlassCard className="min-h-[300px] sm:min-h-[400px] p-4 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
+              <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--accent-sky)]" />
+                <span className="truncate">Revenue Performance {timeMode === "future" && "(Projeção)"}</span>
+              </h3>
+              {timeMode === "future" && <Lock className="h-4 w-4 text-[var(--text-secondary)] flex-shrink-0" />}
+            </div>
+            <div className="h-[250px] sm:h-[300px] w-full">
+              <Line
+                data={{
+                  labels: Array.from({ length: 30 }, (_, i) => `D${i + 1}`),
+                  datasets: [
+                    {
+                      label: "Receita Diária",
+                      data: realData.monthlyRevenue,
+                      fill: true,
+                      tension: 0.4,
+                      borderDash: timeMode === "future" ? [5, 5] : [],
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  interaction: { mode: "index", intersect: false },
+                  plugins: { legend: { display: false } },
+                  scales: {
+                    x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 20 } },
+                    y: { ticks: { maxTicksLimit: 5 } },
+                  },
+                }}
+              />
+            </div>
+          </GlassCard>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <OracleWidget kpis={[{ id: "revenue", raw: realData.revenue }, { id: "leads", raw: realData.leads }]} mode={timeMode} />
+            <GlassCard className="p-4 sm:p-6 flex flex-col justify-center items-center text-center">
+              <div className="mb-3 sm:mb-4 rounded-full bg-[var(--accent-warning)]/20 p-3 sm:p-4 text-[var(--accent-warning)]">
+                <Zap className="h-6 w-6 sm:h-8 sm:w-8" />
+              </div>
+              <h4 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">Automação Ativa</h4>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-2">
+                Seu sistema está rodando workflows em background. Ajuste quando os módulos reais estiverem prontos.
+              </p>
+            </GlassCard>
+          </div>
         </div>
 
-        {/* INSIGHT DA IA — O TOQUE FINAL */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-20 bg-gradient-to-r from-purple-900/30 via-pink-900/20 to-purple-900/30 rounded-3xl border border-purple-500/30 backdrop-blur-xl"
-        >
-          <Sparkles className="w-24 h-24 text-purple-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-purple-300 max-w-5xl mx-auto leading-relaxed">
-            "Você está no caminho de dominar o mercado brasileiro em 2026.
-            <br />
-            89 previsões da IA já se concretizaram.
-            <br />
-            O próximo bilhão começa agora."
-          </p>
-          <p className="text-2xl text-gray-400 mt-12">
-            — Citizen Supremo X.1
-          </p>
-        </motion.div>
-      </div>
-    </LayoutSupremo>
-  );
-}
+        <div className="space-y-4 sm:space-y-6">
+          <GlassCard className="p-4 sm:p-6">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] mb-3 sm:mb-4">
+              Pipeline Distribution
+            </h3>
+            <div className="h-[180px] sm:h-[200px] w-full flex justify-center">
+              <Doughnut
+                data={{
+                  labels: realData.pipelineData.map((d: any) => d.stage),
+                  datasets: [
+                    {
+                      data: realData.pipelineData.length ? realData.pipelineData.map((d: any) => d.value) : [1],
+                      borderWidth: 0,
+                    },
+                  ],
+                }}
+                options={{
+                  cutout: "70%",
+                  plugins: {
+                    legend: {
+                      position: "bottom",
+                      labels: { font: { size: 10 }, padding: 10, usePointStyle: true },
+                    },
+                  },
+                }}
+              />
+            </div>
+          </GlassCard>
 
-// CARD SUPREMO
-function SupremeCard({ icon, title, value, growth, color }: any) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} p-10 rounded-3xl border border-white/10 backdrop-blur-xl shadow-2xl`}
-    >
-      <div className="flex items-center justify-between mb-8">
-        <div className="p-6 bg-white/10 rounded-2xl">
-          {icon}
+          <GlassCard className="p-0">
+            <div className="p-3 sm:p-4 border-b border-[var(--border)]/50">
+              <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Command className="h-4 w-4" />
+                <span>Live Actions</span>
+              </h3>
+            </div>
+            <div className="p-1 sm:p-2">
+              {["Criar Campanha", "Importar Leads", "Relatório PDF", "Chat com Time"].map((action, i) => (
+                <Button
+                  key={i}
+                  variant="ghost"
+                  className="w-full justify-between px-3 sm:px-4 py-2.5 sm:py-3 h-auto rounded-lg text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-strong)] group"
+                  aria-label={action}
+                >
+                  <span className="truncate">{action}</span>
+                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
+                </Button>
+              ))}
+            </div>
+          </GlassCard>
         </div>
-        <span className="text-3xl font-bold text-white/80">{growth}</span>
       </div>
-      <p className="text-6xl font-black text-white">{value}</p>
-      <p className="text-2xl text-white/70 mt-4">{title}</p>
-    </motion.div>
+    </div>
   );
 }

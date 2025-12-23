@@ -68,7 +68,7 @@ export const pagesListSupremo: PageDefinition[] = [
   { id: "forms", label: "Formulários", icon: "ClipboardIcon", module: "Marketing" },
   { id: "seo", label: "SEO", icon: "MagnifyingGlassIcon", module: "Marketing" },
   { id: "social", label: "Social Media", icon: "HashtagIcon", module: "Marketing" },
-  { id: "ads", label: "Ads/Media", icon: "RectangleStackIcon", module: "Marketing" },
+  { id: "ads-manager", label: "Ads Manager", icon: "RectangleStackIcon", module: "Marketing" },
   { id: "ab-testing", label: "A/B Testing", icon: "SquaresPlusIcon", module: "Marketing" },
   { id: "content-hub", label: "Content Hub", icon: "NewspaperIcon", module: "Marketing" },
   { id: "webinars", label: "Webinars/Events", icon: "VideoCameraIcon", module: "Marketing" },
@@ -156,5 +156,8 @@ export const pagesListSupremo: PageDefinition[] = [
   { id: "marketplace", label: "App Marketplace", icon: "ShoppingBagIcon", module: "Futuro" },
   { id: "sandbox", label: "Sandbox/Dev", icon: "CodeBracketSquareIcon", module: "Futuro" },
   { id: "labs-insights", label: "Labs Insights", icon: "ChartBarSquareIcon", module: "Futuro" },
+
+  // Sistema & Personalização
+  { id: "theme-switcher", label: "Temas", icon: "PaintBrushIcon", module: "Sistema" },
 ];
 

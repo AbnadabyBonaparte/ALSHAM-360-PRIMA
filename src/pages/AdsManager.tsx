@@ -1,298 +1,681 @@
 // src/pages/AdsManager.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Ads Manager Alienígena 1000/1000
-// Cada centavo investido retorna como tsunami de conversões.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// ALSHAM 360° PRIMA — Ads Manager
+// CANÔNICO • TOKEN-FIRST • MULTI-TENANT READY • SAFE-UI (sem Sidebar/Layout aqui)
+// Importante: NÃO renderiza LayoutSupremo aqui. O shell é responsabilidade do ProtectedLayout.
+// ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  CurrencyDollarIcon,
-  ChartBarIcon,
-  EyeIcon,
-  CursorArrowRaysIcon,
-  ShoppingCartIcon,
-  SparklesIcon,
-  ArrowTrendingUpIcon,
-  BanknotesIcon
-} from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  BarChart3,
+  BadgeCheck,
+  CircleDollarSign,
+  Filter,
+  Loader2,
+  MousePointerClick,
+  RefreshCw,
+  Search,
+  ShoppingCart,
+  SlidersHorizontal,
+  Sparkles,
+  TrendingUp,
+  Wallet,
+} from 'lucide-react'
+import toast from 'react-hot-toast'
+import { supabase } from '@/lib/supabase/client'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Progress } from '@/components/ui/progress'
+
+type AdStatus = 'ativo' | 'pausado' | 'encerrado'
 
 interface Ad {
-  id: string;
-  nome: string;
-  plataforma: string;
-  status: 'ativo' | 'pausado' | 'encerrado';
-  orcamento_diario: number;
-  gasto_total: number;
-  impressoes: number;
-  cliques: number;
-  conversoes: number;
-  cpc: number;
-  cpa: number;
-  roas: number;
+  id: string
+  nome: string
+  plataforma: string
+  status: AdStatus
+  orcamento_diario: number
+  gasto_total: number
+  impressoes: number
+  cliques: number
+  conversoes: number
+  cpc: number
+  cpa: number
+  roas: number
 }
 
 interface AdsMetrics {
-  gastoTotal: number;
-  receitaGerada: number;
-  roasGeral: number;
-  totalAds: number;
-  adsAtivos: number;
-  cpcMedio: number;
-  cpaMedio: number;
-  ads: Ad[];
+  gastoTotal: number
+  receitaGerada: number
+  roasGeral: number
+  totalAds: number
+  adsAtivos: number
+  cpcMedio: number
+  cpaMedio: number
+  ads: Ad[]
 }
 
-export default function AdsManagerPage() {
-  const [metrics, setMetrics] = useState<AdsMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n))
+}
+
+function formatCurrencyBRL(v: number) {
+  if (!Number.isFinite(v)) return '—'
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+function formatNumberBR(v: number) {
+  if (!Number.isFinite(v)) return '—'
+  return v.toLocaleString('pt-BR')
+}
+
+function formatRatioX(v: number) {
+  if (!Number.isFinite(v)) return '—'
+  return `${v.toFixed(2)}x`
+}
+
+function formatPct(v: number) {
+  if (!Number.isFinite(v)) return '—'
+  return `${(v * 100).toFixed(1)}%`
+}
+
+function toneForRoas(roas: number) {
+  if (!Number.isFinite(roas)) return 'var(--text-secondary)'
+  if (roas >= 2) return 'var(--accent-emerald)'
+  if (roas >= 1) return 'var(--accent-warning)'
+  return 'var(--accent-alert)'
+}
+
+function statusMeta(status: AdStatus) {
+  switch (status) {
+    case 'ativo':
+      return { label: 'Ativo', color: 'var(--accent-emerald)' }
+    case 'pausado':
+      return { label: 'Pausado', color: 'var(--accent-warning)' }
+    case 'encerrado':
+    default:
+      return { label: 'Encerrado', color: 'var(--text-secondary)' }
+  }
+}
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  hint,
+  accent,
+}: {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+  label: string
+  value: string
+  hint?: string
+  accent?: string
+}) {
+  return (
+    <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)]">
+      <CardContent className="flex items-center gap-4 p-4">
+        <div className="rounded-2xl p-3 bg-gradient-to-br from-[var(--accent-1)]/20 to-[var(--accent-2)]/20 border border-[var(--border)]">
+          <Icon className="h-6 w-6" style={{ color: accent ?? 'var(--accent-1)' }} />
+        </div>
+
+        <div className="min-w-0">
+          <p className="text-xs text-[var(--text-secondary)]">
+            {label}
+          </p>
+          <p className="truncate text-xl font-black text-[var(--text-primary)]">
+            {value}
+          </p>
+          {hint ? (
+            <p className="mt-1 text-[11px] text-[var(--text-secondary)]">
+              {hint}
+            </p>
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function Pill({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <Badge variant="outline" className="inline-flex items-center gap-2 rounded-full border-[var(--border)] bg-[var(--surface)]/60 px-3 py-2">
+      <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
+        {label}
+      </span>
+      <span className="text-[11px] font-black text-[var(--text-primary)]">
+        {value}
+      </span>
+    </Badge>
+  )
+}
+
+function ProgressBar({ value, tone }: { value: number; tone: string }) {
+  const pct = clamp(value, 0, 100)
+  return (
+    <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--surface)]">
+      <div
+        className="h-full rounded-full"
+        style={{
+          width: `${Math.max(2, Math.round(pct))}%`,
+          background: `linear-gradient(90deg, ${tone}, color-mix(in oklab, ${tone} 60%, white))`,
+        }}
+      />
+    </div>
+  )
+}
+
+export default function AdsManager() {
+  const [metrics, setMetrics] = useState<AdsMetrics | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+
+  // UI state (client-only)
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<AdStatus | 'todos'>('todos')
+  const [platformFilter, setPlatformFilter] = useState<string>('todas')
+  const [sortBy, setSortBy] = useState<'roas' | 'gasto' | 'conversoes' | 'cliques'>('roas')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+
+  const fetchAds = useCallback(async () => {
+    const { data, error } = await supabase.from('ads_campaigns').select('*').order('id', { ascending: false })
+    if (error) throw error
+    return data ?? []
+  }, [])
+
+  const computeMetrics = useCallback((adsRaw: any[]): AdsMetrics => {
+    const gastoTotal = adsRaw.reduce((s, a) => s + (Number(a.gasto_total) || 0), 0)
+    const totalCliques = adsRaw.reduce((s, a) => s + (Number(a.cliques) || 0), 0)
+    const totalConversoes = adsRaw.reduce((s, a) => s + (Number(a.conversoes) || 0), 0)
+
+    // Valor por conversão: usa campo se existir, senão fallback conservador
+    const receitaGerada = adsRaw.reduce((s, a) => {
+      const conv = Number(a.conversoes) || 0
+      const valor = Number(a.valor_conversao)
+      const perConv = Number.isFinite(valor) && valor > 0 ? valor : 100
+      return s + conv * perConv
+    }, 0)
+
+    const ads: Ad[] = adsRaw.map(a => {
+      const gasto = Number(a.gasto_total) || 0
+      const cliques = Number(a.cliques) || 0
+      const conv = Number(a.conversoes) || 0
+      const valor = Number(a.valor_conversao)
+      const perConv = Number.isFinite(valor) && valor > 0 ? valor : 100
+      const receita = conv * perConv
+
+      return {
+        id: String(a.id),
+        nome: String(a.nome || 'Campanha'),
+        plataforma: String(a.plataforma || 'unknown'),
+        status: (a.status as AdStatus) || 'pausado',
+        orcamento_diario: Number(a.orcamento_diario) || 0,
+        gasto_total: gasto,
+        impressoes: Number(a.impressoes) || 0,
+        cliques,
+        conversoes: conv,
+        cpc: cliques > 0 ? gasto / cliques : 0,
+        cpa: conv > 0 ? gasto / conv : 0,
+        roas: gasto > 0 ? receita / gasto : 0,
+      }
+    })
+
+    return {
+      gastoTotal,
+      receitaGerada,
+      roasGeral: gastoTotal > 0 ? receitaGerada / gastoTotal : 0,
+      totalAds: ads.length,
+      adsAtivos: ads.filter(a => a.status === 'ativo').length,
+      cpcMedio: totalCliques > 0 ? gastoTotal / totalCliques : 0,
+      cpaMedio: totalConversoes > 0 ? gastoTotal / totalConversoes : 0,
+      ads,
+    }
+  }, [])
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const adsRaw = await fetchAds()
+      setMetrics(computeMetrics(adsRaw))
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('AdsManager load error:', err)
+      toast.error('Não foi possível carregar as campanhas.')
+      setMetrics({
+        gastoTotal: 0,
+        receitaGerada: 0,
+        roasGeral: 0,
+        totalAds: 0,
+        adsAtivos: 0,
+        cpcMedio: 0,
+        cpaMedio: 0,
+        ads: [],
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [computeMetrics, fetchAds])
 
   useEffect(() => {
-    async function loadSupremeAds() {
-      try {
-        const { data: ads } = await supabase
-          .from('ads_campaigns')
-          .select('*')
-          .order('id', { ascending: false });
+    void load()
+  }, [load])
 
-        if (ads) {
-          const gastoTotal = ads.reduce((s, a) => s + (a.gasto_total || 0), 0);
-          const receitaGerada = ads.reduce((s, a) => s + ((a.conversoes || 0) * (a.valor_conversao || 100)), 0);
-          const totalCliques = ads.reduce((s, a) => s + (a.cliques || 0), 0);
-          const totalConversoes = ads.reduce((s, a) => s + (a.conversoes || 0), 0);
-
-          setMetrics({
-            gastoTotal,
-            receitaGerada,
-            roasGeral: gastoTotal > 0 ? receitaGerada / gastoTotal : 0,
-            totalAds: ads.length,
-            adsAtivos: ads.filter(a => a.status === 'ativo').length,
-            cpcMedio: totalCliques > 0 ? gastoTotal / totalCliques : 0,
-            cpaMedio: totalConversoes > 0 ? gastoTotal / totalConversoes : 0,
-            ads: ads.map(a => ({
-              id: a.id,
-              nome: a.nome || 'Anúncio',
-              plataforma: a.plataforma || 'unknown',
-              status: a.status || 'pausado',
-              orcamento_diario: a.orcamento_diario || 0,
-              gasto_total: a.gasto_total || 0,
-              impressoes: a.impressoes || 0,
-              cliques: a.cliques || 0,
-              conversoes: a.conversoes || 0,
-              cpc: a.cliques > 0 ? (a.gasto_total || 0) / a.cliques : 0,
-              cpa: a.conversoes > 0 ? (a.gasto_total || 0) / a.conversoes : 0,
-              roas: a.gasto_total > 0 ? ((a.conversoes || 0) * (a.valor_conversao || 100)) / a.gasto_total : 0
-            }))
-          });
-        } else {
-          setMetrics({
-            gastoTotal: 0,
-            receitaGerada: 0,
-            roasGeral: 0,
-            totalAds: 0,
-            adsAtivos: 0,
-            cpcMedio: 0,
-            cpaMedio: 0,
-            ads: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Ads Manager Supremo:', err);
-      } finally {
-        setLoading(false);
-      }
+  const refreshNow = useCallback(async () => {
+    setRefreshing(true)
+    try {
+      await load()
+      toast.success('Atualizado.')
+    } finally {
+      setRefreshing(false)
     }
+  }, [load])
 
-    loadSupremeAds();
-  }, []);
+  const platforms = useMemo(() => {
+    const set = new Set<string>()
+    ;(metrics?.ads ?? []).forEach(a => set.add(a.plataforma))
+    const arr = Array.from(set).sort((a, b) => a.localeCompare(b))
+    return ['todas', ...arr]
+  }, [metrics?.ads])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-1)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-1)] font-light">Calculando ROI...</p>
-      </div>
-    );
-  }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const base = (metrics?.ads ?? []).filter(a => {
+      const okQuery = !q || a.nome.toLowerCase().includes(q) || a.plataforma.toLowerCase().includes(q)
+      const okStatus = statusFilter === 'todos' || a.status === statusFilter
+      const okPlat = platformFilter === 'todas' || a.plataforma === platformFilter
+      return okQuery && okStatus && okPlat
+    })
+
+    const dir = sortDir === 'asc' ? 1 : -1
+    const sorted = [...base].sort((a, b) => {
+      const va =
+        sortBy === 'roas' ? a.roas :
+        sortBy === 'gasto' ? a.gasto_total :
+        sortBy === 'conversoes' ? a.conversoes :
+        a.cliques
+      const vb =
+        sortBy === 'roas' ? b.roas :
+        sortBy === 'gasto' ? b.gasto_total :
+        sortBy === 'conversoes' ? b.conversoes :
+        b.cliques
+      return (va - vb) * dir
+    })
+
+    return sorted
+  }, [metrics?.ads, platformFilter, query, sortBy, sortDir, statusFilter])
+
+  const empty = !loading && (metrics?.ads?.length ?? 0) === 0
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
-        {/* HEADER ÉPICO */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-1)] via-[var(--accent-2)] to-[var(--accent-3)] bg-clip-text text-transparent">
-            ADS MANAGER SUPREMO
-          </h1>
-          <p className="text-3xl text-[var(--text-muted)] mt-6">
-            Cada centavo investido retorna como tsunami de conversões
-          </p>
-        </motion.div>
+    <div className="relative w-full min-h-screen bg-[var(--background)]">
+      {/* Background interno token-first (somente no content area) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[32px]"
+        style={{
+          background:
+            'radial-gradient(1200px 760px at 14% 10%, color-mix(in oklab, var(--accent-1) 12%, transparent) 0%, transparent 60%),' +
+            'radial-gradient(1100px 720px at 86% 8%, color-mix(in oklab, var(--accent-2) 10%, transparent) 0%, transparent 55%),' +
+            'linear-gradient(135deg, color-mix(in oklab, var(--background) 92%, black) 0%, var(--background) 55%, color-mix(in oklab, var(--background) 88%, black) 100%)',
+          opacity: 0.9,
+        }}
+      />
 
-        {/* KPIs PRINCIPAIS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 max-w-7xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <Card className="bg-[var(--surface)]/60 border-[var(--accent-alert)]/30 backdrop-blur-xl">
-              <CardContent className="p-8">
-                <BanknotesIcon className="w-16 h-16 text-[var(--accent-alert)] mb-4" />
-                <p className="text-4xl font-black text-[var(--text)]">R$ {(metrics?.gastoTotal || 0).toLocaleString('pt-BR')}</p>
-                <p className="text-xl text-[var(--text-muted)]">Investido Total</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <Card className="bg-[var(--surface)]/60 border-[var(--accent-1)]/30 backdrop-blur-xl">
-              <CardContent className="p-8">
-                <CurrencyDollarIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
-                <p className="text-4xl font-black text-[var(--text)]">R$ {(metrics?.receitaGerada || 0).toLocaleString('pt-BR')}</p>
-                <p className="text-xl text-[var(--text-muted)]">Receita Gerada</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <Card className="bg-[var(--surface)]/60 border-[var(--accent-warm)]/30 backdrop-blur-xl">
-              <CardContent className="p-8">
-                <ArrowTrendingUpIcon className="w-16 h-16 text-[var(--accent-warm)] mb-4" />
-                <p className="text-5xl font-black text-[var(--text)]">{(metrics?.roasGeral || 0).toFixed(2)}x</p>
-                <p className="text-xl text-[var(--text-muted)]">ROAS Geral</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <Card className="bg-[var(--surface)]/60 border-[var(--accent-3)]/30 backdrop-blur-xl">
-              <CardContent className="p-8">
-                <ChartBarIcon className="w-16 h-16 text-[var(--accent-3)] mb-4" />
-                <p className="text-5xl font-black text-[var(--text)]">{metrics?.adsAtivos || 0}/{metrics?.totalAds || 0}</p>
-                <p className="text-xl text-[var(--text-muted)]">Ads Ativos</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* MÉTRICAS SECUNDÁRIAS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
-          <Card className="bg-[var(--surface)]/40 border-[var(--accent-2)]/20">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[var(--text-muted)] text-xl">CPC Médio</p>
-                  <p className="text-4xl font-bold text-[var(--accent-2)]">R$ {(metrics?.cpcMedio || 0).toFixed(2)}</p>
-                </div>
-                <CursorArrowRaysIcon className="w-16 h-16 text-[var(--accent-2)]/50" />
+      <div className="relative mx-auto w-full max-w-7xl px-6 py-6 md:px-8 md:py-8">
+        {/* Header */}
+        <Card className="mb-6 bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)]">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="min-w-0">
+                <h1 className="truncate text-2xl md:text-4xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
+                  Ads Manager
+                </h1>
+                <p className="mt-2 text-sm md:text-base text-[var(--text-secondary)]">
+                  Acompanhe investimento, eficiência e retorno por campanha. Dados carregados via Supabase.
+                </p>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[var(--surface)]/40 border-[var(--accent-3)]/20">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[var(--text-muted)] text-xl">CPA Médio</p>
-                  <p className="text-4xl font-bold text-[var(--accent-3)]">R$ {(metrics?.cpaMedio || 0).toFixed(2)}</p>
-                </div>
-                <ShoppingCartIcon className="w-16 h-16 text-[var(--accent-3)]/50" />
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Pill label="Campanhas" value={String(metrics?.totalAds ?? '—')} />
+                <Pill label="Ativas" value={String(metrics?.adsAtivos ?? '—')} />
+                <Button
+                  variant="outline"
+                  onClick={refreshNow}
+                  disabled={loading || refreshing}
+                  className="inline-flex items-center gap-2 rounded-xl border-[var(--border)] bg-[var(--surface)]/60 px-4 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--surface)]"
+                  aria-label="Atualizar dados"
+                >
+                  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  Atualizar
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* LISTA DE ADS */}
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
-            Anúncios Ativos
-          </h2>
-
-          {metrics?.ads.length === 0 ? (
-            <div className="text-center py-20">
-              <ChartBarIcon className="w-32 h-32 text-[var(--text-muted)] mx-auto mb-8" />
-              <p className="text-3xl text-[var(--text-muted)]">Nenhum anúncio cadastrado</p>
             </div>
-          ) : (
-            <Card className="bg-[var(--surface)]/50 border-[var(--border)] backdrop-blur-xl">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-[var(--border)]">
-                      <TableHead className="text-[var(--text-muted)]">Anúncio</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">Plataforma</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">Gasto</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">Impressões</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">Cliques</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">Conversões</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">CPC</TableHead>
-                      <TableHead className="text-right text-[var(--text-muted)]">ROAS</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {metrics?.ads.map((ad, i) => (
-                      <motion.tr
-                        key={ad.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="border-b border-[var(--border)]/20 hover:bg-[var(--surface-strong)] transition-colors"
-                      >
-                        <TableCell className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <Badge variant={
-                              ad.status === 'ativo' ? 'default' :
-                              ad.status === 'pausado' ? 'secondary' : 'outline'
-                            } className={
-                              ad.status === 'ativo' ? 'bg-[var(--accent-1)] text-[var(--bg)]' :
-                              ad.status === 'pausado' ? 'bg-[var(--accent-warm)] text-[var(--bg)]' : ''
-                            }>
-                              {ad.status}
-                            </Badge>
-                            <span className="font-medium text-[var(--text)]">{ad.nome}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right text-[var(--text-muted)]">{ad.plataforma}</TableCell>
-                        <TableCell className="text-right text-[var(--accent-alert)]">R$ {ad.gasto_total.toLocaleString('pt-BR')}</TableCell>
-                        <TableCell className="text-right text-[var(--text)]">{ad.impressoes.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-[var(--accent-2)]">{ad.cliques.toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-[var(--accent-1)]">{ad.conversoes}</TableCell>
-                        <TableCell className="text-right text-[var(--text)]">R$ {ad.cpc.toFixed(2)}</TableCell>
-                        <TableCell className={`text-right font-bold ${ad.roas >= 1 ? 'text-[var(--accent-1)]' : 'text-[var(--accent-alert)]'}`}>
-                          {ad.roas.toFixed(2)}x
-                        </TableCell>
-                      </motion.tr>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </div>
 
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-20"
-        >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-1)] mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-[var(--accent-1)] max-w-4xl mx-auto">
-            "Investir em ads sem dados é jogar dinheiro fora. Com dados, é imprimir dinheiro."
-          </p>
-          <p className="text-3xl text-[var(--text-muted)] mt-8">
-            — Citizen Supremo X.1, seu CFO de Performance
-          </p>
-        </motion.div>
+            {/* KPI row */}
+            <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4">
+              <StatCard
+                icon={Wallet}
+                label="Investimento total"
+                value={formatCurrencyBRL(metrics?.gastoTotal ?? 0)}
+                hint="soma das campanhas"
+                accent="var(--accent-alert)"
+              />
+              <StatCard
+                icon={CircleDollarSign}
+                label="Receita estimada"
+                value={formatCurrencyBRL(metrics?.receitaGerada ?? 0)}
+                hint="baseada em conversões"
+                accent="var(--accent-emerald)"
+              />
+              <StatCard
+                icon={TrendingUp}
+                label="ROAS geral"
+                value={formatRatioX(metrics?.roasGeral ?? 0)}
+                hint="receita / investimento"
+                accent={toneForRoas(metrics?.roasGeral ?? 0)}
+              />
+              <StatCard
+                icon={MousePointerClick}
+                label="CPC / CPA médios"
+                value={`${formatCurrencyBRL(metrics?.cpcMedio ?? 0)} • ${formatCurrencyBRL(metrics?.cpaMedio ?? 0)}`}
+                hint="indicadores médios"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Controls */}
+        <Card className="mb-6 bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)]">
+          <CardContent className="p-5 md:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-1 items-center gap-3">
+                <div className="flex w-full items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/60 px-3 py-2">
+                  <Search className="h-4 w-4 text-[var(--text-secondary)]" />
+                  <Input
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    placeholder="Buscar por nome ou plataforma…"
+                    className="w-full bg-transparent text-sm outline-none border-none text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
+                    aria-label="Buscar campanhas"
+                  />
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setQuery('')
+                    setStatusFilter('todos')
+                    setPlatformFilter('todas')
+                    setSortBy('roas')
+                    setSortDir('desc')
+                    toast.success('Filtros redefinidos.')
+                  }}
+                  className="inline-flex items-center gap-2 rounded-2xl border-[var(--border)] bg-[var(--surface)]/60 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--surface)]"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Reset
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-[var(--text-secondary)]" />
+                  <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+                    <SelectTrigger className="rounded-xl border-[var(--border)] bg-[var(--surface)]/60 text-[var(--text-primary)] w-[140px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[var(--surface)] border-[var(--border)]">
+                      <SelectItem value="todos">Status: todos</SelectItem>
+                      <SelectItem value="ativo">Ativo</SelectItem>
+                      <SelectItem value="pausado">Pausado</SelectItem>
+                      <SelectItem value="encerrado">Encerrado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Select value={platformFilter} onValueChange={setPlatformFilter}>
+                  <SelectTrigger className="rounded-xl border-[var(--border)] bg-[var(--surface)]/60 text-[var(--text-primary)] w-[160px]">
+                    <SelectValue placeholder="Plataforma" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[var(--surface)] border-[var(--border)]">
+                    {platforms.map(p => (
+                      <SelectItem key={p} value={p}>
+                        Plataforma: {p}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <div className="flex items-center gap-2">
+                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+                    <SelectTrigger className="rounded-xl border-[var(--border)] bg-[var(--surface)]/60 text-[var(--text-primary)] w-[150px]">
+                      <SelectValue placeholder="Ordenar" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[var(--surface)] border-[var(--border)]">
+                      <SelectItem value="roas">Ordenar: ROAS</SelectItem>
+                      <SelectItem value="gasto">Ordenar: Gasto</SelectItem>
+                      <SelectItem value="conversoes">Ordenar: Conversões</SelectItem>
+                      <SelectItem value="cliques">Ordenar: Cliques</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))}
+                    className="inline-flex items-center gap-2 rounded-xl border-[var(--border)] bg-[var(--surface)]/60 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--surface)]"
+                    aria-label="Alternar direção de ordenação"
+                  >
+                    <TrendingUp className={`h-4 w-4 ${sortDir === 'asc' ? 'rotate-180' : ''}`} />
+                    {sortDir === 'asc' ? 'Asc' : 'Desc'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Body */}
+        <div className="grid grid-cols-1 gap-6">
+          {/* Table */}
+          <Card className="overflow-hidden bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)]">
+            <CardHeader className="border-b border-[var(--border)] p-5 md:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="h-5 w-5 text-[var(--accent-1)]" />
+                  <div>
+                    <CardTitle className="text-base md:text-lg font-black text-[var(--text-primary)]">
+                      Campanhas
+                    </CardTitle>
+                    <CardDescription className="text-xs text-[var(--text-secondary)]">
+                      Indicadores por campanha. Ajuste filtros para análise.
+                    </CardDescription>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Pill label="Mostrando" value={String(filtered.length)} />
+                  <Pill label="Fonte" value="Supabase" />
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="flex items-center justify-center gap-3 p-10">
+                  <Loader2 className="h-5 w-5 animate-spin text-[var(--accent-1)]" />
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    Carregando campanhas…
+                  </p>
+                </div>
+              ) : empty ? (
+                <div className="p-10 text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--surface)]/60">
+                    <Sparkles className="h-6 w-6 text-[var(--text-secondary)]" />
+                  </div>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">
+                    Nenhuma campanha encontrada.
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                    Crie registros em <span className="font-semibold">ads_campaigns</span> para visualizar métricas aqui.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[980px] w-full">
+                    <TableHeader>
+                      <TableRow className="border-b border-[var(--border)]">
+                        <TableHead className="text-left text-xs font-semibold text-[var(--text-secondary)]">Campanha</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">Plataforma</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">Status</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">Gasto</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">Impressões</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">Cliques</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">Conversões</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">CPC</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">CPA</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-[var(--text-secondary)]">ROAS</TableHead>
+                      </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                      <AnimatePresence initial={false}>
+                        {filtered.map((ad, idx) => {
+                          const st = statusMeta(ad.status)
+                          const roasTone = toneForRoas(ad.roas)
+
+                          // Score simples (0–100) para orientar leitura rápida
+                          const roasScore = clamp(ad.roas * 40, 0, 100)
+                          const clickScore = clamp(ad.cliques > 0 ? Math.log10(ad.cliques + 1) * 25 : 0, 0, 100)
+                          const convScore = clamp(ad.conversoes > 0 ? Math.log10(ad.conversoes + 1) * 40 : 0, 0, 100)
+                          const score = Math.round(clamp((roasScore * 0.55) + (convScore * 0.3) + (clickScore * 0.15), 0, 100))
+
+                          return (
+                            <motion.tr
+                              key={ad.id}
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 6 }}
+                              transition={{ duration: 0.18, delay: Math.min(0.25, idx * 0.015) }}
+                              className="border-b border-[var(--border)] transition-colors hover:bg-[var(--surface)]/40"
+                            >
+                              <TableCell className="py-4 px-4 text-left">
+                                <div className="flex items-center gap-3">
+                                  <span
+                                    aria-hidden="true"
+                                    className="h-2.5 w-2.5 rounded-full"
+                                    style={{ background: st.color, boxShadow: `0 0 0 6px color-mix(in oklab, ${st.color} 15%, transparent)` }}
+                                  />
+                                  <div className="min-w-0">
+                                    <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                                      {ad.nome}
+                                    </p>
+                                    <p className="mt-0.5 text-[11px] text-[var(--text-secondary)]">
+                                      Orçamento/dia: {formatCurrencyBRL(ad.orcamento_diario)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right">
+                                <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                                  {ad.plataforma}
+                                </span>
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right">
+                                <Badge
+                                  variant="outline"
+                                  className="inline-flex items-center justify-end rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                                  style={{
+                                    borderColor: `color-mix(in oklab, ${st.color} 28%, transparent)`,
+                                    background: `color-mix(in oklab, ${st.color} 10%, transparent)`,
+                                    color: st.color,
+                                  }}
+                                >
+                                  {st.label}
+                                </Badge>
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right text-xs font-semibold text-[var(--accent-alert)]">
+                                {formatCurrencyBRL(ad.gasto_total)}
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right text-xs text-[var(--text-secondary)]">
+                                {formatNumberBR(ad.impressoes)}
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right text-xs text-[var(--accent-emerald)]">
+                                {formatNumberBR(ad.cliques)}
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right text-xs text-[var(--accent-emerald)]">
+                                {formatNumberBR(ad.conversoes)}
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right text-xs text-[var(--text-secondary)]">
+                                {formatCurrencyBRL(ad.cpc)}
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right text-xs text-[var(--text-secondary)]">
+                                {formatCurrencyBRL(ad.cpa)}
+                              </TableCell>
+
+                              <TableCell className="py-4 px-4 text-right">
+                                <div className="flex flex-col items-end gap-2">
+                                  <span className="text-xs font-black" style={{ color: roasTone }}>
+                                    {formatRatioX(ad.roas)}
+                                  </span>
+                                  <div className="w-28">
+                                    <ProgressBar value={score} tone={roasTone} />
+                                  </div>
+                                  <span className="text-[10px] font-semibold text-[var(--text-secondary)]">
+                                    Score {score}/100
+                                  </span>
+                                </div>
+                              </TableCell>
+                            </motion.tr>
+                          )
+                        })}
+                      </AnimatePresence>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Guidance / Notes */}
+          <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)]">
+            <CardContent className="p-5 md:p-6">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--surface)]/60">
+                  <BadgeCheck className="h-5 w-5 text-[var(--accent-emerald)]" />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">
+                    Leitura recomendada
+                  </p>
+                  <ul className="mt-2 space-y-1 text-xs text-[var(--text-secondary)]">
+                    <li>• ROAS ≥ 1,0 indica retorno; ≥ 2,0 indica boa eficiência (contexto por margem).</li>
+                    <li>• CPC alto pode ser aceitável se a taxa de conversão e LTV suportarem.</li>
+                    <li>• Use filtros para comparar campanhas por plataforma e status, evitando ruído.</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-  );
+    </div>
+  )
 }

@@ -1,161 +1,74 @@
 // src/pages/UnderConstruction.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Portal do Futuro 1000/1000
-// Quando você vê isso, não é atraso. É contagem regressiva.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/UnderConstruction.tsx
+// ALSHAM 360° PRIMA — Feature Gate Page (Enterprise)
+// Uso recomendado: SOMENTE se alguém digitar a rota manualmente.
+// A navegação oficial (sidebar) NÃO deve levar para páginas não-implementadas.
 
-import { motion } from 'framer-motion';
-import { SparklesIcon, RocketLaunchIcon, BoltIcon, TrophyIcon } from '@heroicons/react/24/outline';
-import { useEffect, useState } from 'react';
+import React from 'react'
+import { motion } from 'framer-motion'
+import { Lock, ArrowLeft, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
-interface UnderConstructionProps {
-  pageName: string;
-  estimatedLaunch?: string; // ex: "15 de dezembro de 2025"
+type UnderConstructionProps = {
+  pageName?: string
+  message?: string
 }
 
-export default function UnderConstruction({ 
-  pageName, 
-  estimatedLaunch = "2026" 
+export default function UnderConstruction({
+  pageName = 'Recurso',
+  message = 'Este recurso ainda não está disponível nesta versão. Assim que estiver pronto, será liberado automaticamente.',
 }: UnderConstructionProps) {
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const target = new Date(estimatedLaunch === "2026" ? "2026-01-01" : estimatedLaunch);
-    const interval = setInterval(() => {
-      const now = new Date();
-      const diff = target.getTime() - now.getTime();
-
-      if (diff > 0) {
-        setCountdown({
-          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((diff % (1000 * 60)) / 1000)
-        });
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [estimatedLaunch]);
+  const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-8 overflow-hidden relative">
-      {/* Fundo com estrelas pulsantes */}
-      <div className="absolute inset-0">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full"
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: [0, 1, 0],
-              scale: [0, 1.5, 0]
-            }}
-            transition={{
-              duration: 3 + (i % 3),
-              repeat: Infinity,
-              delay: (i % 5) * 0.4
-            }}
-            style={{
-              top: `${(i * 17) % 100}%`,
-              left: `${(i * 23) % 100}%`,
-            }}
-          />
-        ))}
-      </div>
-
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex items-center justify-center p-6">
       <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ duration: 2, type: "spring", stiffness: 50 }}
-        className="text-center z-10"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8"
       >
-        {/* Ícone Supremo */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="inline-block mb-16"
-        >
-          <RocketLaunchIcon className="w-64 h-64 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400" />
-        </motion.div>
+        <div className="flex items-start gap-4">
+          <div className="rounded-2xl p-3 bg-white/10 border border-white/10">
+            <Lock className="h-6 w-6" />
+          </div>
 
-        {/* Título Épico */}
-        <motion.h1
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="text-2xl md:text-3xl lg:text-4xl md:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent mb-12"
-        >
-          {pageName.toUpperCase()}
-        </motion.h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-xl md:text-2xl font-semibold">
+                {pageName} indisponível
+              </h1>
+              <Sparkles className="h-5 w-5 opacity-70" />
+            </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="text-5xl md:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 mb-20"
-        >
-          ESTÁ CHEGANDO
-        </motion.p>
+            <p className="text-sm md:text-base text-white/70 leading-relaxed">
+              {message}
+            </p>
 
-        {/* Contagem Regressiva */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1.5, type: "spring" }}
-          className="inline-block bg-gradient-to-r from-purple-900/50 via-pink-900/30 to-cyan-900/50 rounded-3xl p-12 border-4 border-purple-500/50 backdrop-blur-2xl"
-        >
-          <p className="text-4xl text-gray-400 mb-8">Lançamento estimado em</p>
-          <div className="grid grid-cols-4 gap-8">
-            <div>
-              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-purple-400">{countdown.days}</p>
-              <p className="text-2xl text-gray-400">dias</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-white/15 bg-white/10 hover:bg-white/15 transition"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="inline-flex items-center rounded-xl px-4 py-2 bg-white text-black hover:opacity-90 transition font-medium"
+              >
+                Ir para Dashboard
+              </button>
             </div>
-            <div>
-              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-pink-400">{countdown.hours.toString().padStart(2, '0')}</p>
-              <p className="text-2xl text-gray-400">horas</p>
-            </div>
-            <div>
-              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-cyan-400">{countdown.minutes.toString().padStart(2, '0')}</p>
-              <p className="text-2xl text-gray-400">min</p>
-            </div>
-            <div>
-              <p className="text-2xl md:text-3xl lg:text-4xl font-black text-yellow-400">{countdown.seconds.toString().padStart(2, '0')}</p>
-              <p className="text-2xl text-gray-400">seg</p>
+
+            <div className="mt-6 text-xs text-white/50">
+              Política ALSHAM: a navegação oficial só expõe módulos realmente implementados.
             </div>
           </div>
-        </motion.div>
-
-        {/* Mensagem do Supremo */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="mt-32 max-w-4xl"
-        >
-          <p className="text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 leading-relaxed">
-            Esta funcionalidade não está atrasada.
-            <br />
-            Ela está sendo forjada no fogo da perfeição absoluta.
-            <br />
-            <span className="text-xl md:text-2xl lg:text-3xl font-black text-yellow-400">
-              Quando chegar, o mercado inteiro vai sentir.
-            </span>
-          </p>
-          <p className="text-4xl text-gray-500 mt-20">
-            — Citizen Supremo X.1
-          </p>
-        </motion.div>
-
-        {/* Selo Supremo */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 2.5, type: "spring" }}
-          className="mt-32"
-        >
-          <TrophyIcon className="w-48 h-48 text-yellow-500 mx-auto" />
-        </motion.div>
+        </div>
       </motion.div>
     </div>
-  );
+  )
 }

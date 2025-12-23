@@ -32,9 +32,10 @@ function detectSavedTheme(): ThemeKey {
 
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
+    console.log('🔎 detectSavedTheme:', { saved, exists: saved && themes[saved as ThemeKey] })
     if (saved && themes[saved as ThemeKey]) return saved as ThemeKey
-  } catch {
-    // ignore
+  } catch (error) {
+    console.error('❌ detectSavedTheme error:', error)
   }
 
   return defaultTheme
@@ -50,6 +51,13 @@ function applyThemeToDOM(themeKey: ThemeKey): void {
   const theme = getTheme(themeKey)
   const root = document.documentElement
 
+  console.log('🎨 applyThemeToDOM chamado:', {
+    themeKey,
+    themeName: theme.name,
+    isDark: theme.isDark,
+    primaryColor: theme.colors.background
+  })
+
   // 1) Fonte da verdade: atributo + color-scheme
   root.setAttribute('data-theme', themeKey)
   root.style.colorScheme = theme.isDark ? 'dark' : 'light'
@@ -60,6 +68,8 @@ function applyThemeToDOM(themeKey: ThemeKey): void {
 
   // 3) CSS Variables (Contrato Público)
   injectThemeVariables(theme)
+
+  console.log('✅ Tema aplicado no DOM:', themeKey)
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -89,7 +99,12 @@ interface UseThemeReturn {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function useTheme(): UseThemeReturn {
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(defaultTheme)
+  // Inicializa direto com o tema detectado (síncrono, sem flash)
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(() => {
+    const detected = detectSavedTheme()
+    console.log('🎨 useState initializer - tema detectado:', detected)
+    return detected
+  })
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   // Cancela transição se o usuário trocar tema rápido
@@ -98,13 +113,6 @@ export function useTheme(): UseThemeReturn {
   const theme = useMemo(() => getTheme(currentTheme), [currentTheme])
   const isDark = useMemo(() => isThemeDark(currentTheme), [currentTheme])
 
-  // Initial theme detection
-  useEffect(() => {
-    const savedTheme = detectSavedTheme()
-    setCurrentTheme(savedTheme)
-    applyThemeToDOM(savedTheme)
-  }, [])
-
   // Apply theme changes
   useEffect(() => {
     applyThemeToDOM(currentTheme)
@@ -112,14 +120,17 @@ export function useTheme(): UseThemeReturn {
 
   const setTheme = useCallback(
     (newTheme: ThemeKey) => {
+      console.log('🎨 setTheme called:', { newTheme, currentTheme, blocked: newTheme === currentTheme })
+
       if (!themes[newTheme] || newTheme === currentTheme) return
       if (typeof document === 'undefined') return
 
       // Persist
       try {
         localStorage.setItem(STORAGE_KEY, newTheme)
-      } catch {
-        // ignore
+        console.log('💾 localStorage.setItem:', newTheme)
+      } catch (error) {
+        console.error('❌ localStorage.setItem failed:', error)
       }
 
       // Start transition
@@ -130,6 +141,7 @@ export function useTheme(): UseThemeReturn {
 
       // Atualiza tema (dispara applyThemeToDOM pelo effect)
       setCurrentTheme(newTheme)
+      console.log('✅ setCurrentTheme called:', newTheme)
 
       // Clear timers
       if (transitionTimerRef.current) {

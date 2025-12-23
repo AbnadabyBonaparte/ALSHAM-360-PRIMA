@@ -1,33 +1,24 @@
 // src/pages/Achievements.tsx
-// 100/100 STYLUS S+ — ALSHAM 360° PRIMA EDITION
-// A página de Achievements mais sofisticada do mundo
+// ALSHAM 360° PRIMA — Achievements
+// CANÔNICO • TOKEN-FIRST • SAFE-UI (sem Sidebar/Layout aqui)
+// Importante: NÃO renderiza LayoutSupremo aqui. O shell é responsabilidade do ProtectedLayout.
 
-import React, { useState, useEffect, useMemo, useRef, Suspense, lazy } from 'react'
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion'
-import { createSupremePage } from '@/components/SupremePageFactory'
-import { supremeConfigs } from './supremeConfigs'
-import { useTheme } from '@/hooks/useTheme'
-import { useAnalytics } from '@/hooks/useAnalytics'
-import confetti from 'canvas-confetti'
-import useSound from 'use-sound'
-import {
-  Trophy, Star, Zap, Medal, Crown, Sparkles, Lock, CheckCircle, Flame, Share2, Download, Gift,
-  TrendingUp, Award, Hexagon, ChevronRight, Globe, Users, Target
-} from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import type { LucideIcon } from 'lucide-react'
+import { CheckCircle2, Crown, Lock, Medal, Sparkles, Star, Trophy, Zap } from 'lucide-react'
+import { IconMedallion, ICON_RARITY_TOKENS } from '../design-system/iconography'
 
-// Lazy-load dos componentes pesados
-const NeuralGraph = lazy(() => import('@/components/visualizations/NeuralGraph').then(m => ({ default: m.NeuralGraph || m.default })))
-const ReplayDebugger = lazy(() => import('@/components/dev/ReplayDebugger').then(m => ({ default: m.ReplayDebugger || m.default })))
+type Rarity = keyof typeof ICON_RARITY_TOKENS
 
-// --- Types ---
 interface Badge {
   id: string
   name: string
   description: string
-  icon: React.ReactNode
-  rarity: 'common' | 'rare' | 'epic' | 'legendary'
+  icon: LucideIcon
+  rarity: Rarity
   unlocked: boolean
-  progress: number // 0-100
+  progress: number
   xp_reward: number
   unlocked_at?: string
 }
@@ -40,287 +31,459 @@ interface UserRank {
   weekly_change: number
 }
 
-// --- Mock data (substitua por Supabase real) ---
 const ACHIEVEMENTS: Badge[] = [
-  { id: '1', name: "Bug Hunter", description: "Resolveu 50 bugs críticos sem reabertura.", icon: <Zap className="w-12 h-12" />, rarity: 'legendary', unlocked: true, progress: 100, xp_reward: 5000, unlocked_at: '2025-11-15' },
-  { id: '2', name: "Pipeline Master", description: "Deployou em produção na sexta sem crash.", icon: <Crown className="w-12 h-12" />, rarity: 'epic', unlocked: true, progress: 100, xp_reward: 2500, unlocked_at: '2025-12-01' },
-  { id: '3', name: "Early Bird", description: "Primeiro commit antes das 8h por 5 dias seguidos.", icon: <Star className="w-12 h-12" />, rarity: 'rare', unlocked: true, progress: 100, xp_reward: 500, unlocked_at: '2025-12-05' },
-  { id: '4', name: "Code Poet", description: "Escreveu documentação que alguém realmente leu.", icon: <Medal className="w-12 h-12" />, rarity: 'rare', unlocked: false, progress: 65, xp_reward: 1000 },
-  { id: '5', name: "Sales Shark", description: "Fechou 3 deals acima de $50k em um mês.", icon: <Trophy className="w-12 h-12" />, rarity: 'legendary', unlocked: false, progress: 20, xp_reward: 10000 },
-  { id: '6', name: "AI Whisperer", description: "Conseguiu 100% de acerto em prompts críticos.", icon: <Sparkles className="w-12 h-12" />, rarity: 'epic', unlocked: false, progress: 0, xp_reward: 7500 },
+  {
+    id: '1',
+    name: 'Estabilidade Operacional',
+    description: 'Resolveu 100 incidentes críticos com tempo de resposta consistente.',
+    icon: Zap,
+    rarity: 'legendary',
+    unlocked: true,
+    progress: 100,
+    xp_reward: 10000,
+    unlocked_at: '2025-11-20',
+  },
+  {
+    id: '2',
+    name: 'Entrega Contínua',
+    description: 'Deploy sem falha por 30 dias consecutivos em ambientes monitorados.',
+    icon: Crown,
+    rarity: 'divine',
+    unlocked: true,
+    progress: 100,
+    xp_reward: 25000,
+    unlocked_at: '2025-12-01',
+  },
+  {
+    id: '3',
+    name: 'Consistência de Rotina',
+    description: 'Primeira contribuição antes das 07:00 por 15 dias no período.',
+    icon: Star,
+    rarity: 'epic',
+    unlocked: true,
+    progress: 100,
+    xp_reward: 5000,
+    unlocked_at: '2025-12-10',
+  },
+  {
+    id: '4',
+    name: 'Documentação de Qualidade',
+    description: 'Documentação adotada e validada por 10+ colaboradores.',
+    icon: Medal,
+    rarity: 'rare',
+    unlocked: false,
+    progress: 78,
+    xp_reward: 3000,
+  },
+  {
+    id: '5',
+    name: 'Performance Comercial',
+    description: 'Atingiu meta trimestral em vendas com alto valor agregado.',
+    icon: Trophy,
+    rarity: 'divine',
+    unlocked: false,
+    progress: 45,
+    xp_reward: 50000,
+  },
+  {
+    id: '6',
+    name: 'Excelência em IA Aplicada',
+    description: 'Alta precisão em fluxos complexos com assistência de IA.',
+    icon: Sparkles,
+    rarity: 'legendary',
+    unlocked: false,
+    progress: 12,
+    xp_reward: 15000,
+  },
 ]
 
-// --- Componente Holográfico 3D Tilt ---
-const HolographicCard = ({ badge, onClick }: { badge: Badge; onClick: () => void }) => {
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const rotateX = useTransform(y, [-100, 100], [12, -12])
-  const rotateY = useTransform(x, [-100, 100], [-12, 12])
-  const spring = { damping: 20, stiffness: 300 }
-  const rotateXSpring = useSpring(rotateX, spring)
-  const rotateYSpring = useSpring(rotateY, spring)
+const SegmentedTabs = ({
+  value,
+  onChange,
+}: {
+  value: 'badges' | 'leaderboard'
+  onChange: (v: 'badges' | 'leaderboard') => void
+}) => {
+  return (
+    <div className="flex justify-center">
+      <div
+        role="tablist"
+        aria-label="Alternar visualização"
+        className={[
+          'relative inline-flex items-center gap-2 p-2 rounded-2xl',
+          'bg-[var(--surface)]/55 backdrop-blur-xl',
+          'border border-[var(--border)]',
+          'shadow-[0_0_0_1px_rgba(255,255,255,0.04)]',
+        ].join(' ')}
+      >
+        <div className="absolute -inset-6 rounded-3xl blur-3xl bg-gradient-to-br from-[var(--accent-1)]/10 via-transparent to-[var(--accent-2)]/10 opacity-70 pointer-events-none" />
 
-  const rarityColors = {
-    common: 'from-slate-600 to-slate-800 border-slate-600',
-    rare: 'from-blue-500 to-cyan-400 border-cyan-400',
-    epic: 'from-purple-600 to-pink-500 border-pink-400',
-    legendary: 'from-amber-400 to-yellow-600 border-yellow-300 shadow-[0_0_40px_rgba(251,191,36,0.5)]',
-  }
+        {(['badges', 'leaderboard'] as const).map(tab => {
+          const active = value === tab
+          return (
+            <button
+              key={tab}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => onChange(tab)}
+              className={[
+                'relative px-8 py-3 rounded-xl font-black',
+                'transition-all duration-200',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-1)]/50',
+                active
+                  ? [
+                      'text-[var(--background)]',
+                      'bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)]',
+                      'shadow-[0_10px_28px_rgba(0,0,0,0.32)]',
+                    ].join(' ')
+                  : 'text-[var(--foreground,var(--text))]/75 hover:text-[var(--foreground,var(--text))] bg-transparent',
+              ].join(' ')}
+            >
+              <span className="text-sm md:text-base tracking-wide">
+                {tab === 'badges' ? 'Conquistas' : 'Ranking'}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
-  const isLocked = !badge.unlocked
+const HolographicCard = ({ badge }: { badge: Badge }) => {
+  const [hovered, setHovered] = useState(false)
+  const lockedIcon = useMemo(() => Lock, [])
 
   return (
     <motion.div
-      style={{ rotateX: rotateXSpring, rotateY: rotateYSpring, transformStyle: "preserve-3d" }}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect()
-        const xPct = (e.clientX - rect.left) / rect.width - 0.5
-        const yPct = (e.clientY - rect.top) / rect.height - 0.5
-        x.set(xPct * 200)
-        y.set(yPct * 200)
-      }}
-      onMouseLeave={() => { x.set(0); y.set(0) }}
-      onClick={!isLocked ? onClick : undefined}
-      className={`relative h-80 w-full rounded-3xl p-[2px] cursor-pointer group perspective-1500 ${isLocked ? 'opacity-70 grayscale' : ''}`}
+      initial={{ opacity: 0, scale: 0.98, rotateY: -6 }}
+      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+      whileHover={{ scale: 1.015, y: -6 }}
+      transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      className="relative"
     >
-      {/* Borda animada */}
-      <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${rarityColors[badge.rarity]} opacity-20 group-hover:opacity-100 transition-opacity duration-500`} />
+      <motion.div
+        aria-hidden="true"
+        animate={{ opacity: hovered ? 0.9 : 0.55 }}
+        className={[
+          'absolute -inset-6 rounded-3xl blur-3xl',
+          'bg-gradient-to-br',
+          ICON_RARITY_TOKENS[badge.rarity].aura,
+        ].join(' ')}
+      />
 
-      {/* Card interno */}
-      <div className="relative h-full w-full bg-[var(--surface-glass)] backdrop-blur-2xl rounded-3xl p-8 flex flex-col items-center justify-between border border-[var(--border)] overflow-hidden">
-        {/* Shine effect */}
-        {!isLocked && (
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none" />
-        )}
+      <div
+        className={[
+          'relative h-96 rounded-3xl',
+          'bg-[var(--surface)]/68 backdrop-blur-2xl',
+          'border border-[var(--border)]',
+          'shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]',
+          'p-8 md:p-10 flex flex-col items-center justify-between overflow-hidden',
+          !badge.unlocked ? 'opacity-95' : '',
+        ].join(' ')}
+        role="group"
+        aria-label={badge.name}
+      >
+        {/* highlight interno sutil (material premium) */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/5 via-transparent to-transparent opacity-70" />
 
-        {/* Ícone com glow */}
-        <div className="relative mt-4">
-          {!isLocked && <div className={`absolute inset-0 blur-3xl opacity-60 bg-gradient-to-r ${rarityColors[badge.rarity]}`} />}
-          <div className="relative z-10">
-            {isLocked ? <Lock className="w-24 h-24 text-[var(--text-muted)]" /> : badge.icon}
-          </div>
+        <motion.div
+          animate={{ rotate: hovered ? 1.15 : 0, scale: hovered ? 1.03 : 1 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+          className="mt-2"
+        >
+          <IconMedallion
+            rarity={badge.rarity}
+            icon={badge.unlocked ? badge.icon : lockedIcon}
+            locked={!badge.unlocked}
+            scale="2xl"
+            container="glass"
+            state={hovered ? 'hover' : 'default'}
+          />
+        </motion.div>
+
+        <div className="text-center">
+          <h3 className="text-2xl md:text-3xl font-black text-[var(--foreground,var(--text))] mb-3 leading-none">
+            {badge.name}
+          </h3>
+          <p className="text-base md:text-lg text-[var(--foreground,var(--text))]/70 px-2 md:px-6">
+            {badge.description}
+          </p>
         </div>
 
-        {/* Conteúdo */}
-        <div className="text-center z-10">
-          <h3 className="font-bold text-2xl mb-2">{badge.name}</h3>
-          <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{badge.description}</p>
-        </div>
-
-        {/* Progresso ou data */}
-        <div className="w-full z-10">
-          {isLocked ? (
-            <div className="w-full bg-black/40 h-3 rounded-full overflow-hidden">
-              <div className="bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] h-full transition-all duration-1000" style={{ width: `${badge.progress}%` }} />
+        <div className="w-full mt-6 md:mt-8">
+          {badge.unlocked ? (
+            <div className="flex items-center justify-center gap-3 text-emerald-400">
+              <CheckCircle2 className="w-8 h-8 stroke-[1.8]" aria-hidden="true" />
+              <p className="text-xl md:text-2xl font-black">+{badge.xp_reward} XP</p>
             </div>
           ) : (
-            <div className="flex justify-center items-center gap-2 text-sm font-bold text-[var(--status-ok)]">
-              <CheckCircle className="w-5 h-5" />
-              Unlocked {badge.unlocked_at ? `— ${new Date(badge.unlocked_at).toLocaleDateString()}` : ''}
+            <div className="w-full">
+              <div className="w-full bg-[var(--background)]/50 rounded-full h-3 overflow-hidden" aria-hidden="true">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${badge.progress}%` }}
+                  transition={{ duration: 1.1, ease: 'easeOut' }}
+                  className="h-full bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)]"
+                />
+              </div>
+              <p className="text-center text-lg md:text-xl font-black text-[var(--foreground,var(--text))] mt-4">
+                {badge.progress}%
+              </p>
             </div>
           )}
+        </div>
+
+        <div className="mt-3 px-6 py-3 rounded-full bg-[var(--background)]/40 border border-[var(--border)]">
+          <p className="text-[10px] font-semibold tracking-[0.28em] text-[var(--foreground,var(--text))]/70">
+            {badge.rarity.toUpperCase()}
+          </p>
         </div>
       </div>
     </motion.div>
   )
 }
 
-// --- Painel de Nível (Circular Progress) ---
-const LevelDashboard = ({ rank }: { rank: UserRank }) => {
-  const progress = (rank.current_xp / rank.next_rank_xp) * 100
-  const [playLevelUp] = useSound('/sounds/level-up.mp3', { volume: 0.4 })
+const LevelOrb = ({ rank }: { rank: UserRank }) => {
+  const safeNext = Math.max(1, rank.next_rank_xp)
+  const progress = (rank.current_xp / safeNext) * 100
+  const pct = Math.max(0, Math.min(100, Math.floor(progress)))
 
-  useEffect(() => {
-    if (progress >= 100) playLevelUp()
-  }, [progress, playLevelUp])
+  const size = 320
+  const stroke = 10
+  const r = size / 2 - stroke / 2 - 8
+  const c = 2 * Math.PI * r
+  const dash = (pct / 100) * c
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] border border-[var(--border)] p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-      {/* Círculo de XP */}
-      <div className="relative w-44 h-44 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90">
-          <circle cx="88" cy="88" r="82" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-[var(--surface-3)]" />
-          <motion.circle
-            cx="88" cy="88" r="82"
-            stroke="url(#gradient-xp)"
-            strokeWidth="12"
-            fill="transparent"
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: progress / 100 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-          />
-          <defs>
-            <linearGradient id="gradient-xp" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--color-primary-from)" />
-              <stop offset="100%" stopColor="var(--color-primary-to)" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-black text-white">{Math.floor(progress)}%</span>
-          <span className="text-xs text-[var(--text-secondary)] uppercase">to Next Rank</span>
-        </div>
-      </div>
+    <div className="relative w-80 h-80 mx-auto">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 mx-auto" aria-hidden="true">
+        <defs>
+          <linearGradient id="alsham-orb" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--accent-1)" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="var(--accent-2)" stopOpacity="0.95" />
+          </linearGradient>
+          <filter id="softGlow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-      <div className="flex flex-col">
-        <h2 className="text-sm font-bold text-[var(--color-primary-from)] uppercase tracking-widest mb-1">Current Rank</h2>
-        <h1 className="text-6xl md:text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tighter drop-shadow-lg">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth={stroke} />
+
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="url(#alsham-orb)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${c - dash}`}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          filter="url(#softGlow)"
+          initial={{ strokeDasharray: `0 ${c}` }}
+          animate={{ strokeDasharray: `${dash} ${c - dash}` }}
+          transition={{ duration: 1.2, ease: 'easeOut' }}
+        />
+
+        {Array.from({ length: 36 }).map((_, i) => {
+          const a = (i / 36) * 2 * Math.PI
+          const x1 = size / 2 + Math.cos(a) * (r - 18)
+          const y1 = size / 2 + Math.sin(a) * (r - 18)
+          const x2 = size / 2 + Math.cos(a) * (r - 8)
+          const y2 = size / 2 + Math.sin(a) * (r - 8)
+          return (
+            <line
+              key={i}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth={2}
+              strokeLinecap="round"
+            />
+          )
+        })}
+      </svg>
+
+      <div className="absolute inset-10 rounded-full bg-[var(--surface)]/40 border border-[var(--border)]/60 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-10">
+        <h2 className="text-3xl md:text-4xl font-black text-[var(--foreground,var(--text))] leading-none tracking-tight">
           {rank.rank_name}
-        </h1>
-        <div className="flex items-center gap-6 mt-6 text-sm">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-green-400" />
-            <span className="text-green-400 font-bold">Top {rank.global_position}%</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Flame className="w-6 h-6 text-orange-500" />
-            <span className="text-orange-500 font-bold">14 Days Streak</span>
-          </div>
+        </h2>
+
+        <p className="mt-3 text-6xl md:text-7xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent leading-none">
+          {pct}%
+        </p>
+
+        <p className="mt-2 text-base md:text-lg text-[var(--foreground,var(--text))]/70">para o próximo nível</p>
+
+        <div className="mt-5">
+          <p className="text-base md:text-lg font-semibold text-emerald-400">
+            Top {rank.global_position}% global
+          </p>
         </div>
       </div>
     </div>
   )
 }
 
-// --- Página Principal ---
-const AchievementsPage = () => {
-  const { theme, setTheme } = useTheme()
-  const { logEvent } = useAnalytics()
-  const [activeTab, setActiveTab] = useState<'badges' | 'leaderboard' | 'rewards'>('badges')
-  const [achievements, setAchievements] = useState<Badge[]>(ACHIEVEMENTS)
-
-  // Simulação de progresso
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setAchievements(prev => prev.map(a => {
-        if (!a.unlocked && a.id === 'first-replay') {
-          return { ...a, progress: Math.min(100, a.progress + 2) }
-        }
-        return a
-      }))
-    }, 3000)
-    return () => clearInterval(timer)
-  }, [])
-
-  // Log de abertura
-  useEffect(() => {
-    logEvent('Achievements_Opened', {
-      theme,
-      unlocked: achievements.filter(a => a.unlocked).length,
-      total: achievements.length
-    })
-  }, [logEvent, achievements, theme])
+export default function Achievements() {
+  const [achievements] = useState(ACHIEVEMENTS)
+  const [activeTab, setActiveTab] = useState<'badges' | 'leaderboard'>('badges')
 
   const unlockedCount = achievements.filter(a => a.unlocked).length
+  const totalXP = achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.xp_reward, 0)
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden font-sans relative" data-theme={theme}>
-      {/* Background dinâmico */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="w-full h-full bg-gradient-to-br from-[var(--color-primary-from)] to-[var(--color-primary-to)] blur-3xl" />
-      </div>
+    <div className="relative w-full">
+      {/* Background interno (somente no content area) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[32px]"
+        style={{
+          background:
+            'radial-gradient(1200px 760px at 14% 10%, color-mix(in oklab, var(--accent-1, #a855f7) 14%, transparent) 0%, transparent 60%),' +
+            'radial-gradient(1100px 720px at 86% 8%, color-mix(in oklab, var(--accent-2, #22c55e) 10%, transparent) 0%, transparent 55%),' +
+            'linear-gradient(135deg, color-mix(in oklab, var(--background) 92%, black) 0%, var(--background) 55%, color-mix(in oklab, var(--background) 88%, black) 100%)',
+          opacity: 0.9,
+        }}
+      />
 
-      {/* Header Hero */}
-      <header className="relative z-10 pt-12 pb-16 px-6 md:px-12 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12"
+      <div className="relative mx-auto w-full max-w-7xl px-6 py-6 md:px-8 md:py-8">
+        {/* Header */}
+        <div
+          className="mb-6 rounded-3xl border p-6 md:p-8"
+          style={{
+            borderColor: 'color-mix(in oklab, var(--foreground, #fff) 10%, transparent)',
+            background: 'color-mix(in oklab, var(--surface, var(--background)) 72%, transparent)',
+            backdropFilter: 'blur(18px)',
+          }}
         >
-          <div>
-            <h1 className="text-5xl md:text-xl md:text-2xl lg:text-3xl font-black tracking-tighter bg-gradient-to-r from-[var(--color-primary-from)] to-[var(--color-primary-to)] bg-clip-text text-transparent">
-              Hall of Glory
-            </h1>
-            <p className="text-xl text-[var(--text-secondary)] mt-3">
-              Sua jornada de lenda na Synapse
-            </p>
-          </div>
-
-          <div className="flex items-center gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-black">{unlockedCount}</div>
-              <div className="text-sm text-[var(--text-secondary)]">Desbloqueadas</div>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0">
+              <h1
+                className="truncate text-2xl md:text-4xl font-black"
+                style={{
+                  backgroundImage: 'linear-gradient(90deg, var(--accent-1, #a855f7), var(--accent-2, #22c55e))',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                }}
+              >
+                Achievements
+              </h1>
+              <p className="mt-2 text-sm md:text-base" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 65%, transparent)' }}>
+                Reconhecimento por consistência, qualidade e impacto (modo simulado).
+              </p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-black">{achievements.length}</div>
-              <div className="text-sm text-[var(--text-secondary)]">Total</div>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Level Dashboard */}
-        <LevelDashboard rank={{
-          rank_name: "Cyber Architect",
-          current_xp: 8450,
-          next_rank_xp: 10000,
-          global_position: 4,
-          weekly_change: 12
-        }} />
-      </header>
-
-      {/* Tabs */}
-      <div className="sticky top-0 z-50 bg-[var(--background)]/90 backdrop-blur-xl border-b border-[var(--border)]">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex gap-12">
-          {['badges', 'leaderboard', 'rewards'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as any)}
-              className={`py-6 text-sm font-bold uppercase tracking-widest border-b-2 transition-all ${
-                activeTab === tab
-                  ? 'border-[var(--color-primary-from)] text-[var(--text-primary)]'
-                  : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12">
-        <AnimatePresence mode="wait">
-          {activeTab === 'badges' && (
-            <motion.div
-              key="badges"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {achievements.map(badge => (
-                <HolographicCard key={badge.id} badge={badge} onClick={() => console.log('Detalhes:', badge.name)} />
-              ))}
-            </motion.div>
-          )}
-
-          {activeTab === 'leaderboard' && (
-            <motion.div
-              key="leaderboard"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-[var(--surface-glass)] rounded-3xl border border-[var(--border)] overflow-hidden p-8 text-center"
-            >
-              <h2 className="text-3xl font-bold mb-6">Global Elite League</h2>
-              <div className="max-w-2xl mx-auto font-mono text-left space-y-4">
-                <div className="p-4 bg-black/30 rounded-xl">
-                  1. Sarah Connor [Cyberdyne] – 99,420 XP
-                </div>
-                <div className="p-4 bg-black/30 rounded-xl">
-                  2. Neo Anderson [Matrix] – 98,000 XP
-                </div>
-                <div className="p-4 bg-[var(--color-primary-from)]/20 rounded-xl border border-[var(--color-primary-from)]">
-                  3. YOU – 8,450 XP
-                </div>
+            <div className="flex flex-wrap gap-10">
+              <div>
+                <p className="text-xs md:text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
+                  Desbloqueadas
+                </p>
+                <p className="text-3xl md:text-4xl font-black text-emerald-400">
+                  {unlockedCount}/{achievements.length}
+                </p>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+
+              <div>
+                <p className="text-xs md:text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
+                  XP total
+                </p>
+                <p className="text-3xl md:text-4xl font-black" style={{ color: 'var(--accent-1, #a855f7)' }}>
+                  {totalXP.toLocaleString('pt-BR')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Plinth premium para orb + tabs */}
+        <div className="mb-8">
+          <div
+            className="relative rounded-3xl border p-6 md:p-10 overflow-hidden"
+            style={{
+              borderColor: 'color-mix(in oklab, var(--foreground, #fff) 10%, transparent)',
+              background: 'color-mix(in oklab, var(--surface, var(--background)) 60%, transparent)',
+              backdropFilter: 'blur(18px)',
+            }}
+          >
+            <div className="absolute -inset-10 blur-3xl bg-gradient-to-br from-[var(--accent-1)]/10 via-transparent to-[var(--accent-2)]/10 opacity-80 pointer-events-none" />
+            <div className="absolute inset-0 rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] pointer-events-none" />
+
+            <LevelOrb
+              rank={{
+                rank_name: 'Operação Avançada',
+                current_xp: 42850,
+                next_rank_xp: 50000,
+                global_position: 3,
+                weekly_change: 18,
+              }}
+            />
+
+            <div className="mt-8 md:mt-10">
+              <SegmentedTabs value={activeTab} onChange={setActiveTab} />
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        {activeTab === 'badges' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            {achievements.map(badge => (
+              <HolographicCard key={badge.id} badge={badge} />
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'leaderboard' && (
+          <div
+            className="rounded-3xl border p-8 md:p-12 text-center"
+            style={{
+              borderColor: 'color-mix(in oklab, var(--foreground, #fff) 10%, transparent)',
+              background: 'color-mix(in oklab, var(--surface, var(--background)) 70%, transparent)',
+              backdropFilter: 'blur(18px)',
+            }}
+          >
+            <h2 className="text-2xl md:text-3xl font-black" style={{ color: 'var(--foreground,var(--text))' }}>
+              Ranking (simulado)
+            </h2>
+            <p className="mt-2 text-sm md:text-base" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
+              Exibição de referência. Quando conectado ao backend, este bloco refletirá dados reais.
+            </p>
+
+            <div className="mt-8 space-y-6 max-w-2xl mx-auto">
+              <div className="p-6 md:p-7 rounded-3xl border" style={{ borderColor: 'color-mix(in oklab, #f59e0b 40%, transparent)', background: 'color-mix(in oklab, #f59e0b 14%, transparent)' }}>
+                <p className="text-lg md:text-xl font-black" style={{ color: 'color-mix(in oklab, #fcd34d 85%, white)' }}>
+                  1. Colaborador A — 142.000 XP
+                </p>
+              </div>
+
+              <div className="p-6 md:p-7 rounded-3xl border" style={{ borderColor: 'color-mix(in oklab, var(--foreground, #fff) 18%, transparent)', background: 'color-mix(in oklab, var(--foreground, #fff) 8%, transparent)' }}>
+                <p className="text-lg md:text-xl font-black" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 82%, transparent)' }}>
+                  2. Colaborador B — 138.500 XP
+                </p>
+              </div>
+
+              <div className="p-6 md:p-7 rounded-3xl border" style={{ borderColor: 'color-mix(in oklab, var(--accent-1, #a855f7) 35%, transparent)', background: 'color-mix(in oklab, var(--accent-1, #a855f7) 14%, transparent)' }}>
+                <p className="text-lg md:text-xl font-black" style={{ color: 'var(--accent-1, #a855f7)' }}>
+                  3. Você — 42.850 XP
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
-
-export default createSupremePage(supremeConfigs['Achievements'], AchievementsPage)

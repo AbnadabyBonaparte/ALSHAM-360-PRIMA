@@ -1,6 +1,5 @@
 // src/pages/LeadsDetails.tsx
-// ALSHAM 360° PRIMA v10 SUPREMO — Lead Detail Alienígena 1000/1000
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/LeadsDetails.tsx
+// ALSHAM 360° PRIMA — Lead Detail (migrado para shadcn/ui)
 
 import {
   UserIcon,
@@ -30,6 +29,10 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState, useMemo } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Lead {
   id: string;
@@ -83,9 +86,9 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-32 h-32 border-8 border-t-transparent border-purple-500 rounded-full"
+          className="w-32 h-32 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full"
         />
-        <p className="absolute text-4xl text-purple-400 font-light">Citizen Supremo X.1 carregando o destino deste lead...</p>
+        <p className="absolute text-4xl text-[var(--accent-purple)] font-light">Carregando lead...</p>
       </div>
     );
   }
@@ -93,7 +96,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
   if (!lead) {
     return (
       <div className="text-center py-40">
-        <AlertTriangleIcon className="w-40 h-40 text-red-500 mx-auto mb-12" />
+        <ExclamationTriangleIcon className="w-40 h-40 text-[var(--accent-alert)] mx-auto mb-12" />
         <p className="text-2xl sm:text-3xl text-[var(--text-secondary)]">Lead não encontrado</p>
       </div>
     );
@@ -106,46 +109,48 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
         {/* HEADER SUPREMO */}
-        <div className="border-b border-[var(--border)] bg-gradient-to-r from-purple-900/30 via-[var(--background)] to-pink-900/30 backdrop-blur-2xl">
+        <div className="border-b border-[var(--border)] bg-gradient-to-r from-[var(--accent-purple)]/30 via-[var(--background)] to-[var(--accent-pink)]/30 backdrop-blur-2xl">
           <div className="p-12 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-8">
-                <button
+                <Button
                   onClick={() => window.history.back()}
-                  className="p-4 bg-[var(--surface)] hover:bg-[var(--surface-strong)] rounded-2xl transition-all"
+                  variant="ghost"
+                  size="icon"
+                  className="h-16 w-16 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-strong)]"
                 >
                   <ArrowLeftIcon className="w-10 h-10" />
-                </button>
+                </Button>
                 <div className="flex items-center gap-8">
                   <div className="relative">
-                    <div className="w-40 h-40 bg-gradient-to-br from-primary to-purple-600 rounded-3xl flex items-center justify-center text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] shadow-2xl">
+                    <div className="w-40 h-40 bg-gradient-to-br from-[var(--accent-sky)] to-[var(--accent-purple)] rounded-3xl flex items-center justify-center text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] shadow-2xl">
                       {lead.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </div>
                     {isHot && (
-                      <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center animate-pulse">
-                        <FlameIcon className="w-16 h-16 text-[var(--text-primary)]" />
+                      <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-r from-[var(--accent-warning)] to-[var(--accent-alert)] rounded-full flex items-center justify-center animate-pulse">
+                        <FireIcon className="w-16 h-16 text-[var(--text-primary)]" />
                       </div>
                     )}
                   </div>
                   <div>
-                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-purple)] bg-clip-text text-transparent">
                       {lead.name}
                     </h1>
                     <p className="text-lg sm:text-xl md:text-2xl text-[var(--text-secondary)] mt-4">
                       {lead.company} • {lead.position || 'Cargo não informado'}
                     </p>
                     <div className="flex items-center gap-6 mt-6">
-                      <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
+                      <Badge className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] text-[var(--text-primary)] border-0 font-semibold text-sm sm:text-base md:text-lg">
                         IA Score: {lead.score}/100
                         {isHot && <SparklesIcon className="w-12 h-12 inline ml-4 animate-pulse" />}
-                      </div>
-                      <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
+                      </Badge>
+                      <Badge className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] text-[var(--text-primary)] border-0 font-semibold text-sm sm:text-base md:text-lg">
                         {lead.probability}% conversão
-                      </div>
+                      </Badge>
                       {isRisk && (
-                        <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
+                        <Badge className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-[var(--accent-alert)] to-[var(--accent-warning)] text-[var(--text-primary)] border-0 font-semibold text-sm sm:text-base md:text-lg">
                           RISCO ALTO
-                        </div>
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -153,13 +158,13 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
               </div>
 
               <div className="text-right">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-400">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--accent-emerald)]">
                   R$ {lead.revenue_potential.toLocaleString('pt-BR')}
                 </p>
                 <p className="text-base sm:text-lg text-[var(--text-secondary)]">Potencial de receita</p>
-                <button className="mt-8 px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg hover:scale-105 transition-all">
+                <Button className="mt-8 px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] hover:opacity-90 text-[var(--text-primary)] rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base md:text-lg">
                   CONVERTER EM CLIENTE
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -177,30 +182,28 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
             <InfoCard icon={<CalendarIcon />} title="Criado em" value={format(new Date(lead.created_at), 'dd/MM/yyyy')} />
 
             {/* IA INSIGHTS */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-3xl p-10 border border-purple-500/30"
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <LightBulbIcon className="w-16 h-16 text-purple-400" />
-                <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">Análise da IA</h3>
-              </div>
-              <div className="space-y-6">
-                <div>
-                  <p className="text-base sm:text-lg text-[var(--text-secondary)]">Probabilidade de conversão</p>
-                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-emerald-400">{lead.probability}%</p>
+            <Card className="bg-gradient-to-br from-[var(--accent-purple)]/50 to-[var(--accent-pink)]/50 border-[var(--accent-purple)]/30 rounded-3xl backdrop-blur-xl">
+              <CardContent className="p-10">
+                <div className="flex items-center gap-4 mb-8">
+                  <LightBulbIcon className="w-16 h-16 text-[var(--accent-purple)]" />
+                  <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">Análise da IA</h3>
                 </div>
-                <div>
-                  <p className="text-base sm:text-lg text-[var(--text-secondary)]">Risco de churn</p>
-                  <p className={`text-xl md:text-2xl lg:text-3xl font-black ${lead.risk >= 60 ? 'text-red-400' : 'text-emerald-400'}`}>{lead.risk}%</p>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-base sm:text-lg text-[var(--text-secondary)]">Probabilidade de conversão</p>
+                    <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--accent-emerald)]">{lead.probability}%</p>
+                  </div>
+                  <div>
+                    <p className="text-base sm:text-lg text-[var(--text-secondary)]">Risco de churn</p>
+                    <p className={`text-xl md:text-2xl lg:text-3xl font-black ${lead.risk >= 60 ? 'text-[var(--accent-alert)]' : 'text-[var(--accent-emerald)]'}`}>{lead.risk}%</p>
+                  </div>
+                  <div>
+                    <p className="text-base sm:text-lg text-[var(--text-secondary)]">Health Score</p>
+                    <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--accent-sky)]">{lead.health}/100</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base sm:text-lg text-[var(--text-secondary)]">Health Score</p>
-                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-cyan-400">{lead.health}/100</p>
-                </div>
-              </div>
-            </motion.div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* COLUNA DO MEIO — ATIVIDADES */}
@@ -237,42 +240,39 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
 
 function InfoCard({ icon: Icon, title, value }: any) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="bg-gradient-to-br from-[var(--surface)] to-[var(--surface-strong)] rounded-3xl p-8 border border-[var(--border)]"
-    >
-      <div className="flex items-center gap-6">
-        <div className="p-6 bg-[var(--surface-strong)] rounded-2xl">
-          <Icon className="w-12 h-12 text-primary" />
+    <Card className="bg-gradient-to-br from-[var(--surface)] to-[var(--surface-strong)] border-[var(--border)] rounded-3xl hover:scale-105 transition-all">
+      <CardContent className="p-8">
+        <div className="flex items-center gap-6">
+          <div className="p-6 bg-[var(--surface-strong)] rounded-2xl">
+            <Icon className="w-12 h-12 text-[var(--accent-sky)]" />
+          </div>
+          <div>
+            <p className="text-base sm:text-lg text-[var(--text-secondary)]">{title}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">{value || '—'}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-base sm:text-lg text-[var(--text-secondary)]">{title}</p>
-          <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">{value || '—'}</p>
-        </div>
-      </div>
-    </motion.div>
+      </CardContent>
+    </Card>
   );
 }
 
 function ActivityItem({ type, title, description, time, user }: any) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="bg-gradient-to-r from-[var(--surface)]/70 to-[var(--background)]/70 rounded-3xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center text-4xl">
-            {type === 'email' ? '✉️' : type === 'call' ? '📞' : '🗓️'}
-          </div>
-          <div>
-            <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{title}</h3>
-            <p className="text-base sm:text-lg text-[var(--text-secondary)]">{description}</p>
-            <p className="text-[var(--text-muted)] mt-2">por {user} • {time}</p>
+    <Card className="bg-gradient-to-r from-[var(--surface)]/70 to-[var(--background)]/70 border-[var(--border)] hover:border-[var(--accent-sky)]/50 rounded-3xl transition-all">
+      <CardContent className="p-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent-sky)] to-[var(--accent-purple)] rounded-2xl flex items-center justify-center text-4xl">
+              {type === 'email' ? '✉️' : type === 'call' ? '📞' : '🗓️'}
+            </div>
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{title}</h3>
+              <p className="text-base sm:text-lg text-[var(--text-secondary)]">{description}</p>
+              <p className="text-[var(--text-secondary)]/70 mt-2">por {user} • {time}</p>
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </CardContent>
+    </Card>
   );
 }

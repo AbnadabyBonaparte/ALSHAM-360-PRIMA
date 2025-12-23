@@ -215,7 +215,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
     >
       {/* Logo Header */}
       <motion.div
-        onClick={() => onNavigate('dashboard-principal')}
+        onClick={() => onNavigate('dashboard')}
         className="sticky top-0 z-10 flex items-center gap-3 bg-[var(--surface-strong)]/95 px-4 py-5 backdrop-blur-xl cursor-pointer hover:bg-[var(--surface)]/95 transition-all duration-300 group border-b border-[var(--border)]/50"
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}

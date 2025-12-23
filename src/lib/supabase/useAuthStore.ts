@@ -1,226 +1,349 @@
+// src/lib/supabase/useAuthStore.ts
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { auth } from './auth'
-import { createSupabaseClientWithOrg } from './client'
-import type { AuthUser, Organization, AuthState } from './types'
+import type { User, Session } from '@supabase/supabase-js'
+import { supabase } from './client'
 
-interface AuthStore extends AuthState {
-  // Actions
-  signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, fullName?: string) => Promise<void>
-  signInWithGoogle: () => Promise<void>
-  signOut: () => Promise<void>
-  switchOrganization: (orgId: string) => Promise<void>
-  initialize: () => Promise<void>
-  clearError: () => void
+export type OrgRole = 'owner' | 'admin' | 'member' | 'viewer' | string
 
-  // Computed properties
-  isAuthenticated: boolean
-  hasMultipleOrgs: boolean
-  needsOrgSelection: boolean
+export type Organization = {
+  id: string
+  name: string
+  created_at?: string | null
+  updated_at?: string | null
+  domain?: string | null
+  logo_url?: string | null
 }
 
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set, get) => ({
-      // Initial state
-      user: null,
-      session: null,
-      currentOrg: null,
-      organizations: [],
-      loading: true,
-      error: null,
+export type UserOrganization = {
+  org_id: string
+  role: OrgRole
+  organizations?: Organization | null
+}
 
-      // Computed properties
-      get isAuthenticated(): boolean {
-        return !!get().user && !!get().session
-      },
+interface AuthState {
+  user: User | null
+  session: Session | null
 
-      get hasMultipleOrgs(): boolean {
-        return get().organizations.length > 1
-      },
+  organizations: Organization[]
+  currentOrgId: string | null
+  currentOrg: Organization | null
+  roleInOrg: OrgRole | null
 
-      get needsOrgSelection(): boolean {
-        const state = get()
-        return state.isAuthenticated && !state.currentOrg && state.organizations.length > 0
-      },
+  loading: boolean
+  loadingAuth: boolean
+  loadingOrgs: boolean
+  initialized: boolean
+  error: string | null
 
-      // Actions
-      async signIn(email: string, password: string) {
-        set({ loading: true, error: null })
+  isAuthenticated: boolean
+  needsOrgSelection: boolean
 
-        try {
-          const { user, session, error } = await auth.signIn({ email, password })
+  init: () => Promise<void>
+  fetchOrganizations: () => Promise<void>
+  refreshOrganizations: () => Promise<void>
+  switchOrganization: (orgId: string) => Promise<void>
+  clearError: () => void
+  signOut: () => Promise<void>
+}
 
-          if (error) {
-            set({ error, loading: false })
-            return
-          }
+// 🔒 listener único
+let authUnsub: (() => void) | null = null
+let initInFlight: Promise<void> | null = null
 
-          if (user && session) {
-            set({ user, session, loading: false })
-            await get().loadUserOrganizations(user.id)
-          }
-        } catch (err) {
-          set({
-            error: err instanceof Error ? err.message : 'Erro ao fazer login',
-            loading: false
-          })
-        }
-      },
+const ORG_STORAGE_KEY = 'ALSHAM_CURRENT_ORG_ID'
 
-      async signUp(email: string, password: string, fullName?: string) {
-        set({ loading: true, error: null })
+function safeArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : []
+}
 
-        try {
-          const { user, session, error } = await auth.signUp({ email, password, fullName })
+function readOrgFromStorage(): string | null {
+  try {
+    return localStorage.getItem(ORG_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
 
-          if (error) {
-            set({ error, loading: false })
-            return
-          }
+function writeOrgToStorage(orgId: string | null) {
+  try {
+    if (!orgId) localStorage.removeItem(ORG_STORAGE_KEY)
+    else localStorage.setItem(ORG_STORAGE_KEY, orgId)
+  } catch {
+    // ignore
+  }
+}
 
-          if (user && session) {
-            set({ user, session, loading: false })
-            // Novo usuário pode não ter organizações ainda
-          }
-        } catch (err) {
-          set({
-            error: err instanceof Error ? err.message : 'Erro ao criar conta',
-            loading: false
-          })
-        }
-      },
+async function fetchOrganizationsForUser(userId: string): Promise<{
+  orgs: Organization[]
+  roleByOrgId: Record<string, OrgRole>
+}> {
+  const { data, error } = await supabase
+    .from('user_organizations')
+    .select('org_id, role, organizations:organizations(*)')
+    .eq('user_id', userId)
 
-      async signInWithGoogle() {
-        set({ loading: true, error: null })
+  if (error) throw error
 
-        try {
-          const { error } = await auth.signInWithGoogle()
+  const rows = safeArray<UserOrganization>(data)
 
-          if (error) {
-            set({ error, loading: false })
-          }
-          // O redirecionamento será tratado pelo onAuthStateChange
-        } catch (err) {
-          set({
-            error: err instanceof Error ? err.message : 'Erro ao fazer login com Google',
-            loading: false
-          })
-        }
-      },
+  const roleByOrgId: Record<string, OrgRole> = {}
+  const orgs = rows
+    .map((r) => {
+      if (r.org_id) roleByOrgId[r.org_id] = r.role ?? 'member'
+      return r.organizations ?? null
+    })
+    .filter(Boolean) as Organization[]
 
-      async signOut() {
-        set({ loading: true, error: null })
+  const seen = new Set<string>()
+  const deduped: Organization[] = []
+  for (const o of orgs) {
+    if (!o?.id) continue
+    if (seen.has(o.id)) continue
+    seen.add(o.id)
+    deduped.push(o)
+  }
 
-        try {
-          const { error } = await auth.signOut()
+  return { orgs: deduped, roleByOrgId }
+}
 
-          if (error) {
-            set({ error, loading: false })
-            return
-          }
+export const useAuthStore = create<AuthState>((set, get) => ({
+  user: null,
+  session: null,
 
-          set({
-            user: null,
-            session: null,
-            currentOrg: null,
-            organizations: [],
-            loading: false
-          })
-        } catch (err) {
-          set({
-            error: err instanceof Error ? err.message : 'Erro ao fazer logout',
-            loading: false
-          })
-        }
-      },
+  organizations: [],
+  currentOrgId: null,
+  currentOrg: null,
+  roleInOrg: null,
 
-      async switchOrganization(orgId: string) {
-        const state = get()
+  loading: true,
+  loadingAuth: true,
+  loadingOrgs: false,
+  initialized: false,
+  error: null,
 
-        // Verificar se usuário tem acesso à organização
-        if (!state.user) return
+  isAuthenticated: false,
+  needsOrgSelection: false,
 
-        const hasAccess = await auth.hasAccessToOrg(state.user.id, orgId)
-        if (!hasAccess) {
-          set({ error: 'Acesso negado à organização selecionada' })
-          return
-        }
+  clearError: () => set({ error: null }),
 
-        const selectedOrg = state.organizations.find(org => org.id === orgId)
-        if (!selectedOrg) {
-          set({ error: 'Organização não encontrada' })
-          return
-        }
+  init: async () => {
+    if (initInFlight) return initInFlight
 
-        set({ currentOrg: selectedOrg, error: null })
-
-        // Atualizar o cliente Supabase com a nova org
-        const clientWithOrg = createSupabaseClientWithOrg(orgId)
-        // Aqui você pode armazenar o cliente com org para uso futuro
-      },
-
-      async initialize() {
-        set({ loading: true })
-
-        try {
-          const session = await auth.getCurrentSession()
-
-          if (session?.user) {
-            set({ user: session.user, session })
-            await get().loadUserOrganizations(session.user.id)
-          } else {
-            set({ user: null, session: null, currentOrg: null, organizations: [], loading: false })
-          }
-        } catch (err) {
-          console.error('Error initializing auth:', err)
-          set({
-            user: null,
-            session: null,
-            currentOrg: null,
-            organizations: [],
-            loading: false,
-            error: 'Erro ao inicializar autenticação'
-          })
-        }
-      },
-
-      async loadUserOrganizations(userId: string) {
-        try {
-          const userOrgs = await auth.getUserOrganizations(userId)
-          const organizations = userOrgs.map(uo => uo.organization)
-
-          set({ organizations })
-
-          // Se só tiver uma organização, seleciona automaticamente
-          if (organizations.length === 1) {
-            set({ currentOrg: organizations[0] })
-          }
-          // Se tiver múltiplas, o usuário precisará escolher
-        } catch (err) {
-          console.error('Error loading user organizations:', err)
-          set({ error: 'Erro ao carregar organizações' })
-        }
-      },
-
-      clearError() {
-        set({ error: null })
-      }
-    }),
-    {
-      name: 'alsham-auth-storage',
-      partialize: (state) => ({
-        // Segurança: não persistir user/session para forçar re-auth
-        currentOrg: state.currentOrg,
-        organizations: state.organizations
+    const setDerived = () => {
+      const s = get()
+      set({
+        isAuthenticated: !!s.user,
+        needsOrgSelection:
+          !!s.user &&
+          !s.currentOrgId &&
+          s.organizations.length !== 1 &&
+          !s.loadingOrgs,
       })
     }
-  )
-)
 
-// Auth state listener removido para evitar duplicação de lógica
-// A lógica de auth é gerenciada exclusivamente pelo método initialize()
+    const run = async () => {
+      set({ loading: true, loadingAuth: true, error: null })
 
+      const { data, error } = await supabase.auth.getSession()
+      if (error) {
+        set({
+          session: null,
+          user: null,
+          organizations: [],
+          currentOrgId: null,
+          currentOrg: null,
+          roleInOrg: null,
+          loading: false,
+          loadingAuth: false,
+          loadingOrgs: false,
+          initialized: true,
+          error: error.message,
+        })
+        setDerived()
+        return
+      }
 
+      const session = data.session
+      const user = session?.user ?? null
 
+      set({
+        session,
+        user,
+        loadingAuth: false,
+        initialized: true,
+      })
+
+      // ✅ ÚNICA fonte de carregamento de orgs
+      if (user) {
+        await get().fetchOrganizations()
+      } else {
+        set({
+          organizations: [],
+          currentOrgId: null,
+          currentOrg: null,
+          roleInOrg: null,
+        })
+        writeOrgToStorage(null)
+      }
+
+      // 🔒 listener único (SEM fetchOrganizations aqui)
+      if (!authUnsub) {
+        const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+          const newUser = newSession?.user ?? null
+
+          set({
+            session: newSession,
+            user: newUser,
+            loadingAuth: false,
+            error: null,
+          })
+
+          if (!newUser) {
+            set({
+              organizations: [],
+              currentOrgId: null,
+              currentOrg: null,
+              roleInOrg: null,
+              loadingOrgs: false,
+            })
+            writeOrgToStorage(null)
+          }
+
+          setDerived()
+        })
+
+        authUnsub = () => sub.subscription.unsubscribe()
+      }
+
+      set({ loading: false })
+      setDerived()
+    }
+
+    initInFlight = run().finally(() => {
+      initInFlight = null
+    })
+
+    return initInFlight
+  },
+
+  fetchOrganizations: async () => {
+    const user = get().user
+
+    const setDerived = () => {
+      const s = get()
+      set({
+        isAuthenticated: !!s.user,
+        needsOrgSelection:
+          !!s.user &&
+          !s.currentOrgId &&
+          s.organizations.length !== 1 &&
+          !s.loadingOrgs,
+      })
+    }
+
+    if (!user) {
+      set({
+        organizations: [],
+        currentOrgId: null,
+        currentOrg: null,
+        roleInOrg: null,
+        loadingOrgs: false,
+      })
+      writeOrgToStorage(null)
+      setDerived()
+      return
+    }
+
+    set({ loadingOrgs: true, error: null })
+    try {
+      const { orgs, roleByOrgId } = await fetchOrganizationsForUser(user.id)
+      const organizations = safeArray<Organization>(orgs)
+
+      // ✅ UX CRAVADA:
+      // - 0 orgs: nenhuma selecionada
+      // - 1 org: auto-seleciona
+      // - >1: força selector (não auto-seleciona, ignora storage)
+      let resolvedOrgId: string | null = null
+      if (organizations.length === 1) resolvedOrgId = organizations[0].id
+
+      const currentOrg = resolvedOrgId
+        ? organizations.find((o) => o.id === resolvedOrgId) ?? null
+        : null
+
+      const roleInOrg = resolvedOrgId ? roleByOrgId[resolvedOrgId] ?? null : null
+
+      set({
+        organizations,
+        currentOrgId: resolvedOrgId,
+        currentOrg,
+        roleInOrg,
+        loadingOrgs: false,
+      })
+
+      writeOrgToStorage(resolvedOrgId)
+      setDerived()
+    } catch (e: any) {
+      set({
+        organizations: [],
+        currentOrgId: null,
+        currentOrg: null,
+        roleInOrg: null,
+        loadingOrgs: false,
+        error: e?.message || 'Falha ao carregar organizações.',
+      })
+      writeOrgToStorage(null)
+      setDerived()
+    }
+  },
+
+  refreshOrganizations: async () => {
+    await get().fetchOrganizations()
+  },
+
+  switchOrganization: async (orgId: string) => {
+    const orgs = get().organizations
+    const target = orgs.find((o) => o.id === orgId) ?? null
+
+    if (!target) {
+      set({
+        error: 'Organização inválida ou não encontrada.',
+        currentOrgId: null,
+        currentOrg: null,
+      })
+      writeOrgToStorage(null)
+      set({ needsOrgSelection: true })
+      return
+    }
+
+    set({
+      currentOrgId: target.id,
+      currentOrg: target,
+      error: null,
+      needsOrgSelection: false,
+    })
+
+    writeOrgToStorage(target.id)
+  },
+
+  signOut: async () => {
+    set({ loading: true, loadingAuth: true, error: null })
+    await supabase.auth.signOut()
+
+    set({
+      user: null,
+      session: null,
+      organizations: [],
+      currentOrgId: null,
+      currentOrg: null,
+      roleInOrg: null,
+      loading: false,
+      loadingAuth: false,
+      loadingOrgs: false,
+      isAuthenticated: false,
+      needsOrgSelection: false,
+      initialized: true,
+    })
+
+    writeOrgToStorage(null)
+  },
+}))
