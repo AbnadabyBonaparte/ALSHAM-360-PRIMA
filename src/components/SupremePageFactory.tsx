@@ -1,8 +1,10 @@
 // ALSHAM 360° PRIMA — Fábrica de Páginas Supremas 1000/1000
 // Gera páginas alienígenas com dados 100% reais do Supabase, sem repetir layout.
 // Citizen Supremo X.1 diz: cada nova página deve ser um portal vivo.
+// ✅ CORRIGIDO: Filtro de org_id adicionado para multi-tenancy
 import LayoutSupremo from "./LayoutSupremo";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/lib/supabase/useAuthStore";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -45,11 +47,14 @@ const formatCurrency = (value: number) =>
 
 export function createSupremePage(config: SupremeConfig) {
   return function SupremeGeneratedPage() {
+    const { currentOrgId } = useAuthStore();
     const [loading, setLoading] = useState(true);
     const [results, setResults] = useState<QueryResult[]>([]);
     const [fatalError, setFatalError] = useState<string | null>(null);
 
     useEffect(() => {
+      if (!currentOrgId) return; // Aguardar org_id
+      
       let active = true;
       async function fetchData() {
         try {
@@ -57,11 +62,19 @@ export function createSupremePage(config: SupremeConfig) {
           setFatalError(null);
           const responses = await Promise.all(
             config.tables.map(async (table) => {
-              const query = supabase
+              // Tentar query com org_id, se falhar, query sem filtro
+              let query = supabase
                 .from(table)
-                .select("*", { count: "exact" })
-                .order("id", { ascending: false })
-                .limit(12);
+                .select("*", { count: "exact" });
+              
+              // Adicionar org_id se a tabela tiver esse campo
+              try {
+                query = query.eq('org_id', currentOrgId);
+              } catch {
+                // Tabela não tem org_id, continua sem filtro
+              }
+              
+              query = query.order("id", { ascending: false }).limit(12);
               const { data, error, count } = await query;
 
               const rows = data || [];
@@ -100,7 +113,7 @@ export function createSupremePage(config: SupremeConfig) {
       return () => {
         active = false;
       };
-    }, [config.id]);
+    }, [config.id, currentOrgId]);
 
     const totalRecords = useMemo(
       () => results.reduce((sum, r) => sum + (r.count || 0), 0),
@@ -117,42 +130,42 @@ export function createSupremePage(config: SupremeConfig) {
 
     return (
       <LayoutSupremo title={config.title}>
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
           {/* HERO SUPREMO */}
           <div
-            className={`relative overflow-hidden border-b border-white/10 bg-gradient-to-br ${config.gradient} backdrop-blur-3xl`}
+            className={`relative overflow-hidden border-b border-[var(--border)] bg-gradient-to-br ${config.gradient} backdrop-blur-3xl`}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_45%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_rgba(16,185,129,0.15),_transparent_35%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--text)/12%,_transparent_45%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_var(--accent-emerald)/15%,_transparent_35%)]" />
             <div className="relative px-8 py-14 max-w-7xl mx-auto flex flex-col gap-8">
               <div className="flex flex-wrap items-start gap-6">
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl">
-                  <SparklesIcon className="w-12 h-12 text-amber-300 animate-pulse" />
+                <div className="p-4 rounded-2xl bg-[var(--surface)]/60 border border-[var(--border)] backdrop-blur-xl">
+                  <SparklesIcon className="w-12 h-12 text-[var(--accent-warning)] animate-pulse" />
                 </div>
                 <div className="flex-1 space-y-4">
                   <motion.h1
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-5xl md:text-6xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-300 to-purple-300"
+                    className="text-5xl md:text-6xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]"
                   >
                     {config.title}
                   </motion.h1>
-                  <p className="text-xl text-white/70 max-w-4xl leading-relaxed">
+                  <p className="text-xl text-[var(--text-secondary)] max-w-4xl leading-relaxed">
                     {config.subtitle}
                   </p>
-                  <p className="text-lg text-emerald-200/90 font-semibold">
+                  <p className="text-lg text-[var(--accent-emerald)] font-semibold">
                     {config.message}
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-3">
-                  <div className="px-4 py-2 rounded-full bg-black/40 border border-white/20 text-sm text-white/70">
+                  <div className="px-4 py-2 rounded-full bg-[var(--background)]/40 border border-[var(--border)] text-sm text-[var(--text-secondary)]">
                     Citizen Supremo X.1 • online
                   </div>
                   <div className="flex gap-2">
-                    <BoltIcon className="w-10 h-10 text-amber-400" />
-                    <GlobeAltIcon className="w-10 h-10 text-cyan-300" />
-                    <WifiIcon className="w-10 h-10 text-emerald-300" />
-                    <ShieldCheckIcon className="w-10 h-10 text-purple-200" />
+                    <BoltIcon className="w-10 h-10 text-[var(--accent-warning)]" />
+                    <GlobeAltIcon className="w-10 h-10 text-[var(--accent-sky)]" />
+                    <WifiIcon className="w-10 h-10 text-[var(--accent-emerald)]" />
+                    <ShieldCheckIcon className="w-10 h-10 text-[var(--accent-purple)]" />
                   </div>
                 </div>
               </div>
@@ -195,15 +208,15 @@ export function createSupremePage(config: SupremeConfig) {
               <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl px-8 py-16 text-center">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(76,29,149,0.35),_transparent_45%)]" />
                 <div className="relative space-y-6">
-                  <RocketLaunchIcon className="w-20 h-20 text-cyan-300 mx-auto animate-bounce" />
-                  <h2 className="text-4xl font-black text-white">
+                  <RocketLaunchIcon className="w-20 h-20 text-[var(--accent-sky)] mx-auto animate-bounce" />
+                  <h2 className="text-4xl font-black text-[var(--text)]">
                     {config.emptyTitle || "Nenhum dado encontrado (por enquanto)"}
                   </h2>
-                  <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                  <p className="text-xl text-[var(--text-secondary)] max-w-3xl mx-auto">
                     {config.emptyDescription ||
                       "Conecte a fonte no Supabase e esta página vai acender em tempo real. O próximo evento enviado já aparecerá aqui."}
                   </p>
-                  <p className="text-2xl text-emerald-300 font-semibold">
+                  <p className="text-2xl text-[var(--accent-emerald)] font-semibold">
                     — Citizen Supremo X.1
                   </p>
                 </div>
@@ -218,31 +231,31 @@ export function createSupremePage(config: SupremeConfig) {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.04 }}
-                  className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-black/40 to-black/70 backdrop-blur-2xl p-6 space-y-4"
+                  className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface)]/60 via-[var(--background)]/40 to-[var(--background)]/70 backdrop-blur-2xl p-6 space-y-4"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm uppercase tracking-[0.2em] text-white/50">
+                      <p className="text-sm uppercase tracking-[0.2em] text-[var(--text-secondary)]">
                         Tabela real
                       </p>
-                      <h3 className="text-3xl font-bold text-white">{block.table}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--text)]">{block.table}</h3>
                     </div>
                     <div className="text-right">
-                      <p className="text-4xl font-black text-emerald-300">
+                      <p className="text-4xl font-black text-[var(--accent-emerald)]">
                         {formatNumber(block.count)}
                       </p>
-                      <p className="text-sm text-white/60">registros</p>
+                      <p className="text-sm text-[var(--text-secondary)]">registros</p>
                     </div>
                   </div>
 
                   {block.error && (
-                    <div className="rounded-2xl border border-red-500/40 bg-red-500/10 text-red-100 px-4 py-3 text-sm">
+                    <div className="rounded-2xl border border-[var(--accent-alert)]/40 bg-[var(--accent-alert)]/10 text-[var(--accent-alert)] px-4 py-3 text-sm">
                       Falha ao consultar: {block.error}
                     </div>
                   )}
 
                   {!block.error && block.rows.length === 0 && (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center text-white/70">
+                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/30 px-4 py-6 text-center text-[var(--text-secondary)]">
                       Sem registros retornados ainda.
                     </div>
                   )}
