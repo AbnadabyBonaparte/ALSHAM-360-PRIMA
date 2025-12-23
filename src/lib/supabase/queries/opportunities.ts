@@ -279,3 +279,9 @@ export const opportunitiesQueries = {
     return { data, error: null }
   }
 }
+
+
+
+
+
+

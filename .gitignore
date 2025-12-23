@@ -68,3 +68,5 @@ secrets/
 
 # Build output
 dist/
+.continue/
+build_output.txt

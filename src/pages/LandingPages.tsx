@@ -6,16 +6,23 @@
 import {
   RocketLaunchIcon,
   EyeIcon,
-  CursorArrowRaysIcon,
   UserPlusIcon,
-  ChartBarIcon,
   SparklesIcon,
   GlobeAltIcon,
   ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
+
+const supabase = createClient(
+  (import.meta as any).env.VITE_SUPABASE_URL,
+  (import.meta as any).env.VITE_SUPABASE_ANON_KEY
+);
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LandingPage {
   id: string;
@@ -52,8 +59,8 @@ export default function LandingPagesPage() {
           .order('visualizacoes', { ascending: false });
 
         if (lps) {
-          const totalViews = lps.reduce((s, l) => s + (l.visualizacoes || 0), 0);
-          const totalConv = lps.reduce((s, l) => s + (l.conversoes || 0), 0);
+          const totalViews = lps.reduce((s: number, l: any) => s + (l.visualizacoes || 0), 0);
+          const totalConv = lps.reduce((s: number, l: any) => s + (l.conversoes || 0), 0);
 
           setMetrics({
             totalLPs: lps.length,
@@ -61,7 +68,7 @@ export default function LandingPagesPage() {
             totalVisualizacoes: totalViews,
             totalConversoes: totalConv,
             taxaMediaConversao: totalViews > 0 ? (totalConv / totalViews) * 100 : 0,
-            landingPages: lps.map(l => ({
+            landingPages: lps.map((l: any) => ({
               id: l.id,
               nome: l.nome || 'LP sem nome',
               url: l.url || '',
@@ -97,12 +104,8 @@ export default function LandingPagesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-cyan-500 rounded-full"
-        />
-        <p className="absolute text-4xl text-cyan-400 font-light">Carregando LPs...</p>
+        <Skeleton className="w-40 h-40 rounded-full" />
+        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Carregando LPs...</p>
       </div>
     );
   }
@@ -115,58 +118,90 @@ export default function LandingPagesPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-            LANDING PAGES SUPREMAS
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada LP é uma armadilha de conversão perfeita
-          </p>
+          <Card className="border-0 bg-transparent">
+            <CardHeader>
+              <CardTitle className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
+                LANDING PAGES SUPREMAS
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl text-[var(--text-secondary)]">
+                Cada LP é uma armadilha de conversão perfeita
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-cyan-900/60 to-blue-900/60 rounded-2xl p-6 border border-cyan-500/30">
-            <GlobeAltIcon className="w-12 h-12 text-cyan-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalLPs || 0}</p>
-            <p className="text-gray-400">Total LPs</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <GlobeAltIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalLPs || 0}</p>
+                <p className="text-[var(--text-secondary)]">Total LPs</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <RocketLaunchIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativas || 0}</p>
-            <p className="text-gray-400">Ativas</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <RocketLaunchIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ativas || 0}</p>
+                <p className="text-[var(--text-secondary)]">Ativas</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
-            <EyeIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Visualizações</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <EyeIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
+                <p className="text-[var(--text-secondary)]">Visualizações</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <UserPlusIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Conversões</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <UserPlusIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
+                <p className="text-[var(--text-secondary)]">Conversões</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-2xl p-6 border border-yellow-500/30">
-            <ArrowTrendingUpIcon className="w-12 h-12 text-yellow-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
-            <p className="text-gray-400">Taxa Média</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <ArrowTrendingUpIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
+                <p className="text-[var(--text-secondary)]">Taxa Média</p>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
 
         {/* LISTA DE LPs */}
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Arsenal de Landing Pages
-          </h2>
+          <Card className="border-0 bg-transparent mb-12">
+            <CardHeader className="text-center">
+              <CardTitle className="text-4xl font-bold text-[var(--text-primary)]">
+                Arsenal de Landing Pages
+              </CardTitle>
+            </CardHeader>
+          </Card>
 
           {metrics?.landingPages.length === 0 ? (
-            <div className="text-center py-20">
-              <GlobeAltIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhuma landing page cadastrada</p>
-            </div>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="text-center py-20">
+                <GlobeAltIcon className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
+                <p className="text-3xl text-[var(--text-secondary)]">Nenhuma landing page cadastrada</p>
+              </CardContent>
+            </Card>
           ) : (
             <div className="space-y-6">
               {metrics?.landingPages.map((lp, i) => (
@@ -175,52 +210,49 @@ export default function LandingPagesPage() {
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-cyan-500/50 transition-all"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                      <div className={`w-4 h-4 rounded-full ${
-                        lp.status === 'ativa' ? 'bg-green-400 animate-pulse' :
-                        lp.status === 'pausada' ? 'bg-yellow-400' : 'bg-gray-400'
-                      }`} />
-                      <div>
-                        <h3 className="text-2xl font-bold text-[var(--text-primary)]">{lp.nome}</h3>
-                        <p className="text-cyan-400 text-sm">{lp.url}</p>
-                        {lp.campanha && <p className="text-gray-500 text-sm">Campanha: {lp.campanha}</p>}
-                      </div>
-                    </div>
+                  <Card className="border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-sky)]/50 transition-all">
+                    <CardContent className="p-8">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6">
+                          <Badge variant="outline" className={`w-4 h-4 rounded-full p-0 ${
+                            lp.status === 'ativa' ? 'bg-[var(--accent-emerald)] animate-pulse' :
+                            lp.status === 'pausada' ? 'bg-[var(--accent-warning)]' : 'bg-[var(--text-secondary)]'
+                          }`} />
+                          <div>
+                            <h3 className="text-2xl font-bold text-[var(--text-primary)]">{lp.nome}</h3>
+                            <p className="text-[var(--accent-sky)] text-sm">{lp.url}</p>
+                            {lp.campanha && <p className="text-[var(--text-secondary)] text-sm">Campanha: {lp.campanha}</p>}
+                          </div>
+                        </div>
 
-                    <div className="flex items-center gap-10 text-right">
-                      <div>
-                        <p className="text-2xl font-bold text-blue-400">{lp.visualizacoes.toLocaleString()}</p>
-                        <p className="text-gray-500 text-sm">Visualizações</p>
+                        <div className="flex items-center gap-10 text-right">
+                          <div>
+                            <p className="text-2xl font-bold text-[var(--accent-sky)]">{lp.visualizacoes.toLocaleString()}</p>
+                            <p className="text-[var(--text-secondary)] text-sm">Visualizações</p>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-[var(--accent-purple)]">{lp.conversoes.toLocaleString()}</p>
+                            <p className="text-[var(--text-secondary)] text-sm">Conversões</p>
+                          </div>
+                          <div>
+                            <p className={`text-2xl font-bold ${
+                              lp.taxa_conversao >= 5 ? 'text-[var(--accent-emerald)]' :
+                              lp.taxa_conversao >= 2 ? 'text-[var(--accent-warning)]' : 'text-[var(--accent-alert)]'
+                            }`}>
+                              {lp.taxa_conversao.toFixed(1)}%
+                            </p>
+                            <p className="text-[var(--text-secondary)] text-sm">Taxa</p>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-2xl font-bold text-purple-400">{lp.conversoes.toLocaleString()}</p>
-                        <p className="text-gray-500 text-sm">Conversões</p>
-                      </div>
-                      <div>
-                        <p className={`text-2xl font-bold ${
-                          lp.taxa_conversao >= 5 ? 'text-green-400' :
-                          lp.taxa_conversao >= 2 ? 'text-yellow-400' : 'text-red-400'
-                        }`}>
-                          {lp.taxa_conversao.toFixed(1)}%
-                        </p>
-                        <p className="text-gray-500 text-sm">Taxa</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* BARRA DE CONVERSÃO */}
-                  <div className="mt-6">
-                    <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min(lp.taxa_conversao * 10, 100)}%` }}
-                        className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
-                      />
-                    </div>
-                  </div>
+                      {/* BARRA DE CONVERSÃO */}
+                      <div className="mt-6">
+                        <Progress value={Math.min(lp.taxa_conversao * 10, 100)} className="h-2" />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               ))}
             </div>
@@ -234,13 +266,17 @@ export default function LandingPagesPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-cyan-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-cyan-300 max-w-4xl mx-auto">
-            "Uma landing page perfeita não convence. Ela hipnotiza."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Arquiteto de Conversão
-          </p>
+          <Card className="border-0 bg-transparent max-w-4xl mx-auto">
+            <CardContent className="text-center">
+              <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+              <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
+                "Uma landing page perfeita não convence. Ela hipnotiza."
+              </p>
+              <p className="text-3xl text-[var(--text-secondary)] mt-8">
+                — Citizen Supremo X.1, seu Arquiteto de Conversão
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
   );

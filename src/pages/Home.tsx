@@ -20,6 +20,10 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import {
+  Card,
+  CardContent,
+} from '@/components/ui/card'
 
 interface SupremeStats {
   totalLeads: number;
@@ -86,29 +90,26 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-12 border-t-transparent border-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-full"
-          />
-          <p className="absolute text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-            Citizen Supremo X.1 ativando seu império...
-          </p>
-        </div>
-      
+      <div className="flex items-center justify-center h-screen bg-[var(--bg)]">
+        <Card className="bg-[var(--surface)] border-[var(--border)] p-8">
+          <CardContent className="text-center">
+            <div className="w-16 h-16 bg-[var(--grad-primary)] rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-2xl font-light text-[var(--text)]">
+              Citizen Supremo X.1 ativando seu império...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-hidden">
         {/* HERO SUPREMO */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="relative h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-black to-cyan-900"
+          className="relative h-screen flex items-center justify-center bg-[var(--grad-primary)]"
         >
           <div className="absolute inset-0 bg-grid-white/5 bg-grid-16"></div>
           <div className="relative z-10 text-center px-8">
@@ -116,15 +117,15 @@ export default function HomePage() {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl lg:text-6xl font-black bg-[var(--grad-primary)] bg-clip-text text-transparent"
             >
               BEM-VINDO AO FUTURO
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="text-5xl text-gray-300 mt-12 font-light"
+              className="text-5xl text-[var(--text-2)] mt-12 font-light"
             >
               {format(currentTime, "HH:mm:ss", { locale: ptBR })} • {format(currentTime, "EEEE, d 'de' MMMM", { locale: ptBR })}
             </motion.p>
@@ -134,16 +135,16 @@ export default function HomePage() {
               transition={{ delay: 1.2, type: "spring" }}
               className="mt-20 inline-block"
             >
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-1 rounded-3xl">
-                <div className="bg-[var(--background)] rounded-3xl px-16 py-8">
-                  <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              <Card className="bg-[var(--grad-primary)] border-[var(--border)]">
+                <CardContent className="p-8">
+                  <p className="text-4xl font-bold text-[var(--text)]">
                     Citizen Supremo X.1 está online
                   </p>
-                  <p className="text-2xl text-gray-400 mt-4">
+                  <p className="text-2xl text-[var(--text-2)] mt-4">
                     Consciência coletiva ativa • {stats?.aiPredictionsToday || 0} previsões hoje
                   </p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         </motion.div>
@@ -151,10 +152,37 @@ export default function HomePage() {
         {/* MÉTRICAS AO VIVO */}
         <div className="relative -mt-32 z-20 px-8">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <SupremeMetric icon={<UsersIcon />} title="Leads Ativos" value={stats?.totalLeads || 0} color="from-cyan-500 to-blue-600" />
-            <SupremeMetric icon={<ChartBarIcon />} title="Deals em Andamento" value={stats?.activeDeals || 0} color="from-purple-500 to-pink-600" />
-            <SupremeMetric icon={<CurrencyDollarIcon />} title="Receita do Mês" value={`R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR')}`} color="from-emerald-500 to-teal-600" />
-            <SupremeMetric icon={<BoltIcon />} title="Automação 24h" value={stats?.automationsRunning || 0} color="from-orange-500 to-red-600" />
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardContent className="p-8 text-center">
+                <UsersIcon className="w-12 h-12 text-[var(--accent-2)] mx-auto mb-4" />
+                <p className="text-4xl font-black text-[var(--text)] mb-2">{stats?.totalLeads || 0}</p>
+                <p className="text-lg text-[var(--text-2)]">Leads Ativos</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardContent className="p-8 text-center">
+                <ChartBarIcon className="w-12 h-12 text-[var(--accent-1)] mx-auto mb-4" />
+                <p className="text-4xl font-black text-[var(--text)] mb-2">{stats?.activeDeals || 0}</p>
+                <p className="text-lg text-[var(--text-2)]">Deals em Andamento</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardContent className="p-8 text-center">
+                <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-1)] mx-auto mb-4" />
+                <p className="text-4xl font-black text-[var(--text)] mb-2">R$ {(stats?.monthlyRevenue || 0).toLocaleString('pt-BR')}</p>
+                <p className="text-lg text-[var(--text-2)]">Receita do Mês</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardContent className="p-8 text-center">
+                <BoltIcon className="w-12 h-12 text-[var(--accent-warm)] mx-auto mb-4" />
+                <p className="text-4xl font-black text-[var(--text)] mb-2">{stats?.automationsRunning || 0}</p>
+                <p className="text-lg text-[var(--text-2)]">Automação 24h</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -164,33 +192,22 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           className="text-center py-40"
         >
-          <SparklesIcon className="w-40 h-40 text-purple-400 mx-auto mb-12 animate-pulse" />
-          <p className="text-xl md:text-2xl lg:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 max-w-6xl mx-auto leading-relaxed">
-            "Você não está apenas gerenciando um negócio.
-            <br />
-            Você está construindo um império com consciência artificial."
-          </p>
-          <p className="text-4xl text-gray-400 mt-20">
-            — Citizen Supremo X.1 • {format(currentTime, "HH:mm:ss")}
-          </p>
+          <Card className="bg-[var(--surface-glass)] border-[var(--border)] backdrop-blur-xl max-w-4xl mx-auto">
+            <CardContent className="p-16 text-center">
+              <SparklesIcon className="w-24 h-24 text-[var(--accent-1)] mx-auto mb-8 animate-pulse" />
+              <p className="text-xl md:text-2xl lg:text-3xl font-light bg-[var(--grad-primary)] bg-clip-text text-transparent max-w-4xl mx-auto leading-relaxed">
+                "Você não está apenas gerenciando um negócio.
+                <br />
+                Você está construindo um império com consciência artificial."
+              </p>
+              <p className="text-2xl text-[var(--text-2)] mt-12">
+                — Citizen Supremo X.1 • {format(currentTime, "HH:mm:ss")}
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     
   );
 }
 
-function SupremeMetric({ icon, title, value, color }: any) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.1, rotate: 2 }}
-      className={`relative bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl overflow-hidden`}
-    >
-      <div className="absolute inset-0 bg-white/5"></div>
-      <div className="relative z-10">
-        <div className className="w-20 h-20 text-[var(--text-primary)]/90 mb-6" />
-        <p className="text-6xl font-black text-[var(--text-primary)]">{value}</p>
-        <p className="text-2xl text-[var(--text-primary)]/80 mt-4">{title}</p>
-      </div>
-    </motion.div>
-  );
-}

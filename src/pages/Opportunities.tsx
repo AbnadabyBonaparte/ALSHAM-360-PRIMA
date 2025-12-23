@@ -3,6 +3,22 @@ import { opportunitiesQueries } from '../lib/supabase/queries/opportunities'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import type { Opportunity } from '../lib/supabase/types'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 export const Opportunities: React.FC = () => {
   const { currentOrg } = useAuthStore()
@@ -48,108 +64,98 @@ export const Opportunities: React.FC = () => {
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
-  const getStageColor = (stage: string) => {
+  const getStageVariant = (stage: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (stage) {
-      case 'prospecção': return 'bg-gray-100 text-gray-800'
-      case 'qualificação': return 'bg-blue-100 text-blue-800'
-      case 'proposta': return 'bg-yellow-100 text-yellow-800'
-      case 'negociação': return 'bg-purple-100 text-purple-800'
-      case 'fechada': return 'bg-green-100 text-green-800'
-      case 'perdida': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'prospecção': return 'secondary'
+      case 'qualificação': return 'default'
+      case 'proposta': return 'outline'
+      case 'negociação': return 'outline'
+      case 'fechada': return 'default'
+      case 'perdida': return 'destructive'
+      default: return 'secondary'
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <div className="space-y-4">
+          <div className="h-8 w-64 bg-[var(--surface)] rounded animate-pulse"></div>
+          <div className="h-4 w-96 bg-[var(--surface)] rounded animate-pulse"></div>
+          <div className="h-96 w-full max-w-7xl bg-[var(--surface)] rounded animate-pulse"></div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-alsham-bg-default">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-alsham-text-primary">Oportunidades</h1>
-          <p className="text-alsham-text-secondary mt-2">
+          <h1 className="text-3xl font-bold text-[var(--text)]">Oportunidades</h1>
+          <p className="text-[var(--text-2)] mt-2">
             Gerencie seu pipeline de vendas
           </p>
         </div>
 
         {/* Opportunities List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          {opportunities.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Oportunidade
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Valor
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stage
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Probabilidade
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fechamento
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {opportunities.map((opp) => (
-                    <tr key={opp.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {opp.title}
-                          </div>
-                          {opp.lead && (
-                            <div className="text-sm text-gray-500">
-                              {opp.lead.name} - {opp.lead.company}
+        <Card className="bg-[var(--surface)] border-[var(--border)]">
+          <CardContent className="p-0">
+            {opportunities.length > 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[var(--text-2)]">Oportunidade</TableHead>
+                      <TableHead className="text-[var(--text-2)]">Valor</TableHead>
+                      <TableHead className="text-[var(--text-2)]">Stage</TableHead>
+                      <TableHead className="text-[var(--text-2)]">Probabilidade</TableHead>
+                      <TableHead className="text-[var(--text-2)]">Fechamento</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {opportunities.map((opp) => (
+                      <TableRow key={opp.id} className="hover:bg-[var(--surface-elev)]">
+                        <TableCell className="font-medium">
+                          <div>
+                            <div className="text-sm font-medium text-[var(--text)]">
+                              {opp.title}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                            {opp.lead && (
+                              <div className="text-sm text-[var(--text-2)]">
+                                {opp.lead.name} - {opp.lead.company}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-[var(--text)]">
                           {formatCurrency(opp.value)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStageColor(opp.stage)}`}>
-                          {opp.stage}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {opp.probability}%
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {opp.expected_close_date ? formatDate(opp.expected_close_date) : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getStageVariant(opp.stage)}>
+                            {opp.stage}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-[var(--text)]">
+                          {opp.probability}%
+                        </TableCell>
+                        <TableCell className="text-[var(--text-2)]">
+                          {opp.expected_close_date ? formatDate(opp.expected_close_date) : '-'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-alsham-text-secondary">
+              <p className="text-[var(--text-2)]">
                 {error || 'Nenhuma oportunidade encontrada'}
               </p>
               {error && (
-                <button
-                  onClick={loadOpportunities}
-                  className="mt-4 px-4 py-2 bg-alsham-primary text-white rounded-lg hover:bg-alsham-primary-hover"
-                >
+                <Button onClick={loadOpportunities} className="mt-4">
                   Tentar novamente
-                </button>
+                </Button>
               )}
             </div>
           )}

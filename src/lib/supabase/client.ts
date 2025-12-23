@@ -59,3 +59,9 @@ export function getSupabaseClientWithOrg() {
   // Por enquanto retorna o cliente base
   return supabase
 }
+
+
+
+
+
+

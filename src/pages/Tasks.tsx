@@ -3,7 +3,7 @@
 // Onde tarefas viram conquistas. Onde atraso vira vergonha. Onde você domina o tempo.
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Tasks.tsx
 
-import { 
+import {
   CheckCircleIcon,
   ClockIcon,
   FireIcon,
@@ -21,6 +21,13 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, isToday, isPast, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 interface Task {
   id: string;
@@ -77,91 +84,219 @@ export default function TasksPage() {
     streak: 42 // IA calcula depois
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical': return 'from-red-600 to-pink-600';
-      case 'high': return 'from-orange-600 to-red-600';
-      case 'medium': return 'from-yellow-600 to-amber-600';
-      default: return 'from-gray-600 to-gray-500';
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-8">
         {/* HEADER ÉPICO */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-[var(--grad-primary)] bg-clip-text text-transparent">
             TAREFAS SUPREMAS
           </h1>
-          <p className="text-6xl text-gray-300 mt-12 font-light">
+          <p className="text-6xl text-[var(--text-2)] mt-12 font-light">
             {stats.total} tarefas • {stats.completed} concluídas • {stats.pointsEarned.toLocaleString()} pontos ganhos
           </p>
-          <p className="text-5xl text-emerald-400 mt-6">
+          <p className="text-5xl text-[var(--accent-1)] mt-6">
             {stats.streak} dias de streak • {stats.overdue} atrasadas
           </p>
         </motion.div>
 
         {/* KPIS SUPREMOS */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-20">
-          <SupremeTaskCard
-            icon={<CheckCircleIcon />}
-            title="Concluídas"
-            value={stats.completed.toString()}
-            color="from-emerald-500 to-teal-600"
-          />
-          <SupremeTaskCard
-            icon={<ClockIcon />}
-            title="Hoje"
-            value={stats.today.toString()}
-            color="from-cyan-500 to-blue-600"
-          />
-          <SupremeTaskCard
-            icon={<ExclamationTriangleIcon />}
-            title="Atrasadas"
-            value={stats.overdue.toString()}
-            color="from-red-500 to-orange-600"
-          />
-          <SupremeTaskCard
-            icon={<TrophyIcon />}
-            title="Pontos Ganhos"
-            value={stats.pointsEarned.toLocaleString()}
-            color="from-yellow-500 to-amber-600"
-          />
-          <SupremeTaskCard
-            icon={<FireIcon />}
-            title="Streak Atual"
-            value={stats.streak.toString()}
-            color="from-orange-500 to-red-600"
-          />
+          <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-6 bg-[var(--surface)] rounded-2xl">
+                  <CheckCircleIcon className="w-12 h-12 text-[var(--accent-1)]" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-[var(--text)] mb-2">{stats.completed}</p>
+              <p className="text-lg text-[var(--text-2)]">Concluídas</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-6 bg-[var(--surface)] rounded-2xl">
+                  <ClockIcon className="w-12 h-12 text-[var(--accent-2)]" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-[var(--text)] mb-2">{stats.today}</p>
+              <p className="text-lg text-[var(--text-2)]">Hoje</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-6 bg-[var(--surface)] rounded-2xl">
+                  <ExclamationTriangleIcon className="w-12 h-12 text-[var(--accent-alert)]" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-[var(--text)] mb-2">{stats.overdue}</p>
+              <p className="text-lg text-[var(--text-2)]">Atrasadas</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-6 bg-[var(--surface)] rounded-2xl">
+                  <TrophyIcon className="w-12 h-12 text-[var(--accent-warm)]" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-[var(--text)] mb-2">{stats.pointsEarned.toLocaleString()}</p>
+              <p className="text-lg text-[var(--text-2)]">Pontos Ganhos</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-6 bg-[var(--surface)] rounded-2xl">
+                  <FireIcon className="w-12 h-12 text-[var(--accent-alert)]" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-[var(--text)] mb-2">{stats.streak}</p>
+              <p className="text-lg text-[var(--text-2)]">Streak Atual</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* GRID DE TAREFAS */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* COLUNA: A FAZER */}
-            <TaskColumn
-              title="A FAZER"
-              tasks={tasks.filter(t => t.status === 'todo')}
-              color="from-blue-600/80 to-cyan-600/80"
-            />
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-center text-4xl">A FAZER</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {tasks.filter(t => t.status === 'todo').map((task: any) => (
+                    <Card key={task.id} className="bg-[var(--surface)] border-[var(--border)] hover:border-[var(--accent-1)]">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-xl font-bold text-[var(--text)]">{task.title}</h3>
+                          <Badge variant={
+                            task.priority === 'critical' ? 'destructive' :
+                            task.priority === 'high' ? 'destructive' :
+                            task.priority === 'medium' ? 'outline' : 'secondary'
+                          }>
+                            {task.priority.toUpperCase()}
+                          </Badge>
+                        </div>
+                        {task.description && (
+                          <p className="text-[var(--text-2)] mb-4">{task.description}</p>
+                        )}
+                        <div className="flex justify-between items-center text-sm text-[var(--text-muted)]">
+                          <div className="flex items-center gap-2">
+                            <UserIcon className="w-4 h-4" />
+                            {task.assignee}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            {format(new Date(task.due_date), 'dd/MM')}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <TrophyIcon className="w-4 h-4 text-[var(--accent-warm)]" />
+                            {task.points} pts
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* COLUNA: FAZENDO */}
-            <TaskColumn
-              title="FAZENDO"
-              tasks={tasks.filter(t => t.status === 'doing')}
-              color="from-purple-600/80 to-pink-600/80"
-            />
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-center text-4xl">FAZENDO</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {tasks.filter(t => t.status === 'doing').map((task: any) => (
+                    <Card key={task.id} className="bg-[var(--surface)] border-[var(--border)] hover:border-[var(--accent-2)]">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-xl font-bold text-[var(--text)]">{task.title}</h3>
+                          <Badge variant={
+                            task.priority === 'critical' ? 'destructive' :
+                            task.priority === 'high' ? 'destructive' :
+                            task.priority === 'medium' ? 'outline' : 'secondary'
+                          }>
+                            {task.priority.toUpperCase()}
+                          </Badge>
+                        </div>
+                        {task.description && (
+                          <p className="text-[var(--text-2)] mb-4">{task.description}</p>
+                        )}
+                        <div className="flex justify-between items-center text-sm text-[var(--text-muted)]">
+                          <div className="flex items-center gap-2">
+                            <UserIcon className="w-4 h-4" />
+                            {task.assignee}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            {format(new Date(task.due_date), 'dd/MM')}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <TrophyIcon className="w-4 h-4 text-[var(--accent-warm)]" />
+                            {task.points} pts
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* COLUNA: CONCLUÍDO */}
-            <TaskColumn
-              title="CONCLUÍDO"
-              tasks={tasks.filter(t => t.status === 'done')}
-              color="from-emerald-600/80 to-teal-600/80"
-            />
+            <Card className="bg-[var(--surface-elev)] border-[var(--border)] backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-center text-4xl">CONCLUÍDO</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {tasks.filter(t => t.status === 'done').map((task: any) => (
+                    <Card key={task.id} className="bg-[var(--surface)] border-[var(--border)] hover:border-[var(--accent-1)] opacity-75">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-xl font-bold text-[var(--text)] line-through">{task.title}</h3>
+                          <Badge variant="default">
+                            CONCLUÍDO
+                          </Badge>
+                        </div>
+                        {task.description && (
+                          <p className="text-[var(--text-2)] mb-4 line-through">{task.description}</p>
+                        )}
+                        <div className="flex justify-between items-center text-sm text-[var(--text-muted)]">
+                          <div className="flex items-center gap-2">
+                            <UserIcon className="w-4 h-4" />
+                            {task.assignee}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <CheckCircleIcon className="w-4 h-4 text-[var(--accent-1)]" />
+                            {format(new Date(task.completed_at || task.due_date), 'dd/MM')}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <TrophyIcon className="w-4 h-4 text-[var(--accent-warm)]" />
+                            +{task.points} pts
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -171,88 +306,22 @@ export default function TasksPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40 mt-32"
         >
-          <TrophyIcon className="w-64 h-64 text-yellow-500 mx-auto mb-16 animate-pulse" />
-          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
-            CADA TAREFA CONCLUÍDA
-          </p>
-          <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
-            É UM PASSO PARA O DOMÍNIO
-          </p>
-          <p className="text-6xl text-gray-400 mt-24">
-            — Citizen Supremo X.1
-          </p>
+          <Card className="bg-[var(--surface-glass)] border-[var(--border)] backdrop-blur-xl max-w-4xl mx-auto">
+            <CardContent className="p-16 text-center">
+              <TrophyIcon className="w-32 h-32 text-[var(--accent-warm)] mx-auto mb-12 animate-pulse" />
+              <p className="text-4xl md:text-5xl lg:text-6xl font-black bg-[var(--grad-primary)] bg-clip-text text-transparent mb-8">
+                CADA TAREFA CONCLUÍDA
+              </p>
+              <p className="text-4xl md:text-5xl lg:text-6xl font-black bg-[var(--grad-secondary)] bg-clip-text text-transparent mb-12">
+                É UM PASSO PARA O DOMÍNIO
+              </p>
+              <p className="text-4xl text-[var(--text-2)]">
+                — Citizen Supremo X.1
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
   );
 }
 
-function TaskColumn({ title, tasks, color }: any) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -100 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={`bg-gradient-to-br ${color} rounded-3xl p-10 border-4 border-white/20 backdrop-blur-xl`}
-    >
-      <h2 className="text-5xl font-black text-[var(--text-primary)] mb-8 text-center">{title}</h2>
-      <div className="space-y-6">
-        {tasks.map((task: any) => (
-          <motion.div
-            key={task.id}
-            whileHover={{ scale: 1.05 }}
-            className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] hover:border-primary/50 transition-all"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-[var(--text-primary)]">{task.title}</h3>
-              <div className={`px-6 py-3 rounded-full font-black text-xl bg-gradient-to-r ${getPriorityColor(task.priority)}`}>
-                {task.priority.toUpperCase()}
-              </div>
-            </div>
-            {task.description && (
-              <p className="text-gray-300 mb-4">{task.description}</p>
-            )}
-            <div className="flex items-center justify-between text-gray-400">
-              <span className="flex items-center gap-2">
-                <UserIcon className="w-6 h-6" />
-                {task.assignee}
-              </span>
-              <span className="flex items-center gap-2">
-                <CalendarIcon className="w-6 h-6" />
-                {format(new Date(task.due_date), 'dd/MM')}
-              </span>
-              <span className="flex items-center gap-2">
-                <TrophyIcon className="w-6 h-6 text-yellow-400" />
-                {task.points} pts
-              </span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-function SupremeTaskCard({ icon, title, value, color }: any) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} rounded-3xl p-12 border border-[var(--border)] backdrop-blur-xl shadow-2xl`}
-    >
-      <div className="flex items-center justify-center mb-8">
-        <div className="p-8 bg-white/10 rounded-3xl">
-          {icon}
-        </div>
-      </div>
-      <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)] text-center">{value}</p>
-      <p className="text-3xl text-[var(--text-primary)]/80 text-center mt-6">{title}</p>
-    </motion.div>
-  );
-}
-
-function getPriorityColor(priority: string) {
-  switch (priority) {
-    case 'critical': return 'from-red-600 to-pink-600';
-    case 'high': return 'from-orange-600 to-red-600';
-    case 'medium': return 'from-yellow-600 to-amber-600';
-    default: return 'from-gray-600 to-gray-500';
-  }
-}

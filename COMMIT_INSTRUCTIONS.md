@@ -122,3 +122,9 @@ Após o push, a Vercel vai fazer o deploy automático e você poderá testar:
 - Todas as funcionalidades enterprise
 
 **Execute os passos acima e me avise quando terminar o push!** 🔥✨
+
+
+
+
+
+

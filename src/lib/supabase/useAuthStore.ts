@@ -211,8 +211,7 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: 'alsham-auth-storage',
       partialize: (state) => ({
-        user: state.user,
-        session: state.session,
+        // Segurança: não persistir user/session para forçar re-auth
         currentOrg: state.currentOrg,
         organizations: state.organizations
       })
@@ -220,36 +219,8 @@ export const useAuthStore = create<AuthStore>()(
   )
 )
 
-// Inicializar auth state change listener
-auth.onAuthStateChange(async (event, session) => {
-  console.log('Auth state changed:', event, session?.user?.email)
+// Auth state listener removido para evitar duplicação de lógica
+// A lógica de auth é gerenciada exclusivamente pelo método initialize()
 
-  if (event === 'SIGNED_IN' && session?.user) {
-    useAuthStore.setState({
-      user: session.user,
-      session,
-      loading: false
-    })
 
-    // Carregar organizações do usuário
-    const userOrgs = await auth.getUserOrganizations(session.user.id)
-    const organizations = userOrgs.map(uo => uo.organization)
 
-    useAuthStore.setState({ organizations })
-
-    // Selecionar org automaticamente se só tiver uma
-    if (organizations.length === 1) {
-      useAuthStore.setState({ currentOrg: organizations[0] })
-    }
-  }
-
-  if (event === 'SIGNED_OUT') {
-    useAuthStore.setState({
-      user: null,
-      session: null,
-      currentOrg: null,
-      organizations: [],
-      loading: false
-    })
-  }
-})

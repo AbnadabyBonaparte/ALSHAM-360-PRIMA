@@ -14,10 +14,18 @@ import {
   SignalIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { format, isPast, isFuture } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const supabase = createClient(
+  (import.meta as any).env.VITE_SUPABASE_URL,
+  (import.meta as any).env.VITE_SUPABASE_ANON_KEY
+);
 
 interface Webinar {
   id: string;
@@ -100,12 +108,8 @@ export default function WebinarsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-red-500 rounded-full"
-        />
-        <p className="absolute text-4xl text-red-400 font-light">Preparando o palco...</p>
+        <Skeleton className="w-40 h-40 rounded-full" />
+        <p className="absolute text-4xl text-[var(--accent-alert)] font-light">Preparando o palco...</p>
       </div>
     );
   }
@@ -125,52 +129,80 @@ export default function WebinarsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-red-400 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
-            WEBINARS SUPREMOS
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada webinar é um palco de autoridade absoluta
-          </p>
+          <Card className="border-0 bg-transparent">
+            <CardHeader>
+              <CardTitle className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
+                WEBINARS SUPREMOS
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl text-[var(--text-secondary)]">
+                Cada webinar é um palco de autoridade absoluta
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-red-900/60 to-orange-900/60 rounded-2xl p-6 border border-red-500/30">
-            <VideoCameraIcon className="w-12 h-12 text-red-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalWebinars || 0}</p>
-            <p className="text-gray-400">Total Webinars</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <VideoCameraIcon className="w-12 h-12 text-[var(--accent-alert)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalWebinars || 0}</p>
+                <p className="text-[var(--text-secondary)]">Total Webinars</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
-            <CalendarDaysIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
-            <p className="text-gray-400">Agendados</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <CalendarDaysIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
+                <p className="text-[var(--text-secondary)]">Agendados</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <UserGroupIcon className="w-12 h-12 text-purple-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Total Inscritos</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <UserGroupIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
+                <p className="text-[var(--text-secondary)]">Total Inscritos</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <ChartBarIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.mediaParticipacao || 0).toFixed(0)}%</p>
-            <p className="text-gray-400">Participação</p>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="p-6">
+                <ChartBarIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+                <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.mediaParticipacao || 0).toFixed(0)}%</p>
+                <p className="text-[var(--text-secondary)]">Participação</p>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
 
         {/* LISTA DE WEBINARS */}
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
-            Próximos e Recentes
-          </h2>
+          <Card className="border-0 bg-transparent mb-12">
+            <CardHeader className="text-center">
+              <CardTitle className="text-4xl font-bold text-[var(--text-primary)]">
+                Próximos e Recentes
+              </CardTitle>
+            </CardHeader>
+          </Card>
 
           {metrics?.webinars.length === 0 ? (
-            <div className="text-center py-20">
-              <VideoCameraIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhum webinar cadastrado</p>
-            </div>
+            <Card className="border-[var(--border)] bg-[var(--surface)]">
+              <CardContent className="text-center py-20">
+                <VideoCameraIcon className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
+                <p className="text-3xl text-[var(--text-secondary)]">Nenhum webinar cadastrado</p>
+              </CardContent>
+            </Card>
           ) : (
             <div className="space-y-6">
               {metrics?.webinars.map((webinar, i) => {
@@ -181,53 +213,67 @@ export default function WebinarsPage() {
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className={`rounded-3xl p-8 border backdrop-blur-xl ${
-                      webinar.status === 'ao_vivo'
-                        ? 'bg-gradient-to-r from-red-900/40 to-orange-900/40 border-red-500/50 shadow-2xl shadow-red-500/20'
-                        : 'bg-gradient-to-r from-white/5 to-white/10 border-[var(--border)]'
-                    }`}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        {/* STATUS BADGE */}
-                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${config.bg} text-[var(--text-primary)] text-sm font-bold mb-4`}>
-                          {config.icon}
-                          {config.text}
-                        </div>
+                    <Card className={`border-[var(--border)] bg-[var(--surface)] ${
+                      webinar.status === 'ao_vivo'
+                        ? 'border-[var(--accent-alert)]/50 shadow-2xl'
+                        : ''
+                    }`}>
+                      <CardContent className="p-8">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            {/* STATUS BADGE */}
+                            <Badge variant="outline" className={`inline-flex items-center gap-2 px-4 py-2 mb-4 ${
+                              webinar.status === 'ao_vivo' ? 'bg-[var(--accent-alert)]/10 text-[var(--accent-alert)]' :
+                              webinar.status === 'agendado' ? 'bg-[var(--accent-sky)]/10 text-[var(--accent-sky)]' :
+                              webinar.status === 'gravado' ? 'bg-[var(--accent-purple)]/10 text-[var(--accent-purple)]' :
+                              'bg-[var(--text-secondary)]/10 text-[var(--text-secondary)]'
+                            }`}>
+                              {config.icon}
+                              {config.text}
+                            </Badge>
 
-                        <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{webinar.titulo}</h3>
-                        <p className="text-gray-400 mb-4">{webinar.descricao}</p>
+                            <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{webinar.titulo}</h3>
+                            <p className="text-[var(--text-secondary)] mb-4">{webinar.descricao}</p>
 
-                        <div className="flex items-center gap-6 text-gray-400">
-                          <span>Por {webinar.apresentador}</span>
-                          <span>•</span>
-                          <span>{webinar.data_hora ? format(new Date(webinar.data_hora), "dd MMM 'às' HH:mm", { locale: ptBR }) : '-'}</span>
-                          <span>•</span>
-                          <span>{webinar.duracao} min</span>
-                        </div>
-                      </div>
-
-                      <div className="text-right space-y-4">
-                        <div className="bg-white/10 rounded-2xl p-4">
-                          <p className="text-3xl font-black text-[var(--text-primary)]">{webinar.inscritos}</p>
-                          <p className="text-gray-400 text-sm">Inscritos</p>
-                        </div>
-                        {(webinar.status === 'encerrado' || webinar.status === 'gravado') && (
-                          <>
-                            <div className="bg-green-500/20 rounded-2xl p-4">
-                              <p className="text-2xl font-bold text-green-400">{webinar.participantes}</p>
-                              <p className="text-gray-400 text-sm">Participaram</p>
+                            <div className="flex items-center gap-6 text-[var(--text-secondary)]">
+                              <span>Por {webinar.apresentador}</span>
+                              <span>•</span>
+                              <span>{webinar.data_hora ? format(new Date(webinar.data_hora), "dd MMM 'às' HH:mm", { locale: ptBR }) : '-'}</span>
+                              <span>•</span>
+                              <span>{webinar.duracao} min</span>
                             </div>
-                            {webinar.replay_views > 0 && (
-                              <div className="bg-purple-500/20 rounded-2xl p-4">
-                                <p className="text-2xl font-bold text-purple-400">{webinar.replay_views}</p>
-                                <p className="text-gray-400 text-sm">Views Replay</p>
-                              </div>
+                          </div>
+
+                          <div className="text-right space-y-4">
+                            <Card className="bg-[var(--surface-strong)] border-[var(--border)]">
+                              <CardContent className="p-4">
+                                <p className="text-3xl font-black text-[var(--text-primary)]">{webinar.inscritos}</p>
+                                <p className="text-[var(--text-secondary)] text-sm">Inscritos</p>
+                              </CardContent>
+                            </Card>
+                            {(webinar.status === 'encerrado' || webinar.status === 'gravado') && (
+                              <>
+                                <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/20">
+                                  <CardContent className="p-4">
+                                    <p className="text-2xl font-bold text-[var(--accent-emerald)]">{webinar.participantes}</p>
+                                    <p className="text-[var(--text-secondary)] text-sm">Participaram</p>
+                                  </CardContent>
+                                </Card>
+                                {webinar.replay_views > 0 && (
+                                  <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/20">
+                                    <CardContent className="p-4">
+                                      <p className="text-2xl font-bold text-[var(--accent-purple)]">{webinar.replay_views}</p>
+                                      <p className="text-[var(--text-secondary)] text-sm">Views Replay</p>
+                                    </CardContent>
+                                  </Card>
+                                )}
+                              </>
                             )}
-                          </>
-                        )}
-                      </div>
-                    </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </motion.div>
                 );
               })}
@@ -242,13 +288,17 @@ export default function WebinarsPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-red-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-red-300 max-w-4xl mx-auto">
-            "Um webinar bem executado vale mais que 100 posts. É autoridade instantânea."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Produtor de Eventos
-          </p>
+          <Card className="border-0 bg-transparent max-w-4xl mx-auto">
+            <CardContent className="text-center">
+              <SparklesIcon className="w-32 h-32 text-[var(--accent-alert)] mx-auto mb-8 animate-pulse" />
+              <p className="text-5xl font-light text-[var(--accent-alert)] max-w-4xl mx-auto">
+                "Um webinar bem executado vale mais que 100 posts. É autoridade instantânea."
+              </p>
+              <p className="text-3xl text-[var(--text-secondary)] mt-8">
+                — Citizen Supremo X.1, seu Produtor de Eventos
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
   );
