@@ -3,6 +3,7 @@
 // Totalmente integrada ao layout global (HeaderSupremo + SidebarSupremo + Tema Dinâmico)
 // Sem layout duplicado • 100% variáveis de tema • Realtime seguro • Performance elite
 // Boss HP, Legiões, Kill Feed, Confetti, Shake, Flash — tudo funcionando e épico
+// ✅ MIGRADO PARA CSS VARIABLES
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
@@ -56,17 +57,17 @@ const BossHUD: React.FC<{ current: number; max: number; shakeControls: any }> = 
           <motion.div
             animate={isEnraged ? { scale: [1, 1.1, 1] } : {}}
             transition={{ duration: 0.5, repeat: isEnraged ? Infinity : 0 }}
-            className={`p-4 rounded-2xl border-4 ${isEnraged ? 'bg-red-900/50 border-red-500/70' : 'bg-[var(--surface)]/50 border-[var(--border)]'}`}
+            className={`p-4 rounded-2xl border-4 ${isEnraged ? 'bg-[var(--accent-alert)]/50 border-[var(--accent-alert)]/70' : 'bg-[var(--surface)]/50 border-[var(--border)]'}`}
           >
-            {isDead ? <Trophy className="w-12 h-12 text-[var(--accent-1)]" /> : <Skull className={`w-12 h-12 ${isEnraged ? 'text-red-500' : 'text-[var(--text)]'}`} />}
+            {isDead ? <Trophy className="w-12 h-12 text-[var(--accent-1)]" /> : <Skull className={`w-12 h-12 ${isEnraged ? 'text-[var(--accent-alert)]' : 'text-[var(--text)]'}`} />}
           </motion.div>
           <div>
             <h2 className="text-5xl font-black text-[var(--text)] uppercase tracking-widest">
               {isDead ? "BOSS ELIMINADO" : ARENA_CONFIG.BOSS_NAME}
             </h2>
             <div className="flex items-center gap-3">
-              {isEnraged && !isDead && <span className="px-3 py-1 bg-red-600/70 text-[var(--text)] text-xs font-bold uppercase rounded animate-pulse">ENRAGED</span>}
-              <p className={`font-mono text-xl ${isEnraged ? 'text-red-400' : 'text-[var(--text)]/70'}`}>
+              {isEnraged && !isDead && <span className="px-3 py-1 bg-[var(--accent-alert)]/70 text-[var(--text)] text-xs font-bold uppercase rounded animate-pulse">ENRAGED</span>}
+              <p className={`font-mono text-xl ${isEnraged ? 'text-[var(--accent-alert)]' : 'text-[var(--text)]/70'}`}>
                 {hpLeft.toLocaleString('pt-BR')} HP RESTANTES
               </p>
             </div>
@@ -87,7 +88,7 @@ const BossHUD: React.FC<{ current: number; max: number; shakeControls: any }> = 
           initial={{ width: 0 }}
           animate={{ width: `${percent}%` }}
           transition={{ type: 'spring', damping: 20, stiffness: 60 }}
-          className={`absolute inset-0 bg-gradient-to-r ${isDead ? 'from-emerald-600 to-teal-600' : 'from-red-900 via-red-600 to-orange-500'}`}
+          className={`absolute inset-0 bg-gradient-to-r ${isDead ? 'from-[var(--accent-emerald)] to-[var(--accent-sky)]' : 'from-[var(--accent-alert)] via-[var(--accent-alert)] to-[var(--accent-warning)]'}`}
         >
           <motion.div
             animate={{ x: [-1000, 2000] }}
@@ -130,7 +131,7 @@ const LegionCard = ({ legion, rank }: { legion: Legion; rank: number }) => {
         <h3 className="text-4xl font-black text-[var(--text)]">{legion.name}</h3>
         <div className="mt-4">
           <span className="text-lg text-[var(--text)]/60">DANO TOTAL</span>
-          <p className={`text-5xl font-black ${isLeader ? 'text-[var(--accent-1)]' : 'text-emerald-400'}`}>
+            <p className={`text-5xl font-black ${isLeader ? 'text-[var(--accent-1)]' : 'text-[var(--accent-emerald)]'}`}>
             {(legion.total_damage / 1000).toFixed(0)}k
           </p>
         </div>
@@ -155,7 +156,7 @@ const LegionCard = ({ legion, rank }: { legion: Legion; rank: number }) => {
         })}
       </div>
 
-      {isRaging && <div className="absolute inset-0 bg-red-600/20 animate-pulse pointer-events-none" />}
+      {isRaging && <div className="absolute inset-0 bg-[var(--accent-alert)]/20 animate-pulse pointer-events-none" />}
     </motion.div>
   );
 };
@@ -168,13 +169,13 @@ const KillFeed = ({ events }: { events: KillEvent[] }) => (
       ) : (
         events.map(ev => (
           <div key={ev.id} className="flex items-center gap-4">
-            <Skull className={`w-8 h-8 ${ev.type === 'CRITICAL' ? 'text-red-500 animate-pulse' : 'text-emerald-500'}`} />
+            <Skull className={`w-8 h-8 ${ev.type === 'CRITICAL' ? 'text-[var(--accent-alert)] animate-pulse' : 'text-[var(--accent-emerald)]'}`} />
             <div>
               <span className="text-2xl font-black text-[var(--text)]">{ev.warrior}</span>
               <span className="text-sm text-[var(--text)]/50 ml-2">
                 {Math.floor((Date.now() - ev.timestamp) / 1000)}s atrás
               </span>
-              <p className={`text-lg font-bold ${ev.type === 'CRITICAL' ? 'text-red-400' : 'text-emerald-400'}`}>
+              <p className={`text-lg font-bold ${ev.type === 'CRITICAL' ? 'text-[var(--accent-alert)]' : 'text-[var(--accent-emerald)]'}`}>
                 CAUSOU R$ {ev.damage.toLocaleString('pt-BR')} {ev.type === 'CRITICAL' && '🔥'}
               </p>
             </div>
@@ -311,7 +312,7 @@ export default function WarArena() {
     return (
       <div className="flex-1 flex items-center justify-center bg-[var(--background)]">
         <div className="text-center">
-          <Skull className="w-24 h-24 text-red-600 animate-pulse mx-auto mb-8" />
+          <Skull className="w-24 h-24 text-[var(--accent-alert)] animate-pulse mx-auto mb-8" />
           <p className="text-4xl font-black text-[var(--text)]">SUMMONING THE BOSS...</p>
         </div>
       </div>

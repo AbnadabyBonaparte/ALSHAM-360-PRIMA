@@ -2,6 +2,7 @@
 // ALSHAM ETERNAL VAULT — VERSÃO CANÔNICA 1000/1000
 // Totalmente integrada ao layout global (HeaderSupremo + SidebarSupremo + Tema Dinâmico)
 // Sem layout duplicado • 100% variáveis de tema • Realtime • Modal elegante • Proporções perfeitas
+// ✅ MIGRADO PARA CSS VARIABLES
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,11 +27,11 @@ interface NFT {
 }
 
 const RARITY_CONFIG = {
-  common: { gradient: 'from-gray-500 to-gray-700', badge: 'text-gray-400', glow: 'shadow-gray-500/30' },
-  rare: { gradient: 'from-blue-500 to-cyan-600', badge: 'text-cyan-300', glow: 'shadow-cyan-500/40' },
-  epic: { gradient: 'from-purple-500 to-pink-600', badge: 'text-purple-300', glow: 'shadow-purple-500/50' },
-  legendary: { gradient: 'from-amber-500 to-yellow-600', badge: 'text-amber-300', glow: 'shadow-amber-500/60' },
-  divine: { gradient: 'from-red-500 via-orange-500 to-yellow-600', badge: 'text-red-400', glow: 'shadow-red-600/80' }
+  common: { gradient: 'from-[var(--text-secondary)] to-[var(--text-secondary)]', badge: 'text-[var(--text-secondary)]', glow: 'shadow-[var(--text-secondary)]/30' },
+  rare: { gradient: 'from-[var(--accent-sky)] to-[var(--accent-sky)]', badge: 'text-[var(--accent-sky)]', glow: 'shadow-[var(--accent-sky)]/40' },
+  epic: { gradient: 'from-[var(--accent-purple)] to-[var(--accent-pink)]', badge: 'text-[var(--accent-purple)]', glow: 'shadow-[var(--accent-purple)]/50' },
+  legendary: { gradient: 'from-[var(--accent-warning)] to-[var(--accent-warning)]', badge: 'text-[var(--accent-warning)]', glow: 'shadow-[var(--accent-warning)]/60' },
+  divine: { gradient: 'from-[var(--accent-alert)] via-[var(--accent-warning)] to-[var(--accent-warning)]', badge: 'text-[var(--accent-alert)]', glow: 'shadow-[var(--accent-alert)]/80' }
 };
 
 export default function EternalVault() {
@@ -146,8 +147,8 @@ export default function EternalVault() {
                     />
 
                     <div className="relative bg-[var(--surface)]/70 backdrop-blur-xl rounded-3xl border-2 border-[var(--border)] p-6 overflow-hidden">
-                      {nft.rarity === 'divine' && <Crown className="absolute top-4 right-4 h-10 w-10 text-red-400" />}
-                      {nft.rarity === 'legendary' && <Trophy className="absolute top-4 right-4 h-8 w-8 text-amber-400" />}
+                      {nft.rarity === 'divine' && <Crown className="absolute top-4 right-4 h-10 w-10 text-[var(--accent-alert)]" />}
+                      {nft.rarity === 'legendary' && <Trophy className="absolute top-4 right-4 h-8 w-8 text-[var(--accent-warning)]" />}
 
                       <div className="aspect-square rounded-2xl overflow-hidden mb-6 border border-[var(--border)]">
                         {nft.image_url ? (
