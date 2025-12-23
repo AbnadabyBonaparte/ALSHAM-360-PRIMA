@@ -1,7 +1,6 @@
 // src/pages/Events.tsx
 // ALSHAM 360° PRIMA v10 SUPREMO — Eventos Alienígenas 1000/1000
-// Cada evento é uma experiência inesquecível. Conexões que transformam negócios.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// 100% CSS Variables + shadcn/ui
 
 import {
   CalendarDaysIcon,
@@ -14,10 +13,13 @@ import {
   GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
-import { format, isPast, isFuture } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 interface Event {
   id: string;
@@ -100,184 +102,186 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      
-        <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-violet-500 rounded-full"
-          />
-          <p className="absolute text-4xl text-violet-400 font-light">Organizando eventos...</p>
-        </div>
-      
+      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full"
+        />
+        <p className="absolute text-4xl text-[var(--accent-purple)] font-light">Organizando eventos...</p>
+      </div>
     );
   }
 
   const tipoIcon = (tipo: string) => {
     switch (tipo) {
-      case 'online': return <GlobeAltIcon className="w-6 h-6 text-blue-400" />;
-      case 'hibrido': return <StarIcon className="w-6 h-6 text-purple-400" />;
-      default: return <MapPinIcon className="w-6 h-6 text-green-400" />;
+      case 'online': return <GlobeAltIcon className="w-6 h-6 text-[var(--accent-sky)]" />;
+      case 'hibrido': return <StarIcon className="w-6 h-6 text-[var(--accent-purple)]" />;
+      default: return <MapPinIcon className="w-6 h-6 text-[var(--accent-emerald)]" />;
     }
   };
 
   return (
-    
-      <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
-        {/* HEADER ÉPICO */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
-            EVENTOS SUPREMOS
-          </h1>
-          <p className="text-3xl text-gray-400 mt-6">
-            Cada evento é uma experiência inesquecível
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text)] p-8">
+      {/* HEADER ÉPICO */}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-16"
+      >
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent">
+          EVENTOS SUPREMOS
+        </h1>
+        <p className="text-3xl text-[var(--text-secondary)] mt-6">
+          Cada evento é uma experiência inesquecível
+        </p>
+      </motion.div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 rounded-2xl p-6 border border-violet-500/30">
-            <CalendarDaysIcon className="w-12 h-12 text-violet-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalEventos || 0}</p>
-            <p className="text-gray-400">Total Eventos</p>
-          </motion.div>
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
+        <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30">
+          <CardContent className="p-6">
+            <CalendarDaysIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalEventos || 0}</p>
+            <p className="text-[var(--text-secondary)]">Total Eventos</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-2xl p-6 border border-blue-500/30">
-            <ClockIcon className="w-12 h-12 text-blue-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.proximos || 0}</p>
-            <p className="text-gray-400">Próximos</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
+          <CardContent className="p-6">
+            <ClockIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{metrics?.proximos || 0}</p>
+            <p className="text-[var(--text-secondary)]">Próximos</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
-            <UserGroupIcon className="w-12 h-12 text-pink-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
-            <p className="text-gray-400">Total Inscritos</p>
-          </motion.div>
+        <Card className="bg-[var(--accent-pink)]/10 border-[var(--accent-pink)]/30">
+          <CardContent className="p-6">
+            <UserGroupIcon className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
+            <p className="text-[var(--text-secondary)]">Total Inscritos</p>
+          </CardContent>
+        </Card>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <TicketIcon className="w-12 h-12 text-green-400 mb-3" />
-            <p className="text-4xl font-black text-[var(--text-primary)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
-            <p className="text-gray-400">Receita Total</p>
-          </motion.div>
-        </div>
+        <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
+          <CardContent className="p-6">
+            <TicketIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <p className="text-4xl font-black text-[var(--text)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
+            <p className="text-[var(--text-secondary)]">Receita Total</p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* LISTA DE EVENTOS */}
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
-            Calendário de Eventos
-          </h2>
+      {/* LISTA DE EVENTOS */}
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent">
+          Calendário de Eventos
+        </h2>
 
-          {metrics?.eventos.length === 0 ? (
-            <div className="text-center py-20">
-              <CalendarDaysIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhum evento cadastrado</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {metrics?.eventos.map((evento, i) => (
-                <motion.div
-                  key={evento.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                  className={`rounded-3xl overflow-hidden border backdrop-blur-xl ${
-                    evento.status === 'em_andamento'
-                      ? 'bg-gradient-to-br from-violet-900/60 to-purple-900/60 border-violet-500/50 shadow-2xl shadow-violet-500/20'
-                      : evento.status === 'cancelado'
-                      ? 'bg-gradient-to-br from-gray-900/60 to-gray-800/60 border-gray-500/30 opacity-60'
-                      : 'bg-gradient-to-br from-white/5 to-white/10 border-[var(--border)]'
-                  }`}
-                >
+        {metrics?.eventos.length === 0 ? (
+          <div className="text-center py-20">
+            <CalendarDaysIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <p className="text-3xl text-[var(--text-secondary)]">Nenhum evento cadastrado</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {metrics?.eventos.map((evento, i) => (
+              <motion.div
+                key={evento.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <Card className={`overflow-hidden backdrop-blur-xl ${
+                  evento.status === 'em_andamento'
+                    ? 'bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/50 shadow-2xl shadow-[var(--accent-purple)]/20'
+                    : evento.status === 'cancelado'
+                    ? 'bg-[var(--surface)]/30 border-[var(--border)] opacity-60'
+                    : 'bg-[var(--surface)]/60 border-[var(--border)]'
+                }`}>
                   {/* HEADER DO EVENTO */}
-                  <div className="p-6 border-b border-[var(--border)]">
+                  <CardHeader className="border-b border-[var(--border)] pb-4">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-sm">
+                      <div className="flex items-center gap-2 px-3 py-1 bg-[var(--surface)]/50 rounded-full text-sm">
                         {tipoIcon(evento.tipo)}
-                        <span className="capitalize">{evento.tipo}</span>
+                        <span className="capitalize text-[var(--text-secondary)]">{evento.tipo}</span>
                       </div>
-                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        evento.status === 'agendado' ? 'bg-blue-500/20 text-blue-400' :
-                        evento.status === 'em_andamento' ? 'bg-green-500/20 text-green-400' :
-                        evento.status === 'encerrado' ? 'bg-gray-500/20 text-gray-400' :
-                        'bg-red-500/20 text-red-400'
-                      }`}>
+                      <Badge variant={
+                        evento.status === 'agendado' ? 'secondary' :
+                        evento.status === 'em_andamento' ? 'default' :
+                        evento.status === 'encerrado' ? 'outline' :
+                        'destructive'
+                      }>
                         {evento.status.replace('_', ' ')}
-                      </div>
+                      </Badge>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{evento.nome}</h3>
-                    <p className="text-gray-400 text-sm line-clamp-2">{evento.descricao}</p>
-                  </div>
+                    <h3 className="text-2xl font-bold text-[var(--text)] mb-2">{evento.nome}</h3>
+                    <p className="text-[var(--text-secondary)] text-sm line-clamp-2">{evento.descricao}</p>
+                  </CardHeader>
 
                   {/* DETALHES */}
-                  <div className="p-6 space-y-4">
-                    <div className="flex items-center gap-3 text-gray-400">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center gap-3 text-[var(--text-secondary)]">
                       <CalendarDaysIcon className="w-5 h-5" />
                       <span>
                         {evento.data_inicio ? format(new Date(evento.data_inicio), "dd MMM yyyy 'às' HH:mm", { locale: ptBR }) : '-'}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3 text-gray-400">
+                    <div className="flex items-center gap-3 text-[var(--text-secondary)]">
                       <MapPinIcon className="w-5 h-5" />
                       <span>{evento.local || 'Local a definir'}</span>
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
                       <div>
-                        <p className="text-2xl font-bold text-[var(--text-primary)]">{evento.inscritos}/{evento.capacidade}</p>
-                        <p className="text-gray-500 text-sm">Inscritos</p>
+                        <p className="text-2xl font-bold text-[var(--text)]">{evento.inscritos}/{evento.capacidade}</p>
+                        <p className="text-[var(--text-secondary)] text-sm">Inscritos</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-green-400">
+                        <p className="text-2xl font-bold text-[var(--accent-emerald)]">
                           {evento.valor_ingresso > 0 ? `R$ ${evento.valor_ingresso}` : 'Gratuito'}
                         </p>
-                        <p className="text-gray-500 text-sm">Ingresso</p>
+                        <p className="text-[var(--text-secondary)] text-sm">Ingresso</p>
                       </div>
                     </div>
 
                     {/* BARRA DE OCUPAÇÃO */}
                     <div>
-                      <div className="flex justify-between text-sm text-gray-400 mb-1">
+                      <div className="flex justify-between text-sm text-[var(--text-secondary)] mb-1">
                         <span>Ocupação</span>
                         <span>{evento.capacidade > 0 ? ((evento.inscritos / evento.capacidade) * 100).toFixed(0) : 0}%</span>
                       </div>
-                      <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${evento.capacidade > 0 ? (evento.inscritos / evento.capacidade) * 100 : 0}%` }}
-                          className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
-                        />
-                      </div>
+                      <Progress 
+                        value={evento.capacidade > 0 ? (evento.inscritos / evento.capacidade) * 100 : 0}
+                        className="h-2"
+                      />
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* MENSAGEM FINAL DA IA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center py-24 mt-16"
-        >
-          <SparklesIcon className="w-32 h-32 text-violet-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-violet-300 max-w-4xl mx-auto">
-            "Eventos não são apenas reuniões. São momentos onde impérios nascem."
-          </p>
-          <p className="text-3xl text-gray-500 mt-8">
-            — Citizen Supremo X.1, seu Mestre de Cerimônias
-          </p>
-        </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
-    
+
+      {/* MENSAGEM FINAL DA IA */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="text-center py-24 mt-16"
+      >
+        <SparklesIcon className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
+        <p className="text-5xl font-light text-[var(--accent-purple)] max-w-4xl mx-auto">
+          "Eventos não são apenas reuniões. São momentos onde impérios nascem."
+        </p>
+        <p className="text-3xl text-[var(--text-secondary)] mt-8">
+          — Citizen Supremo X.1, seu Mestre de Cerimônias
+        </p>
+      </motion.div>
+    </div>
   );
 }

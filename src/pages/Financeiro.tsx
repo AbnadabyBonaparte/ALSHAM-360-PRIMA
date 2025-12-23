@@ -1,6 +1,7 @@
 // src/pages/Financeiro.tsx
 // ALSHAM QUANTUM TREASURY — VERSÃO CANÔNICA 1000/1000
 // Totalmente integrada ao layout global • 100% variáveis de tema • Métricas vivas • Runway simulator
+// ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -12,6 +13,10 @@ import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '@/hooks/useTheme';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Slider } from '@/components/ui/slider';
 
 interface FinancialRecord {
   id: string;
@@ -49,23 +54,24 @@ const StatCard = ({
   trend?: number;
   accent?: string;
 }) => (
-  <motion.div
-    whileHover={{ scale: 1.05, y: -8 }}
-    className="relative bg-[var(--surface)]/70 backdrop-blur-xl rounded-3xl border border-[var(--border)] p-8 overflow-hidden"
-  >
-    <div className={`absolute inset-0 bg-gradient-to-br from-[var(--${accent})]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
-    <p className="text-sm font-black uppercase tracking-widest text-[var(--text)]/50 mb-4">{title}</p>
-    <div className="flex items-end justify-between">
-      <h3 className={`text-5xl font-black text-[var(--${accent})]`}>
-        R$ {value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
-      </h3>
-      {trend !== undefined && (
-        <div className={`flex items-center gap-2 text-xl font-black ${trend > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-          {trend > 0 ? <TrendingUp className="w-8 h-8" /> : <TrendingDown className="w-8 h-8" />}
-          {Math.abs(trend)}%
+  <motion.div whileHover={{ scale: 1.05, y: -8 }}>
+    <Card className="relative bg-[var(--surface)]/70 backdrop-blur-xl border-[var(--border)] overflow-hidden">
+      <CardContent className="p-8">
+        <div className={`absolute inset-0 bg-gradient-to-br from-[var(--${accent})]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
+        <p className="text-sm font-black uppercase tracking-widest text-[var(--text)]/50 mb-4">{title}</p>
+        <div className="flex items-end justify-between">
+          <h3 className={`text-5xl font-black text-[var(--${accent})]`}>
+            R$ {value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+          </h3>
+          {trend !== undefined && (
+            <div className={`flex items-center gap-2 text-xl font-black ${trend > 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-alert)]'}`}>
+              {trend > 0 ? <TrendingUp className="w-8 h-8" /> : <TrendingDown className="w-8 h-8" />}
+              {Math.abs(trend)}%
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   </motion.div>
 );
 
@@ -74,7 +80,7 @@ export default function Financeiro() {
   const themeColors = getThemeColors();
   const [transactions, setTransactions] = useState<FinancialRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [simulationDrop, setSimulationDrop] = useState(0);
+  const [simulationDrop, setSimulationDrop] = useState([0]);
 
   useEffect(() => {
     const load = async () => {
@@ -117,7 +123,7 @@ export default function Financeiro() {
     const recent = transactions.filter(t => new Date(t.date) >= last30Days);
     const totalIncome = recent.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
     const totalExpense = recent.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
-    const simulatedIncome = totalIncome * (1 - simulationDrop / 100);
+    const simulatedIncome = totalIncome * (1 - simulationDrop[0] / 100);
     const cashReserve = totalIncome * 10; // Mock para simulação
     const runway = totalExpense > 0 ? cashReserve / totalExpense : 999;
 
@@ -164,34 +170,32 @@ export default function Financeiro() {
                 </p>
               </div>
               <div className="pb-2">
-                <TrendingUp className="w-12 h-12 text-emerald-400" />
-                <p className="text-2xl text-emerald-400">+12% vs mês anterior</p>
+                <TrendingUp className="w-12 h-12 text-[var(--accent-emerald)]" />
+                <p className="text-2xl text-[var(--accent-emerald)]">+12% vs mês anterior</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[var(--surface)]/70 backdrop-blur-xl border border-[var(--border)] rounded-3xl p-10 w-full max-w-xl">
-            <div className="flex justify-between items-center mb-8">
-              <p className="text-lg font-black uppercase tracking-widest text-[var(--text)]/60">RUNWAY SIMULATOR</p>
-              <span className={`text-5xl font-black ${metrics.runway < 6 ? 'text-red-400' : 'text-emerald-400'}`}>
-                {metrics.runway.toFixed(1)} meses
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="50"
-              value={simulationDrop}
-              onChange={e => setSimulationDrop(Number(e.target.value))}
-              className="w-full h-4 rounded-full appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, var(--accent-1) ${(100 - simulationDrop * 2)}%, var(--accent-alert) ${(100 - simulationDrop * 2)}%)`
-              }}
-            />
-            <p className="text-center text-[var(--text)] mt-4 text-xl">
-              Queda simulada: <span className="text-4xl font-black">{simulationDrop}%</span>
-            </p>
-          </div>
+          <Card className="bg-[var(--surface)]/70 backdrop-blur-xl border-[var(--border)] w-full max-w-xl">
+            <CardContent className="p-10">
+              <div className="flex justify-between items-center mb-8">
+                <p className="text-lg font-black uppercase tracking-widest text-[var(--text)]/60">RUNWAY SIMULATOR</p>
+                <span className={`text-5xl font-black ${metrics.runway < 6 ? 'text-[var(--accent-alert)]' : 'text-[var(--accent-emerald)]'}`}>
+                  {metrics.runway.toFixed(1)} meses
+                </span>
+              </div>
+              <Slider
+                value={simulationDrop}
+                onValueChange={setSimulationDrop}
+                max={50}
+                step={1}
+                className="w-full"
+              />
+              <p className="text-center text-[var(--text)] mt-4 text-xl">
+                Queda simulada: <span className="text-4xl font-black">{simulationDrop[0]}%</span>
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
@@ -208,74 +212,74 @@ export default function Financeiro() {
 
           {/* CHARTS + INSIGHTS */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2 bg-[var(--surface)]/70 backdrop-blur-xl rounded-3xl border border-[var(--border)] p-12">
-              <h3 className="text-4xl font-black text-[var(--text)] mb-12">FLUXO DE CAIXA — 12 MESES</h3>
-              <ResponsiveContainer width="100%" height={500}>
-                <AreaChart data={metrics.monthlyData}>
-                  <defs>
-                    <linearGradient id="inc" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--accent-1)" stopOpacity={0.6}/>
-                      <stop offset="95%" stopColor="var(--accent-1)" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="exp" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--accent-alert)" stopOpacity={0.6}/>
-                      <stop offset="95%" stopColor="var(--accent-alert)" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" stroke="var(--text)" tick={{ fill: 'var(--text)' }} />
-                  <YAxis stroke="var(--text)" tick={{ fill: 'var(--text)' }} tickFormatter={v => `R$${v/1000}k`} />
-                  <Tooltip
-                    contentStyle={{ background: 'var(--background)', border: '1px solid var(--border)', borderRadius: '16px' }}
-                    labelStyle={{ color: 'var(--text)' }}
-                  />
-                  <Area type="monotone" dataKey="income" stroke="var(--accent-1)" strokeWidth={4} fill="url(#inc)" />
-                  <Area type="monotone" dataKey="expense" stroke="var(--accent-alert)" strokeWidth={4} fill="url(#exp)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            <Card className="lg:col-span-2 bg-[var(--surface)]/70 backdrop-blur-xl border-[var(--border)]">
+              <CardContent className="p-12">
+                <h3 className="text-4xl font-black text-[var(--text)] mb-12">FLUXO DE CAIXA — 12 MESES</h3>
+                <ResponsiveContainer width="100%" height={500}>
+                  <AreaChart data={metrics.monthlyData}>
+                    <defs>
+                      <linearGradient id="inc" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--accent-1)" stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor="var(--accent-1)" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="exp" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--accent-alert)" stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor="var(--accent-alert)" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" stroke="var(--text)" tick={{ fill: 'var(--text)' }} />
+                    <YAxis stroke="var(--text)" tick={{ fill: 'var(--text)' }} tickFormatter={v => `R$${v/1000}k`} />
+                    <Tooltip
+                      contentStyle={{ background: 'var(--background)', border: '1px solid var(--border)', borderRadius: '16px' }}
+                      labelStyle={{ color: 'var(--text)' }}
+                    />
+                    <Area type="monotone" dataKey="income" stroke="var(--accent-1)" strokeWidth={4} fill="url(#inc)" />
+                    <Area type="monotone" dataKey="expense" stroke="var(--accent-alert)" strokeWidth={4} fill="url(#exp)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
             <div className="space-y-12">
-              <div className="bg-[var(--surface)]/70 backdrop-blur-xl border border-[var(--border)] rounded-3xl p-10">
-                <div className="flex items-center gap-6 mb-8">
-                  <div className="p-5 bg-[var(--accent-alert)]/30 rounded-2xl">
-                    <AlertTriangle className="w-12 h-12 text-[var(--accent-alert)]" />
+              <Card className="bg-[var(--surface)]/70 backdrop-blur-xl border-[var(--border)]">
+                <CardContent className="p-10">
+                  <div className="flex items-center gap-6 mb-8">
+                    <div className="p-5 bg-[var(--accent-alert)]/30 rounded-2xl">
+                      <AlertTriangle className="w-12 h-12 text-[var(--accent-alert)]" />
+                    </div>
+                    <div>
+                      <h4 className="text-3xl font-black text-[var(--accent-alert)]">ANOMALIA CRÍTICA</h4>
+                      <p className="text-sm text-[var(--text)]/60">Detectada pela IA em tempo real</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-3xl font-black text-[var(--accent-alert)]">ANOMALIA CRÍTICA</h4>
-                    <p className="text-sm text-[var(--text)]/60">Detectada pela IA em tempo real</p>
-                  </div>
-                </div>
-                <p className="text-xl text-[var(--text)] leading-relaxed">
-                  Infraestrutura em nuvem subiu <span className="text-[var(--accent-alert)] text-5xl font-black">47%</span> em 72h.
-                </p>
-                <button className="mt-8 w-full py-6 bg-[var(--accent-alert)]/70 hover:bg-[var(--accent-alert)] text-[var(--background)] text-xl font-black rounded-2xl transition-all hover:scale-105">
-                  Iniciar Investigação Automática
-                </button>
-              </div>
+                  <p className="text-xl text-[var(--text)] leading-relaxed">
+                    Infraestrutura em nuvem subiu <span className="text-[var(--accent-alert)] text-5xl font-black">47%</span> em 72h.
+                  </p>
+                  <Button className="mt-8 w-full py-6 bg-[var(--accent-alert)]/70 hover:bg-[var(--accent-alert)] text-[var(--background)] text-xl font-black rounded-2xl transition-all hover:scale-105">
+                    Iniciar Investigação Automática
+                  </Button>
+                </CardContent>
+              </Card>
 
-              <div className="bg-[var(--surface)]/70 backdrop-blur-xl border border-[var(--border)] rounded-3xl p-10">
-                <h4 className="text-2xl font-black text-[var(--text)] mb-10">DISTRIBUIÇÃO DE GASTOS</h4>
-                {[
-                  { label: 'Marketing', val: 48, accent: 'accent-1' },
-                  { label: 'Equipe', val: 28, accent: 'accent-2' },
-                  { label: 'Infra & AI', val: 18, accent: 'accent-1' },
-                  { label: 'Outros', val: 6, accent: 'accent-2' }
-                ].map(item => (
-                  <div key={item.label} className="mb-8 last:mb-0">
-                    <div className="flex justify-between text-sm mb-3">
-                      <span className="text-[var(--text)]/70 font-bold">{item.label}</span>
-                      <span className="font-black text-[var(--text)] text-2xl">{item.val}%</span>
+              <Card className="bg-[var(--surface)]/70 backdrop-blur-xl border-[var(--border)]">
+                <CardContent className="p-10">
+                  <h4 className="text-2xl font-black text-[var(--text)] mb-10">DISTRIBUIÇÃO DE GASTOS</h4>
+                  {[
+                    { label: 'Marketing', val: 48, accent: 'accent-1' },
+                    { label: 'Equipe', val: 28, accent: 'accent-2' },
+                    { label: 'Infra & AI', val: 18, accent: 'accent-1' },
+                    { label: 'Outros', val: 6, accent: 'accent-2' }
+                  ].map(item => (
+                    <div key={item.label} className="mb-8 last:mb-0">
+                      <div className="flex justify-between text-sm mb-3">
+                        <span className="text-[var(--text)]/70 font-bold">{item.label}</span>
+                        <span className="font-black text-[var(--text)] text-2xl">{item.val}%</span>
+                      </div>
+                      <Progress value={item.val} className="h-4" />
                     </div>
-                    <div className="h-4 bg-[var(--background)]/50 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${item.val}%` }}
-                        className={`h-full bg-gradient-to-r from-[var(--${item.accent})] to-[var(--${item.accent})]/60 rounded-full`}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
