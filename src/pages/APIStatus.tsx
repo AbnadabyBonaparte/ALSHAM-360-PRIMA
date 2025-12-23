@@ -2,6 +2,7 @@
 // ALSHAM 360° PRIMA — API Status
 // CANÔNICO • TOKEN-FIRST • MULTI-TENANT READY • SAFE-UI (sem Sidebar/Layout aqui)
 // Importante: NÃO renderiza LayoutSupremo aqui. O shell é responsabilidade do ProtectedLayout.
+// ✅ MIGRADO PARA CSS VARIABLES (componentes complexos customizados mantidos)
 
 import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense, lazy } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'

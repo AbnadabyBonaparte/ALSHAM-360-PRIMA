@@ -2,6 +2,7 @@
 // ALSHAM 360° PRIMA — Achievements
 // CANÔNICO • TOKEN-FIRST • SAFE-UI (sem Sidebar/Layout aqui)
 // Importante: NÃO renderiza LayoutSupremo aqui. O shell é responsabilidade do ProtectedLayout.
+// ✅ MIGRADO PARA CSS VARIABLES (componentes customizados mantidos)
 
 import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -216,7 +217,7 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
 
         <div className="w-full mt-6 md:mt-8">
           {badge.unlocked ? (
-            <div className="flex items-center justify-center gap-3 text-emerald-400">
+            <div className="flex items-center justify-center gap-3 text-[var(--accent-emerald)]">
               <CheckCircle2 className="w-8 h-8 stroke-[1.8]" aria-hidden="true" />
               <p className="text-xl md:text-2xl font-black">+{badge.xp_reward} XP</p>
             </div>
@@ -327,7 +328,7 @@ const LevelOrb = ({ rank }: { rank: UserRank }) => {
         <p className="mt-2 text-base md:text-lg text-[var(--foreground,var(--text))]/70">para o próximo nível</p>
 
         <div className="mt-5">
-          <p className="text-base md:text-lg font-semibold text-emerald-400">
+          <p className="text-base md:text-lg font-semibold text-[var(--accent-emerald)]">
             Top {rank.global_position}% global
           </p>
         </div>
@@ -391,7 +392,7 @@ export default function Achievements() {
                 <p className="text-xs md:text-sm" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 60%, transparent)' }}>
                   Desbloqueadas
                 </p>
-                <p className="text-3xl md:text-4xl font-black text-emerald-400">
+                <p className="text-3xl md:text-4xl font-black text-[var(--accent-emerald)]">
                   {unlockedCount}/{achievements.length}
                 </p>
               </div>

@@ -1,6 +1,7 @@
 // src/pages/AutomationBuilder.tsx
 // ALSHAM AUTOMATION FORGE ∞ — VERSÃO CANÔNICA 1000/1000
 // Totalmente integrada ao layout global • 100% variáveis de tema • Poder absoluto mantido
+// ✅ MIGRADO PARA CSS VARIABLES (ReactFlow mantido)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactFlow, {
@@ -72,16 +73,16 @@ const nodeTypes = {
     </div>
   ),
   condition: ({ data }: any) => (
-    <div className="px-14 py-12 rounded-3xl bg-gradient-to-br from-orange-600/60 to-red-700/60 border-4 border-orange-400 shadow-2xl backdrop-blur-2xl">
-      <Handle type="target" position={Position.Top} className="w-6 h-6 bg-orange-400" />
-      <Handle type="source" position={Position.Right} id="true" className="w-6 h-6 bg-emerald-400" />
-      <Handle type="source" position={Position.Bottom} id="false" className="w-6 h-6 bg-red-400" />
+    <div className="px-14 py-12 rounded-3xl bg-gradient-to-br from-[var(--accent-warning)]/60 to-[var(--accent-alert)]/60 border-4 border-[var(--accent-warning)] shadow-2xl backdrop-blur-2xl">
+      <Handle type="target" position={Position.Top} className="w-6 h-6 bg-[var(--accent-warning)]" />
+      <Handle type="source" position={Position.Right} id="true" className="w-6 h-6 bg-[var(--accent-emerald)]" />
+      <Handle type="source" position={Position.Bottom} id="false" className="w-6 h-6 bg-[var(--accent-alert)]" />
       <div className="text-center">
-        <GitBranch className="h-24 w-24 text-orange-300 mx-auto mb-8" />
+        <GitBranch className="h-24 w-24 text-[var(--accent-warning)] mx-auto mb-8" />
         <p className="text-4xl font-black text-[var(--text)] mb-8">{data.label}</p>
         <div className="flex justify-center gap-12">
-          <span className="px-10 py-5 rounded-2xl bg-emerald-600/60 text-emerald-300 text-2xl font-black border-2 border-emerald-400">SIM</span>
-          <span className="px-10 py-5 rounded-2xl bg-red-600/60 text-red-300 text-2xl font-black border-2 border-red-400">NÃO</span>
+          <span className="px-10 py-5 rounded-2xl bg-[var(--accent-emerald)]/60 text-[var(--accent-emerald)] text-2xl font-black border-2 border-[var(--accent-emerald)]">SIM</span>
+          <span className="px-10 py-5 rounded-2xl bg-[var(--accent-alert)]/60 text-[var(--accent-alert)] text-2xl font-black border-2 border-[var(--accent-alert)]">NÃO</span>
         </div>
       </div>
     </div>

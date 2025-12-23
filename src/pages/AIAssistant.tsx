@@ -2,6 +2,7 @@
 // ALSHAM 360° PRIMA — AI Assistant
 // CANÔNICO • TOKEN-FIRST • MULTI-TENANT READY • VOZ OPT-IN
 // Importante: NÃO renderiza LayoutSupremo aqui. O shell é responsabilidade do ProtectedLayout.
+// ✅ MIGRADO PARA CSS VARIABLES (chat interface customizada mantida)
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
