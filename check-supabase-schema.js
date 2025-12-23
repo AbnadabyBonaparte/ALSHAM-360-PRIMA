@@ -71,3 +71,9 @@ async function checkTables() {
 }
 
 checkTables().catch(console.error);
+
+
+
+
+
+

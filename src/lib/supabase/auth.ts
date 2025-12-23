@@ -72,3 +72,9 @@ export async function getUser(): Promise<User | null> {
   if (error) throw error
   return data.user
 }
+
+
+
+
+
+

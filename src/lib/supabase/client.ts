@@ -42,3 +42,9 @@ export const supabase: SupabaseClient<Database> =
 export function getSupabaseClientWithOrg() {
   return supabase
 }
+
+
+
+
+
+
