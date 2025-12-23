@@ -18,11 +18,9 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
   const { signIn, signInWithGoogle, error, clearError, isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
-
   const from = location.state?.from?.pathname || '/dashboard'
 
   // Redirect if already authenticated
@@ -36,7 +34,6 @@ export const Login: React.FC = () => {
     e.preventDefault()
     setIsLoading(true)
     clearError()
-
     try {
       await signIn(email, password)
       // Navigation will happen via useEffect when isAuthenticated becomes true
@@ -57,8 +54,11 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+      {/* Background Effects - Grid sutil + Gradientes radiais */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%238B8BFF%22%20fill-opacity%3D%220.04%22%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-900/10 via-transparent to-transparent pointer-events-none"></div>
 
       {/* Floating Orbs */}
       <motion.div
@@ -107,7 +107,6 @@ export const Login: React.FC = () => {
             >
               <Sparkles className="w-8 h-8 text-white" />
             </motion.div>
-
             <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-2">
               ALSHAM 360° PRIMA
             </h1>
@@ -116,7 +115,7 @@ export const Login: React.FC = () => {
             </p>
           </motion.div>
 
-          {/* Form */}
+          {/* Form Card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -278,8 +277,3 @@ export const Login: React.FC = () => {
     </div>
   )
 }
-
-
-
-
-
