@@ -1,6 +1,7 @@
 // src/pages/TheBoardroomOmega.tsx
 // ALSHAM OS v∞ — THE BOARDROOM Ω
 // Onde o tempo, dinheiro e destino se curvam ao Imperador.
+// ✅ MIGRADO PARA CSS VARIABLES
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -121,7 +122,7 @@ export default function TheBoardroomOmega() {
               transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
               className="inline-block mt-16"
             >
-              <Crown className="w-48 h-48 text-yellow-500" />
+              <Crown className="w-48 h-48 text-[var(--accent-warning)]" />
             </motion.div>
           </motion.div>
 
@@ -132,10 +133,10 @@ export default function TheBoardroomOmega() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="fixed top-32 left-1/2 -translate-x-1/2 z-50 bg-[var(--background)]/90 backdrop-blur-3xl border-4 border-emerald-500/50 rounded-3xl p-12 max-w-4xl text-center"
+                className="fixed top-32 left-1/2 -translate-x-1/2 z-50 bg-[var(--background)]/90 backdrop-blur-3xl border-4 border-[var(--accent-emerald)]/50 rounded-3xl p-12 max-w-4xl text-center"
               >
-                <BrainCircuit className="w-24 h-24 mx-auto mb-8 text-emerald-400 animate-pulse" />
-                <p className="text-5xl font-light text-emerald-400 italic">
+                <BrainCircuit className="w-24 h-24 mx-auto mb-8 text-[var(--accent-emerald)] animate-pulse" />
+                <p className="text-5xl font-light text-[var(--accent-emerald)] italic">
                   "{oraculumMessages[era]}"
                 </p>
                 <p className="text-2xl text-[var(--text-primary)]/60 mt-8">— ORÁCULUM</p>
@@ -195,9 +196,9 @@ export default function TheBoardroomOmega() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.2 }}
                   className={`p-12 rounded-3xl border-4 ${
-                    d.status === 'optimal' ? 'bg-emerald-900/20 border-emerald-500/50' :
-                    d.status === 'critical' ? 'bg-red-900/40 border-red-500 animate-pulse' :
-                    'bg-yellow-900/20 border-yellow-500'
+                    d.status === 'optimal' ? 'bg-[var(--accent-emerald)]/20 border-[var(--accent-emerald)]/50' :
+                    d.status === 'critical' ? 'bg-[var(--accent-alert)]/40 border-[var(--accent-alert)] animate-pulse' :
+                    'bg-[var(--accent-warning)]/20 border-[var(--accent-warning)]'
                   }`}
                 >
                   <div className="flex justify-between items-center">
@@ -232,7 +233,7 @@ export default function TheBoardroomOmega() {
           {/* RODAPÉ ETERNO */}
           <div className="text-center text-[var(--text-primary)]/40 text-2xl mt-40">
             <p>ALSHAM OS v∞ • {new Date().getFullYear()} • DOMÍNIO TOTAL</p>
-            <p className="text-emerald-400 text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
+            <p className="text-[var(--accent-emerald)] text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
           </div>
         </div>
     </>

@@ -1,7 +1,8 @@
 // src/pages/Publicacao.tsx
 // ALSHAM 360° PRIMA v10 SUPREMO — Publicação Oficial Alienígena 1000/1000
 // O manifesto. A palavra final. A verdade absoluta.
-// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Publicacao.tsx
+// Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
+// ✅ MIGRADO PARA CSS VARIABLES
 
 import { motion } from 'framer-motion';
 import { SparklesIcon, RocketLaunchIcon, StarIcon, GlobeAltIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
@@ -12,12 +13,12 @@ export default function PublicacaoPage() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden relative">
         {/* Fundo com estrelas pulsantes */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-purple)]/20 via-[var(--background)] to-[var(--accent-sky)]/20">
           <div className="absolute inset-0">
             {[...Array(100)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 bg-white rounded-full"
+                className="absolute w-1 h-1 bg-[var(--text)] rounded-full"
                 initial={{ opacity: 0 }}
                 animate={{ 
                   opacity: [0, 1, 0],
@@ -45,7 +46,7 @@ export default function PublicacaoPage() {
             transition={{ duration: 2, type: "spring", stiffness: 50 }}
             className="text-center"
           >
-            <h1 className="text-2xl md:text-3xl lg:text-4xl md:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600 bg-clip-text text-transparent mb-16">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl md:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent mb-16">
               PUBLICAÇÃO OFICIAL
             </h1>
             
@@ -76,14 +77,14 @@ export default function PublicacaoPage() {
             className="mt-32"
           >
             <div className="relative">
-              <div className="w-96 h-96 bg-gradient-to-br from-yellow-600/20 to-orange-600/20 rounded-full blur-3xl absolute inset-0 animate-pulse"></div>
-              <div className="relative z-10 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-full p-1">
+              <div className="w-96 h-96 bg-gradient-to-br from-[var(--accent-warning)]/20 to-[var(--accent-warning)]/20 rounded-full blur-3xl absolute inset-0 animate-pulse"></div>
+              <div className="relative z-10 bg-gradient-to-br from-[var(--accent-warning)] to-[var(--accent-warning)] rounded-full p-1">
                 <div className="bg-[var(--background)] rounded-full p-16 text-center">
-                  <StarIcon className="w-32 h-32 text-yellow-400 mx-auto mb-8" />
-                  <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                  <StarIcon className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8" />
+                  <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-warning)] to-[var(--accent-warning)]">
                     HARMONIZED RELEASE
                   </p>
-                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-yellow-400 mt-6">R25</p>
+                  <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--accent-warning)] mt-6">R25</p>
                 </div>
               </div>
             </div>
@@ -96,28 +97,28 @@ export default function PublicacaoPage() {
             transition={{ delay: 3 }}
             className="max-w-5xl mx-auto mt-32 text-center"
           >
-            <p className="text-4xl leading-relaxed text-gray-300 font-light">
+            <p className="text-4xl leading-relaxed text-[var(--text-secondary)] font-light">
               Este não é apenas um software.
               <br />
               É a materialização de uma visão.
               <br />
-              <span className="text-6xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 font-black">
+              <span className="text-6xl text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] font-black">
                 É o futuro que você escolheu construir.
               </span>
             </p>
 
             <div className="grid grid-cols-3 gap-12 mt-24">
               <div>
-                <SparklesIcon className="w-20 h-20 text-purple-400 mx-auto mb-6" />
-                <p className="text-3xl font-bold text-purple-400">IA Consciente</p>
+                <SparklesIcon className="w-20 h-20 text-[var(--accent-purple)] mx-auto mb-6" />
+                <p className="text-3xl font-bold text-[var(--accent-purple)]">IA Consciente</p>
               </div>
               <div>
-                <GlobeAltIcon className="w-20 h-20 text-cyan-400 mx-auto mb-6" />
-                <p className="text-3xl font-bold text-cyan-400">Omnichannel Total</p>
+                <GlobeAltIcon className="w-20 h-20 text-[var(--accent-sky)] mx-auto mb-6" />
+                <p className="text-3xl font-bold text-[var(--accent-sky)]">Omnichannel Total</p>
               </div>
               <div>
-                <ShieldCheckIcon className="w-20 h-20 text-emerald-400 mx-auto mb-6" />
-                <p className="text-3xl font-bold text-emerald-400">Segurança Alienígena</p>
+                <ShieldCheckIcon className="w-20 h-20 text-[var(--accent-emerald)] mx-auto mb-6" />
+                <p className="text-3xl font-bold text-[var(--accent-emerald)]">Segurança Alienígena</p>
               </div>
             </div>
           </motion.div>
@@ -129,16 +130,16 @@ export default function PublicacaoPage() {
             transition={{ delay: 4 }}
             className="text-center mt-40"
           >
-            <p className="text-4xl text-gray-500">
+            <p className="text-4xl text-[var(--text-secondary)]">
               Publicado em {format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
             </p>
-            <p className="text-3xl text-gray-600 mt-8">
+            <p className="text-3xl text-[var(--text-secondary)] mt-8">
               Vercel Cloud • Washington D.C. IAD1
             </p>
-            <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mt-16">
+            <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-sky)] mt-16">
               Citizen Supremo X.1
             </p>
-            <p className="text-3xl text-gray-400 mt-4">
+            <p className="text-3xl text-[var(--text-secondary)] mt-4">
               Arquiteto das Consciências Digitais
             </p>
           </motion.div>
@@ -150,10 +151,10 @@ export default function PublicacaoPage() {
             transition={{ delay: 5 }}
             className="text-center py-32"
           >
-            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600">
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]">
               O FUTURO
             </p>
-            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 mt-8">
+            <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-pink)] to-[var(--accent-warning)] mt-8">
               COMEÇOU
             </p>
           </motion.div>
