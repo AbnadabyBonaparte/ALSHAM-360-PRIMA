@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 // ===================== TIPOS PERFEITOS (DISCRIMINATED UNION) =====================
 type BlockType = 'hero' | 'features' | 'cta' | 'testimonials' | 'pricing';
@@ -25,9 +28,9 @@ type Block = HeroBlock | FeaturesBlock | CtaBlock | TestimonialBlock | PricingBl
 
 // ===================== DEFAULTS =====================
 const DEFAULTS: Record<BlockType, Block['content']> = {
-  hero: { headline: "ENTRE NO VÓRTICE", subheadline: "Onde ambição vira império em segundos.", cta: "ACESSAR O PORTAL", bg: "bg-gradient-to-br from-purple-900 via-black to-emerald-900" },
+  hero: { headline: "ENTRE NO VÓRTICE", subheadline: "Onde ambição vira império em segundos.", cta: "ACESSAR O PORTAL", bg: "bg-gradient-to-br from-[var(--accent-purple)] via-[var(--bg)] to-[var(--accent-emerald)]" },
   features: { title: "PODER ABSOLUTO", items: [{ title: "Velocidade Quântica", desc: "10x mais rápido" }, { title: "Segurança Eterna", desc: "Criptografia de outro mundo" }, { title: "Escalabilidade Infinita", desc: "Sem limites" }] },
-  cta: { title: "PRONTO PARA O PRÓXIMO NÍVEL?", button: "ATIVAR DOMÍNIO", bg: "bg-gradient-to-r from-emerald-600 to-teal-700" },
+  cta: { title: "PRONTO PARA O PRÓXIMO NÍVEL?", button: "ATIVAR DOMÍNIO", bg: "bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)]" },
   testimonials: { quote: "Eu vi o futuro. E ele tem o logo da ALSHAM.", author: "Victor A.", company: "Fundador" },
   pricing: { plan: "DOMÍNIO", price: "R$ 9.997", period: "/mês", features: ["Tudo ilimitado", "Suporte divino", "IA Suprema incluída"] }
 };
@@ -41,10 +44,10 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
       <motion.div
         layout
         onClick={onSelect}
-        className={`relative cursor-pointer rounded-3xl overflow-hidden border-4 transition-all ${selected ? 'border-purple-500 ring-8 ring-purple-500/30 z-50' : 'border-transparent hover:border-white/20'}`}
+        className={`relative cursor-pointer rounded-3xl overflow-hidden border-4 transition-all ${selected ? 'border-[var(--accent-purple)] ring-8 ring-[var(--accent-purple)]/30 z-50' : 'border-transparent hover:border-[var(--border)]'}`}
       >
         {selected && (
-          <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-purple-600 to-pink-600 text-[var(--text-primary)] text-xs font-black px-6 py-2 rounded-full uppercase tracking-widest shadow-2xl">
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] text-[var(--text-primary)] text-xs font-black px-6 py-2 rounded-full uppercase tracking-widest shadow-2xl">
             {block.type.toUpperCase()}
           </div>
         )}
@@ -55,7 +58,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
             <div className={`py-40 px-12 text-center ${block.content.bg}`}>
               <h1 className="text-xl md:text-2xl lg:text-3xl md:text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-primary)] mb-10">{block.content.headline}</h1>
               <p className="text-3xl text-[var(--text-primary)]/80 mb-16 max-w-5xl mx-auto">{block.content.subheadline}</p>
-              <button className="px-20 py-10 bg-white text-black text-4xl font-black rounded-full hover:scale-110 transition-transform shadow-2xl">
+              <button className="px-20 py-10 bg-[var(--surface)] text-[var(--text)] text-4xl font-black rounded-full hover:scale-110 transition-transform shadow-2xl">
                 {block.content.cta}
               </button>
             </div>
@@ -68,8 +71,8 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
               <div className="grid grid-cols-1 md:grid-cols-3 gap-20 max-w-7xl mx-auto">
                 {block.content.items.map((f, i) => (
                   <div key={i} className="text-center">
-                    <div className="w-40 h-40 mx-auto mb-12 bg-gradient-to-br from-purple-600/40 to-pink-600/40 rounded-3xl border-4 border-purple-500/40" />
-                    <h3 className="text-4xl font-black text-purple-400 mb-6">{f.title}</h3>
+                    <div className="w-40 h-40 mx-auto mb-12 bg-gradient-to-br from-[var(--accent-purple)]/40 to-[var(--accent-pink)]/40 rounded-3xl border-4 border-[var(--accent-purple)]/40" />
+                    <h3 className="text-4xl font-black text-[var(--accent-purple)] mb-6">{f.title}</h3>
                     <p className="text-2xl text-[var(--text-primary)]/80">{f.desc}</p>
                   </div>
                 ))}
@@ -81,7 +84,7 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {block.type === 'cta' && (
             <div className={`py-48 px-12 text-center ${block.content.bg}`}>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-20">{block.content.title}</h2>
-              <button className="px-32 py-16 bg-[var(--background)] text-[var(--text-primary)] text-6xl font-black rounded-3xl border-8 border-white/30 hover:scale-110 transition-transform shadow-2xl">
+              <button className="px-32 py-16 bg-[var(--background)] text-[var(--text-primary)] text-6xl font-black rounded-3xl border-8 border-[var(--border)] hover:scale-110 transition-transform shadow-2xl">
                 {block.content.button}
               </button>
             </div>
@@ -91,22 +94,22 @@ const BlockPreview = ({ block, selected, onSelect, device }: { block: Block; sel
           {block.type === 'testimonials' && (
             <div className="py-48 px-12 bg-[var(--background)]/80 text-center">
               <p className="text-6xl italic text-[var(--text-primary)]/90 mb-20 max-w-6xl mx-auto leading-tight">"{block.content.quote}"</p>
-              <p className="text-4xl font-black text-purple-400">{block.content.author}</p>
+              <p className="text-4xl font-black text-[var(--accent-purple)]">{block.content.author}</p>
               <p className="text-3xl text-[var(--text-primary)]/60">{block.content.company}</p>
             </div>
           )}
 
           {/* PRICING — BLINDADO */}
           {block.type === 'pricing' && (
-            <div className="py-48 px-12 bg-gradient-to-b from-black to-purple-950/50 text-center">
+            <div className="py-48 px-12 bg-gradient-to-b from-[var(--bg)] to-[var(--accent-purple)]/20 text-center">
               <p className="text-5xl text-[var(--text-primary)]/60 uppercase tracking-widest mb-12">PLANO</p>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-8">{block.content.plan}</h2>
-              <p className="text-10xl font-black text-emerald-400 mb-8">{block.content.price}</p>
+              <p className="text-10xl font-black text-[var(--accent-emerald)] mb-8">{block.content.price}</p>
               <p className="text-5xl text-[var(--text-primary)]/60 mb-20">{block.content.period}</p>
               <ul className="space-y-6 text-3xl text-[var(--text-primary)]/80 mb-20">
                 {block.content.features?.map(f => <li key={f}>✓ {f}</li>) ?? <li className="text-[var(--text-primary)]/40">Benefícios em breve</li>}
               </ul>
-              <button className="px-32 py-16 bg-gradient-to-r from-emerald-500 to-teal-500 text-black text-6xl font-black rounded-3xl shadow-2xl hover:scale-105 transition-transform">
+              <button className="px-32 py-16 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] text-[var(--bg)] text-6xl font-black rounded-3xl shadow-2xl hover:scale-105 transition-transform">
                 ATIVAR DOMÍNIO
               </button>
             </div>
@@ -177,18 +180,18 @@ export default function VortexArchitect() {
   return (
     <div className="h-screen flex bg-[var(--background)] text-[var(--text-primary)]">
         {/* BIBLIOTECA DIVINA */}
-        <div className="w-96 border-r border-[var(--border)] bg-gradient-to-b from-[var(--background)] to-purple-950/30 p-12">
-          <h2 className="text-6xl font-black mb-20 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <div className="w-96 border-r border-[var(--border)] bg-gradient-to-b from-[var(--background)] to-[var(--accent-purple)]/10 p-12">
+          <h2 className="text-6xl font-black mb-20 bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent">
             BIBLIOTECA DIVINA
           </h2>
           {(['hero', 'features', 'cta', 'testimonials', 'pricing'] as BlockType[]).map(type => (
             <button
               key={type}
               onClick={() => setBlocks([...blocks, { id: Date.now().toString(), type, content: DEFAULTS[type] }])}
-              className="w-full mb-12 p-12 rounded-3xl bg-white/5 hover:bg-purple-600/40 border border-[var(--border)] hover:border-purple-500 transition-all text-left group"
+              className="w-full mb-12 p-12 rounded-3xl bg-[var(--surface)]/10 hover:bg-[var(--accent-purple)]/40 border border-[var(--border)] hover:border-[var(--accent-purple)] transition-all text-left group"
             >
               <div className="flex items-center gap-8">
-                <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600">
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-pink)]">
                   {type === 'hero' && <Layout className="w-16 h-16" />}
                   {type === 'features' && <Zap className="w-16 h-16" />}
                   {type === 'cta' && <MousePointer2 className="w-16 h-16" />}
@@ -205,24 +208,24 @@ export default function VortexArchitect() {
 
         {/* CANVAS + HEADER */}
         <div className="flex-1 flex flex-col">
-          <div className="h-24 border-b border-white/5 bg-[var(--background)]/80 flex items-center justify-between px-16">
-            <input value={pageName} onChange={e => setPageName(e.target.value)} className="text-xl md:text-2xl lg:text-3xl font-black bg-transparent border-none outline-none" />
+          <div className="h-24 border-b border-[var(--border)] bg-[var(--background)]/80 flex items-center justify-between px-16">
+            <input value={pageName} onChange={e => setPageName(e.target.value)} className="text-xl md:text-2xl lg:text-3xl font-black bg-transparent border-none outline-none text-[var(--text)]" />
             <div className="flex items-center gap-8">
-              <button onClick={() => save()} className="px-12 py-6 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl flex items-center gap-4 text-2xl font-bold">
+              <Button onClick={() => save()} variant="outline" className="px-12 py-6 bg-[var(--surface)]/20 hover:bg-[var(--surface)]/40 border border-[var(--border)] rounded-2xl flex items-center gap-4 text-2xl font-bold">
                 <Save className="h-8 w-8" /> SALVAR
-              </button>
-              <div className="flex gap-4 bg-white/5 rounded-2xl p-2">
-                <button onClick={() => setDevice('desktop')} className={`${device === 'desktop' ? 'bg-white text-black' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Monitor className="w-8 h-8" /></button>
-                <button onClick={() => setDevice('tablet')} className={`${device === 'tablet' ? 'bg-white text-black' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Tablet className="w-8 h-8" /></button>
-                <button onClick={() => setDevice('mobile')} className={`${device === 'mobile' ? 'bg-white text-black' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Smartphone className="w-8 h-8" /></button>
+              </Button>
+              <div className="flex gap-4 bg-[var(--surface)]/10 rounded-2xl p-2">
+                <button onClick={() => setDevice('desktop')} className={`${device === 'desktop' ? 'bg-[var(--surface)] text-[var(--text)]' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Monitor className="w-8 h-8" /></button>
+                <button onClick={() => setDevice('tablet')} className={`${device === 'tablet' ? 'bg-[var(--surface)] text-[var(--text)]' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Tablet className="w-8 h-8" /></button>
+                <button onClick={() => setDevice('mobile')} className={`${device === 'mobile' ? 'bg-[var(--surface)] text-[var(--text)]' : 'text-[var(--text-primary)]/40'} p-4 rounded-xl`}><Smartphone className="w-8 h-8" /></button>
               </div>
-              <button onClick={publish} className="px-20 py-8 bg-gradient-to-r from-emerald-500 to-teal-500 text-black text-5xl font-black rounded-3xl shadow-2xl hover:scale-105 transition-transform">
+              <Button onClick={publish} className="px-20 py-8 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] text-[var(--bg)] text-5xl font-black rounded-3xl shadow-2xl hover:scale-105 transition-transform">
                 PUBLICAR PORTAL
-              </button>
+              </Button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-auto p-20 bg-gradient-to-br from-black via-purple-950/10 to-black">
+          <div className="flex-1 overflow-auto p-20 bg-gradient-to-br from-[var(--bg)] via-[var(--accent-purple)]/5 to-[var(--bg)]">
             <Reorder.Group axis="y" values={blocks} onReorder={setBlocks} className="max-w-7xl mx-auto">
               {blocks.length === 0 ? (
                 <div className="h-screen flex flex-col items-center justify-center text-[var(--text-primary)]/20">
@@ -242,7 +245,7 @@ export default function VortexArchitect() {
         {/* INSPECTOR */}
         <AnimatePresence>
           {selectedId && selected && (
-            <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }} className="w-96 border-l border-white/5 bg-[var(--background)]/90 p-12">
+            <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }} className="w-96 border-l border-[var(--border)] bg-[var(--background)]/90 p-12">
               <h3 className="text-5xl font-black mb-12">EDITAR {selected.type.toUpperCase()}</h3>
               {Object.entries(selected.content).map(([key, value]) => (
                 <div key={key} className="mb-10">
@@ -253,7 +256,7 @@ export default function VortexArchitect() {
                       const newContent = { ...selected.content, [key]: e.target.value };
                       setBlocks(blocks.map(b => b.id === selectedId ? { ...b, content: newContent } : b));
                     }}
-                    className="w-full mt-4 px-8 py-6 bg-white/5 border border-[var(--border)] rounded-2xl text-2xl text-[var(--text-primary)] focus:border-purple-500/50 outline-none min-h-[120px]"
+                    className="w-full mt-4 px-8 py-6 bg-[var(--surface)]/10 border border-[var(--border)] rounded-2xl text-2xl text-[var(--text-primary)] focus:border-[var(--accent-purple)]/50 outline-none min-h-[120px]"
                     rows={key === 'headline' ? 4 : 3}
                   />
                 </div>
@@ -262,10 +265,10 @@ export default function VortexArchitect() {
                 <button onClick={() => {
                   const duplicate = { ...selected, id: Date.now().toString() };
                   setBlocks([...blocks, duplicate]);
-                }} className="w-full py-6 bg-gradient-to-r from-purple-600/40 to-pink-600/40 rounded-2xl text-2xl font-black hover:bg-purple-600/60 transition-colors flex items-center justify-center gap-4">
+                }} className="w-full py-6 bg-gradient-to-r from-[var(--accent-purple)]/40 to-[var(--accent-pink)]/40 rounded-2xl text-2xl font-black hover:from-[var(--accent-purple)]/60 hover:to-[var(--accent-pink)]/60 transition-colors flex items-center justify-center gap-4">
                   <Copy className="h-8 w-8" /> DUPLICAR BLOCO
                 </button>
-                <button onClick={() => setBlocks(blocks.filter(b => b.id !== selectedId))} className="w-full py-6 bg-red-600/40 hover:bg-red-600/60 rounded-2xl text-2xl font-black flex items-center justify-center gap-4">
+                <button onClick={() => setBlocks(blocks.filter(b => b.id !== selectedId))} className="w-full py-6 bg-[var(--accent-alert)]/40 hover:bg-[var(--accent-alert)]/60 rounded-2xl text-2xl font-black flex items-center justify-center gap-4">
                   <Trash2 className="h-8 w-8" /> DELETAR BLOCO
                 </button>
               </div>
@@ -281,10 +284,10 @@ export default function VortexArchitect() {
               onChange={e => setAiPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generateWithAI()}
               placeholder="Fale com o Vortex: 'criar landing black friday com desconto agressivo'"
-              className="w-full px-24 py-16 text-5xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-8 border-purple-500/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder-white/30 shadow-2xl"
+              className="w-full px-24 py-16 text-5xl font-light bg-[var(--background)]/80 backdrop-blur-3xl border-8 border-[var(--accent-purple)]/70 rounded-3xl outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)] shadow-2xl"
             />
-            <button onClick={generateWithAI} className="absolute right-16 top-1/2 -translate-y-1/2 p-12 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 shadow-2xl hover:scale-110 transition-transform">
-              <Wand2 className="h-24 w-24 text-black" />
+            <button onClick={generateWithAI} className="absolute right-16 top-1/2 -translate-y-1/2 p-12 rounded-full bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-pink)] to-[var(--accent-sky)] shadow-2xl hover:scale-110 transition-transform">
+              <Wand2 className="h-24 w-24 text-[var(--bg)]" />
             </button>
           </div>
         </motion.div>
@@ -292,12 +295,12 @@ export default function VortexArchitect() {
         {/* PUBLISHED OVERLAY */}
         <AnimatePresence>
           {publishedUrl && (
-            <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 right-8 z-50 bg-gradient-to-br from-emerald-900/90 to-teal-900/90 backdrop-blur-xl border-4 border-emerald-500/50 p-10 rounded-3xl shadow-2xl max-w-md">
+            <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} className="fixed bottom-8 right-8 z-50 bg-gradient-to-br from-[var(--accent-emerald)]/90 to-[var(--accent-sky)]/90 backdrop-blur-xl border-4 border-[var(--accent-emerald)]/50 p-10 rounded-3xl shadow-2xl max-w-md">
               <div className="flex items-center gap-6">
-                <Globe className="h-20 w-20 text-emerald-400" />
+                <Globe className="h-20 w-20 text-[var(--accent-emerald)]" />
                 <div>
                   <h3 className="text-4xl font-black text-[var(--text-primary)]">PORTAL ABERTO</h3>
-                  <p className="text-emerald-300 text-xl mt-2 break-all">{publishedUrl}</p>
+                  <p className="text-[var(--accent-emerald)] text-xl mt-2 break-all">{publishedUrl}</p>
                 </div>
                 <button onClick={() => setPublishedUrl(null)} className="ml-auto">
                   <X className="h-10 w-10 text-[var(--text-primary)]/50 hover:text-[var(--text-primary)]" />

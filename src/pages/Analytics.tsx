@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 
-export const Analytics: React.FC = () => {
+const Analytics: React.FC = () => {
   const { currentOrg } = useAuthStore()
   const [loading, setLoading] = useState(true)
 
@@ -43,3 +43,5 @@ export const Analytics: React.FC = () => {
     </div>
   )
 }
+
+export default Analytics;
