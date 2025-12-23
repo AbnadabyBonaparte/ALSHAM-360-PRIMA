@@ -36,15 +36,12 @@ export const Opportunities: React.FC = () => {
     try {
       setLoading(true)
       setError(null)
-
       const { data, error } = await opportunitiesQueries.getAll()
-
       if (error) {
         setError('Erro ao carregar oportunidades')
         return
       }
-
-      setOpportunities(data)
+      setOpportunities(data || [])
     } catch (err) {
       console.error('Error loading opportunities:', err)
       setError('Erro ao carregar oportunidades')
@@ -65,7 +62,7 @@ export const Opportunities: React.FC = () => {
   }
 
   const getStageVariant = (stage: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (stage) {
+    switch (stage.toLowerCase()) {
       case 'prospecção': return 'secondary'
       case 'qualificação': return 'default'
       case 'proposta': return 'outline'
@@ -100,6 +97,9 @@ export const Opportunities: React.FC = () => {
 
         {/* Opportunities List */}
         <Card className="bg-[var(--surface)] border-[var(--border)]">
+          <CardHeader>
+            <CardTitle>Lista de Oportunidades</CardTitle>
+          </CardHeader>
           <CardContent className="p-0">
             {opportunities.length > 0 ? (
               <div className="overflow-x-auto">
@@ -147,19 +147,20 @@ export const Opportunities: React.FC = () => {
                   </TableBody>
                 </Table>
               </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-[var(--text-2)]">
-                {error || 'Nenhuma oportunidade encontrada'}
-              </p>
-              {error && (
-                <Button onClick={loadOpportunities} className="mt-4">
-                  Tentar novamente
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-[var(--text-2)]">
+                  {error || 'Nenhuma oportunidade encontrada'}
+                </p>
+                {error && (
+                  <Button onClick={loadOpportunities} className="mt-4">
+                    Tentar novamente
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
