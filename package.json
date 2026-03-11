@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src/ --ext .ts,.tsx --max-warnings 999",
     "lint:fix": "eslint src/ --ext .ts,.tsx --fix",
@@ -14,7 +14,7 @@
     "test:e2e": "cypress run",
     "typecheck": "tsc --noEmit",
     "validate": "npm run typecheck && npm run lint && npm run test",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
