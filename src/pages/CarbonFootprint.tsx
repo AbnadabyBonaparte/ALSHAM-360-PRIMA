@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  CloudIcon,
-  ArrowTrendingDownIcon,
-  BoltIcon,
-  TruckIcon,
-  BuildingOfficeIcon,
-  SparklesIcon,
-  GlobeAmericasIcon,
-  FireIcon
-} from '@heroicons/react/24/outline';
+  Cloud,
+  TrendingDown,
+  Zap,
+  Truck,
+  Building2,
+  Sparkles,
+  Globe,
+  Flame
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -101,9 +101,9 @@ export default function CarbonFootprintPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-40 h-40 border-8 border-t-transparent border-cyan-500 rounded-full"
+            className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
           />
-          <p className="absolute text-4xl text-cyan-400 font-light">Medindo emissões...</p>
+          <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Medindo emissões...</p>
         </div>
       
     );
@@ -120,10 +120,10 @@ export default function CarbonFootprintPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-sky)] to-[var(--accent-purple)] bg-clip-text text-transparent">
             PEGADA DE CARBONO
           </h1>
-          <p className="text-3xl text-gray-400 mt-6">
+          <p className="text-3xl text-[var(--text-secondary)] mt-6">
             Net Zero é o destino. Cada tonelada conta.
           </p>
         </motion.div>
@@ -132,50 +132,50 @@ export default function CarbonFootprintPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-5xl mx-auto">
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-gray-800/60 to-gray-700/60 rounded-3xl p-8 border border-gray-500/30 text-center"
+            className="bg-gradient-to-br from-[var(--surface)]/60 to-[var(--surface-strong)]/60 rounded-3xl p-8 border border-[var(--border)] text-center"
           >
-            <CloudIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <Cloud className="w-16 h-16 text-[var(--text-secondary)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.emissaoTotal || 0).toLocaleString()}</p>
-            <p className="text-gray-400 mt-2">Ton CO₂ Total</p>
+            <p className="text-[var(--text-secondary)] mt-2">Ton CO₂ Total</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 text-center"
+            className="bg-gradient-to-br from-[var(--accent-emerald)]/20 to-[var(--accent-emerald)]/20 rounded-3xl p-8 border border-[var(--accent-emerald)]/30 text-center"
           >
-            <ArrowTrendingDownIcon className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <p className="text-5xl font-black text-green-400">-{(metrics?.reducao || 0).toFixed(1)}%</p>
-            <p className="text-gray-400 mt-2">Redução YoY</p>
+            <TrendingDown className="w-16 h-16 text-[var(--accent-emerald)] mx-auto mb-4" />
+            <p className="text-5xl font-black text-[var(--accent-emerald)]">-{(metrics?.reducao || 0).toFixed(1)}%</p>
+            <p className="text-[var(--text-secondary)] mt-2">Redução YoY</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.02 }}
             className={`rounded-3xl p-8 border text-center ${
               (metrics?.netEmission || 0) <= 0
-                ? 'bg-gradient-to-br from-emerald-900/60 to-green-900/60 border-emerald-500/30'
-                : 'bg-gradient-to-br from-orange-900/60 to-red-900/60 border-orange-500/30'
+                ? 'bg-gradient-to-br from-[var(--accent-emerald)]/20 to-[var(--accent-emerald)]/20 border-[var(--accent-emerald)]/30'
+                : 'bg-gradient-to-br from-[var(--accent-warning)]/20 to-[var(--accent-alert)]/20 border-[var(--accent-warning)]/30'
             }`}
           >
-            <GlobeAmericasIcon className={`w-16 h-16 mx-auto mb-4 ${
-              (metrics?.netEmission || 0) <= 0 ? 'text-emerald-400' : 'text-orange-400'
+            <Globe className={`w-16 h-16 mx-auto mb-4 ${
+              (metrics?.netEmission || 0) <= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-warning)]'
             }`} />
             <p className={`text-5xl font-black ${
-              (metrics?.netEmission || 0) <= 0 ? 'text-emerald-400' : 'text-orange-400'
+              (metrics?.netEmission || 0) <= 0 ? 'text-[var(--accent-emerald)]' : 'text-[var(--accent-warning)]'
             }`}>
               {(metrics?.netEmission || 0).toLocaleString()}
             </p>
-            <p className="text-gray-400 mt-2">Emissão Líquida</p>
+            <p className="text-[var(--text-secondary)] mt-2">Emissão Líquida</p>
             {(metrics?.netEmission || 0) <= 0 && (
-              <p className="text-emerald-400 text-sm mt-2 font-bold">🌿 CARBONO NEUTRO!</p>
+              <p className="text-[var(--accent-emerald)] text-sm mt-2 font-bold">🌿 CARBONO NEUTRO!</p>
             )}
           </motion.div>
         </div>
 
         {/* CRÉDITOS DE OFFSET */}
         <div className="max-w-md mx-auto mb-16">
-          <div className="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 rounded-2xl p-6 border border-cyan-500/30 text-center">
-            <p className="text-gray-400 mb-2">Créditos de Carbono Compensados</p>
-            <p className="text-4xl font-black text-cyan-400">{(metrics?.offsetCredits || 0).toLocaleString()} ton</p>
+          <div className="bg-gradient-to-br from-[var(--accent-sky)]/20 to-[var(--accent-sky)]/20 rounded-2xl p-6 border border-[var(--accent-sky)]/30 text-center">
+            <p className="text-[var(--text-secondary)] mb-2">Créditos de Carbono Compensados</p>
+            <p className="text-4xl font-black text-[var(--accent-sky)]">{(metrics?.offsetCredits || 0).toLocaleString()} ton</p>
           </div>
         </div>
 
@@ -187,16 +187,16 @@ export default function CarbonFootprintPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <BoltIcon className="w-6 h-6 text-yellow-400" />
+                  <Zap className="w-6 h-6 text-[var(--accent-warning)]" />
                   <span className="text-[var(--text-primary)]">Energia</span>
                 </div>
-                <span className="text-gray-400">{metrics?.porCategoria.energia.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.energia || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
+                <span className="text-[var(--text-secondary)]">{metrics?.porCategoria.energia.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.energia || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
-              <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-4 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${totalCategoria > 0 ? ((metrics?.porCategoria.energia || 0) / totalCategoria * 100) : 0}%` }}
-                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500"
+                  className="h-full bg-gradient-to-r from-[var(--accent-warning)] to-[var(--accent-warning)]"
                 />
               </div>
             </div>
@@ -204,16 +204,16 @@ export default function CarbonFootprintPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <TruckIcon className="w-6 h-6 text-blue-400" />
+                  <Truck className="w-6 h-6 text-[var(--accent-sky)]" />
                   <span className="text-[var(--text-primary)]">Transporte</span>
                 </div>
-                <span className="text-gray-400">{metrics?.porCategoria.transporte.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.transporte || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
+                <span className="text-[var(--text-secondary)]">{metrics?.porCategoria.transporte.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.transporte || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
-              <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-4 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${totalCategoria > 0 ? ((metrics?.porCategoria.transporte || 0) / totalCategoria * 100) : 0}%` }}
-                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                  className="h-full bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-sky)]"
                 />
               </div>
             </div>
@@ -221,16 +221,16 @@ export default function CarbonFootprintPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <BuildingOfficeIcon className="w-6 h-6 text-purple-400" />
+                  <Building2 className="w-6 h-6 text-[var(--accent-purple)]" />
                   <span className="text-[var(--text-primary)]">Operações</span>
                 </div>
-                <span className="text-gray-400">{metrics?.porCategoria.operacoes.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.operacoes || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
+                <span className="text-[var(--text-secondary)]">{metrics?.porCategoria.operacoes.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.operacoes || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
-              <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-4 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${totalCategoria > 0 ? ((metrics?.porCategoria.operacoes || 0) / totalCategoria * 100) : 0}%` }}
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  className="h-full bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-alert)]"
                 />
               </div>
             </div>
@@ -238,16 +238,16 @@ export default function CarbonFootprintPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <FireIcon className="w-6 h-6 text-red-400" />
+                  <Flame className="w-6 h-6 text-[var(--accent-alert)]" />
                   <span className="text-[var(--text-primary)]">Cadeia de Suprimentos</span>
                 </div>
-                <span className="text-gray-400">{metrics?.porCategoria.cadeia.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.cadeia || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
+                <span className="text-[var(--text-secondary)]">{metrics?.porCategoria.cadeia.toLocaleString()} ton ({totalCategoria > 0 ? ((metrics?.porCategoria.cadeia || 0) / totalCategoria * 100).toFixed(0) : 0}%)</span>
               </div>
-              <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-4 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${totalCategoria > 0 ? ((metrics?.porCategoria.cadeia || 0) / totalCategoria * 100) : 0}%` }}
-                  className="h-full bg-gradient-to-r from-red-500 to-orange-500"
+                  className="h-full bg-gradient-to-r from-[var(--accent-alert)] to-[var(--accent-warning)]"
                 />
               </div>
             </div>
@@ -261,11 +261,11 @@ export default function CarbonFootprintPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-8"
         >
-          <SparklesIcon className="w-32 h-32 text-cyan-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-cyan-300 max-w-4xl mx-auto">
+          <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+          <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
             "Net Zero não é utopia. É compromisso com o único planeta que temos."
           </p>
-          <p className="text-3xl text-gray-500 mt-8">
+          <p className="text-3xl text-[var(--text-secondary)] mt-8">
             — Citizen Supremo X.1, seu Guardião Climático
           </p>
         </motion.div>

@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  EnvelopeIcon,
-  EnvelopeOpenIcon,
-  CursorArrowRaysIcon,
-  ChartBarIcon,
-  UserGroupIcon,
-  PaperAirplaneIcon,
-  SparklesIcon,
-  ExclamationTriangleIcon
-} from '@heroicons/react/24/outline';
+  Mail,
+  MailOpen,
+  MousePointerClick,
+  BarChart3,
+  Users,
+  Send,
+  Sparkles,
+  AlertTriangle
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -135,7 +135,7 @@ export default function EmailMarketingPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <PaperAirplaneIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
+            <Send className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text-secondary)]">Emails Enviados</p>
           </motion.div>
@@ -144,7 +144,7 @@ export default function EmailMarketingPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <EnvelopeOpenIcon className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
+            <MailOpen className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaAbertura || 0).toFixed(1)}%</p>
             <p className="text-xl text-[var(--text-secondary)]">Taxa de Abertura</p>
           </motion.div>
@@ -153,7 +153,7 @@ export default function EmailMarketingPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <CursorArrowRaysIcon className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
+            <MousePointerClick className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
             <p className="text-xl text-[var(--text-secondary)]">Taxa de Cliques</p>
           </motion.div>
@@ -162,7 +162,7 @@ export default function EmailMarketingPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <ChartBarIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
+            <BarChart3 className="w-16 h-16 text-[var(--accent-1)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.totalListas || 0}</p>
             <p className="text-xl text-[var(--text-secondary)]">Listas Ativas</p>
           </motion.div>
@@ -171,7 +171,7 @@ export default function EmailMarketingPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <UserGroupIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
+            <Users className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.totalContatos || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text-secondary)]">Total Contatos</p>
           </motion.div>
@@ -185,7 +185,7 @@ export default function EmailMarketingPage() {
 
           {metrics?.campanhas.length === 0 ? (
             <div className="text-center py-20">
-              <EnvelopeIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <Mail className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
               <p className="text-3xl text-[var(--text)]/50">Nenhuma campanha de email</p>
               <p className="text-xl text-[var(--text)]/40 mt-4">Crie sua primeira campanha de email</p>
             </div>
@@ -205,7 +205,7 @@ export default function EmailMarketingPage() {
                         camp.status === 'enviado' ? 'bg-[var(--accent-emerald)]/20' :
                         camp.status === 'agendado' ? 'bg-[var(--accent-warning)]/20' : 'bg-[var(--text)]/10'
                       }`}>
-                        <EnvelopeIcon className={`w-10 h-10 ${
+                        <Mail className={`w-10 h-10 ${
                           camp.status === 'enviado' ? 'text-[var(--accent-emerald)]' :
                           camp.status === 'agendado' ? 'text-[var(--accent-warning)]' : 'text-[var(--text-secondary)]'
                         }`} />
@@ -251,7 +251,7 @@ export default function EmailMarketingPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-20"
         >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
             "A caixa de entrada é sagrada. Cada email aberto é uma porta aberta."
           </p>

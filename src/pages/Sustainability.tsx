@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  GlobeAmericasIcon,
-  SunIcon,
-  CloudIcon,
-  BeakerIcon,
-  SparklesIcon,
-  ArrowPathIcon,
-  BoltIcon,
-  HeartIcon
-} from '@heroicons/react/24/outline';
+  Globe,
+  Sun,
+  Cloud,
+  FlaskConical,
+  Sparkles,
+  RefreshCw,
+  Zap,
+  Heart
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -94,9 +94,9 @@ export default function SustainabilityPage() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-emerald-500 rounded-full"
+          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-emerald)] rounded-full"
         />
-        <p className="absolute text-4xl text-emerald-400 font-light">Calculando pegada...</p>
+        <p className="absolute text-4xl text-[var(--accent-emerald)] font-light">Calculando pegada...</p>
       </div>
     );
   }
@@ -109,10 +109,10 @@ export default function SustainabilityPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-emerald)] to-[var(--accent-emerald)] bg-clip-text text-transparent">
             SUSTENTABILIDADE SUPREMA
           </h1>
-          <p className="text-3xl text-gray-400 mt-6">
+          <p className="text-3xl text-[var(--text-secondary)] mt-6">
             Negócios sustentáveis são negócios eternos
           </p>
         </motion.div>
@@ -124,9 +124,9 @@ export default function SustainabilityPage() {
             transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
             className="relative"
           >
-            <div className="w-64 h-64 rounded-full bg-gradient-to-br from-blue-500 via-green-500 to-emerald-500 opacity-30 blur-3xl absolute inset-0" />
-            <div className="w-64 h-64 rounded-full bg-gradient-to-br from-blue-600 via-green-600 to-emerald-600 flex items-center justify-center relative">
-              <GlobeAmericasIcon className="w-32 h-32 text-[var(--text-primary)]" />
+            <div className="w-64 h-64 rounded-full bg-gradient-to-br from-[var(--accent-sky)] via-[var(--accent-emerald)] to-[var(--accent-emerald)] opacity-30 blur-3xl absolute inset-0" />
+            <div className="w-64 h-64 rounded-full bg-gradient-to-br from-[var(--accent-sky)] via-[var(--accent-emerald)] to-[var(--accent-emerald)] flex items-center justify-center relative">
+              <Globe className="w-32 h-32 text-[var(--text-primary)]" />
             </div>
           </motion.div>
         </div>
@@ -135,70 +135,70 @@ export default function SustainabilityPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 max-w-6xl mx-auto">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-yellow-900/60 to-orange-900/60 rounded-3xl p-8 border border-yellow-500/30 text-center"
+            className="bg-gradient-to-br from-[var(--accent-warning)]/20 to-[var(--accent-warning)]/20 rounded-3xl p-8 border border-[var(--accent-warning)]/30 text-center"
           >
-            <SunIcon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+            <Sun className="w-16 h-16 text-[var(--accent-warning)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.energiaRenovavel}%</p>
-            <p className="text-gray-400 mt-2">Energia Renovável</p>
+            <p className="text-[var(--text-secondary)] mt-2">Energia Renovável</p>
             <div className="mt-4 h-2 bg-[var(--surface)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics?.energiaRenovavel}%` }}
-                className="h-full bg-gradient-to-r from-yellow-500 to-orange-500"
+                className="h-full bg-gradient-to-r from-[var(--accent-warning)] to-[var(--accent-warning)]"
               />
             </div>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-3xl p-8 border border-green-500/30 text-center"
+            className="bg-gradient-to-br from-[var(--accent-emerald)]/20 to-[var(--accent-emerald)]/20 rounded-3xl p-8 border border-[var(--accent-emerald)]/30 text-center"
           >
-            <ArrowPathIcon className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <RefreshCw className="w-16 h-16 text-[var(--accent-emerald)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.reducaoResiduos}%</p>
-            <p className="text-gray-400 mt-2">Redução Resíduos</p>
+            <p className="text-[var(--text-secondary)] mt-2">Redução Resíduos</p>
             <div className="mt-4 h-2 bg-[var(--surface)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics?.reducaoResiduos}%` }}
-                className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                className="h-full bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-emerald)]"
               />
             </div>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 rounded-3xl p-8 border border-blue-500/30 text-center"
+            className="bg-gradient-to-br from-[var(--accent-sky)]/20 to-[var(--accent-sky)]/20 rounded-3xl p-8 border border-[var(--accent-sky)]/30 text-center"
           >
-            <BeakerIcon className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <FlaskConical className="w-16 h-16 text-[var(--accent-sky)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.aguaReciclada}%</p>
-            <p className="text-gray-400 mt-2">Água Reciclada</p>
+            <p className="text-[var(--text-secondary)] mt-2">Água Reciclada</p>
             <div className="mt-4 h-2 bg-[var(--surface)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metrics?.aguaReciclada}%` }}
-                className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                className="h-full bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-sky)]"
               />
             </div>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="bg-gradient-to-br from-teal-900/60 to-cyan-900/60 rounded-3xl p-8 border border-teal-500/30 text-center"
+            className="bg-gradient-to-br from-[var(--accent-emerald)]/20 to-[var(--accent-sky)]/20 rounded-3xl p-8 border border-[var(--accent-emerald)]/30 text-center"
           >
-            <CloudIcon className="w-16 h-16 text-teal-400 mx-auto mb-4" />
+            <Cloud className="w-16 h-16 text-[var(--accent-emerald)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.emissoesSalvas}</p>
-            <p className="text-gray-400 mt-2">Ton CO₂ Evitadas</p>
+            <p className="text-[var(--text-secondary)] mt-2">Ton CO₂ Evitadas</p>
           </motion.div>
         </div>
 
         {/* PROGRESSO DAS METAS */}
         <div className="max-w-xl mx-auto mb-16">
-          <div className="bg-gradient-to-br from-emerald-900/40 to-green-900/40 rounded-3xl p-8 border border-emerald-500/30 text-center">
-            <p className="text-2xl text-gray-400 mb-4">Metas de Sustentabilidade</p>
+          <div className="bg-gradient-to-br from-[var(--accent-emerald)]/20 to-[var(--accent-emerald)]/20 rounded-3xl p-8 border border-[var(--accent-emerald)]/30 text-center">
+            <p className="text-2xl text-[var(--text-secondary)] mb-4">Metas de Sustentabilidade</p>
             <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">
               {metrics?.metasAtingidas}/{metrics?.totalMetas}
             </p>
-            <p className="text-emerald-400 text-xl mt-2">
+            <p className="text-[var(--accent-emerald)] text-xl mt-2">
               {metrics?.totalMetas ? ((metrics.metasAtingidas / metrics.totalMetas) * 100).toFixed(0) : 0}% concluído
             </p>
           </div>
@@ -206,14 +206,14 @@ export default function SustainabilityPage() {
 
         {/* PROJETOS */}
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-emerald)] bg-clip-text text-transparent">
             Projetos Sustentáveis
           </h2>
 
           {metrics?.projetos.length === 0 ? (
             <div className="text-center py-20">
-              <GlobeAmericasIcon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhum projeto cadastrado</p>
+              <Globe className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
+              <p className="text-3xl text-[var(--text-secondary)]">Nenhum projeto cadastrado</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -224,10 +224,10 @@ export default function SustainabilityPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ y: -10 }}
-                  className="bg-gradient-to-br from-white/5 to-white/10 rounded-2xl p-6 border border-[var(--border)] hover:border-emerald-500/50 transition-all"
+                  className="bg-gradient-to-br from-[var(--surface)]/5 to-[var(--surface)]/10 rounded-2xl p-6 border border-[var(--border)] hover:border-[var(--accent-emerald)]/50 transition-all"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-sm">
+                    <span className="px-3 py-1 bg-[var(--accent-emerald)]/20 text-[var(--accent-emerald)] rounded-full text-sm">
                       {projeto.tipo}
                     </span>
                     <span className={`px-3 py-1 rounded-full text-sm ${
@@ -239,13 +239,13 @@ export default function SustainabilityPage() {
                   </div>
 
                   <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">{projeto.nome}</h3>
-                  <p className="text-gray-400 text-sm mb-4">Impacto: {projeto.impacto}</p>
+                  <p className="text-[var(--text-secondary)] text-sm mb-4">Impacto: {projeto.impacto}</p>
 
                   <div className="pt-4 border-t border-[var(--border)]">
-                    <p className="text-2xl font-bold text-emerald-400">
+                    <p className="text-2xl font-bold text-[var(--accent-emerald)]">
                       R$ {projeto.economia.toLocaleString('pt-BR')}
                     </p>
-                    <p className="text-gray-500 text-sm">Economia gerada</p>
+                    <p className="text-[var(--text-secondary)] text-sm">Economia gerada</p>
                   </div>
                 </motion.div>
               ))}
@@ -260,11 +260,11 @@ export default function SustainabilityPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-emerald-400 mx-auto mb-8 animate-pulse" />
-          <p className="text-5xl font-light text-emerald-300 max-w-4xl mx-auto">
+          <Sparkles className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
+          <p className="text-5xl font-light text-[var(--accent-emerald)] max-w-4xl mx-auto">
             "Cada ação sustentável hoje é um legado para as gerações futuras."
           </p>
-          <p className="text-3xl text-gray-500 mt-8">
+          <p className="text-3xl text-[var(--text-secondary)] mt-8">
             — Citizen Supremo X.1, seu Guardião do Futuro
           </p>
         </motion.div>

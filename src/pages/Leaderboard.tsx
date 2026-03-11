@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Leaderboard.tsx
 
 import {
-  TrophyIcon,
-  FireIcon,
-  StarIcon,
-  RocketLaunchIcon,
-  BoltIcon,
-  SparklesIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon
-} from '@heroicons/react/24/outline';
+  Trophy,
+  Flame,
+  Star,
+  Rocket,
+  Zap,
+  Sparkles,
+  TrendingUp,
+  TrendingDown
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -78,28 +78,28 @@ export default function LeaderboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-[var(--accent-warning)] via-orange-500 to-[var(--accent-alert)] bg-clip-text text-transparent">
             HALL DA GLÓRIA
           </h1>
-          <p className="text-5xl text-gray-300 mt-8 font-light">
+          <p className="text-5xl text-[var(--text-secondary)] mt-8 font-light">
             O fogo da competição nunca apaga
           </p>
           <div className="flex justify-center gap-8 mt-12">
             <button
               onClick={() => setTimeframe('week')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${timeframe === 'week' ? 'bg-gradient-to-r from-orange-600 to-red-600 shadow-2xl shadow-orange-500/50' : 'bg-white/10'}`}
+              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${timeframe === 'week' ? 'bg-gradient-to-r from-orange-600 to-[var(--accent-alert)] shadow-2xl shadow-orange-500/50' : 'bg-[var(--surface)]/10'}`}
             >
               Esta Semana
             </button>
             <button
               onClick={() => setTimeframe('month')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${timeframe === 'month' ? 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl shadow-purple-500/50' : 'bg-white/10'}`}
+              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${timeframe === 'month' ? 'bg-gradient-to-r from-[var(--accent-purple)] to-pink-600 shadow-2xl shadow-[var(--accent-purple)]/50' : 'bg-[var(--surface)]/10'}`}
             >
               Este Mês
             </button>
             <button
               onClick={() => setTimeframe('all')}
-              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${timeframe === 'all' ? 'bg-gradient-to-r from-cyan-600 to-blue-600 shadow-2xl shadow-cyan-500/50' : 'bg-white/10'}`}
+              className={`px-12 py-6 rounded-3xl font-bold text-2xl transition-all ${timeframe === 'all' ? 'bg-gradient-to-r from-cyan-600 to-[var(--accent-sky)] shadow-2xl shadow-cyan-500/50' : 'bg-[var(--surface)]/10'}`}
             >
               Todos os Tempos
             </button>
@@ -118,7 +118,7 @@ export default function LeaderboardPage() {
                 className={`relative ${i === 0 ? 'order-first md:order-2' : i === 1 ? 'order-1 md:order-1' : 'order-3 md:order-3'}`}
               >
                 <div className="div"
-                  className={`relative bg-gradient-to-br ${i === 0 ? 'from-yellow-600/60 via-orange-600/60 to-red-600/60' : i === 1 ? 'from-gray-600/60 to-gray-500/60' : 'from-orange-700/60 to-yellow-600/60'} rounded-3xl p-12 border-4 ${i === 0 ? 'border-yellow-500 shadow-2xl shadow-yellow-500/50' : 'border-gray-400'} backdrop-blur-xl`}
+                  className={`relative bg-gradient-to-br ${i === 0 ? 'from-[var(--accent-warning)]/60 via-orange-600/60 to-[var(--accent-alert)]/60' : i === 1 ? 'from-[var(--surface)]/60 to-[var(--surface)]/60' : 'from-orange-700/60 to-[var(--accent-warning)]/60'} rounded-3xl p-12 border-4 ${i === 0 ? 'border-[var(--accent-warning)] shadow-2xl shadow-[var(--accent-warning)]/50' : 'border-[var(--border)]'} backdrop-blur-xl`}
                 >
                   {/* Coroa para o 1º lugar */}
                   {i === 0 && (
@@ -127,15 +127,15 @@ export default function LeaderboardPage() {
                       transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                       className="absolute -top-12 left-1/2 -translate-x-1/2"
                     >
-                      <TrophyIcon className="w-32 h-32 text-yellow-400" />
+                      <Trophy className="w-32 h-32 text-[var(--accent-warning)]" />
                     </motion.div>
                   )}
 
                   {/* Medalha */}
                   <div className="text-center mb-8">
                     <div className={`text-4xl md:text-5xl lg:text-6xl font-black mb-6 ${
-                      i === 0 ? 'text-yellow-400' :
-                      i === 1 ? 'text-gray-300' :
+                      i === 0 ? 'text-[var(--accent-warning)]' :
+                      i === 1 ? 'text-[var(--text-secondary)]' :
                       'text-orange-400'
                     }`}>
                       {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
@@ -153,31 +153,31 @@ export default function LeaderboardPage() {
                       </div>
                     </div>
                     <h2 className="text-5xl font-bold text-[var(--text-primary)] mt-12">{hero.name}</h2>
-                    <p className="text-2xl text-gray-300 mt-4">{hero.title}</p>
-                    <p className="text-xl text-gray-400">{hero.department}</p>
+                    <p className="text-2xl text-[var(--text-secondary)] mt-4">{hero.title}</p>
+                    <p className="text-xl text-[var(--text-secondary)]">{hero.department}</p>
                   </div>
 
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-6 mt-12 text-center">
                     <div>
-                      <p className="text-5xl font-black text-yellow-400">{hero.points.toLocaleString()}</p>
-                      <p className="text-gray-400">pontos</p>
+                      <p className="text-5xl font-black text-[var(--accent-warning)]">{hero.points.toLocaleString()}</p>
+                      <p className="text-[var(--text-secondary)]">pontos</p>
                     </div>
                     <div>
                       <p className="text-5xl font-black text-orange-400">{hero.streak}</p>
-                      <p className="text-gray-400">streak</p>
+                      <p className="text-[var(--text-secondary)]">streak</p>
                     </div>
                     <div>
                       <p className="text-5xl font-black text-cyan-400">{hero.badges}</p>
-                      <p className="text-gray-400">conquistas</p>
+                      <p className="text-[var(--text-secondary)]">conquistas</p>
                     </div>
                   </div>
 
                   {/* Trend */}
                   <div className="text-center mt-8">
-                    {hero.trend === 'up' && <ArrowTrendingUpIcon className="w-16 h-16 text-emerald-400 mx-auto animate-bounce" />}
-                    {hero.trend === 'down' && <ArrowTrendingDownIcon className="w-16 h-16 text-red-400 mx-auto" />}
-                    {hero.trend === 'new' && <SparklesIcon className="w-16 h-16 text-pink-400 mx-auto animate-pulse" />}
+                    {hero.trend === 'up' && <TrendingUp className="w-16 h-16 text-[var(--accent-emerald)] mx-auto animate-bounce" />}
+                    {hero.trend === 'down' && <TrendingDown className="w-16 h-16 text-[var(--accent-alert)] mx-auto" />}
+                    {hero.trend === 'new' && <Sparkles className="w-16 h-16 text-pink-400 mx-auto animate-pulse" />}
                   </div>
                 </div>
               </motion.div>
@@ -187,7 +187,7 @@ export default function LeaderboardPage() {
 
         {/* RESTANTE DO RANKING */}
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-5xl font-bold text-center mb-12 text-gray-300">
+          <h2 className="text-5xl font-bold text-center mb-12 text-[var(--text-secondary)]">
             Os Imortais do ALSHAM
           </h2>
           <div className="space-y-6">
@@ -196,21 +196,21 @@ export default function LeaderboardPage() {
                 key={player.id}
                 initial={{ opacity: 0, x: -100 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                className="bg-gradient-to-r from-gray-900/70 to-black/70 backdrop-blur-xl rounded-3xl p-10 border border-[var(--border)] hover:border-primary/50 transition-all"
+                className="bg-gradient-to-r from-[var(--bg)]/70 to-[var(--bg)]/70 backdrop-blur-xl rounded-3xl p-10 border border-[var(--border)] hover:border-primary/50 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-8">
-                    <div className="text-6xl font-black text-gray-500">
+                    <div className="text-6xl font-black text-[var(--text-secondary)]">
                       #{player.rank}
                     </div>
                     <div>
                       <h3 className="text-3xl font-bold text-[var(--text-primary)]">{player.name}</h3>
-                      <p className="text-xl text-gray-400">{player.title} • {player.department}</p>
+                      <p className="text-xl text-[var(--text-secondary)]">{player.title} • {player.department}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-5xl font-black text-primary">{player.points.toLocaleString()}</p>
-                    <p className="text-gray-400">pontos • streak {player.streak}</p>
+                    <p className="text-[var(--text-secondary)]">pontos • streak {player.streak}</p>
                   </div>
                 </div>
               </motion.div>
@@ -224,11 +224,11 @@ export default function LeaderboardPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40 mt-32"
         >
-          <FireIcon className="w-48 h-48 text-orange-500 mx-auto mb-12 animate-pulse" />
+          <Flame className="w-48 h-48 text-orange-500 mx-auto mb-12 animate-pulse" />
           <p className="text-2xl md:text-3xl lg:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-pink-600">
             O FOGO NUNCA APAGA
           </p>
-          <p className="text-4xl text-gray-400 mt-16">
+          <p className="text-4xl text-[var(--text-secondary)] mt-16">
             — Citizen Supremo X.1
           </p>
         </motion.div>

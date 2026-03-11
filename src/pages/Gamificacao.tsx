@@ -4,14 +4,14 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA/blob/hotfix/recovery-prod/src/pages/Gamificacao.tsx
 
 import {
-  TrophyIcon,
-  FireIcon,
-  RocketLaunchIcon,
-  StarIcon,
-  BoltIcon,
-  ViewfinderCircleIcon,
-  SparklesIcon
-} from '@heroicons/react/24/outline';
+  Trophy,
+  Flame,
+  Rocket,
+  Star,
+  Zap,
+  Crosshair,
+  Sparkles
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -132,7 +132,7 @@ export default function GamificacaoPage() {
   if (!user) {
     return (
       <div className="text-center py-40">
-        <FireIcon className="w-40 h-40 text-[var(--text)]/30 mx-auto mb-12" />
+        <Flame className="w-40 h-40 text-[var(--text)]/30 mx-auto mb-12" />
         <p className="text-5xl text-[var(--text)]/50">Você ainda não entrou no jogo</p>
       </div>
     );
@@ -165,27 +165,27 @@ export default function GamificacaoPage() {
           >
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8 text-center">
               <div>
-                <TrophyIcon className="w-20 h-20 text-[var(--accent-1)] mx-auto mb-auto mb-4" />
+                <Trophy className="w-20 h-20 text-[var(--accent-1)] mx-auto mb-auto mb-4" />
                 <p className="text-6xl font-black text-[var(--accent-1)]">{user.points.toLocaleString()}</p>
                 <p className="text-2xl text-[var(--text)]">Pontos Totais</p>
               </div>
               <div>
-                <StarIcon className="w-20 h-20 text-[var(--accent-purple)] mx-auto mb-4" />
+                <Star className="w-20 h-20 text-[var(--accent-purple)] mx-auto mb-4" />
                 <p className="text-6xl font-black text-[var(--accent-purple)]">Nível {user.level}</p>
                 <p className="text-xl text-[var(--text-secondary)]">{levelProgress.toFixed(0)}% para o próximo</p>
               </div>
               <div>
-                <FireIcon className="w-20 h-20 text-[var(--accent-warning)] mx-auto mb-4 animate-pulse" />
+                <Flame className="w-20 h-20 text-[var(--accent-warning)] mx-auto mb-4 animate-pulse" />
                 <p className="text-6xl font-black text-[var(--accent-warning)]">{user.streak}</p>
                 <p className="text-2xl text-[var(--text)]">Streak Atual</p>
               </div>
               <div>
-                <TrophyIcon className="w-20 h-20 text-[var(--accent-sky)] mx-auto mb-4" />
+                <Trophy className="w-20 h-20 text-[var(--accent-sky)] mx-auto mb-4" />
                 <p className="text-6xl font-black text-[var(--accent-sky)]">{user.badges}</p>
                 <p className="text-2xl text-[var(--text)]">Conquistas</p>
               </div>
               <div>
-                <BoltIcon className="w-20 h-20 text-[var(--accent-pink)] mx-auto mb-4" />
+                <Zap className="w-20 h-20 text-[var(--accent-pink)] mx-auto mb-4" />
                 <p className="text-6xl font-black text-[var(--accent-pink)]">#{user.rank}</p>
                 <p className="text-2xl text-[var(--text)]">no Ranking</p>
               </div>
@@ -229,7 +229,7 @@ export default function GamificacaoPage() {
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-3 justify-end mb-2">
-                      <FireIcon className={`w-10 h-10 ${player.streak > 10 ? 'text-[var(--accent-warning)] animate-pulse' : 'text-[var(--text)]/50'}`} />
+                      <Flame className={`w-10 h-10 ${player.streak > 10 ? 'text-[var(--accent-warning)] animate-pulse' : 'text-[var(--text)]/50'}`} />
                       <span className="text-4xl font-bold text-[var(--text-primary)]">{player.streak}</span>
                     </div>
                     <p className="text-[var(--text-secondary)]">streak • {player.badges} conquistas</p>
@@ -247,7 +247,7 @@ export default function GamificacaoPage() {
           transition={{ delay: 1 }}
           className="text-center py-32 mt-32"
         >
-          <SparklesIcon className="w-40 h-40 text-[var(--accent-purple)] mx-auto mb-12 animate-pulse" />
+          <Sparkles className="w-40 h-40 text-[var(--accent-purple)] mx-auto mb-12 animate-pulse" />
           <p className="text-xl md:text-2xl lg:text-3xl font-light text-[var(--accent-purple)] max-w-5xl mx-auto leading-relaxed">
             "Você não está jogando.
             <br />

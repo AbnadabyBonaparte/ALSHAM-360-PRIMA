@@ -3,13 +3,13 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  UserPlusIcon,
-  CurrencyDollarIcon,
-  ChartBarIcon,
-  TrophyIcon,
-  SparklesIcon,
-  ArrowTrendingUpIcon,
-} from '@heroicons/react/24/outline';
+  UserPlus,
+  DollarSign,
+  BarChart3,
+  Trophy,
+  Sparkles,
+  TrendingUp,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -131,7 +131,7 @@ export default function AffiliatesPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
           <CardContent className="p-6">
-            <UserPlusIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <UserPlus className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalAfiliados || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Afiliados</p>
           </CardContent>
@@ -139,7 +139,7 @@ export default function AffiliatesPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <ChartBarIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <BarChart3 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.ativos || 0}</p>
             <p className="text-[var(--text-secondary)]">Ativos</p>
           </CardContent>
@@ -147,7 +147,7 @@ export default function AffiliatesPage() {
 
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <ArrowTrendingUpIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <TrendingUp className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{(metrics?.vendasGeradas || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Vendas Geradas</p>
           </CardContent>
@@ -155,7 +155,7 @@ export default function AffiliatesPage() {
 
         <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.comissoesPagas || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Comissões Pagas</p>
           </CardContent>
@@ -170,7 +170,7 @@ export default function AffiliatesPage() {
 
         {metrics?.afiliados.length === 0 ? (
           <div className="text-center py-20">
-            <UserPlusIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <UserPlus className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum afiliado cadastrado</p>
           </div>
         ) : (
@@ -250,7 +250,7 @@ export default function AffiliatesPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-warning)] max-w-4xl mx-auto">
           "Afiliados transformam clientes em vendedores. É multiplicação exponencial."
         </p>

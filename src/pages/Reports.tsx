@@ -2,20 +2,20 @@
 // ALSHAM 360° PRIMA — Relatórios (migrado para shadcn/ui)
 
 import {
-  DocumentChartBarIcon,
-  CurrencyDollarIcon,
-  ArrowTrendingUpIcon,
-  UsersIcon,
-  ViewfinderCircleIcon,
-  FireIcon,
-  LightBulbIcon,
-  SparklesIcon,
-  CalendarIcon,
-  ArrowUpRightIcon,
-  ChartBarIcon,
-  FunnelIcon,
-  TrophyIcon
-} from '@heroicons/react/24/outline';
+  FileBarChart,
+  DollarSign,
+  TrendingUp,
+  Users,
+  Crosshair,
+  Flame,
+  Lightbulb,
+  Sparkles,
+  Calendar,
+  ArrowUpRight,
+  BarChart3,
+  Filter,
+  Trophy
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -136,28 +136,28 @@ export default function ReportsPage() {
         {/* KPIS PRINCIPAIS */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-20">
           <SupremeReportCard
-            icon={<CurrencyDollarIcon />}
+            icon={<DollarSign />}
             title="Receita Total"
             value={`R$ ${report?.totalRevenue.toLocaleString('pt-BR')}`}
             growth="+127%"
             colorClass="from-[var(--accent-emerald)] to-[var(--accent-sky)]"
           />
           <SupremeReportCard
-            icon={<ArrowTrendingUpIcon />}
+            icon={<TrendingUp />}
             title="MRR Projetado"
             value={`R$ ${report?.monthlyRecurring.toLocaleString('pt-BR')}`}
             growth="+89%"
             colorClass="from-[var(--accent-purple)] to-[var(--accent-pink)]"
           />
           <SupremeReportCard
-            icon={<UsersIcon />}
+            icon={<Users />}
             title="Leads Este Mês"
             value={report?.newLeads.toString()}
             growth="+64%"
             colorClass="from-[var(--accent-sky)] to-[var(--accent-purple)]"
           />
           <SupremeReportCard
-            icon={<TrophyIcon />}
+            icon={<Trophy />}
             title="Top Performer"
             value={report?.topPerformer}
             growth={`${report?.topPerformerPoints.toLocaleString()} pts`}
@@ -199,7 +199,7 @@ export default function ReportsPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40"
         >
-          <LightBulbIcon className="w-64 h-64 text-[var(--accent-purple)] mx-auto mb-16 animate-pulse" />
+          <Lightbulb className="w-64 h-64 text-[var(--accent-purple)] mx-auto mb-16 animate-pulse" />
           <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]">
             SEUS NÚMEROS NÃO MENTEM
           </p>

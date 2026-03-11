@@ -2,18 +2,18 @@
 // ALSHAM 360° PRIMA — Inbox (migrado para shadcn/ui)
 
 import {
-  InboxIcon,
-  EnvelopeIcon,
-  PhoneIcon,
-  ChatBubbleLeftRightIcon,
-  PaperAirplaneIcon,
-  SparklesIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  MagnifyingGlassIcon,
-  PaperClipIcon
-} from '@heroicons/react/24/outline';
+  Inbox,
+  Mail,
+  Phone,
+  MessageCircle,
+  Send,
+  Sparkles,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Search,
+  Paperclip
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -99,10 +99,10 @@ export default function InboxPage() {
 
   const getChannelIcon = (channel: string) => {
     switch (channel) {
-      case 'whatsapp': return <ChatBubbleLeftRightIcon className="w-6 h-6 text-[var(--accent-emerald)]" />;
-      case 'email': return <EnvelopeIcon className="w-6 h-6 text-[var(--accent-sky)]" />;
-      case 'sms': return <PhoneIcon className="w-6 h-6 text-[var(--accent-sky)]" />;
-      default: return <InboxIcon className="w-6 h-6 text-[var(--text-secondary)]" />;
+      case 'whatsapp': return <MessageCircle className="w-6 h-6 text-[var(--accent-emerald)]" />;
+      case 'email': return <Mail className="w-6 h-6 text-[var(--accent-sky)]" />;
+      case 'sms': return <Phone className="w-6 h-6 text-[var(--accent-sky)]" />;
+      default: return <Inbox className="w-6 h-6 text-[var(--text-secondary)]" />;
     }
   };
 
@@ -113,7 +113,7 @@ export default function InboxPage() {
         <div className="p-8 max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-8">
-              <InboxIcon className="w-20 h-20 text-[var(--accent-sky)] animate-pulse" />
+              <Inbox className="w-20 h-20 text-[var(--accent-sky)] animate-pulse" />
               <div>
                 <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-pink)] to-[var(--accent-sky)] bg-clip-text text-transparent">
                   Inbox Suprema
@@ -165,7 +165,7 @@ export default function InboxPage() {
 
           {/* BUSCA */}
           <div className="mt-8 relative">
-            <MagnifyingGlassIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 text-[var(--text-secondary)]" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 text-[var(--text-secondary)]" />
             <Input
               type="text"
               value={search}
@@ -187,7 +187,7 @@ export default function InboxPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-40">
-            <InboxIcon className="w-40 h-40 text-[var(--text-secondary)] mx-auto mb-12" />
+            <Inbox className="w-40 h-40 text-[var(--text-secondary)] mx-auto mb-12" />
             <p className="text-5xl text-[var(--text-secondary)] font-light">
               {search ? 'Nenhum resultado encontrado' : 'Sua caixa está limpa'}
             </p>
@@ -217,12 +217,12 @@ export default function InboxPage() {
                       </div>
                       {msg.channel === 'whatsapp' && (
                         <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[var(--accent-emerald)] rounded-full flex items-center justify-center">
-                          <ChatBubbleLeftRightIcon className="w-6 h-6 text-[var(--text-primary)]" />
+                          <MessageCircle className="w-6 h-6 text-[var(--text-primary)]" />
                         </div>
                       )}
                       {!msg.read && (
                         <div className="absolute -top-3 -right-3 w-8 h-8 bg-[var(--accent-alert)] rounded-full flex items-center justify-center animate-pulse">
-                          <ExclamationTriangleIcon className="w-5 h-5 text-[var(--text-primary)]" />
+                          <AlertTriangle className="w-5 h-5 text-[var(--text-primary)]" />
                         </div>
                       )}
                     </div>
@@ -247,10 +247,10 @@ export default function InboxPage() {
                       </p>
                       <div className="flex items-center gap-6 mt-6 text-[var(--text-secondary)]">
                         <span className="flex items-center gap-2">
-                          <ClockIcon className="w-5 h-5" />
+                          <Clock className="w-5 h-5" />
                           {formatDistanceToNow(new Date(msg.created_at), { locale: ptBR, addSuffix: true })}
                         </span>
-                        {msg.has_attachment && <PaperClipIcon className="w-5 h-5" />}
+                        {msg.has_attachment && <Paperclip className="w-5 h-5" />}
                       </div>
                     </div>
                   </div>
@@ -259,7 +259,7 @@ export default function InboxPage() {
                     variant="ghost"
                     className="p-4 bg-[var(--surface)]/10 hover:bg-[var(--accent-sky)]/30 rounded-2xl transition-all group"
                   >
-                    <PaperAirplaneIcon className="w-8 h-8 text-[var(--text-primary)] group-hover:text-[var(--text-primary)]" />
+                    <Send className="w-8 h-8 text-[var(--text-primary)] group-hover:text-[var(--text-primary)]" />
                   </Button>
                 </div>
               </motion.div>

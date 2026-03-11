@@ -2,17 +2,17 @@
 // ALSHAM 360° PRIMA — Home (migrado para shadcn/ui)
 
 import {
-  RocketLaunchIcon,
-  LightBulbIcon,
-  BoltIcon,
-  TrophyIcon,
-  GlobeAltIcon,
-  ShieldCheckIcon,
-  SparklesIcon,
-  UsersIcon,
-  CurrencyDollarIcon,
-  ChartBarIcon
-} from '@heroicons/react/24/outline';
+  Rocket,
+  Lightbulb,
+  Zap,
+  Trophy,
+  Globe,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  DollarSign,
+  BarChart3
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -148,25 +148,25 @@ export default function HomePage() {
       <div className="relative -mt-32 z-20 px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <SupremeMetric
-            icon={<UsersIcon />}
+            icon={<Users />}
             title="Leads Ativos"
             value={stats?.totalLeads || 0}
             colorClass="from-[var(--accent-sky)] to-[var(--accent-purple)]"
           />
           <SupremeMetric
-            icon={<ChartBarIcon />}
+            icon={<BarChart3 />}
             title="Deals em Andamento"
             value={stats?.activeDeals || 0}
             colorClass="from-[var(--accent-purple)] to-[var(--accent-pink)]"
           />
           <SupremeMetric
-            icon={<CurrencyDollarIcon />}
+            icon={<DollarSign />}
             title="Receita do Mês"
             value={`R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR')}`}
             colorClass="from-[var(--accent-emerald)] to-[var(--accent-sky)]"
           />
           <SupremeMetric
-            icon={<BoltIcon />}
+            icon={<Zap />}
             title="Automação 24h"
             value={stats?.automationsRunning || 0}
             colorClass="from-[var(--accent-warning)] to-[var(--accent-alert)]"
@@ -180,7 +180,7 @@ export default function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         className="text-center py-40"
       >
-        <SparklesIcon className="w-40 h-40 text-[var(--accent-purple)] mx-auto mb-12 animate-pulse" />
+        <Sparkles className="w-40 h-40 text-[var(--accent-purple)] mx-auto mb-12 animate-pulse" />
         <p className="text-xl md:text-2xl lg:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] via-[var(--accent-pink)] to-[var(--accent-sky)] max-w-6xl mx-auto leading-relaxed">
           "Você não está apenas gerenciando um negócio.
           <br />

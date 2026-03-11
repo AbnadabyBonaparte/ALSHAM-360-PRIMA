@@ -3,13 +3,13 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  DocumentDuplicateIcon,
-  ShieldCheckIcon,
-  CurrencyDollarIcon,
-  CalendarDaysIcon,
-  SparklesIcon,
-  CheckBadgeIcon,
-} from '@heroicons/react/24/outline';
+  Copy,
+  ShieldCheck,
+  DollarSign,
+  CalendarDays,
+  Sparkles,
+  BadgeCheck,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -133,7 +133,7 @@ export default function ContractsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <DocumentDuplicateIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Copy className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalContratos || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Contratos</p>
           </CardContent>
@@ -141,7 +141,7 @@ export default function ContractsPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <ShieldCheckIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <ShieldCheck className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.ativos || 0}</p>
             <p className="text-[var(--text-secondary)]">Ativos</p>
           </CardContent>
@@ -149,7 +149,7 @@ export default function ContractsPage() {
 
         <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorRecorrente || 0) / 1000).toFixed(0)}k/mês</p>
             <p className="text-[var(--text-secondary)]">Recorrente</p>
           </CardContent>
@@ -157,7 +157,7 @@ export default function ContractsPage() {
 
         <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorTotal || 0) / 1000000).toFixed(1)}M</p>
             <p className="text-[var(--text-secondary)]">Valor Total</p>
           </CardContent>
@@ -172,7 +172,7 @@ export default function ContractsPage() {
 
         {metrics?.contratos.length === 0 ? (
           <div className="text-center py-20">
-            <DocumentDuplicateIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <Copy className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum contrato cadastrado</p>
           </div>
         ) : (
@@ -198,7 +198,7 @@ export default function ContractsPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
                           <div className="p-4 bg-[var(--accent-sky)]/20 rounded-2xl">
-                            <DocumentDuplicateIcon className="w-8 h-8 text-[var(--accent-sky)]" />
+                            <Copy className="w-8 h-8 text-[var(--accent-sky)]" />
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-[var(--text)]">{contrato.titulo}</h3>
@@ -225,7 +225,7 @@ export default function ContractsPage() {
                           <div className="flex items-center gap-3">
                             {contrato.renovacao_automatica && (
                               <div className="p-2 bg-[var(--accent-sky)]/20 rounded-lg" title="Renovação automática">
-                                <CheckBadgeIcon className="w-5 h-5 text-[var(--accent-sky)]" />
+                                <BadgeCheck className="w-5 h-5 text-[var(--accent-sky)]" />
                               </div>
                             )}
                             <Badge variant={config.variant} className="capitalize">
@@ -250,7 +250,7 @@ export default function ContractsPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
           "Um contrato bem redigido é a diferença entre lucro e prejuízo."
         </p>

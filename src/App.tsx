@@ -8,6 +8,7 @@ import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ThemeInitializer } from '@/components/ThemeInitializer'
+import { SkipLink } from '@/components/SkipLink'
 
 // Internal page registry renderer
 import { renderPage } from '@/routes'
@@ -129,11 +130,7 @@ function AppContent() {
           element={!hasOrg ? <Navigate to="/select-organization" replace /> : <AppPage />}
         />
 
-        /**
-         * ✅ Compatibilidade com navegação do Sidebar via "/:pageId"
-         * - Evita "travado no dashboard" quando Sidebar manda ids simples.
-         * - Protege rotas reservadas.
-         */
+        {/* Compatibilidade com navegação do Sidebar via "/:pageId" */}
         <Route
           path="/:pageId"
           element={
@@ -188,6 +185,7 @@ function TopLevelPageGuard() {
 export default function App() {
   return (
     <Router>
+      <SkipLink />
       <ThemeInitializer />
       <AppContent />
     </Router>

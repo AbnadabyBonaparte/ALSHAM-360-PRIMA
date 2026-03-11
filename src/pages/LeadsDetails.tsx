@@ -2,28 +2,28 @@
 // ALSHAM 360° PRIMA — Lead Detail (migrado para shadcn/ui)
 
 import {
-  UserIcon,
-  BuildingOfficeIcon,
-  PhoneIcon,
-  EnvelopeIcon,
-  MapPinIcon,
-  BriefcaseIcon,
-  CalendarIcon,
-  ClockIcon,
-  ArrowTrendingUpIcon,
-  LightBulbIcon,
-  SparklesIcon,
-  BoltIcon,
-  ViewfinderCircleIcon,
-  StarIcon,
-  ArrowLeftIcon,
-  PencilIcon,
-  ArrowDownTrayIcon,
-  XMarkIcon,
-  ExclamationTriangleIcon,
-  TrophyIcon,
-  FireIcon
-} from '@heroicons/react/24/outline';
+  User,
+  Building2,
+  Phone,
+  Mail,
+  MapPin,
+  Briefcase,
+  Calendar,
+  Clock,
+  TrendingUp,
+  Lightbulb,
+  Sparkles,
+  Zap,
+  Crosshair,
+  Star,
+  ArrowLeft,
+  Pencil,
+  Download,
+  X,
+  AlertTriangle,
+  Trophy,
+  Flame
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState, useMemo } from 'react';
@@ -96,7 +96,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
   if (!lead) {
     return (
       <div className="text-center py-40">
-        <ExclamationTriangleIcon className="w-40 h-40 text-[var(--accent-alert)] mx-auto mb-12" />
+        <AlertTriangle className="w-40 h-40 text-[var(--accent-alert)] mx-auto mb-12" />
         <p className="text-2xl sm:text-3xl text-[var(--text-secondary)]">Lead não encontrado</p>
       </div>
     );
@@ -119,7 +119,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                   size="icon"
                   className="h-16 w-16 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-strong)]"
                 >
-                  <ArrowLeftIcon className="w-10 h-10" />
+                  <ArrowLeft className="w-10 h-10" />
                 </Button>
                 <div className="flex items-center gap-8">
                   <div className="relative">
@@ -128,7 +128,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                     </div>
                     {isHot && (
                       <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-r from-[var(--accent-warning)] to-[var(--accent-alert)] rounded-full flex items-center justify-center animate-pulse">
-                        <FireIcon className="w-16 h-16 text-[var(--text-primary)]" />
+                        <Flame className="w-16 h-16 text-[var(--text-primary)]" />
                       </div>
                     )}
                   </div>
@@ -142,7 +142,7 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
                     <div className="flex items-center gap-6 mt-6">
                       <Badge className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] text-[var(--text-primary)] border-0 font-semibold text-sm sm:text-base md:text-lg">
                         IA Score: {lead.score}/100
-                        {isHot && <SparklesIcon className="w-12 h-12 inline ml-4 animate-pulse" />}
+                        {isHot && <Sparkles className="w-12 h-12 inline ml-4 animate-pulse" />}
                       </Badge>
                       <Badge className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] text-[var(--text-primary)] border-0 font-semibold text-sm sm:text-base md:text-lg">
                         {lead.probability}% conversão
@@ -174,18 +174,18 @@ export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12 p-12">
           {/* COLUNA ESQUERDA — INFORMAÇÕES DO LEAD */}
           <div className="space-y-8">
-            <InfoCard icon={<BuildingOfficeIcon />} title="Empresa" value={lead.company} />
-            <InfoCard icon={<BriefcaseIcon />} title="Cargo" value={lead.position} />
-            <InfoCard icon={<EnvelopeIcon />} title="E-mail" value={lead.email} />
-            <InfoCard icon={<PhoneIcon />} title="Telefone" value={lead.phone} />
-            <InfoCard icon={<MapPinIcon />} title="Origem" value={lead.origin} />
-            <InfoCard icon={<CalendarIcon />} title="Criado em" value={format(new Date(lead.created_at), 'dd/MM/yyyy')} />
+            <InfoCard icon={<Building2 />} title="Empresa" value={lead.company} />
+            <InfoCard icon={<Briefcase />} title="Cargo" value={lead.position} />
+            <InfoCard icon={<Mail />} title="E-mail" value={lead.email} />
+            <InfoCard icon={<Phone />} title="Telefone" value={lead.phone} />
+            <InfoCard icon={<MapPin />} title="Origem" value={lead.origin} />
+            <InfoCard icon={<Calendar />} title="Criado em" value={format(new Date(lead.created_at), 'dd/MM/yyyy')} />
 
             {/* IA INSIGHTS */}
             <Card className="bg-gradient-to-br from-[var(--accent-purple)]/50 to-[var(--accent-pink)]/50 border-[var(--accent-purple)]/30 rounded-3xl backdrop-blur-xl">
               <CardContent className="p-10">
                 <div className="flex items-center gap-4 mb-8">
-                  <LightBulbIcon className="w-16 h-16 text-[var(--accent-purple)]" />
+                  <Lightbulb className="w-16 h-16 text-[var(--accent-purple)]" />
                   <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">Análise da IA</h3>
                 </div>
                 <div className="space-y-6">

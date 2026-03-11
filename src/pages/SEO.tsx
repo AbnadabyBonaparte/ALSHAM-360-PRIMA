@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  MagnifyingGlassIcon,
-  ArrowTrendingUpIcon,
-  GlobeAltIcon,
-  LinkIcon,
-  DocumentTextIcon,
-  SparklesIcon,
-  ChartBarIcon,
-  BoltIcon
-} from '@heroicons/react/24/outline';
+  Search,
+  TrendingUp,
+  Globe,
+  Link2,
+  FileText,
+  Sparkles,
+  BarChart3,
+  Zap
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -153,7 +153,7 @@ export default function SEOPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)] text-center"
           >
-            <ArrowTrendingUpIcon className="w-20 h-20 text-[var(--accent-emerald)] mx-auto mb-4" />
+            <TrendingUp className="w-20 h-20 text-[var(--accent-emerald)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.trafegoOrganico || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text-secondary)]">Tráfego Orgânico/mês</p>
           </motion.div>
@@ -162,17 +162,17 @@ export default function SEOPage() {
         {/* MÉTRICAS DE AUTORIDADE */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-5xl mx-auto">
           <div className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] text-center">
-            <BoltIcon className="w-16 h-16 text-[var(--accent-purple)] mx-auto mb-4" />
+            <Zap className="w-16 h-16 text-[var(--accent-purple)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.dominioAuthority || 0}</p>
             <p className="text-[var(--text-secondary)]">Domain Authority</p>
           </div>
           <div className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] text-center">
-            <LinkIcon className="w-16 h-16 text-[var(--accent-sky)] mx-auto mb-4" />
+            <Link2 className="w-16 h-16 text-[var(--accent-sky)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.backlinks || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Backlinks</p>
           </div>
           <div className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-8 border border-[var(--border)] text-center">
-            <DocumentTextIcon className="w-16 h-16 text-[var(--accent-emerald)] mx-auto mb-4" />
+            <FileText className="w-16 h-16 text-[var(--accent-emerald)] mx-auto mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.paginasIndexadas || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Páginas Indexadas</p>
           </div>
@@ -186,7 +186,7 @@ export default function SEOPage() {
 
           {metrics?.keywords.length === 0 ? (
             <div className="text-center py-20">
-              <MagnifyingGlassIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <Search className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
               <p className="text-3xl text-[var(--text)]/50">Nenhuma keyword rastreada</p>
             </div>
           ) : (
@@ -233,7 +233,7 @@ export default function SEOPage() {
                         kw.variacao > 0 ? 'text-[var(--accent-emerald)]' :
                         kw.variacao < 0 ? 'text-[var(--accent-alert)]' : 'text-[var(--text-secondary)]'
                       }`}>
-                        <ArrowTrendingUpIcon className={`w-6 h-6 ${kw.variacao < 0 ? 'rotate-180' : ''}`} />
+                        <TrendingUp className={`w-6 h-6 ${kw.variacao < 0 ? 'rotate-180' : ''}`} />
                         <span className="text-xl font-bold">{Math.abs(kw.variacao)}</span>
                       </div>
                     </div>
@@ -251,7 +251,7 @@ export default function SEOPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-20"
         >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
             "Primeira página do Google não é sorte. É arquitetura de conteúdo perfeita."
           </p>

@@ -31,7 +31,7 @@ export const Automations: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-8 text-center">
+        <div className="bg-[var(--surface)] rounded-lg shadow p-8 text-center">
           <h2 className="text-xl font-semibold text-alsham-text-primary mb-4">
             Automações em Desenvolvimento
           </h2>

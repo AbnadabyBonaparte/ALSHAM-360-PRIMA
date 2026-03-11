@@ -1,7 +1,7 @@
 // src/pages/Automacoes.tsx
 // ALSHAM 360° PRIMA — Automação Omnichannel (migrado para shadcn/ui)
 
-import { BoltIcon, PlayIcon, PauseIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Zap, Play, Pause, Plus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -88,7 +88,7 @@ export default function AutomacoesPage() {
         {/* Header Supremo */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-8">
-            <BoltIcon className="w-20 h-20 text-[var(--accent-warning)] animate-pulse" />
+            <Zap className="w-20 h-20 text-[var(--accent-warning)] animate-pulse" />
             <div>
               <h1 className="text-6xl font-bold bg-gradient-to-r from-[var(--accent-warning)] via-[var(--accent-warning)] to-[var(--accent-alert)] bg-clip-text text-transparent">
                 Automação Omnichannel Suprema
@@ -99,7 +99,7 @@ export default function AutomacoesPage() {
             </div>
           </div>
           <Button className="bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-pink)] hover:from-[var(--accent-purple)]/90 hover:to-[var(--accent-pink)]/90 px-10 py-6 rounded-2xl font-bold text-2xl shadow-2xl shadow-[var(--accent-purple)]/50 transition-all transform hover:scale-105 flex items-center gap-4">
-            <PlusIcon className="w-10 h-10" />
+            <Plus className="w-10 h-10" />
             Nova Automação
           </Button>
         </div>
@@ -136,7 +136,7 @@ export default function AutomacoesPage() {
                           variant="ghost"
                           className="p-4 bg-[var(--surface)]/10 hover:bg-[var(--surface)]/20 rounded-2xl transition-all"
                         >
-                          {auto.status === 'active' ? <PauseIcon className="w-8 h-8" /> : <PlayIcon className="w-8 h-8" />}
+                          {auto.status === 'active' ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
                         </Button>
                       </div>
                     </div>
@@ -175,7 +175,7 @@ export default function AutomacoesPage() {
         {/* Se não tiver nenhuma automação */}
         {automations.length === 0 && !loading && (
           <div className="text-center py-32">
-            <BoltIcon className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
+            <Zap className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
             <p className="text-4xl text-[var(--text-secondary)] font-light">Nenhuma automação ativa</p>
             <p className="text-2xl text-[var(--text-secondary)] mt-6">
               Crie sua primeira automação e o Citizen Supremo X.1 vai começar a trabalhar por você 24/7

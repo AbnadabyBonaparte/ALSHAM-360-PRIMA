@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  BuildingOffice2Icon,
-  VideoCameraIcon,
-  ChatBubbleLeftRightIcon,
-  UserGroupIcon,
-  ComputerDesktopIcon,
-  SparklesIcon,
-  GlobeAltIcon,
-  ClockIcon
-} from '@heroicons/react/24/outline';
+  Building2,
+  Video,
+  MessageCircle,
+  Users,
+  Monitor,
+  Sparkles,
+  Globe,
+  Clock
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -98,10 +98,10 @@ export default function VirtualOfficePage() {
   }
 
   const tipoConfig: Record<string, { icon: JSX.Element; color: string; label: string }> = {
-    meeting: { icon: <VideoCameraIcon className="w-8 h-8" />, color: 'text-blue-400', label: 'Reunião' },
-    focus: { icon: <ComputerDesktopIcon className="w-8 h-8" />, color: 'text-green-400', label: 'Foco' },
-    social: { icon: <ChatBubbleLeftRightIcon className="w-8 h-8" />, color: 'text-pink-400', label: 'Social' },
-    event: { icon: <GlobeAltIcon className="w-8 h-8" />, color: 'text-yellow-400', label: 'Evento' }
+    meeting: { icon: <Video className="w-8 h-8" />, color: 'text-[var(--accent-sky)]', label: 'Reunião' },
+    focus: { icon: <Monitor className="w-8 h-8" />, color: 'text-[var(--accent-emerald)]', label: 'Foco' },
+    social: { icon: <MessageCircle className="w-8 h-8" />, color: 'text-pink-400', label: 'Social' },
+    event: { icon: <Globe className="w-8 h-8" />, color: 'text-[var(--accent-warning)]', label: 'Evento' }
   };
 
   return (
@@ -115,7 +115,7 @@ export default function VirtualOfficePage() {
           <h1 className="text-xl md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
             ESCRITÓRIO VIRTUAL
           </h1>
-          <p className="text-3xl text-gray-400 mt-6">
+          <p className="text-3xl text-[var(--text-secondary)] mt-6">
             O futuro do trabalho é aqui
           </p>
         </motion.div>
@@ -128,38 +128,38 @@ export default function VirtualOfficePage() {
             className="bg-gradient-to-br from-violet-900/60 to-purple-900/60 rounded-3xl p-8 border-2 border-violet-500/50 text-center"
           >
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-2xl text-green-400 font-bold">ONLINE AGORA</span>
+              <div className="w-4 h-4 bg-[var(--accent-emerald)] rounded-full animate-pulse" />
+              <span className="text-2xl text-[var(--accent-emerald)] font-bold">ONLINE AGORA</span>
             </div>
             <p className="text-xl md:text-2xl lg:text-3xl font-black text-[var(--text-primary)]">{metrics?.usuariosOnline}</p>
-            <p className="text-gray-400">colaboradores ativos</p>
+            <p className="text-[var(--text-secondary)]">colaboradores ativos</p>
           </motion.div>
         </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-blue-900/60 to-indigo-900/60 rounded-2xl p-6 border border-blue-500/30">
-            <BuildingOffice2Icon className="w-12 h-12 text-blue-400 mb-3" />
+            <Building2 className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.salasCriadas}</p>
-            <p className="text-gray-400">Salas Virtuais</p>
+            <p className="text-[var(--text-secondary)]">Salas Virtuais</p>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 rounded-2xl p-6 border border-green-500/30">
-            <VideoCameraIcon className="w-12 h-12 text-green-400 mb-3" />
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-[var(--accent-emerald)]/60 to-[var(--accent-emerald)]/60 rounded-2xl p-6 border border-[var(--accent-emerald)]/30">
+            <Video className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.reunioesHoje}</p>
-            <p className="text-gray-400">Reuniões Hoje</p>
+            <p className="text-[var(--text-secondary)]">Reuniões Hoje</p>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-purple-900/60 to-pink-900/60 rounded-2xl p-6 border border-purple-500/30">
-            <ClockIcon className="w-12 h-12 text-purple-400 mb-3" />
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-[var(--accent-purple)]/60 to-pink-900/60 rounded-2xl p-6 border border-[var(--accent-purple)]/30">
+            <Clock className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.horasTrabalhadas}h</p>
-            <p className="text-gray-400">Horas Hoje</p>
+            <p className="text-[var(--text-secondary)]">Horas Hoje</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-br from-pink-900/60 to-rose-900/60 rounded-2xl p-6 border border-pink-500/30">
-            <UserGroupIcon className="w-12 h-12 text-pink-400 mb-3" />
+            <Users className="w-12 h-12 text-pink-400 mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.usuariosOnline}</p>
-            <p className="text-gray-400">Team Online</p>
+            <p className="text-[var(--text-secondary)]">Team Online</p>
           </motion.div>
         </div>
 
@@ -171,8 +171,8 @@ export default function VirtualOfficePage() {
 
           {metrics?.salas.length === 0 ? (
             <div className="text-center py-20">
-              <BuildingOffice2Icon className="w-32 h-32 text-gray-700 mx-auto mb-8" />
-              <p className="text-3xl text-gray-500">Nenhuma sala virtual ativa</p>
+              <Building2 className="w-32 h-32 text-[var(--text-primary)] mx-auto mb-8" />
+              <p className="text-3xl text-[var(--text-secondary)]">Nenhuma sala virtual ativa</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,17 +188,17 @@ export default function VirtualOfficePage() {
                     className={`rounded-3xl p-6 border backdrop-blur-xl cursor-pointer transition-all ${
                       sala.participantes > 0
                         ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-violet-500/50 shadow-lg shadow-violet-500/20'
-                        : 'bg-gradient-to-br from-white/5 to-white/10 border-[var(--border)] hover:border-violet-500/30'
+                        : 'bg-gradient-to-br from-[var(--surface)]/5 to-[var(--surface)]/10 border-[var(--border)] hover:border-violet-500/30'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-white/10 ${config.color}`}>
+                      <div className={`p-3 rounded-xl bg-[var(--surface)]/10 ${config.color}`}>
                         {config.icon}
                       </div>
                       {sala.participantes > 0 && (
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-                          <span className="text-green-400 text-sm font-medium">Ativo</span>
+                          <div className="w-3 h-3 bg-[var(--accent-emerald)] rounded-full animate-pulse" />
+                          <span className="text-[var(--accent-emerald)] text-sm font-medium">Ativo</span>
                         </div>
                       )}
                     </div>
@@ -208,13 +208,13 @@ export default function VirtualOfficePage() {
 
                     <div className="mt-6 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <UserGroupIcon className="w-5 h-5 text-gray-400" />
+                        <Users className="w-5 h-5 text-[var(--text-secondary)]" />
                         <span className="text-[var(--text-primary)] font-medium">{sala.participantes}/{sala.capacidade}</span>
                       </div>
                       <button className={`px-4 py-2 rounded-xl font-medium transition-all ${
                         sala.participantes > 0
                           ? 'bg-violet-500 text-[var(--text-primary)] hover:bg-violet-600'
-                          : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                          : 'bg-[var(--surface)]/10 text-[var(--text-secondary)] hover:bg-[var(--surface)]/20'
                       }`}>
                         {sala.participantes > 0 ? 'Entrar' : 'Abrir'}
                       </button>
@@ -233,11 +233,11 @@ export default function VirtualOfficePage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-violet-400 mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-violet-400 mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-violet-300 max-w-4xl mx-auto">
             "O escritório do futuro não tem paredes. Tem conexões."
           </p>
-          <p className="text-3xl text-gray-500 mt-8">
+          <p className="text-3xl text-[var(--text-secondary)] mt-8">
             — Citizen Supremo X.1, seu Arquiteto Virtual
           </p>
         </motion.div>

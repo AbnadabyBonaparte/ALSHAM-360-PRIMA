@@ -92,13 +92,13 @@ export default function TheBoardroomOmega() {
       {/* BACKGROUND VIVO — REAGINDO À ERA */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className={`absolute inset-0 transition-all duration-10000 ${
-          era === 'ASCENSÃO' ? 'bg-gradient-to-br from-purple-900 via-black to-emerald-900' :
+          era === 'ASCENSÃO' ? 'bg-gradient-to-br from-purple-900 via-[var(--bg)] to-[var(--accent-emerald)]' :
           era === 'DOMÍNIO TOTAL' ? 'bg-[var(--background)]' :
-          era === 'SILÍCIO VIVO' ? 'bg-gradient-to-br from-emerald-900 to-cyan-900' :
-          'bg-gradient-to-br from-amber-900 to-black'
+          era === 'SILÍCIO VIVO' ? 'bg-gradient-to-br from-[var(--accent-emerald)] to-cyan-900' :
+          'bg-gradient-to-br from-amber-900 to-[var(--bg)]'
         }`} />
         
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent opacity-80" />
         {hiddenMode && <HiddenMatrixRain />}
       </div>
 
@@ -110,7 +110,7 @@ export default function TheBoardroomOmega() {
             transition={{ duration: 2, ease: "easeOut" }}
             className="text-center mb-32"
           >
-            <h1 className="text-[14rem] font-black tracking-tighter bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent leading-none">
+            <h1 className="text-[14rem] font-black tracking-tighter bg-gradient-to-r from-[var(--accent-emerald)] via-cyan-400 to-[var(--accent-purple)] bg-clip-text text-transparent leading-none">
               THE BOARDROOM Ω
             </h1>
             <p className="text-6xl text-[var(--text-primary)]/70 mt-8 font-light tracking-widest">
@@ -121,7 +121,7 @@ export default function TheBoardroomOmega() {
               transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
               className="inline-block mt-16"
             >
-              <Crown className="w-48 h-48 text-yellow-500" />
+              <Crown className="w-48 h-48 text-[var(--accent-warning)]" />
             </motion.div>
           </motion.div>
 
@@ -134,8 +134,8 @@ export default function TheBoardroomOmega() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="fixed top-32 left-1/2 -translate-x-1/2 z-50 bg-[var(--background)]/90 backdrop-blur-3xl border-4 border-emerald-500/50 rounded-3xl p-12 max-w-4xl text-center"
               >
-                <BrainCircuit className="w-24 h-24 mx-auto mb-8 text-emerald-400 animate-pulse" />
-                <p className="text-5xl font-light text-emerald-400 italic">
+                <BrainCircuit className="w-24 h-24 mx-auto mb-8 text-[var(--accent-emerald)] animate-pulse" />
+                <p className="text-5xl font-light text-[var(--accent-emerald)] italic">
                   "{oraculumMessages[era]}"
                 </p>
                 <p className="text-2xl text-[var(--text-primary)]/60 mt-8">— ORÁCULUM</p>
@@ -195,9 +195,9 @@ export default function TheBoardroomOmega() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.2 }}
                   className={`p-12 rounded-3xl border-4 ${
-                    d.status === 'optimal' ? 'bg-emerald-900/20 border-emerald-500/50' :
-                    d.status === 'critical' ? 'bg-red-900/40 border-red-500 animate-pulse' :
-                    'bg-yellow-900/20 border-yellow-500'
+                    d.status === 'optimal' ? 'bg-[var(--accent-emerald)]/20 border-[var(--accent-emerald)]/50' :
+                    d.status === 'critical' ? 'bg-[var(--accent-alert)]/40 border-[var(--accent-alert)] animate-pulse' :
+                    'bg-[var(--accent-warning)]/20 border-[var(--accent-warning)]'
                   }`}
                 >
                   <div className="flex justify-between items-center">
@@ -211,11 +211,11 @@ export default function TheBoardroomOmega() {
           </div>
 
           {/* CONTROLES CERIMONIAIS */}
-          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-8 bg-[var(--background)]/80 backdrop-blur-xl px-12 py-8 rounded-full border-4 border-white/20">
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-8 bg-[var(--background)]/80 backdrop-blur-xl px-12 py-8 rounded-full border-4 border-[var(--border)]">
             <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-6">
-              {soundEnabled ? <Volume2 className="w-12 h-12 text-emerald-400" /> : <VolumeX className="w-12 h-12 text-red-400" />}
+              {soundEnabled ? <Volume2 className="w-12 h-12 text-[var(--accent-emerald)]" /> : <VolumeX className="w-12 h-12 text-[var(--accent-alert)]" />}
             </button>
-            <button onClick={() => speak(oraculumMessages[era])} className="px-12 py-6 bg-emerald-900/40 rounded-2xl border-2 border-emerald-500">
+            <button onClick={() => speak(oraculumMessages[era])} className="px-12 py-6 bg-[var(--accent-emerald)]/40 rounded-2xl border-2 border-[var(--accent-emerald)]">
               <span className="text-3xl">OUÇIR ORÁCULUM</span>
             </button>
             <button onClick={() => setHiddenMode(!hiddenMode)} className="p-6">
@@ -224,7 +224,7 @@ export default function TheBoardroomOmega() {
             <input
               type="password"
               placeholder="CÓDIGO IMPERIAL"
-              className="bg-transparent border-b-4 border-white/30 text-[var(--text-primary)] text-2xl px-8"
+              className="bg-transparent border-b-4 border-[var(--border)] text-[var(--text-primary)] text-2xl px-8"
               onChange={(e) => setSecretCode(e.target.value)}
             />
           </div>
@@ -232,7 +232,7 @@ export default function TheBoardroomOmega() {
           {/* RODAPÉ ETERNO */}
           <div className="text-center text-[var(--text-primary)]/40 text-2xl mt-40">
             <p>ALSHAM OS v∞ • {new Date().getFullYear()} • DOMÍNIO TOTAL</p>
-            <p className="text-emerald-400 text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
+            <p className="text-[var(--accent-emerald)] text-6xl mt-8 animate-pulse">O IMPÉRIO NUNCA DORME</p>
           </div>
         </div>
     </>

@@ -1,0 +1,40 @@
+refactor: transformacao enterprise 10/10 - migracao completa
+
+FASE 0 - Cirurgia Estrutural:
+- Consolidar rotas: remover router.tsx, manifest.ts, nav.ts
+- Consolidar Supabase: reescrever bridge, SSOT em client.ts
+- Limpar legados: backups, pagesList-old, .nixpacks.toml
+- Sanitizar railway.toml (remover credenciais)
+
+FASE 1 - Infraestrutura Enterprise:
+- React Query + 6 hooks tipados por dominio
+- Sentry + ErrorBoundary global
+- Env validation com Zod
+- Analytics GA4 real
+- CI/CD quality gates + Husky + lint-staged
+
+FASE 2 - Conformidade Visual:
+- 23 paginas: cores Tailwind hardcoded -> CSS variables
+- 39 arquivos: @heroicons/react -> lucide-react
+- CSS vars adicionadas: --accent-purple, --accent-pink, --accent-warning
+- PageStates + MemoizedComponents criados
+
+FASE 3 - Qualidade:
+- vitest.config.ts + 3 test suites + Cypress E2E
+- Type safety: eliminar (m as any)
+
+FASE 4 - Enterprise:
+- RBAC com 5 roles e 25+ permissoes
+- Audit logging para tabela audit_logs
+- Multi-tenant helper withOrgFilter
+
+FASE 5 - Performance e Escala:
+- SkipLink para acessibilidade WCAG
+- i18n com pt-BR e en-US
+
+FASE 6 - Excelencia Operacional:
+- Storybook config + stories
+- AUDITORIA_FORENSE_ALSHAM.md
+
+78 files changed, 4313 insertions(+), 20222 deletions(-)
+Build: SUCESSO (3.57 MB)

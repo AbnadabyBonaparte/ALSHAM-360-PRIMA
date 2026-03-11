@@ -80,19 +80,19 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h1 className="text-xl font-extrabold text-white">Redefinir senha</h1>
-        <p className="mt-1 text-sm text-white/70">Defina uma nova senha para sua conta.</p>
+      <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)]/5 p-6">
+        <h1 className="text-xl font-extrabold text-[var(--text)]">Redefinir senha</h1>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">Defina uma nova senha para sua conta.</p>
 
         {err && (
           <div className="mt-4 rounded-xl border border-[var(--accent-alert)]/30 bg-[var(--accent-alert)]/10 p-3 text-sm text-[var(--accent-alert)]">
             <div className="font-semibold">Não foi possível concluir</div>
             <div className="mt-1">{err}</div>
             <div className="mt-3 flex gap-2">
-              <Link to="/forgot-password" className="rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/15">
+              <Link to="/forgot-password" className="rounded-lg bg-[var(--surface)]/10 px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--surface)]/15">
                 Reenviar email
               </Link>
-              <Link to="/login" className="rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/15">
+              <Link to="/login" className="rounded-lg bg-[var(--surface)]/10 px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--surface)]/15">
                 Login
               </Link>
             </div>
@@ -100,34 +100,34 @@ export default function ResetPassword() {
         )}
 
         {msg && (
-          <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+          <div className="mt-4 rounded-xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 p-3 text-sm text-[var(--accent-emerald)]">
             {msg}
           </div>
         )}
 
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
           <div>
-            <label className="block text-sm font-semibold text-white/80">Nova senha</label>
+            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Nova senha</label>
             <input
               type="password"
               value={p1}
               onChange={(e) => setP1(e.target.value)}
               disabled={!ready || loading}
               autoComplete="new-password"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none disabled:opacity-60"
+              className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--bg)]/30 px-4 py-3 text-[var(--text)] outline-none disabled:opacity-60"
               placeholder="mínimo 8 caracteres"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-white/80">Confirmar senha</label>
+            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Confirmar senha</label>
             <input
               type="password"
               value={p2}
               onChange={(e) => setP2(e.target.value)}
               disabled={!ready || loading}
               autoComplete="new-password"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none disabled:opacity-60"
+              className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--bg)]/30 px-4 py-3 text-[var(--text)] outline-none disabled:opacity-60"
               placeholder="repita a senha"
             />
           </div>
@@ -135,18 +135,18 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={!ready || loading}
-            className="w-full rounded-xl bg-[var(--accent-2)] px-4 py-3 font-bold text-white hover:bg-[var(--accent-2)]/80 disabled:opacity-60"
+            className="w-full rounded-xl bg-[var(--accent-2)] px-4 py-3 font-bold text-[var(--text)] hover:bg-[var(--accent-2)]/80 disabled:opacity-60"
           >
             {loading ? 'Salvando...' : 'Salvar nova senha'}
           </button>
 
           <div className="text-center">
-            <Link to="/login" className="text-sm text-white/70 hover:text-white">
+            <Link to="/login" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text)]">
               Voltar ao login
             </Link>
           </div>
 
-          {!ready && !err && <div className="text-center text-xs text-white/50">Validando link...</div>}
+          {!ready && !err && <div className="text-center text-xs text-[var(--text-secondary)]">Validando link...</div>}
         </form>
       </div>
     </div>

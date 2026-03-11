@@ -2,18 +2,18 @@
 // ALSHAM 360° PRIMA — Tarefas (migrado para shadcn/ui)
 
 import {
-  CheckCircleIcon,
-  ClockIcon,
-  FireIcon,
-  CalendarIcon,
-  UserIcon,
-  TagIcon,
-  TrophyIcon,
-  SparklesIcon,
-  ArrowTrendingUpIcon,
-  ExclamationTriangleIcon,
-  PlusIcon
-} from '@heroicons/react/24/outline';
+  CheckCircle2,
+  Clock,
+  Flame,
+  Calendar,
+  User,
+  Tag,
+  Trophy,
+  Sparkles,
+  TrendingUp,
+  AlertTriangle,
+  Plus
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -113,31 +113,31 @@ export default function TasksPage() {
         {/* KPIS SUPREMOS */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-20">
           <SupremeTaskCard
-            icon={<CheckCircleIcon />}
+            icon={<CheckCircle2 />}
             title="Concluídas"
             value={stats.completed.toString()}
             colorClass="from-[var(--accent-emerald)] to-[var(--accent-sky)]"
           />
           <SupremeTaskCard
-            icon={<ClockIcon />}
+            icon={<Clock />}
             title="Hoje"
             value={stats.today.toString()}
             colorClass="from-[var(--accent-sky)] to-[var(--accent-purple)]"
           />
           <SupremeTaskCard
-            icon={<ExclamationTriangleIcon />}
+            icon={<AlertTriangle />}
             title="Atrasadas"
             value={stats.overdue.toString()}
             colorClass="from-[var(--accent-alert)] to-[var(--accent-warning)]"
           />
           <SupremeTaskCard
-            icon={<TrophyIcon />}
+            icon={<Trophy />}
             title="Pontos Ganhos"
             value={stats.pointsEarned.toLocaleString()}
             colorClass="from-[var(--accent-warning)] to-[var(--accent-warning)]"
           />
           <SupremeTaskCard
-            icon={<FireIcon />}
+            icon={<Flame />}
             title="Streak Atual"
             value={stats.streak.toString()}
             colorClass="from-[var(--accent-warning)] to-[var(--accent-alert)]"
@@ -179,7 +179,7 @@ export default function TasksPage() {
           whileInView={{ opacity: 1 }}
           className="text-center py-40 mt-32"
         >
-          <TrophyIcon className="w-64 h-64 text-[var(--accent-warning)] mx-auto mb-16 animate-pulse" />
+          <Trophy className="w-64 h-64 text-[var(--accent-warning)] mx-auto mb-16 animate-pulse" />
           <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]">
             CADA TAREFA CONCLUÍDA
           </p>
@@ -220,15 +220,15 @@ function TaskColumn({ title, tasks, colorClass, getPriorityVariant }: any) {
                   )}
                   <div className="flex items-center justify-between text-[var(--text-secondary)]">
                     <span className="flex items-center gap-2">
-                      <UserIcon className="w-6 h-6" />
+                      <User className="w-6 h-6" />
                       {task.assignee}
                     </span>
                     <span className="flex items-center gap-2">
-                      <CalendarIcon className="w-6 h-6" />
+                      <Calendar className="w-6 h-6" />
                       {format(new Date(task.due_date), 'dd/MM')}
                     </span>
                     <span className="flex items-center gap-2">
-                      <TrophyIcon className="w-6 h-6 text-[var(--accent-warning)]" />
+                      <Trophy className="w-6 h-6 text-[var(--accent-warning)]" />
                       {task.points} pts
                     </span>
                   </div>

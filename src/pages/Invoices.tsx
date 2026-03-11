@@ -3,15 +3,15 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  DocumentTextIcon,
-  CurrencyDollarIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ExclamationTriangleIcon,
-  SparklesIcon,
-  BanknotesIcon,
-  ArrowPathIcon
-} from '@heroicons/react/24/outline';
+  FileText,
+  DollarSign,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Sparkles,
+  Banknote,
+  RefreshCw
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -109,11 +109,11 @@ export default function InvoicesPage() {
   }
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
-    rascunho: { variant: 'secondary', icon: <DocumentTextIcon className="w-4 h-4" /> },
-    enviada: { variant: 'outline', icon: <ClockIcon className="w-4 h-4" /> },
-    paga: { variant: 'default', icon: <CheckCircleIcon className="w-4 h-4" /> },
-    atrasada: { variant: 'destructive', icon: <ExclamationTriangleIcon className="w-4 h-4" /> },
-    cancelada: { variant: 'secondary', icon: <ArrowPathIcon className="w-4 h-4" /> }
+    rascunho: { variant: 'secondary', icon: <FileText className="w-4 h-4" /> },
+    enviada: { variant: 'outline', icon: <Clock className="w-4 h-4" /> },
+    paga: { variant: 'default', icon: <CheckCircle2 className="w-4 h-4" /> },
+    atrasada: { variant: 'destructive', icon: <AlertTriangle className="w-4 h-4" /> },
+    cancelada: { variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> }
   };
 
   return (
@@ -136,7 +136,7 @@ export default function InvoicesPage() {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
         <Card className="bg-[var(--surface)]/60 border-[var(--border)]">
           <CardContent className="p-6">
-            <DocumentTextIcon className="w-12 h-12 text-[var(--text-secondary)] mb-3" />
+            <FileText className="w-12 h-12 text-[var(--text-secondary)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalFaturas || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Faturas</p>
           </CardContent>
@@ -144,7 +144,7 @@ export default function InvoicesPage() {
 
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <BanknotesIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Banknote className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorEmitido || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Emitido</p>
           </CardContent>
@@ -152,7 +152,7 @@ export default function InvoicesPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorRecebido || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Recebido</p>
           </CardContent>
@@ -160,7 +160,7 @@ export default function InvoicesPage() {
 
         <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
           <CardContent className="p-6">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorPendente || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Pendente</p>
           </CardContent>
@@ -168,7 +168,7 @@ export default function InvoicesPage() {
 
         <Card className="bg-[var(--accent-alert)]/10 border-[var(--accent-alert)]/30">
           <CardContent className="p-6">
-            <ExclamationTriangleIcon className="w-12 h-12 text-[var(--accent-alert)] mb-3" />
+            <AlertTriangle className="w-12 h-12 text-[var(--accent-alert)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.atrasadas || 0}</p>
             <p className="text-[var(--text-secondary)]">Atrasadas</p>
           </CardContent>
@@ -183,7 +183,7 @@ export default function InvoicesPage() {
 
         {metrics?.faturas.length === 0 ? (
           <div className="text-center py-20">
-            <DocumentTextIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <FileText className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhuma fatura cadastrada</p>
           </div>
         ) : (
@@ -252,7 +252,7 @@ export default function InvoicesPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-emerald)] max-w-4xl mx-auto">
           "Fatura enviada é dinheiro a caminho. Fatura paga é império crescendo."
         </p>

@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  DocumentTextIcon,
-  EyeIcon,
-  HeartIcon,
-  ChatBubbleLeftIcon,
-  ClockIcon,
-  TagIcon,
-  SparklesIcon,
-  BookOpenIcon
-} from '@heroicons/react/24/outline';
+  FileText,
+  Eye,
+  Heart,
+  MessageSquare,
+  Clock,
+  Tag,
+  Sparkles,
+  BookOpen
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -139,25 +139,25 @@ export default function BlogPage() {
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <BookOpenIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <BookOpen className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalPosts || 0}</p>
             <p className="text-[var(--text-secondary)]">Total de Posts</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <EyeIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Eye className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Visualizações</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <HeartIcon className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
+            <Heart className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalCurtidas || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Curtidas</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.mediaTempoLeitura || 0).toFixed(0)} min</p>
             <p className="text-[var(--text-secondary)]">Tempo Médio</p>
           </motion.div>
@@ -184,7 +184,7 @@ export default function BlogPage() {
         <div className="max-w-6xl mx-auto">
           {postsFiltrados.length === 0 ? (
             <div className="text-center py-20">
-              <DocumentTextIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <FileText className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
               <p className="text-3xl text-[var(--text)]/50">Nenhum post encontrado</p>
             </div>
           ) : (
@@ -200,7 +200,7 @@ export default function BlogPage() {
                 >
                   {/* IMAGEM DE CAPA */}
                   <div className="h-48 bg-[var(--accent-warning)]/10 flex items-center justify-center">
-                    <BookOpenIcon className="w-20 h-20 text-[var(--accent-warning)]/50" />
+                    <BookOpen className="w-20 h-20 text-[var(--accent-warning)]/50" />
                   </div>
 
                   <div className="p-6">
@@ -232,20 +232,20 @@ export default function BlogPage() {
                     <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                          <EyeIcon className="w-5 h-5" />
+                          <Eye className="w-5 h-5" />
                           <span>{post.visualizacoes}</span>
                         </div>
                         <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                          <HeartIcon className="w-5 h-5" />
+                          <Heart className="w-5 h-5" />
                           <span>{post.curtidas}</span>
                         </div>
                         <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                          <ChatBubbleLeftIcon className="w-5 h-5" />
+                          <MessageSquare className="w-5 h-5" />
                           <span>{post.comentarios}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                        <ClockIcon className="w-5 h-5" />
+                        <Clock className="w-5 h-5" />
                         <span>{post.tempo_leitura} min</span>
                       </div>
                     </div>
@@ -263,7 +263,7 @@ export default function BlogPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-[var(--accent-warning)] max-w-4xl mx-auto">
             "Quem controla o conteúdo, controla a narrativa. Quem controla a narrativa, controla o mercado."
           </p>

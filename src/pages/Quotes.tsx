@@ -3,18 +3,18 @@
 // 100% CSS Variables + shadcn/ui
 
 import { 
-  DocumentTextIcon,
-  CurrencyDollarIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ArrowDownTrayIcon,
-  SparklesIcon,
-  UserIcon,
-  CalendarIcon,
-  TagIcon,
-  PrinterIcon,
-  XCircleIcon
-} from '@heroicons/react/24/outline';
+  FileText,
+  DollarSign,
+  CheckCircle2,
+  Clock,
+  Download,
+  Sparkles,
+  User,
+  Calendar,
+  Tag,
+  Printer,
+  XCircle
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -78,12 +78,12 @@ export default function QuotesPage() {
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'approved': return { variant: 'default' as const, label: 'Aprovada', icon: CheckCircleIcon };
-      case 'sent': return { variant: 'secondary' as const, label: 'Enviada', icon: ClockIcon };
-      case 'viewed': return { variant: 'outline' as const, label: 'Visualizada', icon: SparklesIcon };
-      case 'rejected': return { variant: 'destructive' as const, label: 'Rejeitada', icon: XCircleIcon };
-      case 'expired': return { variant: 'secondary' as const, label: 'Expirada', icon: CalendarIcon };
-      default: return { variant: 'outline' as const, label: 'Rascunho', icon: DocumentTextIcon };
+      case 'approved': return { variant: 'default' as const, label: 'Aprovada', icon: CheckCircle2 };
+      case 'sent': return { variant: 'secondary' as const, label: 'Enviada', icon: Clock };
+      case 'viewed': return { variant: 'outline' as const, label: 'Visualizada', icon: Sparkles };
+      case 'rejected': return { variant: 'destructive' as const, label: 'Rejeitada', icon: XCircle };
+      case 'expired': return { variant: 'secondary' as const, label: 'Expirada', icon: Calendar };
+      default: return { variant: 'outline' as const, label: 'Rascunho', icon: FileText };
     }
   };
 
@@ -162,17 +162,17 @@ export default function QuotesPage() {
 
                   <div className="space-y-6">
                     <div className="flex items-center gap-4">
-                      <UserIcon className="w-8 h-8 text-[var(--text-secondary)]" />
+                      <User className="w-8 h-8 text-[var(--text-secondary)]" />
                       <span className="text-xl text-[var(--text-secondary)]">{quote.owner}</span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <CalendarIcon className="w-8 h-8 text-[var(--text-secondary)]" />
+                      <Calendar className="w-8 h-8 text-[var(--text-secondary)]" />
                       <span className="text-xl text-[var(--text-secondary)]">
                         Válida até {format(new Date(quote.validity_date), "dd/MM/yyyy")}
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <TagIcon className="w-8 h-8 text-[var(--text-secondary)]" />
+                      <Tag className="w-8 h-8 text-[var(--text-secondary)]" />
                       <span className="text-xl text-[var(--text-secondary)]">{quote.items_count} itens</span>
                     </div>
                   </div>
@@ -180,11 +180,11 @@ export default function QuotesPage() {
                   {/* Botões de ação */}
                   <div className="flex gap-4 mt-10">
                     <Button className="flex-1 py-5 text-xl font-bold">
-                      <ArrowDownTrayIcon className="w-6 h-6 mr-2" />
+                      <Download className="w-6 h-6 mr-2" />
                       Baixar PDF
                     </Button>
                     <Button variant="outline" className="flex-1 py-5 text-xl font-bold">
-                      <PrinterIcon className="w-6 h-6 mr-2" />
+                      <Printer className="w-6 h-6 mr-2" />
                       Imprimir
                     </Button>
                   </div>
@@ -201,7 +201,7 @@ export default function QuotesPage() {
         whileInView={{ opacity: 1 }}
         className="text-center py-40 mt-32"
       >
-        <CurrencyDollarIcon className="w-64 h-64 text-[var(--accent-emerald)] mx-auto mb-16 animate-pulse" />
+        <DollarSign className="w-64 h-64 text-[var(--accent-emerald)] mx-auto mb-16 animate-pulse" />
         <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]">
           O DINHEIRO FALA
         </p>

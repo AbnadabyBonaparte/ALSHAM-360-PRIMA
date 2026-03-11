@@ -1,7 +1,7 @@
 // src/pages/Calendar.tsx
 // ALSHAM 360° PRIMA — Calendário (migrado para shadcn/ui)
 
-import { CalendarIcon, ClockIcon, VideoCameraIcon, UserGroupIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { Calendar, Clock, Video, Users, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
@@ -75,7 +75,7 @@ export default function CalendarPage() {
       {/* Header Supremo */}
       <div className="flex items-center justify-between mb-12">
         <div className="flex items-center gap-8">
-          <CalendarIcon className="w-20 h-20 text-[var(--accent-sky)] animate-pulse" />
+          <Calendar className="w-20 h-20 text-[var(--accent-sky)] animate-pulse" />
           <div>
             <h1 className="text-6xl font-bold bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent">
               Calendário

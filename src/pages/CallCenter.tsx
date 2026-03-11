@@ -5,15 +5,15 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  PhoneIcon,
-  PhoneArrowDownLeftIcon,
-  PhoneArrowUpRightIcon,
-  ClockIcon,
-  UserGroupIcon,
-  SparklesIcon,
-  SignalIcon,
-  MicrophoneIcon
-} from '@heroicons/react/24/outline';
+  Phone,
+  PhoneIncoming,
+  PhoneOutgoing,
+  Clock,
+  Users,
+  Sparkles,
+  Signal,
+  Mic
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -148,7 +148,7 @@ export default function CallCenterPage() {
           <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--accent-sky)]/50 shadow-2xl shadow-[var(--accent-sky)]/20">
             <CardContent className="p-8">
               <div className="flex items-center justify-center gap-4 mb-4">
-                <SignalIcon className="w-8 h-8 text-[var(--accent-sky)] animate-pulse" />
+                <Signal className="w-8 h-8 text-[var(--accent-sky)] animate-pulse" />
                 <span className="text-2xl font-bold text-[var(--accent-sky)]">LIGAÇÕES AO VIVO</span>
               </div>
               <p className="text-center text-6xl font-black text-[var(--text-primary)]">{metrics.emAndamento}</p>
@@ -161,7 +161,7 @@ export default function CallCenterPage() {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12 max-w-7xl mx-auto">
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <UserGroupIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Users className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.atendentesAtivos || 0}</p>
             <p className="text-[var(--text-secondary)]">Atendentes</p>
           </CardContent>
@@ -169,7 +169,7 @@ export default function CallCenterPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <PhoneIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Phone className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.ligacoesHoje || 0}</p>
             <p className="text-[var(--text-secondary)]">Ligações Hoje</p>
           </CardContent>
@@ -177,7 +177,7 @@ export default function CallCenterPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <PhoneIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3 animate-pulse" />
+            <Phone className="w-12 h-12 text-[var(--accent-emerald)] mb-3 animate-pulse" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.emAndamento || 0}</p>
             <p className="text-[var(--text-secondary)]">Em Andamento</p>
           </CardContent>
@@ -185,7 +185,7 @@ export default function CallCenterPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{formatDuration(metrics?.tempoMedioLigacao || 0)}</p>
             <p className="text-[var(--text-secondary)]">Tempo Médio</p>
           </CardContent>
@@ -193,7 +193,7 @@ export default function CallCenterPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <PhoneArrowDownLeftIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <PhoneIncoming className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaAtendimento || 0).toFixed(0)}%</p>
             <p className="text-[var(--text-secondary)]">Atendimento</p>
           </CardContent>
@@ -208,7 +208,7 @@ export default function CallCenterPage() {
 
         {metrics?.calls.length === 0 ? (
           <div className="text-center py-20">
-            <PhoneIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <Phone className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhuma ligação registrada</p>
           </div>
         ) : (
@@ -231,8 +231,8 @@ export default function CallCenterPage() {
                       call.tipo === 'entrada' ? 'bg-[var(--accent-emerald)]/20' : 'bg-[var(--accent-sky)]/20'
                     }`}>
                       {call.tipo === 'entrada'
-                        ? <PhoneArrowDownLeftIcon className="w-6 h-6 text-[var(--accent-emerald)]" />
-                        : <PhoneArrowUpRightIcon className="w-6 h-6 text-[var(--accent-sky)]" />
+                        ? <PhoneIncoming className="w-6 h-6 text-[var(--accent-emerald)]" />
+                        : <PhoneOutgoing className="w-6 h-6 text-[var(--accent-sky)]" />
                       }
                     </div>
                     <div>
@@ -250,7 +250,7 @@ export default function CallCenterPage() {
                       </p>
                     </div>
                     {call.gravacao && (
-                      <MicrophoneIcon className="w-5 h-5 text-[var(--accent-purple)]" title="Gravado" />
+                      <Mic className="w-5 h-5 text-[var(--accent-purple)]" title="Gravado" />
                     )}
                     <Badge className={`capitalize ${
                       call.status === 'em_andamento' ? 'bg-[var(--accent-emerald)]/20 text-[var(--accent-emerald)]' :
@@ -275,7 +275,7 @@ export default function CallCenterPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
           "A voz humana ainda é a arma mais poderosa de vendas. Use-a com sabedoria."
         </p>

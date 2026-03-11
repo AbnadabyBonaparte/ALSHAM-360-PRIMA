@@ -4,14 +4,14 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  HeartIcon,
-  ChatBubbleLeftIcon,
-  ShareIcon,
-  EyeIcon,
-  UserPlusIcon,
-  SparklesIcon,
-  GlobeAltIcon
-} from '@heroicons/react/24/outline';
+  Heart,
+  MessageSquare,
+  Share2,
+  Eye,
+  UserPlus,
+  Sparkles,
+  Globe
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -143,7 +143,7 @@ export default function SocialMediaPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <UserPlusIcon className="w-16 h-16 text-[var(--accent-pink)] mb-4" />
+            <UserPlus className="w-16 h-16 text-[var(--accent-pink)] mb-4" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalSeguidores || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text-secondary)]">Seguidores Totais</p>
           </motion.div>
@@ -152,7 +152,7 @@ export default function SocialMediaPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <HeartIcon className="w-16 h-16 text-[var(--accent-alert)] mb-4" />
+            <Heart className="w-16 h-16 text-[var(--accent-alert)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{(metrics?.engajamentoMedio || 0).toFixed(1)}%</p>
             <p className="text-xl text-[var(--text-secondary)]">Engajamento Médio</p>
           </motion.div>
@@ -161,7 +161,7 @@ export default function SocialMediaPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <ChatBubbleLeftIcon className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
+            <MessageSquare className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">{metrics?.totalPosts || 0}</p>
             <p className="text-xl text-[var(--text-secondary)]">Posts Publicados</p>
           </motion.div>
@@ -170,7 +170,7 @@ export default function SocialMediaPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <EyeIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
+            <Eye className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.alcanceTotal || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text-secondary)]">Alcance Total</p>
           </motion.div>
@@ -179,7 +179,7 @@ export default function SocialMediaPage() {
             whileHover={{ scale: 1.05 }}
             className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]"
           >
-            <ShareIcon className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
+            <Share2 className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
             <p className="text-5xl font-black text-[var(--text-primary)]">+{(metrics?.crescimentoMensal || 0).toFixed(1)}%</p>
             <p className="text-xl text-[var(--text-secondary)]">Crescimento Mensal</p>
           </motion.div>
@@ -193,7 +193,7 @@ export default function SocialMediaPage() {
 
           {metrics?.contas.length === 0 ? (
             <div className="text-center py-20">
-              <GlobeAltIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <Globe className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
               <p className="text-3xl text-[var(--text)]/50">Nenhuma conta conectada</p>
               <p className="text-xl text-[var(--text)]/40 mt-4">Conecte suas redes sociais</p>
             </div>
@@ -250,7 +250,7 @@ export default function SocialMediaPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-20"
         >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-pink)] mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-[var(--accent-pink)] mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-[var(--accent-pink)] max-w-4xl mx-auto">
             "Viralizar não é sorte. É estratégia alienígena."
           </p>

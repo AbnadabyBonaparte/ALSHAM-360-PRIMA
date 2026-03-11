@@ -1,0 +1,67 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro ao carregar dados",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "noData": "Nenhum dado encontrado",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "close": "Fechar",
+    "reload": "Recarregar página"
+  },
+  "auth": {
+    "login": "Entrar",
+    "signup": "Criar conta",
+    "logout": "Sair",
+    "forgotPassword": "Esqueceu a senha?",
+    "resetPassword": "Redefinir senha",
+    "email": "E-mail",
+    "password": "Senha",
+    "fullName": "Nome completo"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "contacts": "Contatos",
+    "pipeline": "Pipeline",
+    "tasks": "Tarefas",
+    "calendar": "Calendário",
+    "campaigns": "Campanhas",
+    "reports": "Relatórios",
+    "settings": "Configurações"
+  },
+  "leads": {
+    "title": "Leads",
+    "newLead": "Novo Lead",
+    "noLeads": "Nenhum lead encontrado",
+    "noLeadsDesc": "Comece adicionando seu primeiro lead ao CRM.",
+    "status": "Status",
+    "temperature": "Temperatura",
+    "score": "Score",
+    "owner": "Responsável"
+  },
+  "dashboard": {
+    "title": "Dashboard Principal",
+    "totalLeads": "Total de Leads",
+    "totalOpportunities": "Oportunidades",
+    "totalTasks": "Tarefas",
+    "recentLeads": "Leads Recentes"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro inesperado. Tente novamente.",
+    "network": "Erro de conexão. Verifique sua internet.",
+    "unauthorized": "Sessão expirada. Faça login novamente.",
+    "forbidden": "Você não tem permissão para esta ação."
+  }
+}

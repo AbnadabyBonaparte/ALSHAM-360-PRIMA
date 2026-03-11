@@ -6,13 +6,13 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  SparklesIcon,
-  BoltIcon,
-  GlobeAltIcon,
-  WifiIcon,
-  ShieldCheckIcon,
-  RocketLaunchIcon,
-} from "@heroicons/react/24/outline";
+  Sparkles,
+  Zap,
+  Globe,
+  Wifi,
+  ShieldCheck,
+  Rocket,
+} from "lucide-react";
 
 export interface SupremeConfig {
   id: string;
@@ -127,7 +127,7 @@ export function createSupremePage(config: SupremeConfig) {
             <div className="relative px-8 py-14 max-w-7xl mx-auto flex flex-col gap-8">
               <div className="flex flex-wrap items-start gap-6">
                 <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl">
-                  <SparklesIcon className="w-12 h-12 text-amber-300 animate-pulse" />
+                  <Sparkles className="w-12 h-12 text-amber-300 animate-pulse" />
                 </div>
                 <div className="flex-1 space-y-4">
                   <motion.h1
@@ -149,10 +149,10 @@ export function createSupremePage(config: SupremeConfig) {
                     Citizen Supremo X.1 • online
                   </div>
                   <div className="flex gap-2">
-                    <BoltIcon className="w-10 h-10 text-amber-400" />
-                    <GlobeAltIcon className="w-10 h-10 text-cyan-300" />
-                    <WifiIcon className="w-10 h-10 text-emerald-300" />
-                    <ShieldCheckIcon className="w-10 h-10 text-purple-200" />
+                    <Zap className="w-10 h-10 text-amber-400" />
+                    <Globe className="w-10 h-10 text-cyan-300" />
+                    <Wifi className="w-10 h-10 text-emerald-300" />
+                    <ShieldCheck className="w-10 h-10 text-purple-200" />
                   </div>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export function createSupremePage(config: SupremeConfig) {
               <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl px-8 py-16 text-center">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(76,29,149,0.35),_transparent_45%)]" />
                 <div className="relative space-y-6">
-                  <RocketLaunchIcon className="w-20 h-20 text-cyan-300 mx-auto animate-bounce" />
+                  <Rocket className="w-20 h-20 text-cyan-300 mx-auto animate-bounce" />
                   <h2 className="text-4xl font-black text-white">
                     {config.emptyTitle || "Nenhum dado encontrado (por enquanto)"}
                   </h2>

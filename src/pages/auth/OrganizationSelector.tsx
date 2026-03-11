@@ -40,9 +40,9 @@ export const OrganizationSelector: React.FC = () => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Carregando organizações...</h2>
-          <p className="text-slate-400">Aguarde enquanto buscamos suas organizações.</p>
+          <Loader2 className="w-12 h-12 animate-spin text-[var(--accent-sky)] mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-[var(--text)] mb-2">Carregando organizações...</h2>
+          <p className="text-[var(--text-secondary)]">Aguarde enquanto buscamos suas organizações.</p>
         </motion.div>
       </div>
     )
@@ -53,14 +53,14 @@ export const OrganizationSelector: React.FC = () => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-lg">
-          <h2 className="text-xl font-semibold text-white mb-2">Nenhuma organização encontrada</h2>
-          <p className="text-slate-400 mb-6">
+          <h2 className="text-xl font-semibold text-[var(--text)] mb-2">Nenhuma organização encontrada</h2>
+          <p className="text-[var(--text-secondary)] mb-6">
             Seu usuário autenticou, mas não retornou organizações. Verifique vínculos em
             <code className="mx-1">user_organizations</code> e políticas/RLS.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="rounded-xl bg-white/10 px-4 py-2 text-white hover:bg-white/15"
+            className="rounded-xl bg-[var(--surface)]/10 px-4 py-2 text-[var(--text)] hover:bg-[var(--surface)]/15"
           >
             Recarregar
           </button>
@@ -76,11 +76,11 @@ export const OrganizationSelector: React.FC = () => {
       <div className="relative z-10 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl mb-6 shadow-lg shadow-blue-500/25">
-              <Building2 className="w-10 h-10 text-white" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-purple)] rounded-3xl mb-6 shadow-lg shadow-[var(--accent-sky)]/25">
+              <Building2 className="w-10 h-10 text-[var(--text)]" />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">Selecionar Organização</h1>
-            <p className="text-slate-400 text-lg">Escolha qual organização você deseja acessar</p>
+            <h1 className="text-4xl font-bold text-[var(--text)] mb-2">Selecionar Organização</h1>
+            <p className="text-[var(--text-secondary)] text-lg">Escolha qual organização você deseja acessar</p>
           </div>
 
           <AnimatePresence>
@@ -110,7 +110,7 @@ export const OrganizationSelector: React.FC = () => {
               >
                 <motion.button
                   onClick={() => handleOrgSelect(org)}
-                  className="w-full bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300 text-left shadow-lg hover:shadow-xl"
+                  className="w-full bg-[var(--surface)]/5 backdrop-blur-xl rounded-3xl border border-[var(--border)] p-6 hover:bg-[var(--surface)]/10 hover:border-[var(--border)] transition-all duration-300 text-left shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -123,8 +123,8 @@ export const OrganizationSelector: React.FC = () => {
                           className="w-16 h-16 rounded-2xl object-cover shadow-lg"
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                          <span className="text-white font-bold text-xl">
+                        <div className="w-16 h-16 bg-gradient-to-r from-[var(--accent-sky)] to-[var(--accent-purple)] rounded-2xl flex items-center justify-center shadow-lg">
+                          <span className="text-[var(--text)] font-bold text-xl">
                             {org.name?.charAt(0)?.toUpperCase?.() ?? 'O'}
                           </span>
                         </div>
@@ -132,13 +132,13 @@ export const OrganizationSelector: React.FC = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">
+                      <h3 className="text-xl font-bold text-[var(--text)] mb-1 group-hover:text-[var(--accent-sky)] transition-colors">
                         {org.name}
                       </h3>
-                      <p className="text-slate-400 text-sm mb-2">
+                      <p className="text-[var(--text-secondary)] text-sm mb-2">
                         {org.domain || 'Sem domínio configurado'}
                       </p>
-                      <div className="flex items-center space-x-4 text-xs text-slate-500">
+                      <div className="flex items-center space-x-4 text-xs text-[var(--text-secondary)]">
                         <div className="flex items-center space-x-1">
                           <Users className="w-3 h-3" />
                           <span>—</span>
@@ -152,8 +152,8 @@ export const OrganizationSelector: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 text-sm">Acessar organização</span>
-                    <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform" />
+                    <span className="text-[var(--text-secondary)] text-sm">Acessar organização</span>
+                    <ArrowRight className="w-5 h-5 text-[var(--accent-sky)] group-hover:translate-x-1 transition-transform" />
                   </div>
                 </motion.button>
               </motion.div>

@@ -5,15 +5,15 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  BookOpenIcon,
-  DocumentTextIcon,
-  MagnifyingGlassIcon,
-  EyeIcon,
-  HandThumbUpIcon,
-  FolderIcon,
-  SparklesIcon,
-  LightBulbIcon
-} from '@heroicons/react/24/outline';
+  BookOpen,
+  FileText,
+  Search,
+  Eye,
+  ThumbsUp,
+  Folder,
+  Sparkles,
+  Lightbulb
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -142,7 +142,7 @@ export default function KnowledgeBasePage() {
       {/* BUSCA */}
       <div className="max-w-2xl mx-auto mb-12">
         <div className="relative">
-          <MagnifyingGlassIcon className="w-6 h-6 text-[var(--text-secondary)] absolute left-4 top-1/2 transform -translate-y-1/2" />
+          <Search className="w-6 h-6 text-[var(--text-secondary)] absolute left-4 top-1/2 transform -translate-y-1/2" />
           <Input
             type="text"
             placeholder="Buscar artigos..."
@@ -157,7 +157,7 @@ export default function KnowledgeBasePage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <BookOpenIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <BookOpen className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalArtigos || 0}</p>
             <p className="text-[var(--text-secondary)]">Artigos</p>
           </CardContent>
@@ -165,7 +165,7 @@ export default function KnowledgeBasePage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <FolderIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Folder className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalCategorias || 0}</p>
             <p className="text-[var(--text-secondary)]">Categorias</p>
           </CardContent>
@@ -173,7 +173,7 @@ export default function KnowledgeBasePage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <EyeIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Eye className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Visualizações</p>
           </CardContent>
@@ -181,7 +181,7 @@ export default function KnowledgeBasePage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <HandThumbUpIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <ThumbsUp className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.satisfacao || 0).toFixed(0)}%</p>
             <p className="text-[var(--text-secondary)]">Satisfação</p>
           </CardContent>
@@ -221,7 +221,7 @@ export default function KnowledgeBasePage() {
       <div className="max-w-4xl mx-auto">
         {artigosFiltrados.length === 0 ? (
           <div className="text-center py-20">
-            <DocumentTextIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <FileText className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum artigo encontrado</p>
           </div>
         ) : (
@@ -238,7 +238,7 @@ export default function KnowledgeBasePage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <LightBulbIcon className="w-6 h-6 text-[var(--accent-warning)]" />
+                      <Lightbulb className="w-6 h-6 text-[var(--accent-warning)]" />
                       <Badge className="bg-[var(--accent-warning)]/20 text-[var(--accent-warning)]">
                         {artigo.categoria}
                       </Badge>
@@ -250,11 +250,11 @@ export default function KnowledgeBasePage() {
                   <div className="text-right ml-6">
                     <div className="flex items-center gap-4 text-[var(--text-secondary)] text-sm">
                       <div className="flex items-center gap-1">
-                        <EyeIcon className="w-4 h-4" />
+                        <Eye className="w-4 h-4" />
                         <span>{artigo.visualizacoes}</span>
                       </div>
                       <div className="flex items-center gap-1 text-[var(--accent-emerald)]">
-                        <HandThumbUpIcon className="w-4 h-4" />
+                        <ThumbsUp className="w-4 h-4" />
                         <span>{artigo.votos_positivos}</span>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ export default function KnowledgeBasePage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-warning)] max-w-4xl mx-auto">
           "Conhecimento documentado é suporte escalado. Cada artigo lido é um ticket evitado."
         </p>

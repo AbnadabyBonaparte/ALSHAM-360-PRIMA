@@ -5,9 +5,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  GlobeAltIcon, RocketLaunchIcon, EyeIcon, UserPlusIcon,
-  ArrowTrendingUpIcon, SparklesIcon
-} from '@heroicons/react/24/outline';
+  Globe, Rocket, Eye, UserPlus,
+  TrendingUp, Sparkles
+} from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -129,27 +129,27 @@ export default function LandingPagesPage() {
       <div className="p-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 mb-16">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <GlobeAltIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
+            <Globe className="w-16 h-16 text-[var(--accent-1)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{metrics?.totalLPs || 0}</p>
             <p className="text-xl text-[var(--text)]/70">Total LPs</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <RocketLaunchIcon className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
+            <Rocket className="w-16 h-16 text-[var(--accent-emerald)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{metrics?.ativas || 0}</p>
             <p className="text-xl text-[var(--text)]/70">Ativas</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <EyeIcon className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
+            <Eye className="w-16 h-16 text-[var(--accent-sky)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalVisualizacoes || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text)]/70">Visualizações</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <UserPlusIcon className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
+            <UserPlus className="w-16 h-16 text-[var(--accent-purple)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{(metrics?.totalConversoes || 0).toLocaleString()}</p>
             <p className="text-xl text-[var(--text)]/70">Conversões</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-3xl p-8 border border-[var(--border)]">
-            <ArrowTrendingUpIcon className="w-16 h-16 text-[var(--accent-1)] mb-4" />
+            <TrendingUp className="w-16 h-16 text-[var(--accent-1)] mb-4" />
             <p className="text-5xl font-black text-[var(--text)]">{(metrics?.taxaMediaConversao || 0).toFixed(1)}%</p>
             <p className="text-xl text-[var(--text)]/70">Taxa Média</p>
           </motion.div>
@@ -163,7 +163,7 @@ export default function LandingPagesPage() {
 
           {metrics?.landingPages.length === 0 ? (
             <div className="text-center py-32">
-              <GlobeAltIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <Globe className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
               <p className="text-3xl text-[var(--text)]/50">Nenhuma landing page cadastrada ainda</p>
             </div>
           ) : (
@@ -219,7 +219,7 @@ export default function LandingPagesPage() {
 
       {/* MENSAGEM FINAL DA IA */}
       <div className="fixed bottom-12 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-        <SparklesIcon className="w-24 h-24 text-[var(--accent-1)] mx-auto mb-6 animate-pulse" />
+        <Sparkles className="w-24 h-24 text-[var(--accent-1)] mx-auto mb-6 animate-pulse" />
         <p className="text-4xl font-black bg-gradient-to-r from-[var(--accent-1)] to-[var(--accent-2)] bg-clip-text text-transparent">
           "Uma landing page perfeita não convence. Ela hipnotiza."
         </p>

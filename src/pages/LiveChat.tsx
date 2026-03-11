@@ -5,15 +5,15 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  ChatBubbleLeftRightIcon,
-  UserGroupIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  SignalIcon,
-  SparklesIcon,
-  BoltIcon,
-  HeartIcon
-} from '@heroicons/react/24/outline';
+  MessageCircle,
+  Users,
+  Clock,
+  CheckCircle2,
+  Signal,
+  Sparkles,
+  Zap,
+  Heart
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -139,7 +139,7 @@ export default function LiveChatPage() {
       <Card className="max-w-4xl mx-auto mb-12 bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--accent-emerald)]/30">
         <CardContent className="p-8">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <SignalIcon className="w-8 h-8 text-[var(--accent-emerald)] animate-pulse" />
+            <Signal className="w-8 h-8 text-[var(--accent-emerald)] animate-pulse" />
             <span className="text-2xl font-bold text-[var(--accent-emerald)]">STATUS AO VIVO</span>
           </div>
           <div className="grid grid-cols-3 gap-8 text-center">
@@ -163,7 +163,7 @@ export default function LiveChatPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ChatBubbleLeftRightIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <MessageCircle className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.chats.length || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Hoje</p>
           </CardContent>
@@ -171,7 +171,7 @@ export default function LiveChatPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.tempoMedioEspera || 0}min</p>
             <p className="text-[var(--text-secondary)]">Tempo Espera</p>
           </CardContent>
@@ -179,7 +179,7 @@ export default function LiveChatPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <BoltIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Zap className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">30s</p>
             <p className="text-[var(--text-secondary)]">Resposta Média</p>
           </CardContent>
@@ -187,7 +187,7 @@ export default function LiveChatPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <HeartIcon className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
+            <Heart className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.satisfacaoMedia || 0).toFixed(0)}%</p>
             <p className="text-[var(--text-secondary)]">Satisfação</p>
           </CardContent>
@@ -202,7 +202,7 @@ export default function LiveChatPage() {
 
         {metrics?.chats.length === 0 ? (
           <div className="text-center py-20">
-            <ChatBubbleLeftRightIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <MessageCircle className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhuma conversa ativa</p>
           </div>
         ) : (
@@ -278,7 +278,7 @@ export default function LiveChatPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-emerald)] max-w-4xl mx-auto">
           "Cada segundo conta. Velocidade de resposta é velocidade de conversão."
         </p>

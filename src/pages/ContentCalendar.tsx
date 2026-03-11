@@ -5,16 +5,16 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  CalendarDaysIcon,
-  DocumentTextIcon,
-  VideoCameraIcon,
-  PhotoIcon,
-  MicrophoneIcon,
-  SparklesIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  PencilSquareIcon
-} from '@heroicons/react/24/outline';
+  CalendarDays,
+  FileText,
+  Video,
+  Image,
+  Mic,
+  Sparkles,
+  CheckCircle2,
+  Clock,
+  Edit
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -118,11 +118,11 @@ export default function ContentCalendarPage() {
 
   const typeIcon = (tipo: string) => {
     switch (tipo) {
-      case 'video': return <VideoCameraIcon className="w-4 h-4" />;
-      case 'social': return <PhotoIcon className="w-4 h-4" />;
-      case 'podcast': return <MicrophoneIcon className="w-4 h-4" />;
-      case 'email': return <DocumentTextIcon className="w-4 h-4" />;
-      default: return <PencilSquareIcon className="w-4 h-4" />;
+      case 'video': return <Video className="w-4 h-4" />;
+      case 'social': return <Image className="w-4 h-4" />;
+      case 'podcast': return <Mic className="w-4 h-4" />;
+      case 'email': return <FileText className="w-4 h-4" />;
+      default: return <Edit className="w-4 h-4" />;
     }
   };
 
@@ -156,7 +156,7 @@ export default function ContentCalendarPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <CalendarDaysIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <CalendarDays className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalConteudos || 0}</p>
             <p className="text-[var(--text-secondary)]">Total no Mês</p>
           </CardContent>
@@ -164,7 +164,7 @@ export default function ContentCalendarPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.publicados || 0}</p>
             <p className="text-[var(--text-secondary)]">Publicados</p>
           </CardContent>
@@ -172,7 +172,7 @@ export default function ContentCalendarPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
             <p className="text-[var(--text-secondary)]">Agendados</p>
           </CardContent>
@@ -180,7 +180,7 @@ export default function ContentCalendarPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <PencilSquareIcon className="w-12 h-12 text-[var(--text-secondary)] mb-3" />
+            <Edit className="w-12 h-12 text-[var(--text-secondary)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.rascunhos || 0}</p>
             <p className="text-[var(--text-secondary)]">Rascunhos</p>
           </CardContent>
@@ -296,7 +296,7 @@ export default function ContentCalendarPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-purple)] max-w-4xl mx-auto">
           "Consistência é o segredo. Cada dia sem conteúdo é um dia que seu concorrente avança."
         </p>

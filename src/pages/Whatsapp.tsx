@@ -5,18 +5,18 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  ChatBubbleLeftRightIcon,
-  PaperAirplaneIcon,
-  PhoneIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  SparklesIcon,
-  UsersIcon,
-  ArrowTrendingUpIcon,
-  BoltIcon,
-  CpuChipIcon,
-  GlobeAltIcon
-} from '@heroicons/react/24/outline';
+  MessageCircle,
+  Send,
+  Phone,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  Users,
+  TrendingUp,
+  Zap,
+  Cpu,
+  Globe
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -89,25 +89,25 @@ export default function WhatsappPage() {
       {/* KPIS SUPREMOS */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-20">
         <SupremeWhatsAppCard
-          icon={<ChatBubbleLeftRightIcon className="w-16 h-16" />}
+          icon={<MessageCircle className="w-16 h-16" />}
           title="Mensagens este mês"
           value={stats?.totalMessages.toLocaleString() || '0'}
           color="from-[var(--accent-emerald)] to-[var(--accent-sky)]"
         />
         <SupremeWhatsAppCard
-          icon={<ArrowTrendingUpIcon className="w-16 h-16" />}
+          icon={<TrendingUp className="w-16 h-16" />}
           title="Taxa de Abertura"
           value={`${stats?.openRate}%`}
           color="from-[var(--accent-sky)] to-[var(--accent-purple)]"
         />
         <SupremeWhatsAppCard
-          icon={<ClockIcon className="w-16 h-16" />}
+          icon={<Clock className="w-16 h-16" />}
           title="Tempo de Resposta"
           value={`${stats?.responseTime}m`}
           color="from-[var(--accent-purple)] to-[var(--accent-pink)]"
         />
         <SupremeWhatsAppCard
-          icon={<CpuChipIcon className="w-16 h-16" />}
+          icon={<Cpu className="w-16 h-16" />}
           title="Automatizadas"
           value={stats?.automatedResponses.toLocaleString() || '0'}
           color="from-[var(--accent-warning)] to-[var(--accent-alert)]"
@@ -130,7 +130,7 @@ export default function WhatsappPage() {
       >
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--accent-emerald)]/50 shadow-2xl shadow-[var(--accent-emerald)]/30">
           <CardContent className="p-16 text-center">
-            <CpuChipIcon className="w-48 h-48 text-[var(--accent-emerald)] mx-auto mb-12 animate-pulse" />
+            <Cpu className="w-48 h-48 text-[var(--accent-emerald)] mx-auto mb-12 animate-pulse" />
             <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-sky)] mb-8">
               CHATBOT IA ATIVO 24/7
             </h2>
@@ -164,7 +164,7 @@ export default function WhatsappPage() {
         whileInView={{ opacity: 1 }}
         className="text-center py-40"
       >
-        <GlobeAltIcon className="w-64 h-64 text-[var(--accent-emerald)] mx-auto mb-16 animate-pulse" />
+        <Globe className="w-64 h-64 text-[var(--accent-emerald)] mx-auto mb-16 animate-pulse" />
         <p className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-emerald)]">
           O CLIENTE NÃO ESPERA
         </p>

@@ -5,15 +5,15 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  TicketIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  UserIcon,
-  SparklesIcon,
-  ChatBubbleLeftRightIcon,
-  FireIcon
-} from '@heroicons/react/24/outline';
+  Ticket,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  User,
+  Sparkles,
+  MessageCircle,
+  Flame
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -147,7 +147,7 @@ export default function SupportTicketsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <TicketIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Ticket className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalTickets || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Tickets</p>
           </CardContent>
@@ -155,7 +155,7 @@ export default function SupportTicketsPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ExclamationTriangleIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <AlertTriangle className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.abertos || 0}</p>
             <p className="text-[var(--text-secondary)]">Abertos</p>
           </CardContent>
@@ -163,7 +163,7 @@ export default function SupportTicketsPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.tempoMedioResposta || 0).toFixed(0)}min</p>
             <p className="text-[var(--text-secondary)]">Tempo Médio</p>
           </CardContent>
@@ -171,7 +171,7 @@ export default function SupportTicketsPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.satisfacao || 0}%</p>
             <p className="text-[var(--text-secondary)]">Satisfação</p>
           </CardContent>
@@ -186,7 +186,7 @@ export default function SupportTicketsPage() {
 
         {metrics?.tickets.length === 0 ? (
           <div className="text-center py-20">
-            <TicketIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <Ticket className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum ticket aberto</p>
             <p className="text-xl text-[var(--text-secondary)]/60 mt-2">Suporte zerado = Clientes felizes</p>
           </div>
@@ -211,7 +211,7 @@ export default function SupportTicketsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       {ticket.prioridade === 'urgente' && (
-                        <FireIcon className="w-8 h-8 text-[var(--accent-alert)] animate-pulse" />
+                        <Flame className="w-8 h-8 text-[var(--accent-alert)] animate-pulse" />
                       )}
                       <div>
                         <div className="flex items-center gap-3 mb-1">
@@ -231,7 +231,7 @@ export default function SupportTicketsPage() {
                     <div className="flex items-center gap-6">
                       {ticket.atendente && (
                         <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                          <UserIcon className="w-5 h-5" />
+                          <User className="w-5 h-5" />
                           <span>{ticket.atendente}</span>
                         </div>
                       )}
@@ -264,7 +264,7 @@ export default function SupportTicketsPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
           "Um problema bem resolvido transforma reclamante em fã. Suporte é a última linha de vendas."
         </p>

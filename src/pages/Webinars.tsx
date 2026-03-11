@@ -4,15 +4,15 @@
 // Link oficial: https://github.com/AbnadabyBonaparte/ALSHAM-360-PRIMA
 
 import {
-  VideoCameraIcon,
-  UserGroupIcon,
-  ClockIcon,
-  PlayCircleIcon,
-  CalendarDaysIcon,
-  SparklesIcon,
-  ChartBarIcon,
-  SignalIcon
-} from '@heroicons/react/24/outline';
+  Video,
+  Users,
+  Clock,
+  PlayCircle,
+  CalendarDays,
+  Sparkles,
+  BarChart3,
+  Signal
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -113,10 +113,10 @@ export default function WebinarsPage() {
   }
 
   const statusConfig = {
-    ao_vivo: { bg: 'from-[var(--accent-alert)] to-[var(--accent-warning)]', icon: <SignalIcon className="w-6 h-6 animate-pulse" />, text: 'AO VIVO' },
-    agendado: { bg: 'from-[var(--accent-sky)] to-[var(--accent-1)]', icon: <CalendarDaysIcon className="w-6 h-6" />, text: 'Agendado' },
-    encerrado: { bg: 'from-[var(--text-secondary)] to-[var(--text-secondary)]', icon: <ClockIcon className="w-6 h-6" />, text: 'Encerrado' },
-    gravado: { bg: 'from-[var(--accent-purple)] to-[var(--accent-pink)]', icon: <PlayCircleIcon className="w-6 h-6" />, text: 'Gravado' }
+    ao_vivo: { bg: 'from-[var(--accent-alert)] to-[var(--accent-warning)]', icon: <Signal className="w-6 h-6 animate-pulse" />, text: 'AO VIVO' },
+    agendado: { bg: 'from-[var(--accent-sky)] to-[var(--accent-1)]', icon: <CalendarDays className="w-6 h-6" />, text: 'Agendado' },
+    encerrado: { bg: 'from-[var(--text-secondary)] to-[var(--text-secondary)]', icon: <Clock className="w-6 h-6" />, text: 'Encerrado' },
+    gravado: { bg: 'from-[var(--accent-purple)] to-[var(--accent-pink)]', icon: <PlayCircle className="w-6 h-6" />, text: 'Gravado' }
   };
 
   return (
@@ -138,25 +138,25 @@ export default function WebinarsPage() {
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <VideoCameraIcon className="w-12 h-12 text-[var(--accent-alert)] mb-3" />
+            <Video className="w-12 h-12 text-[var(--accent-alert)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalWebinars || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Webinars</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <CalendarDaysIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <CalendarDays className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.agendados || 0}</p>
             <p className="text-[var(--text-secondary)]">Agendados</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <UserGroupIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Users className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Total Inscritos</p>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.05 }} className="bg-[var(--surface)]/60 backdrop-blur-xl rounded-2xl p-6 border border-[var(--border)]">
-            <ChartBarIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <BarChart3 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.mediaParticipacao || 0).toFixed(0)}%</p>
             <p className="text-[var(--text-secondary)]">Participação</p>
           </motion.div>
@@ -170,7 +170,7 @@ export default function WebinarsPage() {
 
           {metrics?.webinars.length === 0 ? (
             <div className="text-center py-20">
-              <VideoCameraIcon className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
+              <Video className="w-32 h-32 text-[var(--text)]/30 mx-auto mb-8" />
               <p className="text-3xl text-[var(--text)]/50">Nenhum webinar cadastrado</p>
             </div>
           ) : (
@@ -244,7 +244,7 @@ export default function WebinarsPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-alert)] mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-[var(--accent-alert)] mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-[var(--accent-alert)] max-w-4xl mx-auto">
             "Um webinar bem executado vale mais que 100 posts. É autoridade instantânea."
           </p>

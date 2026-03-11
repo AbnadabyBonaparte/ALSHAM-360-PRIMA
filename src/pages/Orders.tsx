@@ -3,14 +3,14 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  ShoppingCartIcon,
-  CurrencyDollarIcon,
-  TruckIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  SparklesIcon,
-  XCircleIcon,
-} from '@heroicons/react/24/outline';
+  ShoppingCart,
+  DollarSign,
+  Truck,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  XCircle,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -107,11 +107,11 @@ export default function OrdersPage() {
   }
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
-    pendente: { variant: 'outline', icon: <ClockIcon className="w-4 h-4" /> },
-    confirmado: { variant: 'secondary', icon: <CheckCircleIcon className="w-4 h-4" /> },
-    enviado: { variant: 'default', icon: <TruckIcon className="w-4 h-4" /> },
-    entregue: { variant: 'default', icon: <CheckCircleIcon className="w-4 h-4" /> },
-    cancelado: { variant: 'destructive', icon: <XCircleIcon className="w-4 h-4" /> }
+    pendente: { variant: 'outline', icon: <Clock className="w-4 h-4" /> },
+    confirmado: { variant: 'secondary', icon: <CheckCircle2 className="w-4 h-4" /> },
+    enviado: { variant: 'default', icon: <Truck className="w-4 h-4" /> },
+    entregue: { variant: 'default', icon: <CheckCircle2 className="w-4 h-4" /> },
+    cancelado: { variant: 'destructive', icon: <XCircle className="w-4 h-4" /> }
   };
 
   const pedidosFiltrados = filtroStatus === 'todos'
@@ -138,7 +138,7 @@ export default function OrdersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <ShoppingCartIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <ShoppingCart className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalPedidos || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Pedidos</p>
           </CardContent>
@@ -146,7 +146,7 @@ export default function OrdersPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Receita Total</p>
           </CardContent>
@@ -154,7 +154,7 @@ export default function OrdersPage() {
 
         <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {(metrics?.ticketMedio || 0).toFixed(0)}</p>
             <p className="text-[var(--text-secondary)]">Ticket Médio</p>
           </CardContent>
@@ -162,7 +162,7 @@ export default function OrdersPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{(metrics?.taxaConclusao || 0).toFixed(0)}%</p>
             <p className="text-[var(--text-secondary)]">Taxa Conclusão</p>
           </CardContent>
@@ -187,7 +187,7 @@ export default function OrdersPage() {
       <div className="max-w-6xl mx-auto">
         {pedidosFiltrados.length === 0 ? (
           <div className="text-center py-20">
-            <ShoppingCartIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <ShoppingCart className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum pedido encontrado</p>
           </div>
         ) : (
@@ -253,7 +253,7 @@ export default function OrdersPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
           "Cada pedido entregue é um cliente fidelizado. Cada cliente fidelizado é um império fortalecido."
         </p>

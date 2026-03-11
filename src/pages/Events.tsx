@@ -3,15 +3,15 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  CalendarDaysIcon,
-  MapPinIcon,
-  UserGroupIcon,
-  TicketIcon,
-  ClockIcon,
-  SparklesIcon,
-  StarIcon,
-  GlobeAltIcon
-} from '@heroicons/react/24/outline';
+  CalendarDays,
+  MapPin,
+  Users,
+  Ticket,
+  Clock,
+  Sparkles,
+  Star,
+  Globe
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -115,9 +115,9 @@ export default function EventsPage() {
 
   const tipoIcon = (tipo: string) => {
     switch (tipo) {
-      case 'online': return <GlobeAltIcon className="w-6 h-6 text-[var(--accent-sky)]" />;
-      case 'hibrido': return <StarIcon className="w-6 h-6 text-[var(--accent-purple)]" />;
-      default: return <MapPinIcon className="w-6 h-6 text-[var(--accent-emerald)]" />;
+      case 'online': return <Globe className="w-6 h-6 text-[var(--accent-sky)]" />;
+      case 'hibrido': return <Star className="w-6 h-6 text-[var(--accent-purple)]" />;
+      default: return <MapPin className="w-6 h-6 text-[var(--accent-emerald)]" />;
     }
   };
 
@@ -141,7 +141,7 @@ export default function EventsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30">
           <CardContent className="p-6">
-            <CalendarDaysIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <CalendarDays className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalEventos || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Eventos</p>
           </CardContent>
@@ -149,7 +149,7 @@ export default function EventsPage() {
 
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <ClockIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Clock className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.proximos || 0}</p>
             <p className="text-[var(--text-secondary)]">Próximos</p>
           </CardContent>
@@ -157,7 +157,7 @@ export default function EventsPage() {
 
         <Card className="bg-[var(--accent-pink)]/10 border-[var(--accent-pink)]/30">
           <CardContent className="p-6">
-            <UserGroupIcon className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
+            <Users className="w-12 h-12 text-[var(--accent-pink)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{(metrics?.totalInscritos || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">Total Inscritos</p>
           </CardContent>
@@ -165,7 +165,7 @@ export default function EventsPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <TicketIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <Ticket className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">R$ {((metrics?.receitaTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Receita Total</p>
           </CardContent>
@@ -180,7 +180,7 @@ export default function EventsPage() {
 
         {metrics?.eventos.length === 0 ? (
           <div className="text-center py-20">
-            <CalendarDaysIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <CalendarDays className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum evento cadastrado</p>
           </div>
         ) : (
@@ -224,14 +224,14 @@ export default function EventsPage() {
                   {/* DETALHES */}
                   <CardContent className="p-6 space-y-4">
                     <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                      <CalendarDaysIcon className="w-5 h-5" />
+                      <CalendarDays className="w-5 h-5" />
                       <span>
                         {evento.data_inicio ? format(new Date(evento.data_inicio), "dd MMM yyyy 'às' HH:mm", { locale: ptBR }) : '-'}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3 text-[var(--text-secondary)]">
-                      <MapPinIcon className="w-5 h-5" />
+                      <MapPin className="w-5 h-5" />
                       <span>{evento.local || 'Local a definir'}</span>
                     </div>
 
@@ -274,7 +274,7 @@ export default function EventsPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-purple)] max-w-4xl mx-auto">
           "Eventos não são apenas reuniões. São momentos onde impérios nascem."
         </p>

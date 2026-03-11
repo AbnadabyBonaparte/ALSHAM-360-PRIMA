@@ -54,6 +54,9 @@ export function injectThemeVariables(theme: Theme): void {
     '--accent-sky': theme.colors.accentSecondary,
     '--accent-fuchsia': theme.colors.accentTertiary,
     '--accent-amber': theme.colors.accentWarm,
+    '--accent-purple': theme.colors.accentTertiary,
+    '--accent-pink': theme.colors.accentTertiary,
+    '--accent-warning': theme.colors.accentWarm,
 
     // Gradients diretos
     '--grad-primary': theme.colors.gradientPrimary,

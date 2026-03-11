@@ -3,15 +3,15 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  DocumentTextIcon,
-  CurrencyDollarIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ClockIcon,
-  SparklesIcon,
-  ArrowTrendingUpIcon,
-  PaperAirplaneIcon
-} from '@heroicons/react/24/outline';
+  FileText,
+  DollarSign,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Sparkles,
+  TrendingUp,
+  Send
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -103,12 +103,12 @@ export default function ProposalsPage() {
   }
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
-    rascunho: { variant: 'secondary', icon: <DocumentTextIcon className="w-4 h-4" /> },
-    enviada: { variant: 'default', icon: <PaperAirplaneIcon className="w-4 h-4" /> },
-    visualizada: { variant: 'outline', icon: <ClockIcon className="w-4 h-4" /> },
-    aceita: { variant: 'default', icon: <CheckCircleIcon className="w-4 h-4" /> },
-    recusada: { variant: 'destructive', icon: <XCircleIcon className="w-4 h-4" /> },
-    expirada: { variant: 'outline', icon: <ClockIcon className="w-4 h-4" /> }
+    rascunho: { variant: 'secondary', icon: <FileText className="w-4 h-4" /> },
+    enviada: { variant: 'default', icon: <Send className="w-4 h-4" /> },
+    visualizada: { variant: 'outline', icon: <Clock className="w-4 h-4" /> },
+    aceita: { variant: 'default', icon: <CheckCircle2 className="w-4 h-4" /> },
+    recusada: { variant: 'destructive', icon: <XCircle className="w-4 h-4" /> },
+    expirada: { variant: 'outline', icon: <Clock className="w-4 h-4" /> }
   };
 
   return (
@@ -131,7 +131,7 @@ export default function ProposalsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <DocumentTextIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <FileText className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalPropostas || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Propostas</p>
           </CardContent>
@@ -139,7 +139,7 @@ export default function ProposalsPage() {
 
         <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.valorTotal || 0) / 1000).toFixed(0)}k</p>
             <p className="text-[var(--text-secondary)]">Valor Total</p>
           </CardContent>
@@ -147,7 +147,7 @@ export default function ProposalsPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.aceitas || 0}</p>
             <p className="text-[var(--text-secondary)]">Aceitas</p>
           </CardContent>
@@ -155,7 +155,7 @@ export default function ProposalsPage() {
 
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <ArrowTrendingUpIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <TrendingUp className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{(metrics?.taxaAceitacao || 0).toFixed(0)}%</p>
             <p className="text-[var(--text-secondary)]">Taxa Aceitação</p>
           </CardContent>
@@ -170,7 +170,7 @@ export default function ProposalsPage() {
 
         {metrics?.propostas.length === 0 ? (
           <div className="text-center py-20">
-            <DocumentTextIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <FileText className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhuma proposta cadastrada</p>
           </div>
         ) : (
@@ -237,7 +237,7 @@ export default function ProposalsPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-emerald)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-emerald)] max-w-4xl mx-auto">
           "Uma proposta perfeita não vende. Ela faz o cliente implorar para comprar."
         </p>

@@ -25,10 +25,10 @@ export default function UnderConstruction({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8"
+        className="w-full max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface)]/5 backdrop-blur-xl p-8"
       >
         <div className="flex items-start gap-4">
-          <div className="rounded-2xl p-3 bg-white/10 border border-white/10">
+          <div className="rounded-2xl p-3 bg-[var(--surface)]/10 border border-[var(--border)]">
             <Lock className="h-6 w-6" />
           </div>
 
@@ -40,7 +40,7 @@ export default function UnderConstruction({
               <Sparkles className="h-5 w-5 opacity-70" />
             </div>
 
-            <p className="text-sm md:text-base text-white/70 leading-relaxed">
+            <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed">
               {message}
             </p>
 
@@ -48,7 +48,7 @@ export default function UnderConstruction({
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-white/15 bg-white/10 hover:bg-white/15 transition"
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-[var(--border)] bg-[var(--surface)]/10 hover:bg-[var(--surface)]/15 transition"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
@@ -57,13 +57,13 @@ export default function UnderConstruction({
               <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
-                className="inline-flex items-center rounded-xl px-4 py-2 bg-white text-black hover:opacity-90 transition font-medium"
+                className="inline-flex items-center rounded-xl px-4 py-2 bg-[var(--surface)] text-[var(--text-primary)] hover:opacity-90 transition font-medium"
               >
                 Ir para Dashboard
               </button>
             </div>
 
-            <div className="mt-6 text-xs text-white/50">
+            <div className="mt-6 text-xs text-[var(--text-secondary)]">
               Política ALSHAM: a navegação oficial só expõe módulos realmente implementados.
             </div>
           </div>

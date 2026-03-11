@@ -1,7 +1,7 @@
 // src/pages/Contacts.tsx
 // ALSHAM 360° PRIMA — Contatos (migrado para shadcn/ui)
 
-import { UserGroupIcon, PhoneIcon, EnvelopeIcon, BuildingOfficeIcon, SparklesIcon, ClockIcon, StarIcon } from '@heroicons/react/24/outline';
+import { Users, Phone, Mail, Building2, Sparkles, Clock, Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,7 +51,7 @@ export default function ContactsPage() {
         {/* Header Supremo */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-8">
-            <UserGroupIcon className="w-20 h-20 text-[var(--accent-sky)] animate-pulse" />
+            <Users className="w-20 h-20 text-[var(--accent-sky)] animate-pulse" />
             <div>
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[var(--accent-sky)] via-[var(--accent-purple)] to-[var(--accent-pink)] bg-clip-text text-transparent">
                 Contatos
@@ -101,7 +101,7 @@ export default function ContactsPage() {
                 'bg-gradient-to-r from-[var(--surface-strong)] to-[var(--surface-strong)]'
               }`}>
                 IA Score: {contact.score}/100
-                {contact.score >= 90 && <SparklesIcon className="w-6 h-6 inline ml-2 animate-pulse" />}
+                {contact.score >= 90 && <Sparkles className="w-6 h-6 inline ml-2 animate-pulse" />}
               </div>
 
               <CardContent className="p-10">
@@ -113,7 +113,7 @@ export default function ContactsPage() {
                     </div>
                     {contact.score >= 90 && (
                       <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-r from-[var(--accent-warning)] to-[var(--accent-alert)] rounded-full flex items-center justify-center animate-bounce">
-                        <StarIcon className="w-8 h-8 text-[var(--text-primary)]" />
+                        <Star className="w-8 h-8 text-[var(--text-primary)]" />
                       </div>
                     )}
                   </div>
@@ -121,7 +121,7 @@ export default function ContactsPage() {
                     <h2 className="text-3xl font-bold text-[var(--text-primary)]">{contact.name}</h2>
                     <p className="text-xl text-[var(--text-secondary)] mt-2">{contact.title || 'Sem cargo'}</p>
                     <div className="flex items-center gap-3 mt-4">
-                      <BuildingOfficeIcon className="w-6 h-6 text-[var(--text-secondary)]" />
+                      <Building2 className="w-6 h-6 text-[var(--text-secondary)]" />
                       <p className="text-lg text-[var(--text-secondary)]">{contact.company || 'Sem empresa'}</p>
                     </div>
                   </div>
@@ -130,12 +130,12 @@ export default function ContactsPage() {
                 {/* Contatos */}
                 <div className="space-y-5 mb-8">
                   <div className="flex items-center gap-4">
-                    <EnvelopeIcon className="w-7 h-7 text-[var(--accent-sky)]" />
+                    <Mail className="w-7 h-7 text-[var(--accent-sky)]" />
                     <p className="text-lg text-[var(--text-primary)]">{contact.email}</p>
                   </div>
                   {contact.phone && (
                     <div className="flex items-center gap-4">
-                      <PhoneIcon className="w-7 h-7 text-[var(--accent-emerald)]" />
+                      <Phone className="w-7 h-7 text-[var(--accent-emerald)]" />
                       <p className="text-lg text-[var(--text-primary)]">{contact.phone}</p>
                     </div>
                   )}
@@ -172,7 +172,7 @@ export default function ContactsPage() {
                 )}
 
                 <p className="text-[var(--text-secondary)] text-sm mt-8 flex items-center gap-2">
-                  <ClockIcon className="w-5 h-5" />
+                  <Clock className="w-5 h-5" />
                   Último contato: {contact.last_contact ? new Date(contact.last_contact).toLocaleDateString('pt-BR') : 'Nunca'}
                 </p>
               </CardContent>
@@ -183,7 +183,7 @@ export default function ContactsPage() {
         {/* Empty State Supremo */}
         {!loading && contacts.length === 0 && (
           <div className="text-center py-40">
-            <UserGroupIcon className="w-40 h-40 text-[var(--text-secondary)] mx-auto mb-12 opacity-50" />
+            <Users className="w-40 h-40 text-[var(--text-secondary)] mx-auto mb-12 opacity-50" />
             <h2 className="text-5xl font-bold text-[var(--text-secondary)] mb-8">
               Nenhum contato ainda
             </h2>

@@ -3,13 +3,13 @@
 // Cada produto é uma obra-prima de valor. O catálogo que vende sozinho.
 
 import {
-  CubeIcon,
-  ArchiveBoxIcon,
-  SparklesIcon,
-  StarIcon,
-  ShoppingBagIcon,
-  ChartBarIcon
-} from '@heroicons/react/24/outline';
+  Box,
+  Archive,
+  Sparkles,
+  Star,
+  ShoppingBag,
+  BarChart3
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
@@ -136,7 +136,7 @@ export default function ProductsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
           <Card className="bg-gradient-to-br from-[var(--accent-warning)]/60 to-[var(--accent-warning)]/60 rounded-2xl border border-[var(--accent-warning)]/30 hover:scale-105 transition-all">
             <CardContent className="p-6">
-              <CubeIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+              <Box className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
               <p className="text-4xl font-black text-[var(--text-primary)]">{metrics?.totalProdutos || 0}</p>
               <p className="text-[var(--text-secondary)]">Total Produtos</p>
             </CardContent>
@@ -144,7 +144,7 @@ export default function ProductsPage() {
 
           <Card className="bg-gradient-to-br from-[var(--accent-warning)]/60 to-[var(--accent-warning)]/60 rounded-2xl border border-[var(--accent-warning)]/30 hover:scale-105 transition-all">
             <CardContent className="p-6">
-              <ArchiveBoxIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+              <Archive className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
               <p className="text-3xl font-black text-[var(--text-primary)]">R$ {((metrics?.valorEstoque || 0) / 1000).toFixed(0)}k</p>
               <p className="text-[var(--text-secondary)]">Valor Estoque</p>
             </CardContent>
@@ -152,7 +152,7 @@ export default function ProductsPage() {
 
           <Card className="bg-gradient-to-br from-[var(--accent-emerald)]/60 to-[var(--accent-emerald)]/60 rounded-2xl border border-[var(--accent-emerald)]/30 hover:scale-105 transition-all">
             <CardContent className="p-6">
-              <ChartBarIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+              <BarChart3 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
               <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.margemMedia || 0).toFixed(0)}%</p>
               <p className="text-[var(--text-secondary)]">Margem Média</p>
             </CardContent>
@@ -160,7 +160,7 @@ export default function ProductsPage() {
 
           <Card className="bg-gradient-to-br from-[var(--accent-purple)]/60 to-[var(--accent-pink)]/60 rounded-2xl border border-[var(--accent-purple)]/30 hover:scale-105 transition-all">
             <CardContent className="p-6">
-              <ShoppingBagIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+              <ShoppingBag className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
               <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalVendidos || 0).toLocaleString()}</p>
               <p className="text-[var(--text-secondary)]">Unidades Vendidas</p>
             </CardContent>
@@ -189,7 +189,7 @@ export default function ProductsPage() {
         <div className="max-w-7xl mx-auto">
           {produtosFiltrados.length === 0 ? (
             <div className="text-center py-20">
-              <CubeIcon className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
+              <Box className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
               <p className="text-3xl text-[var(--text-secondary)]">Nenhum produto encontrado</p>
             </div>
           ) : (
@@ -209,7 +209,7 @@ export default function ProductsPage() {
                   }`}>
                     {/* IMAGEM */}
                     <div className="h-40 bg-gradient-to-br from-[var(--accent-warning)]/30 to-[var(--accent-warning)]/30 flex items-center justify-center relative">
-                      <CubeIcon className="w-20 h-20 text-[var(--accent-warning)]/50" />
+                      <Box className="w-20 h-20 text-[var(--accent-warning)]/50" />
                       {produto.status === 'esgotado' && (
                         <div className="absolute inset-0 bg-[var(--background)]/60 flex items-center justify-center">
                           <span className="text-[var(--accent-alert)] font-bold text-xl">ESGOTADO</span>
@@ -217,7 +217,7 @@ export default function ProductsPage() {
                       )}
                       {produto.vendidos > 50 && (
                         <div className="absolute top-3 right-3 bg-[var(--accent-warning)] text-[var(--text-primary)] px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
-                          <StarIcon className="w-4 h-4" /> TOP
+                          <Star className="w-4 h-4" /> TOP
                         </div>
                       )}
                     </div>
@@ -264,7 +264,7 @@ export default function ProductsPage() {
           transition={{ delay: 0.8 }}
           className="text-center py-24 mt-16"
         >
-          <SparklesIcon className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
+          <Sparkles className="w-32 h-32 text-[var(--accent-warning)] mx-auto mb-8 animate-pulse" />
           <p className="text-5xl font-light text-[var(--accent-warning)] max-w-4xl mx-auto">
             "Um catálogo organizado vende mais que mil vendedores."
           </p>

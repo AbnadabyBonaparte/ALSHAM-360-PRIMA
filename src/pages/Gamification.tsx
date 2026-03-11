@@ -56,21 +56,21 @@ export const Gamification: React.FC = () => {
 
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6 text-center">
+            <div className="bg-[var(--surface)] rounded-lg shadow p-6 text-center">
               <div className="text-3xl font-bold text-alsham-primary mb-2">
                 {stats.total_points}
               </div>
               <div className="text-alsham-text-secondary">Pontos Totais</div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6 text-center">
+            <div className="bg-[var(--surface)] rounded-lg shadow p-6 text-center">
               <div className="text-3xl font-bold text-alsham-primary mb-2">
                 {stats.badges_count}
               </div>
               <div className="text-alsham-text-secondary">Badges Conquistados</div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6 text-center">
+            <div className="bg-[var(--surface)] rounded-lg shadow p-6 text-center">
               <div className="text-3xl font-bold text-alsham-primary mb-2">
                 #{stats.current_rank}
               </div>
@@ -80,11 +80,11 @@ export const Gamification: React.FC = () => {
         )}
 
         {error && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
+          <div className="bg-[var(--surface)] rounded-lg shadow p-8 text-center">
             <p className="text-alsham-text-secondary mb-4">{error}</p>
             <button
               onClick={loadGamificationData}
-              className="px-4 py-2 bg-alsham-primary text-white rounded-lg hover:bg-alsham-primary-hover"
+              className="px-4 py-2 bg-alsham-primary text-[var(--text)] rounded-lg hover:bg-alsham-primary-hover"
             >
               Tentar novamente
             </button>
@@ -94,9 +94,3 @@ export const Gamification: React.FC = () => {
     </div>
   )
 }
-
-
-
-
-
-

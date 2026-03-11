@@ -3,14 +3,14 @@
 // 100% CSS Variables + shadcn/ui
 
 import {
-  BuildingOffice2Icon,
-  CurrencyDollarIcon,
-  ChartBarIcon,
-  GlobeAltIcon,
-  SparklesIcon,
-  StarIcon,
-  TrophyIcon
-} from '@heroicons/react/24/outline';
+  Building2,
+  DollarSign,
+  BarChart3,
+  Globe,
+  Sparkles,
+  Star,
+  Trophy
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -140,7 +140,7 @@ export default function PartnersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--accent-sky)]/10 border-[var(--accent-sky)]/30">
           <CardContent className="p-6">
-            <BuildingOffice2Icon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <Building2 className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.totalParceiros || 0}</p>
             <p className="text-[var(--text-secondary)]">Total Parceiros</p>
           </CardContent>
@@ -148,7 +148,7 @@ export default function PartnersPage() {
 
         <Card className="bg-[var(--accent-emerald)]/10 border-[var(--accent-emerald)]/30">
           <CardContent className="p-6">
-            <StarIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <Star className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.ativos || 0}</p>
             <p className="text-[var(--text-secondary)]">Ativos</p>
           </CardContent>
@@ -156,7 +156,7 @@ export default function PartnersPage() {
 
         <Card className="bg-[var(--accent-warning)]/10 border-[var(--accent-warning)]/30">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-3xl font-black text-[var(--text)]">R$ {((metrics?.receitaTotal || 0) / 1000000).toFixed(1)}M</p>
             <p className="text-[var(--text-secondary)]">Receita Gerada</p>
           </CardContent>
@@ -164,7 +164,7 @@ export default function PartnersPage() {
 
         <Card className="bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30">
           <CardContent className="p-6">
-            <ChartBarIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <BarChart3 className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text)]">{metrics?.dealsConjuntos || 0}</p>
             <p className="text-[var(--text-secondary)]">Deals Conjuntos</p>
           </CardContent>
@@ -179,7 +179,7 @@ export default function PartnersPage() {
 
         {metrics?.parceiros.length === 0 ? (
           <div className="text-center py-20">
-            <BuildingOffice2Icon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <Building2 className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhum parceiro cadastrado</p>
           </div>
         ) : (
@@ -203,14 +203,14 @@ export default function PartnersPage() {
                           </Badge>
                         </div>
                         <div className="flex items-center gap-1">
-                          <TrophyIcon className="w-5 h-5 text-[var(--accent-warning)]" />
+                          <Trophy className="w-5 h-5 text-[var(--accent-warning)]" />
                           <span className="text-[var(--accent-warning)] font-bold capitalize">{parceiro.nivel}</span>
                         </div>
                       </div>
 
                       <h3 className="text-2xl font-bold text-[var(--text)] mb-1">{parceiro.nome}</h3>
                       <div className="flex items-center gap-2 text-[var(--text-secondary)] text-sm mb-6">
-                        <GlobeAltIcon className="w-4 h-4" />
+                        <Globe className="w-4 h-4" />
                         <span>{parceiro.pais}</span>
                         {parceiro.status !== 'ativo' && (
                           <Badge variant="secondary" className="text-xs">
@@ -232,7 +232,7 @@ export default function PartnersPage() {
                           <span className="text-[var(--text-secondary)]">Satisfação</span>
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, idx) => (
-                              <StarIcon
+                              <Star
                                 key={idx}
                                 className={`w-4 h-4 ${idx < parceiro.nota_satisfacao ? 'text-[var(--accent-warning)] fill-[var(--accent-warning)]' : 'text-[var(--text-secondary)]/30'}`}
                               />
@@ -256,7 +256,7 @@ export default function PartnersPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-sky)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-sky)] max-w-4xl mx-auto">
           "Sozinhos vamos rápido. Juntos vamos longe. Parceiros são multiplicadores."
         </p>

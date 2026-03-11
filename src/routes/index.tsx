@@ -6,7 +6,7 @@ import React, { Suspense, lazy, type LazyExoticComponent, type ReactNode, type C
 import UnderConstruction from '../pages/UnderConstruction'
 import { pagesList } from './pagesList'
 
-export type RouteLoader = () => Promise<{ default: ComponentType<any> }>
+export type RouteLoader = () => Promise<{ default: ComponentType<Record<string, never>> }>
 
 interface RouteOptions {
   label?: string
@@ -24,7 +24,7 @@ interface RegisteredRoute {
 
 const routeRegistry = new Map<string, RegisteredRoute>()
 const aliasRegistry = new Map<string, string>()
-const lazyCache = new Map<string, LazyExoticComponent<ComponentType<any>>>()
+const lazyCache = new Map<string, LazyExoticComponent<ComponentType<Record<string, never>>>>()
 
 const DEFAULT_ROUTE_ID = 'dashboard'
 
@@ -224,7 +224,7 @@ export function renderPage(activePage: string | null | undefined): ReactNode {
 
   if (LazyComponent) {
     return (
-      <Suspense fallback={<div className="p-10 text-[var(--text-secondary)]">Carregando…</div>}>
+      <Suspense fallback={<div className="flex h-64 items-center justify-center text-[var(--text-secondary)]" role="status" aria-label="Carregando página"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-1)] border-t-transparent" /></div>}>
         <LazyComponent />
       </Suspense>
     )
@@ -280,7 +280,8 @@ function bootstrapRealRoutes() {
     'leads-lista',
     () =>
       import('../pages/Leads').then((m) => {
-        const Component = (m as any).default ?? (m as any).Leads
+        const mod = m as Record<string, unknown>
+        const Component = (mod.default ?? mod.Leads) as ComponentType<Record<string, never>> | undefined
         if (!Component) return createPlaceholderLoader('Leads')()
         return { default: Component }
       }),
@@ -400,5 +401,12 @@ function bootstrapPlaceholderRoutes() {
   })
 }
 
-bootstrapRealRoutes()
-bootstrapPlaceholderRoutes()
+let _bootstrapped = false
+export function bootstrapRoutes() {
+  if (_bootstrapped) return
+  _bootstrapped = true
+  bootstrapRealRoutes()
+  bootstrapPlaceholderRoutes()
+}
+
+bootstrapRoutes()

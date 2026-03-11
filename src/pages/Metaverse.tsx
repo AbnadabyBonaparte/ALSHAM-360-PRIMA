@@ -156,13 +156,13 @@ const SpatialNodeMesh = ({ node, onSelect }: { node: SpatialNode; onSelect: (n: 
           <Html distanceFactor={15} transform position={[0, 2.5, 0]}>
             <div className="bg-[var(--background)]/80 backdrop-blur-md border border-cyan-500/50 p-3 rounded-lg w-48 text-center select-none pointer-events-none transform transition-all duration-300">
               <h3 className="text-cyan-400 font-bold text-lg">{node.name}</h3>
-              <div className="flex justify-between text-xs text-gray-300 mt-2">
+              <div className="flex justify-between text-xs text-[var(--text-secondary)] mt-2">
                 <span>Visitors</span>
                 <span className="font-mono text-[var(--text-primary)]">{node.metrics.visitors}</span>
               </div>
-              <div className="flex justify-between text-xs text-gray-300">
+              <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                 <span>Revenue</span>
-                <span className="font-mono text-green-400">${(node.metrics.revenue / 1000).toFixed(1)}k</span>
+                <span className="font-mono text-[var(--accent-emerald)]">${(node.metrics.revenue / 1000).toFixed(1)}k</span>
               </div>
             </div>
           </Html>
@@ -189,12 +189,12 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
           <motion.h1 
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-purple-500 font-['Rajdhani'] tracking-tighter"
+            className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-[var(--surface)] to-[var(--accent-purple)] font-['Rajdhani'] tracking-tighter"
           >
             OMNIVERSE
           </motion.h1>
           <div className="flex items-center space-x-2 mt-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <div className="w-2 h-2 bg-[var(--accent-emerald)] rounded-full animate-pulse" />
             <span className="text-cyan-500/80 text-sm tracking-widest uppercase">System Operational • Live Feed</span>
           </div>
         </div>
@@ -215,14 +215,14 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
           animate={{ x: 0, opacity: 1 }}
           className="bg-[var(--background)]/60 backdrop-blur-xl border-l-2 border-cyan-500 p-6 rounded-l-2xl"
         >
-          <h3 className="text-gray-400 text-sm uppercase mb-4">Real-time Telemetry</h3>
+          <h3 className="text-[var(--text-secondary)] text-sm uppercase mb-4">Real-time Telemetry</h3>
           <div className="space-y-6">
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-[var(--text-primary)]">Active Avatars</span>
                 <span className="text-cyan-400 font-mono">14,205</span>
               </div>
-              <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }} animate={{ width: '75%' }} 
                   className="h-full bg-cyan-500" 
@@ -232,21 +232,21 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-[var(--text-primary)]">Global Revenue (1h)</span>
-                <span className="text-green-400 font-mono">$842,390</span>
+                <span className="text-[var(--accent-emerald)] font-mono">$842,390</span>
               </div>
-              <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }} animate={{ width: '92%' }} 
-                  className="h-full bg-green-500" 
+                  className="h-full bg-[var(--accent-emerald)]" 
                 />
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-[var(--text-primary)]">Sentiment Analysis</span>
-                <span className="text-purple-400 font-mono">POSITIVE (0.84)</span>
+                <span className="text-[var(--accent-purple)] font-mono">POSITIVE (0.84)</span>
               </div>
-              <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1 bg-[var(--bg)] rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }} animate={{ width: '84%' }} 
                   className="h-full bg-gradient-to-r from-purple-500 to-pink-500" 
@@ -265,19 +265,19 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
          >
            <div className="flex items-center justify-between mb-4">
              <h2 className="text-2xl font-bold text-[var(--text-primary)]">{selectedNode.name}</h2>
-             <span className={`w-3 h-3 rounded-full ${selectedNode.status === 'active' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+             <span className={`w-3 h-3 rounded-full ${selectedNode.status === 'active' ? 'bg-[var(--accent-emerald)]' : 'bg-[var(--accent-alert)]'} animate-pulse`} />
            </div>
-           <p className="text-gray-400 text-sm mb-4">
+           <p className="text-[var(--text-secondary)] text-sm mb-4">
              Node ID: <span className="font-mono text-cyan-300">{selectedNode.id.toUpperCase()}</span>
            </p>
            <div className="grid grid-cols-2 gap-4">
              <button className="col-span-2 bg-cyan-600 hover:bg-cyan-500 text-[var(--text-primary)] font-bold py-2 rounded transition-colors">
                ENTER IMMERSION
              </button>
-             <button className="border border-white/20 text-[var(--text-primary)] hover:bg-white/10 py-2 rounded text-sm">
+             <button className="border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface)]/10 py-2 rounded text-sm">
                Audit Logs
              </button>
-             <button className="border border-white/20 text-[var(--text-primary)] hover:bg-white/10 py-2 rounded text-sm">
+             <button className="border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface)]/10 py-2 rounded text-sm">
                Config
              </button>
            </div>
@@ -297,9 +297,9 @@ const HeadsUpDisplay = ({ selectedNode, metrics }: { selectedNode: SpatialNode |
              <motion.button
               key={i}
               whileHover={{ scale: 1.2, y: -5 }}
-              className="w-12 h-12 rounded-xl bg-gradient-to-tr from-gray-800 to-gray-700 border border-[var(--border)] flex items-center justify-center hover:border-cyan-500 transition-colors"
+              className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[var(--surface)] to-[var(--surface)] border border-[var(--border)] flex items-center justify-center hover:border-cyan-500 transition-colors"
              >
-               <div className="w-6 h-6 bg-white/20 rounded-sm" />
+               <div className="w-6 h-6 bg-[var(--surface)]/20 rounded-sm" />
              </motion.button>
            ))}
         </motion.div>

@@ -5,15 +5,15 @@
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
 import {
-  ChatBubbleBottomCenterTextIcon,
-  PaperAirplaneIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  UserGroupIcon,
-  SparklesIcon,
-  CurrencyDollarIcon,
-  ChartBarIcon
-} from '@heroicons/react/24/outline';
+  MessageSquare,
+  Send,
+  CheckCircle2,
+  AlertTriangle,
+  Users,
+  Sparkles,
+  DollarSign,
+  BarChart3
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
@@ -129,7 +129,7 @@ export default function SMSPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto">
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <PaperAirplaneIcon className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
+            <Send className="w-12 h-12 text-[var(--accent-purple)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.totalEnviados || 0).toLocaleString()}</p>
             <p className="text-[var(--text-secondary)]">SMS Enviados</p>
           </CardContent>
@@ -137,7 +137,7 @@ export default function SMSPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <CheckCircleIcon className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
+            <CheckCircle2 className="w-12 h-12 text-[var(--accent-emerald)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaEntrega || 0).toFixed(1)}%</p>
             <p className="text-[var(--text-secondary)]">Taxa Entrega</p>
           </CardContent>
@@ -145,7 +145,7 @@ export default function SMSPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <ChartBarIcon className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
+            <BarChart3 className="w-12 h-12 text-[var(--accent-sky)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">{(metrics?.taxaCliques || 0).toFixed(1)}%</p>
             <p className="text-[var(--text-secondary)]">Taxa Cliques</p>
           </CardContent>
@@ -153,7 +153,7 @@ export default function SMSPage() {
 
         <Card className="bg-[var(--surface)]/60 backdrop-blur-xl border-[var(--border)] hover:scale-105 transition-transform">
           <CardContent className="p-6">
-            <CurrencyDollarIcon className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
+            <DollarSign className="w-12 h-12 text-[var(--accent-warning)] mb-3" />
             <p className="text-4xl font-black text-[var(--text-primary)]">R$ {(metrics?.custoTotal || 0).toFixed(2)}</p>
             <p className="text-[var(--text-secondary)]">Custo Total</p>
           </CardContent>
@@ -168,7 +168,7 @@ export default function SMSPage() {
 
         {metrics?.campanhas.length === 0 ? (
           <div className="text-center py-20">
-            <ChatBubbleBottomCenterTextIcon className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
+            <MessageSquare className="w-32 h-32 text-[var(--text-secondary)]/30 mx-auto mb-8" />
             <p className="text-3xl text-[var(--text-secondary)]">Nenhuma campanha SMS</p>
           </div>
         ) : (
@@ -240,7 +240,7 @@ export default function SMSPage() {
         transition={{ delay: 0.8 }}
         className="text-center py-24 mt-16"
       >
-        <SparklesIcon className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
+        <Sparkles className="w-32 h-32 text-[var(--accent-purple)] mx-auto mb-8 animate-pulse" />
         <p className="text-5xl font-light text-[var(--accent-purple)] max-w-4xl mx-auto">
           "SMS tem 98% de taxa de abertura. É a mensagem que ninguém ignora."
         </p>
