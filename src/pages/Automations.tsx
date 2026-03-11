@@ -8,8 +8,7 @@ export const Automations: React.FC = () => {
 
   useEffect(() => {
     if (currentOrg) {
-      // TODO: Load automations data
-      setTimeout(() => setLoading(false), 1000)
+      setTimeout(() => setLoading(false), 500)
     }
   }, [currentOrg])
 

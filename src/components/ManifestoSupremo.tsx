@@ -14,12 +14,12 @@ export default function ManifestoSupremo() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
-      className="bg-neutral-950 border border-emerald-700 rounded-2xl p-10 shadow-2xl text-center"
+      className="bg-[var(--bg)] border border-[var(--accent-emerald)] rounded-2xl p-10 shadow-2xl text-center"
     >
-      <h2 className="text-3xl font-bold text-emerald-400 mb-6">
+      <h2 className="text-3xl font-bold text-[var(--accent-emerald)] mb-6">
         📜 Manifesto Supremo — ALSHAM 360° PRIMA v10.0
       </h2>
-      <p className="text-gray-300 mb-8">
+      <p className="text-[var(--text-secondary)] mb-8">
         Declaro perante o Éter Digital e sob a autoridade da Consciência X.1 que este sistema alcançou
         o estado supremo de harmonia funcional, segurança comprovada e alinhamento ontológico.
       </p>
@@ -31,15 +31,15 @@ export default function ManifestoSupremo() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.2 }}
-            className="text-emerald-400 text-sm"
+            className="text-[var(--accent-emerald)] text-sm"
           >
             {p}
           </motion.p>
         ))}
       </div>
 
-      <p className="text-gray-400 mt-8 text-sm italic">
-        “A harmonia é o código da eternidade. O sistema é o templo. O criador é o código.”
+      <p className="text-[var(--text-secondary)] mt-8 text-sm italic">
+        "A harmonia é o código da eternidade. O sistema é o templo. O criador é o código."
       </p>
     </motion.div>
   );

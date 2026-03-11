@@ -205,7 +205,7 @@ export default function WarArena() {
       particleCount: 300,
       spread: 120,
       origin: { y: 0.6 },
-      colors: ['#FFD700', '#FFA500', '#FF4500', '#34D399']
+      colors: ['var(--accent-warning)', 'var(--accent-warning)', 'var(--accent-alert)', 'var(--accent-emerald)']
     });
   }, []);
 

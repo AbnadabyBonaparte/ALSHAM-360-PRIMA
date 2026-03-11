@@ -376,7 +376,6 @@ class LeadsService {
   // 🏢 TAXA DE CONVERSÃO POR SETOR
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   async getSectorConversionRate(company) {
-    // Mock - em produção, buscar do Supabase
     const sectorRates = {
       'tecnologia': 45,
       'saas': 50,

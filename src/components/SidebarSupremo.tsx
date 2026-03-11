@@ -221,7 +221,7 @@ export function SidebarDesktop({ activePage, onNavigate, isCollapsed = false }: 
         whileTap={{ scale: 0.99 }}
       >
         <div className="relative">
-          <div className="grid h-11 w-11 place-content-center rounded-2xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-white font-bold text-lg shadow-lg group-hover:shadow-[var(--color-primary-from)]/30 transition-shadow duration-300">
+          <div className="grid h-11 w-11 place-content-center rounded-2xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-[var(--text)] font-bold text-lg shadow-lg group-hover:shadow-[var(--color-primary-from)]/30 transition-shadow duration-300">
             A∞
           </div>
           <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-[var(--accent-emerald)] border-2 border-[var(--surface-strong)] animate-pulse" />
@@ -498,7 +498,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-50 bg-[var(--bg)]/60 backdrop-blur-sm lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -519,7 +519,7 @@ export function SidebarMobile({ activePage, onNavigate, isOpen, onClose }: Sideb
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[var(--border)]/50 px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-content-center rounded-xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-white font-bold shadow-lg">
+                <div className="grid h-10 w-10 place-content-center rounded-xl bg-gradient-to-br from-[var(--color-primary-from)] via-[var(--accent-sky)] to-[var(--accent-fuchsia)] text-[var(--text)] font-bold shadow-lg">
                   A∞
                 </div>
                 <div>

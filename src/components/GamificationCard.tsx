@@ -12,7 +12,7 @@ export default function GamificationCard({
   title,
   value,
   subtitle,
-  color = "text-emerald-400",
+  color = "text-[var(--accent-emerald)]",
   delay = 0,
 }: GamificationCardProps) {
   return (
@@ -20,11 +20,11 @@ export default function GamificationCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-lg hover:border-emerald-500 transition-all"
+      className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 shadow-lg hover:border-[var(--accent-emerald)] transition-all"
     >
       <h2 className="text-lg font-semibold mb-2">{title}</h2>
       <p className={`text-3xl font-bold ${color}`}>{value}</p>
-      {subtitle && <p className="text-gray-400 text-sm mt-1">{subtitle}</p>}
+      {subtitle && <p className="text-[var(--text-secondary)] text-sm mt-1">{subtitle}</p>}
     </motion.div>
   );
 }

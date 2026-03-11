@@ -71,7 +71,7 @@ const TheCore = ({ sentiment }: { sentiment: number }) => {
     }
   });
 
-  const color = sentiment > 0.7 ? '#00ffd5' : sentiment > 0.4 ? '#8a2be2' : '#ff0055';
+  const color = sentiment > 0.7 ? 'var(--accent-sky)' : sentiment > 0.4 ? 'var(--accent-purple)' : 'var(--accent-alert)';
 
   return (
     <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
@@ -109,7 +109,7 @@ const DataStreams = ({ nodes }: { nodes: SpatialNode[] }) => {
       return (
         <mesh key={`line-${i}`}>
           <tubeGeometry args={[curve, 20, 0.05, 8, false]} />
-          <meshBasicMaterial color={node.status === 'warning' ? '#ff0055' : '#00ffd5'} transparent opacity={0.1} />
+          <meshBasicMaterial color={node.status === 'warning' ? 'var(--accent-alert)' : 'var(--accent-sky)'} transparent opacity={0.1} />
         </mesh>
       );
     });
@@ -128,7 +128,7 @@ const SpatialNodeMesh = ({ node, onSelect }: { node: SpatialNode; onSelect: (n: 
     }
   });
 
-  const color = node.type === 'store' ? '#4ade80' : node.type === 'hq' ? '#f472b6' : '#60a5fa';
+  const color = node.type === 'store' ? 'var(--accent-emerald)' : node.type === 'hq' ? 'var(--accent-alert)' : 'var(--accent-sky)';
 
   return (
     <group 
@@ -142,8 +142,8 @@ const SpatialNodeMesh = ({ node, onSelect }: { node: SpatialNode; onSelect: (n: 
         <mesh>
           <boxGeometry args={[2, 2, 2]} />
           <meshStandardMaterial 
-            color={node.status === 'warning' ? '#ff0055' : color} 
-            emissive={node.status === 'warning' ? '#ff0055' : color}
+            color={node.status === 'warning' ? 'var(--accent-alert)' : color} 
+            emissive={node.status === 'warning' ? 'var(--accent-alert)' : color}
             emissiveIntensity={hovered ? 2 : 0.5}
             roughness={0.2}
             metalness={0.8}
@@ -359,13 +359,13 @@ export default function MetaversePage() {
         {/* 3D WORLD */}
         <div className="absolute inset-0 z-0">
           <Canvas dpr={[1, 2]} camera={{ position: [0, 20, 40], fov: 45 }}>
-            <color attach="background" args={['#050505']} />
+            <color attach="background" args={['var(--bg)']} />
             
             {/* AMBIENTE */}
             <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
             <ambientLight intensity={0.2} />
-            <pointLight position={[10, 10, 10]} intensity={1} color="#00ffff" />
-            <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff00ff" />
+            <pointLight position={[10, 10, 10]} intensity={1} color="var(--accent-sky)" />
+            <pointLight position={[-10, -10, -10]} intensity={0.5} color="var(--accent-purple)" />
             
             {/* O MUNDO DE DADOS */}
             <group>

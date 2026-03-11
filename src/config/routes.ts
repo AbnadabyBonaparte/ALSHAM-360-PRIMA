@@ -331,7 +331,6 @@ export function normalizeRoute(route: string): AppRoute {
  * Constrói breadcrumbs para uma rota
  */
 export function getBreadcrumbs(route: AppRoute): { label: string; route: AppRoute }[] {
-  // TODO: Implementar lógica de breadcrumbs baseada na estrutura da sidebar
   return [
     { label: 'Dashboard', route: 'dashboard-principal' },
     { label: 'Página Atual', route },

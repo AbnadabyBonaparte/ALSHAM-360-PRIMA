@@ -32,11 +32,11 @@ export default function GuardianSentinel() {
   }, []);
 
   return (
-    <div className="bg-neutral-950 p-6 border border-neutral-800 rounded-xl">
-      <h2 className="text-xl font-bold mb-4 text-emerald-400">
+    <div className="bg-[var(--bg)] p-6 border border-[var(--border)] rounded-xl">
+      <h2 className="text-xl font-bold mb-4 text-[var(--accent-emerald)]">
         🛡️ Guardian Sentinel — Monitoramento Ativo
       </h2>
-      <p className="text-gray-400 text-sm mb-4">{status}</p>
+      <p className="text-[var(--text-secondary)] text-sm mb-4">{status}</p>
       <div className="space-y-2">
         {alerts.map((a, i) => (
           <SecurityAlert key={i} level={a.level} message={a.message} />

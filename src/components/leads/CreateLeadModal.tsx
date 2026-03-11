@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
-import { createLead } from '../../lib/supabase-full.js';
+import { createLead } from '../../lib/supabase';
 
 interface CreateLeadModalProps {
   isOpen: boolean;
@@ -152,7 +152,7 @@ const CreateLeadModal: React.FC<CreateLeadModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--bg)]/70 backdrop-blur-sm" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="bg-[var(--neutral-900)] border border-[var(--neutral-800)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
@@ -178,16 +178,16 @@ const CreateLeadModal: React.FC<CreateLeadModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="space-y-6">
             {submitStatus === 'success' && (
-              <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                <p className="text-sm text-emerald-400">Lead criado com sucesso!</p>
+              <div className="flex items-center gap-3 p-4 bg-[var(--accent-emerald)]/10 border border-[var(--accent-emerald)]/30 rounded-lg">
+                <CheckCircle2 className="w-5 h-5 text-[var(--accent-emerald)]" />
+                <p className="text-sm text-[var(--accent-emerald)]">Lead criado com sucesso!</p>
               </div>
             )}
 
             {submitStatus === 'error' && (
-              <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-red-400" />
-                <p className="text-sm text-red-400">Erro ao criar lead. Tente novamente.</p>
+              <div className="flex items-center gap-3 p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/30 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-[var(--accent-alert)]" />
+                <p className="text-sm text-[var(--accent-alert)]">Erro ao criar lead. Tente novamente.</p>
               </div>
             )}
 
@@ -204,11 +204,11 @@ const CreateLeadModal: React.FC<CreateLeadModalProps> = ({
                     value={formData.nome}
                     onChange={handleChange}
                     className={`w-full px-4 py-2 bg-[var(--neutral-950)] border ${
-                      errors.nome ? 'border-red-500' : 'border-[var(--neutral-800)]'
+                      errors.nome ? 'border-[var(--accent-alert)]' : 'border-[var(--neutral-800)]'
                     } rounded-lg focus:ring-2 focus:ring-[var(--accent-emerald)] text-[var(--text-white)]`}
                     placeholder="Ex: João da Silva"
                   />
-                  {errors.nome && <p className="text-sm text-red-400 mt-1">{errors.nome}</p>}
+                  {errors.nome && <p className="text-sm text-[var(--accent-alert)] mt-1">{errors.nome}</p>}
                 </div>
 
                 <div>
@@ -219,11 +219,11 @@ const CreateLeadModal: React.FC<CreateLeadModalProps> = ({
                     value={formData.email}
                     onChange={handleChange}
                     className={`w-full px-4 py-2 bg-[var(--neutral-950)] border ${
-                      errors.email ? 'border-red-500' : 'border-[var(--neutral-800)]'
+                      errors.email ? 'border-[var(--accent-alert)]' : 'border-[var(--neutral-800)]'
                     } rounded-lg focus:ring-2 focus:ring-[var(--accent-emerald)] text-[var(--text-white)]`}
                     placeholder="email@exemplo.com"
                   />
-                  {errors.email && <p className="text-sm text-red-400 mt-1">{errors.email}</p>}
+                  {errors.email && <p className="text-sm text-[var(--accent-alert)] mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
@@ -325,7 +325,7 @@ const CreateLeadModal: React.FC<CreateLeadModalProps> = ({
                   O lead forneceu consentimento para uso de dados
                 </p>
                 {errors.consentimento && (
-                  <p className="text-sm text-red-400 mt-1">{errors.consentimento}</p>
+                  <p className="text-sm text-[var(--accent-alert)] mt-1">{errors.consentimento}</p>
                 )}
               </div>
             </div>
@@ -345,7 +345,7 @@ const CreateLeadModal: React.FC<CreateLeadModalProps> = ({
             type="submit"
             onClick={handleSubmit}
             disabled={isSubmitting || submitStatus === 'success'}
-            className="px-6 py-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+            className="px-6 py-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-teal)] text-[var(--text)] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
           >
             {isSubmitting ? (
               <>

@@ -9,9 +9,9 @@ interface AuditCardProps {
 
 export default function AuditCard({ policy, status, details, delay = 0 }: AuditCardProps) {
   const colors = {
-    OK: "border-emerald-600 text-emerald-400",
-    Warning: "border-amber-500 text-amber-400",
-    Critical: "border-red-600 text-red-400",
+    OK: "border-[var(--accent-emerald)] text-[var(--accent-emerald)]",
+    Warning: "border-[var(--accent-warning)] text-[var(--accent-warning)]",
+    Critical: "border-[var(--accent-alert)] text-[var(--accent-alert)]",
   };
 
   return (
@@ -19,11 +19,11 @@ export default function AuditCard({ policy, status, details, delay = 0 }: AuditC
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={`border ${colors[status]} bg-neutral-900 rounded-xl p-5 shadow-lg`}
+      className={`border ${colors[status]} bg-[var(--surface)] rounded-xl p-5 shadow-lg`}
     >
       <h3 className="text-lg font-semibold mb-2">{policy}</h3>
-      <p className="text-sm mb-2 text-gray-400">Status: {status}</p>
-      {details && <p className="text-xs text-gray-500">{details}</p>}
+      <p className="text-sm mb-2 text-[var(--text-secondary)]">Status: {status}</p>
+      {details && <p className="text-xs text-[var(--text-secondary)]">{details}</p>}
     </motion.div>
   );
 }

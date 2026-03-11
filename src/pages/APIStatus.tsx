@@ -190,7 +190,7 @@ function statusMeta(status: HealthStatus) {
       return { label: 'Degradado', icon: ShieldCheck, tone: 'var(--accent-1, #a855f7)' }
     case HealthStatus.critical:
     default:
-      return { label: 'Crítico', icon: AlertTriangle, tone: '#ef4444' }
+      return { label: 'Crítico', icon: AlertTriangle, tone: 'var(--accent-alert)' }
   }
 }
 
@@ -509,14 +509,14 @@ export default function APIStatus() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => toast('Em breve: alternar fontes de dados (Realtime/Mock).')}
+                    onClick={() => toast('Em breve: alternar fontes de dados (Realtime/Simulado).')}
                     className="rounded-xl border px-4 py-2 text-sm font-semibold transition hover:opacity-90"
                     style={{
                       borderColor: 'color-mix(in oklab, var(--foreground, #fff) 14%, transparent)',
                       background: 'color-mix(in oklab, var(--background) 55%, transparent)',
                     }}
                   >
-                    Fonte: Mock
+                    Fonte: Simulado
                   </button>
                 </div>
               </div>
@@ -650,7 +650,7 @@ export default function APIStatus() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <AlertTriangle className="h-6 w-6" style={{ color: '#ef4444' }} />
+                    <AlertTriangle className="h-6 w-6" style={{ color: 'var(--accent-alert)' }} />
                     <div>
                       <p className="text-sm font-black md:text-lg" style={{ color: 'var(--foreground, var(--text))' }}>
                         Falhas recentes
@@ -670,9 +670,9 @@ export default function APIStatus() {
                     disabled={failures.length === 0}
                     className="rounded-2xl border px-4 py-2 text-xs font-black transition hover:opacity-90"
                     style={{
-                      borderColor: 'color-mix(in oklab, #ef4444 30%, transparent)',
-                      background: 'color-mix(in oklab, #ef4444 16%, transparent)',
-                      color: '#fecaca',
+                      borderColor: 'color-mix(in oklab, var(--accent-alert) 30%, transparent)',
+                      background: 'color-mix(in oklab, var(--accent-alert) 16%, transparent)',
+                      color: 'var(--accent-alert)',
                     }}
                   >
                     Limpar (segure)
@@ -701,11 +701,11 @@ export default function APIStatus() {
                         key={f.id}
                         className="rounded-2xl border p-4"
                         style={{
-                          borderColor: 'color-mix(in oklab, #ef4444 30%, transparent)',
-                          background: 'color-mix(in oklab, #ef4444 10%, transparent)',
+                          borderColor: 'color-mix(in oklab, var(--accent-alert) 30%, transparent)',
+                          background: 'color-mix(in oklab, var(--accent-alert) 10%, transparent)',
                         }}
                       >
-                        <p className="text-sm font-black" style={{ color: 'color-mix(in oklab, #fecaca 85%, white)' }}>
+                        <p className="text-sm font-black" style={{ color: 'color-mix(in oklab, var(--accent-alert) 85%, white)' }}>
                           {f.title}
                         </p>
                         <p className="mt-1 text-xs" style={{ color: 'color-mix(in oklab, var(--foreground, #fff) 65%, transparent)' }}>
@@ -745,7 +745,7 @@ export default function APIStatus() {
                   {[
                     { label: 'Sucesso', value: 0.9992, tone: 'var(--accent-2, #22c55e)' },
                     { label: 'Retries', value: 0.017, tone: 'var(--accent-1, #a855f7)' },
-                    { label: 'Dead-letter', value: 0.001, tone: '#ef4444' },
+                    { label: 'Dead-letter', value: 0.001, tone: 'var(--accent-alert)' },
                   ].map(row => (
                     <div key={row.label}>
                       <div className="mb-2 flex items-center justify-between">

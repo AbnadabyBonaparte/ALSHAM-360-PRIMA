@@ -124,7 +124,7 @@ export default function Financeiro() {
     const totalIncome = recent.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
     const totalExpense = recent.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
     const simulatedIncome = totalIncome * (1 - simulationDrop[0] / 100);
-    const cashReserve = totalIncome * 10; // Mock para simulação
+    const cashReserve = totalIncome * 10;
     const runway = totalExpense > 0 ? cashReserve / totalExpense : 999;
 
     return {

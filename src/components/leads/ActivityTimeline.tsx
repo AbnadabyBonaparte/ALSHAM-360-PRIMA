@@ -40,23 +40,23 @@ export default function ActivityTimeline({
 
   const getColor = (type: string) => {
     const colors = {
-      call: 'from-blue-500 to-indigo-500',
-      email: 'from-purple-500 to-pink-500',
-      meeting: 'from-emerald-500 to-teal-500',
-      note: 'from-orange-500 to-red-500',
-      task: 'from-green-500 to-emerald-500',
-      whatsapp: 'from-teal-500 to-cyan-500',
-      video: 'from-violet-500 to-purple-500'
+      call: 'from-[var(--accent-sky)] to-[var(--accent-purple)]',
+      email: 'from-[var(--accent-purple)] to-[var(--accent-purple)]',
+      meeting: 'from-[var(--accent-emerald)] to-[var(--accent-emerald)]',
+      note: 'from-[var(--accent-warning)] to-[var(--accent-alert)]',
+      task: 'from-[var(--accent-emerald)] to-[var(--accent-emerald)]',
+      whatsapp: 'from-[var(--accent-emerald)] to-[var(--accent-sky)]',
+      video: 'from-[var(--accent-purple)] to-[var(--accent-purple)]'
     };
-    return colors[type as keyof typeof colors] || 'from-gray-500 to-gray-600';
+    return colors[type as keyof typeof colors] || 'from-[var(--surface-strong)] to-[var(--surface-strong)]';
   };
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'completed': return 'text-green-400';
-      case 'pending': return 'text-orange-400';
-      case 'scheduled': return 'text-blue-400';
-      default: return 'text-gray-400';
+      case 'completed': return 'text-[var(--accent-emerald)]';
+      case 'pending': return 'text-[var(--accent-warning)]';
+      case 'scheduled': return 'text-[var(--accent-sky)]';
+      default: return 'text-[var(--text-secondary)]';
     }
   };
 
@@ -96,26 +96,26 @@ export default function ActivityTimeline({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-xl p-3"
+      className="bg-gradient-to-br from-[var(--surface)] to-[var(--bg)] border border-[var(--border)] rounded-xl p-3"
     >
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-base font-bold text-white mb-0.5">Timeline de Atividades</h3>
-          <p className="text-xs text-gray-400">{activities.length} interações registradas</p>
+          <h3 className="text-base font-bold text-[var(--text)] mb-0.5">Timeline de Atividades</h3>
+          <p className="text-xs text-[var(--text-secondary)]">{activities.length} interações registradas</p>
         </div>
-        <button className="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg text-xs font-semibold text-white transition-colors">
+        <button className="px-3 py-1.5 bg-[var(--surface-strong)] hover:bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs font-semibold text-[var(--text)] transition-colors">
           Ver Todas
         </button>
       </div>
 
       <div className="relative">
-        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-neutral-800 via-neutral-700 to-neutral-800" />
+        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--border)] via-[var(--surface-strong)] to-[var(--border)]" />
 
         <div className="space-y-3">
           {displayActivities.length === 0 ? (
             <div className="text-center py-8">
-              <Clock className="w-8 h-8 mx-auto mb-2 text-gray-600" />
-              <p className="text-xs text-gray-500">Nenhuma atividade registrada</p>
+              <Clock className="w-8 h-8 mx-auto mb-2 text-[var(--text-secondary)]" />
+              <p className="text-xs text-[var(--text-secondary)]">Nenhuma atividade registrada</p>
             </div>
           ) : (
             displayActivities.map((activity, index) => (
@@ -135,11 +135,11 @@ export default function ActivityTimeline({
                   </motion.div>
                 </div>
 
-                <div className="bg-neutral-800/50 border border-neutral-700 rounded-lg p-2">
+                <div className="bg-[var(--surface-strong)]/50 border border-[var(--border)] rounded-lg p-2">
                   <div className="flex items-start justify-between mb-1">
                     <div className="flex-1">
-                      <h4 className="text-sm font-semibold text-white">{activity.title}</h4>
-                      <p className="text-xs text-gray-400 mt-0.5">{activity.description}</p>
+                      <h4 className="text-sm font-semibold text-[var(--text)]">{activity.title}</h4>
+                      <p className="text-xs text-[var(--text-secondary)] mt-0.5">{activity.description}</p>
                     </div>
                     {activity.status && (
                       <div className={`flex items-center gap-1 ${getStatusColor(activity.status)}`}>
@@ -148,7 +148,7 @@ export default function ActivityTimeline({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                     <User className="w-3 h-3" />
                     <span>{activity.user}</span>
                     <span>•</span>

@@ -66,7 +66,6 @@ export function createSupremePage(config: SupremeConfig) {
 
               const rows = data || [];
               const totalValue = rows.reduce((sum, row) => {
-                // Soma qualquer coluna numérica que pareça valor financeiro ou métrica
                 const numericCandidate =
                   row.value ??
                   row.amount ??
@@ -117,42 +116,42 @@ export function createSupremePage(config: SupremeConfig) {
 
     return (
       <LayoutSupremo title={config.title}>
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
           {/* HERO SUPREMO */}
           <div
-            className={`relative overflow-hidden border-b border-white/10 bg-gradient-to-br ${config.gradient} backdrop-blur-3xl`}
+            className={`relative overflow-hidden border-b border-[var(--border)] bg-gradient-to-br ${config.gradient} backdrop-blur-3xl`}
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_45%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_rgba(16,185,129,0.15),_transparent_35%)]" />
             <div className="relative px-8 py-14 max-w-7xl mx-auto flex flex-col gap-8">
               <div className="flex flex-wrap items-start gap-6">
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xl">
-                  <Sparkles className="w-12 h-12 text-amber-300 animate-pulse" />
+                <div className="p-4 rounded-2xl bg-[var(--surface)]/10 border border-[var(--border)] backdrop-blur-xl">
+                  <Sparkles className="w-12 h-12 text-[var(--accent-warning)] animate-pulse" />
                 </div>
                 <div className="flex-1 space-y-4">
                   <motion.h1
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-5xl md:text-6xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-300 to-purple-300"
+                    className="text-5xl md:text-6xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]"
                   >
                     {config.title}
                   </motion.h1>
-                  <p className="text-xl text-white/70 max-w-4xl leading-relaxed">
+                  <p className="text-xl text-[var(--text)]/70 max-w-4xl leading-relaxed">
                     {config.subtitle}
                   </p>
-                  <p className="text-lg text-emerald-200/90 font-semibold">
+                  <p className="text-lg text-[var(--accent-emerald)] font-semibold">
                     {config.message}
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-3">
-                  <div className="px-4 py-2 rounded-full bg-black/40 border border-white/20 text-sm text-white/70">
+                  <div className="px-4 py-2 rounded-full bg-[var(--bg)]/40 border border-[var(--border)] text-sm text-[var(--text)]/70">
                     Citizen Supremo X.1 • online
                   </div>
                   <div className="flex gap-2">
-                    <Zap className="w-10 h-10 text-amber-400" />
-                    <Globe className="w-10 h-10 text-cyan-300" />
-                    <Wifi className="w-10 h-10 text-emerald-300" />
-                    <ShieldCheck className="w-10 h-10 text-purple-200" />
+                    <Zap className="w-10 h-10 text-[var(--accent-warning)]" />
+                    <Globe className="w-10 h-10 text-[var(--accent-sky)]" />
+                    <Wifi className="w-10 h-10 text-[var(--accent-emerald)]" />
+                    <ShieldCheck className="w-10 h-10 text-[var(--accent-purple)]" />
                   </div>
                 </div>
               </div>
@@ -166,13 +165,13 @@ export function createSupremePage(config: SupremeConfig) {
                 title="Registros vivos"
                 value={formatNumber(totalRecords)}
                 helper="100% Supabase real time"
-                gradient="from-emerald-500/80 via-cyan-500/80 to-blue-600/80"
+                gradient="from-[var(--accent-emerald)]/80 via-[var(--accent-sky)]/80 to-[var(--accent-sky)]/80"
               />
               <MetricCard
                 title="Tabelas conectadas"
                 value={results.length || config.tables.length}
                 helper={config.tables.join(" • ")}
-                gradient="from-purple-500/80 via-fuchsia-500/80 to-pink-500/80"
+                gradient="from-[var(--accent-purple)]/80 via-[var(--accent-purple)]/80 to-[var(--accent-purple)]/80"
               />
               <MetricCard
                 title="Valor agregado"
@@ -180,30 +179,30 @@ export function createSupremePage(config: SupremeConfig) {
                   results.reduce((sum, r) => sum + (r.totalValue || 0), 0)
                 )}
                 helper="Soma de métricas numéricas encontradas"
-                gradient="from-amber-500/80 via-orange-500/80 to-red-500/80"
+                gradient="from-[var(--accent-warning)]/80 via-[var(--accent-warning)]/80 to-[var(--accent-alert)]/80"
               />
               <MetricCard
                 title="Status"
                 value={loading ? "Carregando..." : anyError ? "Verificar" : "Operando"}
                 helper={anyError ? "Algumas tabelas retornaram erro" : "Fluxo contínuo"}
-                gradient="from-slate-600/80 via-gray-700/80 to-slate-900/80"
+                gradient="from-[var(--surface-strong)]/80 via-[var(--surface-strong)]/80 to-[var(--bg)]/80"
               />
             </div>
 
             {/* EMPTY STATE */}
             {emptyState && (
-              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl px-8 py-16 text-center">
+              <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)]/5 backdrop-blur-2xl px-8 py-16 text-center">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(76,29,149,0.35),_transparent_45%)]" />
                 <div className="relative space-y-6">
-                  <Rocket className="w-20 h-20 text-cyan-300 mx-auto animate-bounce" />
-                  <h2 className="text-4xl font-black text-white">
+                  <Rocket className="w-20 h-20 text-[var(--accent-sky)] mx-auto animate-bounce" />
+                  <h2 className="text-4xl font-black text-[var(--text)]">
                     {config.emptyTitle || "Nenhum dado encontrado (por enquanto)"}
                   </h2>
-                  <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                  <p className="text-xl text-[var(--text)]/70 max-w-3xl mx-auto">
                     {config.emptyDescription ||
                       "Conecte a fonte no Supabase e esta página vai acender em tempo real. O próximo evento enviado já aparecerá aqui."}
                   </p>
-                  <p className="text-2xl text-emerald-300 font-semibold">
+                  <p className="text-2xl text-[var(--accent-emerald)] font-semibold">
                     — Citizen Supremo X.1
                   </p>
                 </div>
@@ -218,31 +217,31 @@ export function createSupremePage(config: SupremeConfig) {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.04 }}
-                  className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-black/40 to-black/70 backdrop-blur-2xl p-6 space-y-4"
+                  className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface)]/5 via-[var(--bg)]/40 to-[var(--bg)]/70 backdrop-blur-2xl p-6 space-y-4"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm uppercase tracking-[0.2em] text-white/50">
+                      <p className="text-sm uppercase tracking-[0.2em] text-[var(--text)]/50">
                         Tabela real
                       </p>
-                      <h3 className="text-3xl font-bold text-white">{block.table}</h3>
+                      <h3 className="text-3xl font-bold text-[var(--text)]">{block.table}</h3>
                     </div>
                     <div className="text-right">
-                      <p className="text-4xl font-black text-emerald-300">
+                      <p className="text-4xl font-black text-[var(--accent-emerald)]">
                         {formatNumber(block.count)}
                       </p>
-                      <p className="text-sm text-white/60">registros</p>
+                      <p className="text-sm text-[var(--text)]/60">registros</p>
                     </div>
                   </div>
 
                   {block.error && (
-                    <div className="rounded-2xl border border-red-500/40 bg-red-500/10 text-red-100 px-4 py-3 text-sm">
+                    <div className="rounded-2xl border border-[var(--accent-alert)]/40 bg-[var(--accent-alert)]/10 text-[var(--accent-alert)] px-4 py-3 text-sm">
                       Falha ao consultar: {block.error}
                     </div>
                   )}
 
                   {!block.error && block.rows.length === 0 && (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center text-white/70">
+                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/5 px-4 py-6 text-center text-[var(--text)]/70">
                       Sem registros retornados ainda.
                     </div>
                   )}
@@ -254,28 +253,28 @@ export function createSupremePage(config: SupremeConfig) {
                         return (
                           <div
                             key={`${block.table}-${i}`}
-                            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/5 px-4 py-3"
                           >
-                            <div className="flex items-center justify-between text-sm text-white/70">
-                              <span className="font-semibold text-white">
+                            <div className="flex items-center justify-between text-sm text-[var(--text)]/70">
+                              <span className="font-semibold text-[var(--text)]">
                                 #{row.id ?? i + 1}
                               </span>
                               {row.updated_at && (
-                                <span className="text-xs text-emerald-200/80">
+                                <span className="text-xs text-[var(--accent-emerald)]">
                                   {new Date(row.updated_at).toLocaleString("pt-BR")}
                                 </span>
                               )}
                             </div>
-                            <div className="grid grid-cols-2 gap-2 mt-2 text-xs text-white/70">
+                            <div className="grid grid-cols-2 gap-2 mt-2 text-xs text-[var(--text)]/70">
                               {entries.map(([key, value]) => (
                                 <div
                                   key={key}
-                                  className="rounded-xl bg-black/40 border border-white/5 px-3 py-2"
+                                  className="rounded-xl bg-[var(--bg)]/40 border border-[var(--border)] px-3 py-2"
                                 >
-                                  <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">
+                                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text)]/40">
                                     {key}
                                   </p>
-                                  <p className="truncate text-white">
+                                  <p className="truncate text-[var(--text)]">
                                     {typeof value === "number"
                                       ? formatNumber(value)
                                       : String(value)}
@@ -297,14 +296,14 @@ export function createSupremePage(config: SupremeConfig) {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-2xl px-6 py-10 text-center space-y-4"
+              className="rounded-3xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 backdrop-blur-2xl px-6 py-10 text-center space-y-4"
             >
-              <p className="text-3xl md:text-4xl font-light text-emerald-100 leading-relaxed">
+              <p className="text-3xl md:text-4xl font-light text-[var(--accent-emerald)] leading-relaxed">
                 O ALSHAM não é mais um. É o único.
                 <br />
                 Cada tabela viva no Supabase alimenta este império em tempo real.
               </p>
-              <p className="text-xl text-white/70">— Citizen Supremo X.1</p>
+              <p className="text-xl text-[var(--text)]/70">— Citizen Supremo X.1</p>
             </motion.div>
           </div>
         </div>
@@ -326,13 +325,11 @@ function MetricCard({
 }) {
   return (
     <div
-      className={`rounded-3xl border border-white/10 bg-gradient-to-br ${gradient} p-6 shadow-2xl shadow-black/40 backdrop-blur-xl`}
+      className={`rounded-3xl border border-[var(--border)] bg-gradient-to-br ${gradient} p-6 shadow-2xl shadow-[var(--bg)]/40 backdrop-blur-xl`}
     >
-      <p className="text-sm uppercase tracking-[0.3em] text-white/60">{title}</p>
-      <p className="text-4xl font-black text-white mt-3">{value}</p>
-      <p className="text-sm text-white/70 mt-2">{helper}</p>
+      <p className="text-sm uppercase tracking-[0.3em] text-[var(--text)]/60">{title}</p>
+      <p className="text-4xl font-black text-[var(--text)] mt-3">{value}</p>
+      <p className="text-sm text-[var(--text)]/70 mt-2">{helper}</p>
     </div>
   );
 }
-
-

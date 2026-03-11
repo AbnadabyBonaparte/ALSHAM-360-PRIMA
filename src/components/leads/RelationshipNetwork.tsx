@@ -198,17 +198,17 @@ export default function RelationshipNetwork({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6"
+      className="bg-gradient-to-br from-[var(--surface)] to-[var(--bg)] border border-[var(--border)] rounded-2xl p-6"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-bold text-white mb-1">Rede de Relacionamentos</h3>
-          <p className="text-sm text-gray-400">Mapeamento visual de conexões</p>
+          <h3 className="text-xl font-bold text-[var(--text)] mb-1">Rede de Relacionamentos</h3>
+          <p className="text-sm text-[var(--text-secondary)]">Mapeamento visual de conexões</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-          <GitBranch className="w-4 h-4 text-emerald-400" />
-          <span className="text-sm font-semibold text-emerald-400">
+        <div className="flex items-center gap-2 px-4 py-2 bg-[var(--accent-emerald)]/10 border border-[var(--accent-emerald)]/20 rounded-xl">
+          <GitBranch className="w-4 h-4 text-[var(--accent-emerald)]" />
+          <span className="text-sm font-semibold text-[var(--accent-emerald)]">
             {nodes.length} nós • {edges.length} conexões
           </span>
         </div>
@@ -219,23 +219,23 @@ export default function RelationshipNetwork({
         <canvas
           ref={canvasRef}
           onClick={handleCanvasClick}
-          className="w-full h-96 rounded-xl bg-neutral-950/50 cursor-pointer"
+          className="w-full h-96 rounded-xl bg-[var(--bg)]/50 cursor-pointer"
         />
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 bg-neutral-900/90 backdrop-blur-sm border border-neutral-800 rounded-xl p-4">
+        <div className="absolute bottom-4 left-4 bg-[var(--surface)]/90 backdrop-blur-sm border border-[var(--border)] rounded-xl p-4">
           <div className="space-y-2 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500" />
-              <span className="text-gray-300">Lead Principal</span>
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[var(--accent-emerald)] to-[var(--accent-emerald)]" />
+              <span className="text-[var(--text-secondary)]">Lead Principal</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-blue-500 to-purple-500" />
-              <span className="text-gray-300">Contatos</span>
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[var(--accent-sky)] to-[var(--accent-purple)]" />
+              <span className="text-[var(--text-secondary)]">Contatos</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500" />
-              <span className="text-gray-300">Empresas</span>
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[var(--accent-sky)] to-[var(--accent-purple)]" />
+              <span className="text-[var(--text-secondary)]">Empresas</span>
             </div>
           </div>
         </div>
@@ -245,34 +245,34 @@ export default function RelationshipNetwork({
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute top-4 right-4 bg-neutral-900/90 backdrop-blur-sm border border-neutral-800 rounded-xl p-4 min-w-64"
+            className="absolute top-4 right-4 bg-[var(--surface)]/90 backdrop-blur-sm border border-[var(--border)] rounded-xl p-4 min-w-64"
           >
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-white">{selectedNode.label}</h4>
+              <h4 className="font-semibold text-[var(--text)]">{selectedNode.label}</h4>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-[var(--text-secondary)] hover:text-[var(--text)]"
               >
                 ×
               </button>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-gray-400">Tipo:</span>
-                <span className="text-white capitalize">{selectedNode.type}</span>
+                <span className="text-[var(--text-secondary)]">Tipo:</span>
+                <span className="text-[var(--text)] capitalize">{selectedNode.type}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-400">Influência:</span>
-                <span className="text-emerald-400">{selectedNode.value}/100</span>
+                <span className="text-[var(--text-secondary)]">Influência:</span>
+                <span className="text-[var(--accent-emerald)]">{selectedNode.value}/100</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-400">Conexões:</span>
-                <span className="text-white">
+                <span className="text-[var(--text-secondary)]">Conexões:</span>
+                <span className="text-[var(--text)]">
                   {edges.filter(e => e.from === selectedNode.id || e.to === selectedNode.id).length}
                 </span>
               </div>
             </div>
-            <button className="w-full mt-3 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-sm font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all">
+            <button className="w-full mt-3 px-4 py-2 bg-gradient-to-r from-[var(--accent-emerald)] to-[var(--accent-emerald)] text-[var(--text)] rounded-lg text-sm font-semibold hover:from-[var(--accent-emerald)] hover:to-[var(--accent-emerald)] transition-all">
               Ver Detalhes
             </button>
           </motion.div>
@@ -281,30 +281,30 @@ export default function RelationshipNetwork({
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mt-6">
-        <div className="p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-xl">
+        <div className="p-4 bg-gradient-to-br from-[var(--accent-sky)]/10 to-[var(--accent-sky)]/10 border border-[var(--accent-sky)]/20 rounded-xl">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-blue-400" />
-            <span className="text-xs text-gray-400">Contatos Diretos</span>
+            <Users className="w-4 h-4 text-[var(--accent-sky)]" />
+            <span className="text-xs text-[var(--text-secondary)]">Contatos Diretos</span>
           </div>
-          <div className="text-2xl font-bold text-blue-400">
+          <div className="text-2xl font-bold text-[var(--accent-sky)]">
             {edges.filter(e => e.from === centerNodeId).length}
           </div>
         </div>
 
-        <div className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl">
+        <div className="p-4 bg-gradient-to-br from-[var(--accent-purple)]/10 to-[var(--accent-purple)]/10 border border-[var(--accent-purple)]/20 rounded-xl">
           <div className="flex items-center gap-2 mb-2">
-            <GitBranch className="w-4 h-4 text-purple-400" />
-            <span className="text-xs text-gray-400">Rede Estendida</span>
+            <GitBranch className="w-4 h-4 text-[var(--accent-purple)]" />
+            <span className="text-xs text-[var(--text-secondary)]">Rede Estendida</span>
           </div>
-          <div className="text-2xl font-bold text-purple-400">{nodes.length}</div>
+          <div className="text-2xl font-bold text-[var(--accent-purple)]">{nodes.length}</div>
         </div>
 
-        <div className="p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl">
+        <div className="p-4 bg-gradient-to-br from-[var(--accent-emerald)]/10 to-[var(--accent-emerald)]/10 border border-[var(--accent-emerald)]/20 rounded-xl">
           <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs text-gray-400">Força Média</span>
+            <Zap className="w-4 h-4 text-[var(--accent-emerald)]" />
+            <span className="text-xs text-[var(--text-secondary)]">Força Média</span>
           </div>
-          <div className="text-2xl font-bold text-emerald-400">
+          <div className="text-2xl font-bold text-[var(--accent-emerald)]">
             {edges.length > 0 ? Math.round((edges.reduce((sum, e) => sum + e.strength, 0) / edges.length) * 100) : 0}%
           </div>
         </div>

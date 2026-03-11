@@ -463,8 +463,8 @@ export default function Achievements() {
             </p>
 
             <div className="mt-8 space-y-6 max-w-2xl mx-auto">
-              <div className="p-6 md:p-7 rounded-3xl border" style={{ borderColor: 'color-mix(in oklab, #f59e0b 40%, transparent)', background: 'color-mix(in oklab, #f59e0b 14%, transparent)' }}>
-                <p className="text-lg md:text-xl font-black" style={{ color: 'color-mix(in oklab, #fcd34d 85%, white)' }}>
+              <div className="p-6 md:p-7 rounded-3xl border" style={{ borderColor: 'color-mix(in oklab, var(--accent-warning) 40%, transparent)', background: 'color-mix(in oklab, var(--accent-warning) 14%, transparent)' }}>
+                <p className="text-lg md:text-xl font-black" style={{ color: 'color-mix(in oklab, var(--accent-warning) 85%, white)' }}>
                   1. Colaborador A — 142.000 XP
                 </p>
               </div>

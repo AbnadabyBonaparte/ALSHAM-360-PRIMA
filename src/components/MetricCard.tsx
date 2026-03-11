@@ -18,17 +18,17 @@ export default function MetricCard({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-lg hover:border-emerald-500 transition-all flex flex-col items-start justify-center"
+      className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 shadow-lg hover:border-[var(--accent-emerald)] transition-all flex flex-col items-start justify-center"
     >
       <h2 className="text-lg font-semibold mb-2">{title}</h2>
       {loading ? (
-        <div className="h-6 w-24 bg-neutral-800 rounded-md animate-pulse" />
+        <div className="h-6 w-24 bg-[var(--surface-strong)] rounded-md animate-pulse" />
       ) : (
-        <p className="text-3xl font-bold text-emerald-400">
+        <p className="text-3xl font-bold text-[var(--accent-emerald)]">
           {value ?? 0}
         </p>
       )}
-      <p className="text-gray-500 text-xs mt-1">
+      <p className="text-[var(--text-secondary)] text-xs mt-1">
         Atualizado em tempo real
       </p>
     </motion.div>
