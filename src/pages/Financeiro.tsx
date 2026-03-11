@@ -3,12 +3,15 @@
 // Totalmente integrada ao layout global • 100% variáveis de tema • Métricas vivas • Runway simulator
 // ✅ MIGRADO PARA SHADCN/UI + CSS VARIABLES
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   TrendingUp, TrendingDown, Wallet, Activity, AlertTriangle
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -78,28 +81,22 @@ const StatCard = ({
 export default function Financeiro() {
   const { getThemeColors } = useTheme();
   const themeColors = getThemeColors();
-  const [transactions, setTransactions] = useState<FinancialRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [simulationDrop, setSimulationDrop] = useState([0]);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('financial_records')
-          .select('id, date, type, amount, description')
-          .order('date', { ascending: false });
-
-        if (error) throw error;
-        if (data) setTransactions(data as FinancialRecord[]);
-      } catch (err) {
-        console.error('Erro ao carregar tesouro quântico:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
+  const { data: transactions = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['financial_records', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('financial_records')
+        .select('id, date, type, amount, description')
+        .eq('org_id', orgId!)
+        .order('date', { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as FinancialRecord[];
+    },
+    enabled: !!orgId,
+  });
 
   const metrics = useMemo<Metrics>(() => {
     if (transactions.length === 0) {
@@ -138,20 +135,8 @@ export default function Financeiro() {
     };
   }, [transactions, simulationDrop]);
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-[var(--background)]">
-        <div className="text-center">
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
-            <Activity className="w-32 h-32 text-[var(--accent-1)]" />
-          </motion.div>
-          <p className="mt-12 text-5xl font-black text-[var(--accent-1)] tracking-widest">
-            SINCRONIZANDO O LEDGER QUÂNTICO
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">

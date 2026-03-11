@@ -14,8 +14,11 @@ import {
   BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,8 +35,7 @@ interface SupremeStats {
 }
 
 export default function HomePage() {
-  const [stats, setStats] = useState<SupremeStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -41,62 +43,46 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    async function loadSupremePortal() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const orgId = user?.user_metadata?.org_id;
+  const { data: rawData, isLoading, error, refetch } = useQuery({
+    queryKey: ['home-stats', orgId],
+    queryFn: async () => {
+      const [
+        { count: leads },
+        { count: deals },
+        { data: revenue },
+        { count: users },
+        { count: automations },
+        { data: predictions }
+      ] = await Promise.all([
+        supabase.from('leads').select('id', { count: 'exact' }),
+        supabase.from('opportunities').select('id', { count: 'exact' }).neq('stage', 'Ganho').neq('stage', 'Perdido'),
+        supabase.from('registros_financeiros').select('valor').eq('tipo', 'receita'),
+        supabase.from('users').select('id', { count: 'exact' }),
+        supabase.from('automation_logs').select('id', { count: 'exact' }).gte('created_at', new Date(Date.now() - 24*60*60*1000)),
+        supabase.from('ai_predictions').select('id', { count: 'exact' }).gte('created_at', new Date().toISOString().split('T')[0])
+      ]);
 
-        const [
-          { count: leads },
-          { count: deals },
-          { data: revenue },
-          { count: users },
-          { count: automations },
-          { data: predictions }
-        ] = await Promise.all([
-          supabase.from('leads').select('id', { count: 'exact' }),
-          supabase.from('opportunities').select('id', { count: 'exact' }).neq('stage', 'Ganho').neq('stage', 'Perdido'),
-          supabase.from('registros_financeiros').select('valor').eq('tipo', 'receita'),
-          supabase.from('users').select('id', { count: 'exact' }),
-          supabase.from('automation_logs').select('id', { count: 'exact' }).gte('created_at', new Date(Date.now() - 24*60*60*1000)),
-          supabase.from('ai_predictions').select('id', { count: 'exact' }).gte('created_at', new Date().toISOString().split('T')[0])
-        ]);
+      return { leads, deals, revenue, users, automations, predictions };
+    },
+    enabled: !!orgId,
+  });
 
-        setStats({
-          totalLeads: leads || 0,
-          activeDeals: deals || 0,
-          monthlyRevenue: revenue?.reduce((s: number, r: any) => s + r.valor, 0) || 0,
-          activeUsers: users || 0,
-          automationsRunning: automations || 0,
-          aiPredictionsToday: predictions || 0,
-          userStreak: 42,
-          companyGrowth: 127
-        });
-      } catch (err) {
-        console.error('Portal Supremo carregando em modo offline...', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const stats = useMemo((): SupremeStats | null => {
+    if (!rawData) return null;
+    return {
+      totalLeads: rawData.leads || 0,
+      activeDeals: rawData.deals || 0,
+      monthlyRevenue: rawData.revenue?.reduce((s: number, r: any) => s + r.valor, 0) || 0,
+      activeUsers: rawData.users || 0,
+      automationsRunning: rawData.automations || 0,
+      aiPredictionsToday: rawData.predictions || 0,
+      userStreak: 42,
+      companyGrowth: 127
+    };
+  }, [rawData]);
 
-    loadSupremePortal();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-12 border-t-transparent border-[var(--accent-purple)] rounded-full"
-        />
-        <p className="absolute text-5xl font-light text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-purple)] to-[var(--accent-sky)]">
-          Sistema ALSHAM ativando seu império...
-        </p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden">

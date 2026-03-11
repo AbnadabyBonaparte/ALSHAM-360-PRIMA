@@ -16,8 +16,11 @@ import {
   Edit
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -41,69 +44,55 @@ interface CalendarMetrics {
 }
 
 export default function ContentCalendarPage() {
-  const [metrics, setMetrics] = useState<CalendarMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  useEffect(() => {
-    async function loadSupremeCalendar() {
-      try {
-        const start = startOfMonth(currentMonth);
-        const end = endOfMonth(currentMonth);
+  const { data: metrics, isLoading, error, refetch } = useQuery<CalendarMetrics>({
+    queryKey: ['content-calendar', orgId, format(currentMonth, 'yyyy-MM')],
+    queryFn: async () => {
+      const start = startOfMonth(currentMonth);
+      const end = endOfMonth(currentMonth);
 
-        const { data: conteudos } = await supabase
-          .from('content_calendar')
-          .select('*')
-          .gte('data_publicacao', format(start, 'yyyy-MM-dd'))
-          .lte('data_publicacao', format(end, 'yyyy-MM-dd'))
-          .order('data_publicacao', { ascending: true });
+      const { data: conteudos, error } = await supabase
+        .from('content_calendar')
+        .select('*')
+        .eq('org_id', orgId!)
+        .gte('data_publicacao', format(start, 'yyyy-MM-dd'))
+        .lte('data_publicacao', format(end, 'yyyy-MM-dd'))
+        .order('data_publicacao', { ascending: true });
 
-        if (conteudos) {
-          setMetrics({
-            totalConteudos: conteudos.length,
-            publicados: conteudos.filter((c: any) => c.status === 'publicado').length,
-            agendados: conteudos.filter((c: any) => c.status === 'agendado').length,
-            rascunhos: conteudos.filter((c: any) => c.status === 'rascunho').length,
-            conteudos: conteudos.map((c: any) => ({
-              id: c.id,
-              titulo: c.titulo || 'Sem título',
-              tipo: c.tipo || 'blog',
-              status: c.status || 'rascunho',
-              data_publicacao: c.data_publicacao || '',
-              canal: c.canal || ''
-            }))
-          });
-        } else {
-          setMetrics({
-            totalConteudos: 0,
-            publicados: 0,
-            agendados: 0,
-            rascunhos: 0,
-            conteudos: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Content Calendar Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (error) throw error;
+
+      if (conteudos) {
+        return {
+          totalConteudos: conteudos.length,
+          publicados: conteudos.filter((c: any) => c.status === 'publicado').length,
+          agendados: conteudos.filter((c: any) => c.status === 'agendado').length,
+          rascunhos: conteudos.filter((c: any) => c.status === 'rascunho').length,
+          conteudos: conteudos.map((c: any) => ({
+            id: c.id,
+            titulo: c.titulo || 'Sem título',
+            tipo: c.tipo || 'blog',
+            status: c.status || 'rascunho',
+            data_publicacao: c.data_publicacao || '',
+            canal: c.canal || ''
+          }))
+        };
       }
-    }
 
-    loadSupremeCalendar();
-  }, [currentMonth]);
+      return {
+        totalConteudos: 0,
+        publicados: 0,
+        agendados: 0,
+        rascunhos: 0,
+        conteudos: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-purple)] font-light">Carregando calendário...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   const days = eachDayOfInterval({
     start: startOfMonth(currentMonth),

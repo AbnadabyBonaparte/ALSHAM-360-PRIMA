@@ -13,8 +13,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -42,71 +44,47 @@ interface InvoiceMetrics {
 }
 
 export default function InvoicesPage() {
-  const [metrics, setMetrics] = useState<InvoiceMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeInvoices() {
-      try {
-        const { data: faturas } = await supabase
-          .from('faturas')
-          .select('*')
-          .order('data_emissao', { ascending: false });
-
-        if (faturas) {
-          const pagas = faturas.filter(f => f.status === 'paga');
-          const pendentes = faturas.filter(f => ['enviada', 'atrasada'].includes(f.status));
-          const atrasadas = faturas.filter(f => f.status === 'atrasada');
-
-          setMetrics({
-            totalFaturas: faturas.length,
-            valorEmitido: faturas.reduce((s, f) => s + (f.valor || 0), 0),
-            valorRecebido: pagas.reduce((s, f) => s + (f.valor || 0), 0),
-            valorPendente: pendentes.reduce((s, f) => s + (f.valor || 0), 0),
-            atrasadas: atrasadas.length,
-            faturas: faturas.map(f => ({
-              id: f.id,
-              numero: f.numero || `#${f.id}`,
-              cliente: f.cliente || 'Cliente',
-              valor: f.valor || 0,
-              status: f.status || 'rascunho',
-              data_emissao: f.data_emissao || '',
-              data_vencimento: f.data_vencimento || '',
-              data_pagamento: f.data_pagamento || null
-            }))
-          });
-        } else {
-          setMetrics({
-            totalFaturas: 0,
-            valorEmitido: 0,
-            valorRecebido: 0,
-            valorPendente: 0,
-            atrasadas: 0,
-            faturas: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nas Faturas Supremas:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['faturas', orgId],
+    queryFn: async () => {
+      const { data: faturas, error } = await supabase
+        .from('faturas')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_emissao', { ascending: false });
+      if (error) throw error;
+      if (!faturas || faturas.length === 0) {
+        return { totalFaturas: 0, valorEmitido: 0, valorRecebido: 0, valorPendente: 0, atrasadas: 0, faturas: [] } as InvoiceMetrics;
       }
-    }
+      const pagas = faturas.filter(f => f.status === 'paga');
+      const pendentes = faturas.filter(f => ['enviada', 'atrasada'].includes(f.status));
+      const atrasadas = faturas.filter(f => f.status === 'atrasada');
+      return {
+        totalFaturas: faturas.length,
+        valorEmitido: faturas.reduce((s, f) => s + (f.valor || 0), 0),
+        valorRecebido: pagas.reduce((s, f) => s + (f.valor || 0), 0),
+        valorPendente: pendentes.reduce((s, f) => s + (f.valor || 0), 0),
+        atrasadas: atrasadas.length,
+        faturas: faturas.map(f => ({
+          id: f.id,
+          numero: f.numero || `#${f.id}`,
+          cliente: f.cliente || 'Cliente',
+          valor: f.valor || 0,
+          status: f.status || 'rascunho',
+          data_emissao: f.data_emissao || '',
+          data_vencimento: f.data_vencimento || '',
+          data_pagamento: f.data_pagamento || null
+        }))
+      } as InvoiceMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeInvoices();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-emerald)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-emerald)] font-light">Contando dinheiro...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.faturas?.length) return <EmptyState title="Nenhuma fatura encontrada" />;
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
     rascunho: { variant: 'secondary', icon: <FileText className="w-4 h-4" /> },

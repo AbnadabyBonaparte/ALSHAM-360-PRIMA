@@ -14,9 +14,12 @@ import {
   Signal
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
-import { format, isPast, isFuture } from 'date-fns';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -34,83 +37,55 @@ interface Webinar {
   replay_views: number;
 }
 
-interface WebinarMetrics {
-  totalWebinars: number;
-  agendados: number;
-  totalInscritos: number;
-  mediaParticipacao: number;
-  webinars: Webinar[];
-}
-
 export default function WebinarsPage() {
-  const [metrics, setMetrics] = useState<WebinarMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeWebinars() {
-      try {
-        const { data: webinars } = await supabase
-          .from('webinars')
-          .select('*')
-          .order('data_hora', { ascending: false });
+  const { data: webinars, isLoading, error, refetch } = useQuery({
+    queryKey: ['webinars', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('webinars')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_hora', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!orgId,
+  });
 
-        if (webinars) {
-          const encerrados = webinars.filter(w => w.status === 'encerrado' || w.status === 'gravado');
-          const totalInscritos = webinars.reduce((s, w) => s + (w.inscritos || 0), 0);
-          const totalParticipantes = encerrados.reduce((s, w) => s + (w.participantes || 0), 0);
-          const totalInscritosEncerrados = encerrados.reduce((s, w) => s + (w.inscritos || 0), 0);
+  const metrics = useMemo(() => {
+    if (!webinars) return null;
+    const encerrados = webinars.filter((w: any) => w.status === 'encerrado' || w.status === 'gravado');
+    const totalInscritos = webinars.reduce((s: number, w: any) => s + (w.inscritos || 0), 0);
+    const totalParticipantes = encerrados.reduce((s: number, w: any) => s + (w.participantes || 0), 0);
+    const totalInscritosEncerrados = encerrados.reduce((s: number, w: any) => s + (w.inscritos || 0), 0);
 
-          setMetrics({
-            totalWebinars: webinars.length,
-            agendados: webinars.filter(w => w.status === 'agendado').length,
-            totalInscritos,
-            mediaParticipacao: totalInscritosEncerrados > 0
-              ? (totalParticipantes / totalInscritosEncerrados) * 100
-              : 0,
-            webinars: webinars.map(w => ({
-              id: w.id,
-              titulo: w.titulo || 'Webinar',
-              descricao: w.descricao || '',
-              apresentador: w.apresentador || 'Apresentador',
-              data_hora: w.data_hora || '',
-              duracao: w.duracao || 60,
-              status: w.status || 'agendado',
-              inscritos: w.inscritos || 0,
-              participantes: w.participantes || 0,
-              replay_views: w.replay_views || 0
-            }))
-          });
-        } else {
-          setMetrics({
-            totalWebinars: 0,
-            agendados: 0,
-            totalInscritos: 0,
-            mediaParticipacao: 0,
-            webinars: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Webinars Supremos:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    return {
+      totalWebinars: webinars.length,
+      agendados: webinars.filter((w: any) => w.status === 'agendado').length,
+      totalInscritos,
+      mediaParticipacao: totalInscritosEncerrados > 0
+        ? (totalParticipantes / totalInscritosEncerrados) * 100
+        : 0,
+      webinars: webinars.map((w: any): Webinar => ({
+        id: w.id,
+        titulo: w.titulo || 'Webinar',
+        descricao: w.descricao || '',
+        apresentador: w.apresentador || 'Apresentador',
+        data_hora: w.data_hora || '',
+        duracao: w.duracao || 60,
+        status: w.status || 'agendado',
+        inscritos: w.inscritos || 0,
+        participantes: w.participantes || 0,
+        replay_views: w.replay_views || 0
+      }))
+    };
+  }, [webinars]);
 
-    loadSupremeWebinars();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-alert)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-alert)] font-light">Preparando o palco...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!webinars?.length) return <EmptyState title="Nenhum webinar encontrado" />;
 
   const statusConfig = {
     ao_vivo: { bg: 'from-[var(--accent-alert)] to-[var(--accent-warning)]', icon: <Signal className="w-6 h-6 animate-pulse" />, text: 'AO VIVO' },

@@ -5,9 +5,9 @@ interface SecurityAlertProps {
 
 export default function SecurityAlert({ level, message }: SecurityAlertProps) {
   const colors = {
-    success: "text-emerald-400",
-    warning: "text-amber-400",
-    error: "text-red-400",
+    success: "text-[var(--accent-emerald)]",
+    warning: "text-[var(--accent-warning)]",
+    error: "text-[var(--accent-alert)]",
   };
 
   return (

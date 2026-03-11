@@ -2,8 +2,11 @@
 // ALSHAM 360° PRIMA — Calendário (migrado para shadcn/ui)
 
 import { Calendar, Clock, Video, Users, Sparkles } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState } from '@/components/PageStates';
+import { useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,26 +25,26 @@ interface Event {
 }
 
 export default function CalendarPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadCalendar() {
+  const { data: events = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['calendar-events', orgId, format(currentMonth, 'yyyy-MM')],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('calendar_events')
         .select('id, title, type, start, end, participants, status, revenue_potential')
         .gte('start', format(startOfMonth(currentMonth), 'yyyy-MM-dd'))
         .lte('start', format(endOfMonth(currentMonth), 'yyyy-MM-dd'));
+      if (error) throw error;
+      return (data ?? []) as Event[];
+    },
+    enabled: !!orgId,
+  });
 
-      if (!error && data) {
-        setEvents(data);
-      }
-      setLoading(false);
-    }
-    loadCalendar();
-  }, [currentMonth]);
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);

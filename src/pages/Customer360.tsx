@@ -2,13 +2,16 @@
 // ALSHAM 360° PRIMA — CUSTOMER360 NEURAL TWIN (migrado para shadcn/ui)
 // Dados 100% do Supabase — leads_crm + interactions + next_best_actions + ai_predictions
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Phone, Mail, FileText, Sparkles, Trophy
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState } from '@/components/PageStates';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useTheme } from '@/hooks/useTheme';
@@ -52,13 +55,12 @@ export default function Customer360Real() {
   const { getThemeColors } = useTheme();
   const themeColors = getThemeColors();
   const { id } = useParams();
-  const [lead, setLead] = useState<any>(null);
-  const [timeline, setTimeline] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadRealTwin() {
-      if (!id) return;
+  const { data: rawData, isLoading, error, refetch } = useQuery({
+    queryKey: ['customer360', id, orgId],
+    queryFn: async () => {
+      if (!id) throw new Error('Lead ID não informado');
 
       const { data: leadData, error: leadError } = await supabase
         .from('leads_crm')
@@ -66,12 +68,8 @@ export default function Customer360Real() {
         .eq('id', id)
         .single();
 
-      if (leadError || !leadData) {
-        setLoading(false);
-        return;
-      }
+      if (leadError || !leadData) throw new Error('Lead não encontrado');
 
-      // Dados reais de IA
       const { data: nba } = await supabase
         .from('next_best_actions')
         .select('action, confidence')
@@ -101,49 +99,42 @@ export default function Customer360Real() {
         .eq('lead_id', id)
         .eq('stage', 'Negociação');
 
-      setLead({
-        ...leadData,
-        score: score?.score || 87,
-        mood: score?.score > 85 ? 'divine' : score?.score > 70 ? 'hot' : 'warm',
-        nextAction: nba?.action || 'Agendar call de fechamento',
-        ltv: ltvData?.predicted_ltv ? `R$ ${Math.round(ltvData.predicted_ltv / 1000)}k` : 'R$ 350k',
-        pipeline: pipelineData?.[0]?.value ? `R$ ${pipelineData[0].value.toLocaleString('pt-BR')}` : 'R$ 120.000',
-        tags: leadData.tags || ['VIP', 'High LTV', 'Hot Lead']
-      });
+      return { leadData, nba, score, interactions, ltvData, pipelineData };
+    },
+    enabled: !!id && !!orgId,
+  });
 
-      setTimeline(interactions?.map(i => ({
-        id: i.id,
-        type: i.type,
-        title: i.title || 'Interação',
-        desc: i.description || '',
-        date: new Date(i.created_at),
-        icon: i.type === 'call' ? <Phone className="h-5 w-5 text-[var(--accent-emerald)]" /> :
-              i.type === 'email' ? <Mail className="h-5 w-5 text-[var(--accent-sky)]" /> :
-              <FileText className="h-5 w-5 text-[var(--accent-purple)]" />
-      })));
+  const { lead, timeline } = useMemo(() => {
+    if (!rawData?.leadData) return { lead: null, timeline: [] };
 
-      setLoading(false);
-    }
+    const leadData = rawData.leadData;
 
-    loadRealTwin();
+    const lead = {
+      ...leadData,
+      score: rawData.score?.score || 87,
+      mood: (rawData.score?.score || 87) > 85 ? 'divine' : (rawData.score?.score || 87) > 70 ? 'hot' : 'warm',
+      nextAction: rawData.nba?.action || 'Agendar call de fechamento',
+      ltv: rawData.ltvData?.predicted_ltv ? `R$ ${Math.round(rawData.ltvData.predicted_ltv / 1000)}k` : 'R$ 350k',
+      pipeline: rawData.pipelineData?.[0]?.value ? `R$ ${rawData.pipelineData[0].value.toLocaleString('pt-BR')}` : 'R$ 120.000',
+      tags: leadData.tags || ['VIP', 'High LTV', 'Hot Lead']
+    };
 
-    // Realtime
-    const channel = supabase.channel('customer360-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'interactions', filter: `lead_id=eq.${id}` }, () => {
-        loadRealTwin();
-      })
-      .subscribe();
+    const timeline = rawData.interactions?.map((i: any) => ({
+      id: i.id,
+      type: i.type,
+      title: i.title || 'Interação',
+      desc: i.description || '',
+      date: new Date(i.created_at),
+      icon: i.type === 'call' ? <Phone className="h-5 w-5 text-[var(--accent-emerald)]" /> :
+            i.type === 'email' ? <Mail className="h-5 w-5 text-[var(--accent-sky)]" /> :
+            <FileText className="h-5 w-5 text-[var(--accent-purple)]" />
+    })) || [];
 
-    return () => { supabase.removeChannel(channel); };
-  }, [id]);
+    return { lead, timeline };
+  }, [rawData]);
 
-  if (loading) return (
-    <div className="h-screen flex items-center justify-center bg-[var(--background)]">
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full" />
-      <p className="absolute text-2xl text-[var(--accent-purple)] font-light">Construindo gêmeo neural real...</p>
-    </div>
-  );
-
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
   if (!lead) return <div className="text-center py-32 text-4xl text-[var(--text-secondary)]">Lead não encontrado</div>;
 
   return (
@@ -196,7 +187,7 @@ export default function Customer360Real() {
             <GlassPanel className="p-10 h-full">
               <h2 className="text-4xl font-black mb-10 text-[var(--text-primary)]">Linha do Tempo Neural</h2>
               <div className="space-y-8">
-                {timeline.map((item, i) => (
+                {timeline.map((item: any, i: number) => (
                   <motion.div
                     key={item.id}
                     initial={{ opacity: 0, x: -50 }}

@@ -1,12 +1,14 @@
 // src/components/ProtectedLayout.tsx
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useEffect } from 'react'
 import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import LayoutSupremo from '@/components/LayoutSupremo'
 import { canonicalizeRouteId, normalizePageId } from '@/routes'
 
 export function ProtectedLayout() {
+  const { trackPageView, identifyUser } = useAnalytics()
   const location = useLocation()
   const navigate = useNavigate()
   const params = useParams()
@@ -23,7 +25,7 @@ export function ProtectedLayout() {
    * - /select-organization => select-organization
    */
   const activePage = useMemo(() => {
-    const paramPage = (params as any)?.pageId as string | undefined
+    const paramPage = (params as Record<string, string | undefined>).pageId
     if (paramPage) return canonicalizeRouteId(paramPage)
 
     const path = location.pathname || ''
@@ -54,7 +56,14 @@ export function ProtectedLayout() {
     [navigate],
   )
 
-  // Loading gate
+  useEffect(() => {
+    trackPageView(location.pathname, activePage)
+  }, [location.pathname, activePage, trackPageView])
+
+  useEffect(() => {
+    if (user?.id) identifyUser(user.id, { email: user.email ?? '' })
+  }, [user, identifyUser])
+
   if (loading || loadingOrgs) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">

@@ -15,8 +15,11 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,79 +46,54 @@ interface KBMetrics {
 }
 
 export default function KnowledgeBasePage() {
-  const [metrics, setMetrics] = useState<KBMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [busca, setBusca] = useState('');
   const [categoriaAtiva, setCategoriaAtiva] = useState<string>('todas');
 
-  useEffect(() => {
-    async function loadSupremeKB() {
-      try {
-        const { data: artigos } = await supabase
-          .from('knowledge_base')
-          .select('*')
-          .order('visualizacoes', { ascending: false });
-
-        if (artigos) {
-          const categorias = [...new Set(artigos.map((a: any) => a.categoria))];
-          const categoriasCount = categorias.map(cat => ({
-            nome: cat,
-            count: artigos.filter((a: any) => a.categoria === cat).length
-          }));
-
-          const totalViews = artigos.reduce((s: number, a: any) => s + (a.visualizacoes || 0), 0);
-          const totalPositivos = artigos.reduce((s: number, a: any) => s + (a.votos_positivos || 0), 0);
-          const totalVotos = totalPositivos + artigos.reduce((s: number, a: any) => s + (a.votos_negativos || 0), 0);
-
-          setMetrics({
-            totalArtigos: artigos.length,
-            totalCategorias: categorias.length,
-            totalVisualizacoes: totalViews,
-            satisfacao: totalVotos > 0 ? (totalPositivos / totalVotos) * 100 : 100,
-            artigos: artigos.map((a: any) => ({
-              id: a.id,
-              titulo: a.titulo || 'Artigo',
-              resumo: a.resumo || '',
-              categoria: a.categoria || 'Geral',
-              visualizacoes: a.visualizacoes || 0,
-              votos_positivos: a.votos_positivos || 0,
-              votos_negativos: a.votos_negativos || 0,
-              atualizado_em: a.atualizado_em || ''
-            })),
-            categorias: categoriasCount
-          });
-        } else {
-          setMetrics({
-            totalArtigos: 0,
-            totalCategorias: 0,
-            totalVisualizacoes: 0,
-            satisfacao: 0,
-            artigos: [],
-            categorias: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro na Knowledge Base Suprema:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['knowledge_base', orgId],
+    queryFn: async () => {
+      const { data: artigos, error } = await supabase
+        .from('knowledge_base')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('visualizacoes', { ascending: false });
+      if (error) throw error;
+      if (!artigos || artigos.length === 0) {
+        return { totalArtigos: 0, totalCategorias: 0, totalVisualizacoes: 0, satisfacao: 0, artigos: [], categorias: [] } as KBMetrics;
       }
-    }
+      const categorias = [...new Set(artigos.map((a: any) => a.categoria))];
+      const categoriasCount = categorias.map(cat => ({
+        nome: cat,
+        count: artigos.filter((a: any) => a.categoria === cat).length
+      }));
+      const totalViews = artigos.reduce((s: number, a: any) => s + (a.visualizacoes || 0), 0);
+      const totalPositivos = artigos.reduce((s: number, a: any) => s + (a.votos_positivos || 0), 0);
+      const totalVotos = totalPositivos + artigos.reduce((s: number, a: any) => s + (a.votos_negativos || 0), 0);
+      return {
+        totalArtigos: artigos.length,
+        totalCategorias: categorias.length,
+        totalVisualizacoes: totalViews,
+        satisfacao: totalVotos > 0 ? (totalPositivos / totalVotos) * 100 : 100,
+        artigos: artigos.map((a: any) => ({
+          id: a.id,
+          titulo: a.titulo || 'Artigo',
+          resumo: a.resumo || '',
+          categoria: a.categoria || 'Geral',
+          visualizacoes: a.visualizacoes || 0,
+          votos_positivos: a.votos_positivos || 0,
+          votos_negativos: a.votos_negativos || 0,
+          atualizado_em: a.atualizado_em || ''
+        })),
+        categorias: categoriasCount
+      } as KBMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeKB();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-warning)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-warning)] font-light">Carregando conhecimento...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.artigos?.length) return <EmptyState title="Nenhum artigo encontrado" />;
 
   const artigosFiltrados = metrics?.artigos.filter(a => {
     const matchBusca = busca === '' || a.titulo.toLowerCase().includes(busca.toLowerCase());

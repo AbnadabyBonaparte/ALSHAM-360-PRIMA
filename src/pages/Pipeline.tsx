@@ -2,8 +2,11 @@
 // ALSHAM 360° PRIMA — PIPELINE QUÂNTICO (migrado para shadcn/ui)
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import toast from 'react-hot-toast';
 import { Search, Trophy, Flame } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -88,60 +91,40 @@ const DealCard = ({ deal }: { deal: Deal }) => {
 };
 
 export default function PipelineQuantico() {
-  const [deals, setDeals] = useState<Deal[]>([]);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const { data: deals = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['pipeline', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('opportunities')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((d: any): Deal => ({
+        ...d,
+        health: d.value > 1000000 ? 'divine' :
+                d.probability > 90 ? 'hot' :
+                d.probability > 60 ? 'warm' :
+                d.probability < 20 ? 'fallen' : 'cold'
+      }));
+    },
+    enabled: !!orgId,
+  });
 
   useEffect(() => {
-    const loadDeals = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const { data, error: queryError } = await supabase
-          .from('opportunities')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (queryError) {
-          console.error('Erro ao carregar oportunidades:', queryError);
-          setError('Não foi possível carregar o pipeline. Verifique a tabela opportunities.');
-          return;
-        }
-
-        if (data) {
-          const enriched: Deal[] = data.map((d: any) => ({
-            ...d,
-            health: d.value > 1000000 ? 'divine' :
-                    d.probability > 90 ? 'hot' :
-                    d.probability > 60 ? 'warm' :
-                    d.probability < 20 ? 'fallen' : 'cold'
-          }));
-          setDeals(enriched);
-        }
-      } catch (err) {
-        console.error('Erro inesperado:', err);
-        setError('Erro de conexão com o banco.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDeals();
-
-    // Realtime subscription (multi-org seguro via RLS)
     const channel = supabase
       .channel('pipeline-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'opportunities' }, () => {
-        loadDeals();
+        refetch();
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [refetch]);
 
   const filteredDeals = useMemo(() => {
     return deals.filter(d =>
@@ -161,34 +144,9 @@ export default function PipelineQuantico() {
   const totalValue = deals.reduce((sum, d) => sum + d.value, 0);
   const weightedValue = deals.reduce((sum, d) => sum + d.value * (d.probability / 100), 0);
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-[var(--accent-sky)] mx-auto mb-6"></div>
-          <p className="text-2xl text-[var(--text-primary)]/70">Despertando o Pipeline Quântico...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center max-w-lg">
-          <p className="text-6xl mb-6">⚠️</p>
-          <h2 className="text-3xl font-black text-[var(--text-primary)] mb-4">Pipeline Indisponível</h2>
-          <p className="text-xl text-[var(--text-primary)]/70 mb-8">{error}</p>
-          <Button
-            onClick={() => window.location.reload()}
-            className="px-8 py-4 bg-[var(--accent-sky)]/70 hover:bg-[var(--accent-sky)] text-[var(--background)] rounded-2xl font-bold text-lg"
-          >
-            Tentar Novamente
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!deals.length) return <EmptyState title="Pipeline vazio" description="Adicione oportunidades para visualizar seu pipeline." />;
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">

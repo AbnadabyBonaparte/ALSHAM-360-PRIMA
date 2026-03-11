@@ -11,8 +11,11 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -29,80 +32,52 @@ interface Affiliate {
   status: 'ativo' | 'inativo' | 'pendente';
 }
 
-interface AffiliateMetrics {
-  totalAfiliados: number;
-  ativos: number;
-  vendasGeradas: number;
-  comissoesPagas: number;
-  afiliados: Affiliate[];
-}
-
 export default function AffiliatesPage() {
-  const [metrics, setMetrics] = useState<AffiliateMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeAffiliates() {
-      try {
-        const { data: afiliados } = await supabase
-          .from('afiliados')
-          .select('*')
-          .order('comissao_total', { ascending: false });
+  const { data: afiliados, isLoading, error, refetch } = useQuery({
+    queryKey: ['afiliados', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('afiliados')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('comissao_total', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!orgId,
+  });
 
-        if (afiliados) {
-          const ativos = afiliados.filter(a => a.status === 'ativo').length;
-          const vendasGeradas = afiliados.reduce((s, a) => s + (a.vendas || 0), 0);
-          const comissoesPagas = afiliados.reduce((s, a) => s + (a.comissao_total || 0), 0);
+  const metrics = useMemo(() => {
+    if (!afiliados) return null;
+    const ativos = afiliados.filter((a: any) => a.status === 'ativo').length;
+    const vendasGeradas = afiliados.reduce((s: number, a: any) => s + (a.vendas || 0), 0);
+    const comissoesPagas = afiliados.reduce((s: number, a: any) => s + (a.comissao_total || 0), 0);
 
-          setMetrics({
-            totalAfiliados: afiliados.length,
-            ativos,
-            vendasGeradas,
-            comissoesPagas,
-            afiliados: afiliados.map(a => ({
-              id: a.id,
-              nome: a.nome || 'Afiliado',
-              email: a.email || '',
-              nivel: a.nivel || 'bronze',
-              vendas: a.vendas || 0,
-              comissao_total: a.comissao_total || 0,
-              comissao_pendente: a.comissao_pendente || 0,
-              cliques: a.cliques || 0,
-              conversao: a.cliques > 0 ? ((a.vendas || 0) / a.cliques) * 100 : 0,
-              status: a.status || 'pendente'
-            }))
-          });
-        } else {
-          setMetrics({
-            totalAfiliados: 0,
-            ativos: 0,
-            vendasGeradas: 0,
-            comissoesPagas: 0,
-            afiliados: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Afiliados Supremos:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    return {
+      totalAfiliados: afiliados.length,
+      ativos,
+      vendasGeradas,
+      comissoesPagas,
+      afiliados: afiliados.map((a: any): Affiliate => ({
+        id: a.id,
+        nome: a.nome || 'Afiliado',
+        email: a.email || '',
+        nivel: a.nivel || 'bronze',
+        vendas: a.vendas || 0,
+        comissao_total: a.comissao_total || 0,
+        comissao_pendente: a.comissao_pendente || 0,
+        cliques: a.cliques || 0,
+        conversao: a.cliques > 0 ? ((a.vendas || 0) / a.cliques) * 100 : 0,
+        status: a.status || 'pendente'
+      }))
+    };
+  }, [afiliados]);
 
-    loadSupremeAffiliates();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-warning)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-warning)] font-light">Carregando afiliados...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!afiliados?.length) return <EmptyState title="Nenhum afiliado encontrado" />;
 
   const nivelConfig: Record<string, { bg: string; emoji: string }> = {
     bronze: { bg: 'from-[var(--accent-warning)] to-[var(--accent-warning)]/70', emoji: '🥉' },

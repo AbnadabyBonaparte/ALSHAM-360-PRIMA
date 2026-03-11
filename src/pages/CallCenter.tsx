@@ -15,8 +15,11 @@ import {
   Mic
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,78 +46,57 @@ interface CallMetrics {
 }
 
 export default function CallCenterPage() {
-  const [metrics, setMetrics] = useState<CallMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeCallCenter() {
-      try {
-        const { data: calls } = await supabase
-          .from('call_center')
-          .select('*')
-          .order('inicio', { ascending: false })
-          .limit(50);
+  const { data: calls, isLoading, error, refetch } = useQuery({
+    queryKey: ['call_center', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('call_center')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('inicio', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!orgId,
+  });
 
-        if (calls) {
-          const emAndamento = calls.filter((c: any) => c.status === 'em_andamento');
-          const encerradas = calls.filter((c: any) => c.status === 'encerrada');
-          const perdidas = calls.filter((c: any) => c.status === 'perdida');
-          const tempoMedio = encerradas.length > 0
-            ? encerradas.reduce((s: number, c: any) => s + (c.duracao || 0), 0) / encerradas.length
-            : 0;
+  const metrics = useMemo((): CallMetrics | null => {
+    if (!calls) return null;
+    const emAndamento = calls.filter((c: any) => c.status === 'em_andamento');
+    const encerradas = calls.filter((c: any) => c.status === 'encerrada');
+    const perdidas = calls.filter((c: any) => c.status === 'perdida');
+    const tempoMedio = encerradas.length > 0
+      ? encerradas.reduce((s: number, c: any) => s + (c.duracao || 0), 0) / encerradas.length
+      : 0;
 
-          setMetrics({
-            atendentesAtivos: 5,
-            ligacoesHoje: calls.length,
-            emAndamento: emAndamento.length,
-            taxaAtendimento: calls.length > 0
-              ? ((calls.length - perdidas.length) / calls.length) * 100
-              : 100,
-            tempoMedioLigacao: tempoMedio,
-            calls: calls.map((c: any) => ({
-              id: c.id,
-              tipo: c.tipo || 'entrada',
-              numero: c.numero || '',
-              contato: c.contato || 'Desconhecido',
-              atendente: c.atendente || '',
-              status: c.status || 'encerrada',
-              duracao: c.duracao || 0,
-              inicio: c.inicio || '',
-              gravacao: c.gravacao || false
-            }))
-          });
-        } else {
-          setMetrics({
-            atendentesAtivos: 0,
-            ligacoesHoje: 0,
-            emAndamento: 0,
-            taxaAtendimento: 0,
-            tempoMedioLigacao: 0,
-            calls: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Call Center Supremo:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    return {
+      atendentesAtivos: 5,
+      ligacoesHoje: calls.length,
+      emAndamento: emAndamento.length,
+      taxaAtendimento: calls.length > 0
+        ? ((calls.length - perdidas.length) / calls.length) * 100
+        : 100,
+      tempoMedioLigacao: tempoMedio,
+      calls: calls.map((c: any): Call => ({
+        id: c.id,
+        tipo: c.tipo || 'entrada',
+        numero: c.numero || '',
+        contato: c.contato || 'Desconhecido',
+        atendente: c.atendente || '',
+        status: c.status || 'encerrada',
+        duracao: c.duracao || 0,
+        inicio: c.inicio || '',
+        gravacao: c.gravacao || false
+      }))
+    };
+  }, [calls]);
 
-    loadSupremeCallCenter();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Conectando linhas...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!calls?.length) return <EmptyState title="Nenhuma ligação encontrada" />;
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

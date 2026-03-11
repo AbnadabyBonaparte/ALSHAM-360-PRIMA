@@ -52,20 +52,20 @@ export default function CitizenOrb() {
       >
         <motion.button
           onClick={() => setOpen(!open)}
-          className="relative w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 shadow-2xl flex items-center justify-center overflow-hidden"
+          className="relative w-20 h-20 rounded-full bg-gradient-to-br from-[var(--accent-emerald)] via-[var(--accent-emerald)] to-[var(--accent-emerald)] shadow-2xl flex items-center justify-center overflow-hidden"
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.95 }}
         >
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--accent-emerald)]/20 to-transparent"
           />
-          <BrainCircuit className="w-12 h-12 text-white relative z-10" />
+          <BrainCircuit className="w-12 h-12 text-[var(--text)] relative z-10" />
           <motion.div
             animate={{ scale: [1, 1.3, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="absolute inset-0 rounded-full bg-emerald-400/20 blur-xl"
+            className="absolute inset-0 rounded-full bg-[var(--accent-emerald)]/20 blur-xl"
           />
         </motion.button>
       </motion.div>

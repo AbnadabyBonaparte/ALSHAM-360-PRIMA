@@ -12,8 +12,11 @@ import {
   Trophy
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -30,80 +33,52 @@ interface Partner {
   pais: string;
 }
 
-interface PartnerMetrics {
-  totalParceiros: number;
-  ativos: number;
-  receitaTotal: number;
-  dealsConjuntos: number;
-  parceiros: Partner[];
-}
-
 export default function PartnersPage() {
-  const [metrics, setMetrics] = useState<PartnerMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremePartners() {
-      try {
-        const { data: parceiros } = await supabase
-          .from('parceiros')
-          .select('*')
-          .order('receita_gerada', { ascending: false });
+  const { data: parceiros, isLoading, error, refetch } = useQuery({
+    queryKey: ['parceiros', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('parceiros')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('receita_gerada', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!orgId,
+  });
 
-        if (parceiros) {
-          const ativos = parceiros.filter(p => p.status === 'ativo').length;
-          const receitaTotal = parceiros.reduce((s, p) => s + (p.receita_gerada || 0), 0);
-          const dealsConjuntos = parceiros.reduce((s, p) => s + (p.deals_conjuntos || 0), 0);
+  const metrics = useMemo(() => {
+    if (!parceiros) return null;
+    const ativos = parceiros.filter((p: any) => p.status === 'ativo').length;
+    const receitaTotal = parceiros.reduce((s: number, p: any) => s + (p.receita_gerada || 0), 0);
+    const dealsConjuntos = parceiros.reduce((s: number, p: any) => s + (p.deals_conjuntos || 0), 0);
 
-          setMetrics({
-            totalParceiros: parceiros.length,
-            ativos,
-            receitaTotal,
-            dealsConjuntos,
-            parceiros: parceiros.map(p => ({
-              id: p.id,
-              nome: p.nome || 'Parceiro',
-              tipo: p.tipo || 'estrategico',
-              nivel: p.nivel || 'bronze',
-              status: p.status || 'prospect',
-              receita_gerada: p.receita_gerada || 0,
-              deals_conjuntos: p.deals_conjuntos || 0,
-              nota_satisfacao: p.nota_satisfacao || 0,
-              contato: p.contato || '',
-              pais: p.pais || 'Brasil'
-            }))
-          });
-        } else {
-          setMetrics({
-            totalParceiros: 0,
-            ativos: 0,
-            receitaTotal: 0,
-            dealsConjuntos: 0,
-            parceiros: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Parceiros Supremos:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    return {
+      totalParceiros: parceiros.length,
+      ativos,
+      receitaTotal,
+      dealsConjuntos,
+      parceiros: parceiros.map((p: any): Partner => ({
+        id: p.id,
+        nome: p.nome || 'Parceiro',
+        tipo: p.tipo || 'estrategico',
+        nivel: p.nivel || 'bronze',
+        status: p.status || 'prospect',
+        receita_gerada: p.receita_gerada || 0,
+        deals_conjuntos: p.deals_conjuntos || 0,
+        nota_satisfacao: p.nota_satisfacao || 0,
+        contato: p.contato || '',
+        pais: p.pais || 'Brasil'
+      }))
+    };
+  }, [parceiros]);
 
-    loadSupremePartners();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Conectando alianças...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!parceiros?.length) return <EmptyState title="Nenhum parceiro encontrado" />;
 
   const nivelConfig: Record<string, { bg: string; border: string }> = {
     bronze: { bg: 'from-[var(--accent-warning)]/40 to-[var(--accent-warning)]/20', border: 'border-[var(--accent-warning)]/30' },

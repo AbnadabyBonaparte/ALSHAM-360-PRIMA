@@ -104,7 +104,7 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleImport}
-        className="px-4 py-2 bg-sky-500/10 border border-sky-500/30 text-sky-400 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-sky-500/20 transition-colors"
+        className="px-4 py-2 bg-[var(--accent-sky)]/10 border border-[var(--accent-sky)]/30 text-[var(--accent-sky)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-sky)]/20 transition-colors"
       >
         <Upload className="w-4 h-4" />
         <span className="hidden sm:inline">Importar</span>
@@ -115,7 +115,7 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         whileTap={{ scale: 0.95 }}
         onClick={showExportMenu}
         disabled={isExporting}
-        className="px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
+        className="px-4 py-2 bg-[var(--accent-warning)]/10 border border-[var(--accent-warning)]/30 text-[var(--accent-warning)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-warning)]/20 transition-colors disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
         <span className="hidden sm:inline">{isExporting ? 'Exportando...' : 'Exportar'}</span>
@@ -125,7 +125,7 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={onNewLead}
-        className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-emerald-500/20 transition-colors"
+        className="px-4 py-2 bg-[var(--accent-emerald)]/10 border border-[var(--accent-emerald)]/30 text-[var(--accent-emerald)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-[var(--accent-emerald)]/20 transition-colors"
       >
         <Plus className="w-4 h-4" />
         <span className="hidden sm:inline">Novo Lead</span>

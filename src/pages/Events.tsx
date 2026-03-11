@@ -13,8 +13,10 @@ import {
   Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -45,73 +47,60 @@ interface EventMetrics {
 }
 
 export default function EventsPage() {
-  const [metrics, setMetrics] = useState<EventMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeEvents() {
-      try {
-        const { data: eventos } = await supabase
-          .from('eventos')
-          .select('*')
-          .order('data_inicio', { ascending: false });
+  const { data: metrics, isLoading, error, refetch } = useQuery<EventMetrics>({
+    queryKey: ['eventos', orgId],
+    queryFn: async () => {
+      const { data: eventos, error } = await supabase
+        .from('eventos')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_inicio', { ascending: false });
 
-        if (eventos) {
-          const proximos = eventos.filter(e => e.status === 'agendado').length;
-          const totalInscritos = eventos.reduce((s, e) => s + (e.inscritos || 0), 0);
-          const receitaTotal = eventos.reduce((s, e) => s + ((e.inscritos || 0) * (e.valor_ingresso || 0)), 0);
+      if (error) throw error;
 
-          setMetrics({
-            totalEventos: eventos.length,
-            proximos,
-            totalInscritos,
-            receitaTotal,
-            eventos: eventos.map(e => ({
-              id: e.id,
-              nome: e.nome || 'Evento',
-              descricao: e.descricao || '',
-              tipo: e.tipo || 'presencial',
-              local: e.local || '',
-              data_inicio: e.data_inicio || '',
-              data_fim: e.data_fim || '',
-              capacidade: e.capacidade || 0,
-              inscritos: e.inscritos || 0,
-              confirmados: e.confirmados || 0,
-              status: e.status || 'agendado',
-              valor_ingresso: e.valor_ingresso || 0
-            }))
-          });
-        } else {
-          setMetrics({
-            totalEventos: 0,
-            proximos: 0,
-            totalInscritos: 0,
-            receitaTotal: 0,
-            eventos: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Eventos Supremos:', err);
-      } finally {
-        setLoading(false);
+      if (eventos) {
+        const proximos = eventos.filter(e => e.status === 'agendado').length;
+        const totalInscritos = eventos.reduce((s, e) => s + (e.inscritos || 0), 0);
+        const receitaTotal = eventos.reduce((s, e) => s + ((e.inscritos || 0) * (e.valor_ingresso || 0)), 0);
+
+        return {
+          totalEventos: eventos.length,
+          proximos,
+          totalInscritos,
+          receitaTotal,
+          eventos: eventos.map(e => ({
+            id: e.id,
+            nome: e.nome || 'Evento',
+            descricao: e.descricao || '',
+            tipo: e.tipo || 'presencial',
+            local: e.local || '',
+            data_inicio: e.data_inicio || '',
+            data_fim: e.data_fim || '',
+            capacidade: e.capacidade || 0,
+            inscritos: e.inscritos || 0,
+            confirmados: e.confirmados || 0,
+            status: e.status || 'agendado',
+            valor_ingresso: e.valor_ingresso || 0
+          }))
+        };
       }
-    }
 
-    loadSupremeEvents();
-  }, []);
+      return {
+        totalEventos: 0,
+        proximos: 0,
+        totalInscritos: 0,
+        receitaTotal: 0,
+        eventos: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-purple)] font-light">Organizando eventos...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.eventos.length) return <EmptyState title="Nenhum evento cadastrado" />;
 
   const tipoIcon = (tipo: string) => {
     switch (tipo) {

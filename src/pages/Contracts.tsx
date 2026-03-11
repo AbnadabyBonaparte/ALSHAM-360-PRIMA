@@ -11,8 +11,10 @@ import {
   BadgeCheck,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format, differenceInDays } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,70 +41,47 @@ interface ContractMetrics {
 }
 
 export default function ContractsPage() {
-  const [metrics, setMetrics] = useState<ContractMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeContracts() {
-      try {
-        const { data: contratos } = await supabase
-          .from('contratos')
-          .select('*')
-          .order('id', { ascending: false });
-
-        if (contratos) {
-          const ativos = contratos.filter(c => c.status === 'ativo');
-          const valorRecorrente = ativos.reduce((s, c) => s + (c.valor_mensal || 0), 0);
-
-          setMetrics({
-            totalContratos: contratos.length,
-            ativos: ativos.length,
-            valorRecorrente,
-            valorTotal: contratos.reduce((s, c) => s + (c.valor_total || 0), 0),
-            contratos: contratos.map(c => ({
-              id: c.id,
-              titulo: c.titulo || 'Contrato',
-              cliente: c.cliente || 'Cliente',
-              tipo: c.tipo || 'Serviço',
-              valor_mensal: c.valor_mensal || 0,
-              valor_total: c.valor_total || 0,
-              status: c.status || 'rascunho',
-              data_inicio: c.data_inicio || '',
-              data_fim: c.data_fim || '',
-              renovacao_automatica: c.renovacao_automatica || false
-            }))
-          });
-        } else {
-          setMetrics({
-            totalContratos: 0,
-            ativos: 0,
-            valorRecorrente: 0,
-            valorTotal: 0,
-            contratos: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Contratos Supremos:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['contratos', orgId],
+    queryFn: async () => {
+      const { data: contratos, error } = await supabase
+        .from('contratos')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('id', { ascending: false });
+      if (error) throw error;
+      if (!contratos || contratos.length === 0) {
+        return { totalContratos: 0, ativos: 0, valorRecorrente: 0, valorTotal: 0, contratos: [] } as ContractMetrics;
       }
-    }
+      const ativos = contratos.filter(c => c.status === 'ativo');
+      const valorRecorrente = ativos.reduce((s, c) => s + (c.valor_mensal || 0), 0);
+      return {
+        totalContratos: contratos.length,
+        ativos: ativos.length,
+        valorRecorrente,
+        valorTotal: contratos.reduce((s, c) => s + (c.valor_total || 0), 0),
+        contratos: contratos.map(c => ({
+          id: c.id,
+          titulo: c.titulo || 'Contrato',
+          cliente: c.cliente || 'Cliente',
+          tipo: c.tipo || 'Serviço',
+          valor_mensal: c.valor_mensal || 0,
+          valor_total: c.valor_total || 0,
+          status: c.status || 'rascunho',
+          data_inicio: c.data_inicio || '',
+          data_fim: c.data_fim || '',
+          renovacao_automatica: c.renovacao_automatica || false
+        }))
+      } as ContractMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeContracts();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Analisando contratos...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.contratos?.length) return <EmptyState title="Nenhum contrato encontrado" />;
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
     rascunho: { variant: 'secondary' },

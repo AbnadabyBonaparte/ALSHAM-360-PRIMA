@@ -21,7 +21,7 @@ export default function KpiCard({
   glow,
 }: Props) {
   const trendIcon = trend !== undefined && trend < 0 ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />;
-  const trendColor = trend !== undefined && trend < 0 ? 'text-red-400' : 'text-emerald-400';
+  const trendColor = trend !== undefined && trend < 0 ? 'text-[var(--accent-alert)]' : 'text-[var(--accent-emerald)]';
 
   return (
     <div

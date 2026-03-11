@@ -99,42 +99,42 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--accent-purple)] to-[var(--accent-purple)] flex items-center justify-center text-[var(--text)] font-bold text-xs">
             {getInitials()}
           </div>
           <div>
-            <h3 className="font-semibold text-white text-sm">{lead.first_name} {lead.last_name}</h3>
-            <p className="text-xs text-gray-400">{lead.company || 'Sem empresa'}</p>
+            <h3 className="font-semibold text-[var(--text)] text-sm">{lead.first_name} {lead.last_name}</h3>
+            <p className="text-xs text-[var(--text-secondary)]">{lead.company || 'Sem empresa'}</p>
           </div>
         </div>
         
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 hover:bg-white/5 rounded-lg transition-colors"
+            className="p-1 hover:bg-[var(--surface)]/5 rounded-lg transition-colors"
           >
-            <MoreVertical className="w-4 h-4 text-gray-400" />
+            <MoreVertical className="w-4 h-4 text-[var(--text-secondary)]" />
           </button>
           
           {showMenu && (
             <div className="absolute right-0 top-8 bg-[var(--neutral-800)] border border-[var(--neutral-700)] rounded-lg shadow-xl z-10 py-1 min-w-[140px]">
               <button
                 onClick={() => { onView?.(lead); setShowMenu(false); }}
-                className="w-full px-3 py-1.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2"
+                className="w-full px-3 py-1.5 text-left text-sm text-[var(--text)] hover:bg-[var(--surface)]/5 flex items-center gap-2"
               >
                 <Eye className="w-3 h-3" />
                 Ver Detalhes
               </button>
               <button
                 onClick={() => { onEdit?.(lead); setShowMenu(false); }}
-                className="w-full px-3 py-1.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2"
+                className="w-full px-3 py-1.5 text-left text-sm text-[var(--text)] hover:bg-[var(--surface)]/5 flex items-center gap-2"
               >
                 <Edit className="w-3 h-3" />
                 Editar
               </button>
               <button
                 onClick={() => { onDelete?.(lead); setShowMenu(false); }}
-                className="w-full px-3 py-1.5 text-left text-sm text-red-400 hover:bg-white/5 flex items-center gap-2"
+                className="w-full px-3 py-1.5 text-left text-sm text-[var(--accent-alert)] hover:bg-[var(--surface)]/5 flex items-center gap-2"
               >
                 <Trash2 className="w-3 h-3" />
                 Excluir
@@ -144,25 +144,25 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
         </div>
       </div>
 
-      <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(lead.status)} text-white inline-block mb-2`}>
+      <div className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(lead.status)} text-[var(--text)] inline-block mb-2`}>
         {lead.status}
       </div>
 
       <div className="space-y-1.5 mb-3">
         {lead.email && (
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
             <Mail className="w-3 h-3" />
             <span className="truncate">{lead.email}</span>
           </div>
         )}
         {lead.phone && (
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
             <Phone className="w-3 h-3" />
             <span>{lead.phone}</span>
           </div>
         )}
         {lead.position && (
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
             <User className="w-3 h-3" />
             <span className="truncate">{lead.position}</span>
           </div>
@@ -183,7 +183,7 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
         </button>
         <button
           onClick={handleWhatsApp}
-          className="flex-1 px-2 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-2 py-1.5 bg-[var(--accent-emerald)]/10 border border-[var(--accent-emerald)]/30 text-[var(--accent-emerald)] rounded-lg text-xs font-semibold hover:bg-[var(--accent-emerald)]/20 transition-colors flex items-center justify-center gap-1"
         >
           <MessageSquare className="w-3 h-3" />
           Zap
@@ -198,7 +198,7 @@ export default function LeadCard({ lead, onEdit, onDelete, onView, delay = 0 }: 
       </div>
 
       {daysSinceContact !== null && daysSinceContact > 7 && (
-        <div className="mt-2 px-2 py-1 bg-orange-500/10 border border-orange-500/30 rounded text-xs text-orange-400 flex items-center gap-1">
+        <div className="mt-2 px-2 py-1 bg-[var(--accent-warning)]/10 border border-[var(--accent-warning)]/30 rounded text-xs text-[var(--accent-warning)] flex items-center gap-1">
           <Calendar className="w-3 h-3" />
           <span>Sem contato há {daysSinceContact} dias</span>
         </div>

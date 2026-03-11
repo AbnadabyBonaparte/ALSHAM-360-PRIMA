@@ -13,8 +13,10 @@ import {
   Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -38,76 +40,66 @@ interface SocialMetrics {
 }
 
 export default function SocialMediaPage() {
-  const [metrics, setMetrics] = useState<SocialMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeSocial() {
-      try {
-        const { data: contas } = await supabase
-          .from('social_accounts')
-          .select('*')
-          .order('seguidores', { ascending: false });
+  const { data: metrics, isLoading, error, refetch } = useQuery<SocialMetrics>({
+    queryKey: ['social-media', orgId],
+    queryFn: async () => {
+      const { data: contas, error: e1 } = await supabase
+        .from('social_accounts')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('seguidores', { ascending: false });
 
-        const { data: posts } = await supabase
-          .from('social_posts')
-          .select('alcance, curtidas, comentarios, compartilhamentos');
+      if (e1) throw e1;
 
-        if (contas) {
-          const totalSeguidores = contas.reduce((s, c) => s + (c.seguidores || 0), 0);
-          const engajamentoMedio = contas.reduce((s, c) => s + (c.engajamento || 0), 0) / (contas.length || 1);
-          const totalPosts = posts?.length || 0;
-          const alcanceTotal = posts?.reduce((s, p) => s + (p.alcance || 0), 0) || 0;
-          const crescimentoMensal = contas.reduce((s, c) => s + (c.crescimento || 0), 0) / (contas.length || 1);
+      const { data: posts, error: e2 } = await supabase
+        .from('social_posts')
+        .select('alcance, curtidas, comentarios, compartilhamentos')
+        .eq('org_id', orgId!);
 
-          setMetrics({
-            totalSeguidores,
-            engajamentoMedio,
-            totalPosts,
-            alcanceTotal,
-            crescimentoMensal,
-            contas: contas.map(c => ({
-              id: c.id,
-              plataforma: c.plataforma || 'unknown',
-              nome: c.nome || c.username || 'Conta',
-              seguidores: c.seguidores || 0,
-              engajamento: c.engajamento || 0,
-              posts_mes: c.posts_mes || 0,
-              crescimento: c.crescimento || 0
-            }))
-          });
-        } else {
-          setMetrics({
-            totalSeguidores: 0,
-            engajamentoMedio: 0,
-            totalPosts: 0,
-            alcanceTotal: 0,
-            crescimentoMensal: 0,
-            contas: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Social Media Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (e2) throw e2;
+
+      if (contas) {
+        const totalSeguidores = contas.reduce((s, c) => s + (c.seguidores || 0), 0);
+        const engajamentoMedio = contas.reduce((s, c) => s + (c.engajamento || 0), 0) / (contas.length || 1);
+        const totalPosts = posts?.length || 0;
+        const alcanceTotal = posts?.reduce((s, p) => s + (p.alcance || 0), 0) || 0;
+        const crescimentoMensal = contas.reduce((s, c) => s + (c.crescimento || 0), 0) / (contas.length || 1);
+
+        return {
+          totalSeguidores,
+          engajamentoMedio,
+          totalPosts,
+          alcanceTotal,
+          crescimentoMensal,
+          contas: contas.map(c => ({
+            id: c.id,
+            plataforma: c.plataforma || 'unknown',
+            nome: c.nome || c.username || 'Conta',
+            seguidores: c.seguidores || 0,
+            engajamento: c.engajamento || 0,
+            posts_mes: c.posts_mes || 0,
+            crescimento: c.crescimento || 0
+          }))
+        };
       }
-    }
 
-    loadSupremeSocial();
-  }, []);
+      return {
+        totalSeguidores: 0,
+        engajamentoMedio: 0,
+        totalPosts: 0,
+        alcanceTotal: 0,
+        crescimentoMensal: 0,
+        contas: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-pink)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-pink)] font-light">Conectando às redes...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.contas.length) return <EmptyState title="Nenhuma conta social conectada" />;
 
   const platformIcon = (plataforma: string) => {
     const colors: Record<string, string> = {

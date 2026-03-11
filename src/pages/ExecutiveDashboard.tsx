@@ -2,7 +2,7 @@
 // THE BOARDROOM — ALSHAM STYLUS EDITION (migrado para shadcn/ui)
 // 100/100: Concept • Visual • Technical • Brand • Business
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   FileText, Globe, Briefcase,
@@ -10,7 +10,10 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState } from '@/components/PageStates';
 import { useTheme } from '@/hooks/useTheme';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -105,16 +108,13 @@ const SentimentOrb = ({ score }: { score: number }) => {
 export default function ExecutiveDashboard() {
   const { getThemeColors } = useTheme();
   const themeColors = getThemeColors();
-  const [metrics, setMetrics] = useState<ExecutiveMetrics | null>(null);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [generatingReport, setGeneratingReport] = useState(false);
   const [easterEggActive, setEasterEggActive] = useState(false);
 
-  // DATA ENGINE
-  useEffect(() => {
-    async function loadEmpireData() {
-      // Fetch Real Data via Promise.all
+  const { data: rawData, isLoading, error, refetch } = useQuery({
+    queryKey: ['executive-dashboard', orgId],
+    queryFn: async () => {
       const [
         { data: finance },
         { data: opps },
@@ -125,64 +125,68 @@ export default function ExecutiveDashboard() {
         supabase.from('user_profiles').select('id', { count: 'exact' })
       ]);
 
-      // --- CALCULATIONS (Business Logic) ---
-      const income = finance?.filter(f => f.type === 'income').reduce((a, b) => a + b.amount, 0) || 0;
-      const expense = finance?.filter(f => f.type === 'expense').reduce((a, b) => a + b.amount, 0) || 0;
-      const ebitda = income - expense;
-      const ebitdaMargin = income > 0 ? (ebitda / income) * 100 : 0;
+      return { finance, opps, users };
+    },
+    enabled: !!orgId,
+  });
 
-      // Trend real por mês (ordenado)
-      const monthlyMap = new Map<string, { income: number; expense: number }>();
-      finance?.forEach((f) => {
-        const key = new Date(f.date).toISOString().slice(0, 7);
-        const current = monthlyMap.get(key) || { income: 0, expense: 0 };
-        if (f.type === 'income') current.income += f.amount;
-        if (f.type === 'expense') current.expense += f.amount;
-        monthlyMap.set(key, current);
-      });
+  const { metrics, departments } = useMemo(() => {
+    if (!rawData) return { metrics: null, departments: [] };
 
-      const revenueTrend = Array.from(monthlyMap.entries())
-        .sort(([a], [b]) => (a > b ? 1 : -1))
-        .slice(-12)
-        .map(([month, totals]) => ({
-          month,
-          revenue: totals.income,
-          profit: totals.income - totals.expense,
-        }));
+    const { finance, opps, users } = rawData;
 
-      // Unit economics a partir dos dados reais
-      const totalOppValue = opps?.reduce((acc, o) => acc + (o.value ?? 0), 0) || 0;
-      const ltvCacRatio = expense > 0 ? (income / expense) : 0;
-      const runwayMonths = expense > 0 ? (income / expense) * 6 : 24;
+    const income = finance?.filter((f: any) => f.type === 'income').reduce((a: number, b: any) => a + b.amount, 0) || 0;
+    const expense = finance?.filter((f: any) => f.type === 'expense').reduce((a: number, b: any) => a + b.amount, 0) || 0;
+    const ebitda = income - expense;
+    const ebitdaMargin = income > 0 ? (ebitda / income) * 100 : 0;
 
-      const wonDeals = opps?.filter((o) => o.stage?.toLowerCase() === 'ganho' || o.stage?.toLowerCase() === 'ganho ').length || 0;
-      const marketSentiment = opps && opps.length > 0 ? Math.min(100, Math.max(0, (wonDeals / opps.length) * 100)) : 0;
+    const monthlyMap = new Map<string, { income: number; expense: number }>();
+    finance?.forEach((f: any) => {
+      const key = new Date(f.date).toISOString().slice(0, 7);
+      const current = monthlyMap.get(key) || { income: 0, expense: 0 };
+      if (f.type === 'income') current.income += f.amount;
+      if (f.type === 'expense') current.expense += f.amount;
+      monthlyMap.set(key, current);
+    });
 
-      setMetrics({
-        revenueYTD: income,
-        revenueGrowth: revenueTrend.length >= 2
-          ? ((revenueTrend[revenueTrend.length - 1].revenue - revenueTrend[0].revenue) / Math.max(1, revenueTrend[0].revenue)) * 100
-          : 0,
-        revenueTrend,
-        ebitda,
-        ebitdaMargin,
-        ltvCacRatio,
-        runwayMonths,
-        headcount: users?.length || 1,
-        marketSentiment,
-      });
+    const revenueTrend = Array.from(monthlyMap.entries())
+      .sort(([a], [b]) => (a > b ? 1 : -1))
+      .slice(-12)
+      .map(([month, totals]) => ({
+        month,
+        revenue: totals.income,
+        profit: totals.income - totals.expense,
+      }));
 
-      setDepartments([
-        { name: 'Vendas', status: 'optimal', metric: 'Pipeline Velocity', value: 'R$ 4.2M' },
-        { name: 'Financeiro', status: runwayMonths > 12 ? 'optimal' : 'warning', metric: 'Cash Runway', value: `${runwayMonths.toFixed(1)}m` },
-        { name: 'Tech', status: 'optimal', metric: 'Uptime', value: '99.99%' },
-        { name: 'Growth', status: 'warning', metric: 'CAC', value: 'R$ 420' },
-      ]);
+    const ltvCacRatio = expense > 0 ? (income / expense) : 0;
+    const runwayMonths = expense > 0 ? (income / expense) * 6 : 24;
 
-      setLoading(false);
-    }
-    loadEmpireData();
-  }, []);
+    const wonDeals = opps?.filter((o: any) => o.stage?.toLowerCase() === 'ganho' || o.stage?.toLowerCase() === 'ganho ').length || 0;
+    const marketSentiment = opps && opps.length > 0 ? Math.min(100, Math.max(0, (wonDeals / opps.length) * 100)) : 0;
+
+    const m: ExecutiveMetrics = {
+      revenueYTD: income,
+      revenueGrowth: revenueTrend.length >= 2
+        ? ((revenueTrend[revenueTrend.length - 1].revenue - revenueTrend[0].revenue) / Math.max(1, revenueTrend[0].revenue)) * 100
+        : 0,
+      revenueTrend,
+      ebitda,
+      ebitdaMargin,
+      ltvCacRatio,
+      runwayMonths,
+      headcount: users?.length || 1,
+      marketSentiment,
+    };
+
+    const deps: Department[] = [
+      { name: 'Vendas', status: 'optimal', metric: 'Pipeline Velocity', value: 'R$ 4.2M' },
+      { name: 'Financeiro', status: runwayMonths > 12 ? 'optimal' : 'warning', metric: 'Cash Runway', value: `${runwayMonths.toFixed(1)}m` },
+      { name: 'Tech', status: 'optimal', metric: 'Uptime', value: '99.99%' },
+      { name: 'Growth', status: 'warning', metric: 'CAC', value: 'R$ 420' },
+    ];
+
+    return { metrics: m, departments: deps };
+  }, [rawData]);
 
   const handleGenerateReport = () => {
     setGeneratingReport(true);
@@ -211,24 +215,8 @@ export default function ExecutiveDashboard() {
     setTimeout(() => setEasterEggActive(false), 5000);
   };
 
-  if (loading) {
-    return (
-      <div className="h-screen bg-[var(--background)] flex items-center justify-center">
-        <div className="text-center">
-          <motion.div
-            animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            <Briefcase className="w-32 h-32 text-[var(--accent-emerald)]/20" />
-          </motion.div>
-          <p className="mt-12 text-2xl font-black text-[var(--text-primary)]/30 tracking-[0.5em] animate-pulse">
-            ACESSANDO NÍVEL EXECUTIVO...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
   if (!metrics) return null;
 
   return (

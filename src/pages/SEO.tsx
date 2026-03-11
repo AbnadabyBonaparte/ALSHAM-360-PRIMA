@@ -14,8 +14,10 @@ import {
   Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -40,78 +42,68 @@ interface SEOMetrics {
 }
 
 export default function SEOPage() {
-  const [metrics, setMetrics] = useState<SEOMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeSEO() {
-      try {
-        const { data: keywords } = await supabase
-          .from('seo_keywords')
-          .select('*')
-          .order('posicao', { ascending: true });
+  const { data: metrics, isLoading, error, refetch } = useQuery<SEOMetrics>({
+    queryKey: ['seo-keywords', orgId],
+    queryFn: async () => {
+      const { data: keywords, error: e1 } = await supabase
+        .from('seo_keywords')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('posicao', { ascending: true });
 
-        const { data: siteMetrics } = await supabase
-          .from('seo_metrics')
-          .select('*')
-          .order('id', { ascending: false })
-          .limit(1)
-          .single();
+      if (e1) throw e1;
 
-        if (keywords) {
-          const top10 = keywords.filter(k => k.posicao <= 10).length;
-          const top3 = keywords.filter(k => k.posicao <= 3).length;
+      const { data: siteMetrics, error: e2 } = await supabase
+        .from('seo_metrics')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('id', { ascending: false })
+        .limit(1)
+        .single();
 
-          setMetrics({
-            palavrasTop10: top10,
-            palavrasTop3: top3,
-            trafegoOrganico: siteMetrics?.trafego_organico || 0,
-            backlinks: siteMetrics?.backlinks || 0,
-            dominioAuthority: siteMetrics?.domain_authority || 0,
-            paginasIndexadas: siteMetrics?.paginas_indexadas || 0,
-            keywords: keywords.map(k => ({
-              id: k.id,
-              palavra: k.palavra || k.keyword || '',
-              posicao: k.posicao || 0,
-              volume: k.volume || 0,
-              dificuldade: k.dificuldade || 0,
-              url: k.url || '',
-              variacao: k.variacao || 0
-            }))
-          });
-        } else {
-          setMetrics({
-            palavrasTop10: 0,
-            palavrasTop3: 0,
-            trafegoOrganico: 0,
-            backlinks: 0,
-            dominioAuthority: 0,
-            paginasIndexadas: 0,
-            keywords: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no SEO Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (e2 && e2.code !== 'PGRST116') throw e2;
+
+      if (keywords) {
+        const top10 = keywords.filter(k => k.posicao <= 10).length;
+        const top3 = keywords.filter(k => k.posicao <= 3).length;
+
+        return {
+          palavrasTop10: top10,
+          palavrasTop3: top3,
+          trafegoOrganico: siteMetrics?.trafego_organico || 0,
+          backlinks: siteMetrics?.backlinks || 0,
+          dominioAuthority: siteMetrics?.domain_authority || 0,
+          paginasIndexadas: siteMetrics?.paginas_indexadas || 0,
+          keywords: keywords.map(k => ({
+            id: k.id,
+            palavra: k.palavra || k.keyword || '',
+            posicao: k.posicao || 0,
+            volume: k.volume || 0,
+            dificuldade: k.dificuldade || 0,
+            url: k.url || '',
+            variacao: k.variacao || 0
+          }))
+        };
       }
-    }
 
-    loadSupremeSEO();
-  }, []);
+      return {
+        palavrasTop10: 0,
+        palavrasTop3: 0,
+        trafegoOrganico: 0,
+        backlinks: 0,
+        dominioAuthority: 0,
+        paginasIndexadas: 0,
+        keywords: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Analisando rankings...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.keywords.length) return <EmptyState title="Nenhuma keyword rastreada" />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">

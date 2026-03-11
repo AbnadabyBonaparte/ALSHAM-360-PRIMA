@@ -16,8 +16,10 @@ import {
   XCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,36 +40,33 @@ interface Quote {
 }
 
 export default function QuotesPage() {
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeQuotes() {
+  const { data: quotes = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['quotes', orgId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('quotes')
         .select('*')
+        .eq('org_id', orgId!)
         .order('created_at', { ascending: false });
-
-      if (!error && data) {
-        setQuotes(data.map((q: any) => ({
-          id: q.id,
-          number: q.quote_number || `COT-${q.id.slice(0, 8).toUpperCase()}`,
-          client_name: q.client_name || 'Cliente Supremo',
-          company: q.company || 'Empresa X',
-          value: q.total_value || 0,
-          status: q.status || 'draft',
-          validity_date: q.validity_date || new Date(Date.now() + 30*24*60*60*1000).toISOString(),
-          created_at: q.created_at,
-          items_count: q.items?.length || 0,
-          conversion_probability: q.ai_conversion_probability || 0,
-          owner: q.owner_name || 'Você'
-        })));
-      }
-      setLoading(false);
-    }
-
-    loadSupremeQuotes();
-  }, []);
+      if (error) throw error;
+      return (data ?? []).map((q: any) => ({
+        id: q.id,
+        number: q.quote_number || `COT-${q.id.slice(0, 8).toUpperCase()}`,
+        client_name: q.client_name || 'Cliente Supremo',
+        company: q.company || 'Empresa X',
+        value: q.total_value || 0,
+        status: q.status || 'draft',
+        validity_date: q.validity_date || new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+        created_at: q.created_at,
+        items_count: q.items?.length || 0,
+        conversion_probability: q.ai_conversion_probability || 0,
+        owner: q.owner_name || 'Você'
+      })) as Quote[];
+    },
+    enabled: !!orgId,
+  });
 
   const stats = {
     totalValue: quotes.reduce((s, q) => s + q.value, 0),
@@ -87,18 +86,9 @@ export default function QuotesPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-emerald)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-emerald)] font-light">Carregando cotações...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!quotes?.length) return <EmptyState title="Nenhuma cotação encontrada" />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)] p-8">

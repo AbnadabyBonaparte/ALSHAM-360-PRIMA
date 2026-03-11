@@ -12,8 +12,11 @@ import {
   XCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -41,70 +44,47 @@ interface OrderMetrics {
 }
 
 export default function OrdersPage() {
-  const [metrics, setMetrics] = useState<OrderMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
 
-  useEffect(() => {
-    async function loadSupremeOrders() {
-      try {
-        const { data: pedidos } = await supabase
-          .from('pedidos')
-          .select('*')
-          .order('data_pedido', { ascending: false });
-
-        if (pedidos) {
-          const concluidos = pedidos.filter(p => p.status === 'entregue').length;
-          const receitaTotal = pedidos.filter(p => p.status !== 'cancelado').reduce((s, p) => s + (p.valor || 0), 0);
-
-          setMetrics({
-            totalPedidos: pedidos.length,
-            receitaTotal,
-            ticketMedio: pedidos.length > 0 ? receitaTotal / pedidos.length : 0,
-            taxaConclusao: pedidos.length > 0 ? (concluidos / pedidos.length) * 100 : 0,
-            pedidos: pedidos.map(p => ({
-              id: p.id,
-              numero: p.numero || `#${p.id}`,
-              cliente: p.cliente || 'Cliente',
-              valor: p.valor || 0,
-              itens: p.itens || 1,
-              status: p.status || 'pendente',
-              data_pedido: p.data_pedido || '',
-              data_entrega: p.data_entrega || null,
-              metodo_pagamento: p.metodo_pagamento || 'Não informado'
-            }))
-          });
-        } else {
-          setMetrics({
-            totalPedidos: 0,
-            receitaTotal: 0,
-            ticketMedio: 0,
-            taxaConclusao: 0,
-            pedidos: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Pedidos Supremos:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['pedidos', orgId],
+    queryFn: async () => {
+      const { data: pedidos, error } = await supabase
+        .from('pedidos')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_pedido', { ascending: false });
+      if (error) throw error;
+      if (!pedidos || pedidos.length === 0) {
+        return { totalPedidos: 0, receitaTotal: 0, ticketMedio: 0, taxaConclusao: 0, pedidos: [] } as OrderMetrics;
       }
-    }
+      const concluidos = pedidos.filter(p => p.status === 'entregue').length;
+      const receitaTotal = pedidos.filter(p => p.status !== 'cancelado').reduce((s, p) => s + (p.valor || 0), 0);
+      return {
+        totalPedidos: pedidos.length,
+        receitaTotal,
+        ticketMedio: pedidos.length > 0 ? receitaTotal / pedidos.length : 0,
+        taxaConclusao: pedidos.length > 0 ? (concluidos / pedidos.length) * 100 : 0,
+        pedidos: pedidos.map(p => ({
+          id: p.id,
+          numero: p.numero || `#${p.id}`,
+          cliente: p.cliente || 'Cliente',
+          valor: p.valor || 0,
+          itens: p.itens || 1,
+          status: p.status || 'pendente',
+          data_pedido: p.data_pedido || '',
+          data_entrega: p.data_entrega || null,
+          metodo_pagamento: p.metodo_pagamento || 'Não informado'
+        }))
+      } as OrderMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeOrders();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Processando pedidos...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.pedidos?.length) return <EmptyState title="Nenhum pedido encontrado" />;
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
     pendente: { variant: 'outline', icon: <Clock className="w-4 h-4" /> },

@@ -13,8 +13,10 @@ import {
   Send
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -39,68 +41,45 @@ interface ProposalMetrics {
 }
 
 export default function ProposalsPage() {
-  const [metrics, setMetrics] = useState<ProposalMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeProposals() {
-      try {
-        const { data: propostas } = await supabase
-          .from('propostas')
-          .select('*')
-          .order('id', { ascending: false });
-
-        if (propostas) {
-          const aceitas = propostas.filter(p => p.status === 'aceita').length;
-          const enviadas = propostas.filter(p => ['enviada', 'visualizada', 'aceita', 'recusada'].includes(p.status)).length;
-
-          setMetrics({
-            totalPropostas: propostas.length,
-            valorTotal: propostas.reduce((s, p) => s + (p.valor || 0), 0),
-            aceitas,
-            taxaAceitacao: enviadas > 0 ? (aceitas / enviadas) * 100 : 0,
-            propostas: propostas.map(p => ({
-              id: p.id,
-              titulo: p.titulo || 'Proposta',
-              cliente: p.cliente || 'Cliente',
-              valor: p.valor || 0,
-              status: p.status || 'rascunho',
-              data_envio: p.data_envio || '',
-              data_expiracao: p.data_expiracao || '',
-              probabilidade: p.probabilidade || 50
-            }))
-          });
-        } else {
-          setMetrics({
-            totalPropostas: 0,
-            valorTotal: 0,
-            aceitas: 0,
-            taxaAceitacao: 0,
-            propostas: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nas Propostas Supremas:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['propostas', orgId],
+    queryFn: async () => {
+      const { data: propostas, error } = await supabase
+        .from('propostas')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('id', { ascending: false });
+      if (error) throw error;
+      if (!propostas || propostas.length === 0) {
+        return { totalPropostas: 0, valorTotal: 0, aceitas: 0, taxaAceitacao: 0, propostas: [] } as ProposalMetrics;
       }
-    }
+      const aceitas = propostas.filter(p => p.status === 'aceita').length;
+      const enviadas = propostas.filter(p => ['enviada', 'visualizada', 'aceita', 'recusada'].includes(p.status)).length;
+      return {
+        totalPropostas: propostas.length,
+        valorTotal: propostas.reduce((s, p) => s + (p.valor || 0), 0),
+        aceitas,
+        taxaAceitacao: enviadas > 0 ? (aceitas / enviadas) * 100 : 0,
+        propostas: propostas.map(p => ({
+          id: p.id,
+          titulo: p.titulo || 'Proposta',
+          cliente: p.cliente || 'Cliente',
+          valor: p.valor || 0,
+          status: p.status || 'rascunho',
+          data_envio: p.data_envio || '',
+          data_expiracao: p.data_expiracao || '',
+          probabilidade: p.probabilidade || 50
+        }))
+      } as ProposalMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeProposals();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-emerald)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-emerald)] font-light">Preparando propostas...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.propostas?.length) return <EmptyState title="Nenhuma proposta encontrada" />;
 
   const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: JSX.Element }> = {
     rascunho: { variant: 'secondary', icon: <FileText className="w-4 h-4" /> },

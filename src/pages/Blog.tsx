@@ -14,8 +14,11 @@ import {
   BookOpen
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -47,74 +50,61 @@ interface BlogMetrics {
 }
 
 export default function BlogPage() {
-  const [metrics, setMetrics] = useState<BlogMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [filtro, setFiltro] = useState<'todos' | 'publicado' | 'rascunho'>('todos');
 
-  useEffect(() => {
-    async function loadSupremeBlog() {
-      try {
-        const { data: posts } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .order('data_publicacao', { ascending: false });
+  const { data: metrics, isLoading, error, refetch } = useQuery<BlogMetrics>({
+    queryKey: ['blog-posts', orgId],
+    queryFn: async () => {
+      const { data: posts, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_publicacao', { ascending: false });
 
-        if (posts) {
-          const publicados = posts.filter(p => p.status === 'publicado');
-          setMetrics({
-            totalPosts: posts.length,
-            totalVisualizacoes: publicados.reduce((s, p) => s + (p.visualizacoes || 0), 0),
-            totalCurtidas: publicados.reduce((s, p) => s + (p.curtidas || 0), 0),
-            mediaTempoLeitura: publicados.length > 0
-              ? publicados.reduce((s, p) => s + (p.tempo_leitura || 5), 0) / publicados.length
-              : 0,
-            posts: posts.map(p => ({
-              id: p.id,
-              titulo: p.titulo || 'Sem título',
-              resumo: p.resumo || '',
-              autor: p.autor || 'Anônimo',
-              categoria: p.categoria || 'Geral',
-              tags: p.tags || [],
-              visualizacoes: p.visualizacoes || 0,
-              curtidas: p.curtidas || 0,
-              comentarios: p.comentarios || 0,
-              tempo_leitura: p.tempo_leitura || 5,
-              data_publicacao: p.data_publicacao || '',
-              status: p.status || 'rascunho',
-              imagem_capa: p.imagem_capa || ''
-            }))
-          });
-        } else {
-          setMetrics({
-            totalPosts: 0,
-            totalVisualizacoes: 0,
-            totalCurtidas: 0,
-            mediaTempoLeitura: 0,
-            posts: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Blog Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (error) throw error;
+
+      if (posts) {
+        const publicados = posts.filter(p => p.status === 'publicado');
+        return {
+          totalPosts: posts.length,
+          totalVisualizacoes: publicados.reduce((s, p) => s + (p.visualizacoes || 0), 0),
+          totalCurtidas: publicados.reduce((s, p) => s + (p.curtidas || 0), 0),
+          mediaTempoLeitura: publicados.length > 0
+            ? publicados.reduce((s, p) => s + (p.tempo_leitura || 5), 0) / publicados.length
+            : 0,
+          posts: posts.map(p => ({
+            id: p.id,
+            titulo: p.titulo || 'Sem título',
+            resumo: p.resumo || '',
+            autor: p.autor || 'Anônimo',
+            categoria: p.categoria || 'Geral',
+            tags: p.tags || [],
+            visualizacoes: p.visualizacoes || 0,
+            curtidas: p.curtidas || 0,
+            comentarios: p.comentarios || 0,
+            tempo_leitura: p.tempo_leitura || 5,
+            data_publicacao: p.data_publicacao || '',
+            status: p.status || 'rascunho',
+            imagem_capa: p.imagem_capa || ''
+          }))
+        };
       }
-    }
 
-    loadSupremeBlog();
-  }, []);
+      return {
+        totalPosts: 0,
+        totalVisualizacoes: 0,
+        totalCurtidas: 0,
+        mediaTempoLeitura: 0,
+        posts: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-warning)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-warning)] font-light">Carregando artigos...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.posts.length) return <EmptyState title="Nenhum post encontrado" />;
 
   const postsFiltrados = metrics?.posts.filter(p =>
     filtro === 'todos' ? true : p.status === filtro

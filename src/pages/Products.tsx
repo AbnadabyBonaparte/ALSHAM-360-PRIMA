@@ -11,8 +11,11 @@ import {
   BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -39,77 +42,54 @@ interface ProductMetrics {
 }
 
 export default function ProductsPage() {
-  const [metrics, setMetrics] = useState<ProductMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [categoria, setCategoria] = useState<string>('todas');
 
-  useEffect(() => {
-    async function loadSupremeProducts() {
-      try {
-        const { data: produtos } = await supabase
-          .from('produtos')
-          .select('*')
-          .order('vendidos', { ascending: false });
-
-        if (produtos) {
-          const valorEstoque = produtos.reduce((s, p) => s + ((p.preco || 0) * (p.estoque || 0)), 0);
-          const totalVendidos = produtos.reduce((s, p) => s + (p.vendidos || 0), 0);
-
-          setMetrics({
-            totalProdutos: produtos.length,
-            valorEstoque,
-            margemMedia: produtos.length > 0
-              ? produtos.reduce((s, p) => {
-                  const margem = p.preco_custo > 0 ? ((p.preco - p.preco_custo) / p.preco_custo) * 100 : 0;
-                  return s + margem;
-                }, 0) / produtos.length
-              : 0,
-            totalVendidos,
-            produtos: produtos.map(p => ({
-              id: p.id,
-              nome: p.nome || 'Produto',
-              descricao: p.descricao || '',
-              categoria: p.categoria || 'Geral',
-              preco: p.preco || 0,
-              preco_custo: p.preco_custo || 0,
-              estoque: p.estoque || 0,
-              vendidos: p.vendidos || 0,
-              status: p.estoque === 0 ? 'esgotado' : p.status || 'ativo',
-              imagem: p.imagem || '',
-              margem: p.preco_custo > 0 ? ((p.preco - p.preco_custo) / p.preco_custo) * 100 : 0
-            }))
-          });
-        } else {
-          setMetrics({
-            totalProdutos: 0,
-            valorEstoque: 0,
-            margemMedia: 0,
-            totalVendidos: 0,
-            produtos: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Produtos Supremos:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['produtos', orgId],
+    queryFn: async () => {
+      const { data: produtos, error } = await supabase
+        .from('produtos')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('vendidos', { ascending: false });
+      if (error) throw error;
+      if (!produtos || produtos.length === 0) {
+        return { totalProdutos: 0, valorEstoque: 0, margemMedia: 0, totalVendidos: 0, produtos: [] } as ProductMetrics;
       }
-    }
+      const valorEstoque = produtos.reduce((s, p) => s + ((p.preco || 0) * (p.estoque || 0)), 0);
+      const totalVendidos = produtos.reduce((s, p) => s + (p.vendidos || 0), 0);
+      return {
+        totalProdutos: produtos.length,
+        valorEstoque,
+        margemMedia: produtos.length > 0
+          ? produtos.reduce((s, p) => {
+              const margem = p.preco_custo > 0 ? ((p.preco - p.preco_custo) / p.preco_custo) * 100 : 0;
+              return s + margem;
+            }, 0) / produtos.length
+          : 0,
+        totalVendidos,
+        produtos: produtos.map(p => ({
+          id: p.id,
+          nome: p.nome || 'Produto',
+          descricao: p.descricao || '',
+          categoria: p.categoria || 'Geral',
+          preco: p.preco || 0,
+          preco_custo: p.preco_custo || 0,
+          estoque: p.estoque || 0,
+          vendidos: p.vendidos || 0,
+          status: p.estoque === 0 ? 'esgotado' : p.status || 'ativo',
+          imagem: p.imagem || '',
+          margem: p.preco_custo > 0 ? ((p.preco - p.preco_custo) / p.preco_custo) * 100 : 0
+        }))
+      } as ProductMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeProducts();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-warning)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-warning)] font-light">Carregando catálogo...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.produtos?.length) return <EmptyState title="Nenhum produto encontrado" />;
 
   const categorias = ['todas', ...new Set(metrics?.produtos.map(p => p.categoria) || [])];
   const produtosFiltrados = categoria === 'todas'

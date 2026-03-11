@@ -1,7 +1,8 @@
 // src/pages/Dashboard.tsx
 // ALSHAM 360° PRIMA v10 SUPREMO — Dashboard (migrado para shadcn/ui)
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp, TrendingDown, Target, Rocket, Zap, Brain, Clock,
@@ -12,8 +13,10 @@ import {
   LineElement, BarElement, Title, Tooltip, Legend, Filler, ArcElement
 } from "chart.js";
 import { Line, Doughnut } from "react-chartjs-2";
-import { getSupabaseClient } from "../lib/supabase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/lib/supabase/client";
+import { useAuthStore } from "@/lib/supabase/useAuthStore";
+import { PageSkeleton, ErrorState } from "@/components/PageStates";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -165,48 +168,29 @@ const useKonamiCode = (callback: () => void) => {
 };
 
 export default function DashboardSupremo() {
-  const [loading, setLoading] = useState(true);
   const [timeMode, setTimeMode] = useState<"past" | "present" | "future">("present");
   const [matrixMode, setMatrixMode] = useState(false);
-  const [realData, setRealData] = useState<any>({
-    revenue: 0,
-    leads: 0,
-    deals: 0,
-    activeCampaigns: 0,
-    pipelineData: [],
-    monthlyRevenue: [],
-  });
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  const fetchData = async (mode: "past" | "present" | "future") => {
-    setLoading(true);
-    const supabase = getSupabaseClient();
-
-    try {
+  const { data: realData, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ["dashboard", orgId, timeMode],
+    queryFn: async () => {
       const now = new Date();
       const startDate = new Date();
-      startDate.setDate(now.getDate() - (mode === "past" ? 60 : 30));
+      startDate.setDate(now.getDate() - (timeMode === "past" ? 60 : 30));
       const isoStart = startDate.toISOString();
 
-      // IMPORTANT: não inventar schema.
-      // - opportunities: usa stage/value (status NÃO existe no schema que você enviou).
-      // - campaigns: substitui marketing_campaigns (404).
       const [leadsRes, oppsRes, campaignsRes] = await Promise.all([
         supabase.from("leads_crm").select("created_at").gte("created_at", isoStart),
         supabase.from("opportunities").select("created_at, stage, value").gte("created_at", isoStart),
         supabase.from("campaigns").select("id, status").eq("status", "active"),
       ]);
 
-      // Se alguma tabela não existir ou RLS bloquear, não travar o dashboard.
       const leads = Array.isArray(leadsRes.data) ? leadsRes.data : [];
       const opps = Array.isArray(oppsRes.data) ? oppsRes.data : [];
       const campaigns = Array.isArray(campaignsRes.data) ? campaignsRes.data : [];
 
-      const revenue = opps.reduce((acc: number, curr: any) => {
-        // Sem coluna status: adotamos heurística neutra (não soma por "won").
-        // Receita aqui vira "soma total de value" (ajuste posterior quando definir status no schema).
-        return acc + (Number(curr.value) || 0);
-      }, 0);
-
+      const revenue = opps.reduce((acc: number, curr: any) => acc + (Number(curr.value) || 0), 0);
       const activeDeals = opps.length;
 
       const pipelineStages = opps.reduce((acc: any, curr: any) => {
@@ -227,33 +211,29 @@ export default function DashboardSupremo() {
       let finalLeads = leads.length;
       let chartData = dailyRevenue;
 
-      if (mode === "future") {
+      if (timeMode === "future") {
         const predictedRevenuePoints = predictFuture(dailyRevenue);
         const predictedLeadsPoints = predictFuture(new Array(30).fill(Math.round((leads.length || 1) / 30)));
-
         finalRevenue = predictedRevenuePoints.reduce((a, b) => a + b, 0);
         finalLeads = predictedLeadsPoints.reduce((a, b) => a + b, 0);
         chartData = predictedRevenuePoints;
       }
 
-      setRealData({
+      return {
         revenue: finalRevenue,
         leads: finalLeads,
         deals: activeDeals,
         activeCampaigns: campaigns.length,
         pipelineData: Object.entries(pipelineStages).map(([k, v]) => ({ stage: k, value: v })),
         monthlyRevenue: chartData,
-      });
-    } catch (error) {
-      console.error("Erro ao buscar dados do dashboard:", error);
-    } finally {
-      setTimeout(() => setLoading(false), 400);
-    }
-  };
-
-  useEffect(() => {
-    fetchData(timeMode);
-  }, [timeMode]);
+      };
+    },
+    enabled: !!orgId,
+    initialData: {
+      revenue: 0, leads: 0, deals: 0, activeCampaigns: 0,
+      pipelineData: [], monthlyRevenue: [],
+    },
+  });
 
   const voiceActions = {
     retro: () => setTimeMode("past"),
@@ -269,6 +249,9 @@ export default function DashboardSupremo() {
     setMatrixMode((prev) => !prev);
     alert("SYSTEM OVERRIDE: GOD MODE ENABLED");
   });
+
+  if (loading && !realData.monthlyRevenue.length) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   if (matrixMode) {
     return (

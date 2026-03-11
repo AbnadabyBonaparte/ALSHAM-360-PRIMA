@@ -1,16 +1,16 @@
 // src/pages/Leads.tsx
 // ALSHAM 360° PRIMA — Leads (migrado para shadcn/ui)
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { leadsQueries } from '../lib/supabase/queries/leads'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
-import { LoadingSpinner } from '../components/LoadingSpinner'
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates'
 import type { Lead } from '../lib/supabase/types'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -28,43 +28,23 @@ import {
 } from '@/components/ui/select'
 
 export const Leads: React.FC = () => {
-  const { currentOrg } = useAuthStore()
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const orgId = useAuthStore((s) => s.currentOrgId)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
 
-  useEffect(() => {
-    if (currentOrg) {
-      loadLeads()
-    }
-  }, [currentOrg, searchTerm, statusFilter])
+  const filters: any = {}
+  if (searchTerm) filters.search = searchTerm
+  if (statusFilter && statusFilter.trim()) filters.status = statusFilter
 
-  const loadLeads = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const filters: any = {}
-      if (searchTerm) filters.search = searchTerm
-      if (statusFilter) filters.status = statusFilter
-
+  const { data: leads = [], isLoading, error, refetch } = useQuery<Lead[]>({
+    queryKey: ['leads', orgId, searchTerm, statusFilter],
+    queryFn: async () => {
       const { data, error } = await leadsQueries.getAll(filters)
-
-      if (error) {
-        setError('Erro ao carregar leads')
-        return
-      }
-
-      setLeads(data)
-    } catch (err) {
-      console.error('Error loading leads:', err)
-      setError('Erro ao carregar leads')
-    } finally {
-      setLoading(false)
-    }
-  }
+      if (error) throw error
+      return (data ?? []) as Lead[]
+    },
+    enabled: !!orgId,
+  })
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR')
@@ -100,13 +80,9 @@ export const Leads: React.FC = () => {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
+  if (isLoading) return <PageSkeleton />
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />
+  if (!leads?.length && !searchTerm && !statusFilter) return <EmptyState title="Nenhum lead" description="Comece adicionando seus primeiros leads ao CRM." />
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -229,16 +205,8 @@ export const Leads: React.FC = () => {
           ) : (
             <CardContent className="py-12 text-center">
               <p className="text-[var(--text-secondary)]">
-                {error || 'Nenhum lead encontrado'}
+                Nenhum lead encontrado
               </p>
-              {error && (
-                <Button
-                  onClick={loadLeads}
-                  className="mt-4 bg-[var(--accent-sky)] text-white hover:bg-[var(--accent-sky)]/90"
-                >
-                  Tentar novamente
-                </Button>
-              )}
             </CardContent>
           )}
         </Card>

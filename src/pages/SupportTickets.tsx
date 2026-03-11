@@ -15,8 +15,10 @@ import {
   Flame
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,73 +46,50 @@ interface TicketMetrics {
 }
 
 export default function SupportTicketsPage() {
-  const [metrics, setMetrics] = useState<TicketMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeTickets() {
-      try {
-        const { data: tickets } = await supabase
-          .from('support_tickets')
-          .select('*')
-          .order('data_abertura', { ascending: false });
-
-        if (tickets) {
-          const abertos = tickets.filter((t: any) => ['aberto', 'em_andamento', 'aguardando'].includes(t.status)).length;
-          const temposResposta = tickets.filter((t: any) => t.tempo_resposta).map((t: any) => t.tempo_resposta);
-          const tempoMedio = temposResposta.length > 0
-            ? temposResposta.reduce((s: number, t: number) => s + t!, 0) / temposResposta.length
-            : 0;
-
-          setMetrics({
-            totalTickets: tickets.length,
-            abertos,
-            tempoMedioResposta: tempoMedio,
-            satisfacao: 95,
-            tickets: tickets.map((t: any) => ({
-              id: t.id,
-              numero: t.numero || `#${t.id}`,
-              titulo: t.titulo || 'Ticket',
-              cliente: t.cliente || 'Cliente',
-              prioridade: t.prioridade || 'media',
-              status: t.status || 'aberto',
-              categoria: t.categoria || 'Geral',
-              data_abertura: t.data_abertura || '',
-              tempo_resposta: t.tempo_resposta || null,
-              atendente: t.atendente || null
-            }))
-          });
-        } else {
-          setMetrics({
-            totalTickets: 0,
-            abertos: 0,
-            tempoMedioResposta: 0,
-            satisfacao: 0,
-            tickets: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro nos Tickets Supremos:', err);
-      } finally {
-        setLoading(false);
+  const { data: metrics, isLoading, error, refetch } = useQuery({
+    queryKey: ['support_tickets', orgId],
+    queryFn: async () => {
+      const { data: tickets, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_abertura', { ascending: false });
+      if (error) throw error;
+      if (!tickets || tickets.length === 0) {
+        return { totalTickets: 0, abertos: 0, tempoMedioResposta: 0, satisfacao: 0, tickets: [] } as TicketMetrics;
       }
-    }
+      const abertos = tickets.filter((t: any) => ['aberto', 'em_andamento', 'aguardando'].includes(t.status)).length;
+      const temposResposta = tickets.filter((t: any) => t.tempo_resposta).map((t: any) => t.tempo_resposta);
+      const tempoMedio = temposResposta.length > 0
+        ? temposResposta.reduce((s: number, t: number) => s + t!, 0) / temposResposta.length
+        : 0;
+      return {
+        totalTickets: tickets.length,
+        abertos,
+        tempoMedioResposta: tempoMedio,
+        satisfacao: 95,
+        tickets: tickets.map((t: any) => ({
+          id: t.id,
+          numero: t.numero || `#${t.id}`,
+          titulo: t.titulo || 'Ticket',
+          cliente: t.cliente || 'Cliente',
+          prioridade: t.prioridade || 'media',
+          status: t.status || 'aberto',
+          categoria: t.categoria || 'Geral',
+          data_abertura: t.data_abertura || '',
+          tempo_resposta: t.tempo_resposta || null,
+          atendente: t.atendente || null
+        }))
+      } as TicketMetrics;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeTickets();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Carregando tickets...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.tickets?.length) return <EmptyState title="Nenhum ticket encontrado" />;
 
   const prioridadeConfig: Record<string, { bg: string; text: string }> = {
     baixa: { bg: 'bg-[var(--text-secondary)]/20', text: 'text-[var(--text-secondary)]' },

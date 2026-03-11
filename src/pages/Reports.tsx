@@ -16,9 +16,11 @@ import {
   Filter,
   Trophy
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState } from '@/components/PageStates';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,80 +41,63 @@ interface SupremeReport {
 }
 
 export default function ReportsPage() {
-  const [report, setReport] = useState<SupremeReport | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeIntelligence() {
-      try {
-        const thirtyDaysAgo = subDays(new Date(), 30);
+  const { data: report, isLoading, error, refetch } = useQuery({
+    queryKey: ['reports', orgId],
+    queryFn: async () => {
+      const thirtyDaysAgo = subDays(new Date(), 30);
 
-        const [
-          { data: revenueData },
-          { data: leadsData },
-          { data: opportunities },
-          { data: wonDeals },
-          { data: automations },
-          { data: predictions }
-        ] = await Promise.all([
-          supabase.from('financial_records').select('value').eq('type', 'revenue'),
-          supabase.from('leads').select('id, created_at'),
-          supabase.from('opportunities').select('value, stage, owner_name'),
-          supabase.from('opportunities').select('value, owner_name').eq('stage', 'Ganho'),
-          supabase.from('automation_logs').select('id').gte('created_at', thirtyDaysAgo),
-          supabase.from('ai_predictions').select('accuracy')
-        ]);
+      const [
+        { data: revenueData },
+        { data: leadsData },
+        { data: opportunities },
+        { data: wonDeals },
+        { data: automations },
+        { data: predictions }
+      ] = await Promise.all([
+        supabase.from('financial_records').select('value').eq('type', 'revenue'),
+        supabase.from('leads').select('id, created_at'),
+        supabase.from('opportunities').select('value, stage, owner_name'),
+        supabase.from('opportunities').select('value, owner_name').eq('stage', 'Ganho'),
+        supabase.from('automation_logs').select('id').gte('created_at', thirtyDaysAgo.toISOString()),
+        supabase.from('ai_predictions').select('accuracy')
+      ]);
 
-        const revenue = revenueData?.reduce((s: number, r: any) => s + r.value, 0) || 0;
-        const newLeads = leadsData?.filter((l: any) => new Date(l.created_at) >= thirtyDaysAgo).length || 0;
-        const totalDeals = opportunities?.length || 0;
-        const won = wonDeals?.length || 0;
-        const pipeline = opportunities
-          ?.filter((o: any) => !['Ganho', 'Perdido'].includes(o.stage))
-          .reduce((s: number, o: any) => s + o.value, 0) || 0;
+      const revenue = revenueData?.reduce((s: number, r: any) => s + r.value, 0) || 0;
+      const newLeads = leadsData?.filter((l: any) => new Date(l.created_at) >= thirtyDaysAgo).length || 0;
+      const totalDeals = opportunities?.length || 0;
+      const won = wonDeals?.length || 0;
+      const pipeline = opportunities
+        ?.filter((o: any) => !['Ganho', 'Perdido'].includes(o.stage))
+        .reduce((s: number, o: any) => s + o.value, 0) || 0;
 
-        const topPerformer = wonDeals
-          ?.reduce((acc: any, curr: any) => {
-            const current = wonDeals.filter((d: any) => d.owner_name === curr.owner_name);
-            return current.length > acc.count ? { name: curr.owner_name, count: current.length } : acc;
-          }, { name: 'Nenhum', count: 0 });
+      const topPerformer = wonDeals
+        ?.reduce((acc: any, curr: any) => {
+          const current = wonDeals.filter((d: any) => d.owner_name === curr.owner_name);
+          return current.length > acc.count ? { name: curr.owner_name, count: current.length } : acc;
+        }, { name: 'Nenhum', count: 0 });
 
-        setReport({
-          totalRevenue: revenue,
-          monthlyRecurring: revenue * 1.15, // projeção
-          newLeads,
-          conversionRate: totalDeals ? Math.round((won / totalDeals) * 100) : 0,
-          avgDealSize: won ? Math.round(revenue / won) : 0,
-          winRate: totalDeals ? Math.round((won / totalDeals) * 100) : 0,
-          pipelineValue: pipeline,
-          forecastNext30: pipeline * 1.3,
-          topPerformer: topPerformer.name,
-          topPerformerPoints: topPerformer.count * 1000,
-          activeAutomations: automations?.length || 0,
-          aiPredictionsAccuracy: predictions?.[0]?.accuracy || 94.7
-        });
-      } catch (err) {
-        console.error('Erro no Relatório Supremo:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+      return {
+        totalRevenue: revenue,
+        monthlyRecurring: revenue * 1.15,
+        newLeads,
+        conversionRate: totalDeals ? Math.round((won / totalDeals) * 100) : 0,
+        avgDealSize: won ? Math.round(revenue / won) : 0,
+        winRate: totalDeals ? Math.round((won / totalDeals) * 100) : 0,
+        pipelineValue: pipeline,
+        forecastNext30: pipeline * 1.3,
+        topPerformer: topPerformer.name,
+        topPerformerPoints: topPerformer.count * 1000,
+        activeAutomations: automations?.length || 0,
+        aiPredictionsAccuracy: predictions?.[0]?.accuracy || 94.7
+      } as SupremeReport;
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeIntelligence();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-12 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-5xl text-[var(--accent-sky)] font-light">Sistema ALSHAM calculando seu império...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">

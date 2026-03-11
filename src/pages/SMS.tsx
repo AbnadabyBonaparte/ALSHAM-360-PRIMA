@@ -15,8 +15,10 @@ import {
   BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -43,71 +45,58 @@ interface SMSMetrics {
 }
 
 export default function SMSPage() {
-  const [metrics, setMetrics] = useState<SMSMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeSMS() {
-      try {
-        const { data: campanhas } = await supabase
-          .from('sms_campaigns')
-          .select('*')
-          .order('data_envio', { ascending: false });
+  const { data: metrics, isLoading, error, refetch } = useQuery<SMSMetrics>({
+    queryKey: ['sms-campaigns', orgId],
+    queryFn: async () => {
+      const { data: campanhas, error } = await supabase
+        .from('sms_campaigns')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('data_envio', { ascending: false });
 
-        if (campanhas) {
-          const totalEnviados = campanhas.reduce((s: number, c: any) => s + (c.enviados || 0), 0);
-          const totalEntregues = campanhas.reduce((s: number, c: any) => s + (c.entregues || 0), 0);
-          const totalCliques = campanhas.reduce((s: number, c: any) => s + (c.cliques || 0), 0);
-          const custoTotal = campanhas.reduce((s: number, c: any) => s + (c.custo || 0), 0);
+      if (error) throw error;
 
-          setMetrics({
-            totalEnviados,
-            taxaEntrega: totalEnviados > 0 ? (totalEntregues / totalEnviados) * 100 : 0,
-            taxaCliques: totalEntregues > 0 ? (totalCliques / totalEntregues) * 100 : 0,
-            custoTotal,
-            campanhas: campanhas.map((c: any) => ({
-              id: c.id,
-              nome: c.nome || 'Campanha SMS',
-              mensagem: c.mensagem || '',
-              enviados: c.enviados || 0,
-              entregues: c.entregues || 0,
-              cliques: c.cliques || 0,
-              status: c.status || 'rascunho',
-              data_envio: c.data_envio || '',
-              custo: c.custo || 0
-            }))
-          });
-        } else {
-          setMetrics({
-            totalEnviados: 0,
-            taxaEntrega: 0,
-            taxaCliques: 0,
-            custoTotal: 0,
-            campanhas: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no SMS Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (campanhas) {
+        const totalEnviados = campanhas.reduce((s: number, c: any) => s + (c.enviados || 0), 0);
+        const totalEntregues = campanhas.reduce((s: number, c: any) => s + (c.entregues || 0), 0);
+        const totalCliques = campanhas.reduce((s: number, c: any) => s + (c.cliques || 0), 0);
+        const custoTotal = campanhas.reduce((s: number, c: any) => s + (c.custo || 0), 0);
+
+        return {
+          totalEnviados,
+          taxaEntrega: totalEnviados > 0 ? (totalEntregues / totalEnviados) * 100 : 0,
+          taxaCliques: totalEntregues > 0 ? (totalCliques / totalEntregues) * 100 : 0,
+          custoTotal,
+          campanhas: campanhas.map((c: any) => ({
+            id: c.id,
+            nome: c.nome || 'Campanha SMS',
+            mensagem: c.mensagem || '',
+            enviados: c.enviados || 0,
+            entregues: c.entregues || 0,
+            cliques: c.cliques || 0,
+            status: c.status || 'rascunho',
+            data_envio: c.data_envio || '',
+            custo: c.custo || 0
+          }))
+        };
       }
-    }
 
-    loadSupremeSMS();
-  }, []);
+      return {
+        totalEnviados: 0,
+        taxaEntrega: 0,
+        taxaCliques: 0,
+        custoTotal: 0,
+        campanhas: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-purple)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-purple)] font-light">Carregando SMS...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.campanhas.length) return <EmptyState title="Nenhuma campanha SMS encontrada" />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">

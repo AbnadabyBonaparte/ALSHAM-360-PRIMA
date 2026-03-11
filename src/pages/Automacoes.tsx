@@ -2,8 +2,11 @@
 // ALSHAM 360° PRIMA — Automação Omnichannel (migrado para shadcn/ui)
 
 import { Zap, Play, Pause, Plus } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,41 +23,42 @@ interface Automation {
 }
 
 export default function AutomacoesPage() {
-  const [automations, setAutomations] = useState<Automation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function loadAutomations() {
+  const { data: automations = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['automation_rules', orgId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('automation_rules')
         .select('id, name, trigger, actions, status, executions, last_run, success_rate')
+        .eq('org_id', orgId!)
         .order('executions', { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Automation[];
+    },
+    enabled: !!orgId,
+  });
 
-      if (!error && data) {
-        setAutomations(data);
-      }
-      setLoading(false);
-    }
-    loadAutomations();
-
-    // Realtime — se alguém disparar uma automação, atualiza na hora
+  useEffect(() => {
     const channel = supabase
       .channel('automations-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'automation_rules' }, () => {
-        loadAutomations();
+        queryClient.invalidateQueries({ queryKey: ['automation_rules', orgId] });
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [orgId, queryClient]);
 
   const toggleStatus = async (id: string, current: string) => {
     await supabase
       .from('automation_rules')
       .update({ status: current === 'active' ? 'paused' : 'active' })
       .eq('id', id);
+    queryClient.invalidateQueries({ queryKey: ['automation_rules', orgId] });
   };
 
   const getStatusVariant = (status: string) => {
@@ -104,10 +108,10 @@ export default function AutomacoesPage() {
           </Button>
         </div>
 
-        {loading ? (
-          <div className="text-center py-32">
-            <div className="inline-block animate-spin w-24 h-24 border-8 border-[var(--accent-warning)] border-t-transparent rounded-full"></div>
-          </div>
+        {isLoading ? (
+          <PageSkeleton />
+        ) : error ? (
+          <ErrorState message={(error as Error).message} onRetry={refetch} />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             {automations.map(auto => {
@@ -173,7 +177,7 @@ export default function AutomacoesPage() {
         )}
 
         {/* Se não tiver nenhuma automação */}
-        {automations.length === 0 && !loading && (
+        {automations.length === 0 && !isLoading && (
           <div className="text-center py-32">
             <Zap className="w-32 h-32 text-[var(--text-secondary)] mx-auto mb-8" />
             <p className="text-4xl text-[var(--text-secondary)] font-light">Nenhuma automação ativa</p>

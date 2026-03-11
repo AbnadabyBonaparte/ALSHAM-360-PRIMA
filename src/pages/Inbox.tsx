@@ -14,9 +14,12 @@ import {
   Search,
   Paperclip
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState } from '@/components/PageStates';
+import { useEffect, useState, useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,63 +42,57 @@ interface Message {
 }
 
 export default function InboxPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [filtered, setFiltered] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'unread' | 'high' | 'whatsapp'>('all');
 
-  useEffect(() => {
-    async function loadSupremeInbox() {
+  const { data: messages = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['inbox', orgId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('messages')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
+      if (error) throw error;
+      return (data ?? []) as Message[];
+    },
+    enabled: !!orgId,
+  });
 
-      if (!error && data) {
-        setMessages(data);
-        setFiltered(data);
-      }
-      setLoading(false);
-    }
-
-    loadSupremeInbox();
-
-    // Realtime total
+  useEffect(() => {
     const channel = supabase
       .channel('inbox-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
-        loadSupremeInbox();
+        refetch();
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [refetch]);
 
-  // Filtro + busca
-  useEffect(() => {
-    let filtered = messages;
-
-    if (filter === 'unread') filtered = filtered.filter(m => !m.read);
-    if (filter === 'high') filtered = filtered.filter(m => m.priority === 'high');
-    if (filter === 'whatsapp') filtered = filtered.filter(m => m.channel === 'whatsapp');
-
+  const filtered = useMemo(() => {
+    let result = messages;
+    if (filter === 'unread') result = result.filter(m => !m.read);
+    if (filter === 'high') result = result.filter(m => m.priority === 'high');
+    if (filter === 'whatsapp') result = result.filter(m => m.channel === 'whatsapp');
     if (search) {
-      filtered = filtered.filter(m =>
+      result = result.filter(m =>
         m.from.toLowerCase().includes(search.toLowerCase()) ||
         m.subject.toLowerCase().includes(search.toLowerCase()) ||
         m.body.toLowerCase().includes(search.toLowerCase())
       );
     }
-
-    setFiltered(filtered);
+    return result;
   }, [messages, filter, search]);
 
   const unreadCount = messages.filter(m => !m.read).length;
   const highPriorityCount = messages.filter(m => m.priority === 'high').length;
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   const getChannelIcon = (channel: string) => {
     switch (channel) {
@@ -179,13 +176,7 @@ export default function InboxPage() {
 
       {/* MENSAGENS */}
       <div className="p-8 max-w-7xl mx-auto">
-        {loading ? (
-          <div className="space-y-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-[var(--surface)]/5 rounded-3xl h-40 animate-pulse" />
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="text-center py-40">
             <Inbox className="w-40 h-40 text-[var(--text-secondary)] mx-auto mb-12" />
             <p className="text-5xl text-[var(--text-secondary)] font-light">

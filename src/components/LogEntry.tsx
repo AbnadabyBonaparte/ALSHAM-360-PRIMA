@@ -5,9 +5,9 @@ interface LogEntryProps {
 
 export default function LogEntry({ message, type = "info" }: LogEntryProps) {
   const colors = {
-    info: "text-blue-400",
-    success: "text-emerald-400",
-    error: "text-red-400",
+    info: "text-[var(--accent-sky)]",
+    success: "text-[var(--accent-emerald)]",
+    error: "text-[var(--accent-alert)]",
   };
 
   return (

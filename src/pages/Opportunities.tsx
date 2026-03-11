@@ -1,10 +1,11 @@
 // src/pages/Opportunities.tsx
 // ALSHAM 360° PRIMA — Opportunities (migrado para shadcn/ui)
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { opportunitiesQueries } from '../lib/supabase/queries/opportunities'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
-import { LoadingSpinner } from '../components/LoadingSpinner'
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates'
 import type { Opportunity } from '../lib/supabase/types'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,37 +20,17 @@ import {
 } from '@/components/ui/table'
 
 export const Opportunities: React.FC = () => {
-  const { currentOrg } = useAuthStore()
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const orgId = useAuthStore((s) => s.currentOrgId)
 
-  useEffect(() => {
-    if (currentOrg) {
-      loadOpportunities()
-    }
-  }, [currentOrg])
-
-  const loadOpportunities = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
+  const { data: opportunities = [], isLoading, error, refetch } = useQuery<Opportunity[]>({
+    queryKey: ['opportunities', orgId],
+    queryFn: async () => {
       const { data, error } = await opportunitiesQueries.getAll()
-
-      if (error) {
-        setError('Erro ao carregar oportunidades')
-        return
-      }
-
-      setOpportunities(data)
-    } catch (err) {
-      console.error('Error loading opportunities:', err)
-      setError('Erro ao carregar oportunidades')
-    } finally {
-      setLoading(false)
-    }
-  }
+      if (error) throw error
+      return (data ?? []) as Opportunity[]
+    },
+    enabled: !!orgId,
+  })
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -81,13 +62,9 @@ export const Opportunities: React.FC = () => {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
+  if (isLoading) return <PageSkeleton />
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />
+  if (!opportunities?.length) return <EmptyState title="Nenhuma oportunidade" description="Adicione oportunidades ao seu pipeline de vendas." />
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -162,16 +139,8 @@ export const Opportunities: React.FC = () => {
           ) : (
             <CardContent className="py-12 text-center">
               <p className="text-[var(--text-secondary)]">
-                {error || 'Nenhuma oportunidade encontrada'}
+                Nenhuma oportunidade encontrada
               </p>
-              {error && (
-                <Button
-                  onClick={loadOpportunities}
-                  className="mt-4 bg-[var(--accent-sky)] hover:bg-[var(--accent-sky)]/90 text-[var(--text-primary)]"
-                >
-                  Tentar novamente
-                </Button>
-              )}
             </CardContent>
           )}
         </Card>

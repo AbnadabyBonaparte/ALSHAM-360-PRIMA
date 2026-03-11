@@ -15,8 +15,10 @@ import {
   Heart
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,80 +46,70 @@ interface ChatMetrics {
 }
 
 export default function LiveChatPage() {
-  const [metrics, setMetrics] = useState<ChatMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeChat() {
-      try {
-        const { data: chats } = await supabase
-          .from('live_chats')
-          .select('*')
-          .order('inicio', { ascending: false });
+  const { data: metrics, isLoading, error, refetch } = useQuery<ChatMetrics>({
+    queryKey: ['live-chats', orgId],
+    queryFn: async () => {
+      const { data: chats, error: e1 } = await supabase
+        .from('live_chats')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('inicio', { ascending: false });
 
-        const { data: atendentes } = await supabase
-          .from('atendentes')
-          .select('id')
-          .eq('status', 'online');
+      if (e1) throw e1;
 
-        if (chats) {
-          const ativos = chats.filter((c: any) => c.status === 'ativo');
-          const naFila = chats.filter((c: any) => c.status === 'na_fila');
-          const encerrados = chats.filter((c: any) => c.status === 'encerrado' && c.satisfacao);
-          const satisfacaoMedia = encerrados.length > 0
-            ? encerrados.reduce((s: number, c: any) => s + c.satisfacao, 0) / encerrados.length
-            : 0;
+      const { data: atendentes, error: e2 } = await supabase
+        .from('atendentes')
+        .select('id')
+        .eq('org_id', orgId!)
+        .eq('status', 'online');
 
-          setMetrics({
-            atendentesOnline: atendentes?.length || 0,
-            chatsAtivos: ativos.length,
-            naFila: naFila.length,
-            tempoMedioEspera: 2,
-            satisfacaoMedia: satisfacaoMedia * 20,
-            chats: chats.slice(0, 20).map((c: any) => ({
-              id: c.id,
-              visitante: c.visitante || 'Visitante',
-              atendente: c.atendente || null,
-              status: c.status || 'na_fila',
-              mensagens: c.mensagens || 0,
-              inicio: c.inicio || '',
-              duracao: c.duracao || 0,
-              satisfacao: c.satisfacao || null,
-              pagina_origem: c.pagina_origem || '/'
-            }))
-          });
-        } else {
-          setMetrics({
-            atendentesOnline: 0,
-            chatsAtivos: 0,
-            naFila: 0,
-            tempoMedioEspera: 0,
-            satisfacaoMedia: 0,
-            chats: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Live Chat Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (e2) throw e2;
+
+      if (chats) {
+        const ativos = chats.filter((c: any) => c.status === 'ativo');
+        const naFila = chats.filter((c: any) => c.status === 'na_fila');
+        const encerrados = chats.filter((c: any) => c.status === 'encerrado' && c.satisfacao);
+        const satisfacaoMedia = encerrados.length > 0
+          ? encerrados.reduce((s: number, c: any) => s + c.satisfacao, 0) / encerrados.length
+          : 0;
+
+        return {
+          atendentesOnline: atendentes?.length || 0,
+          chatsAtivos: ativos.length,
+          naFila: naFila.length,
+          tempoMedioEspera: 2,
+          satisfacaoMedia: satisfacaoMedia * 20,
+          chats: chats.slice(0, 20).map((c: any) => ({
+            id: c.id,
+            visitante: c.visitante || 'Visitante',
+            atendente: c.atendente || null,
+            status: c.status || 'na_fila',
+            mensagens: c.mensagens || 0,
+            inicio: c.inicio || '',
+            duracao: c.duracao || 0,
+            satisfacao: c.satisfacao || null,
+            pagina_origem: c.pagina_origem || '/'
+          }))
+        };
       }
-    }
 
-    loadSupremeChat();
-  }, []);
+      return {
+        atendentesOnline: 0,
+        chatsAtivos: 0,
+        naFila: 0,
+        tempoMedioEspera: 0,
+        satisfacaoMedia: 0,
+        chats: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-emerald)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-emerald)] font-light">Conectando ao chat...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.chats.length) return <EmptyState title="Nenhuma conversa de chat encontrada" />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">

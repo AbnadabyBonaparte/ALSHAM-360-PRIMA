@@ -2,13 +2,16 @@
 // ALSHAM 360° PRIMA — LANDING PAGES SUPREMAS (VERSÃO CANÔNICA 1000/1000)
 // Totalmente integrada ao layout global • 100% variáveis de tema • Realtime • Métricas vivas
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Globe, Rocket, Eye, UserPlus,
   TrendingUp, Sparkles
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import toast from 'react-hot-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,79 +40,74 @@ interface LPMetrics {
 }
 
 export default function LandingPagesPage() {
-  const [metrics, setMetrics] = useState<LPMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
+
+  const { data: metrics, isLoading, error, refetch } = useQuery<LPMetrics>({
+    queryKey: ['landing-pages', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('landing_pages')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('visualizacoes', { ascending: false });
+
+      if (error) throw error;
+
+      if (data) {
+        const totalViews = data.reduce((s, l) => s + (l.visualizacoes || 0), 0);
+        const totalConv = data.reduce((s, l) => s + (l.conversoes || 0), 0);
+
+        const processed = data.map(l => ({
+          id: l.id,
+          nome: l.nome || 'LP sem nome',
+          url: l.url || '',
+          status: l.status || 'rascunho',
+          visualizacoes: l.visualizacoes || 0,
+          conversoes: l.conversoes || 0,
+          taxa_conversao: l.visualizacoes > 0 ? ((l.conversoes || 0) / l.visualizacoes) * 100 : 0,
+          leads_gerados: l.leads_gerados || 0,
+          campanha: l.campanha || '',
+          data_criacao: l.data_criacao || ''
+        }));
+
+        return {
+          totalLPs: data.length,
+          ativas: data.filter(l => l.status === 'ativa').length,
+          totalVisualizacoes: totalViews,
+          totalConversoes: totalConv,
+          taxaMediaConversao: totalViews > 0 ? (totalConv / totalViews) * 100 : 0,
+          landingPages: processed
+        };
+      }
+
+      return {
+        totalLPs: 0,
+        ativas: 0,
+        totalVisualizacoes: 0,
+        totalConversoes: 0,
+        taxaMediaConversao: 0,
+        landingPages: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
   useEffect(() => {
-    const loadLPs = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('landing_pages')
-          .select('*')
-          .order('visualizacoes', { ascending: false });
+    if (!orgId) return;
 
-        if (error) throw error;
-
-        if (data) {
-          const totalViews = data.reduce((s, l) => s + (l.visualizacoes || 0), 0);
-          const totalConv = data.reduce((s, l) => s + (l.conversoes || 0), 0);
-
-          const processed = data.map(l => ({
-            id: l.id,
-            nome: l.nome || 'LP sem nome',
-            url: l.url || '',
-            status: l.status || 'rascunho',
-            visualizacoes: l.visualizacoes || 0,
-            conversoes: l.conversoes || 0,
-            taxa_conversao: l.visualizacoes > 0 ? ((l.conversoes || 0) / l.visualizacoes) * 100 : 0,
-            leads_gerados: l.leads_gerados || 0,
-            campanha: l.campanha || '',
-            data_criacao: l.data_criacao || ''
-          }));
-
-          setMetrics({
-            totalLPs: data.length,
-            ativas: data.filter(l => l.status === 'ativa').length,
-            totalVisualizacoes: totalViews,
-            totalConversoes: totalConv,
-            taxaMediaConversao: totalViews > 0 ? (totalConv / totalViews) * 100 : 0,
-            landingPages: processed
-          });
-        }
-      } catch (err) {
-        console.error('Erro ao carregar Landing Pages:', err);
-        toast.error('Falha ao carregar o arsenal de LPs');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadLPs();
-
-    // Realtime (opcional — novo LP ou update)
     const channel = supabase
       .channel('lps-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'landing_pages' }, loadLPs)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'landing_pages' }, () => {
+        refetch();
+      })
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
-  }, []);
+    return () => { supabase.removeChannel(channel); };
+  }, [orgId, refetch]);
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-[var(--background)]">
-        <div className="text-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-24 h-24 border-8 border-t-transparent border-[var(--accent-1)] rounded-full mx-auto mb-8"
-          />
-          <p className="text-3xl font-black text-[var(--text)]">CARREGANDO O ARSENAL SUPREMO...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.landingPages.length) return <EmptyState title="Nenhuma landing page cadastrada" />;
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--background)] overflow-hidden">

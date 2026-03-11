@@ -14,9 +14,11 @@ import {
   AlertTriangle,
   Plus
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { format, isToday, isPast, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent } from '@/components/ui/card';
@@ -38,36 +40,36 @@ interface Task {
 }
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeTasks() {
+  const { data: tasks = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['tasks', orgId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
         .order('due_date', { ascending: true });
+      if (error) throw error;
+      return (data ?? []).map((t: any): Task => ({
+        id: t.id,
+        title: t.title || 'Tarefa sem nome',
+        description: t.description,
+        status: t.completed_at ? 'done' : isPast(new Date(t.due_date)) ? 'overdue' : 'todo',
+        priority: t.priority || 'medium',
+        assignee: t.assignee_name || 'Você',
+        due_date: t.due_date,
+        points: t.points || 100,
+        tags: t.tags || [],
+        completed_at: t.completed_at,
+        created_at: t.created_at
+      }));
+    },
+    enabled: !!orgId,
+  });
 
-      if (!error && data) {
-        setTasks(data.map((t: any) => ({
-          id: t.id,
-          title: t.title || 'Tarefa sem nome',
-          description: t.description,
-          status: t.completed_at ? 'done' : isPast(new Date(t.due_date)) ? 'overdue' : 'todo',
-          priority: t.priority || 'medium',
-          assignee: t.assignee_name || 'Você',
-          due_date: t.due_date,
-          points: t.points || 100,
-          tags: t.tags || [],
-          completed_at: t.completed_at,
-          created_at: t.created_at
-        })));
-      }
-      setLoading(false);
-    }
-
-    loadSupremeTasks();
-  }, []);
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!tasks.length) return <EmptyState title="Nenhuma tarefa" description="Crie suas primeiras tarefas para acompanhar o progresso." />;
 
   const stats = {
     total: tasks.length,

@@ -13,8 +13,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -39,95 +42,71 @@ interface UserStats {
 }
 
 export default function GamificacaoPage() {
-  const [user, setUser] = useState<UserStats | null>(null);
-  const [leaderboard, setLeaderboard] = useState<Player[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeGamification() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user?.email) {
-          setLoading(false);
-          return;
-        }
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['gamificacao', orgId],
+    queryFn: async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser?.email) return { profile: null, allPlayers: [] };
 
-        const { data: profile, error: profileError } = await supabase
-          .from('gamificacao_usuarios')
-          .select('*')
-          .eq('email', user.email)
-          .single();
+      const { data: profile, error: profileError } = await supabase
+        .from('gamificacao_usuarios')
+        .select('*')
+        .eq('email', authUser.email)
+        .single();
 
-        // Se a tabela não existe ou há erro, mostra mensagem apropriada
-        if (profileError) {
-          console.warn('Gamificação não configurada:', profileError);
-          setLoading(false);
-          return;
-        }
+      if (profileError) return { profile: null, allPlayers: [] };
 
-        const { data: allPlayers, error: playersError } = await supabase
-          .from('gamificacao_usuarios')
-          .select('name, pontos, streak, nivel, badges, email')
-          .order('pontos', { ascending: false })
-          .limit(10);
+      const { data: allPlayers, error: playersError } = await supabase
+        .from('gamificacao_usuarios')
+        .select('name, pontos, streak, nivel, badges, email')
+        .order('pontos', { ascending: false })
+        .limit(10);
 
-        if (playersError) {
-          console.warn('Erro ao buscar ranking:', playersError);
-          setLoading(false);
-          return;
-        }
+      if (playersError) return { profile, allPlayers: [] };
 
-        if (profile) {
-          const rank = allPlayers?.findIndex((p: any) => p.email === user.email) + 1 || 0;
+      return { profile, allPlayers: allPlayers ?? [], userEmail: authUser.email };
+    },
+    enabled: !!orgId,
+  });
 
-          setUser({
-            points: profile.pontos || 0,
-            level: profile.nivel || 1,
-            streak: profile.streak || 0,
-            badges: profile.badges || 0,
-            rank,
-            nextLevelPoints: profile.nivel * 500,
-            weeklyProgress: profile.progresso_semanal || [0,0,0,0,0,0,0]
-          });
+  const { user, leaderboard } = useMemo(() => {
+    if (!data?.profile) return { user: null, leaderboard: [] };
 
-          setLeaderboard(allPlayers?.map((p: any, i: number) => {
-            const next = allPlayers?.[i + 1];
-            const trend = next
-              ? (p.pontos >= next.pontos ? 'up' : 'down')
-              : 'same';
-            return {
-              rank: i + 1,
-              name: p.name,
-              level: p.nivel,
-              points: p.pontos,
-              streak: p.streak,
-              badges: p.badges,
-              trend
-            };
-          }) || []);
-        }
-      } catch (err) {
-        console.error('Erro ao carregar gamificação:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    const rank = data.allPlayers?.findIndex((p: any) => p.email === data.userEmail) + 1 || 0;
 
-    loadSupremeGamification();
-  }, []);
+    const userStats: UserStats = {
+      points: data.profile.pontos || 0,
+      level: data.profile.nivel || 1,
+      streak: data.profile.streak || 0,
+      badges: data.profile.badges || 0,
+      rank,
+      nextLevelPoints: data.profile.nivel * 500,
+      weeklyProgress: data.profile.progresso_semanal || [0,0,0,0,0,0,0]
+    };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-warning)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-warning)] font-light">Acendendo o fogo da glória...</p>
-      </div>
-    );
-  }
+    const players: Player[] = data.allPlayers?.map((p: any, i: number) => {
+      const next = data.allPlayers?.[i + 1];
+      const trend = next
+        ? (p.pontos >= next.pontos ? 'up' : 'down')
+        : 'same';
+      return {
+        rank: i + 1,
+        name: p.name,
+        level: p.nivel,
+        points: p.pontos,
+        streak: p.streak,
+        badges: p.badges,
+        trend
+      };
+    }) || [];
+
+    return { user: userStats, leaderboard: players };
+  }, [data]);
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
 
   if (!user) {
     return (
@@ -138,7 +117,7 @@ export default function GamificacaoPage() {
     );
   }
 
-  const levelProgress = (user.points % 500) / 5; // 500 pontos por nível
+  const levelProgress = (user.points % 500) / 5;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">

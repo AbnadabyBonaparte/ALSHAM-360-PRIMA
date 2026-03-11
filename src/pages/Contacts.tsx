@@ -2,8 +2,11 @@
 // ALSHAM 360° PRIMA — Contatos (migrado para shadcn/ui)
 
 import { Users, Phone, Mail, Building2, Sparkles, Clock, Star } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,27 +27,29 @@ interface Contact {
 }
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
   const [sortBy, setSortBy] = useState<'score' | 'recent' | 'revenue'>('score');
 
-  useEffect(() => {
-    async function loadSupremeContacts() {
+  const { data: contacts = [], isLoading, error, refetch } = useQuery<Contact[]>({
+    queryKey: ['contacts', orgId, sortBy],
+    queryFn: async () => {
+      const col = sortBy === 'score' ? 'score' : sortBy === 'revenue' ? 'revenue_potential' : 'last_contact';
       const { data, error } = await supabase
         .from('contacts')
         .select('id, name, email, phone, company, title, avatar_url, created_at, last_contact, score, tags, revenue_potential')
-        .order(sortBy === 'score' ? 'score' : sortBy === 'revenue' ? 'revenue_potential' : 'last_contact', { ascending: false, nullsLast: true });
-
-      if (!error && data) {
-        setContacts(data);
-      }
-      setLoading(false);
-    }
-    loadSupremeContacts();
-  }, [sortBy]);
+        .order(col as any, { ascending: false, nullsLast: true });
+      if (error) throw error;
+      return (data ?? []) as Contact[];
+    },
+    enabled: !!orgId,
+  });
 
   const totalRevenue = contacts.reduce((sum, c) => sum + (c.revenue_potential || 0), 0);
   const hotContacts = contacts.filter(c => c.score >= 90).length;
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!contacts.length) return <EmptyState title="Nenhum contato" description="Quando o primeiro lead entrar, o sistema vai começar a trabalhar." />;
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -180,18 +185,7 @@ export default function ContactsPage() {
           ))}
         </div>
 
-        {/* Empty State Supremo */}
-        {!loading && contacts.length === 0 && (
-          <div className="text-center py-40">
-            <Users className="w-40 h-40 text-[var(--text-secondary)] mx-auto mb-12 opacity-50" />
-            <h2 className="text-5xl font-bold text-[var(--text-secondary)] mb-8">
-              Nenhum contato ainda
-            </h2>
-            <p className="text-2xl text-[var(--text-secondary)]">
-              Quando o primeiro lead entrar, o sistema vai começar a trabalhar.
-            </p>
-          </div>
-        )}
+        
       </div>
   );
 }

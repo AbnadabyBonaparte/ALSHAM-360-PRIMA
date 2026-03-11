@@ -1,8 +1,8 @@
 // src/pages/Settings.tsx
 // ALSHAM 360° PRIMA — Settings (migrado para shadcn/ui)
 
-import React, { useEffect, useState } from 'react'
-import { useAuthStore } from '../lib/supabase/useAuthStore'
+import React, { useState } from 'react'
+import { useAuthStore } from '@/lib/supabase/useAuthStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'

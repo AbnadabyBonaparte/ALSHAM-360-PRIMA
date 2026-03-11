@@ -18,7 +18,10 @@ import {
   Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface WhatsAppStats {
@@ -33,39 +36,54 @@ interface WhatsAppStats {
 }
 
 export default function WhatsappPage() {
-  const [stats, setStats] = useState<WhatsAppStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeWhatsApp() {
-      setStats({
-        totalMessages: 3847,
-        openRate: 98.7,
+  const { data: stats, isLoading, error, refetch } = useQuery<WhatsAppStats>({
+    queryKey: ['whatsapp-stats', orgId],
+    queryFn: async () => {
+      const { data: conversations, error: e1 } = await supabase
+        .from('whatsapp_conversations')
+        .select('*')
+        .eq('org_id', orgId!);
+
+      if (e1) throw e1;
+
+      const { data: campaigns, error: e2 } = await supabase
+        .from('whatsapp_campaigns')
+        .select('*')
+        .eq('org_id', orgId!)
+        .eq('status', 'ativa');
+
+      if (e2) throw e2;
+
+      const totalMessages = conversations?.reduce((s, c) => s + (c.total_mensagens || 0), 0) || 0;
+      const totalOpened = conversations?.reduce((s, c) => s + (c.mensagens_abertas || 0), 0) || 0;
+      const automated = conversations?.filter(c => c.tipo === 'automatizada').length || 0;
+      const revenue = conversations?.reduce((s, c) => s + (c.receita || 0), 0) || 0;
+      const converted = conversations?.filter(c => c.convertido).length || 0;
+      const today = conversations?.filter(c => {
+        const d = new Date(c.created_at);
+        const now = new Date();
+        return d.toDateString() === now.toDateString();
+      }).length || 0;
+
+      return {
+        totalMessages,
+        openRate: totalMessages > 0 ? (totalOpened / totalMessages) * 100 : 0,
         responseTime: 2.4,
-        conversationsToday: 312,
-        automatedResponses: 2891,
-        revenueGenerated: 1874000,
-        activeCampaigns: 12,
-        conversionRate: 34.8
-      });
-      setLoading(false);
-    }
+        conversationsToday: today,
+        automatedResponses: automated,
+        revenueGenerated: revenue,
+        activeCampaigns: campaigns?.length || 0,
+        conversionRate: conversations?.length ? (converted / conversations.length) * 100 : 0
+      };
+    },
+    enabled: !!orgId,
+  });
 
-    loadSupremeWhatsApp();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-12 border-t-transparent border-[var(--accent-emerald)] rounded-full"
-        />
-        <p className="absolute text-5xl text-[var(--accent-emerald)] font-light">WhatsApp Business API conectando...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!stats) return <EmptyState title="Nenhum dado do WhatsApp encontrado" />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">
@@ -79,7 +97,7 @@ export default function WhatsappPage() {
           WHATSAPP BUSINESS
         </h1>
         <p className="text-6xl text-[var(--text-secondary)] mt-12 font-light">
-          {stats?.totalMessages.toLocaleString()} mensagens • {stats?.openRate}% abertura
+          {stats?.totalMessages.toLocaleString()} mensagens • {stats?.openRate.toFixed(1)}% abertura
         </p>
         <p className="text-5xl text-[var(--accent-emerald)] mt-6">
           R$ {stats?.revenueGenerated.toLocaleString('pt-BR')} gerados via WhatsApp
@@ -97,7 +115,7 @@ export default function WhatsappPage() {
         <SupremeWhatsAppCard
           icon={<TrendingUp className="w-16 h-16" />}
           title="Taxa de Abertura"
-          value={`${stats?.openRate}%`}
+          value={`${stats?.openRate.toFixed(1)}%`}
           color="from-[var(--accent-sky)] to-[var(--accent-purple)]"
         />
         <SupremeWhatsAppCard
@@ -118,7 +136,7 @@ export default function WhatsappPage() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-20">
         <MiniCard title="Conversas Hoje" value={stats?.conversationsToday.toString() || '0'} color="emerald" />
         <MiniCard title="Campanhas Ativas" value={stats?.activeCampaigns.toString() || '0'} color="sky" />
-        <MiniCard title="Taxa de Conversão" value={`${stats?.conversionRate}%`} color="purple" />
+        <MiniCard title="Taxa de Conversão" value={`${stats?.conversionRate.toFixed(1)}%`} color="purple" />
         <MiniCard title="Receita via WhatsApp" value={`R$ ${stats?.revenueGenerated.toLocaleString('pt-BR')}`} color="warning" />
       </div>
 

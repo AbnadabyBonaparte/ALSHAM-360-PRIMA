@@ -1,47 +1,28 @@
 // src/pages/Campaigns.tsx
 // ALSHAM 360° PRIMA — Campanhas (migrado para shadcn/ui)
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { campaignsQueries } from '../lib/supabase/queries/campaigns'
 import { useAuthStore } from '../lib/supabase/useAuthStore'
-import { LoadingSpinner } from '../components/LoadingSpinner'
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates'
 import type { Campaign } from '../lib/supabase/types'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 export const Campaigns: React.FC = () => {
-  const { currentOrg } = useAuthStore()
-  const [campaigns, setCampaigns] = useState<Campaign[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const orgId = useAuthStore((s) => s.currentOrgId)
 
-  useEffect(() => {
-    if (currentOrg) {
-      loadCampaigns()
-    }
-  }, [currentOrg])
-
-  const loadCampaigns = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
+  const { data: campaigns = [], isLoading, error, refetch } = useQuery<Campaign[]>({
+    queryKey: ['campaigns', orgId],
+    queryFn: async () => {
       const { data, error } = await campaignsQueries.getAll()
-
-      if (error) {
-        setError('Erro ao carregar campanhas')
-        return
-      }
-
-      setCampaigns(data)
-    } catch (err) {
-      console.error('Error loading campaigns:', err)
-      setError('Erro ao carregar campanhas')
-    } finally {
-      setLoading(false)
-    }
-  }
+      if (error) throw error
+      return (data ?? []) as Campaign[]
+    },
+    enabled: !!orgId,
+  })
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -69,13 +50,9 @@ export const Campaigns: React.FC = () => {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
+  if (isLoading) return <PageSkeleton />
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />
+  if (!campaigns?.length) return <EmptyState title="Nenhuma campanha" description="Crie sua primeira campanha de marketing." />
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -162,16 +139,8 @@ export const Campaigns: React.FC = () => {
               <Card className="border-[var(--border)]/40 bg-[var(--surface)]/70">
                 <CardContent className="py-12 text-center">
                   <p className="text-[var(--text-secondary)]">
-                    {error || 'Nenhuma campanha encontrada'}
+                    Nenhuma campanha encontrada
                   </p>
-                  {error && (
-                    <Button
-                      onClick={loadCampaigns}
-                      className="mt-4 bg-[var(--accent-sky)] hover:bg-[var(--accent-sky)]/90 text-[var(--text-primary)]"
-                    >
-                      Tentar novamente
-                    </Button>
-                  )}
                 </CardContent>
               </Card>
             </div>

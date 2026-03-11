@@ -14,8 +14,10 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/lib/supabase/useAuthStore';
+import { PageSkeleton, ErrorState, EmptyState } from '@/components/PageStates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -41,77 +43,67 @@ interface EmailMetrics {
 }
 
 export default function EmailMarketingPage() {
-  const [metrics, setMetrics] = useState<EmailMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const orgId = useAuthStore((s) => s.currentOrgId);
 
-  useEffect(() => {
-    async function loadSupremeEmails() {
-      try {
-        const { data: campaigns } = await supabase
-          .from('email_campaigns')
-          .select('*')
-          .order('id', { ascending: false });
+  const { data: metrics, isLoading, error, refetch } = useQuery<EmailMetrics>({
+    queryKey: ['email-campaigns', orgId],
+    queryFn: async () => {
+      const { data: campaigns, error: e1 } = await supabase
+        .from('email_campaigns')
+        .select('*')
+        .eq('org_id', orgId!)
+        .order('id', { ascending: false });
 
-        const { data: listas } = await supabase
-          .from('email_listas')
-          .select('id, total_contatos');
+      if (e1) throw e1;
 
-        if (campaigns) {
-          const totalEnviados = campaigns.reduce((s, c) => s + (c.enviados || 0), 0);
-          const totalAbertos = campaigns.reduce((s, c) => s + (c.abertos || 0), 0);
-          const totalCliques = campaigns.reduce((s, c) => s + (c.cliques || 0), 0);
-          const totalContatos = listas?.reduce((s, l) => s + (l.total_contatos || 0), 0) || 0;
+      const { data: listas, error: e2 } = await supabase
+        .from('email_listas')
+        .select('id, total_contatos')
+        .eq('org_id', orgId!);
 
-          setMetrics({
-            totalEnviados,
-            taxaAbertura: totalEnviados > 0 ? (totalAbertos / totalEnviados) * 100 : 0,
-            taxaCliques: totalAbertos > 0 ? (totalCliques / totalAbertos) * 100 : 0,
-            totalListas: listas?.length || 0,
-            totalContatos,
-            campanhas: campaigns.map(c => ({
-              id: c.id,
-              assunto: c.assunto || 'Sem assunto',
-              enviados: c.enviados || 0,
-              abertos: c.abertos || 0,
-              cliques: c.cliques || 0,
-              bounces: c.bounces || 0,
-              unsubscribes: c.unsubscribes || 0,
-              status: c.status || 'rascunho',
-              data_envio: c.data_envio || ''
-            }))
-          });
-        } else {
-          setMetrics({
-            totalEnviados: 0,
-            taxaAbertura: 0,
-            taxaCliques: 0,
-            totalListas: 0,
-            totalContatos: 0,
-            campanhas: []
-          });
-        }
-      } catch (err) {
-        console.error('Erro no Email Marketing Supremo:', err);
-      } finally {
-        setLoading(false);
+      if (e2) throw e2;
+
+      if (campaigns) {
+        const totalEnviados = campaigns.reduce((s, c) => s + (c.enviados || 0), 0);
+        const totalAbertos = campaigns.reduce((s, c) => s + (c.abertos || 0), 0);
+        const totalCliques = campaigns.reduce((s, c) => s + (c.cliques || 0), 0);
+        const totalContatos = listas?.reduce((s, l) => s + (l.total_contatos || 0), 0) || 0;
+
+        return {
+          totalEnviados,
+          taxaAbertura: totalEnviados > 0 ? (totalAbertos / totalEnviados) * 100 : 0,
+          taxaCliques: totalAbertos > 0 ? (totalCliques / totalAbertos) * 100 : 0,
+          totalListas: listas?.length || 0,
+          totalContatos,
+          campanhas: campaigns.map(c => ({
+            id: c.id,
+            assunto: c.assunto || 'Sem assunto',
+            enviados: c.enviados || 0,
+            abertos: c.abertos || 0,
+            cliques: c.cliques || 0,
+            bounces: c.bounces || 0,
+            unsubscribes: c.unsubscribes || 0,
+            status: c.status || 'rascunho',
+            data_envio: c.data_envio || ''
+          }))
+        };
       }
-    }
 
-    loadSupremeEmails();
-  }, []);
+      return {
+        totalEnviados: 0,
+        taxaAbertura: 0,
+        taxaCliques: 0,
+        totalListas: 0,
+        totalContatos: 0,
+        campanhas: []
+      };
+    },
+    enabled: !!orgId,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[var(--background)]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-40 h-40 border-8 border-t-transparent border-[var(--accent-sky)] rounded-full"
-        />
-        <p className="absolute text-4xl text-[var(--accent-sky)] font-light">Preparando disparos...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={(error as Error).message} onRetry={refetch} />;
+  if (!metrics?.campanhas.length) return <EmptyState title="Nenhuma campanha de email encontrada" />;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] p-8">

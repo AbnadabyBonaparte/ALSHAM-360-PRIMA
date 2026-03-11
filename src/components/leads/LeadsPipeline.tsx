@@ -81,7 +81,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`flex-shrink-0 w-80 ${snapshot.isDraggingOver ? 'bg-emerald-500/5 rounded-lg' : ''}`}
+                className={`flex-shrink-0 w-80 ${snapshot.isDraggingOver ? 'bg-[var(--accent-emerald)]/5 rounded-lg' : ''}`}
               >
                 <div className="bg-[var(--surface-strong)] rounded-t-lg p-4 border-b border-[var(--border)]">
                   <div className="flex items-center justify-between mb-2">
@@ -96,7 +96,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
 
                 <button
                   onClick={() => handleAddLead(stage.id)}
-                  className="p-1 hover:bg-white/5 rounded transition-colors"
+                  className="p-1 hover:bg-[var(--surface)]/5 rounded transition-colors"
                   title={`Adicionar lead em ${stage.name}`}
                 >
                   <Plus className="w-4 h-4 text-[var(--text-secondary)]" />
@@ -125,7 +125,7 @@ export default function LeadsPipeline({ stages: initialStages, onLeadMove }: Lea
                     <p className="text-[var(--text-secondary)] mb-2">Nenhum lead nesta etapa</p>
                     <button
                       onClick={() => handleAddLead(stage.id)}
-                      className="w-full px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm hover:bg-emerald-500/20 transition-colors inline-flex items-center justify-center gap-2"
+                      className="w-full px-4 py-2 bg-[var(--accent-emerald)]/10 border border-[var(--accent-emerald)]/30 text-[var(--accent-emerald)] rounded-lg text-sm hover:bg-[var(--accent-emerald)]/20 transition-colors inline-flex items-center justify-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
                       Adicionar primeiro lead
