@@ -20,8 +20,8 @@ const supabaseAnonKey = rawKey || 'placeholder-key'
 const GLOBAL_KEY = '__ALSHAM_SUPABASE_CLIENT__'
 const STORAGE_KEY = 'alsham-360-prima-auth' // importante: único e consistente
 
-function createSingleton(): SupabaseClient<Database> {
-  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+function createSingleton(): SupabaseClient {
+  return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -43,7 +43,7 @@ function createSingleton(): SupabaseClient<Database> {
 }
 
 // ✅ garante 1 instância por navegador (evita warning do GoTrue)
-export const supabase: SupabaseClient<Database> =
+export const supabase: SupabaseClient =
   (globalThis as any)[GLOBAL_KEY] ?? ((globalThis as any)[GLOBAL_KEY] = createSingleton())
 
 // ⚠️ NÃO crie outro createClient aqui. Se precisar de org, use headers por requisição (RPC/edge) ou RLS via JWT.

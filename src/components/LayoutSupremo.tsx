@@ -245,4 +245,3 @@ export default function LayoutSupremo({
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export { SkeletonLoading, SkeletonCard, ErrorState }
-export type { LayoutSupremoProps }

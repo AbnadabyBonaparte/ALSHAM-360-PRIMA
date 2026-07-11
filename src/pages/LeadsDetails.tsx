@@ -56,7 +56,7 @@ interface Lead {
   avatar_url?: string;
 }
 
-export default function LeadsDetailsPage({ leadId }: { leadId: string }) {
+export default function LeadsDetailsPage({ leadId }: { leadId?: string }) {
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);

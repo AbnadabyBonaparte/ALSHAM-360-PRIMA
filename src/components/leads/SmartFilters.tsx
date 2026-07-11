@@ -32,9 +32,10 @@ export default function SmartFilters({ onFilterChange, totalResults }: SmartFilt
     };
 
     // Remover campos 'all'
-    Object.keys(newFilters).forEach(key => {
-      if (newFilters[key] === 'all' || newFilters[key] === undefined) {
-        delete newFilters[key];
+    const mutableFilters = newFilters as Record<string, unknown>;
+    Object.keys(mutableFilters).forEach((key: string) => {
+      if (mutableFilters[key] === 'all' || mutableFilters[key] === undefined) {
+        delete mutableFilters[key];
       }
     });
 

@@ -1,15 +1,43 @@
 // src/services/leads.service.ts
-import { 
-  getLeads, 
-  updateLeadScore, 
-  getTopLeadsByScore,
-  subscribeLeads,
-  createLead,
-  updateLead,
-  deleteLead,
-  getLeadInteractions,
-  bulkImportLeads
-} from '../lib/supabase';
+import { getLeads, subscribeLeads } from '../lib/supabase';
+
+/**
+ * Lead shape used inside the intelligence layer. Combines the persisted
+ * columns this service reads with the AI-enriched fields it derives. Kept
+ * permissive (extra keys allowed) because rows are spread/enriched at runtime.
+ */
+interface ServiceLead {
+  id: string;
+  company?: string | null;
+  position?: string | null;
+  status?: string | null;
+  notes?: string | null;
+  lead_source?: string | null;
+  last_contact?: string | null;
+  next_action_date?: string | null;
+  score_ia?: number;
+  interactions_count?: number;
+  company_size?: number;
+  estimated_budget?: number;
+  ai_conversion_probability?: number;
+  ai_risk_score?: number;
+  [key: string]: unknown;
+}
+
+interface NextActionSuggestion {
+  action: string;
+  priority: string;
+  reason: string;
+  script: string;
+  icon: string;
+  color: string;
+}
+
+interface SentimentResult {
+  score: number;
+  label: string;
+  color: string;
+}
 
 /**
  * 🧠 LEADS SERVICE - CAMADA DE INTELIGÊNCIA
@@ -23,7 +51,9 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🎯 BUSCA INTELIGENTE COM CACHE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async getLeadsIntelligent(filters = {}) {
+  async getLeadsIntelligent(
+    filters: Record<string, unknown> = {}
+  ): Promise<{ success: boolean; data: ServiceLead[]; enriched: ServiceLead[] }> {
     const cacheKey = JSON.stringify(filters);
     
     // Cache hit
@@ -34,14 +64,17 @@ class LeadsService {
       }
     }
 
-    // Buscar do Supabase
-    const result = await getLeads(filters);
-    
+    // Buscar do Supabase (preserva o contrato legado de retorno { success, data })
+    const result = (await getLeads(filters as unknown as string)) as unknown as {
+      success?: boolean;
+      data?: { data?: ServiceLead[] };
+    };
+
     if (!result?.success || !result?.data?.data) {
       return { success: false, data: [], enriched: [] };
     }
 
-    const leads = result.data.data;
+    const leads: ServiceLead[] = result.data.data;
 
     // 🤖 ENRIQUECER COM IA
     const enriched = await this.enrichWithAI(leads);
@@ -58,9 +91,9 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🤖 ENRIQUECIMENTO COM IA
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async enrichWithAI(leads) {
+  async enrichWithAI(leads: ServiceLead[]): Promise<ServiceLead[]> {
     const enrichedLeads = await Promise.all(
-      leads.map(async (lead) => {
+      leads.map(async (lead: ServiceLead) => {
         const aiData = await this.getAIData(lead);
         return {
           ...lead,
@@ -71,7 +104,7 @@ class LeadsService {
     return enrichedLeads;
   }
 
-  async getAIData(lead) {
+  async getAIData(lead: ServiceLead): Promise<Record<string, unknown>> {
     const cacheKey = `ai_${lead.id}`;
     
     if (this.aiCache.has(cacheKey)) {
@@ -113,7 +146,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🎲 PREVISÃO DE CONVERSÃO (ML)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async predictConversion(lead) {
+  async predictConversion(lead: ServiceLead) {
     try {
       // Fatores de conversão
       let score = 50; // Base
@@ -125,16 +158,16 @@ class LeadsService {
       else if (daysSinceLastContact > 30) score -= 20;
 
       // 2. Score atual (+20%)
-      if (lead.score_ia > 80) score += 20;
-      else if (lead.score_ia > 60) score += 10;
+      if ((lead.score_ia ?? 0) > 80) score += 20;
+      else if ((lead.score_ia ?? 0) > 60) score += 10;
 
       // 3. Interações (+15%)
-      if (lead.interactions_count > 10) score += 15;
-      else if (lead.interactions_count > 5) score += 8;
+      if ((lead.interactions_count ?? 0) > 10) score += 15;
+      else if ((lead.interactions_count ?? 0) > 5) score += 8;
 
       // 4. Lead source qualidade (+10%)
       const qualitySources = ['referral', 'partner', 'organic'];
-      if (qualitySources.includes(lead.lead_source?.toLowerCase())) {
+      if (qualitySources.includes(lead.lead_source?.toLowerCase() ?? '')) {
         score += 10;
       }
 
@@ -157,7 +190,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 💡 PRÓXIMA MELHOR AÇÃO (SMART)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async suggestNextAction(lead) {
+  async suggestNextAction(lead: ServiceLead): Promise<NextActionSuggestion> {
     const daysSince = this.getDaysSince(lead.last_contact);
     const conversionProb = await this.predictConversion(lead);
     
@@ -174,7 +207,7 @@ class LeadsService {
     }
 
     // Lead morno + engajado = EMAIL
-    if (conversionProb > 50 && lead.interactions_count > 5) {
+    if (conversionProb > 50 && (lead.interactions_count ?? 0) > 5) {
       return {
         action: 'email',
         priority: 'high',
@@ -223,7 +256,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 😊 ANÁLISE DE SENTIMENTO
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async analyzeSentiment(lead) {
+  async analyzeSentiment(lead: ServiceLead): Promise<SentimentResult> {
     // Palavras-chave de sentimento (simplificado)
     const positiveKeywords = ['interessado', 'gostei', 'perfeito', 'ótimo', 'excelente'];
     const negativeKeywords = ['caro', 'complicado', 'difícil', 'problema', 'não'];
@@ -251,19 +284,21 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 👥 LEADS SIMILARES (COLLABORATIVE FILTERING)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async findSimilarLeads(lead) {
+  async findSimilarLeads(
+    lead: ServiceLead
+  ): Promise<Array<{ lead: ServiceLead; similarity: number }>> {
     try {
       const allLeads = await this.getLeadsIntelligent({});
       if (!allLeads.data) return [];
 
       // Calcular similaridade
-      const similarities = allLeads.data
-        .filter(l => l.id !== lead.id)
-        .map(l => ({
+      const similarities = (allLeads.data as ServiceLead[])
+        .filter((l: ServiceLead) => l.id !== lead.id)
+        .map((l: ServiceLead) => ({
           lead: l,
           similarity: this.calculateSimilarity(lead, l)
         }))
-        .sort((a, b) => b.similarity - a.similarity)
+        .sort((a: { similarity: number }, b: { similarity: number }) => b.similarity - a.similarity)
         .slice(0, 3);
 
       return similarities;
@@ -272,7 +307,7 @@ class LeadsService {
     }
   }
 
-  calculateSimilarity(lead1, lead2) {
+  calculateSimilarity(lead1: ServiceLead, lead2: ServiceLead) {
     let score = 0;
     
     // Mesmo setor
@@ -294,7 +329,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ⚠️ CÁLCULO DE RISCO
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async calculateRisk(lead) {
+  async calculateRisk(lead: ServiceLead) {
     let risk = 0;
 
     // 1. Inatividade
@@ -317,7 +352,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 💚 SCORE DE SAÚDE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  calculateHealthScore(lead, conversionProb, riskScore) {
+  calculateHealthScore(_lead: ServiceLead, conversionProb: number, riskScore: number) {
     const health = conversionProb - riskScore;
     return Math.min(Math.max(health, 0), 100);
   }
@@ -325,7 +360,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🎯 PRIORIDADE AUTOMÁTICA
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  calculatePriority(conversionProb, riskScore) {
+  calculatePriority(conversionProb: number, riskScore: number) {
     if (conversionProb > 70) return 'P0 - Urgente';
     if (conversionProb > 50 && riskScore < 30) return 'P1 - Alta';
     if (riskScore > 60) return 'P2 - Risco Alto';
@@ -335,8 +370,19 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 💡 GERAR INSIGHTS AUTOMÁTICOS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  generateInsights(lead, conversionProb, nextAction, sentiment) {
-    const insights = [];
+  generateInsights(
+    lead: ServiceLead,
+    conversionProb: number,
+    nextAction: NextActionSuggestion,
+    sentiment: SentimentResult
+  ) {
+    const insights: Array<{
+      type: string;
+      icon: string;
+      title: string;
+      message: string;
+      action: string;
+    }> = [];
 
     if (conversionProb > 80) {
       insights.push({
@@ -375,8 +421,8 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🏢 TAXA DE CONVERSÃO POR SETOR
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async getSectorConversionRate(company) {
-    const sectorRates = {
+  async getSectorConversionRate(company: string | null | undefined) {
+    const sectorRates: Record<string, number> = {
       'tecnologia': 45,
       'saas': 50,
       'ecommerce': 35,
@@ -388,7 +434,7 @@ class LeadsService {
     return sectorRates[sector] || sectorRates.default;
   }
 
-  identifySector(company) {
+  identifySector(company: string | null | undefined): string {
     if (!company) return 'default';
     const lower = company.toLowerCase();
     if (lower.includes('tech') || lower.includes('software')) return 'tecnologia';
@@ -400,16 +446,16 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🎯 FIT COM ICP (Ideal Customer Profile)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  calculateICPFit(lead) {
+  calculateICPFit(lead: ServiceLead) {
     let fit = 0;
 
     // Empresa com mais de 50 funcionários
-    if (lead.company_size > 50) fit += 25;
-    else if (lead.company_size > 10) fit += 15;
+    if ((lead.company_size ?? 0) > 50) fit += 25;
+    else if ((lead.company_size ?? 0) > 10) fit += 15;
 
     // Budget adequado
-    if (lead.estimated_budget > 10000) fit += 25;
-    else if (lead.estimated_budget > 5000) fit += 15;
+    if ((lead.estimated_budget ?? 0) > 10000) fit += 25;
+    else if ((lead.estimated_budget ?? 0) > 5000) fit += 15;
 
     // Setor alvo
     const targetSectors = ['tecnologia', 'saas', 'ecommerce'];
@@ -427,7 +473,7 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 📅 UTILITÁRIOS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  getDaysSince(date) {
+  getDaysSince(date: string | null | undefined) {
     if (!date) return 999;
     const diff = Date.now() - new Date(date).getTime();
     return Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -436,8 +482,8 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 🔄 REAL-TIME
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  subscribe(callback) {
-    return subscribeLeads((payload) => {
+  subscribe(callback: (payload: unknown[]) => void) {
+    return subscribeLeads((payload: unknown[]) => {
       // Limpar cache
       this.cache.clear();
       this.aiCache.clear();
@@ -448,32 +494,32 @@ class LeadsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 📊 ANALYTICS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async getAnalytics(leads) {
+  async getAnalytics(leads: ServiceLead[]) {
     const total = leads.length;
-    const qualified = leads.filter(l => (l.score_ia || 0) > 60).length;
-    const hot = leads.filter(l => (l.ai_conversion_probability || 0) > 70).length;
-    const cold = leads.filter(l => (l.ai_conversion_probability || 0) < 30).length;
-    const atRisk = leads.filter(l => (l.ai_risk_score || 0) > 60).length;
+    const qualified = leads.filter((l: ServiceLead) => (l.score_ia || 0) > 60).length;
+    const hot = leads.filter((l: ServiceLead) => (l.ai_conversion_probability || 0) > 70).length;
+    const cold = leads.filter((l: ServiceLead) => (l.ai_conversion_probability || 0) < 30).length;
+    const atRisk = leads.filter((l: ServiceLead) => (l.ai_risk_score || 0) > 60).length;
 
     // Distribuição por fonte
-    const bySource = leads.reduce((acc, lead) => {
+    const bySource = leads.reduce((acc: Record<string, number>, lead: ServiceLead) => {
       const source = lead.lead_source || 'Desconhecida';
       acc[source] = (acc[source] || 0) + 1;
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
     // Distribuição por status
-    const byStatus = leads.reduce((acc, lead) => {
+    const byStatus = leads.reduce((acc: Record<string, number>, lead: ServiceLead) => {
       const status = lead.status || 'novo';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
     // Score médio
-    const avgScore = leads.reduce((sum, l) => sum + (l.score_ia || 0), 0) / total || 0;
-    
+    const avgScore = leads.reduce((sum: number, l: ServiceLead) => sum + (l.score_ia || 0), 0) / total || 0;
+
     // Conversão estimada
-    const avgConversion = leads.reduce((sum, l) => sum + (l.ai_conversion_probability || 0), 0) / total || 0;
+    const avgConversion = leads.reduce((sum: number, l: ServiceLead) => sum + (l.ai_conversion_probability || 0), 0) / total || 0;
 
     return {
       total,

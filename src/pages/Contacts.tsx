@@ -37,7 +37,7 @@ export default function ContactsPage() {
       const { data, error } = await supabase
         .from('contacts')
         .select('id, name, email, phone, company, title, avatar_url, created_at, last_contact, score, tags, revenue_potential')
-        .order(col as any, { ascending: false, nullsLast: true });
+        .order(col as string, { ascending: false, nullsFirst: false });
       if (error) throw error;
       return (data ?? []) as Contact[];
     },

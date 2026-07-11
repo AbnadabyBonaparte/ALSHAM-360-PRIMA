@@ -69,14 +69,14 @@ export const gamificationQueries = {
     reason?: string,
     relatedEntityId?: string
   ) {
-    const insertData: GamificationPointInsert = {
+    const insertData = {
       user_id: userId,
       org_id: orgId,
       points_awarded: pointsAwarded,
       activity_type: activityType,
       reason: reason || null,
       related_entity_id: relatedEntityId || null
-    }
+    } as GamificationPointInsert
 
     const { data, error } = await supabase
       .from('gamification_points')
@@ -258,7 +258,7 @@ export const gamificationQueries = {
 
   // Criar notificação de pontos
   async createPointsNotification(userId: string, points: number, reason: string) {
-    const notification: NotificationInsert = {
+    const notification = {
       user_id: userId,
       type: 'gamification',
       title: 'Pontos conquistados! 🏆',
@@ -277,7 +277,7 @@ export const gamificationQueries = {
 
   // Criar notificação de badge
   async createBadgeNotification(userId: string, badgeName: string, badgeIcon: string) {
-    const notification: NotificationInsert = {
+    const notification = {
       user_id: userId,
       type: 'gamification',
       title: 'Novo badge conquistado! 🎖️',

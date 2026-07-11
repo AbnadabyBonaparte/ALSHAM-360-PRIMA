@@ -10,7 +10,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  type ChartOptions
 } from 'chart.js';
 import { TrendingUp, Zap, Target } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
@@ -203,7 +204,7 @@ export default function PredictiveChart({
       </div>
 
       <div className="h-[300px]">
-        <Line data={data} options={options} />
+        <Line data={data} options={options as ChartOptions<'line'>} />
       </div>
 
       <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-[var(--border)]">

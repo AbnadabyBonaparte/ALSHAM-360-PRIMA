@@ -99,7 +99,7 @@ export function ThemeSwitcher() {
       </div>
 
       {/* Estilo global para animação do gradient (adicione no themes.css ou index.css) */}
-      <style jsx>{`
+      <style>{`
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

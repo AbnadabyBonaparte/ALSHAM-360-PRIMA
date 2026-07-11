@@ -22,12 +22,16 @@ import {
 export const Opportunities: React.FC = () => {
   const orgId = useAuthStore((s) => s.currentOrgId)
 
-  const { data: opportunities = [], isLoading, error, refetch } = useQuery<Opportunity[]>({
+  type OpportunityWithLead = Opportunity & {
+    lead?: { name?: string | null; company?: string | null } | null
+  }
+
+  const { data: opportunities = [], isLoading, error, refetch } = useQuery<OpportunityWithLead[]>({
     queryKey: ['opportunities', orgId],
     queryFn: async () => {
       const { data, error } = await opportunitiesQueries.getAll()
       if (error) throw error
-      return (data ?? []) as Opportunity[]
+      return (data ?? []) as OpportunityWithLead[]
     },
     enabled: !!orgId,
   })

@@ -199,7 +199,7 @@ const HolographicCard = ({ badge }: { badge: Badge }) => {
             rarity={badge.rarity}
             icon={badge.unlocked ? badge.icon : lockedIcon}
             locked={!badge.unlocked}
-            scale="2xl"
+            scale="xxl"
             container="glass"
             state={hovered ? 'hover' : 'default'}
           />

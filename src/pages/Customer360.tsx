@@ -99,7 +99,14 @@ export default function Customer360Real() {
         .eq('lead_id', id)
         .eq('stage', 'Negociação');
 
-      return { leadData, nba, score, interactions, ltvData, pipelineData };
+      return {
+        leadData,
+        nba,
+        score: score as { score?: number } | null,
+        interactions,
+        ltvData: ltvData as { predicted_ltv?: number } | null,
+        pipelineData,
+      };
     },
     enabled: !!id && !!orgId,
   });

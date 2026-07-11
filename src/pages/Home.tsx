@@ -52,7 +52,7 @@ export default function HomePage() {
         { data: revenue },
         { count: users },
         { count: automations },
-        { data: predictions }
+        { count: predictions }
       ] = await Promise.all([
         supabase.from('leads').select('id', { count: 'exact' }),
         supabase.from('opportunities').select('id', { count: 'exact' }).neq('stage', 'Ganho').neq('stage', 'Perdido'),

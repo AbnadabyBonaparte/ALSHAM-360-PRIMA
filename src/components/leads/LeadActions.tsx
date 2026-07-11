@@ -33,7 +33,7 @@ export default function LeadActions({ leads, onImport, onExport, onNewLead }: Le
             const values = lines[i].split(',');
             if (values.length === headers.length) {
               const obj: any = {};
-              headers.forEach((header, index) => {
+              headers.forEach((header: string, index: number) => {
                 obj[header.trim()] = values[index].trim();
               });
               data.push(obj);

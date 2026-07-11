@@ -1,7 +1,7 @@
 // src/hooks/useLeadsAI.ts
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import type { Lead } from '../types';
+import type { Lead } from '../lib/supabase/types';
 
 interface UseLeadsAIResult {
   leads: Lead[];

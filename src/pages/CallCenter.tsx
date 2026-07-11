@@ -232,7 +232,7 @@ export default function CallCenterPage() {
                       </p>
                     </div>
                     {call.gravacao && (
-                      <Mic className="w-5 h-5 text-[var(--accent-purple)]" title="Gravado" />
+                      <Mic className="w-5 h-5 text-[var(--accent-purple)]" aria-label="Gravado" />
                     )}
                     <Badge className={`capitalize ${
                       call.status === 'em_andamento' ? 'bg-[var(--accent-emerald)]/20 text-[var(--accent-emerald)]' :
