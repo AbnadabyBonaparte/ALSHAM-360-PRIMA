@@ -10,8 +10,8 @@
 
 | | Contagem |
 |---|---|
-| Páginas reais registradas (rota + dados) | **41** (19 originais + 10 do LOTE 1 + 12 do LOTE 2) |
-| Itens de menu ainda `placeholder` (a construir) | ~82 |
+| Páginas reais registradas (rota + dados) | **53** (19 originais + 10 do LOTE 1 + 12 do LOTE 2 + 12 do LOTE 3) |
+| Itens de menu ainda `placeholder` (a construir) | ~70 |
 | Arquivos `createSupremePage` (4 linhas, **não conectados** ao router) | 68 |
 | Migration SQL do schema core | `supabase/migrations/0001_core_schema.sql` |
 
@@ -58,6 +58,25 @@
 | `workflows-lista` | `WorkflowsList.tsx` | `automations` |
 | `sequences-de-vendas` | `SalesSequences.tsx` | `automations` (trigger_type=sequence) |
 | `analytics-dashboard` | `AnalyticsDashboard.tsx` | `leads_crm`/`opportunities`/`campaigns` (agregação + recharts) |
+
+## LOTE 3 — concluído neste trabalho (12 páginas reais)
+
+Todas usam tabelas já existentes (nenhuma migration nova foi necessária).
+
+| Rota (id sidebar) | Página | Tabela(s) (filtradas por `org_id`) |
+|---|---|---|
+| `relatorios-personalizados` | `CustomReports.tsx` | `leads_crm`/`opportunities`/`campaigns`/`accounts`/`contacts` (cortes por dimensão) |
+| `forecasting-de-vendas` | `SalesForecasting.tsx` | `opportunities` (valor × probabilidade por mês de fechamento) |
+| `analise-de-roi` | `RoiAnalysis.tsx` | `campaigns` + `opportunities` (receita ganha por `campaign_id`) |
+| `atribuicao-de-marketing` | `MarketingAttribution.tsx` | `leads_crm` (por `source`/`campaign_id`) + `opportunities` + `campaigns` |
+| `cohort-analysis` | `CohortAnalysis.tsx` | `leads_crm` (coortes por mês de `created_at` + conversão) |
+| `executive-reports` | `ExecutiveReports.tsx` | `leads_crm`/`opportunities`/`campaigns`/`accounts` (snapshot executivo) |
+| `analytics-de-gamificacao` | `GamificationAnalytics.tsx` | `gamification_points`/`gamification_badges`/`gamification_rewards` |
+| `equipes-lista` | `TeamsList.tsx` | `user_profiles` (agrupado por `role`) |
+| `calendario` | `CalendarView.tsx` | `opportunities` (`expected_close_date`) + `contacts` (`next_followup`) |
+| `atividades-tarefas` | `ActivitiesTasks.tsx` | `contacts` (`next_followup`/`last_contact`) |
+| `privacidade-de-dados` | `DataPrivacy.tsx` | `leads_crm` (`consent`/`consent_at`/`canal_captura`) |
+| `data-export-import` | `DataExportImport.tsx` | `leads_crm`/`contacts`/`opportunities`/`accounts` (export CSV) |
 
 ## LOTE 2 sugerido (restante, baixo risco — tabela já existe)
 

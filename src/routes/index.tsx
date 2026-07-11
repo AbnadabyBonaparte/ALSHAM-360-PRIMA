@@ -507,6 +507,70 @@ function bootstrapRealRoutes() {
     label: 'Analytics Dashboard',
     aliases: ['analytics'],
   })
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🧩 LOTE 3 — Páginas reais de CRM (dados Supabase filtrados por org_id)
+  // Padrão: docs/PAGE-PATTERN.md (hook useOrgData + PageStates)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  registerRoute('relatorios-personalizados', () => import('../pages/CustomReports'), {
+    label: 'Relatórios Personalizados',
+    aliases: ['custom-reports', 'relatorios'],
+  })
+
+  registerRoute('forecasting-de-vendas', () => import('../pages/SalesForecasting'), {
+    label: 'Forecasting de Vendas',
+    aliases: ['forecasting', 'sales-forecasting'],
+  })
+
+  registerRoute('analise-de-roi', () => import('../pages/RoiAnalysis'), {
+    label: 'Análise de ROI',
+    aliases: ['roi', 'roi-analysis'],
+  })
+
+  registerRoute('atribuicao-de-marketing', () => import('../pages/MarketingAttribution'), {
+    label: 'Atribuição de Marketing',
+    aliases: ['attribution', 'marketing-attribution'],
+  })
+
+  registerRoute('cohort-analysis', () => import('../pages/CohortAnalysis'), {
+    label: 'Cohort Analysis',
+    aliases: ['cohorts', 'coortes'],
+  })
+
+  registerRoute('executive-reports', () => import('../pages/ExecutiveReports'), {
+    label: 'Executive Reports',
+    aliases: ['exec-reports', 'relatorios-executivos'],
+  })
+
+  registerRoute('analytics-de-gamificacao', () => import('../pages/GamificationAnalytics'), {
+    label: 'Analytics de Gamificação',
+    aliases: ['gamification-analytics'],
+  })
+
+  registerRoute('equipes-lista', () => import('../pages/TeamsList'), {
+    label: 'Equipes',
+    aliases: ['equipes', 'teams'],
+  })
+
+  registerRoute('calendario', () => import('../pages/CalendarView'), {
+    label: 'Calendário',
+    aliases: ['calendar', 'agenda'],
+  })
+
+  registerRoute('atividades-tarefas', () => import('../pages/ActivitiesTasks'), {
+    label: 'Atividades / Tarefas',
+    aliases: ['tarefas', 'tasks', 'atividades'],
+  })
+
+  registerRoute('privacidade-de-dados', () => import('../pages/DataPrivacy'), {
+    label: 'Privacidade de Dados',
+    aliases: ['data-privacy', 'privacidade'],
+  })
+
+  registerRoute('data-export-import', () => import('../pages/DataExportImport'), {
+    label: 'Data Export/Import',
+    aliases: ['export-import', 'exportacao'],
+  })
 }
 
 function bootstrapPlaceholderRoutes() {
