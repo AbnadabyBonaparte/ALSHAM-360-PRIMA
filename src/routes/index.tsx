@@ -389,6 +389,60 @@ function bootstrapRealRoutes() {
     label: 'API Status',
     aliases: ['status'],
   })
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🧩 LOTE 1 — Páginas reais de CRM (dados Supabase filtrados por org_id)
+  // Padrão: docs/PAGE-PATTERN.md (hook useOrgData + PageStates)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  registerRoute('contatos-lista', () => import('../pages/ContactsList'), {
+    label: 'Contatos',
+    aliases: ['contatos', 'contacts'],
+  })
+
+  registerRoute('contas-empresas-lista', () => import('../pages/AccountsList'), {
+    label: 'Contas / Empresas',
+    aliases: ['contas', 'accounts'],
+  })
+
+  registerRoute('oportunidades-lista', () => import('../pages/OpportunitiesList'), {
+    label: 'Oportunidades',
+    aliases: ['oportunidades', 'opportunities'],
+  })
+
+  registerRoute('campanhas-lista', () => import('../pages/CampaignsList'), {
+    label: 'Campanhas',
+    aliases: ['campanhas', 'campaigns'],
+  })
+
+  registerRoute('notificacoes', () => import('../pages/NotificationsCenter'), {
+    label: 'Notificações',
+    aliases: ['notifications'],
+  })
+
+  registerRoute('leaderboards', () => import('../pages/Leaderboards'), {
+    label: 'Leaderboards',
+    aliases: ['ranking'],
+  })
+
+  registerRoute('badges-e-conquistas', () => import('../pages/BadgesCatalog'), {
+    label: 'Badges e Conquistas',
+    aliases: ['badges'],
+  })
+
+  registerRoute('usuarios-lista', () => import('../pages/UsersList'), {
+    label: 'Usuários',
+    aliases: ['usuarios', 'users'],
+  })
+
+  registerRoute('funcoes-e-permissoes', () => import('../pages/RolesPermissions'), {
+    label: 'Funções e Permissões',
+    aliases: ['roles', 'permissoes'],
+  })
+
+  registerRoute('ai-insights', () => import('../pages/AIInsights'), {
+    label: 'AI Insights',
+    aliases: ['insights'],
+  })
 }
 
 function bootstrapPlaceholderRoutes() {
