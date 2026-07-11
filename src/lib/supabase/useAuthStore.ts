@@ -164,7 +164,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       const session = data.session
-      const user = session?.user ?? null
+      let user = session?.user ?? null
+
+      // 🔒 Segurança: getSession() apenas decodifica o token do localStorage,
+      // sem validá-lo no servidor. Um token forjado/adulterado na chave
+      // 'alsham-360-prima-auth' faria o app tratar o visitante como autenticado.
+      // getUser() valida o token contra o Auth server do Supabase, exigindo uma
+      // sessão real para liberar as rotas protegidas.
+      if (session && user) {
+        const { data: verified, error: verifyError } = await supabase.auth.getUser()
+        if (verifyError || !verified.user) {
+          // Sessão inválida/forjada/expirada: encerra e limpa o storage.
+          await supabase.auth.signOut().catch(() => {})
+          set({
+            session: null,
+            user: null,
+            organizations: [],
+            currentOrgId: null,
+            currentOrg: null,
+            roleInOrg: null,
+            loading: false,
+            loadingAuth: false,
+            loadingOrgs: false,
+            initialized: true,
+            error: null,
+          })
+          writeOrgToStorage(null)
+          setDerived()
+          return
+        }
+        user = verified.user
+      }
 
       set({
         session,
