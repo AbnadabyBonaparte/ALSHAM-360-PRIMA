@@ -443,6 +443,70 @@ function bootstrapRealRoutes() {
     label: 'AI Insights',
     aliases: ['insights'],
   })
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🧩 LOTE 2 — Páginas reais de CRM (dados Supabase filtrados por org_id)
+  // Padrão: docs/PAGE-PATTERN.md (hook useOrgData + PageStates)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  registerRoute('oportunidades-kanban', () => import('../pages/OpportunitiesKanban'), {
+    label: 'Oportunidades (Kanban)',
+    aliases: ['kanban', 'opportunities-kanban'],
+  })
+
+  registerRoute('campanhas-criar-editar', () => import('../pages/CampaignForm'), {
+    label: 'Criar/Editar Campanha',
+    aliases: ['campanha-form', 'campaign-form'],
+  })
+
+  registerRoute('contatos-detalhes', () => import('../pages/ContactDetails'), {
+    label: 'Detalhes do Contato',
+    aliases: ['contato-detalhes', 'contact-details'],
+  })
+
+  registerRoute('contas-detalhes', () => import('../pages/AccountDetails'), {
+    label: 'Detalhes da Conta',
+    aliases: ['conta-detalhes', 'account-details'],
+  })
+
+  registerRoute('leads-importacao', () => import('../pages/LeadsImport'), {
+    label: 'Importação de Leads',
+    aliases: ['leads-import', 'importacao-leads'],
+  })
+
+  registerRoute('logs-de-auditoria', () => import('../pages/AuditLogs'), {
+    label: 'Logs de Auditoria',
+    aliases: ['audit-log', 'auditoria'],
+  })
+
+  registerRoute('seguranca-avancada', () => import('../pages/SecurityAudit'), {
+    label: 'Segurança Avançada',
+    aliases: ['security', 'seguranca'],
+  })
+
+  registerRoute('rewards-store', () => import('../pages/RewardsStore'), {
+    label: 'Rewards Store',
+    aliases: ['rewards', 'recompensas'],
+  })
+
+  registerRoute('pontuacao-e-niveis', () => import('../pages/PointsAndLevels'), {
+    label: 'Pontuação e Níveis',
+    aliases: ['pontuacao', 'points-levels'],
+  })
+
+  registerRoute('workflows-lista', () => import('../pages/WorkflowsList'), {
+    label: 'Lista de Workflows',
+    aliases: ['workflows', 'automations-list'],
+  })
+
+  registerRoute('sequences-de-vendas', () => import('../pages/SalesSequences'), {
+    label: 'Sequences de Vendas',
+    aliases: ['sequences', 'sales-sequences'],
+  })
+
+  registerRoute('analytics-dashboard', () => import('../pages/AnalyticsDashboard'), {
+    label: 'Analytics Dashboard',
+    aliases: ['analytics'],
+  })
 }
 
 function bootstrapPlaceholderRoutes() {

@@ -10,8 +10,8 @@
 
 | | Contagem |
 |---|---|
-| Páginas reais registradas (rota + dados) | **29** (19 originais + 10 do LOTE 1) |
-| Itens de menu ainda `placeholder` (a construir) | ~94 |
+| Páginas reais registradas (rota + dados) | **41** (19 originais + 10 do LOTE 1 + 12 do LOTE 2) |
+| Itens de menu ainda `placeholder` (a construir) | ~82 |
 | Arquivos `createSupremePage` (4 linhas, **não conectados** ao router) | 68 |
 | Migration SQL do schema core | `supabase/migrations/0001_core_schema.sql` |
 
@@ -42,7 +42,24 @@
 | `funcoes-e-permissoes` | `RolesPermissions.tsx` | `user_roles` |
 | `ai-insights` | `AIInsights.tsx` | `ai_predictions` |
 
-## LOTE 2 sugerido (próximos, baixo risco — tabela já existe)
+## LOTE 2 — concluído neste trabalho (12 páginas reais)
+
+| Rota (id sidebar) | Página | Tabela (filtrada por `org_id`) |
+|---|---|---|
+| `oportunidades-kanban` | `OpportunitiesKanban.tsx` | `opportunities` (agrupado por `stage`) |
+| `campanhas-criar-editar` | `CampaignForm.tsx` | `campaigns` (form insert/update) |
+| `contatos-detalhes` | `ContactDetails.tsx` | `contacts` + `opportunities`/`ai_predictions` |
+| `contas-detalhes` | `AccountDetails.tsx` | `accounts` + `contacts` (account_id) |
+| `leads-importacao` | `LeadsImport.tsx` | `leads_crm` (CSV parse + insert) |
+| `logs-de-auditoria` | `AuditLogs.tsx` | `audit_log` |
+| `seguranca-avancada` | `SecurityAudit.tsx` | `security_audit_log` |
+| `rewards-store` | `RewardsStore.tsx` | `gamification_rewards` |
+| `pontuacao-e-niveis` | `PointsAndLevels.tsx` | `gamification_points` + `gamification_rank_history` |
+| `workflows-lista` | `WorkflowsList.tsx` | `automations` |
+| `sequences-de-vendas` | `SalesSequences.tsx` | `automations` (trigger_type=sequence) |
+| `analytics-dashboard` | `AnalyticsDashboard.tsx` | `leads_crm`/`opportunities`/`campaigns` (agregação + recharts) |
+
+## LOTE 2 sugerido (restante, baixo risco — tabela já existe)
 
 | Rota (id sidebar) | Label | Fonte de dados proposta (`org_id`) | Observação |
 |---|---|---|---|

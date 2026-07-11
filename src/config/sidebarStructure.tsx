@@ -190,7 +190,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'leads-importacao',
             label: 'Importação',
-            status: 'placeholder',
+            status: 'implemented',
           },
         ],
       },
@@ -207,7 +207,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'contatos-detalhes',
             label: 'Detalhes do Contato',
-            status: 'placeholder',
+            status: 'implemented',
           },
         ],
       },
@@ -224,7 +224,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'contas-detalhes',
             label: 'Detalhes da Conta',
-            status: 'placeholder',
+            status: 'implemented',
           },
         ],
       },
@@ -241,7 +241,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'oportunidades-kanban',
             label: 'Kanban',
-            status: 'placeholder',
+            status: 'implemented',
           },
         ],
       },
@@ -306,7 +306,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'campanhas-criar-editar',
             label: 'Criar/Editar',
-            status: 'placeholder',
+            status: 'implemented',
           },
         ],
       },
@@ -483,7 +483,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'analytics-dashboard',
         label: 'Analytics Dashboard',
         icon: <BarChart className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'relatorios-personalizados',
@@ -559,7 +559,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'workflows-lista',
             label: 'Lista de Workflows',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'workflows-builder',
@@ -578,7 +578,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'sequences-de-vendas',
         label: 'Sequences de Vendas',
         icon: <Send className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'ai-insights',
@@ -644,7 +644,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'pontuacao-e-niveis',
         label: 'Pontuação e Níveis',
         icon: <Star className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'nft-gallery',
@@ -668,7 +668,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'rewards-store',
         label: 'Rewards Store',
         icon: <Gift className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'feedback-gamificado',
@@ -992,13 +992,13 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'logs-de-auditoria',
         label: 'Logs de Auditoria',
         icon: <FileSearch className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'seguranca-avancada',
         label: 'Segurança Avançada',
         icon: <Shield className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'onboarding-wizard',
