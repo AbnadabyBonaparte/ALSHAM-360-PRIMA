@@ -325,7 +325,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'email-marketing-dashboard',
             label: 'Dashboard',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'email-marketing-templates',
@@ -381,7 +381,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'redes-sociais-dashboard',
             label: 'Dashboard',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'redes-sociais-agendamento',
@@ -394,7 +394,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'automacao-de-marketing',
         label: 'Automação de Marketing',
         icon: <Zap className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
     ],
   },
@@ -416,12 +416,12 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'tickets-lista',
             label: 'Lista de Tickets',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'tickets-detalhes',
             label: 'Detalhes',
-            status: 'placeholder',
+            status: 'implemented',
           },
         ],
       },
@@ -435,7 +435,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'base-de-conhecimento',
         label: 'Base de Conhecimento',
         icon: <BookOpen className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'feedback-de-clientes',
@@ -638,7 +638,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'metas-e-desafios',
         label: 'Metas e Desafios',
         icon: <TargetIcon className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'pontuacao-e-niveis',
@@ -806,13 +806,13 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'comissoes',
         label: 'Comissões',
         icon: <DollarSign className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'metas-de-equipe',
         label: 'Metas de Equipe',
         icon: <Target className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'treinamentos',
@@ -824,7 +824,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'performance-reviews',
         label: 'Performance Reviews',
         icon: <Star className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
     ],
   },
@@ -944,7 +944,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'configuracoes-gerais',
         label: 'Configurações Gerais',
         icon: <Settings className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'notificacoes',
@@ -1028,7 +1028,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'system-status',
         label: 'System Status',
         icon: <Server className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'api-status',

@@ -854,6 +854,159 @@ export interface Database {
           created_at?: string
         }
       }
+
+      // Support tickets (LOTE 4)
+      support_tickets: {
+        Row: {
+          id: string
+          org_id: string
+          subject: string
+          description: string | null
+          status: string
+          priority: string
+          category: string | null
+          channel: string | null
+          requester_name: string | null
+          requester_email: string | null
+          contact_id: string | null
+          assignee_id: string | null
+          resolved_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          subject: string
+          description?: string | null
+          status?: string
+          priority?: string
+          category?: string | null
+          channel?: string | null
+          requester_name?: string | null
+          requester_email?: string | null
+          contact_id?: string | null
+          assignee_id?: string | null
+          resolved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          subject?: string
+          description?: string | null
+          status?: string
+          priority?: string
+          category?: string | null
+          channel?: string | null
+          requester_name?: string | null
+          requester_email?: string | null
+          contact_id?: string | null
+          assignee_id?: string | null
+          resolved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+
+      // Knowledge base articles (LOTE 4)
+      kb_articles: {
+        Row: {
+          id: string
+          org_id: string
+          title: string
+          slug: string | null
+          category: string | null
+          content: string | null
+          status: string
+          views: number
+          author_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          title: string
+          slug?: string | null
+          category?: string | null
+          content?: string | null
+          status?: string
+          views?: number
+          author_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          title?: string
+          slug?: string | null
+          category?: string | null
+          content?: string | null
+          status?: string
+          views?: number
+          author_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+
+      // Goals (individual challenges + team goals) (LOTE 4)
+      goals: {
+        Row: {
+          id: string
+          org_id: string
+          title: string
+          description: string | null
+          category: string
+          team: string | null
+          owner_id: string | null
+          metric: string | null
+          target_value: number
+          current_value: number
+          unit: string | null
+          status: string
+          due_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          title: string
+          description?: string | null
+          category?: string
+          team?: string | null
+          owner_id?: string | null
+          metric?: string | null
+          target_value?: number
+          current_value?: number
+          unit?: string | null
+          status?: string
+          due_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          title?: string
+          description?: string | null
+          category?: string
+          team?: string | null
+          owner_id?: string | null
+          metric?: string | null
+          target_value?: number
+          current_value?: number
+          unit?: string | null
+          status?: string
+          due_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       // CRM Overview
@@ -976,6 +1129,9 @@ export type GamificationBadge = Tables<'gamification_badges'>
 export type Notification = Tables<'notifications'>
 export type AIPrediction = Tables<'ai_predictions'>
 export type AuditLog = Tables<'audit_log'>
+export type SupportTicket = Tables<'support_tickets'>
+export type KbArticle = Tables<'kb_articles'>
+export type Goal = Tables<'goals'>
 
 // Tipos para inserts/updates
 export type LeadInsert = Database['public']['Tables']['leads_crm']['Insert']

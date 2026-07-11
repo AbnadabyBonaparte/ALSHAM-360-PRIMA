@@ -10,8 +10,8 @@
 
 | | Contagem |
 |---|---|
-| Páginas reais registradas (rota + dados) | **53** (19 originais + 10 do LOTE 1 + 12 do LOTE 2 + 12 do LOTE 3) |
-| Itens de menu ainda `placeholder` (a construir) | ~70 |
+| Páginas reais registradas (rota + dados) | **65** (19 originais + 10 do LOTE 1 + 12 do LOTE 2 + 12 do LOTE 3 + 12 do LOTE 4) |
+| Itens de menu ainda `placeholder` (a construir) | ~58 |
 | Arquivos `createSupremePage` (4 linhas, **não conectados** ao router) | 68 |
 | Migration SQL do schema core | `supabase/migrations/0001_core_schema.sql` |
 
@@ -77,6 +77,27 @@ Todas usam tabelas já existentes (nenhuma migration nova foi necessária).
 | `atividades-tarefas` | `ActivitiesTasks.tsx` | `contacts` (`next_followup`/`last_contact`) |
 | `privacidade-de-dados` | `DataPrivacy.tsx` | `leads_crm` (`consent`/`consent_at`/`canal_captura`) |
 | `data-export-import` | `DataExportImport.tsx` | `leads_crm`/`contacts`/`opportunities`/`accounts` (export CSV) |
+
+## LOTE 4 — concluído neste trabalho (12 páginas reais)
+
+Sete páginas usam tabelas já existentes; cinco usam três novas tabelas mínimas
+(`support_tickets`, `kb_articles`, `goals`) criadas na migration
+`supabase/migrations/0002_lote4_schema.sql` (org_id + RLS por `is_org_member`, tipos em `types.ts`).
+
+| Rota (id sidebar) | Página | Tabela(s) (filtradas por `org_id`) |
+|---|---|---|
+| `tickets-lista` | `TicketsList.tsx` | `support_tickets` (nova) |
+| `tickets-detalhes` | `TicketDetails.tsx` | `support_tickets` (nova, por id) |
+| `base-de-conhecimento` | `KnowledgeBaseList.tsx` | `kb_articles` (nova) |
+| `metas-e-desafios` | `GoalsChallenges.tsx` | `goals` (nova, `category` individual/challenge) |
+| `metas-de-equipe` | `TeamGoals.tsx` | `goals` (nova, `category` team) |
+| `comissoes` | `Commissions.tsx` | `opportunities` (ganhas) + `user_profiles` (comissão por owner) |
+| `email-marketing-dashboard` | `EmailMarketingDashboard.tsx` | `campaigns` (type email) |
+| `redes-sociais-dashboard` | `SocialMediaDashboard.tsx` | `campaigns` (type social) |
+| `automacao-de-marketing` | `MarketingAutomation.tsx` | `automations` (trigger de marketing) |
+| `performance-reviews` | `PerformanceOverview.tsx` | `gamification_points` + `opportunities` + `user_profiles` |
+| `system-status` | `SystemStatus.tsx` | contagens multi-tabela (saúde de dados por módulo) |
+| `configuracoes-gerais` | `GeneralSettings.tsx` | `organizations` (por id) + `user_profiles` |
 
 ## LOTE 2 sugerido (restante, baixo risco — tabela já existe)
 

@@ -571,6 +571,71 @@ function bootstrapRealRoutes() {
     label: 'Data Export/Import',
     aliases: ['export-import', 'exportacao'],
   })
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 🧩 LOTE 4 — Páginas reais de CRM (dados Supabase filtrados por org_id)
+  // Padrão: docs/PAGE-PATTERN.md (hook useOrgData + PageStates)
+  // Novas tabelas: support_tickets, kb_articles, goals (migration 0002)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  registerRoute('tickets-lista', () => import('../pages/TicketsList'), {
+    label: 'Tickets de Suporte',
+    aliases: ['tickets', 'support-tickets'],
+  })
+
+  registerRoute('tickets-detalhes', () => import('../pages/TicketDetails'), {
+    label: 'Detalhes do Ticket',
+    aliases: ['ticket-details', 'ticket-detalhes'],
+  })
+
+  registerRoute('base-de-conhecimento', () => import('../pages/KnowledgeBaseList'), {
+    label: 'Base de Conhecimento',
+    aliases: ['knowledge-base', 'kb'],
+  })
+
+  registerRoute('metas-e-desafios', () => import('../pages/GoalsChallenges'), {
+    label: 'Metas e Desafios',
+    aliases: ['goals-challenges', 'metas-desafios'],
+  })
+
+  registerRoute('metas-de-equipe', () => import('../pages/TeamGoals'), {
+    label: 'Metas de Equipe',
+    aliases: ['team-goals', 'metas-equipe'],
+  })
+
+  registerRoute('comissoes', () => import('../pages/Commissions'), {
+    label: 'Comissões',
+    aliases: ['commissions'],
+  })
+
+  registerRoute('email-marketing-dashboard', () => import('../pages/EmailMarketingDashboard'), {
+    label: 'Email Marketing',
+    aliases: ['email-marketing', 'email-dashboard'],
+  })
+
+  registerRoute('redes-sociais-dashboard', () => import('../pages/SocialMediaDashboard'), {
+    label: 'Redes Sociais',
+    aliases: ['social-media', 'redes-sociais'],
+  })
+
+  registerRoute('automacao-de-marketing', () => import('../pages/MarketingAutomation'), {
+    label: 'Automação de Marketing',
+    aliases: ['marketing-automation'],
+  })
+
+  registerRoute('performance-reviews', () => import('../pages/PerformanceOverview'), {
+    label: 'Performance da Equipe',
+    aliases: ['performance', 'performance-overview'],
+  })
+
+  registerRoute('system-status', () => import('../pages/SystemStatus'), {
+    label: 'System Status',
+    aliases: ['status-do-sistema'],
+  })
+
+  registerRoute('configuracoes-gerais', () => import('../pages/GeneralSettings'), {
+    label: 'Configurações Gerais',
+    aliases: ['general-settings', 'configuracoes'],
+  })
 }
 
 function bootstrapPlaceholderRoutes() {
