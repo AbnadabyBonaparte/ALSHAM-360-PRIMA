@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { signUp } from '@/lib/supabase/auth'
 import { useAuthStore } from '@/lib/supabase/useAuthStore'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export const SignUp: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -10,19 +14,20 @@ export const SignUp: React.FC = () => {
   const [fullName, setFullName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
 
-  const user = useAuthStore(s => s.user)
-  const loading = useAuthStore(s => s.loading)
-  const init = useAuthStore(s => s.init)
+  const user = useAuthStore((s) => s.user)
+  const loading = useAuthStore((s) => s.loading)
+  const init = useAuthStore((s) => s.init)
 
   const navigate = useNavigate()
-  const location = useLocation() as any
+  const location = useLocation() as { state?: { from?: { pathname?: string } } }
 
   useEffect(() => {
     init()
   }, [init])
 
-  // se já está logado, não deixa criar conta de novo
+  // Se já está logado, não deixa criar conta de novo
   useEffect(() => {
     if (!loading && user) {
       const from = location?.state?.from?.pathname
@@ -36,100 +41,121 @@ export const SignUp: React.FC = () => {
     setError(null)
 
     try {
-      await signUp(email, password, { fullName })
-      navigate('/dashboard', { replace: true })
-    } catch (err: any) {
-      setError(err?.message || 'Falha ao criar conta.')
+      const data = await signUp(email, password, { full_name: fullName })
+      // Se a confirmação de email estiver ativa, não há sessão imediata.
+      if (data?.session) {
+        navigate('/dashboard', { replace: true })
+      } else {
+        setSent(true)
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Falha ao criar conta.'
+      setError(message)
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-alsham-primary/5 to-alsham-secondary/5 px-4">
-      <div className="max-w-md w-full bg-[var(--surface)] rounded-xl shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-alsham-text-primary mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
+      <Card className="max-w-md w-full bg-[var(--surface)] border-[var(--border)] shadow-2xl">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl font-bold text-[var(--text-primary)]">
             Criar conta no ALSHAM 360° PRIMA
-          </h1>
-          <p className="text-alsham-text-secondary">
-            Comece sua jornada com o melhor CRM do mercado
-          </p>
-        </div>
+          </CardTitle>
+          <CardDescription className="text-[var(--text-secondary)]">
+            Comece sua jornada com o CRM
+          </CardDescription>
+        </CardHeader>
 
-        {error && (
-          <div className="mb-6 p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/30 rounded-lg">
-            <p className="text-[var(--accent-alert)] text-sm">{error}</p>
-          </div>
-        )}
+        <CardContent>
+          {sent ? (
+            <div className="space-y-4 text-center">
+              <Alert className="bg-[var(--accent-1)]/10 border-[var(--accent-1)]/30 text-[var(--accent-1)]">
+                <AlertDescription>
+                  Conta criada! Verifique seu email para confirmar o cadastro antes de entrar.
+                </AlertDescription>
+              </Alert>
+              <Link to="/login" className="text-[var(--accent-2)] hover:underline font-medium text-sm">
+                Voltar ao login
+              </Link>
+            </div>
+          ) : (
+            <>
+              {error && (
+                <Alert
+                  variant="destructive"
+                  className="mb-6 bg-[var(--accent-alert)]/10 border-[var(--accent-alert)]/30 text-[var(--accent-alert)]"
+                >
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-alsham-text-primary mb-2">
-              Nome completo
-            </label>
-            <input
-              id="fullName"
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full px-4 py-3 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
-              placeholder="Seu nome completo"
-              autoComplete="name"
-            />
-          </div>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="text-[var(--text-primary)]">
+                    Nome completo
+                  </Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="bg-[var(--surface-strong)] border-[var(--border)] text-[var(--text-primary)]"
+                    placeholder="Seu nome completo"
+                    autoComplete="name"
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-alsham-text-primary mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
-              placeholder="seu@email.com"
-              autoComplete="email"
-            />
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-[var(--text-primary)]">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-[var(--surface-strong)] border-[var(--border)] text-[var(--text-primary)]"
+                    placeholder="seu@email.com"
+                    autoComplete="email"
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-alsham-text-primary mb-2">
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
-              placeholder="••••••••"
-              autoComplete="new-password"
-            />
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-[var(--text-primary)]">
+                    Senha
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-[var(--surface-strong)] border-[var(--border)] text-[var(--text-primary)]"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-alsham-primary text-[var(--text)] py-3 px-4 rounded-lg font-medium hover:bg-alsham-primary-hover focus:ring-2 focus:ring-alsham-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            {submitting ? <LoadingSpinner size="sm" /> : 'Criar conta'}
-          </button>
-        </form>
+                <Button type="submit" disabled={submitting} className="w-full">
+                  {submitting ? 'Criando conta...' : 'Criar conta'}
+                </Button>
+              </form>
 
-        <div className="mt-6 text-center">
-          <div className="text-sm text-alsham-text-secondary">
-            Já tem conta?{' '}
-            <Link to="/login" className="text-alsham-primary hover:text-alsham-primary-hover font-medium">
-              Entrar
-            </Link>
-          </div>
-        </div>
-      </div>
+              <div className="mt-6 text-center text-sm text-[var(--text-secondary)]">
+                Já tem conta?{' '}
+                <Link to="/login" className="text-[var(--accent-2)] hover:underline font-medium">
+                  Entrar
+                </Link>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

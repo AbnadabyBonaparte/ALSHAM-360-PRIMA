@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { resetPassword } from '@/lib/supabase/auth'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -16,89 +21,81 @@ export const ForgotPassword: React.FC = () => {
     try {
       await resetPassword(email)
       setSent(true)
-    } catch (err: any) {
-      setError(err?.message || 'Falha ao enviar instruções. Tente novamente.')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Falha ao enviar instruções. Tente novamente.'
+      setError(message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-alsham-primary/5 to-alsham-secondary/5 px-4">
-      <div className="max-w-md w-full bg-[var(--surface)] rounded-xl shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-alsham-text-primary mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
+      <Card className="max-w-md w-full bg-[var(--surface)] border-[var(--border)] shadow-2xl">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl font-bold text-[var(--text-primary)]">
             Esqueceu sua senha?
-          </h1>
-          <p className="text-alsham-text-secondary">
+          </CardTitle>
+          <CardDescription className="text-[var(--text-secondary)]">
             Digite seu email para receber instruções de recuperação
-          </p>
-        </div>
+          </CardDescription>
+        </CardHeader>
 
-        {sent ? (
-          <div className="text-center space-y-4">
-            <div className="p-4 bg-[var(--accent-1)]/10 border border-[var(--accent-1)]/30 rounded-lg">
-              <p className="text-[var(--accent-1)] text-sm">
-                Email enviado! Verifique sua caixa de entrada.
-              </p>
-              <p className="text-[var(--accent-1)]/70 text-xs mt-2">
-                Abra o link do email para definir uma nova senha.
-              </p>
+        <CardContent>
+          {sent ? (
+            <div className="space-y-4 text-center">
+              <Alert className="bg-[var(--accent-1)]/10 border-[var(--accent-1)]/30 text-[var(--accent-1)]">
+                <AlertDescription>
+                  Email enviado! Verifique sua caixa de entrada e abra o link para definir uma nova senha.
+                </AlertDescription>
+              </Alert>
+              <Link to="/login" className="text-[var(--accent-2)] hover:underline font-medium text-sm">
+                Voltar ao login
+              </Link>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <Alert
+                  variant="destructive"
+                  className="bg-[var(--accent-alert)]/10 border-[var(--accent-alert)]/30 text-[var(--accent-alert)]"
+                >
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-            <Link
-              to="/login"
-              className="text-alsham-primary hover:text-alsham-primary-hover font-medium"
-            >
-              Voltar ao login
-            </Link>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-4 bg-[var(--accent-alert)]/10 border border-[var(--accent-alert)]/30 rounded-lg">
-                <p className="text-[var(--accent-alert)] text-sm">{error}</p>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-[var(--text-primary)]">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-[var(--surface-strong)] border-[var(--border)] text-[var(--text-primary)]"
+                  placeholder="seu@email.com"
+                  autoComplete="email"
+                />
               </div>
-            )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-alsham-text-primary mb-2"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-alsham-border-default rounded-lg focus:ring-2 focus:ring-alsham-primary focus:border-transparent"
-                placeholder="seu@email.com"
-                autoComplete="email"
-              />
-            </div>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? 'Enviando...' : 'Enviar instruções'}
+              </Button>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-alsham-primary text-[var(--text)] py-3 px-4 rounded-lg font-medium hover:bg-alsham-primary-hover focus:ring-2 focus:ring-alsham-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Enviando...' : 'Enviar instruções'}
-            </button>
-          </form>
-        )}
-
-        <div className="mt-6 text-center">
-          <Link
-            to="/login"
-            className="text-alsham-primary hover:text-alsham-primary-hover text-sm"
-          >
-            Voltar ao login
-          </Link>
-        </div>
-      </div>
+              <div className="text-center">
+                <Link
+                  to="/login"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm underline underline-offset-4"
+                >
+                  Voltar ao login
+                </Link>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

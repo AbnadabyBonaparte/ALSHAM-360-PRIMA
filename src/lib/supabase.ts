@@ -160,8 +160,12 @@ export function subscribeLeads(callback: (leads: unknown[]) => void) {
   return () => { channel.unsubscribe() }
 }
 
-export async function createLead(lead: Record<string, unknown>) {
-  const { data, error } = await supabase.from('leads_crm').insert(lead).select().single()
+export async function createLead(orgId: string, lead: Record<string, unknown>) {
+  const { data, error } = await supabase
+    .from('leads_crm')
+    .insert({ ...lead, org_id: orgId })
+    .select()
+    .single()
   if (error) throw error
   return data
 }

@@ -1026,9 +1026,6 @@ export type UserGamificationStats = {
   rank_in_org: number
 }
 
-// AI Tables
-export type AIPrediction = Tables<'ai_predictions'>
-
 // AI Predictions
 export interface ai_predictions {
   Row: {

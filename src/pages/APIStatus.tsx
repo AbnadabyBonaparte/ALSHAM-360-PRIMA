@@ -21,11 +21,21 @@ import { useNavigate } from 'react-router-dom'
 // Lazy components (resiliente a default/named export)
 const NeuralGraph = lazy(async () => {
   const m = await import('@/components/visualizations/NeuralGraph')
-  return { default: (m as any).NeuralGraph ?? (m as any).default }
+  return {
+    default: ((m as any).NeuralGraph ?? (m as any).default) as React.ComponentType<{
+      selectedNode: string | null
+      onNodeSelect: React.Dispatch<React.SetStateAction<string | null>>
+    }>,
+  }
 })
 const ReplayDebugger = lazy(async () => {
   const m = await import('@/components/dev/ReplayDebugger')
-  return { default: (m as any).ReplayDebugger ?? (m as any).default }
+  return {
+    default: ((m as any).ReplayDebugger ?? (m as any).default) as React.ComponentType<{
+      isOpen: boolean
+      onClose: () => void
+    }>,
+  }
 })
 
 enum HealthStatus {

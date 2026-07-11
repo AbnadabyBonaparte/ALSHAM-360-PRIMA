@@ -214,7 +214,7 @@ export default function LandingPageBuilder() {
             <Button
               key={type}
               variant="ghost"
-              onClick={() => setBlocks(prev => [...prev, { id: Date.now().toString(), type, content: DEFAULTS[type] }])}
+              onClick={() => setBlocks(prev => [...prev, { id: Date.now().toString(), type, content: DEFAULTS[type] } as Block])}
               className="w-full mb-6 p-6 rounded-2xl bg-[var(--surface)]/40 hover:bg-[var(--accent-1)]/20 border border-[var(--border)] hover:border-[var(--accent-1)] transition-all text-left group h-auto"
             >
               <div className="flex items-center gap-5">
@@ -265,7 +265,7 @@ export default function LandingPageBuilder() {
                     value={value as string}
                     onChange={e => {
                       const newContent = { ...selected.content, [key]: e.target.value };
-                      setBlocks(prev => prev.map(b => b.id === selectedId ? { ...b, content: newContent } : b));
+                      setBlocks(prev => prev.map(b => b.id === selectedId ? { ...b, content: newContent } as Block : b));
                     }}
                     className="w-full mt-3 px-6 py-4 bg-[var(--background)]/50 border border-[var(--border)] rounded-xl text-xl text-[var(--text-primary)] focus:border-[var(--accent-1)] outline-none min-h-[100px]"
                     rows={key === 'headline' || key === 'quote' ? 4 : 3}

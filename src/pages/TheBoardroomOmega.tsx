@@ -24,6 +24,27 @@ import SentimentOrb from '@/components/boardroom/SentimentOrb';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { useTheme } from '@/hooks/useTheme';
 
+// Estados cerimoniais (loading / vazio) e camada decorativa opcional.
+function LoadingCeremony() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--bg)]">
+      <div className="text-[var(--text-secondary)] text-xl animate-pulse">Preparando o ritual...</div>
+    </div>
+  );
+}
+
+function GenesisAwaiting() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--bg)]">
+      <div className="text-[var(--text-secondary)] text-xl">Aguardando a gênese das métricas...</div>
+    </div>
+  );
+}
+
+function HiddenMatrixRain() {
+  return null;
+}
+
 export default function TheBoardroomOmega() {
   const { getThemeColors } = useTheme();
   const themeColors = getThemeColors();
@@ -74,6 +95,7 @@ export default function TheBoardroomOmega() {
   // TRILHA SONORA ADAPTATIVA (Web Audio API)
   useEffect(() => {
     if (soundEnabled && metrics) {
+      const audioContext = new AudioContext();
       const osc = new OscillatorNode(audioContext);
       const gain = new GainNode(audioContext);
       osc.connect(gain).connect(audioContext.destination);

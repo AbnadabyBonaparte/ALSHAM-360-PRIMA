@@ -18,11 +18,15 @@ export function useSupabaseRealtime({ table, event = '*', callback }: UseSupabas
 
     const channel = supabase
       .channel(`public:${table}`)
-      .on('postgres_changes', { event, schema: 'public', table }, (payload) => {
-        if (callback) {
-          callback(payload);
+      .on(
+        'postgres_changes',
+        { event, schema: 'public', table } as { event: '*'; schema: string; table: string },
+        (payload: Record<string, unknown>) => {
+          if (callback) {
+            callback(payload);
+          }
         }
-      })
+      )
       .subscribe();
 
     return () => {

@@ -202,7 +202,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'contatos-lista',
             label: 'Lista de Contatos',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'contatos-detalhes',
@@ -219,7 +219,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'contas-empresas-lista',
             label: 'Lista de Contas',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'contas-detalhes',
@@ -236,7 +236,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'oportunidades-lista',
             label: 'Lista',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'oportunidades-kanban',
@@ -301,7 +301,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
           {
             id: 'campanhas-lista',
             label: 'Lista de Campanhas',
-            status: 'placeholder',
+            status: 'implemented',
           },
           {
             id: 'campanhas-criar-editar',
@@ -584,7 +584,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'ai-insights',
         label: 'AI Insights',
         icon: <Lightbulb className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'ai-assistant',
@@ -620,7 +620,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'leaderboards',
         label: 'Leaderboards',
         icon: <Trophy className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'achievements',
@@ -632,7 +632,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'badges-e-conquistas',
         label: 'Badges e Conquistas',
         icon: <Award className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'metas-e-desafios',
@@ -788,13 +788,13 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'usuarios-lista',
         label: 'Usuários - Lista',
         icon: <UserCheck className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'funcoes-e-permissoes',
         label: 'Funções e Permissões',
         icon: <Shield className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'territorios-e-cotas',
@@ -950,7 +950,7 @@ export const SIDEBAR_STRUCTURE: SidebarCategory[] = [
         id: 'notificacoes',
         label: 'Notificações',
         icon: <BellRing className="h-4 w-4" />,
-        status: 'placeholder',
+        status: 'implemented',
       },
       {
         id: 'email-config',

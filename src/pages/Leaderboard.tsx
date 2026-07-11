@@ -117,7 +117,7 @@ export default function LeaderboardPage() {
                 transition={{ delay: i * 0.2 }}
                 className={`relative ${i === 0 ? 'order-first md:order-2' : i === 1 ? 'order-1 md:order-1' : 'order-3 md:order-3'}`}
               >
-                <div className="div"
+                <div
                   className={`relative bg-gradient-to-br ${i === 0 ? 'from-[var(--accent-warning)]/60 via-orange-600/60 to-[var(--accent-alert)]/60' : i === 1 ? 'from-[var(--surface)]/60 to-[var(--surface)]/60' : 'from-orange-700/60 to-[var(--accent-warning)]/60'} rounded-3xl p-12 border-4 ${i === 0 ? 'border-[var(--accent-warning)] shadow-2xl shadow-[var(--accent-warning)]/50' : 'border-[var(--border)]'} backdrop-blur-xl`}
                 >
                   {/* Coroa para o 1º lugar */}

@@ -5,6 +5,7 @@
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import toast from 'react-hot-toast';
 
 export async function generateRitualReport() {
   // Voz cerimonial — início do rito

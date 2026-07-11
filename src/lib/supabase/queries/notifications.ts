@@ -63,7 +63,7 @@ export const notificationsQueries = {
   },
 
   // Criar nova notificação
-  async create(notification: NotificationInsert) {
+  async create(notification: Omit<NotificationInsert, 'org_id'> & { org_id?: string }) {
     const { data, error } = await supabase
       .from('notifications')
       .insert(notification)
@@ -188,7 +188,7 @@ export const notificationsQueries = {
 
   // Criar notificação de sistema
   async createSystemNotification(userId: string, title: string, message: string, data?: any) {
-    const notification: NotificationInsert = {
+    const notification = {
       user_id: userId,
       type: 'system',
       title,
@@ -201,7 +201,7 @@ export const notificationsQueries = {
 
   // Criar notificação de lead
   async createLeadNotification(userId: string, leadName: string, action: string) {
-    const notification: NotificationInsert = {
+    const notification = {
       user_id: userId,
       type: 'lead',
       title: 'Atualização de Lead',
@@ -214,7 +214,7 @@ export const notificationsQueries = {
 
   // Criar notificação de oportunidade
   async createOpportunityNotification(userId: string, oppTitle: string, action: string) {
-    const notification: NotificationInsert = {
+    const notification = {
       user_id: userId,
       type: 'opportunity',
       title: 'Atualização de Oportunidade',
