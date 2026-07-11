@@ -1,12 +1,21 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './types'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Fall back to a valid placeholder instead of throwing at module load. An unset
+// env var would make createClient throw "supabaseUrl is required" and blank the
+// entire app before it renders. In degraded mode the client constructs fine;
+// Supabase-backed features simply fail their requests until real keys are set.
+const rawUrl = import.meta.env.VITE_SUPABASE_URL
+const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+if (!rawUrl || !rawKey) {
+  console.warn(
+    '[supabase] Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY — running in degraded mode (backend features disabled).'
+  )
 }
+
+const supabaseUrl = rawUrl || 'https://placeholder.supabase.co'
+const supabaseAnonKey = rawKey || 'placeholder-key'
 
 const GLOBAL_KEY = '__ALSHAM_SUPABASE_CLIENT__'
 const STORAGE_KEY = 'alsham-360-prima-auth' // importante: único e consistente

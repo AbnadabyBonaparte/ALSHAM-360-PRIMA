@@ -29,8 +29,22 @@ function parseEnv() {
     const formatted = result.error.issues
       .map((i) => `  - ${i.path.join('.')}: ${i.message}`)
       .join('\n')
-    console.error(`[env] Invalid environment variables:\n${formatted}`)
-    throw new Error(`Invalid environment variables:\n${formatted}`)
+    // Do NOT throw at module load — that blanks the entire app before it renders.
+    // Warn and fall back to valid placeholders so the app boots in a degraded state
+    // (Supabase-backed features stay disabled until real keys are configured).
+    console.warn(
+      `[env] Missing/invalid environment variables — running in degraded mode:\n${formatted}`
+    )
+    return {
+      VITE_SUPABASE_URL: raw.VITE_SUPABASE_URL || 'https://placeholder.supabase.co',
+      VITE_SUPABASE_ANON_KEY: raw.VITE_SUPABASE_ANON_KEY || 'placeholder-key',
+      VITE_SENTRY_DSN: undefined,
+      VITE_GA_MEASUREMENT_ID: raw.VITE_GA_MEASUREMENT_ID,
+      VITE_POSTHOG_KEY: raw.VITE_POSTHOG_KEY,
+      MODE: raw.MODE ?? 'production',
+      DEV: raw.DEV ?? false,
+      PROD: raw.PROD ?? true,
+    }
   }
 
   return result.data
