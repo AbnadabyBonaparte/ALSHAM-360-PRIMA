@@ -1,6 +1,6 @@
-// Catálogo Supremo — 74 páginas finais conectadas ao Supabase
-// Geração programática para evitar repetição e manter identidade única 1000/1000.
-// Tema: Cyber Vivid • Gradientes + Glassmorphism + Animações.
+// Catálogo de módulos em desenvolvimento (stubs).
+// Cada entrada gera uma página que exibe honestamente o estado
+// "Módulo em desenvolvimento" — não são dashboards finalizados.
 
 export interface SupremeConfigItem {
   id: string;
@@ -137,15 +137,14 @@ export const supremeConfigs: Record<string, SupremeConfigItem> = Object.fromEntr
       id,
       {
         id,
-        title: `⚡ ${title}`,
-        subtitle: "Layout único • Tema Cyber Vivid • Dados 100% reais do Supabase",
-        message:
-          "Citizen Supremo X.1: este módulo está vivo, conectado e monitorando cada métrica em tempo real.",
+        title,
+        subtitle: "Módulo em desenvolvimento",
+        message: "Este módulo ainda não foi implementado.",
         gradient,
         tables,
-        emptyTitle: "Estado zero. Pronto para o primeiro evento real.",
+        emptyTitle: "Módulo em desenvolvimento",
         emptyDescription:
-          "Conecte suas integrações ou insira um registro e esta página se ilumina instantaneamente.",
+          "A interface deste módulo está em construção. Nenhuma funcionalidade está ativa no momento.",
       },
     ];
   })

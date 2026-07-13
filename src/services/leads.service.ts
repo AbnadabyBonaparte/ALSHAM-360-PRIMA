@@ -40,8 +40,14 @@ interface SentimentResult {
 }
 
 /**
- * 🧠 LEADS SERVICE - CAMADA DE INTELIGÊNCIA
- * Processa dados do Supabase com IA e cache inteligente
+ * LEADS SERVICE — CAMADA DE SCORING HEURÍSTICO
+ *
+ * ⚠️ HONESTIDADE: os métodos abaixo (predictConversion, analyzeSentiment,
+ * calculateRisk, etc.) NÃO usam IA/ML. São heurísticas determinísticas
+ * (aritmética de regras + palavras-chave) sobre dados do Supabase. Não há
+ * modelo treinado, rede neural nem chamada a serviço externo. Os campos
+ * prefixados `ai_` são mantidos por compatibilidade de schema, mas
+ * representam scores calculados por regras — não por inteligência artificial.
  */
 class LeadsService {
   private cache = new Map();
@@ -76,7 +82,7 @@ class LeadsService {
 
     const leads: ServiceLead[] = result.data.data;
 
-    // 🤖 ENRIQUECER COM IA
+    // Enriquecer com scores heurísticos (não é IA)
     const enriched = await this.enrichWithAI(leads);
 
     // Cache
@@ -89,7 +95,7 @@ class LeadsService {
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🤖 ENRIQUECIMENTO COM IA
+  // ENRIQUECIMENTO POR HEURÍSTICAS (não é IA)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   async enrichWithAI(leads: ServiceLead[]): Promise<ServiceLead[]> {
     const enrichedLeads = await Promise.all(
@@ -111,7 +117,7 @@ class LeadsService {
       return this.aiCache.get(cacheKey);
     }
 
-    // Executar IA em paralelo
+    // Executar heurísticas em paralelo
     const [
       conversionProb,
       nextAction,
@@ -144,7 +150,7 @@ class LeadsService {
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 🎲 PREVISÃO DE CONVERSÃO (ML)
+  // 🎲 PREVISÃO DE CONVERSÃO (heurística de regras — não é ML)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   async predictConversion(lead: ServiceLead) {
     try {

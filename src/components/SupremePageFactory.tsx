@@ -1,18 +1,20 @@
-// ALSHAM 360° PRIMA — Fábrica de Páginas Supremas 1000/1000
-// Gera páginas alienígenas com dados 100% reais do Supabase, sem repetir layout.
-// Citizen Supremo X.1 diz: cada nova página deve ser um portal vivo.
+// ALSHAM 360° PRIMA — Fábrica de Páginas (stub honesto + multi-tenant)
+// Estas páginas são MÓDULOS EM DESENVOLVIMENTO. Não fingem ser dashboards
+// finalizados: exibem um estado claro de "em desenvolvimento" e, quando a
+// organização já tem dados nas tabelas de origem, apenas indicam a contagem
+// real (escopada por tenant) — sem despejar linhas de outros clientes.
+//
+// 🔒 SEGURANÇA (multi-tenant / defense-in-depth):
+// Toda query emitida aqui é filtrada por `.eq('org_id', currentOrgId)`, exceto
+// tabelas explicitamente globais no whitelist ORG_EXEMPT_TABLES. Nunca usar
+// `.select('*')` sem escopo de org — isso vazaria linhas entre tenants caso o
+// RLS falhe. Além disso usamos `head: true` (apenas contagem, zero linhas).
 import LayoutSupremo from "./LayoutSupremo";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/lib/supabase/useAuthStore";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Sparkles,
-  Zap,
-  Globe,
-  Wifi,
-  ShieldCheck,
-  Rocket,
-} from "lucide-react";
+import { Hammer, Database, ShieldCheck, Clock } from "lucide-react";
 
 export interface SupremeConfig {
   id: string;
@@ -25,311 +27,180 @@ export interface SupremeConfig {
   emptyDescription?: string;
 }
 
-interface QueryResult {
+interface TableStatus {
   table: string;
   count: number;
-  rows: Record<string, any>[];
-  totalValue: number;
   error?: string;
 }
 
-const formatNumber = (value: number) =>
-  value.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+// 🔓 Tabelas globais que NÃO possuem coluna org_id.
+// Qualquer tabela fora deste conjunto é obrigatoriamente filtrada por org_id.
+// Mantenha este whitelist mínimo e explícito.
+const ORG_EXEMPT_TABLES = new Set<string>([
+  "organizations",
+  "system_manifests",
+  "system_health",
+]);
 
-const formatCurrency = (value: number) =>
-  value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 0,
-  });
+const formatNumber = (value: number) =>
+  value.toLocaleString("pt-BR", { maximumFractionDigits: 0 });
 
 export function createSupremePage(config: SupremeConfig) {
   return function SupremeGeneratedPage() {
+    const orgId = useAuthStore((s) => s.currentOrgId);
     const [loading, setLoading] = useState(true);
-    const [results, setResults] = useState<QueryResult[]>([]);
-    const [fatalError, setFatalError] = useState<string | null>(null);
+    const [statuses, setStatuses] = useState<TableStatus[]>([]);
 
     useEffect(() => {
       let active = true;
-      async function fetchData() {
+
+      async function fetchCounts() {
+        // Sem organização selecionada não emitimos nenhuma query de dados.
+        if (!orgId) {
+          if (active) {
+            setStatuses([]);
+            setLoading(false);
+          }
+          return;
+        }
+
         try {
           setLoading(true);
-          setFatalError(null);
           const responses = await Promise.all(
-            config.tables.map(async (table) => {
-              const query = supabase
+            config.tables.map(async (table): Promise<TableStatus> => {
+              // 🔒 Apenas contagem (head: true) — nenhuma linha é retornada.
+              let query = supabase
                 .from(table)
-                .select("*", { count: "exact" })
-                .order("id", { ascending: false })
-                .limit(12);
-              const { data, error, count } = await query;
+                .select("id", { count: "exact", head: true });
 
-              const rows = data || [];
-              const totalValue = rows.reduce((sum, row) => {
-                const numericCandidate =
-                  row.value ??
-                  row.amount ??
-                  row.valor ??
-                  row.total ??
-                  row.score ??
-                  row.metric ??
-                  0;
-                return sum + (typeof numericCandidate === "number" ? numericCandidate : 0);
-              }, 0);
+              // 🔒 Escopo de tenant obrigatório, salvo tabelas globais.
+              if (!ORG_EXEMPT_TABLES.has(table)) {
+                query = query.eq("org_id", orgId);
+              }
 
+              const { count, error } = await query;
               return {
                 table,
-                rows,
-                count: count ?? rows.length,
-                totalValue,
+                count: count ?? 0,
                 error: error?.message,
               };
             })
           );
           if (!active) return;
-          setResults(responses);
-        } catch (err: any) {
-          if (!active) return;
-          setFatalError(err?.message || "Falha desconhecida ao consultar o Supabase.");
+          setStatuses(responses);
+        } catch {
+          if (active) setStatuses([]);
         } finally {
           if (active) setLoading(false);
         }
       }
-      fetchData();
+
+      fetchCounts();
       return () => {
         active = false;
       };
-    }, [config.id]);
+    }, [config.id, orgId]);
 
     const totalRecords = useMemo(
-      () => results.reduce((sum, r) => sum + (r.count || 0), 0),
-      [results]
+      () => statuses.reduce((sum, s) => sum + (s.count || 0), 0),
+      [statuses]
     );
-
-    const anyError = useMemo(
-      () => results.find((r) => r.error)?.error ?? fatalError,
-      [results, fatalError]
-    );
-
-    const emptyState =
-      !loading && totalRecords === 0 && !anyError;
 
     return (
       <LayoutSupremo title={config.title}>
         <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-          {/* HERO SUPREMO */}
+          {/* HERO — honesto: módulo em desenvolvimento */}
           <div
             className={`relative overflow-hidden border-b border-[var(--border)] bg-gradient-to-br ${config.gradient} backdrop-blur-3xl`}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_45%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_rgba(16,185,129,0.15),_transparent_35%)]" />
-            <div className="relative px-8 py-14 max-w-7xl mx-auto flex flex-col gap-8">
-              <div className="flex flex-wrap items-start gap-6">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.10),_transparent_45%)]" />
+            <div className="relative px-8 py-14 max-w-5xl mx-auto flex flex-col gap-6">
+              <div className="flex flex-wrap items-center gap-4">
                 <div className="p-4 rounded-2xl bg-[var(--surface)]/10 border border-[var(--border)] backdrop-blur-xl">
-                  <Sparkles className="w-12 h-12 text-[var(--accent-warning)] animate-pulse" />
+                  <Hammer className="w-10 h-10 text-[var(--accent-warning)]" />
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 min-w-[240px] space-y-3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-warning)]/15 border border-[var(--accent-warning)]/40 text-[var(--accent-warning)] text-xs font-semibold uppercase tracking-[0.2em]">
+                    <Clock className="w-3.5 h-3.5" />
+                    Módulo em desenvolvimento
+                  </div>
                   <motion.h1
-                    initial={{ opacity: 0, y: -12 }}
+                    initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-5xl md:text-6xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-emerald)] via-[var(--accent-sky)] to-[var(--accent-purple)]"
+                    className="text-4xl md:text-5xl font-black tracking-tight text-[var(--text)]"
                   >
                     {config.title}
                   </motion.h1>
-                  <p className="text-xl text-[var(--text)]/70 max-w-4xl leading-relaxed">
-                    {config.subtitle}
+                  <p className="text-lg text-[var(--text)]/70 max-w-3xl leading-relaxed">
+                    Este módulo ainda não foi implementado. A interface final
+                    está em construção — nenhuma funcionalidade deste módulo está
+                    ativa no momento.
                   </p>
-                  <p className="text-lg text-[var(--accent-emerald)] font-semibold">
-                    {config.message}
-                  </p>
-                </div>
-                <div className="flex flex-col items-end gap-3">
-                  <div className="px-4 py-2 rounded-full bg-[var(--bg)]/40 border border-[var(--border)] text-sm text-[var(--text)]/70">
-                    Citizen Supremo X.1 • online
-                  </div>
-                  <div className="flex gap-2">
-                    <Zap className="w-10 h-10 text-[var(--accent-warning)]" />
-                    <Globe className="w-10 h-10 text-[var(--accent-sky)]" />
-                    <Wifi className="w-10 h-10 text-[var(--accent-emerald)]" />
-                    <ShieldCheck className="w-10 h-10 text-[var(--accent-purple)]" />
-                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* METRICAS */}
-          <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <MetricCard
-                title="Registros vivos"
-                value={formatNumber(totalRecords)}
-                helper="100% Supabase real time"
-                gradient="from-[var(--accent-emerald)]/80 via-[var(--accent-sky)]/80 to-[var(--accent-sky)]/80"
-              />
-              <MetricCard
-                title="Tabelas conectadas"
-                value={results.length || config.tables.length}
-                helper={config.tables.join(" • ")}
-                gradient="from-[var(--accent-purple)]/80 via-[var(--accent-purple)]/80 to-[var(--accent-purple)]/80"
-              />
-              <MetricCard
-                title="Valor agregado"
-                value={formatCurrency(
-                  results.reduce((sum, r) => sum + (r.totalValue || 0), 0)
-                )}
-                helper="Soma de métricas numéricas encontradas"
-                gradient="from-[var(--accent-warning)]/80 via-[var(--accent-warning)]/80 to-[var(--accent-alert)]/80"
-              />
-              <MetricCard
-                title="Status"
-                value={loading ? "Carregando..." : anyError ? "Verificar" : "Operando"}
-                helper={anyError ? "Algumas tabelas retornaram erro" : "Fluxo contínuo"}
-                gradient="from-[var(--surface-strong)]/80 via-[var(--surface-strong)]/80 to-[var(--bg)]/80"
-              />
-            </div>
-
-            {/* EMPTY STATE */}
-            {emptyState && (
-              <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)]/5 backdrop-blur-2xl px-8 py-16 text-center">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(76,29,149,0.35),_transparent_45%)]" />
-                <div className="relative space-y-6">
-                  <Rocket className="w-20 h-20 text-[var(--accent-sky)] mx-auto animate-bounce" />
-                  <h2 className="text-4xl font-black text-[var(--text)]">
-                    {config.emptyTitle || "Nenhum dado encontrado (por enquanto)"}
-                  </h2>
-                  <p className="text-xl text-[var(--text)]/70 max-w-3xl mx-auto">
-                    {config.emptyDescription ||
-                      "Conecte a fonte no Supabase e esta página vai acender em tempo real. O próximo evento enviado já aparecerá aqui."}
-                  </p>
-                  <p className="text-2xl text-[var(--accent-emerald)] font-semibold">
-                    — Citizen Supremo X.1
-                  </p>
-                </div>
+          {/* CORPO — estado honesto */}
+          <div className="max-w-5xl mx-auto px-6 py-12 space-y-8">
+            <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)]/5 backdrop-blur-2xl p-8 space-y-4">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-6 h-6 text-[var(--accent-emerald)]" />
+                <h2 className="text-2xl font-bold text-[var(--text)]">
+                  Em construção
+                </h2>
               </div>
-            )}
-
-            {/* LISTAS DE DADOS */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {results.map((block, idx) => (
-                <motion.div
-                  key={block.table}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.04 }}
-                  className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface)]/5 via-[var(--bg)]/40 to-[var(--bg)]/70 backdrop-blur-2xl p-6 space-y-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.2em] text-[var(--text)]/50">
-                        Tabela real
-                      </p>
-                      <h3 className="text-3xl font-bold text-[var(--text)]">{block.table}</h3>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-4xl font-black text-[var(--accent-emerald)]">
-                        {formatNumber(block.count)}
-                      </p>
-                      <p className="text-sm text-[var(--text)]/60">registros</p>
-                    </div>
-                  </div>
-
-                  {block.error && (
-                    <div className="rounded-2xl border border-[var(--accent-alert)]/40 bg-[var(--accent-alert)]/10 text-[var(--accent-alert)] px-4 py-3 text-sm">
-                      Falha ao consultar: {block.error}
-                    </div>
-                  )}
-
-                  {!block.error && block.rows.length === 0 && (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/5 px-4 py-6 text-center text-[var(--text)]/70">
-                      Sem registros retornados ainda.
-                    </div>
-                  )}
-
-                  {!block.error && block.rows.length > 0 && (
-                    <div className="space-y-3">
-                      {block.rows.slice(0, 4).map((row, i) => {
-                        const entries = Object.entries(row).slice(0, 4);
-                        return (
-                          <div
-                            key={`${block.table}-${i}`}
-                            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/5 px-4 py-3"
-                          >
-                            <div className="flex items-center justify-between text-sm text-[var(--text)]/70">
-                              <span className="font-semibold text-[var(--text)]">
-                                #{row.id ?? i + 1}
-                              </span>
-                              {row.updated_at && (
-                                <span className="text-xs text-[var(--accent-emerald)]">
-                                  {new Date(row.updated_at).toLocaleString("pt-BR")}
-                                </span>
-                              )}
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 mt-2 text-xs text-[var(--text)]/70">
-                              {entries.map(([key, value]) => (
-                                <div
-                                  key={key}
-                                  className="rounded-xl bg-[var(--bg)]/40 border border-[var(--border)] px-3 py-2"
-                                >
-                                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text)]/40">
-                                    {key}
-                                  </p>
-                                  <p className="truncate text-[var(--text)]">
-                                    {typeof value === "number"
-                                      ? formatNumber(value)
-                                      : String(value)}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-
-            {/* MENSAGEM DO SUPREMO */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="rounded-3xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 backdrop-blur-2xl px-6 py-10 text-center space-y-4"
-            >
-              <p className="text-3xl md:text-4xl font-light text-[var(--accent-emerald)] leading-relaxed">
-                O ALSHAM não é mais um. É o único.
-                <br />
-                Cada tabela viva no Supabase alimenta este império em tempo real.
+              <p className="text-[var(--text)]/70 leading-relaxed">
+                Estamos desenvolvendo este módulo. Enquanto isso, ele não exibe
+                dados operacionais nem executa ações. Assim que estiver pronto,
+                aparecerá aqui com a experiência completa — sempre isolado por
+                organização.
               </p>
-              <p className="text-xl text-[var(--text)]/70">— Citizen Supremo X.1</p>
-            </motion.div>
+
+              {/* Indicador de prontidão dos dados — contagens reais, escopadas por tenant */}
+              {!orgId ? (
+                <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)]/40 px-4 py-4 text-sm text-[var(--text)]/60">
+                  Selecione uma organização para ver a prontidão dos dados.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-[var(--text)]/60">
+                    <Database className="w-4 h-4" />
+                    Prontidão dos dados na sua organização
+                    {!loading && (
+                      <span className="text-[var(--text)]/40">
+                        • {formatNumber(totalRecords)} registro(s)
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {config.tables.map((table) => {
+                      const status = statuses.find((s) => s.table === table);
+                      return (
+                        <div
+                          key={table}
+                          className="rounded-2xl border border-[var(--border)] bg-[var(--bg)]/40 px-4 py-3"
+                        >
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text)]/40 truncate">
+                            {table}
+                          </p>
+                          <p className="text-lg font-bold text-[var(--text)] mt-1">
+                            {loading
+                              ? "…"
+                              : status?.error
+                              ? "—"
+                              : formatNumber(status?.count ?? 0)}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </LayoutSupremo>
     );
   };
-}
-
-function MetricCard({
-  title,
-  value,
-  helper,
-  gradient,
-}: {
-  title: string;
-  value: string | number;
-  helper: string;
-  gradient: string;
-}) {
-  return (
-    <div
-      className={`rounded-3xl border border-[var(--border)] bg-gradient-to-br ${gradient} p-6 shadow-2xl shadow-[var(--bg)]/40 backdrop-blur-xl`}
-    >
-      <p className="text-sm uppercase tracking-[0.3em] text-[var(--text)]/60">{title}</p>
-      <p className="text-4xl font-black text-[var(--text)] mt-3">{value}</p>
-      <p className="text-sm text-[var(--text)]/70 mt-2">{helper}</p>
-    </div>
-  );
 }
